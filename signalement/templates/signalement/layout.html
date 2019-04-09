@@ -19,7 +19,7 @@
             <div class="ui container">
                 <a href="{% url 'index' %}" class="header item">
                     <img id="menu-logo" class="logo" src="{% static 'signalement/img/logo.png' %}">
-                    Collab
+                    Collab{% if project %}&nbsp;- {{project.title}}{% endif %}
                 </a>
                 <div class="right menu">
                     <a href="{% url 'help' %}" class="item">Aide</a>
