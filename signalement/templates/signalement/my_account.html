@@ -1,0 +1,345 @@
+{% extends "signalement/layout.html" %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+<div class="ui top aligned stackable grid container">
+    <div class="top aligned row">
+        <div class="four wide column">
+            <div class="ui secondary vertical pointing menu">
+                <a class="active item">
+                    Mon profil
+                </a>
+                <a class="item">
+                    Mes projets
+                </a>
+                <a class="item">
+                    Notifications reçues
+                </a>
+                <a class="item">
+                    Mes signalements
+                </a>
+                <a class="item">
+                    Mes commentaires
+                </a>
+            </div>
+        </div>
+
+        <div class="twelve wide column">
+            <h4 id="profil_utilisateur" class="ui horizontal divider header">
+                <i class="user icon"></i>
+                Mon profil
+            </h4>
+            <table class="ui definition table">
+                <tbody>
+                    <tr>
+                        <td class="five wide column">Nom d'utilisateur</td>
+                        <td>current_user.login</td>
+                    </tr>
+                    <tr>
+                        <td>Nom complet</td>
+                        <td>current_user.name</td>
+                    </tr>
+                    <tr>
+                        <td>Adresse e-mail</td>
+                        <td>current_user.email</td>
+                    </tr>
+                    <tr>
+                        <td>Administrateur&nbsp;?</td>
+                        <td>Non</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!--div class="ui grid">
+                <div class="right floated right aligned four wide column">
+                    <div class="ui primary button"><i class="icon edit"></i>Modifier</div>
+                </div>
+            </div-->
+            <!--h4 class="ui horizontal divider header">
+                <i class="power off icon"></i>
+                Delete your account
+            </h4>
+            <div class="ui grid">
+                <div class="left floated twelve wide column">
+                    <p>Clicking this button will launch the process for your account deletion.
+                        <br>An e-mail asking for confirmation will be sent to you.</p>
+                </div>
+                <div class="right floated right aligned four wide column">
+                    <div class="ui negative button"><i class="power off icon"></i>Delete my account</div>
+                </div>
+            </div-->
+
+
+            <h4 id="mes_projets" class="ui horizontal divider header">
+                <i class="users icon"></i>
+                Mes projets
+            </h4>
+            <div class="ui divided items">
+                <div class="item">
+                    <div class="ui tiny image">
+                        <img src="https://www.rapid-sign.com/ori-numeros-de-maison-noir-13cm-74.jpg">
+                    </div>
+                    <div class="middle aligned content">
+                        <a class="header" href="{% url 'project' project_slug='adresses' %}">Adresses</a>
+                        <div class="description">
+                            <p>Ce projet a pour objectif d'identifier les erreurs ou absences dans les bases d'adresse
+                                de référence. Les signalements recueillis concernent aussi bien les erreurs de
+                                localisation, de numérotation et de dénomination.</p>
+                        </div>
+                        <div class="meta">
+                            <span class="right floated">Projet non modéré</span>
+                            <span>Mon niveau d'autorisation&nbsp;: Contributeur</span>
+                        </div>
+                        <div class="meta">
+                            <span class="right floated" data-tooltip="Projet créé le 12/03/2014">
+                                <i class="calendar icon"></i>&nbsp;12/03/2014
+                            </span>
+                            <span data-tooltip="35 personnes ont contribué à ce projet">
+                                35&nbsp;<i class="user icon"></i>
+                            </span>
+                            <span data-tooltip="152 signalements ont été créés pour ce projet">
+                                &nbsp;152&nbsp;<i class="map marker icon"></i>
+                            </span>
+                            <span data-tooltip="223 commentaires ont été créés pour ce projet">
+                                &nbsp;223&nbsp;<i class="comment icon"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="ui tiny image">
+                        <img src="https://www.geopicardie.fr/geoserver/geopicardie/ows?SERVICE=WMS&LAYERS=picardie_ortho_ign_2013_vis&TRANSPARENT=true&VERSION=1.3.0&FORMAT=image%2Fpng&EXCEPTIONS=XML&REQUEST=GetMap&STYLES=&SLD_VERSION=1.1.0&CRS=EPSG%3A3857&BBOX=276314.73430822,6307626.8969942,276950.11710584,6308262.2797919&WIDTH=532&HEIGHT=532">
+                    </div>
+                    <div class="middle aligned content">
+                        <a class="header" href="{% url 'project' project_slug='ortho-2018' %}">Ortho 2018</a>
+                        <div class="description">
+                            <p>Ce projet a pour objectif d'identifier les non-conformités de l'ortho 2018 par rapport à
+                                ses spécifications : précision planimétrique, radiométrie, colorimétrie...</p>
+                        </div>
+                        <div class="meta">
+                            <span class="right floated">Projet non modéré</span>
+                            <span>Mon niveau d'autorisation&nbsp;: Administrateur</span>
+                        </div>
+                        <div class="meta">
+                            <span class="right floated" data-tooltip="Projet créé le 23/09/2018">
+                                <i class="calendar icon"></i>&nbsp;23/09/2018
+                            </span>
+                            <span data-tooltip="5 personnes ont contribué à ce projet">
+                                5&nbsp;<i class="user icon"></i>
+                            </span>
+                            <span data-tooltip="28 signalements ont été créés pour ce projet">
+                                &nbsp;28&nbsp;<i class="map marker icon"></i>
+                            </span>
+                            <span data-tooltip="41 commentaires ont été créés pour ce projet">
+                                &nbsp;41&nbsp;<i class="comment icon"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="ui tiny image">
+                        <img src="https://www.geopicardie.fr/geoserver/geopicardie/ows?SERVICE=WMS&LAYERS=mos_picardie&EXCEPTIONS=XML&FORMAT=image%2Fpng&TRANSPARENT=TRUE&VERSION=1.3.0&SLD_VERSION=1.1.0&REQUEST=GetMap&STYLES=&CRS=EPSG%3A3857&BBOX=284696.53219112,6305613.2590304,294862.65695304,6315779.3837923&WIDTH=532&HEIGHT=532">
+                    </div>
+                    <div class="middle aligned content">
+                        <a class="header" href="{% url 'project' project_slug='occupation-du-sol' %}">Occupation du sol 2D</a>
+                        <div class="description">
+                            <p>Ce projet a pour objectif d'identifier les anomalies présentes dans la base de
+                                l'occupation du sol 2D issues d'erreur flagrantes de photo-interprétation.</p>
+                        </div>
+                        <div class="meta">
+                            <span class="right floated">Projet non modéré</span>
+                            <span>Mon niveau d'autorisation&nbsp;: Utilisateur connecté</span>
+                        </div>
+                        <div class="meta">
+                            <span class="right floated" data-tooltip="Projet créé le 04/05/2018">
+                                <i class="calendar icon"></i>&nbsp;04/05/2018
+                            </span>
+                            <span data-tooltip="12 personnes ont contribué à ce projet">
+                                12&nbsp;<i class="user icon"></i>
+                            </span>
+                            <span data-tooltip="41 signalements ont été créés pour ce projet">
+                                &nbsp;41&nbsp;<i class="map marker icon"></i>
+                            </span>
+                            <span data-tooltip="109 commentaires ont été créés pour ce projet">
+                                &nbsp;109&nbsp;<i class="comment icon"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="ui tiny image">
+                        <img src="https://image.freepik.com/photos-gratuite/closeup-mains-separer-bouteilles-plastique_53876-46918.jpg">
+                    </div>
+                    <div class="middle aligned content">
+                        <a class="header" href="{% url 'project' project_slug='decheteries' %}">Déchèteries</a>
+                        <div class="description">
+                            <p>Ce projet a pour objectif de localiser les déchèteries en Région Hauts-de-France.</p>
+                        </div>
+                        <div class="meta">
+                            <span class="right floated">Projet modéré</span>
+                            <span>Mon niveau d'autorisation&nbsp;: Modérateur</span>
+                        </div>
+                        <div class="meta">
+                            <span class="right floated" data-tooltip="Projet créé le 04/05/2018">
+                                <i class="calendar icon"></i>&nbsp;04/05/2018
+                            </span>
+                            <span data-tooltip="12 personnes ont contribué à ce projet">
+                                20&nbsp;<i class="user icon"></i>
+                            </span>
+                            <span data-tooltip="41 signalements ont été créés pour ce projet">
+                                &nbsp;131&nbsp;<i class="map marker icon"></i>
+                            </span>
+                            <span data-tooltip="109 commentaires ont été créés pour ce projet">
+                                &nbsp;12&nbsp;<i class="comment icon"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h4 id="dernieres_notifications" class="ui horizontal divider header">
+                <i class="bullhorn icon"></i>
+                Dernières notifications reçues
+            </h4>
+            <div class="ui list">
+                <div class="item">
+                    <i class="map marker icon"></i>
+                    <div class="content">
+                        <a class="header">
+                            12/03/2019 - 12:08 - Projet - Auteur [Signalement en attente de publication]</a>
+                        <div class="description">Titre du signalement</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="map marker icon"></i>
+                    <div class="content">
+                        <a class="header">
+                            12/03/2019 - 12:05 - Projet - Auteur [Signalement publié]</a>
+                        <div class="description">Titre du signalement</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="comment icon"></i>
+                    <div class="content">
+                        <a class="header">
+                            10/03/2019 - 9:25 - Projet - Auteur [Commentaire ajouté]</a>
+                        <div class="description">Titre du signalement</div>
+                        <div class="description">Début du texte du commentaire</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="map marker icon"></i>
+                    <div class="content">
+                        <a class="header">
+                            11/03/2019 - 11:52 - Projet - Auteur [Signalement modifié]</a>
+                        <div class="description">Modification de localisation</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="user icon"></i>
+                    <div class="content">
+                        <a class="header">
+                            09/03/2019 - 17:25 - Projet - Auteur [Demande de droits]</a>
+                        <div class="description">Niveau de droit demandé&nbsp;: Collaborateur</div>
+                    </div>
+                </div>
+            </div>
+
+            <h4 id="mes_derniers_signalements" class="ui horizontal divider header">
+                <i class="map marker alternate icon"></i>
+                Mes derniers signalements
+            </h4>
+            <div class="ui list">
+                <div class="item">
+                    <i class="map marker icon"></i>
+                    <div class="content">
+                        <a class="header">Projet - Titre du signalement</a>
+                        <div class="description">Début de la description</div>
+                        <div class="description">Date de dernière modification&nbsp;: 12/03/2019 - 13:18 [Création]</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="map marker icon"></i>
+                    <div class="content">
+                        <a class="header">Projet - Titre du signalement</a>
+                        <div class="description">Début de la description</div>
+                        <div class="description">Date de dernière modification&nbsp;: 12/03/2019 - 12:05 [Changement de statut]</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="map marker  icon"></i>
+                    <div class="content">
+                        <a class="header">Projet - Titre du signalement</a>
+                        <div class="description">Début de la description</div>
+                        <div class="description">Date de dernière modification&nbsp;: 10/03/2019 - 9:25 [Modification de la localisation]</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="map marker icon"></i>
+                    <div class="content">
+                        <a class="header">Projet - Titre du signalement</a>
+                        <div class="description">Début de la description</div>
+                        <div class="description">Date de dernière modification&nbsp;: 11/03/2019 - 11:52 [Modification d'un attribut]</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="map marker  icon"></i>
+                    <div class="content">
+                        <a class="header">Projet - Titre du signalement</a>
+                        <div class="description">Début de la description</div>
+                        <div class="description">Date de dernière modification&nbsp;: 09/03/2019 - 17:25 [Supression]</div>
+                    </div>
+                </div>
+            </div>
+
+            <h4 id="mes_derniers_commentaires" class="ui horizontal divider header">
+                <i class="comments icon"></i>
+                Mes derniers commentaires
+            </h4>
+            <div class="ui list">
+                <div class="item">
+                    <i class="comment icon"></i>
+                    <div class="content">
+                        <a class="header">Projet - Titre du signalement</a>
+                        <div class="description">Début du commentaire</div>
+                        <div class="description">Date du commentaire&nbsp;: 12/03/2019 - 13:18</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="comment icon"></i>
+                    <div class="content">
+                        <a class="header">Projet - Titre du signalement</a>
+                        <div class="description">Début du commentaire</div>
+                        <div class="description">Date du commentaire&nbsp;: 12/03/2019 - 12:05</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="comment icon"></i>
+                    <div class="content">
+                        <a class="header">Projet - Titre du signalement</a>
+                        <div class="description">Début du commentaire</div>
+                        <div class="description">Date du commentaire&nbsp;: 10/03/2019 - 9:25</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="comment icon"></i>
+                    <div class="content">
+                        <a class="header">Projet - Titre du signalement</a>
+                        <div class="description">Début du commentaire</div>
+                        <div class="description">Date du commentaire&nbsp;: 11/03/2019 - 11:52</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="comment icon"></i>
+                    <div class="content">
+                        <a class="header">Projet - Titre du signalement</a>
+                        <div class="description">Début du commentaire</div>
+                        <div class="description">Date du commentaire&nbsp;: 09/03/2019 - 17:25</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

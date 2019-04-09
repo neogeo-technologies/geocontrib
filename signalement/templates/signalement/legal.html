@@ -1,0 +1,93 @@
+{% extends "signalement/layout.html" %}
+{% load static %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+<div class="ui top aligned stackable grid container">
+    <div class="top aligned row">
+        <div class="four wide column">
+            <div class="ui secondary vertical pointing menu">
+                <a class="active item">
+                    Hébergement et réalisation
+                </a>
+                <a class="item">
+                    Données personnelles
+                </a>
+                <a class="item">
+                    Contenu du site
+                </a>
+                <a class="item">
+                    Litige
+                </a>
+            </div>
+        </div>
+
+        <div class="ten wide column">
+
+            <h2 id="hebergement_et_realisation" class="style-editeur">Hébergement et réalisation</h2>
+            <h3 class="style-editeur">Conception et développement</h3>
+            <p>La conception et le développement de cet outil est assurée par Neogeo Technologies.</p>
+            <p><a href="http://www.neogeo.fr/">Neogeo Technologies</a><br>
+                B.L. 31<br>
+                18 Rue de Bayard<br>
+                31000 Toulouse<br>
+                Téléphone : 05 32 10 83 49<br>
+                contact[–arobase–]neogeo.fr</p>
+
+            <p>Le code source de cet outil est disponible sur <a
+                    href="https://www.github.com/neogeo-technologies/datalab">Github</a>.
+            </p>
+            <p>L'hébergement est assuré par la société <a href="http://www.ovh.com/fr/">OVH</a>.</p>
+            <p>L'administration de l'outil est assurée par la Région Hauts-de-France et les membres de Géo2France.</p>
+
+
+            <h2 id="donnees_personnelles" class="style-editeur">Collecte des données personnelles et CNIL</h2>
+            <h3 class="style-editeur">Collecte d’informations à caractère personnel</h3>
+            <p>Cette application recueille uniquement les informations nécessaire à sa mise en œuvre&nbsp;:</p>
+            <ul>
+                <li>Identification des utilisateurs disposant d'un compte nominatif&nbsp;: nom et adresse email&nbsp;;
+                </li>
+                <li>Modifications réalisées par les utilisateurs sur les bases de données collaboratives afin d'assurer
+                    un suivi des modifications sous la forme de fils de discussion, de mettre en place des mécanismes
+                    de notification et de modération des contenus.
+                </li>
+            </ul>
+            <p>Les informations à caractère personnel ne sont accessibles qu'aux utilisateurs connectés pour les besoins
+                des fonctions collaboratives et aux administrateurs pour les besoins d'administration de l'outil. Ces
+                informations sont anonymisés lorsqu'elles sont présentées aux utilisateurs ne disposant pas de compte
+                nominatif. Lorsqu'un utilisateur supprime son compte, les informations qui se rapportent à lui sont
+                anomynisées de manière définitive.</p>
+
+            <h3 class="style-editeur">CNIL</h3>
+            <p>À rédiger.</p>
+
+
+            <h2 id="contenu" class="style-editeur">Contenu du site</h2>
+            <h3 class="style-editeur">Responsabilité</h3>
+            <p>La Région Hauts-de-France n’est tenu qu'à une simple obligation de moyens concernant les informations
+                éditoriales et les données qu'elle met à disposition des personnes qui accèdent à cet outil.
+                Elle ne peut garantir l'exactitude, la précision, la mise à jour ou l'exhaustivité de ces
+                contenus ni être tenue pour responsable des résultats qui pourraient être obtenus par leur usage.</p>
+            <p>Les utilisateurs de cet outil sont tenus de ne pas l’utiliser par des moyens ou à des fins illicites ou
+                interdits par les lois.</p>
+
+            <h3 class="style-editeur">Propriété et droits d’auteur</h3>
+            <p>À rédiger.</p>
+
+            <h3 class="style-editeur">Droits d’usage des ressources géographiques du portail</h3>
+            <p>Les données produites par le présent outil peuvent être soumises à des conditions
+                d’accès et d’utilisation particulières. Il est de la responsabilité de ses utilisateurs de s’assurer que
+                l’usage qu’ils en font respecte les conditions d’accès et d’utilisation propres à chacune d’elles,
+                y compris lorsqu’elles sont exploitées ensuite en dehors du cadre strict de cet outil.</p>
+
+
+            <h2 id="loi_applicable" class="style-editeur">Litige</h2>
+            <p>En cas de litige découlant de l’utilisation du site, les seuls tribunaux compétents sont le Tribunal de
+                Grande Instance dont dépend la Région Hauts-de-France et le Tribunal Administratif dont dépend la Région
+                Hauts-de-France.</p>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
