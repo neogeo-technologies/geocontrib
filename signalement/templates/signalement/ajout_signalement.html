@@ -1,0 +1,43 @@
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <!-- jQuery Core 3.3.1 -->
+  <script src="{% static "signalement/resources/jquery-3.3.1/jquery-3.3.1.min.js"%}"></script>
+  <!-- Semantic UI -->
+  <link rel="stylesheet" href="{% static "signalement/resources/semantic-ui-2.3.1/semantic.min.css"%}"/>
+  <script src="{% static "signalement/resources/semantic-ui-2.3.1/semantic.min.js"%}"></script>
+</head>
+
+<form method="POST" style='margin-left:10px;margin-top:10px'>
+  {% csrf_token %}
+    <div class="ui input">
+       <input type="text" placeholder="Type de signalement" name="sig_type">
+     </div>
+     <div id="dynamicInput">
+         <div class="ui input">
+            <input type="text" placeholder="Nom du champ" name="nom">
+          </div>
+          <div class="ui selection dropdown">
+            <input type="hidden" name="type" placeholder="Type">
+            <i class="dropdown icon"></i>
+            <div class="default text">Type</div>
+            <div class="menu">
+              <div class="item" data-value="int">int</div>
+              <div class="item" data-value="float">float</div>
+              <div class="item" data-value="date">date</div>
+              <div class="item"  data-value="string">string</div>
+            </div>
+          </div>
+
+     </div>
+     <div style="margin-top:10px">
+        <input class="ui button" type="button" value="Add another text input" onClick="addInput('dynamicInput');">
+        <button class="ui button" type="submit">
+         Modifier le modèle
+       </button>
+     </div>
+</form>
+
+{% block additional_scripts %}
+  <script src="{% static "signalement/js/ajoutchamp.js" %}"></script>
+{% endblock %}
