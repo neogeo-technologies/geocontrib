@@ -2,10 +2,10 @@
 <head>
   <meta charset="utf-8">
   <!-- jQuery Core 3.3.1 -->
-  <script src="{% static 'signalement/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script>
+  <script src="{% static 'collab/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script>
   <!-- Semantic UI -->
-  <link rel="stylesheet" href="{% static 'signalement/resources/semantic-ui-2.3.1/semantic.min.css' %}"/>
-  <script src="{% static 'signalement/resources/semantic-ui-2.3.1/semantic.min.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'collab/resources/semantic-ui-2.3.1/semantic.min.css' %}"/>
+  <script src="{% static 'collab/resources/semantic-ui-2.3.1/semantic.min.js' %}"></script>
 </head>
 
 <form method="POST" style='margin-left:10px;margin-top:10px'>
@@ -39,5 +39,5 @@
 </form>
 
 {% block additional_scripts %}
-  <script src="{% static "signalement/js/ajoutchamp.js" %}"></script>
+  <script src="{% static 'collab/js/add_field.js' %}"></script>
 {% endblock %}

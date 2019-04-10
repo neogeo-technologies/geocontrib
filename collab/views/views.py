@@ -75,22 +75,22 @@ def index(request):
         "title": "Collab",
         "projects": dummy_projects,
     }
-    return render(request, 'signalement/index.html', context)
+    return render(request, 'collab/index.html', context)
 
 
 def my_account(request):
     context = {"title": "My account"}
-    return render(request, 'signalement/my_account.html', context)
+    return render(request, 'collab/my_account.html', context)
 
 
 def legal(request):
     context = {"title": "Mentions légales"}
-    return render(request, 'signalement/legal.html', context)
+    return render(request, 'collab/legal.html', context)
 
 
 def site_help(request):
     context = {"title": "Aide"}
-    return render(request, 'signalement/help.html', context)
+    return render(request, 'collab/help.html', context)
 
 
 def project(request, project_slug):
@@ -102,7 +102,7 @@ def project(request, project_slug):
         "title": project_info.get("title") if project_info else "Nom du projet",
         "project": project_info,
     }
-    return render(request, 'signalement/project_home.html', context)
+    return render(request, 'collab/project_home.html', context)
 
 
 def project_users(request, project_slug):
@@ -111,7 +111,7 @@ def project_users(request, project_slug):
         "title": "Nom du projet",
         "content": "{} project : users".format(project_slug),
     }
-    return render(request, 'signalement/empty.html', context)
+    return render(request, 'collab/empty.html', context)
 
 
 def project_issues_list(request, project_slug):
@@ -120,7 +120,7 @@ def project_issues_list(request, project_slug):
         "title": "Nom du projet",
         "content": "{} project : issues list".format(project_slug),
     }
-    return render(request, 'signalement/empty.html', context)
+    return render(request, 'collab/empty.html', context)
 
 
 def project_issues_map(request, project_slug):
@@ -129,7 +129,7 @@ def project_issues_map(request, project_slug):
         "title": "Nom du projet",
         "content": "{} project : issues map".format(project_slug),
     }
-    return render(request, 'signalement/empty.html', context)
+    return render(request, 'collab/empty.html', context)
 
 
 def project_issue_detail(request, project_slug, issue_id):
@@ -138,7 +138,7 @@ def project_issue_detail(request, project_slug, issue_id):
         "title": "Nom du projet",
         "content": "{} project : issue detail {}".format(project_slug, issue_id),
     }
-    return render(request, 'signalement/empty.html', context)
+    return render(request, 'collab/empty.html', context)
 
 
 def project_import_issues(request, project_slug):
@@ -147,7 +147,7 @@ def project_import_issues(request, project_slug):
         "title": "Nom du projet",
         "content": "{} project : import issues".format(project_slug),
     }
-    return render(request, 'signalement/empty.html', context)
+    return render(request, 'collab/empty.html', context)
 
 
 def project_import_geo_image(request, project_slug):
@@ -156,7 +156,7 @@ def project_import_geo_image(request, project_slug):
         "title": "Nom du projet",
         "content": "{} project : import geo image".format(project_slug),
     }
-    return render(request, 'signalement/empty.html', context)
+    return render(request, 'collab/empty.html', context)
 
 
 def project_download_issues(request, project_slug):
@@ -165,4 +165,4 @@ def project_download_issues(request, project_slug):
         "title": "Nom du projet",
         "content": "{} project : download issues".format(project_slug),
     }
-    return render(request, 'signalement/empty.html', context)
+    return render(request, 'collab/empty.html', context)

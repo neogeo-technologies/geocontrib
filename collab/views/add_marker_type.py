@@ -10,7 +10,7 @@ from ..actions import create_model
 APP_NAME = __package__.split('.')[0]
 
 
-def ajout_signalement(request):
+def add_marker_type(request):
 
     if request.method == 'POST':
         if request.POST.getlist('type') and request.POST.get('sig_type') and request.POST.getlist('type'):
@@ -19,7 +19,7 @@ def ajout_signalement(request):
         else:
             return JsonResponse("nok", status=200, safe=False)
     else:
-        return render(request, APP_NAME + '/ajout_signalement.html')
+        return render(request, APP_NAME + '/add_amrcker_type.html')
 
 
 def generate_model(sig_type, nom, type):
@@ -62,7 +62,7 @@ def generate_model(sig_type, nom, type):
     out = io.StringIO()
     call_command('inspectdb', table_name, stdout=out)
 
-    with open(application + """/models/models_type_{signalement}.py""".format(
-              signalement=sig_type), 'a') as fd:
+    with open(application + """/models/models_type_{marker_type}.py""".format(
+              marker_type=sig_type), 'a') as fd:
         out.seek(0)
         shutil.copyfileobj(out, fd)
