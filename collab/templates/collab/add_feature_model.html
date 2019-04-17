@@ -1,0 +1,57 @@
+{% extends "collab/layout.html" %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+
+{% if not message %}
+  <form method="POST" style='margin-left:10px;margin-top:10px'>
+    {% csrf_token %}
+
+
+      <div class="ui selection dropdown type">
+        <input type="hidden"  name="project" placeholder="Projet">
+        <i class="dropdown icon"></i>
+        <div class="default text">Projet Associé au signalement</div>
+        <div class="menu">
+          {% for elt in projects %}
+              <div class="item" data-value={{elt.pk}}>{{elt.title}}</div>
+          {% endfor %}
+        </div>
+      </div>
+     </br>
+      <div class="ui input">
+         <input type="text" placeholder="Type de signalement" name="feature">
+       </div>
+       <div id="dynamicInput">
+           <div class="ui input">
+              <input type="text"  placeholder="Nom du champ" name="field_name">
+            </div>
+            <div class="ui selection dropdown">
+              <input type="hidden" name="field_type" placeholder="Type">
+              <i class="dropdown icon"></i>
+              <div class="default text">Type</div>
+              <div class="menu">
+                <div class="item" data-value="int">Entier</div>
+                <div class="item" data-value="float">Flottant</div>
+                <div class="item" data-value="date">Date</div>
+                <div class="item"  data-value="string">ChaÎne de caractère</div>
+                <div class="item"  data-value="text">Text</div>
+                <div class="item"  data-value="boolean">Booléen</div>
+              </div>
+            </div>
+
+       </div>
+       <div style="margin-top:10px">
+          <input class="ui button" type="button" value="Ajout d'un nouveau champ" onClick="addInput('dynamicInput');">
+          <button class="ui button" type="submit">
+           Modifier le modèle
+         </button>
+       </div>
+  </form>
+{% else %}
+  {{message}}
+{% endif %}
+{% load staticfiles %}
+  <script src="{% static 'collab/js/add_model.js' %}"></script>
+{% endblock %}

@@ -1,5 +1,17 @@
-from django.shortcuts import render
+from collab import models
+from collab.db_utils import commit_data
+from collab.views.project_services import generate_feature_id
+from collab.views.project_services import last_user_registered
+from collab.views.project_services import project_features_fields
+from collab.views.project_services import project_features_types
 import datetime
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render
+from django.views import View
+import json
+
+
+APP_NAME = __package__.split('.')[0]
 
 dummy_projects = {
     "l49": {
@@ -93,15 +105,98 @@ def site_help(request):
     return render(request, 'collab/help.html', context)
 
 
+class ProjectFeature(View):
+    """
+        Function to add a feature to a project
+        @param
+        @return JSON
+    """
+    def get(self, request, project_slug):
+
+        project = get_object_or_404(models.Project,
+                                    slug=project_slug)
+        # type of features
+        features_types = project_features_types(APP_NAME, project_slug)
+        # type of features's fields
+        res = {}
+        for elt in features_types:
+            res[elt] = project_features_fields(APP_NAME, project_slug, elt)
+        if not features_types:
+            context = {"message": "Veuillez creer un type de signalement pour ce projet"}
+            return render(request, 'collab/add_feature.html', context)
+
+        # add info for JS display
+        for key, val in res.items():
+            if val.get('geom', ''):
+                # type of geometry
+                val['geom']['info'] = project.get_geom_type_display()
+            if val.get('status'):
+                # char list
+                val['status']['info'] = models.STATUS
+        # build contexte for template
+        context = {"res": res, "dic_key": features_types[3]}
+        return render(request, 'collab/add_feature.html', context)
+
+    def post(self, request, project_slug):
+
+        project = get_object_or_404(models.Project,
+                                    slug=project_slug)
+        data = request.POST.dict()
+        table_name = """{app_name}_{project_slug}_{feature}""".format(
+                        app_name=APP_NAME,
+                        project_slug=project_slug,
+                        feature=data.get('feature', ''))
+        user_id = request.user.id
+        date_creation = datetime.datetime.now()
+        feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
+        # remove the csrfmiddlewaretoken key
+        try:
+            data.pop('csrfmiddlewaretoken')
+            data.pop('feature')
+        except Exception as e:
+            pass
+        # add data send by the form
+        # remove empty keys
+        data = {k: v for k, v in data.items() if v}
+        data_keys = ' , '.join(list(data.keys()))
+        data_values = "' , '".join(list(data.values()))
+        # # create with basic keys
+        sql = """INSERT INTO "{table}" (date_creation, user_id, project_id, feature_id,{data_keys})
+                 VALUES ('{date_creation}','{user_id}','{project_id}',
+                 '{feature_id}','{data_values}');""".format(
+                 date_creation=date_creation,
+                 project_id=project.id,
+                 user_id=user_id,
+                 table=table_name,
+                 feature_id=feature_id,
+                 data_keys=data_keys,
+                 data_values=data_values)
+        creation = commit_data('default', sql)
+        if creation == True:
+            # register the new signal
+            context = {'message': 'Le signalement a bien été ajouté'}
+            return render(request, 'collab/add_feature.html', context)
+        else:
+            context = {'message': "Une erreur s'est produite. Veuillez réessayer ultérieurement"}
+            return render(request, 'collab/add_feature.html', context)
+
+
+
 def project(request, project_slug):
 
-    # Get project info from slug
-    project_info = dummy_projects.get(project_slug)
+    # Recuperation du projet
+    # recuperation du document
+    project = get_object_or_404(models.Project,
+                                slug=project_slug)
+    # recuperation des derniers utilisateurs
+    users = last_user_registered(project_slug)
+    # recuperation du nombre de contributeur
+    nb_contributor = models.Autorisation.objects.filter(
+                      project__slug=project_slug,
+                      level="1").count()
 
-    context = {
-        "title": project_info.get("title") if project_info else "Nom du projet",
-        "project": project_info,
-    }
+    context = {"project": project, "users": users,
+               "nb_contributor":nb_contributor}
     return render(request, 'collab/project_home.html', context)
 
 

@@ -4,15 +4,18 @@
 {{ title }}
 {% endblock %}
 {% block content %}
+
 <div class="ui top aligned centered grid container">
     <div class="four wide column left aligned">
         <div class="ui item">
-            <img src="{{project.illustration}}" class="ui small image"/>
+            <img src="{{project.icons_URL}}" class="ui small image"/>
         </div>
         <div class="ui medium vertical menu">
             <div class="item">
-                <div class="header">Consulter les signalements</div>
+                <div class="header">Signalements</div>
                 <div class="menu">
+                   <a class="item" href="{% url 'project_add_feature' project_slug=project.slug  %}">
+                      <i class="icon map"></i>Ajout</a>
                     <a class="item" href="{% url 'project_issues_map' project_slug=project.id  %}">
                         <i class="icon map"></i>Carte...</a>
                     <a class="item" href="{% url 'project_issues_list' project_slug=project.id  %}">
@@ -47,35 +50,35 @@
             <tbody>
             <tr>
                 <td>Date de création du projet</td>
-                <td><strong>{{project.date_creation|date:'d/m/Y'}}</strong></td>
+                <td><strong>{{project.creation_date|date:'d/m/Y'}}</strong></td>
             </tr>
             <tr>
                 <td>Niveau de droit requis</td>
-                <td><strong>{{project.min_access_level_for_published_issues}}</strong></td>
+                <td><strong>{{project.get_visi_feature_display}}</strong></td>
             </tr>
             <tr>
                 <td>Nombre de contributeurs</td>
-                <td><strong>{{project.nb_of_contributors}}</strong></td>
+                <td><strong>{{nb_contributor}}</strong></td>
             </tr>
             <tr>
                 <td>Nombre de signalements</td>
-                <td><strong>{{project.nb_of_issues}}</strong></td>
+                <td><strong>23</strong></td>
             </tr>
             <tr>
                 <td>Nombre de commentaires</td>
-                <td><strong>{{project.nb_of_comments}}</strong></td>
+                <td><strong>23</strong></td>
             </tr>
             <tr>
                 <td>Modération activée&nbsp;?</td>
-                <td>{% if project.is_moderated %}<strong>Oui</strong>{% else %}<strong>Non</strong>{% endif %}</td>
+                <td>{% if project.moderation %}<strong>Oui</strong>{% else %}<strong>Non</strong>{% endif %}</td>
             </tr>
             </tbody>
         </table>
 
         <h3 class="ui header">Derniers utilisateurs inscrits</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed scelerisque felis.
-            Nulla vehicula id neque sed rhoncus.</p>
-
+            {% for elt in users %}
+                <p>{{elt.user__last_name}} {{elt.user__first_name}}</p>
+            {% endfor %}
         <h3 class="ui header">Derniers signalements</h3>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed scelerisque felis.
             Nulla vehicula id neque sed rhoncus.</p>
