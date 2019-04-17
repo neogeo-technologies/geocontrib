@@ -1,10 +1,13 @@
 from collab import models
 from collab.db_utils import commit_data
 from collab.views.project_services import generate_feature_id
+from collab.views.project_services import get_last_features
 from collab.views.project_services import last_user_registered
-from collab.views.project_services import project_features_fields
+from collab.views.project_services import project_feature_fields
+from collab.views.project_services import project_feature_number
 from collab.views.project_services import project_features_types
 import datetime
+from django.core import serializers
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.views import View
@@ -83,9 +86,32 @@ dummy_projects = {
 
 
 def index(request):
+    """
+        Main page with the current available projects
+    """
+    # list of projects
+    data = models.Project.objects.values()
+    for elt in data:
+        # import pdb; pdb.set_trace()
+        project = models.Project.objects.get(slug=elt['slug'])
+        elt['visi_feature_name'] = project.get_visi_feature_display()
+        # recuperation du nombre de contributeur
+        elt['nb_contributors'] = models.Autorisation.objects.filter(
+                                    project__slug=elt['slug'],
+                                    level="1").count()
+        # get number of feature per project
+        list_features = project_features_types(APP_NAME, elt['slug'])
+        nb_features = 0
+        for feature_name in list_features:
+            nb_features += int(project_feature_number(APP_NAME,
+                              elt['slug'],
+                              feature_name))
+
+        elt['nb_features'] = nb_features
+
     context = {
         "title": "Collab",
-        "projects": dummy_projects,
+        "projects": list(data),
     }
     return render(request, 'collab/index.html', context)
 
@@ -120,7 +146,7 @@ class ProjectFeature(View):
         # type of features's fields
         res = {}
         for elt in features_types:
-            res[elt] = project_features_fields(APP_NAME, project_slug, elt)
+            res[elt] = project_feature_fields(APP_NAME, project_slug, elt)
         if not features_types:
             context = {"message": "Veuillez creer un type de signalement pour ce projet"}
             return render(request, 'collab/add_feature.html', context)
@@ -134,7 +160,7 @@ class ProjectFeature(View):
                 # char list
                 val['status']['info'] = models.STATUS
         # build contexte for template
-        context = {"res": res, "dic_key": features_types[3]}
+        context = {"res": res, "dic_key": features_types[0]}
         return render(request, 'collab/add_feature.html', context)
 
     def post(self, request, project_slug):
@@ -161,10 +187,11 @@ class ProjectFeature(View):
         data_keys = ' , '.join(list(data.keys()))
         data_values = "' , '".join(list(data.values()))
         # # create with basic keys
-        sql = """INSERT INTO "{table}" (date_creation, user_id, project_id, feature_id,{data_keys})
+        sql = """INSERT INTO "{table}" (date_creation, date_modification, user_id, project_id, feature_id,{data_keys})
                  VALUES ('{date_creation}','{user_id}','{project_id}',
                  '{feature_id}','{data_values}');""".format(
                  date_creation=date_creation,
+                 date_modification=date_creation,
                  project_id=project.id,
                  user_id=user_id,
                  table=table_name,
@@ -181,7 +208,6 @@ class ProjectFeature(View):
             return render(request, 'collab/add_feature.html', context)
 
 
-
 def project(request, project_slug):
 
     # Recuperation du projet
@@ -191,12 +217,28 @@ def project(request, project_slug):
     # recuperation des derniers utilisateurs
     users = last_user_registered(project_slug)
     # recuperation du nombre de contributeur
-    nb_contributor = models.Autorisation.objects.filter(
+    nb_contributors = models.Autorisation.objects.filter(
                       project__slug=project_slug,
                       level="1").count()
+    # list of feature per project
+    list_features = project_features_types(APP_NAME, project_slug)
+    nb_features = 0
+    last_features = {}
 
+    # get list of feature per project
+    for feature_name in list_features:
+        # get number of feature per project
+        nb_features += int(project_feature_number(APP_NAME,
+                           project_slug,
+                           feature_name))
+        last_features.setdefault(feature_name, []).append(get_last_features(APP_NAME,
+                                                          project_slug,
+                                                          feature_name))
+    print(last_features)
     context = {"project": project, "users": users,
-               "nb_contributor":nb_contributor}
+               "nb_contributors": nb_contributors,
+               "nb_features": nb_features,
+               "last_features": last_features}
     return render(request, 'collab/project_home.html', context)
 
 

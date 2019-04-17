@@ -150,6 +150,7 @@ class Subscription(models.Model):
                              help_text="Utilisateur abonné")
     feature_id = models.UUIDField("Identifiant du signalement",
                                   editable=False, max_length=32)
+    project_slug = models.SlugField('Slug', max_length=128)
 
     class Meta:
         verbose_name = "Abonnement"
@@ -166,6 +167,8 @@ class Comment(models.Model):
     feature_id = models.UUIDField("Identifiant du signalement",
                                   editable=False, max_length=32)
     comment = models.TextField('Commentaire', blank=True)
+
+    project_slug = models.SlugField('Slug', max_length=128)
 
     class Meta:
         verbose_name = "Commentaire"
@@ -202,6 +205,8 @@ class Attachment(models.Model):
 
     info = models.TextField('Info', blank=True)
 
+    project_slug = models.SlugField('Slug', max_length=128)
+
 
     def __str__(self):
         return self.titre
@@ -230,6 +235,7 @@ class Event(models.Model):
     object_type = models.CharField("Type d'évènement",
                                    choices=EVEN_TYPE,
                                    max_length=1)
+    project_slug = models.SlugField('Slug', max_length=128)
     data = JSONField()
 
     class Meta:

@@ -58,11 +58,11 @@
             </tr>
             <tr>
                 <td>Nombre de contributeurs</td>
-                <td><strong>{{nb_contributor}}</strong></td>
+                <td><strong>{{nb_contributors}}</strong></td>
             </tr>
             <tr>
                 <td>Nombre de signalements</td>
-                <td><strong>23</strong></td>
+                <td><strong>{{nb_features}}</strong></td>
             </tr>
             <tr>
                 <td>Nombre de commentaires</td>
@@ -80,8 +80,16 @@
                 <p>{{elt.user__last_name}} {{elt.user__first_name}}</p>
             {% endfor %}
         <h3 class="ui header">Derniers signalements</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed scelerisque felis.
-            Nulla vehicula id neque sed rhoncus.</p>
+            {% for key,val in last_features.items %}
+                <div class="item">
+                  <div><strong>{{key|title}}</strong></div>
+                  <div class="list">
+                     {% for elt in val %}
+                        <a class="item" href="#">{{elt.titre}}</a>
+                     {% endfor %}
+                  </div>
+                </div>
+            {% endfor %}
 
         <h3 class="ui header">Derniers commentaires</h3>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed scelerisque felis.
