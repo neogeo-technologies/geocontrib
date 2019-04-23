@@ -114,13 +114,30 @@ def project_feature_fields(app_name, project_slug, feature_name):
     return res
 
 
+def get_project_features(app_name, project_slug, feature_name):
+    """
+        Return the features of a given project
+        @param app_name name of the application
+        @param project_slug project slug
+        @param feature_name name of the feature
+        @return JSON
+    """
+    sql = """ SELECT *
+              FROM "{app_name}_{slug}_{feature_name}" ORDER BY
+              date_creation DESC ;
+          """.format(app_name=app_name, slug=project_slug,
+                     feature_name=feature_name)
+    data = fetch_raw_data('default', sql)
+    return data
+
+
 def get_last_features(app_name, project_slug, feature_name, num=""):
     """
         Return the last features saved
         @param app_name name of the application
         @param project_slug project slug
         @param feature_name name of the feature
-        @param feature_name name of the feature
+        @param num number of features required
         @return JSON
     """
     limit = ""
@@ -134,7 +151,4 @@ def get_last_features(app_name, project_slug, feature_name, num=""):
                      feature_name=feature_name,
                      limit=limit)
     data = fetch_raw_data('default', sql)
-    if data:
-        return data[0]
-    else:
-        return ""
+    return data

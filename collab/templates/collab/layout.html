@@ -8,15 +8,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
         <title>{% block title %}{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="{% static 'collab/css/site.css' %}" />
-        <link href="https://cdn.rawgit.com/mdehoog/Semantic-UI/6e6d051d47b598ebab05857545f242caf2b4b48c/dist/semantic.min.css" rel="stylesheet" type="text/css" />
-        <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
-        <script src="https://cdn.rawgit.com/mdehoog/Semantic-UI/6e6d051d47b598ebab05857545f242caf2b4b48c/dist/semantic.min.js"></script>
         <!-- jQuery Core 3.3.1 -->
-        <!-- <script src="{% static 'collab/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script> -->
+        <script src="{% static 'collab/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script>
         <!-- Semantic UI -->
-        <!-- <link rel="stylesheet" href="{% static 'collab/resources/semantic-ui-2.3.1/semantic.min.css' %}"/>
-        <script src="{% static 'collab/resources/semantic-ui-2.3.1/semantic.min.js' %}"></script>
-    </head> -->
+        <link rel="stylesheet" href="{% static 'collab/resources/semantic-ui-2.4.0/semantic.min.css' %}"/>
+        <script src="{% static 'collab/resources/semantic-ui-2.4.0/semantic.min.js' %}"></script>
+        <!-- DataTables -->
+        <link rel="stylesheet" href="{% static 'collab/resources/DataTables-1.10.18/datatables.min.css' %}"/>
+        <script src="{% static 'collab/resources/DataTables-1.10.18/datatables.min.js' %}"></script>
+    </head>
 
     <body>
         <div class="ui fixed inverted menu">

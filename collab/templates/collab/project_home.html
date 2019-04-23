@@ -1,99 +1,65 @@
-{% extends "collab/layout.html" %}
+{% extends "collab/layout_menu.html" %}
 {% load static %}
 {% block title %}
 {{ title }}
 {% endblock %}
 {% block content %}
+    <h2 class="ui header">{{project.title}}</h2>
+    <p>{{project.description}}</p>
 
-<div class="ui top aligned centered grid container">
-    <div class="four wide column left aligned">
-        <div class="ui item">
-            <img src="{{project.icons_URL}}" class="ui small image"/>
+    <table class="ui very basic table">
+        <tbody>
+        <tr>
+            <td>Date de création du projet</td>
+            <td><strong>{{project.creation_date|date:'d/m/Y'}}</strong></td>
+        </tr>
+        <tr>
+            <td>Niveau de droit requis</td>
+            <td><strong>{{project.get_visi_feature_display}}</strong></td>
+        </tr>
+        <tr>
+            <td>Nombre de contributeurs</td>
+            <td><strong>{{nb_contributors}}</strong></td>
+        </tr>
+        <tr>
+            <td>Nombre de signalements</td>
+            <td><strong>{{nb_features}}</strong></td>
+        </tr>
+        <tr>
+            <td>Nombre de commentaires</td>
+            <td><strong>23</strong></td>
+        </tr>
+        <tr>
+            <td>Modération activée&nbsp;?</td>
+            <td>{% if project.moderation %}<strong>Oui</strong>{% else %}<strong>Non</strong>{% endif %}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3 class="ui header">Derniers utilisateurs inscrits</h3>
+        {% for elt in users %}
+            <p>{{elt.user__last_name}} {{elt.user__first_name}}</p>
+        {% endfor %}
+    <h3 class="ui header">Derniers signalements</h3>
+       <div class="ui list">
+           {% for key,val in last_features.items %}
+                <div class="item" >
+                    <strong>{{key|title}}</strong>
+                    {% if val %}
+                        <div class="ui bulleted list">
+                            {% for elt in val %}
+                                <a class="item" href="#">{{elt.titre}}</a>
+                            {% endfor %}
+                         </div>
+                    {% else %}
+                        <br><br><span>Aucun signalement de ce type n'a été créé</span>
+                    {% endif %}
+                 </div>
+                 <br>
+           {% endfor %}
         </div>
-        <div class="ui medium vertical menu">
-            <div class="item">
-                <div class="header">Signalements</div>
-                <div class="menu">
-                   <a class="item" href="{% url 'project_add_feature' project_slug=project.slug  %}">
-                      <i class="icon map"></i>Ajout</a>
-                    <a class="item" href="{% url 'project_issues_map' project_slug=project.id  %}">
-                        <i class="icon map"></i>Carte...</a>
-                    <a class="item" href="{% url 'project_issues_list' project_slug=project.id  %}">
-                        <i class="icon list"></i>Liste...</a>
-                </div>
-            </div>
-            <div class="item">
-                <div class="header">Import et export</div>
-                <div class="menu">
-                    <a class="item" href="{% url 'project_import_issues' project_slug=project.id  %}">
-                        <i class="icon upload"></i>Importer en masse...</a>
-                    <a class="item" href="{% url 'project_import_geo_image' project_slug=project.id  %}">
-                        <i class="icon camera"></i>Importer une photographie...</a>
-                    <a class="item" href="{% url 'project_download_issues' project_slug=project.id  %}">
-                        <i class="icon download"></i>Télécharger...</a>
-                </div>
-            </div>
-            <div class="item">
-                <div class="header">Configuration</div>
-                <div class="menu">
-                    <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation...</a>
-                    <a class="item"><i class="icon wrench"></i>Administrer le projet...</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="ten wide column">
-        <h2 class="ui header">{{project.title}}</h2>
-        <p>{{project.description}}</p>
+    <h3 class="ui header">Derniers commentaires</h3>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed scelerisque felis.
+        Nulla vehicula id neque sed rhoncus.</p>
 
-        <table class="ui very basic table">
-            <tbody>
-            <tr>
-                <td>Date de création du projet</td>
-                <td><strong>{{project.creation_date|date:'d/m/Y'}}</strong></td>
-            </tr>
-            <tr>
-                <td>Niveau de droit requis</td>
-                <td><strong>{{project.get_visi_feature_display}}</strong></td>
-            </tr>
-            <tr>
-                <td>Nombre de contributeurs</td>
-                <td><strong>{{nb_contributors}}</strong></td>
-            </tr>
-            <tr>
-                <td>Nombre de signalements</td>
-                <td><strong>{{nb_features}}</strong></td>
-            </tr>
-            <tr>
-                <td>Nombre de commentaires</td>
-                <td><strong>23</strong></td>
-            </tr>
-            <tr>
-                <td>Modération activée&nbsp;?</td>
-                <td>{% if project.moderation %}<strong>Oui</strong>{% else %}<strong>Non</strong>{% endif %}</td>
-            </tr>
-            </tbody>
-        </table>
-
-        <h3 class="ui header">Derniers utilisateurs inscrits</h3>
-            {% for elt in users %}
-                <p>{{elt.user__last_name}} {{elt.user__first_name}}</p>
-            {% endfor %}
-        <h3 class="ui header">Derniers signalements</h3>
-            {% for key,val in last_features.items %}
-                <div class="item">
-                  <div><strong>{{key|title}}</strong></div>
-                  <div class="list">
-                     {% for elt in val %}
-                        <a class="item" href="#">{{elt.titre}}</a>
-                     {% endfor %}
-                  </div>
-                </div>
-            {% endfor %}
-
-        <h3 class="ui header">Derniers commentaires</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed scelerisque felis.
-            Nulla vehicula id neque sed rhoncus.</p>
-    </div>
-</div>
 {% endblock %}

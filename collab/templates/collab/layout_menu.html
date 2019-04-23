@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'collab/css/site.css' %}" />
+    <!-- jQuery Core 3.3.1 -->
+    <script src="{% static 'collab/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script>
+    <!-- Semantic UI -->
+    <link rel="stylesheet" href="{% static 'collab/resources/semantic-ui-2.4.0/semantic.min.css' %}"/>
+    <script src="{% static 'collab/resources/semantic-ui-2.4.0/semantic.min.js' %}"></script>
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{% static 'collab/resources/DataTables-1.10.18/datatables.min.css' %}"/>
+    <script src="{% static 'collab/resources/DataTables-1.10.18/datatables.min.js' %}"></script>
+</head>
+
+
+    <body>
+        <div class="ui fixed inverted menu">
+            <div class="ui container">
+                <a href="{% url 'index' %}" class="header item">
+                    <img id="menu-logo" class="logo" src="{% static 'collab/img/logo.png' %}">
+                    Collab{% if project %}&nbsp;- {{project.title}}{% endif %}
+                </a>
+                <div class="right menu">
+                    <a href="{% url 'help' %}" class="item">Aide</a>
+                    <a href="{% url 'my_account' %}" class="item">Mon compte</a>
+                    <a href="" class="item">Se déconnecter</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui main container">
+          <div class="ui top aligned centered grid container">
+            <div class="four wide column left aligned">
+                {% block menu %}
+                  <div class="ui item">
+                        <img src="{{project.icons_URL}}" class="ui small image"/>
+                  </div>
+                  <div class="ui medium vertical menu">
+                      <div class="item">
+                          <div class="header">Signalements</div>
+                          <div class="menu">
+                             <a class="item" href="{% url 'project_add_feature' project_slug=project.slug  %}">
+                                <i class="icon plus"></i>Ajout d'un signalement </a>
+                              <a class="item" href="{% url 'project_feature_list' project_slug=project.slug %}">
+                                <i class="icon list"></i><i class="icon map"></i>Liste / Carte</a>
+                          </div>
+                      </div>
+                      <div class="item">
+                          <div class="header">Import et export</div>
+                          <div class="menu">
+                              <a class="item" href="{% url 'project_import_issues' project_slug=project.id  %}">
+                                  <i class="icon upload"></i>Importer en masse...</a>
+                              <a class="item" href="{% url 'project_import_geo_image' project_slug=project.id  %}">
+                                  <i class="icon camera"></i>Importer une photographie...</a>
+                              <a class="item" href="{% url 'project_download_issues' project_slug=project.id  %}">
+                                  <i class="icon download"></i>Télécharger...</a>
+                          </div>
+                      </div>
+                      <div class="item">
+                          <div class="header">Configuration</div>
+                          <div class="menu">
+                              <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation...</a>
+                              <a class="item"><i class="icon wrench"></i>Administrer le projet...</a>
+                          </div>
+                      </div>
+                  </div>
+                {% endblock %}
+            </div>
+            <div class="twelve wide column">
+                {% block content %}
+                {% endblock %}
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="ui inverted vertical footer segment">
+            <div class="ui center aligned container">
+                <div class="ui horizontal inverted small divided link list">
+                    <a class="item" href="{% url 'legal' %}">Mentions légales</a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
