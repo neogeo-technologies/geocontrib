@@ -10,14 +10,9 @@ from collab.models import Subscription
 
 app = apps.get_app_config('collab')
 
-# class StatusAdmin(admin.ModelAdmin):
-#     # readonly_fields = ('status',)
-#     list_display = ('status', )
-#     empty_value_display = '-aucun-'
-# admin.site.register(Status, StatusAdmin)
 
 class ProjectAdmin(admin.ModelAdmin):
-    readonly_fields = ('slug', 'feature_type')
+    readonly_fields = ('slug',)
     list_display = ('title', 'thumbLink', 'moderation')
     empty_value_display = '-aucun-'
 admin.site.register(Project, ProjectAdmin)

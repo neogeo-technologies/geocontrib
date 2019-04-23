@@ -76,8 +76,8 @@ class Project(models.Model):
                                             null=True)
     delete_feature = models.DurationField('Délai avant suppression',
                                            blank=True, null=True)
-    feature_type = JSONField('Type de signalements disponibles',
-                             blank=True, null=True)
+    # feature_type = JSONField('Type de signalements disponibles',
+    #                          blank=True, null=True)
 
     def __str__(self):
         return self.title

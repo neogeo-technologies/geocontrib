@@ -109,18 +109,18 @@ def generate_feature_model(projet_id, feature, names, types, user):
     try:
         with connection.schema_editor() as editor:
             editor.create_model(model)
-
-        if not projet.feature_type:
-            projet.feature_type = [{'table_name': table_name,
-                                   'feature': feature,
-                                   'user_id': user.id,
-                                   'username': user.username}]
-        else:
-            projet.feature_type.append({'table_name': table_name,
-                                   'feature': feature,
-                                   'user_id': user.id,
-                                   'username': user.username})
-        projet.save()
+        #
+        # if not projet.feature_type:
+        #     projet.feature_type = [{'table_name': table_name,
+        #                            'feature': feature,
+        #                            'user_id': user.id,
+        #                            'username': user.username}]
+        # else:
+        #     projet.feature_type.append({'table_name': table_name,
+        #                            'feature': feature,
+        #                            'user_id': user.id,
+        #                            'username': user.username})
+        # projet.save()
         # generation du fichier models.py
         # out = io.StringIO()
         # call_command('inspectdb', table_name, stdout=out)
