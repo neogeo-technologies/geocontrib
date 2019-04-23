@@ -161,7 +161,7 @@ class ProjectFeature(View):
                 # char list
                 val['status']['info'] = models.STATUS
         # build contexte for template
-        context = {"res": res, "dic_key": features_types[1]}
+        context = {"res": res, "dic_key": features_types[0]}
         return render(request, 'collab/add_feature.html', context)
 
     def post(self, request, project_slug):
