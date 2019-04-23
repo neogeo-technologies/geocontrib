@@ -188,7 +188,7 @@ class ProjectFeature(View):
         data_values = "' , '".join(list(data.values()))
         # # create with basic keys
         sql = """INSERT INTO "{table}" (date_creation, date_modification, user_id, project_id, feature_id,{data_keys})
-                 VALUES ('{date_creation}','{user_id}','{project_id}',
+                 VALUES ('{date_creation}','{date_modification}','{user_id}','{project_id}',
                  '{feature_id}','{data_values}');""".format(
                  date_creation=date_creation,
                  date_modification=date_creation,
