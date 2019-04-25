@@ -1,96 +1,104 @@
-{% extends "collab/layout.html" %}
+{% extends "collab/layout_menu.html" %}
+{% load app_filters %}
 {% block title %}
 {{ title }}
 {% endblock %}
 {% block content %}
 
 {% if not message %}
+
     <div class="ui middle aligned stackable grid container">
-        <form class='ui form' method="POST" style='margin-left:10px;margin-top:10px'>
-          {% csrf_token %}
+        <div class="row">
+            <h2 class="ui header">{{project.title}}</h2>
+        </div>
+        <div class="row">
+            <form class='ui equal width addfeature form' method="POST" >
+              {% csrf_token %}
 
-          <div class="field">
-              <label>Type de signalement </label>
-              <div class="ui selection dropdown feature">
-                  <input type="hidden"  name="feature" placeholder="" />
-                  <i class="dropdown icon"></i>
-                  <div class="default text">Choisisez un signalement</div>
-                   <div class="menu">
-                    {% for key,val in res.items %}
-                        <div class="item" data-value={{key}} >{{key}}</div>
-                    {% endfor %}
+              <div class="field">
+                  <label>Type de signalement </label>
+                  <div class="ui selection dropdown feature">
+                      <input type="hidden"  name="feature" placeholder="" />
+                      <i class="dropdown icon"></i>
+                      <div class="default text">Choisisez un signalement</div>
+                       <div class="menu">
+                        {% for key,val in res.items %}
+                            <div class="item" data-value={{key}} >{{key}}</div>
+                        {% endfor %}
+                      </div>
+                   </div>
+              </div>
+              <div class="field" class='geomfield'>
+                  <label> Geometrie de type {{project.get_geom_type_display}}</label> <br>
+                  <div id='mapdaddfeature'>
                   </div>
-               </div>
-          </div>
-         {% for key,val in res|get_item:dic_key %}
-                {% if val.column_name not in 'id,user_id,project_id,feature_id,date_creation' %}
-                    {% if val.type == 'varchar' and val.info %}
-                      <div class="field">
-                          <label>{{val.column_name}}</label>
-                          <div class="ui selection dropdown status">
-                              <input type="hidden"  name="{{val.column_name}}" placeholder="{{val.column_name}}" />
-                              <i class="dropdown icon"></i>
-                              <div class="default text">{{val.column_name}}</div>
-                              <div class="menu">
-                                {% for status in val.info %}
-                                    <div class="item" data-value={{status.0}}>{{status.1}}</div>
-                                {% endfor %}
-                              </div>
-                           </div>
-                      </div>
-
-                    {% elif val.type == 'varchar' %}
-                      <div class="field">
-                         <label>{{val.column_name}}</label>
-                         <input type="text" maxlength="{{val.char_max_size}}" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
-                      </div>
-                    {% elif val.type == 'date' %}
-                      <div class="field">
-                        <div class="ui calendar" id="date-field">
-                          <label><b>{{val.column_name}}</b></label>
-                          <div class="ui input left icon">
-                            <i class="calendar icon"></i>
-                            <input type="text"  name="{{val.column_name}}" placeholder="{{val.column_name}}" />
+                      <!-- <input type="" placeholder="{{val.column_name}}" name="{{val.column_name}}" /> -->
+              </div>
+             {% for key,val in res|get_item:dic_key %}
+                    {% if val.column_name not in 'id,user_id,project_id,feature_id,date_creation' %}
+                        {% if val.type == 'varchar' and val.info %}
+                          <div class="field">
+                              <label>{{val.column_name|feature_key_display}}</label>
+                              <div class="ui selection dropdown status">
+                                  <input type="hidden"  name="{{val.column_name}}" placeholder="{{val.column_name}}" />
+                                  <i class="dropdown icon"></i>
+                                  <div class="default text">{{val.column_name}}</div>
+                                  <div class="menu">
+                                    {% for status in val.info %}
+                                        <div class="item" data-value={{status.0}}>{{status.1}}</div>
+                                    {% endfor %}
+                                  </div>
+                               </div>
                           </div>
-                        </div>
-                      </div>
-                    {% elif val.type == 'text' %}
-                      <div class="field">
-                          <label>{{val.column_name}}</label>
-                          <textarea name="{{val.column_name}}"></textarea>
-                      </div>
-                    {% elif val.data_type == 'boolean' %}
-                      <div class="inline field">
-                        <div class="ui checkbox boolfield">
-                          <input type="checkbox"  name="{{val.column_name}}" class="hidden" >
-                          <input type='hidden' value='0' name="{{val.column_name}}">
-                          <label>{{val.column_name}}</label>
-                        </div>
-                      </div>
-                    {% elif val.data_type == 'integer' %}
-                      <div class="field">
-                          <label>{{val.column_name}}</label>
-                          <input type="number" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
-                      </div>
-                  {% elif val.data_type == 'double precision' %}
-                    <div class="field">
-                        <label>{{val.column_name}}</label>
-                        <input type="number" step="any"  placeholder="{{val.column_name}}" name="{{val.column_name}}" />
-                    </div>
-                    {% elif val.type == 'geometry' %}
+
+                        {% elif val.type == 'varchar' %}
+                          <div class="field">
+                             <label>{{val.column_name|feature_key_display}}</label>
+                             <input type="text" maxlength="{{val.char_max_size}}" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
+                          </div>
+                        {% elif val.type == 'date' %}
+                          <div class="field">
+                            <!-- <div class="ui calendar" id="date-field"> -->
+                              <label>{{val.column_name|feature_key_display}}</label>
+                              <div class="ui input left icon">
+                                <i class="calendar icon"></i>
+                                <input type="text"  name="{{val.column_name}}" placeholder="{{val.column_name}}" />
+                              </div>
+                            <!-- </div> -->
+                          </div>
+                        {% elif val.type == 'text' %}
+                          <div class="field">
+                              <label>{{val.column_name|feature_key_display}}</label>
+                              <textarea name="{{val.column_name}}"></textarea>
+                          </div>
+                        {% elif val.data_type == 'boolean' %}
+                          <div class="inline field">
+                            <div class="ui checkbox boolfield">
+                              <input type="checkbox"  name="{{val.column_name}}" class="hidden" >
+                              <input type='hidden' value='0' name="{{val.column_name}}">
+                              <label>{{val.column_name|feature_key_display}}</label>
+                            </div>
+                          </div>
+                        {% elif val.data_type == 'integer' %}
+                          <div class="field">
+                              <label>{{val.column_name|feature_key_display}}</label>
+                              <input type="number" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
+                          </div>
+                      {% elif val.data_type == 'double precision' %}
                         <div class="field">
-                            <label>{{val.column_name}}</label>
-                            <input type="" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
+                            <label>{{val.column_name|feature_key_display}}</label>
+                            <input type="number" step="any"  placeholder="{{val.column_name}}" name="{{val.column_name}}" />
                         </div>
+                      {% endif %}
                     {% endif %}
-                {% endif %}
-            {% endfor %}
-             <div style="margin-top:10px">
-                <button class="ui button" type="submit">
-                 Ajouter le signalement
-               </button>
-             </div>
-        </form>
+                {% endfor %}
+                 <div style="margin-top:10px">
+                    <button class="ui button" type="submit">
+                     Ajouter le signalement
+                   </button>
+                 </div>
+            </form>
+        </div>
 
     </div>
     </div>

@@ -1,11 +1,12 @@
 {% extends "collab/layout_menu.html" %}
+{% load app_filters %}
 {% block title %}
 {{ title }}
 {% endblock %}
 {% block content %}
 <div class="ui tabular menu featurelist">
   <div class="active item"  data-tab="liste">Liste</div>
-  <div class="item"  data-tab="carte">Carte</div>
+  <div class="item carte"  data-tab="carte">Carte</div>
 </div>
 
 <div class="ui active tab" data-tab="liste">
@@ -19,9 +20,10 @@
         <table id="" class="display" style="width:100%">
           <thead>
               <tr>
+                 <th>Titre</th>
                  {% for head in val|first %}
-                     {% if head not in 'id,user_id,project_id,feature_id' %}
-                          <th>{{head|upper}}</th>
+                     {% if head not in 'id,user_id,project_id,feature_id,titre' %}
+                          <th>{{head|header_display}}</th>
                      {% endif %}
                  {% endfor %}
                </tr>
@@ -29,12 +31,19 @@
           <tbody>
               {% for feature in val %}
                   <tr>
+                    <td><a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=feature.id  %}">{{feature.titre|feature_val_display}}</a></td>
                     {% for feature_key, feature_val in feature.items %}
-                        {% if feature_key not in 'id,user_id,project_id,feature_id' %}
+                        {% if feature_key not in 'id,user_id,project_id,feature_id,titre' %}
                           {%  if feature_val %}
-                             <td>{{feature_val}}</td>
+                              {%  if feature_val == True %}
+                                  <td><i class="green check icon"></td>
+                              {% elif feature_val == False %}
+                                  <td><i class="inverted red remove icon"></td>
+                              {%else%}
+                                  <td>{{feature_val|feature_val_display}}</td>
+                              {% endif %}
                           {% else %}
-                             <td><i class="inverted red remove icon"></td>
+                             <td><i class="minus icon"></td>
                           {% endif %}
                         {% endif %}
                     {% endfor %}
@@ -44,21 +53,21 @@
         </table>
      {% else %}
        <h3 class="ui header">
-            Aucun signalement n'a été créé pour cette application
+            Aucun signalement de ce type n'a été créé pour cette application
         </h3>
      {% endif %}
      <br><br>
   {% endfor %}
 {% else %}
    <h3 class="ui header">
-       Aucun signalement n'a été créé pour cette application
+       Aucun signalementde n'a été créé pour cette application
    </h3>
 {% endif %}
 </div>
 
-<div class="ui tab" data-tab="carte">
-  <p></p>
-  <p></p>
+<div class="ui tab" data-tab="carte" >
+  <div id='maplist' >
+  </div>
 </div>
 
 {% load staticfiles %}

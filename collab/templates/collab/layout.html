@@ -37,13 +37,14 @@
             {% block content %}
             {% endblock %}
         </div>
-
-        <div class="ui inverted vertical footer segment">
+        <!-- BRICOLAGE A AMELIORER !!!!!! -->
+        <div class="ui sixteen wide column" style="height:100px">
+        <div>
+        <footer class="ui bottom fixed inverted menu footer">
             <div class="ui center aligned container">
-                <div class="ui horizontal inverted small divided link list">
-                    <a class="item" href="{% url 'legal' %}">Mentions légales</a>
-                </div>
+                <a class="item" href="{% url 'legal' %}">Mentions légales</a>
             </div>
-        </div>
+        </footer>
     </body>
+
 </html>

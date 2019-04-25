@@ -1,6 +1,7 @@
 from collab.db_utils import fetch_first_row
 from collab.db_utils import fetch_raw_data
 from collab import models
+from collections import OrderedDict
 from django.core import serializers
 from django.http import HttpResponse
 from django.utils import timezone
@@ -76,37 +77,37 @@ def project_features_types(app_name, project_slug):
     return list_feature
 
 
-def project_feature_number(app_name, project_slug, feature_name):
+def project_feature_number(app_name, project_slug, feature_type):
     """
         Return the number of feature per project
         @param app_name name of the application
         @param project_slug project slug
-        @param feature_name name of the feature
+        @param feature_type type of the feature
         @return JSON
     """
 
-    sql = """ SELECT COUNT(*) FROM "{app_name}_{slug}_{feature_name}" ;
+    sql = """ SELECT COUNT(*) FROM "{app_name}_{slug}_{feature_type}" ;
           """.format(app_name=app_name, slug=project_slug,
-                     feature_name=feature_name)
+                     feature_type=feature_type)
     num = fetch_first_row('default', sql)
     return num.get('count', 0)
 
 
-def project_feature_fields(app_name, project_slug, feature_name):
+def project_feature_fields(app_name, project_slug, feature_type):
     """
         Type of fields for a given feature
         @param app_name name of the application
         @param project_slug project slug
-        @param feature_name name of the feature
+        @param feature_type type of the feature
         @return JSON
     """
     sql = """ SELECT column_name,data_type,udt_name as type,
               character_maximum_length as char_max_size,
               null As info
               from information_schema.columns WHERE table_schema='public'
-              AND table_name LIKE '{app_name}_{slug}_{feature_name}%';
+              AND table_name LIKE '{app_name}_{slug}_{feature_type}%';
           """.format(app_name=app_name, slug=project_slug,
-                     feature_name=feature_name)
+                     feature_type=feature_type)
     data = fetch_raw_data('default', sql)
     res = {}
     for elt in data:
@@ -114,29 +115,30 @@ def project_feature_fields(app_name, project_slug, feature_name):
     return res
 
 
-def get_project_features(app_name, project_slug, feature_name):
+def get_project_features(app_name, project_slug, feature_type):
     """
         Return the features of a given project
         @param app_name name of the application
         @param project_slug project slug
-        @param feature_name name of the feature
+        @param feature_type type of the feature
         @return JSON
     """
     sql = """ SELECT *
-              FROM "{app_name}_{slug}_{feature_name}" ORDER BY
+              FROM "{app_name}_{slug}_{feature_type}" ORDER BY
               date_creation DESC ;
           """.format(app_name=app_name, slug=project_slug,
-                     feature_name=feature_name)
+                     feature_type=feature_type)
     data = fetch_raw_data('default', sql)
-    return data
+
+    return [OrderedDict(sorted(v.items())) for v in data]
 
 
-def get_last_features(app_name, project_slug, feature_name, num=""):
+def get_last_features(app_name, project_slug, feature_type, num=""):
     """
         Return the last features saved
         @param app_name name of the application
         @param project_slug project slug
-        @param feature_name name of the feature
+        @param feature_type type of the feature
         @param num number of features required
         @return JSON
     """
@@ -145,10 +147,28 @@ def get_last_features(app_name, project_slug, feature_name, num=""):
         limit = "  LIMIT " + str(num)
 
     sql = """ SELECT id,feature_id,titre
-              FROM "{app_name}_{slug}_{feature_name}" ORDER BY
+              FROM "{app_name}_{slug}_{feature_type}" ORDER BY
               date_creation DESC {limit};
           """.format(app_name=app_name, slug=project_slug,
-                     feature_name=feature_name,
+                     feature_type=feature_type,
                      limit=limit)
     data = fetch_raw_data('default', sql)
     return data
+
+
+def get_feature(app_name, project_slug, feature_type, id):
+    """
+        Return a specific feature
+        @param app_name name of the application
+        @param project_slug project slug
+        @param feature_type type of the feature
+        @param id id of the feature
+        @return JSON
+    """
+    sql = """ SELECT *
+              FROM "{app_name}_{slug}_{feature_type}"
+              WHERE id={id};
+          """.format(app_name=app_name, slug=project_slug,
+                     feature_type=feature_type, id=id)
+    data = fetch_first_row('default', sql)
+    return OrderedDict(sorted(data.items()))

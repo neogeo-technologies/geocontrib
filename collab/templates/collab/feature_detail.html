@@ -1,0 +1,40 @@
+{% extends "collab/layout_menu.html" %}
+{% load app_filters %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+
+  <h2 class="ui header">{{project.title}}</h2>
+  <h3>{{feature.titre}}</h3>
+
+  <table class="ui very basic table">
+      <tbody>
+      {% for key,val in feature.items %}
+          {% if key not in 'id,user_id,project_id,feature_id,titre' %}
+              <tr>
+                  <td><strong>{{key|feature_key_display}}</strong></td>
+                  {% if val %}
+                      {%  if val == True %}
+                          <td><i class="green check icon"></td>
+                      {% elif val == False %}
+                          <td><i class="inverted red remove icon"></td>
+                      {%else%}
+                          <td>{{val|feature_val_display}}</td>
+                      {% endif %}
+                  {% else %}
+                     <td><i class="minus icon"></td>
+                  {%endif%}
+              </tr>
+          {%endif%}
+      {%endfor%}
+      <title>Display a map</title>
+      </tbody>
+  </table>
+  <div id='mapdetail'>
+  </div>
+
+  {% load staticfiles %}
+   <script src="{% static 'collab/js/map_element.js' %}"></script>
+
+{% endblock %}

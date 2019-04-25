@@ -37,9 +37,11 @@
     </table>
 
     <h3 class="ui header">Derniers utilisateurs inscrits</h3>
+      <div class="ui bulleted list">
         {% for elt in users %}
-            <p>{{elt.user__last_name}} {{elt.user__first_name}}</p>
+            <div class="item">{{elt.user__last_name}} {{elt.user__first_name}}</div>
         {% endfor %}
+      </div>
     <h3 class="ui header">Derniers signalements</h3>
        <div class="ui list">
            {% for key,val in last_features.items %}
@@ -48,7 +50,7 @@
                     {% if val %}
                         <div class="ui bulleted list">
                             {% for elt in val %}
-                                <a class="item" href="#">{{elt.titre}}</a>
+                                <a class="item" href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=elt.id  %}">{{elt.titre}}</a>
                             {% endfor %}
                          </div>
                     {% else %}

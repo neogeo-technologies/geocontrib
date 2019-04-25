@@ -1,5 +1,7 @@
 from collab import models
+from collab.choices import STATUS
 from collab.db_utils import commit_data
+from collab.forms import ProjectForm
 from collab.views.project_services import generate_feature_id
 from collab.views.project_services import get_last_features
 from collab.views.project_services import last_user_registered
@@ -7,83 +9,15 @@ from collab.views.project_services import project_feature_fields
 from collab.views.project_services import project_feature_number
 from collab.views.project_services import project_features_types
 from collab.views.project_services import get_project_features
+from collab.views.project_services import get_feature
+from collections import OrderedDict
 import datetime
-from django.core import serializers
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.views import View
-import json
-
+from django.views.generic.edit import FormView
 
 APP_NAME = __package__.split('.')[0]
-
-dummy_projects = {
-    "l49": {
-        "id": "l49",
-        "title": "L49",
-        "description": "Publication de la localisation de travaux planifiés sur la voie publique en vue de "
-                       "l'application de l'article L49 du Code des postes et des communications électroniques.",
-        "illustration": "http://www.montpellier3m.fr/sites/default/files/vignettes/actualite/travaux_2.jpg",
-        "min_access_level_for_published_issues": "anonymous",
-        "date_creation": datetime.date(2014, 8, 24),
-        "is_moderated": False,
-        "nb_of_contributors": 13,
-        "nb_of_issues": 134,
-        "nb_of_comments": 3,
-    },
-    "adresses": {
-        "id": "adresses",
-        "title": "Adresses",
-        "description": "Identification des erreurs ou absences dans les bases d'adresse de référence. Les signalements "
-                       "recueillis concernent aussi bien les erreurs de localisation, de numérotation et de "
-                       "dénomination.",
-        "illustration": "https://www.rapid-sign.com/ori-numeros-de-maison-noir-13cm-74.jpg",
-        "min_access_level_for_published_issues": "connected",
-        "date_creation": datetime.date(2012, 4, 12),
-        "is_moderated": False,
-        "nb_of_contributors": 32,
-        "nb_of_issues": 152,
-        "nb_of_comments": 223,
-    },
-    "ortho-2018": {
-        "id": "ortho-2018",
-        "title": "Ortho 2018",
-        "description": "Identification des non-conformités de l'ortho 2018 par rapport à ses spécifications&nbsp;: "
-                       "précision planimétrique, radiométrie, colorimétrie...",
-        "illustration": "https://www.geopicardie.fr/geoserver/geopicardie/ows?SERVICE=WMS&LAYERS=picardie_ortho_ign_2013_vis&TRANSPARENT=true&VERSION=1.3.0&FORMAT=image%2Fpng&EXCEPTIONS=XML&REQUEST=GetMap&STYLES=&SLD_VERSION=1.1.0&CRS=EPSG%3A3857&BBOX=276314.73430822,6307626.8969942,276950.11710584,6308262.2797919&WIDTH=532&HEIGHT=532",
-        "min_access_level_for_published_issues": "contributor",
-        "date_creation": datetime.date(2018, 9, 23),
-        "is_moderated": False,
-        "nb_of_contributors": 5,
-        "nb_of_issues": 28,
-        "nb_of_comments": 41,
-    },
-    "occupation-du-sol-2d": {
-        "id": "occupation-du-sol-2d",
-        "title": "Occupation du sol 2D",
-        "description": "Identification des anomalies présentes dans la base de l'occupation du sol 2D issues d'erreur "
-                       "flagrantes de photo-interprétation.",
-        "illustration": "https://www.geopicardie.fr/geoserver/geopicardie/ows?SERVICE=WMS&LAYERS=mos_picardie&EXCEPTIONS=XML&FORMAT=image%2Fpng&TRANSPARENT=TRUE&VERSION=1.3.0&SLD_VERSION=1.1.0&REQUEST=GetMap&STYLES=&CRS=EPSG%3A3857&BBOX=284696.53219112,6305613.2590304,294862.65695304,6315779.3837923&WIDTH=532&HEIGHT=532",
-        "min_access_level_for_published_issues": "contributor",
-        "date_creation": datetime.date(2018, 5, 4),
-        "is_moderated": False,
-        "nb_of_contributors": 12,
-        "nb_of_issues": 41,
-        "nb_of_comments": 109,
-    },
-    "decheteries": {
-        "id": "decheteries",
-        "title": "Déchèteries",
-        "description": "Lacolisation des déchèteries en Région Hauts-de-France.",
-        "illustration": "https://image.freepik.com/photos-gratuite/closeup-mains-separer-bouteilles-plastique_53876-46918.jpg",
-        "min_access_level_for_published_issues": "anonymous",
-        "date_creation": datetime.date(2018, 5, 4),
-        "is_moderated": True,
-        "nb_of_contributors": 20,
-        "nb_of_issues": 131,
-        "nb_of_comments": 12,
-    },
-}
 
 
 def index(request):
@@ -95,7 +29,7 @@ def index(request):
     for elt in data:
         # import pdb; pdb.set_trace()
         project = models.Project.objects.get(slug=elt['slug'])
-        elt['visi_feature_name'] = project.get_visi_feature_display()
+        elt['visi_feature_type'] = project.get_visi_feature_display()
         # recuperation du nombre de contributeur
         elt['nb_contributors'] = models.Autorisation.objects.filter(
                                     project__slug=elt['slug'],
@@ -103,10 +37,10 @@ def index(request):
         # get number of feature per project
         list_features = project_features_types(APP_NAME, elt['slug'])
         nb_features = 0
-        for feature_name in list_features:
+        for feature_type in list_features:
             nb_features += int(project_feature_number(APP_NAME,
                               elt['slug'],
-                              feature_name))
+                              feature_type))
 
         elt['nb_features'] = nb_features
 
@@ -115,6 +49,40 @@ def index(request):
         "projects": list(data),
     }
     return render(request, 'collab/index.html', context)
+
+
+class ProjectView(FormView):
+    template_name = 'collab/add_project.html'
+    form_class = ProjectForm
+    success_url = 'collab/add_project.html'
+
+    def form_valid(self, form):
+
+        # verifie qu'un projet avec ce titre n'existe pas deja
+        try:
+            project = models.Project.objects.get(title=form.cleaned_data['title'])
+            context = {'errors':
+            {'erreur': ["""Veuillez modifier le titre de votre application,
+            une application avec ce titre existe déjà"""]}, 'form': form}
+            return render(self.request, 'collab/add_project.html', context)
+        except Exception as e:
+            pass
+        dberror = form.create_project()
+        if dberror:
+            context = {'errors':
+            {"Une erreur s'est produite": [dberror]}, 'form': form}
+            return render(self.request, 'collab/add_project.html', context)
+        return render(self.request, 'collab/add_project.html')
+
+
+    def form_invalid(self, form):
+        errors = form.errors.copy()
+        for key, val in form.errors.items():
+            label = form.fields[key].label
+            errors[label] = errors.pop(key)
+        context = {'errors': errors, 'form': form}
+        return render(self.request, 'collab/add_project.html', context)
+
 
 
 def my_account(request):
@@ -159,9 +127,11 @@ class ProjectFeature(View):
                 val['geom']['info'] = project.get_geom_type_display()
             if val.get('status'):
                 # char list
-                val['status']['info'] = models.STATUS
+                val['status']['info'] = STATUS
         # build contexte for template
-        context = {"res": res, "dic_key": features_types[0]}
+        context = {"res": res, "dic_key": features_types[0],
+                   "project": project}
+        print(project)
         return render(request, 'collab/add_feature.html', context)
 
     def post(self, request, project_slug):
@@ -210,7 +180,9 @@ class ProjectFeature(View):
 
 
 def project(request, project_slug):
-
+    """
+        Display the detail of a specific project
+    """
     # Recuperation du projet
     project = get_object_or_404(models.Project,
                                 slug=project_slug)
@@ -226,14 +198,14 @@ def project(request, project_slug):
     last_features = {}
 
     # get list of feature per project
-    for feature_name in feature_type:
+    for feature_type in feature_type:
         # get number of feature per project
         nb_features += int(project_feature_number(APP_NAME,
                            project_slug,
-                           feature_name))
-        last_features[feature_name] = get_last_features(APP_NAME,
+                           feature_type))
+        last_features[feature_type] = get_last_features(APP_NAME,
                                                         project_slug,
-                                                        feature_name)
+                                                        feature_type)
 
     context = {"project": project, "users": users,
                "nb_contributors": nb_contributors,
@@ -252,31 +224,61 @@ def project_users(request, project_slug):
 
 
 def project_feature_list(request, project_slug):
-
+    """
+        Display the list of the available features for a
+        given project
+    """
     # get project
     project = get_object_or_404(models.Project,
                                 slug=project_slug)
 
     # list of feature per project
     feature_type = project_features_types(APP_NAME, project_slug)
-    feature_list = {}
+    feature_list = OrderedDict()
     # get list of feature per project
-    for feature_name in feature_type:
-        feature_list[feature_name] = get_project_features(APP_NAME,
+    for feature_type in feature_type:
+        feature_list[feature_type] = get_project_features(APP_NAME,
                                                           project_slug,
-                                                          feature_name)
+                                                          feature_type)
+    # add info for JS display
+    for key, val in feature_list.items():
+        for elt in val:
+            if elt['status']:
+                elt['status'] = STATUS[int(elt['status'])][1]
+            if elt['user_id']:
+                elt['utilisateur'] = elt.pop('user_id')
+                try:
+                    elt['utilisateur'] = models.CustomUser.objects.get(
+                                         id=elt['utilisateur'])
+                except Exception as e:
+                    elt['utilisateur'] = 'Anonyme'
 
     context = {'project': project, 'feature_list': feature_list}
+
     return render(request, 'collab/feature_list.html', context)
 
 
-def project_issue_detail(request, project_slug, issue_id):
+def project_feature_detail(request, project_slug, feature_type, feature_pk):
+    """
+        Display the detail of a given feature
+    """
     # Get project info from slug
-    context = {
-        "title": "Nom du projet",
-        "content": "{} project : issue detail {}".format(project_slug, issue_id),
-    }
-    return render(request, 'collab/empty.html', context)
+    # get project
+    project = get_object_or_404(models.Project,
+                                slug=project_slug)
+    # get features fields
+    feature = get_feature(APP_NAME, project_slug, feature_type, feature_pk)
+    if feature['status']:
+        feature['status'] = STATUS[int(feature['status'])][1]
+    if feature['user_id']:
+        feature['utilisateur'] = feature.pop('user_id')
+        try:
+            feature['utilisateur'] = models.CustomUser.objects.get(
+                                     id=feature['utilisateur'])
+        except Exception as e:
+            feature['utilisateur'] = 'Anonyme'
+    context = {'project': project, 'feature': feature}
+    return render(request, 'collab/feature_detail.html', context)
 
 
 def project_import_issues(request, project_slug):

@@ -1,0 +1,111 @@
+{% extends "collab/layout_menu.html" %}
+{% load app_filters %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+
+
+
+    <div class="ui middle aligned stackable grid container">
+        {% if form %}
+            <div class="row">
+                <h2 class="ui header">Creer une nouvelle application</h2>
+            </div>
+            {% if errors %}
+                <div class="ui error message">
+                     <div class="header">Veuillez corriger votre formulaire</div><br>
+                    {% for key,val in errors.items %}
+                         <strong>{{key}}</strong>: {{val.0}}<br>
+                    {% endfor %}
+                 </div>
+            {% endif %}
+            <div class="row">
+                <form class='ui equal width addproject form' method="POST" >
+                  {% csrf_token %}
+
+                      <div class="required field">
+                          <label>{{form.title.label}}</label>
+                          <input type="text"  name="title" placeholder="{{form.title.label}}" />
+                      </div>
+                      <div class="field">
+                          <label>{{form.icons_URL.label}}</label>
+                          <input type="url"  name="icons_URL" placeholder="{{form.icons_URL.label}}" />
+                      </div>
+                      <div class="required field">
+                          <label>{{form.geom_type.label}} </label>
+                          <div class="ui selection dropdown feature">
+                              <input type="hidden"  name="geom_type" placeholder="" />
+                              <i class="dropdown icon"></i>
+                              <div class="default text">Choisisez un type de géométrie</div>
+                               <div class="menu">
+                                {% for value,text in form.geom_type.field.choices %}
+                                    <div class="item" data-value={{value}} >{{text}}</div>
+                                {% endfor %}
+                              </div>
+                           </div>
+                      </div>
+                      <div class="required field">
+                          <label>{{form.visi_feature.label}} </label>
+                          <div class="ui selection dropdown feature">
+                              <input type="hidden"  name="visi_feature" placeholder="" />
+                              <i class="dropdown icon"></i>
+                              <div class="default text"></div>
+                               <div class="menu">
+                                {% for value,text in form.visi_feature.field.choices %}
+                                    <div class="item" data-value={{value}} >{{text}}</div>
+                                {% endfor %}
+                              </div>
+                           </div>
+                      </div>
+                      <div class="required field">
+                          <label>{{form.visi_archive.label}} </label>
+                          <div class="ui selection dropdown feature">
+                              <input type="hidden"  name="visi_archive" placeholder="" />
+                              <i class="dropdown icon"></i>
+                              <div class="default text"></div>
+                               <div class="menu">
+                                {% for value,text in form.visi_archive.field.choices %}
+                                    <div class="item" data-value={{value}} >{{text}}</div>
+                                {% endfor %}
+                              </div>
+                           </div>
+                      </div>
+                      <div class="field">
+                        <label>{{form.description.label}}</label>
+                        <textarea name="description"></textarea>
+                      </div>
+                      <div class="inline field">
+                        <div class="ui checkbox boolfield">
+                          <input type="checkbox"  name="moderation" class="hidden" >
+                          <input type='hidden' value='0' name="moderation">
+                          <label>{{form.moderation.label}}</label>
+                        </div>
+                      </div>
+                      <div class="field">
+                          <label>{{form.archive_feature.label}}</label>
+                          <input type="number" step="any" name="archive_feature" placeholder="{{form.archive_feature.label}}" />
+                      </div>
+                      <div class="field">
+                          <label>{{form.delete_feature.label}}</label>
+                          <input type="number"  step="any" name="delete_feature" placeholder="{{form.delete_feature.label}}" />
+                      </div>
+
+                     <div style="margin-top:10px">
+                        <button class="ui button" type="submit">
+                         Creer
+                       </button>
+                     </div>
+                </form>
+            </div>
+        {% else %}
+            <div class="ui success message">
+                <div class="header">'Votre application a bien été créé</div>
+            </div>
+        {% endif %}
+    </div>
+    </div>
+
+{% load staticfiles %}
+ <script src="{% static 'collab/js/add_project.js' %}"></script>
+{% endblock %}

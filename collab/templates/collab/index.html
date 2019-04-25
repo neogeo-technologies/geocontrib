@@ -34,16 +34,16 @@
                             <span class="right floated">
                                 {% if project.moderation %}<strong>Projet modéré</strong>{% else %}<strong>Projet non modéré</strong>{% endif %}
                             </span>
-                            <span>Niveau d'autorisation requis&nbsp;: {{project.visi_feature_name}} </span>
+                            <span>Niveau d'autorisation requis&nbsp;: {{project.visi_feature_type}} </span>
                         </div>
                         <div class="meta">
                             <span class="right floated" data-tooltip="">
                                 <i class="calendar icon"></i>&nbsp; {{project.creation_date|date:'d/m/Y'}}
                             </span>
-                            <span data-tooltip="">
+                            <span data-tooltip="  {{project.nb_contributors}} personnes ont contribué à ce projet">
                                 {{project.nb_contributors}}&nbsp;<i class="user icon"></i>
                             </span>
-                            <span data-tooltip="">
+                            <span data-tooltip="{{project.nb_features}} signalements ont été créés pour ce projet">
                                 &nbsp;{{project.nb_features}}&nbsp;<i class="map marker icon"></i>
                             </span>
                             <span data-tooltip="3 commentaires ont été créés pour ce projet">

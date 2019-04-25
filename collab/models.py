@@ -1,3 +1,6 @@
+from collab.choices import GEOM_TYPE
+from collab.choices import USER_TYPE
+from collab.choices import USER_TYPE_ARCHIVE
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -5,12 +8,6 @@ from django.utils.html import format_html
 from django.utils.text import slugify
 from datetime import timedelta
 
-STATUS = (
-    ('0', 'Brouillon'),
-    ('1', 'En attente de publication'),
-    ('2', 'Publié'),
-    ('3', 'Archivé'),
-)
 
 class CustomUser(AbstractUser):
     # add additional fields in here
@@ -20,40 +17,8 @@ class CustomUser(AbstractUser):
         return '%s %s' % (self.first_name, self.last_name.upper())
 
 
-# Create your models here.
-
-# class Status(models.Model):
-#
-#     status = models.CharField('Status des signalements',
-#                               choices=STATUS,
-#                               max_length=1, default='0')
-#
-#     def __str__(self):
-#         return '%s' % (STATUS[int(self.status)][1])
-#
-#     class Meta:
-#         verbose_name = "Status"
-#         verbose_name_plural = "Status"
-
-
 class Project(models.Model):
-    GEOM_TYPE = (
-        ('0', 'Point'),
-        ('1', 'Ligne brisée'),
-        ('2', 'Polygone')
-    )
-    USER_TYPE = (
-        ('0', 'Contributeur'),
-        ('1', 'Utilisateur connecté'),
-        ('2', 'Utilisateur anonyme'),
-    )
-    USER_TYPE_ARCHIVE = (
-        ('0', 'Administrateur'),
-        ('1', 'Modérateur'),
-        ('2', 'Contributeur'),
-        ('3', 'Utilisateur connecté'),
-        ('4', 'Utilisateur anonyme'),
-    )
+
     # Admin prepopulated_fields = {"slug": ("titre",)}
     title = models.CharField('Titre', max_length=128, unique=True)
     slug = models.SlugField('Slug', max_length=128, unique=True)

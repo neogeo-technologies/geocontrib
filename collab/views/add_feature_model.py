@@ -10,6 +10,7 @@ import io
 import uuid
 import shutil
 from collab import models as custom
+from collab.choices import STATUS
 from hashlib import md5
 from ..actions import create_model
 
@@ -62,7 +63,7 @@ def generate_feature_model(projet_id, feature, names, types, user):
         'description': models.TextField('Description', blank=True, null=True),
         'geometrie': models.GeometryField(null=True, blank=True),
         'status': models.CharField('Status des signalements',
-                                   choices=custom.STATUS,
+                                   choices=STATUS,
                                    max_length=1, default='0',
                                    null=True, blank=True),
         'date_archivage': models.DateField("Date d'archivage automatique",

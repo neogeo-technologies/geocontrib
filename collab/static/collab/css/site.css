@@ -19,13 +19,57 @@ img#menu-logo.logo {
 .wireframe {
     margin-top: 2em;
 }
-
+/*
 .ui.footer.segment {
     margin: 1em 0em 0em;
     padding: 1em 0em;
+}*/
+footer{
+  /*height:55px;
+  margin-top: 50px;*/
 }
+.ui.bottom.menu.footer .container {
+    align-items: center;
+    justify-content: center;
 
+}
 .equal-width .label{
     min-width: 8em;
 }
 
+#maplist {
+    background: #f8f4f0;
+    height:400px;
+    width:100%;
+ }
+
+ #mapdetail {
+     background: #f8f4f0;
+     height:400px;
+     width:100%;
+  }
+
+ .featuremap{
+    margin: 20px 0 100px 0;
+ }
+
+/*add feature form*/
+#mapdaddfeature {
+    background: #f8f4f0;
+    height:350px;
+    width:350px;
+    float:left;
+    margin:20px 0 30px 0;
+ }
+
+.addfeature.ui.form, .addproject.ui.form{
+  width:60%;
+  float:left;
+}
+
+.addfeature.ui.form .field label{
+  float:left;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
