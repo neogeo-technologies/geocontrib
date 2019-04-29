@@ -9,7 +9,7 @@ services = [
 ]
 
 urlpatterns = services + [
-    path('ajout_signalement/', views.add_feature_model),
+    path('ajout_signalement/', views.add_feature_model, name="add_feature"),
     path('', views.index, name='index'),
     path('mon_compte/', views.my_account, name='my_account'),
     path('mentions/', views.legal, name='legal'),
