@@ -1,57 +1,83 @@
-{% extends "collab/layout.html" %}
+{% extends "collab/layout_menu.html" %}
 {% block title %}
 {{ title }}
 {% endblock %}
 {% block content %}
 
-{% if not message %}
-  <form method="POST" style='margin-left:10px;margin-top:10px'>
-    {% csrf_token %}
+<div class="ui middle aligned stackable grid container">
 
-
-      <div class="ui selection dropdown type">
-        <input type="hidden"  name="project" placeholder="Projet">
-        <i class="dropdown icon"></i>
-        <div class="default text">Projet Associé au signalement</div>
-        <div class="menu">
-          {% for elt in projects %}
-              <div class="item" data-value={{elt.pk}}>{{elt.title}}</div>
-          {% endfor %}
+  {% if projects %}
+    <div class="row">
+      <h2 class="ui header">Creer un nouveau type de signalement</h2>
+    </div>
+    {% if error %}
+      <br>
+      <div class="ui error message">
+           <div class="header">Veuillez corriger votre formulaire</div><br>
+           <strong>{{error}}</strong>
+       </div>
+    {% endif %}
+    <form class='ui equal width addfeaturemodel form' method="POST">
+        {% csrf_token %}
+        <div class="required field">
+            <label>Projet Associé </label>
+            <div class="ui selection dropdown feature">
+                <input type="hidden"  name="project" placeholder="Projet" />
+                <i class="dropdown icon"></i>
+                <div class="default text">Choisisez le projet associé</div>
+                 <div class="menu">
+                   {% for elt in projects %}
+                       <div class="item" data-value={{elt.pk}}>{{elt.title}}</div>
+                   {% endfor %}
+                </div>
+             </div>
         </div>
-      </div>
-     </br>
-      <div class="ui input">
-         <input type="text" placeholder="Type de signalement" name="feature">
-       </div>
-       <div id="dynamicInput">
-           <div class="ui input">
-              <input type="text"  placeholder="Nom du champ" name="field_name">
-            </div>
-            <div class="ui selection dropdown">
-              <input type="hidden" name="field_type" placeholder="Type">
-              <i class="dropdown icon"></i>
-              <div class="default text">Type</div>
-              <div class="menu">
-                <div class="item" data-value="int">Entier</div>
-                <div class="item" data-value="float">Flottant</div>
-                <div class="item" data-value="date">Date</div>
-                <div class="item"  data-value="string">ChaÎne de caractère</div>
-                <div class="item"  data-value="text">Text</div>
-                <div class="item"  data-value="boolean">Booléen</div>
+        <div class="required field">
+            <label>Nom du nouveau signalement</label>
+            <input type="text"  name="feature" placeholder="Nom du signalement" />
+        </div>
+        <span id='title_addfeature'>Champ(s) additionnel(s)</span>
+         <div id="dynamicInput">
+              <div class="ui input">
+                <input type="text"  placeholder="Nom du champ" name="field_name">
               </div>
-            </div>
-
-       </div>
-       <div style="margin-top:10px">
-          <input class="ui button" type="button" value="Ajout d'un nouveau champ" onClick="addInput('dynamicInput');">
-          <button class="ui button" type="submit">
-           Modifier le modèle
-         </button>
-       </div>
-  </form>
-{% else %}
-  {{message}}
-{% endif %}
-{% load staticfiles %}
-  <script src="{% static 'collab/js/add_model.js' %}"></script>
-{% endblock %}
+              <div class="ui selection dropdown">
+                <input type="hidden" name="field_type" placeholder="Type">
+                <i class="dropdown icon"></i>
+                <div class="default text">Type</div>
+                <div class="menu">
+                  <div class="item" data-value="int">Entier</div>
+                  <div class="item" data-value="float">Flottant</div>
+                  <div class="item" data-value="date">Date</div>
+                  <div class="item"  data-value="string">ChaÎne de caractère</div>
+                  <div class="item"  data-value="text">Text</div>
+                  <div class="item"  data-value="boolean">Booléen</div>
+                </div>
+              </div>
+              <i onClick="addInput('dynamicInput');" class="big green plus square icon"></i>
+         </div>
+         <div style="margin-top:10px">
+            <!-- <input class="ui button" type="button" value="Ajout d'un nouveau champ" onClick="addInput('dynamicInput');"> -->
+            <button class="green ui button" type="submit">
+              Créer le signalement
+           </button>
+         </div>
+    </form>
+  {% else %}
+      {% if success %}
+          <br>
+          <div class="ui success message">
+            <div class="header">{{success}}</div>
+          </div>
+      {% endif %}
+      {% if error %}
+          <br>
+          <div class="ui error message">
+               <strong>{{error}}</strong>
+           </div>
+      {% endif %}
+  {% endif %}
+  {% load staticfiles %}
+    <script src="{% static 'collab/js/add_model.js' %}"></script>
+  {% endblock %}
+</div>

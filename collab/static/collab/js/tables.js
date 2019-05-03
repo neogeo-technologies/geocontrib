@@ -1,17 +1,15 @@
-
-
-var maplist;
+$('.tabular.menu .item').tab();
 
 $(document).ready(function() {
-    $('table.display').DataTable({
+    var table = $('table.display').DataTable({
          "scrollX": true,
          "language": {
                "url": "../../../static/collab/js/datatables_french.json"
           },
           "columnDefs": [
-            {"className": "dt-center", "targets": "_all"}
+            {"className": "dt-body-left", "targets": "_all"}
           ],
-         "dom": 'Bfrtip',
+         "dom": 'frtip',
          "buttons": [
              {
                    extend: 'excel',
@@ -45,26 +43,20 @@ $(document).ready(function() {
          ],
          "select": true
     });
-
-
 } );
 
 
-$('.tabular.menu .item.carte').one('click', function() {
-    maplist = new mapboxgl.Map({
-              container: 'maplist', // container id
-              style: 'https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json', // stylesheet location
-              center: [1.97, 47.14], // starting position [lng, lat]
-              zoom: 4 // starting zoomx
-    });
-    var mapDiv = document.getElementById('maplist');
-    maplist._container = mapDiv;
-    maplist.on('load', function() {
-            maplist.resize();
-    });
-
-});
-
-$('.tabular.menu .item').tab(
-
-);
+// $('.tabular.menu .item.carte').one('click', function() {
+//     maplist = new mapboxgl.Map({
+//               container: 'maplist', // container id
+//               style: 'https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json', // stylesheet location
+//               center: [1.97, 47.14], // starting position [lng, lat]
+//               zoom: 4 // starting zoomx
+//     });
+//     var mapDiv = document.getElementById('maplist');
+//     maplist._container = mapDiv;
+//     maplist.on('load', function() {
+//             maplist.resize();
+//     });
+//
+// });

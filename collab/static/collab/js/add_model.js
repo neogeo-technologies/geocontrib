@@ -1,4 +1,4 @@
-$('.ui.selection.dropdown.type')
+$('.ui.selection.dropdown')
   .dropdown()
 ;
 
@@ -6,19 +6,10 @@ $('.ui.selection.dropdown.type')
 var counter = 1;
 var limit = 20;
 function addInput(divName){
-
-      $('.ui.selection.dropdown')
-        .dropdown()
-      ;
      if (counter == limit)  {
           alert("You have reached the limit of adding " + counter + " inputs");
      }
      else {
-
-       $('.ui.selection.dropdown')
-         .dropdown()
-       ;
-
           var newdiv = document.createElement('div');
           newdiv.innerHTML = `
           <br><div class="ui input">
@@ -27,7 +18,7 @@ function addInput(divName){
           <div class="ui selection dropdown">
           <input type="hidden" name="field_type">
           <i class="dropdown icon"></i>
-          <div class="default text">Type` + (counter + 1)
+          <div class="default text">Type`
            + `</div>
                 <div class="menu">
                   <div class="item" data-value="int">Entier</div>
@@ -41,5 +32,9 @@ function addInput(divName){
           `;
           document.getElementById(divName).appendChild(newdiv);
           counter++;
+          $('.ui.selection.dropdown')
+            .dropdown()
+          ;
+
      }
 }

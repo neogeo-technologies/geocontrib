@@ -1,5 +1,6 @@
 body {
     background-color: #FFFFFF;
+    height:auto;
 }
 
 img#menu-logo.logo {
@@ -54,6 +55,13 @@ footer{
  }
 
 /*add feature form*/
+.ui.form,
+.ui.checkbox label,
+.ui.form .field>label
+{
+  font-size: 1.0em;
+  font-weight: bold;
+}
 #mapdaddfeature {
     background: #f8f4f0;
     height:350px;
@@ -70,6 +78,17 @@ footer{
 .addfeature.ui.form .field label{
   float:left;
   font-weight: bold;
-  font-size: 14px;
   margin-bottom: 10px;
+}
+
+/*add feature model css*/
+.addfeaturemodel{
+  margin-top:20px;
+  float:left;
+}
+#dynamicInput{
+  margin-top: 10px;
+}
+#title_addfeature{
+  font-weight: bold;
 }

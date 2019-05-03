@@ -1,0 +1,75 @@
+{% extends "collab/layout_menu.html" %}
+{% load app_filters %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+<div class="ui tabular menu featurelist">
+  <div class="active item"  data-tab="liste">Liste</div>
+  <div class="item carte"  data-tab="carte">Carte</div>
+</div>
+
+<div class="ui active tab" data-tab="liste">
+{% if feature_list %}
+  {% for key,val in feature_list.items %}
+     <h2 class="ui header">
+       <!-- <img src="{{project.icons_URL}}" class="ui circular image"> -->
+       {{key|upper}}
+     </h2>
+     {% if val %}
+        <table id="" class="display" style="width:100%">
+          <thead>
+              <tr>
+                 <th>Titre</th>
+                 {% for head in val|first %}
+                     {% if head not in 'id,user_id,project_id,feature_id,titre' %}
+                          <th>{{head|header_display}}</th>
+                     {% endif %}
+                 {% endfor %}
+               </tr>
+          </thead>
+          <tbody>
+              {% for feature in val %}
+                  <tr>
+                    <td><a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=feature.id  %}">{{feature.titre|feature_val_display}}</a></td>
+                    {% for feature_key, feature_val in feature.items %}
+                        {% if feature_key not in 'id,user_id,project_id,feature_id,titre' %}
+                          {%  if feature_val %}
+                              {%  if feature_val == True %}
+                                  <td><i class="green check icon"></td>
+                              {% elif feature_val == False %}
+                                  <td><i class="inverted red remove icon"></td>
+                              {%else%}
+                                  <td>{{feature_val|feature_val_display}}</td>
+                              {% endif %}
+                          {% else %}
+                             <td><i class="minus icon"></td>
+                          {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                  </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+     {% else %}
+       <h3 class="ui header">
+            Aucun signalement de ce type n'a été créé pour cette application
+        </h3>
+     {% endif %}
+     <br><br>
+  {% endfor %}
+{% else %}
+   <h3 class="ui header">
+       Aucun signalementde n'a été créé pour cette application
+   </h3>
+{% endif %}
+</div>
+
+<div class="ui tab" data-tab="carte" >
+  <div id='maplist' >
+  </div>
+</div>
+
+{% load staticfiles %}
+ <script src="{% static 'collab/js/tables.js' %}"></script>
+{% endblock %}

@@ -7,7 +7,7 @@
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'collab/css/site.css' %}" />
+
     <!-- jQuery Core 3.3.1 -->
     <script src="{% static 'collab/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script>
     <!-- Semantic UI -->
@@ -24,6 +24,9 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+    <!--STYLE CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'collab/css/site.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'collab/css/table.css' %}" />
 </head>
 
 
@@ -57,7 +60,9 @@
                                      <a class="item" href="{% url 'project_add_feature' project_slug=project.slug  %}">
                                         <i class="icon plus"></i>Ajout d'un signalement </a>
                                       <a class="item" href="{% url 'project_feature_list' project_slug=project.slug %}">
-                                        <i class="icon list"></i><i class="icon map"></i>Liste / Carte</a>
+                                        <i class="icon list"></i>Liste</a>
+                                      <a class="item" href="{% url 'project_feature_map' project_slug=project.slug %}">
+                                      <i class="icon map"></i>Carte</a>
                                   </div>
                               </div>
                               <div class="item">

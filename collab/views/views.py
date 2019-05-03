@@ -223,6 +223,27 @@ def project_users(request, project_slug):
     return render(request, 'collab/empty.html', context)
 
 
+def project_feature_map(request, project_slug):
+    """
+        Display the list of the available features for a
+        given project on a map
+    """
+    # get project
+    project = get_object_or_404(models.Project,
+                                slug=project_slug)
+
+    # list of feature per project
+    feature_type = project_features_types(APP_NAME, project_slug)
+    feature_list = OrderedDict()
+    # get list of feature per project
+    for feature_type in feature_type:
+        feature_list[feature_type] = get_project_features(APP_NAME,
+                                                          project_slug,
+                                                          feature_type)
+    context = {'project': project, 'feature_list': feature_list}
+    return render(request, 'collab/feature_map.html', context)
+
+
 def project_feature_list(request, project_slug):
     """
         Display the list of the available features for a

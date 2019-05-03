@@ -83,24 +83,24 @@
                         </div>
                       </div>
                       <div class="field">
-                          <label>{{form.archive_feature.label}}</label>
-                          <input type="number" step="any" name="archive_feature" placeholder="{{form.archive_feature.label}}" />
+                          <label>{{form.nbday_archive.label}} (nombre de jours)</label>
+                          <input type="number" step="any" name="nbday_archive" placeholder="" />
                       </div>
                       <div class="field">
-                          <label>{{form.delete_feature.label}}</label>
-                          <input type="number"  step="any" name="delete_feature" placeholder="{{form.delete_feature.label}}" />
+                          <label>{{form.nbday_delete.label}}  (nombre de jours)</label>
+                          <input type="number"  step="any" name="nbday_delete" placeholder="" />
                       </div>
 
                      <div style="margin-top:10px">
-                        <button class="ui button" type="submit">
-                         Creer
+                        <button class="green ui button" type="submit">
+                         Creer votre projet
                        </button>
                      </div>
                 </form>
             </div>
         {% else %}
             <div class="ui success message">
-                <div class="header">'Votre application a bien été créé</div>
+                <div class="header">Votre application a bien été créé</div>
             </div>
         {% endif %}
     </div>

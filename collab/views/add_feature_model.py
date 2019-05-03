@@ -1,39 +1,35 @@
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.contrib.gis.db import models
-from django.core.management import call_command
-from django.db import connection
-from django.db.models import Manager as GeoManager
-from django.http import JsonResponse
-from django.shortcuts import render
-import io
-import uuid
-import shutil
+from ..actions import create_model
 from collab import models as custom
 from collab.choices import STATUS
+from collab.views.project_services import project_features_types
+from django.contrib.gis.db import models
+from django.db import connection
+from django.db.models import Manager as GeoManager
+from django.shortcuts import render
 from hashlib import md5
-from ..actions import create_model
+import re
 
 APP_NAME = __package__.split('.')[0]
+DEFAULT_FIELDS = ['feature_id', 'date_creation', 'date_modification',
+                  'titre', 'description', 'geometrie', 'status',
+                  'date_archivage', 'user', 'project']
 
 
 def add_feature_model(request):
 
     if request.method == 'POST':
-
-        if request.POST.getlist('field_type') and request.POST.getlist('field_name') \
-           and request.POST.getlist('project') and request.POST.getlist('feature'):
-
+        if request.POST.get('project') and request.POST.get('feature'):
             message = generate_feature_model(request.POST.get('project'),
                                              request.POST.get('feature'),
-                                             request.POST.getlist('field_name'),
-                                             request.POST.getlist('field_type'),
+                                             request.POST.getlist('field_name' , []),
+                                             request.POST.getlist('field_type', []),
                                              request.user)
-            context = {'message': message}
+            context = message
             return render(request, APP_NAME + '/add_feature_model.html',
                           context=context)
         else:
-            context = {'message': message}
+            projects = custom.Project.objects.all()
+            context = {'projects': projects, 'error': "Les paramètres obligatoires sont manquants"}
             return render(request, APP_NAME + '/add_feature_model.html',
                           context=context)
     else:
@@ -45,8 +41,23 @@ def add_feature_model(request):
 
 def generate_feature_model(projet_id, feature, names, types, user):
 
-    # Récuperation du nom du projet
+    # Get project
     projet = custom.Project.objects.get(id=projet_id)
+    # check the fields names given by users
+    intersection = list(set(names) & set(DEFAULT_FIELDS))
+    if intersection:
+        return {'error': """Le(s) champ(s) suivant(s) font déjà parti du modèle de base
+            d'un signalement, il n'est pas nécessaire de les recréer: """ +  ','.join(intersection)}
+    if len(names) != len(set(names)):
+        return {'error': """Veuillez corriger vos champs. Vous avez entré le même nom de champ plusieurs fois"""}
+    # check if this feature name does not exist already
+    project_features = project_features_types(APP_NAME, projet.slug)
+    if feature in project_features:
+        return {'error': """Un signalement avec ce nom a déjà étè crée"""}
+    # check title of the feature
+    pattern = re.compile("^[a-zA-Z0-9]*$")
+    if not pattern.match(feature):
+        return {'error': """Le nom du signalement ne doit être composé que de chiffres et/ou de lettres (sans accent)"""}
 
     fields = {
         'objects': GeoManager(),
@@ -98,9 +109,6 @@ def generate_feature_model(projet_id, feature, names, types, user):
                                                    blank=True, null=True))
             fields[names[elt]] = field_type[elt]
 
-    # ajout du nom de la table
-    table_name = APP_NAME + "_" + projet.slug + '_' + feature
-
     # creation modele
     model = create_model(projet.slug + '_' + feature, fields,
                          app_label=APP_NAME,
@@ -110,31 +118,6 @@ def generate_feature_model(projet_id, feature, names, types, user):
     try:
         with connection.schema_editor() as editor:
             editor.create_model(model)
-        #
-        # if not projet.feature_type:
-        #     projet.feature_type = [{'table_name': table_name,
-        #                            'feature': feature,
-        #                            'user_id': user.id,
-        #                            'username': user.username}]
-        # else:
-        #     projet.feature_type.append({'table_name': table_name,
-        #                            'feature': feature,
-        #                            'user_id': user.id,
-        #                            'username': user.username})
-        # projet.save()
-        # generation du fichier models.py
-        # out = io.StringIO()
-        # call_command('inspectdb', table_name, stdout=out)
-        #
-        # # A AMELIORER GESTION FK ajout du nom du projet par inspectdb....
-        # out = out.getvalue().replace('CollabProject', 'Project').replace(
-        #                              'CollabCustomuser', 'CustomUser').replace(
-        #                              'CollabStatus', 'Status')
-        #
-        # with open(APP_NAME + """/models/models_feature_{feature_type}.py""".format(
-        #           feature_type=feature), 'a') as fd:
-        #     fd.write(out)
-
-        return "Votre demande a bien été prise en compte, votre signalement sera bientôt disponible"
+        return {'success': "Votre signalement a été crée avec succès"}
     except Exception as e:
-        return "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
+        return {'error': "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"}

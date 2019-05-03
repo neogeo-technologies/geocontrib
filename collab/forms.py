@@ -1,8 +1,8 @@
 from collab.choices import GEOM_TYPE
-from collab.choices import STATUS
 from collab.choices import USER_TYPE
 from collab.choices import USER_TYPE_ARCHIVE
 from collab.models import Project
+from datetime import timedelta
 from django import forms
 
 
@@ -15,9 +15,9 @@ class ProjectForm(forms.Form):
                   widget=forms.Textarea(),
                   label='Description', required=False)
     moderation = forms.BooleanField(label='Modération')
-    archive_feature = forms.DurationField(label='Délai avant archivage',
+    nbday_archive = forms.IntegerField(label='Délai avant archivage',
                                           required=False)
-    delete_feature = forms.DurationField(label='Délai avant suppression',
+    nbday_delete = forms.IntegerField(label='Délai avant suppression',
                                          required=False)
     geom_type = forms.ChoiceField(label='Type de géométrie',
                                   choices=GEOM_TYPE,
@@ -31,6 +31,13 @@ class ProjectForm(forms.Form):
 
     def create_project(self):
         try:
+            # add archive_feature / delete_feature
+            if self.cleaned_data.get('nbday_archive'):
+                nbday = self.cleaned_data.pop('nbday_archive')
+                self.cleaned_data['archive_feature'] = timedelta(days=nbday)
+            if self.cleaned_data.get('nbday_delete'):
+                nbday = self.cleaned_data.pop('nbday_delete')
+                self.cleaned_data['delete_feature'] = timedelta(days=nbday)
             obj = Project(**self.cleaned_data)
             obj.save()
             return ''
