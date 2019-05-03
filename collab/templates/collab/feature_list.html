@@ -10,36 +10,28 @@
     <h2 class="ui header">
       {{key|upper}}
    </h2>
-   <table id="" class="display" style="width:100%">
+   <table id="" class="display feature_table" style="width:100%">
      <thead>
          <tr>
-            <th>Titre</th>
-            {% for head in val|first %}
-                {% if head not in 'id,user_id,project_id,feature_id,titre' %}
-                     <th>{{head|header_display}}</th>
-                {% endif %}
-            {% endfor %}
+            <th><h2>Signalements</h2></th>
           </tr>
      </thead>
      <tbody>
          {% for feature in val %}
              <tr>
-               <td><a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=feature.id  %}">{{feature.titre|feature_val_display}}</a></td>
-               {% for feature_key, feature_val in feature.items %}
-                   {% if feature_key not in 'id,user_id,project_id,feature_id,titre' %}
-                     {%  if feature_val %}
-                         {%  if feature_val == True %}
-                             <td><i class="green check icon"></td>
-                         {% elif feature_val == False %}
-                             <td><i class="inverted red remove icon"></td>
-                         {%else%}
-                             <td>{{feature_val|feature_val_display}}</td>
-                         {% endif %}
-                     {% else %}
-                        <td><i class="minus icon"></td>
-                     {% endif %}
-                   {% endif %}
-               {% endfor %}
+               <td>
+                 {% if feature.status == 'Archivé'%}
+                   <span  data-tooltip="Archivé" data-position="right center"><i class="red file alternate outline icon"></i></span>
+                 {% elif feature.status == 'En attente de publication'%}
+                   <span  data-tooltip="En attente de publication" data-position="right center"><i  class="orange file alternate outline icon"></i></span>
+                 {% elif feature.status == 'Publié'%}
+                   <span  data-tooltip="Publié" data-position="right center" ><i class="green file alternate outline icon"></i></span>
+                 {% else%}
+                   <span  data-tooltip="Brouillon"  data-position="right center"><i class="file alternate outline icon"></i></span>
+                 {% endif %}
+                 <strong><a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=feature.id  %}">{{feature.titre|feature_val_display}}</a></strong>
+                 <span class="sous-titre"><br> Créer par {{feature.utilisateur}} le {{feature.date_creation|date:"d/m/Y" }}</span>
+               </td>
              </tr>
          {% endfor %}
      </tbody>
@@ -84,23 +76,7 @@
                         {% endif %}
                         <strong><a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=feature.id  %}">{{feature.titre|feature_val_display}}</a></strong>
                         <span class="sous-titre"><br> Créer par {{feature.utilisateur}} le {{feature.date_creation|date:"d/m/Y" }}</span>
-
                       </td>
-                      <!-- {% for feature_key, feature_val in feature.items %}
-                          {% if feature_key not in 'id,user_id,project_id,feature_id,titre' %}
-                            {%  if feature_val %}
-                                {%  if feature_val == True %}
-                                    <td><i class="green check icon"></td>
-                                {% elif feature_val == False %}
-                                    <td><i class="inverted red remove icon"></td>
-                                {%else%}
-                                    <td>{{feature_val|feature_val_display}}</td>
-                                {% endif %}
-                            {% else %}
-                               <td><i class="minus icon"></td>
-                            {% endif %}
-                          {% endif %}
-                      {% endfor %} -->
                     </tr>
                 {% endfor %}
             </tbody>

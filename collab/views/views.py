@@ -153,14 +153,18 @@ class ProjectFeature(View):
         except Exception as e:
             pass
         # add data send by the form
-        # remove empty keys
+        # remove empty keys -> A AMELIORER "'"
         data = {k: v for k, v in data.items() if v}
-        data_keys = ' , '.join(list(data.keys()))
-        data_values = "' , '".join(list(data.values()))
+        data_keys = " "
+        data_values = " "
+        if data.keys():
+            data_keys = ' , ' + ' , '.join(list(data.keys()))
+        if data.values():
+            data_values = " , '" + "' , '".join(list(data.values())) + "'"
         # # create with basic keys
-        sql = """INSERT INTO "{table}" (date_creation, date_modification, user_id, project_id, feature_id,{data_keys})
+        sql = """INSERT INTO "{table}" (date_creation, date_modification, user_id, project_id, feature_id {data_keys})
                  VALUES ('{date_creation}','{date_modification}','{user_id}','{project_id}',
-                 '{feature_id}','{data_values}');""".format(
+                 '{feature_id}' {data_values});""".format(
                  date_creation=date_creation,
                  date_modification=date_creation,
                  project_id=project.id,
