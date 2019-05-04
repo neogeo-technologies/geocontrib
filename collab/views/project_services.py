@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from hashlib import md5
-import re
+# import re
 
 
 def get_project_feature_geom(app_name, project_slug, feature):
@@ -46,7 +46,7 @@ def generate_feature_id(app_name, project_slug, feature):
 
 def project_list(request):
     """
-        List of projects availables
+        List of available projects
         @param
         @return JSON
     """
@@ -73,7 +73,7 @@ def last_user_registered(project_slug, nbuser=None):
 
 def project_features_types(app_name, project_slug):
     """
-        Type of features available for a given project
+        List the feature types for a given project
         @param app_name name of the application
         @param project_slug project slug
         @return JSON
@@ -98,7 +98,7 @@ def project_features_types(app_name, project_slug):
 
 def project_feature_number(app_name, project_slug, feature_type):
     """
-        Return the number of feature per project
+        Return the number of features per project
         @param app_name name of the application
         @param project_slug project slug
         @param feature_type type of the feature
@@ -112,9 +112,9 @@ def project_feature_number(app_name, project_slug, feature_type):
     return num.get('count', 0)
 
 
-def project_feature_fields(app_name, project_slug, feature_type):
+def project_feature_type_fields(app_name, project_slug, feature_type):
     """
-        Type of fields for a given feature
+        Type of fields for a given feature type
         @param app_name name of the application
         @param project_slug project slug
         @param feature_type type of the feature
@@ -136,15 +136,15 @@ def project_feature_fields(app_name, project_slug, feature_type):
 
 def get_project_features(app_name, project_slug, feature_type):
     """
-        Return the features of a given project
+        Return the features of a given feature type
         @param app_name name of the application
         @param project_slug project slug
         @param feature_type type of the feature
         @return JSON
     """
     sql = """ SELECT *
-              FROM "{app_name}_{slug}_{feature_type}" ORDER BY
-              date_creation DESC ;
+              FROM "{app_name}_{slug}_{feature_type}"
+              ORDER BY date_creation DESC ;
           """.format(app_name=app_name, slug=project_slug,
                      feature_type=feature_type)
     data = fetch_raw_data('default', sql)
@@ -154,7 +154,7 @@ def get_project_features(app_name, project_slug, feature_type):
 
 def get_last_features(app_name, project_slug, feature_type, num=""):
     """
-        Return the last features saved
+        Return the last features saved for a given feature type
         @param app_name name of the application
         @param project_slug project slug
         @param feature_type type of the feature
@@ -166,8 +166,8 @@ def get_last_features(app_name, project_slug, feature_type, num=""):
         limit = "  LIMIT " + str(num)
 
     sql = """ SELECT id,feature_id,titre
-              FROM "{app_name}_{slug}_{feature_type}" ORDER BY
-              date_creation DESC {limit};
+              FROM "{app_name}_{slug}_{feature_type}"
+              ORDER BY date_creation DESC {limit};
           """.format(app_name=app_name, slug=project_slug,
                      feature_type=feature_type,
                      limit=limit)

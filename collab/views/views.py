@@ -5,7 +5,7 @@ from collab.forms import ProjectForm
 from collab.views.project_services import generate_feature_id
 from collab.views.project_services import get_last_features
 from collab.views.project_services import last_user_registered
-from collab.views.project_services import project_feature_fields
+from collab.views.project_services import project_feature_type_fields
 from collab.views.project_services import get_project_feature_geom
 from collab.views.project_services import project_feature_number
 from collab.views.project_services import project_features_types
@@ -114,7 +114,7 @@ class ProjectFeature(View):
         # type of features's fields
         res = {}
         for elt in features_types:
-            res[elt] = project_feature_fields(APP_NAME, project_slug, elt)
+            res[elt] = project_feature_type_fields(APP_NAME, project_slug, elt)
             # type of geometry
             res[elt].update({'geometry_type': get_project_feature_geom(APP_NAME,
                                                                        project_slug,
