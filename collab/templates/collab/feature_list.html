@@ -5,56 +5,34 @@
 {% endblock %}
 {% block content %}
 
-{% if feature_list|length == 1 %}
-  {% for key,val in feature_list.items %}
-    <h2 class="ui header">
-      {{key|upper}}
-   </h2>
-   <table id="" class="display feature_table" style="width:100%">
-     <thead>
-         <tr>
-            <th><h2>Signalements</h2></th>
-          </tr>
-     </thead>
-     <tbody>
-         {% for feature in val %}
-             <tr>
-               <td>
-                 {% if feature.status == 'Archivé'%}
-                   <span  data-tooltip="Archivé" data-position="right center"><i class="red file alternate outline icon"></i></span>
-                 {% elif feature.status == 'En attente de publication'%}
-                   <span  data-tooltip="En attente de publication" data-position="right center"><i  class="orange file alternate outline icon"></i></span>
-                 {% elif feature.status == 'Publié'%}
-                   <span  data-tooltip="Publié" data-position="right center" ><i class="green file alternate outline icon"></i></span>
-                 {% else%}
-                   <span  data-tooltip="Brouillon"  data-position="right center"><i class="file alternate outline icon"></i></span>
-                 {% endif %}
-                 <strong><a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=feature.id  %}">{{feature.titre|feature_val_display}}</a></strong>
-                 <span class="sous-titre"><br> Créer par {{feature.utilisateur}} le {{feature.date_creation|date:"d/m/Y" }}</span>
-               </td>
-             </tr>
-         {% endfor %}
-     </tbody>
-   </table>
-  {% endfor %}
-{% elif feature_list %}
-  <div class="ui tabular menu featurelist">
+{%if feature_list %}
+    {% if feature_list|length == 1 %}
       {% for key,val in feature_list.items %}
-          {% if forloop.first %}
-            <div class="active item"  data-tab={{key}}><strong>{{key|upper}}</strong></div>
-          {% else %}
-            <div class="item"  data-tab={{key}}><strong>{{key|upper}}</strong></div>
-          {% endif %}
+        <h2 class="ui header">
+          {{key|upper}}
+       </h2>
       {% endfor %}
-  </div>
-
-  {% for key,val in feature_list.items %}
-    {% if forloop.first %}
-    <div class="ui active tab" data-tab="{{key}}" >
-    {% else %}
-    <div class="ui tab" data-tab="{{key}}" >
+    {% elif feature_list %}
+      <div class="ui tabular menu featurelist">
+          {% for key,val in feature_list.items %}
+              {% if forloop.first %}
+                <div class="active item"  data-tab={{key}}><strong>{{key|upper}}</strong></div>
+              {% else %}
+                <div class="item"  data-tab={{key}}><strong>{{key|upper}}</strong></div>
+              {% endif %}
+          {% endfor %}
+      </div>
     {% endif %}
-       {% if val %}
+
+    {% for key,val in feature_list.items %}
+        {% if feature_list|length != 1 %}
+            {% if forloop.first %}
+              <div class="ui active tab" data-tab="{{key}}" >
+            {% else %}
+              <div class="ui tab" data-tab="{{key}}" >
+            {% endif %}
+        {% endif %}
+        {% if val %}
           <table id="" class="display feature_table" style="width:100%">
             <thead>
                 <tr>
@@ -81,17 +59,19 @@
                 {% endfor %}
             </tbody>
           </table>
-       {% else %}
+        {% else %}
           <h3 class="ui header">
               Aucun signalement de ce type n'a été créé pour cette application
           </h3>
-       {% endif %}
-     </div>
-  {% endfor %}
+        {% endif %}
+        {% if feature_list|length != 1 %}
+          </div>
+        {% endif %}
+    {% endfor %}
 {% else %}
-  <h3 class="ui header">
-      Aucun signalementde n'a été créé pour cette application
-  </h3>
+    <h3 class="ui header">
+        Aucun signalement n'a été créé pour cette application
+    </h3>
 {% endif %}
 
 {% load staticfiles %}
