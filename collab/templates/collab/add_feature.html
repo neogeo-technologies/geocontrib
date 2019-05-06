@@ -28,14 +28,16 @@
                       </div>
                    </div>
               </div>
-              <div class="field" class='geomfield'>
-                  <label> Geometrie de type {{project.get_geom_type_display}}</label> <br>
-                  <div id='mapdaddfeature'>
-                  </div>
-                      <!-- <input type="" placeholder="{{val.column_name}}" name="{{val.column_name}}" /> -->
-              </div>
              {% for key,val in res|get_item:dic_key %}
-                    {% if val.column_name not in 'id,user_id,project_id,feature_id,date_creation' %}
+                    {% if key == 'geometry_type' %}
+                        <div class="field" class='geomfield'>
+                            <label> Geometrie de type {{val}}</label> <br>
+                            <div id='mapdaddfeature'>
+                            </div>
+                                <!-- <input type="" placeholder="{{val.column_name}}" name="{{val.column_name}}" /> -->
+                        </div>
+                    {% elif val.column_name not in 'id,user_id,project_id,feature_id,date_creation' %}
+
                         {% if val.type == 'varchar' and val.info %}
                           <div class="field">
                               <label>{{val.column_name|feature_key_display}}</label>

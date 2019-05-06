@@ -10,6 +10,25 @@ from hashlib import md5
 import re
 
 
+def get_project_feature_geom(app_name, project_slug, feature):
+    """
+        Return the feature geometry for a type of feature
+        @app_name name of  the current application
+        @project_slug slug of the feature project
+        @feature feature name
+        @return type of geom
+    """
+
+    try:
+        project = models.Project.objects.get(slug=project_slug)
+        for elt in project.feature_type:
+            if elt.get("feature", "") == feature:
+                return elt.get('geometrie', "Non défini")
+        return "Non défini"
+    except Exception as e:
+        return "Non défini"
+
+
 def generate_feature_id(app_name, project_slug, feature):
     """
         Generate a unique uuid for a feature based on

@@ -1,7 +1,7 @@
 
 GEOM_TYPE = (
     ('0', 'Point'),
-    ('1', 'Ligne brisée'),
+    ('1', 'Ligne'),
     ('2', 'Polygone')
 )
 

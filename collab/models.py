@@ -28,8 +28,6 @@ class Project(models.Model):
     # image = models.ImageField('Image', upload_to="", blank=True, null=True)
     icons_URL = models.URLField("URL de l'icône du projet", blank=True,
                                  null=True, max_length=1000)
-    geom_type = models.CharField('Type de géométrie', choices=GEOM_TYPE,
-                                 max_length=1, default='0')
     moderation = models.BooleanField('Modération', default=False)
     visi_feature = models.CharField('Visibilité des signalements publiés',
                                     choices=USER_TYPE,
@@ -41,8 +39,8 @@ class Project(models.Model):
                                             null=True)
     delete_feature = models.DurationField('Délai avant suppression',
                                            blank=True, null=True)
-    # feature_type = JSONField('Type de signalements disponibles',
-    #                          blank=True, null=True)
+    feature_type = JSONField('Type de signalements disponibles',
+                             blank=True, null=True)
 
     def __str__(self):
         return self.title

@@ -36,6 +36,19 @@
             <label>Nom du nouveau signalement</label>
             <input type="text"  name="feature" placeholder="Nom du signalement" />
         </div>
+        <div class="required field">
+            <label>Type de géometrie Associé </label>
+            <div class="ui selection dropdown feature">
+                <input type="hidden"  name="geometry" placeholder="Geometrie" />
+                <i class="dropdown icon"></i>
+                <div class="default text">Choisisez un type de géométrie</div>
+                 <div class="menu">
+                   <div class="item" data-value="0">Point</div>
+                   <div class="item" data-value="1">Ligne brisée</div>
+                   <div class="item" data-value="2">Polygone</div>
+                </div>
+             </div>
+        </div>
         <span id='title_addfeature'>Champ(s) additionnel(s)</span>
          <div id="dynamicInput">
               <div class="ui input">

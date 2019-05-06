@@ -1,5 +1,6 @@
 from ..actions import create_model
 from collab import models as custom
+from collab.choices import GEOM_TYPE
 from collab.choices import STATUS
 from collab.views.project_services import project_features_types
 from django.contrib.gis.db import models
@@ -18,9 +19,11 @@ DEFAULT_FIELDS = ['feature_id', 'date_creation', 'date_modification',
 def add_feature_model(request):
 
     if request.method == 'POST':
-        if request.POST.get('project') and request.POST.get('feature'):
+        if request.POST.get('project') and request.POST.get('feature') and \
+           request.POST.get('geometry'):
             message = generate_feature_model(request.POST.get('project'),
                                              request.POST.get('feature'),
+                                             request.POST.get('geometry'),
                                              request.POST.getlist('field_name' , []),
                                              request.POST.getlist('field_type', []),
                                              request.user)
@@ -39,7 +42,7 @@ def add_feature_model(request):
                       context=context)
 
 
-def generate_feature_model(projet_id, feature, names, types, user):
+def generate_feature_model(projet_id, feature, geometry, names, types, user):
 
     # Get project
     projet = custom.Project.objects.get(id=projet_id)
@@ -118,6 +121,22 @@ def generate_feature_model(projet_id, feature, names, types, user):
     try:
         with connection.schema_editor() as editor:
             editor.create_model(model)
+
+        # ajout du nom de la table
+        table_name = APP_NAME + "_" + projet.slug + '_' + feature
+        if not projet.feature_type:
+            projet.feature_type = [{'table_name': table_name,
+                                    'geometrie': GEOM_TYPE[int(geometry)][1],
+                                    'feature': feature,
+                                    'user_id': user.id,
+                                    'username': user.username}]
+        else:
+            projet.feature_type.append({'table_name': table_name,
+                                        'geometrie': GEOM_TYPE[int(geometry)][1],
+                                        'feature': feature,
+                                        'user_id': user.id,
+                                        'username': user.username})
+        projet.save()
         return {'success': "Votre signalement a été crée avec succès"}
     except Exception as e:
         return {'error': "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"}

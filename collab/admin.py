@@ -49,7 +49,6 @@ for model_name, model in app.models.items():
 
     if 'auth' not in model_name and 'django' not in model_name and 'customuser_' not in model_name:
         if not admin.site._registry.get(model, ''):
-            # import pdb; pdb.set_trace()
 
             if 'feature' in model_name:
                 model_admin = type(model_name + "Admin", (admin.ModelAdmin, ), {'list_display': tuple([field.name for field in model._meta.fields]),  'readonly_fields':('feature_id',)})

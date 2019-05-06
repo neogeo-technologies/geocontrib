@@ -6,6 +6,7 @@ from collab.views.project_services import generate_feature_id
 from collab.views.project_services import get_last_features
 from collab.views.project_services import last_user_registered
 from collab.views.project_services import project_feature_fields
+from collab.views.project_services import get_project_feature_geom
 from collab.views.project_services import project_feature_number
 from collab.views.project_services import project_features_types
 from collab.views.project_services import get_project_features
@@ -27,7 +28,6 @@ def index(request):
     # list of projects
     data = models.Project.objects.values()
     for elt in data:
-        # import pdb; pdb.set_trace()
         project = models.Project.objects.get(slug=elt['slug'])
         elt['visi_feature_type'] = project.get_visi_feature_display()
         # recuperation du nombre de contributeur
@@ -84,7 +84,6 @@ class ProjectView(FormView):
         return render(self.request, 'collab/add_project.html', context)
 
 
-
 def my_account(request):
     context = {"title": "My account"}
     return render(request, 'collab/my_account.html', context)
@@ -116,22 +115,22 @@ class ProjectFeature(View):
         res = {}
         for elt in features_types:
             res[elt] = project_feature_fields(APP_NAME, project_slug, elt)
+            # type of geometry
+            res[elt].update({'geometry_type': get_project_feature_geom(APP_NAME,
+                                                                       project_slug,
+                                                                       elt)})
         if not features_types:
             context = {"message": "Veuillez creer un type de signalement pour ce projet"}
             return render(request, 'collab/add_feature.html', context)
 
         # add info for JS display
         for key, val in res.items():
-            if val.get('geom', ''):
-                # type of geometry
-                val['geom']['info'] = project.get_geom_type_display()
             if val.get('status'):
                 # char list
                 val['status']['info'] = STATUS
         # build contexte for template
         context = {"res": res, "dic_key": features_types[0],
                    "project": project}
-        print(project)
         return render(request, 'collab/add_feature.html', context)
 
     def post(self, request, project_slug):
@@ -153,7 +152,7 @@ class ProjectFeature(View):
         except Exception as e:
             pass
         # add data send by the form
-        # remove empty keys -> A AMELIORER "'"
+        # remove empty keys -> A AMELIORER "'" !!!!!!!!!
         data = {k: v for k, v in data.items() if v}
         data_keys = " "
         data_values = " "

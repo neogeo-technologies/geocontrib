@@ -19,9 +19,6 @@ class ProjectForm(forms.Form):
                                           required=False)
     nbday_delete = forms.IntegerField(label='Délai avant suppression',
                                          required=False)
-    geom_type = forms.ChoiceField(label='Type de géométrie',
-                                  choices=GEOM_TYPE,
-                                  widget=forms.Select())
     visi_feature = forms.ChoiceField(label='Visibilité des signalements publiés',
                                      choices=USER_TYPE,
                                      widget=forms.Select())

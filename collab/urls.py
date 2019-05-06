@@ -5,7 +5,7 @@ from collab.views.views import ProjectFeature
 from collab.views.views import ProjectView
 
 services = [
-    path('liste_projet/', views.project_list),
+    path('api/liste_projet/', views.project_list),
 ]
 
 urlpatterns = services + [

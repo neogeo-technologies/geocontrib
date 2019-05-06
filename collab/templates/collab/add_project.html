@@ -33,19 +33,6 @@
                           <input type="url"  name="icons_URL" placeholder="{{form.icons_URL.label}}" />
                       </div>
                       <div class="required field">
-                          <label>{{form.geom_type.label}} </label>
-                          <div class="ui selection dropdown feature">
-                              <input type="hidden"  name="geom_type" placeholder="" />
-                              <i class="dropdown icon"></i>
-                              <div class="default text">Choisisez un type de géométrie</div>
-                               <div class="menu">
-                                {% for value,text in form.geom_type.field.choices %}
-                                    <div class="item" data-value={{value}} >{{text}}</div>
-                                {% endfor %}
-                              </div>
-                           </div>
-                      </div>
-                      <div class="required field">
                           <label>{{form.visi_feature.label}} </label>
                           <div class="ui selection dropdown feature">
                               <input type="hidden"  name="visi_feature" placeholder="" />
