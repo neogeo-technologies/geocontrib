@@ -1,12 +1,16 @@
 from collab.choices import GEOM_TYPE
 from collab.choices import USER_TYPE
 from collab.choices import USER_TYPE_ARCHIVE
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils.html import format_html
 from django.utils.text import slugify
 from datetime import timedelta
+import os
 
 
 class CustomUser(AbstractUser):
@@ -17,6 +21,18 @@ class CustomUser(AbstractUser):
         return '%s %s' % (self.first_name, self.last_name.upper())
 
 
+
+class OverwriteStorage(FileSystemStorage):
+    '''
+    Returns a filename that's free on the target storage system, and
+    available for new content to be written to.
+    '''
+    def get_available_name(self, name, max_length=None):
+        if self.exists(name):
+            os.remove(os.path.join(settings.MEDIA_ROOT, name))
+        return name
+
+
 class Project(models.Model):
 
     # Admin prepopulated_fields = {"slug": ("titre",)}
@@ -25,9 +41,8 @@ class Project(models.Model):
     creation_date = models.DateTimeField("Date de création du projet",
                                           auto_now_add=True)
     description = models.TextField('Description', blank=True)
-    # image = models.ImageField('Image', upload_to="", blank=True, null=True)
-    icons_URL = models.URLField("URL de l'icône du projet", blank=True,
-                                 null=True, max_length=1000)
+    icon = models.ImageField('icon', upload_to="icons",  storage=OverwriteStorage(),
+                             null=True)
     moderation = models.BooleanField('Modération', default=False)
     visi_feature = models.CharField('Visibilité des signalements publiés',
                                     choices=USER_TYPE,
@@ -46,8 +61,11 @@ class Project(models.Model):
         return self.title
 
     def thumbLink(self):
-        return format_html('<img src="{url}" width=200 height=200/>',
-                           url=self.icons_URL)
+        try:
+            return format_html('<img src="{url}" width=200 height=200/>',
+                               url=settings.BASE_URL+self.icon.url)
+        except Exception as e:
+            pass
 
     thumbLink.allow_tags = True
     thumbLink.short_description = "Icône"

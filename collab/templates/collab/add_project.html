@@ -10,7 +10,7 @@
     <div class="ui middle aligned stackable grid container">
         {% if form %}
             <div class="row">
-                <h2 class="ui header">Creer une nouvelle application</h2>
+                <h2 class="ui header">Créer un nouveau projet</h2>
             </div>
             {% if errors %}
                 <div class="ui error message">
@@ -21,7 +21,7 @@
                  </div>
             {% endif %}
             <div class="row">
-                <form class='ui equal width addproject form' method="POST" >
+                <form class='ui equal width addproject form' method="POST"  enctype="multipart/form-data">
                   {% csrf_token %}
 
                       <div class="required field">
@@ -29,8 +29,14 @@
                           <input type="text"  name="title" placeholder="{{form.title.label}}" />
                       </div>
                       <div class="field">
-                          <label>{{form.icons_URL.label}}</label>
-                          <input type="url"  name="icons_URL" placeholder="{{form.icons_URL.label}}" />
+                         <label>{{form.icon.label}}</label>
+                         <div class="ui action input">
+                              <input type="text"  placeholder="Icon" readonly>
+                              <input type="file" id='icon' name="icon" style="display: none">
+                              <div class="ui icon button iconfile">
+                                <i class="attach icon"></i>
+                              </div>
+                         </div>
                       </div>
                       <div class="required field">
                           <label>{{form.visi_feature.label}} </label>

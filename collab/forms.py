@@ -9,8 +9,8 @@ from django import forms
 class ProjectForm(forms.Form):
 
     title = forms.CharField(label='Titre', max_length=100)
-    icons_URL = forms.URLField(label="URL de l'icône du projet",
-                               max_length=1000, required=False)
+    icon = forms.ImageField(label="Icône du projet",
+                            required=False)
     description = forms.CharField(
                   widget=forms.Textarea(),
                   label='Description', required=False)
@@ -27,13 +27,14 @@ class ProjectForm(forms.Form):
                                      widget=forms.Select())
 
     def create_project(self):
+
         try:
             # add archive_feature / delete_feature
-            if self.cleaned_data.get('nbday_archive'):
-                nbday = self.cleaned_data.pop('nbday_archive')
+            nbday = self.cleaned_data.pop('nbday_archive')
+            if nbday:
                 self.cleaned_data['archive_feature'] = timedelta(days=nbday)
-            if self.cleaned_data.get('nbday_delete'):
-                nbday = self.cleaned_data.pop('nbday_delete')
+            nbday = self.cleaned_data.pop('nbday_delete', '')
+            if nbday:
                 self.cleaned_data['delete_feature'] = timedelta(days=nbday)
             obj = Project(**self.cleaned_data)
             obj.save()
