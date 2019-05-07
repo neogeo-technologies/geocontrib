@@ -41,7 +41,7 @@ class Project(models.Model):
     creation_date = models.DateTimeField("Date de création du projet",
                                           auto_now_add=True)
     description = models.TextField('Description', blank=True)
-    icon = models.ImageField('icon', upload_to="icons",  storage=OverwriteStorage(),
+    illustration = models.ImageField('illustration', upload_to="illustrations",  storage=OverwriteStorage(),
                              null=True)
     moderation = models.BooleanField('Modération', default=False)
     visi_feature = models.CharField('Visibilité des signalements publiés',
@@ -63,7 +63,7 @@ class Project(models.Model):
     def thumbLink(self):
         try:
             return format_html('<img src="{url}" width=200 height=200/>',
-                               url=settings.BASE_URL+self.icon.url)
+                               url=settings.BASE_URL+self.illustration.url)
         except Exception as e:
             pass
 
