@@ -1,0 +1,89 @@
+
+{% for key,val in res %}
+       {% if key == 'geometry_type' %}
+           <div class="field" class='geomfield'>
+               <label> Geometrie de type {{val}}</label> <br>
+               <div id='mapfeature'></div>
+           </div>
+       {% elif val.column_name not in 'id,user_id,project_id,feature_id,date_creation' %}
+
+           {% if val.type == 'varchar' and val.info %}
+             <div class="field">
+                 <label>{{val.column_name|feature_key_display}}</label>
+                 <div class="ui selection dropdown status">
+                     <input type="hidden"  name="{{val.column_name}}" placeholder="{{val.column_name}}" />
+                     <i class="dropdown icon"></i>
+                     <div class="default text">{{val.column_name}}</div>
+                     <div class="menu">
+                       {% for status in val.info %}
+
+                           <div class="item" data-value={{status.0}}>{{status.1}}</div>
+                       {% endfor %}
+                     </div>
+                  </div>
+             </div>
+           {% elif val.type == 'varchar' %}
+             <div class="field">
+                <label>{{val.column_name|feature_key_display}}</label>
+                <input type="text" maxlength="{{val.char_max_size}}" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
+             </div>
+           {% elif val.type == 'date' %}
+             <div class="field">
+               <!-- <div class="ui calendar" id="date-field"> -->
+                 <label>{{val.column_name|feature_key_display}}</label>
+                 <div class="ui input left icon">
+                   <i class="calendar icon"></i>
+                   <input type="text"  name="{{val.column_name}}" placeholder="{{val.column_name}}" />
+                 </div>
+               <!-- </div> -->
+             </div>
+           {% elif val.type == 'text' %}
+             <div class="field">
+                 <label>{{val.column_name|feature_key_display}}</label>
+                 <textarea name="{{val.column_name}}"></textarea>
+             </div>
+           {% elif val.data_type == 'boolean' %}
+             <div class="inline field">
+               <div class="ui checkbox boolfield">
+                 <input type="checkbox"  name="{{val.column_name}}" class="hidden" >
+                 <input type='hidden' value='0' name="{{val.column_name}}">
+                 <label>{{val.column_name|feature_key_display}}</label>
+               </div>
+             </div>
+           {% elif val.data_type == 'integer' %}
+             <div class="field">
+                 <label>{{val.column_name|feature_key_display}}</label>
+                 <input type="number" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
+             </div>
+           {% elif val.data_type == 'double precision' %}
+               <div class="field">
+                   <label>{{val.column_name|feature_key_display}}</label>
+                   <input type="number" step="any"  placeholder="{{val.column_name}}" name="{{val.column_name}}" />
+               </div>
+           {% endif %}
+       {% endif %}
+{% endfor %}
+{% if res %}
+  <div style="margin-top:10px">
+      <button class="green ui button" type="submit">
+            Ajouter le signalement
+      </button>
+  </div>
+{% endif %}
+
+<script type="text/javascript">
+      $('.ui.checkbox.boolfield')
+        .checkbox()
+      ;
+      $('.ui.selection.dropdown.status')
+        .dropdown()
+      ;
+      if($('#mapfeature').length >0 ){
+            new mapboxgl.Map({
+                      container: 'mapfeature', // container id
+                      style: 'https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json', // stylesheet location
+                      center: [1.97, 47.14], // starting position [lng, lat]
+                      zoom: 4 // starting zoomx
+            });
+      }
+</script>
