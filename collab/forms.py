@@ -9,7 +9,7 @@ from django import forms
 class ProjectForm(forms.Form):
 
     title = forms.CharField(label='Titre', max_length=100)
-    icon = forms.ImageField(label="Icône du projet",
+    illustration = forms.ImageField(label="Illustration du projet",
                             required=False)
     description = forms.CharField(
                   widget=forms.Textarea(),

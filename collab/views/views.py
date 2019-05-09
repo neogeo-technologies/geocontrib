@@ -120,7 +120,7 @@ class ProjectFeature(View):
                                                                        project_slug,
                                                                        elt)})
         if not features_types:
-            context = {"message": "Veuillez creer un type de signalement pour ce projet"}
+            context = {"message": "Veuillez créer un type de signalement pour ce projet"}
             return render(request, 'collab/add_feature.html', context)
 
         # add info for JS display
@@ -128,10 +128,12 @@ class ProjectFeature(View):
             if val.get('status'):
                 # char list
                 val['status']['info'] = STATUS
-        # build contexte for template
-        context = {"res": res, "dic_key": features_types[0],
-                   "project": project}
-        return render(request, 'collab/add_feature.html', context)
+        if request.is_ajax():
+            context = {"res": res.get(request.GET.get('name')).items}
+            return render(request, 'collab/form_body.html', context)
+        else:
+            context = {"project": project, "features_types": features_types}
+            return render(request, 'collab/add_feature.html', context)
 
     def post(self, request, project_slug):
 
@@ -174,11 +176,10 @@ class ProjectFeature(View):
                  data_values=data_values)
         creation = commit_data('default', sql)
         if creation == True:
-            # register the new signal
-            context = {'message': 'Le signalement a bien été ajouté'}
+            context = {"project": project, 'success': 'Le signalement a bien été ajouté'}
             return render(request, 'collab/add_feature.html', context)
         else:
-            context = {'message': "Une erreur s'est produite. Veuillez réessayer ultérieurement"}
+            context = {"project": project, 'error': "Une erreur s'est produite. Veuillez réessayer ultérieurement"}
             return render(request, 'collab/add_feature.html', context)
 
 
