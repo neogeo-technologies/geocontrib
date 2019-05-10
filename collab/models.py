@@ -143,13 +143,13 @@ class Comment(models.Model):
     creation_date = models.DateTimeField("Date de création du commentaire",
                                          auto_now_add=True)
     author = models.ForeignKey(CustomUser, verbose_name="Auteur",
-                               on_delete=models.CASCADE,
+                               on_delete=models.PROTECT,
                                help_text="Auteur du commentaire")
     feature_id = models.UUIDField("Identifiant du signalement",
                                   editable=False, max_length=32)
     comment = models.TextField('Commentaire', blank=True)
 
-    project_slug = models.SlugField('Slug', max_length=128)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Commentaire"
@@ -170,24 +170,15 @@ class Attachment(models.Model):
                                   max_length=1)
     file = models.FileField(
         'Piece jointe',
-        upload_to="",
+        upload_to="piecejointe",
         # validators=[] -> TO DO VALIDER L'extension + Taille du fichier
     )
 
-    creation_date = models.DateTimeField("Date de création du commentaire",
-                                      auto_now_add=True)
-    author = models.ForeignKey(CustomUser, verbose_name="Auteur",
-                               on_delete=models.CASCADE,
-                               help_text="Auteur du commentaire")
     feature_id = models.UUIDField("Identifiant du signalement",
                                   editable=False, max_length=32, blank=True)
-    comment = models.ForeignKey(Comment,
-                                on_delete=models.CASCADE)
-
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
     info = models.TextField('Info', blank=True)
-
-    project_slug = models.SlugField('Slug', max_length=128)
-
 
     def __str__(self):
         return self.titre

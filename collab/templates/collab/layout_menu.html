@@ -51,7 +51,9 @@
                 {% block menu %}
                     {% if project %}
                           <div class="item">
-                              <img  class="ui small image" src="{{project.illustration.url}}" height="200">
+                              {% if project.illustration %}
+                                <img  class="ui small image" src="{{project.illustration.url}}" height="200">
+                              {% endif %}
                           </div>
                           <div class="ui medium vertical menu">
                               <div class="item">

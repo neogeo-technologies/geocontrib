@@ -16,34 +16,37 @@
         </div>
     {% endif %}
 {% else %}
-
-    <div class="ui middle aligned stackable grid container">
-        <div class="row">
-            <h2 class="ui header">{{project.title}}</h2>
+    {% if features_types %}
+        <div class="ui middle aligned stackable grid container">
+            <div class="row">
+                <h2 class="ui header">{{project.title}}</h2>
+            </div>
+            <div class="row">
+                <form class='ui equal width addfeature form' method="POST" >
+                  {% csrf_token %}
+                  <div class="field">
+                      <label>Type de signalement </label>
+                      <div class="ui selection dropdown feature" id='feature_type'>
+                          <input type="hidden"  name="feature" placeholder="" />
+                          <i class="dropdown icon"></i>
+                          <div class="default text">Choisisez un signalement</div>
+                           <div class="menu">
+                            {% for elt in features_types %}
+                                <div class="item" data-value={{elt}} >{{elt}}</div>
+                            {% endfor %}
+                          </div>
+                       </div>
+                  </div>
+                  <div id="form_body">
+                        {% include 'collab/form_body.html' %}
+                  </div>
+               </form>
+            </div>
         </div>
-        <div class="row">
-            <form class='ui equal width addfeature form' method="POST" >
-              {% csrf_token %}
-              <div class="field">
-                  <label>Type de signalement </label>
-                  <div class="ui selection dropdown feature" id='feature_type'>
-                      <input type="hidden"  name="feature" placeholder="" />
-                      <i class="dropdown icon"></i>
-                      <div class="default text">Choisisez un signalement</div>
-                       <div class="menu">
-                        {% for elt in features_types %}
-                            <div class="item" data-value={{elt}} >{{elt}}</div>
-                        {% endfor %}
-                      </div>
-                   </div>
-              </div>
-              <div id="form_body">
-                    {% include 'collab/form_body.html' %}
-              </div>
-           </form>
         </div>
-    </div>
-    </div>
+    {% else %}
+        <div class="header">Veuillez créer un type de signalement </div>
+    {% endif %}
 {% endif %}
 {% load staticfiles %}
  <script src="{% static 'collab/js/add_feature.js' %}"></script>

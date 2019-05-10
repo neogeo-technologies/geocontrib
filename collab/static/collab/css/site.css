@@ -92,3 +92,17 @@ footer{
 #title_addfeature{
   font-weight: bold;
 }
+
+/*add feature comment css*/
+.comment .actions{
+  float:right;
+  margin-bottom:10px;
+}
+
+.ui.celled.table #addcomment{
+  float:right;
+}
+
+.comment_title{
+  color:gray;
+}

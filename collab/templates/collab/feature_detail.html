@@ -28,13 +28,59 @@
               </tr>
           {%endif%}
       {%endfor%}
-      <title>Display a map</title>
       </tbody>
   </table>
   <div id='mapdetail'>
   </div>
+  {% if comments%}
+    {% for val in comments %}
+      <table class="ui celled table">
+        <thead>
+          <tr><th>
+                  <span class="comment_title"> <strong>{{val.author__first_name|title}}
+                                      {{val.author__last_name|title}} <strong>
+                                       Le {{val.creation_date|date:"d M Y"}}</span>
+                  {% if forloop.first %}
+                    <i id="addcomment" class=" big green plus square icon"></i>
+                  {% endif %}
+          </th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="">{{val.comment}}</td>
+          </tr>
+        </tbody>
+     </table>
+
+    {%endfor%}
+  {% else %}
+    <br>
+    <i id="addcomment" class=" big green plus square icon"> </i> <strong>Ajouter un commentaire </strong>
+  {% endif %}
+
+  <div class="ui small modal comment">
+    <i class="close icon"></i>
+    <div class="header">
+      Ajouter un commentaire
+    </div>
+    <div class="content">
+        <form class="ui form comment_form" method="POST">
+            {% csrf_token %}
+            <div class="ui error message"></div>
+            <div class="required field">
+              <textarea name="comment"></textarea>
+            </div>
+            <div class="actions">
+              <div class="ui cancel button">
+                Annuler
+              </div>
+             <button class="ui button green" type="submit">Ajouter</button>
+            </div>
+        </form>
+    </div>
+  </div>
 
   {% load staticfiles %}
-   <script src="{% static 'collab/js/map_element.js' %}"></script>
+   <script src="{% static 'collab/js/feature_detail.js' %}"></script>
 
 {% endblock %}

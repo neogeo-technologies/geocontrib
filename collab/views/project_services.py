@@ -1,9 +1,11 @@
+from collab.choices import STATUS
 from collab.db_utils import fetch_first_row
 from collab.db_utils import fetch_raw_data
 from collab import models
 from collections import OrderedDict
 from django.core import serializers
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from hashlib import md5
@@ -165,8 +167,12 @@ def get_last_features(app_name, project_slug, feature_type, num=""):
     if num:
         limit = "  LIMIT " + str(num)
 
-    sql = """ SELECT id,feature_id,titre
+    sql = """ SELECT collab_customuser.id,
+              first_name,last_name,
+              user_id,feature_id,titre,date_creation
               FROM "{app_name}_{slug}_{feature_type}"
+              INNER JOIN public.collab_customuser ON
+              user_id=collab_customuser.id
               ORDER BY date_creation DESC {limit};
           """.format(app_name=app_name, slug=project_slug,
                      feature_type=feature_type,
@@ -191,3 +197,31 @@ def get_feature(app_name, project_slug, feature_type, id):
                      feature_type=feature_type, id=id)
     data = fetch_first_row('default', sql)
     return OrderedDict(sorted(data.items()))
+
+
+def get_feature_detail(app_name, project_slug, feature_type, feature_pk):
+    """
+        Return the detail of a specific feature
+        @param app_name name of the application
+        @param project_slug project slug
+        @param feature_type type of the feature
+        @param feature_pk pk of the feature
+        @return JSON
+    """
+    # Get project info from slug
+    # get project
+    project = get_object_or_404(models.Project,
+                                slug=project_slug)
+    # get features fields
+    feature = get_feature(app_name, project_slug, feature_type, feature_pk)
+    if feature['status']:
+        feature['status'] = STATUS[int(feature['status'])][1]
+    if feature['user_id']:
+        feature['utilisateur'] = feature.pop('user_id')
+        try:
+            feature['utilisateur'] = models.CustomUser.objects.get(
+                                     id=feature['utilisateur'])
+        except Exception as e:
+            feature['utilisateur'] = 'Anonyme'
+
+    return project, feature

@@ -2,6 +2,7 @@ from django.conf.urls import re_path
 from django.urls import path
 from . import views
 from collab.views.views import ProjectFeature
+from collab.views.views import ProjectFeatureDetail
 from collab.views.views import ProjectView
 
 services = [
@@ -20,7 +21,7 @@ urlpatterns = services + [
     path('projet/<slug:project_slug>/ajout/', ProjectFeature.as_view(), name='project_add_feature'),
     path('projet/<slug:project_slug>/liste/', views.project_feature_list, name='project_feature_list'),
     path('projet/<slug:project_slug>/carte/', views.project_feature_map, name='project_feature_map'),
-    path('projet/<slug:project_slug>/<slug:feature_type>/<int:feature_pk>', views.project_feature_detail,
+    path('projet/<slug:project_slug>/<slug:feature_type>/<int:feature_pk>', ProjectFeatureDetail.as_view(),
          name='project_feature_detail'),
     path('projet/<slug:project_slug>/import/', views.project_import_issues, name='project_import_issues'),
     path('projet/<slug:project_slug>/import-geo-image/', views.project_import_geo_image,

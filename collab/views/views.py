@@ -3,14 +3,15 @@ from collab.choices import STATUS
 from collab.db_utils import commit_data
 from collab.forms import ProjectForm
 from collab.views.project_services import generate_feature_id
+from collab.views.project_services import get_feature
+from collab.views.project_services import get_feature_detail
 from collab.views.project_services import get_last_features
+from collab.views.project_services import get_project_features
+from collab.views.project_services import get_project_feature_geom
 from collab.views.project_services import last_user_registered
 from collab.views.project_services import project_feature_type_fields
-from collab.views.project_services import get_project_feature_geom
 from collab.views.project_services import project_feature_number
 from collab.views.project_services import project_features_types
-from collab.views.project_services import get_project_features
-from collab.views.project_services import get_feature
 from collections import OrderedDict
 import datetime
 from django.shortcuts import get_object_or_404
@@ -34,6 +35,8 @@ def index(request):
         elt['nb_contributors'] = models.Autorisation.objects.filter(
                                     project__slug=elt['slug'],
                                     level="1").count()
+        # recuperation du nombre de commentaire
+        elt['nb_comments'] = models.Comment.objects.filter(project=project).count()
         # get number of feature per project
         list_features = project_features_types(APP_NAME, elt['slug'])
         nb_features = 0
@@ -151,6 +154,8 @@ class ProjectFeature(View):
         try:
             data.pop('csrfmiddlewaretoken')
             data.pop('feature')
+            # get comment
+            comment = data.pop('comment')
         except Exception as e:
             pass
         # add data send by the form
@@ -175,6 +180,11 @@ class ProjectFeature(View):
                  data_keys=data_keys,
                  data_values=data_values)
         creation = commit_data('default', sql)
+        # create comment
+        obj, created = models.Comment.objects.get_or_create(author=request.user,
+                                             feature_id=feature_id,
+                                             comment=comment,
+                                             classproject=project)
         if creation == True:
             context = {"project": project, 'success': 'Le signalement a bien été ajouté'}
             return render(request, 'collab/add_feature.html', context)
@@ -196,6 +206,16 @@ def project(request, project_slug):
     nb_contributors = models.Autorisation.objects.filter(
                       project__slug=project_slug,
                       level="1").count()
+    # recuperation du nombre de commentaire
+    comments = models.Comment.objects.filter(project=project).order_by('-creation_date')
+    # recuperation du nombre de commentaire
+    nb_comments = comments.count()
+    comments = comments.values('author__first_name', 'author__last_name',
+                               'comment', 'creation_date')
+    if comments:
+        # get list of last comment
+        if nb_comments > 3:
+            comments = comments[0:3]
     # list of feature type per project
     feature_type = project_features_types(APP_NAME, project_slug)
     nb_features = 0
@@ -209,11 +229,12 @@ def project(request, project_slug):
                            feature_type))
         last_features[feature_type] = get_last_features(APP_NAME,
                                                         project_slug,
-                                                        feature_type)
-
+                                                        feature_type, 3)
     context = {"project": project, "users": users,
                "nb_contributors": nb_contributors,
                "nb_features": nb_features,
+               "nb_comments": nb_comments,
+               "comments": comments,
                "last_features": last_features}
     return render(request, 'collab/project_home.html', context)
 
@@ -283,27 +304,49 @@ def project_feature_list(request, project_slug):
     return render(request, 'collab/feature_list.html', context)
 
 
-def project_feature_detail(request, project_slug, feature_type, feature_pk):
-    """
-        Display the detail of a given feature
-    """
-    # Get project info from slug
-    # get project
-    project = get_object_or_404(models.Project,
-                                slug=project_slug)
-    # get features fields
-    feature = get_feature(APP_NAME, project_slug, feature_type, feature_pk)
-    if feature['status']:
-        feature['status'] = STATUS[int(feature['status'])][1]
-    if feature['user_id']:
-        feature['utilisateur'] = feature.pop('user_id')
-        try:
-            feature['utilisateur'] = models.CustomUser.objects.get(
-                                     id=feature['utilisateur'])
-        except Exception as e:
-            feature['utilisateur'] = 'Anonyme'
-    context = {'project': project, 'feature': feature}
-    return render(request, 'collab/feature_detail.html', context)
+class ProjectFeatureDetail(View):
+
+    def get(self, request, project_slug, feature_type, feature_pk):
+        """
+            Display the detail of a given feature
+            @param
+            @return JSON
+        """
+        project, feature = get_feature_detail(APP_NAME, project_slug, feature_type, feature_pk)
+        # get feature comment
+        comments = list(models.Comment.objects.filter(project=project,
+                                                feature_id=feature['feature_id']
+                                                ).values('comment',
+                                                'author__first_name',
+                                                'author__last_name',
+                                                'creation_date'))
+        context = {'project': project, 'feature': feature, 'comments': comments}
+        return render(request, 'collab/feature_detail.html', context)
+
+    def post(self, request, project_slug, feature_type, feature_pk):
+        """
+            Add feature comment
+            @param
+            @return JSON
+        """
+        comment = request.POST.get('comment', '')
+        project, feature = get_feature_detail(APP_NAME, project_slug,
+                                              feature_type, feature_pk)
+        # create comment
+        obj, created = models.Comment.objects.get_or_create(author=request.user,
+                                                            feature_id=feature['feature_id'],
+                                                            comment=comment,
+                                                            project=project)
+        # get feature comment
+        comments = list(models.Comment.objects.filter(project=project,
+                                                      feature_id=feature['feature_id']
+                                                      ).values('comment',
+                                                      'author__first_name',
+                                                      'author__last_name',
+                                                      'creation_date'))
+        context = {'project': project, 'feature': feature, 'comments': comments}
+        return render(request, 'collab/feature_detail.html', context)
+
 
 
 def project_import_issues(request, project_slug):
