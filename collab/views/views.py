@@ -184,7 +184,7 @@ class ProjectFeature(View):
         obj, created = models.Comment.objects.get_or_create(author=request.user,
                                              feature_id=feature_id,
                                              comment=comment,
-                                             classproject=project)
+                                             project=project)
         if creation == True:
             context = {"project": project, 'success': 'Le signalement a bien été ajouté'}
             return render(request, 'collab/add_feature.html', context)
