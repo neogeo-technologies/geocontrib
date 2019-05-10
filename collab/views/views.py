@@ -181,7 +181,7 @@ class ProjectFeature(View):
                  data_values=data_values)
         creation = commit_data('default', sql)
         # create comment
-        obj, created = models.Comment.objects.get_or_create(author=request.user,
+        obj, created = models.Comment.objects.create(author=request.user,
                                              feature_id=feature_id,
                                              comment=comment,
                                              project=project)
@@ -333,7 +333,7 @@ class ProjectFeatureDetail(View):
         project, feature = get_feature_detail(APP_NAME, project_slug,
                                               feature_type, feature_pk)
         # create comment
-        obj, created = models.Comment.objects.get_or_create(author=request.user,
+        obj, created = models.Comment.objects.create(author=request.user,
                                                             feature_id=feature['feature_id'],
                                                             comment=comment,
                                                             project=project)
