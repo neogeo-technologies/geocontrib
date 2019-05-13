@@ -55,7 +55,7 @@
                             <div class="ui list">
                                 {% for elt in val %}
                                     <div class="content">
-                                         <a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=elt.id  %}" class="header">{{elt.titre|title}}</a>
+                                         <a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=elt.pk  %}" class="header">{{elt.titre|title}}</a>
                                          <div class="description">Créer par  {{elt.last_name|title}} {{elt.first_name|title}} le {{elt.date_creation|date:"d M Y"}}</div>
                                      </div>
                                      <br>

@@ -166,9 +166,8 @@ def get_last_features(app_name, project_slug, feature_type, num=""):
     limit = ""
     if num:
         limit = "  LIMIT " + str(num)
-
-    sql = """ SELECT collab_customuser.id,
-              first_name,last_name,
+    sql = """ SELECT collab_customuser.id AS userid,
+              first_name,last_name,"{app_name}_{slug}_{feature_type}".id as pk,
               user_id,feature_id,titre,date_creation
               FROM "{app_name}_{slug}_{feature_type}"
               INNER JOIN public.collab_customuser ON
