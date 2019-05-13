@@ -24,6 +24,7 @@
             <div class="row">
                 <form class='ui equal width addfeature form' method="POST" >
                   {% csrf_token %}
+                  <div class="ui error message"></div>
                   <div class="field">
                       <label>Type de signalement </label>
                       <div class="ui selection dropdown feature" id='feature_type'>

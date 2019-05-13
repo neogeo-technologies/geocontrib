@@ -1,6 +1,7 @@
 from django.conf.urls import re_path
 from django.urls import path
 from . import views
+from collab.views.views import ProjectAdminView
 from collab.views.views import ProjectFeature
 from collab.views.views import ProjectFeatureDetail
 from collab.views.views import ProjectView
@@ -16,6 +17,7 @@ urlpatterns = services + [
     path('mentions/', views.legal, name='legal'),
     path('aide/', views.site_help, name='help'),
     path('creer_projet/', ProjectView.as_view(), name='create_project'),
+    path('admin_projet/<slug:project_slug>/', ProjectAdminView.as_view(), name='admin_project'),
     path('projet/<slug:project_slug>/', views.project, name='project'),
     path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),
     path('projet/<slug:project_slug>/ajout/', ProjectFeature.as_view(), name='project_add_feature'),

@@ -23,7 +23,7 @@
             <div class="row">
                 <form class='ui equal width addproject form' method="POST"  enctype="multipart/form-data">
                   {% csrf_token %}
-
+                      <div class="ui error message"></div>
                       <div class="required field">
                           <label>{{form.title.label}}</label>
                           <input type="text"  name="title" placeholder="{{form.title.label}}" />
@@ -100,5 +100,5 @@
     </div>
 
 {% load staticfiles %}
- <script src="{% static 'collab/js/add_project.js' %}"></script>
+ <script src="{% static 'collab/js/project.js' %}"></script>
 {% endblock %}

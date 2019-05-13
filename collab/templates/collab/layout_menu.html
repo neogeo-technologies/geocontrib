@@ -57,50 +57,79 @@
                           </div>
                           <div class="ui medium vertical menu">
                               <div class="item">
+                                  <div class="header">Accueil</div>
+                                  <div class="menu">
+                                      <a class="item" href="{% url 'index'  %}">
+                                      <i class="icon home"></i>Page d'accueil</a>
+                                  </div>
+                              </div>
+                              <div class="item">
                                   <div class="header">Signalements</div>
                                   <div class="menu">
-                                     <a class="item" href="{% url 'project_add_feature' project_slug=project.slug  %}">
-                                        <i class="icon plus"></i>Ajout d'un signalement </a>
                                       <a class="item" href="{% url 'project_feature_list' project_slug=project.slug %}">
-                                        <i class="icon list"></i>Liste</a>
+                                      <i class="icon list"></i>Liste</a>
                                       <a class="item" href="{% url 'project_feature_map' project_slug=project.slug %}">
                                       <i class="icon map"></i>Carte</a>
+                                      <a class="item" href="{% url 'project_add_feature' project_slug=project.slug  %}">
+                                      <i class="icon plus"></i>Ajout d'un signalement </a>
+                                      <a class="item" href="{% url 'add_feature'  %}">
+                                      <i class="icon plus"></i>Créer un nouveau type de signalement</a>
                                   </div>
                               </div>
                               <div class="item">
                                   <div class="header">Import et export</div>
                                   <div class="menu">
-                                      <a class="item" href="{% url 'project_import_issues' project_slug=project.id  %}">
+                                      <a class="item" href="#">
                                           <i class="icon upload"></i>Importer en masse...</a>
-                                      <a class="item" href="{% url 'project_import_geo_image' project_slug=project.id  %}">
+                                      <a class="item" href="#">
                                           <i class="icon camera"></i>Importer une photographie...</a>
-                                      <a class="item" href="{% url 'project_download_issues' project_slug=project.id  %}">
+                                      <a class="item" href="#">
                                           <i class="icon download"></i>Télécharger...</a>
                                   </div>
                               </div>
                               <div class="item">
-                                  <div class="header">Configuration</div>
+                                  <div class="header">Projet</div>
                                   <div class="menu">
-                                      <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation...</a>
-                                      <a class="item"><i class="icon wrench"></i>Administrer le projet...</a>
+                                      <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation</a>
+                                      <a class="item" href="{% url 'admin_project'  project_slug=project.slug  %}"><i class="icon wrench"></i>Administrer le projet...</a>
                                       <a class="item" href="{% url 'create_project'  %}">
                                       <i class="icon plus"></i>Créer un nouveau projet</a>
-                                      <a class="item" href="{% url 'add_feature'  %}">
-                                      <i class="icon plus"></i>Créer un nouveau type de signalement</a>
+
                                   </div>
                               </div>
                           </div>
                     {% else %}
                         <div class="ui medium vertical menu">
                             <div class="item">
-                                <div class="header">Configuration</div>
+                                <div class="header">Accueil</div>
                                 <div class="menu">
-                                    <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation...</a>
-                                    <a class="item"><i class="icon wrench"></i>Administrer le projet...</a>
-                                    <a class="item" href="{% url 'create_project'  %}">
-                                    <i class="icon plus"></i>Créer un nouveau projet</a>
+                                    <a class="item" href="{% url 'index'  %}">
+                                    <i class="icon home"></i>Page d'accueil</a>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="header">Signalements</div>
+                                <div class="menu">
                                     <a class="item" href="{% url 'add_feature'  %}">
                                     <i class="icon plus"></i>Créer un nouveau type de signalement</a>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="header">Import et export</div>
+                                <div class="menu">
+                                    <a class="item" href="">
+                                        <i class="icon upload"></i>Importer en masse...</a>
+                                    <a class="item" href="">
+                                        <i class="icon camera"></i>Importer une photographie...</a>
+                                    <a class="item" href="">
+                                        <i class="icon download"></i>Télécharger...</a>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="header">Projet</div>
+                                <div class="menu">
+                                    <a class="item" href="{% url 'create_project'  %}">
+                                    <i class="icon plus"></i>Créer un nouveau projet</a>
                                 </div>
                             </div>
                         </div>

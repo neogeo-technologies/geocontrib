@@ -4,7 +4,9 @@
 {{ title }}
 {% endblock %}
 {% block content %}
-    <h2 class="ui header">{{project.title}}</h2>
+    <div class="project_header">
+      <h2 class="ui header">{{project.title|title }}</h2>
+    </div>
     <p>{{project.description}}</p>
 
     <table class="ui very basic table">
@@ -56,7 +58,7 @@
                                 {% for elt in val %}
                                     <div class="content">
                                          <a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=elt.pk  %}" class="header">{{elt.titre|title}}</a>
-                                         <div class="description">Créer par  {{elt.last_name|title}} {{elt.first_name|title}} le {{elt.date_creation|date:"d M Y"}}</div>
+                                         <div class="description">Créer par  {{elt.last_name|title}} {{elt.first_name|title}} le {{elt.date_creation|date:"d/m/Y"}}</div>
                                      </div>
                                      <br>
                                 {% endfor %}
@@ -73,22 +75,26 @@
     <br>
     <h3 class="ui header">Derniers commentaires</h3>
     <div class="ui bulleted list">
-      {% for elt in comments %}
-          <table class="ui celled table">
-            <thead>
-              <tr><th>
-                      <span class="comment_title"> <strong>{{elt.author__first_name|title}}
-                                          {{elt.author__last_name|title}} <strong>
-                                           Le {{elt.creation_date|date:"d M Y"}}</span>
-              </th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td data-label="">{{elt.comment}}</td>
-              </tr>
-            </tbody>
-         </table>
-      {% endfor %}
+      {% if comments %}
+          {% for elt in comments %}
+              <table class="ui celled table">
+                <thead>
+                  <tr><th>
+                          <span class="comment_title"> <strong>{{elt.author__first_name|title}}
+                                              {{elt.author__last_name|title}} <strong>
+                                               Le {{elt.creation_date|date:"d M Y"}}</span>
+                  </th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td data-label="">{{elt.comment}}</td>
+                  </tr>
+                </tbody>
+             </table>
+          {% endfor %}
+      {% else %}
+          <div class="description"><span>Aucun commentaire n'a été ajouté</span></div>
+      {% endif %}
     </div>
 
 {% endblock %}

@@ -106,3 +106,14 @@ footer{
 .comment_title{
   color:gray;
 }
+/* edit object */
+.project_title{
+ float: left;
+}
+.edit_object{
+ float: right;
+}
+.project_header{
+  padding-bottom: 30px;
+  padding-top: 20px;
+}

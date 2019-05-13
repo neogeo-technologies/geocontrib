@@ -1,5 +1,6 @@
 from collab import models
 from collab.choices import STATUS
+from collab.choices import USER_TYPE_ARCHIVE
 from collab.db_utils import commit_data
 from collab.forms import ProjectForm
 from collab.views.project_services import generate_feature_id
@@ -54,6 +55,58 @@ def index(request):
     return render(request, 'collab/index.html', context)
 
 
+class ProjectAdminView(View):
+    """
+        View to administrate a project
+        @param
+        @return JSON
+    """
+
+    def get(self, request, project_slug):
+        project = get_object_or_404(models.Project,
+                                    slug=project_slug)
+
+        data = models.Project.objects.filter(slug=project_slug).values(
+                                    'description', 'illustration', 'title',
+                                    'creation_date', 'moderation', 'visi_feature' ,
+                                    'visi_archive', 'archive_feature',
+                                    'delete_feature', 'slug')
+
+        if data:
+            # visi_archive
+            id = int(data[0]['visi_archive'])
+            data[0]['visi_archive'] = USER_TYPE_ARCHIVE[id][1]
+            data[0]['visibilité_des_signalements_archivés'] = data[0].pop('visi_archive')
+            # visi_feature
+            id = int(data[0]['visi_feature'])
+            data[0]['visi_feature'] = USER_TYPE_ARCHIVE[id][1]
+            data[0]['visibilité_des_signalements_publiés'] = data[0].pop('visi_feature')
+            # archive_feature
+            data[0]['délai_avant_archivage'] = data[0].pop('archive_feature')
+            # delete_feature
+            data[0]['délai_avant_suppression'] = data[0].pop('delete_feature')
+            # delete_feature
+            data[0]['date_de_création'] = data[0].pop('creation_date')
+            # title
+            data[0]['titre'] = data[0].pop('title')
+
+            if request.is_ajax():
+                context = {
+                    "project": project,
+                    "ajax": True,
+                    "user_type": USER_TYPE_ARCHIVE
+                }
+                return render(request, 'collab/project_form.html', context)
+            else:
+                context = {
+                    "project": project,
+                    "data": OrderedDict(sorted(data[0].items())),
+                }
+                return render(request, 'collab/admin_project.html', context)
+        else:
+            return render(request, 'collab/admin_project.html', {})
+
+
 class ProjectView(FormView):
     template_name = 'collab/add_project.html'
     form_class = ProjectForm
@@ -76,7 +129,6 @@ class ProjectView(FormView):
             {"Une erreur s'est produite": [dberror]}, 'form': form}
             return render(self.request, 'collab/add_project.html', context)
         return render(self.request, 'collab/add_project.html')
-
 
     def form_invalid(self, form):
         errors = form.errors.copy()

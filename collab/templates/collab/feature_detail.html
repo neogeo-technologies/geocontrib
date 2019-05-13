@@ -4,9 +4,10 @@
 {{ title }}
 {% endblock %}
 {% block content %}
-
-  <h2 class="ui header">{{project.title}}</h2>
-  <h3>{{feature.titre}}</h3>
+  <div class="project_header">
+    <h2 class="ui header">{{project.title|title}}</h2>
+    <h3>{{feature.titre}}</h3>
+  </div>
 
   <table class="ui very basic table">
       <tbody>
@@ -39,7 +40,7 @@
           <tr><th>
                   <span class="comment_title"> <strong>{{val.author__first_name|title}}
                                       {{val.author__last_name|title}} <strong>
-                                       Le {{val.creation_date|date:"d M Y"}}</span>
+                                       Le {{val.creation_date|date:"d/m/Y"}}</span>
                   {% if forloop.first %}
                     <i id="addcomment" class=" big green plus square icon"></i>
                   {% endif %}

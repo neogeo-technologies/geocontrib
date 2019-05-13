@@ -7,7 +7,7 @@
 <div class="ui middle aligned stackable grid container">
 
   {% if projects %}
-    <div class="row">
+    <div class="row ">
       <h2 class="ui header">Creer un nouveau type de signalement</h2>
     </div>
     {% if error %}
@@ -19,6 +19,7 @@
     {% endif %}
     <form class='ui equal width addfeaturemodel form' method="POST">
         {% csrf_token %}
+        <div class="ui error message"></div>
         <div class="required field">
             <label>Projet Associé </label>
             <div class="ui selection dropdown feature">

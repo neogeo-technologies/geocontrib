@@ -1,8 +1,9 @@
-
 {% for key,val in res %}
        {% if key == 'geometry_type' %}
+
            <div class="field" class='geomfield'>
                <label> Geometrie de type {{val}}</label> <br>
+               <input type="hidden"  name="geometrie" placeholder="geometrie" />
                <div id='mapfeature'></div>
            </div>
        {% elif val.column_name not in 'id,user_id,project_id,feature_id,date_creation' %}
@@ -74,6 +75,7 @@
       </button>
   </div>
 {% endif %}
+{% load staticfiles %}
 
 <script type="text/javascript">
       $('.ui.checkbox.boolfield')
@@ -90,4 +92,40 @@
                       zoom: 4 // starting zoomx
             });
       }
+
+      // form validation
+      $('.addfeature')
+        .form({
+          fields: {
+            status:  {
+              identifier: 'status',
+              rules: [
+                {
+                  type   : 'empty',
+                  prompt : 'Veuillez choisir un status'
+                }
+              ]
+            },
+            titre:  {
+              identifier: 'titre',
+              rules: [
+                {
+                  type   : 'empty',
+                  prompt : 'Veuillez entrer un titre pour ce signalement'
+                }
+              ]
+            },
+            // commente en attendant la mise en place de la partie carto !!!
+            // geometrie:  {
+            //   identifier: 'geometrie',
+            //   rules: [
+            //     {
+            //       type   : 'empty',
+            //       prompt : 'Veuillez localiser ce signalement'
+            //     }
+            //   ]
+            // },
+          }
+        })
+      ;
 </script>

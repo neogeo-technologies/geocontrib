@@ -20,13 +20,12 @@
         </h4>
         <div class="ui divided items">
             {% for project in projects %}
-                {{projet.nb_contributor}}
                 <div class="item">
                     <div class="ui tiny image">
                         <img src="{{project.illustration}}">
                     </div>
                     <div class="middle aligned content">
-                        <a class="header" href="{% url 'project' project_slug=project.slug %}">{{project.title}}</a>
+                        <a class="header" href="{% url 'project' project_slug=project.slug %}">{{project.title|title }}</a>
                         <div class="description">
                             <p>{{project.description}}</p>
                         </div>
