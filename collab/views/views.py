@@ -289,9 +289,9 @@ def project_feature_list(request, project_slug):
     # add info for JS display
     for key, val in feature_list.items():
         for elt in val:
-            if elt['status']:
+            if elt.get('status', ''):
                 elt['status'] = STATUS[int(elt['status'])][1]
-            if elt['user_id']:
+            if elt.get('user_id', ''):
                 elt['utilisateur'] = elt.pop('user_id')
                 try:
                     elt['utilisateur'] = models.CustomUser.objects.get(

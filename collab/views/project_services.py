@@ -214,9 +214,9 @@ def get_feature_detail(app_name, project_slug, feature_type, feature_pk):
                                 slug=project_slug)
     # get features fields
     feature = get_feature(app_name, project_slug, feature_type, feature_pk)
-    if feature['status']:
+    if feature.get('status', ''):
         feature['status'] = STATUS[int(feature['status'])][1]
-    if feature['user_id']:
+    if feature.get('user_id', ''):
         feature['utilisateur'] = feature.pop('user_id')
         try:
             feature['utilisateur'] = models.CustomUser.objects.get(
