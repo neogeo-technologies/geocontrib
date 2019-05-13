@@ -181,10 +181,10 @@ class ProjectFeature(View):
                  data_values=data_values)
         creation = commit_data('default', sql)
         # create comment
-        obj, created = models.Comment.objects.get_or_create(author=request.user,
-                                             feature_id=feature_id,
-                                             comment=comment,
-                                             project=project)
+        obj = models.Comment.objects.create(author=request.user,
+                                            feature_id=feature_id,
+                                            comment=comment,
+                                            project=project)
         if creation == True:
             context = {"project": project, 'success': 'Le signalement a bien été ajouté'}
             return render(request, 'collab/add_feature.html', context)
@@ -333,10 +333,10 @@ class ProjectFeatureDetail(View):
         project, feature = get_feature_detail(APP_NAME, project_slug,
                                               feature_type, feature_pk)
         # create comment
-        obj, created = models.Comment.objects.get_or_create(author=request.user,
-                                                            feature_id=feature['feature_id'],
-                                                            comment=comment,
-                                                            project=project)
+        obj = models.Comment.objects.create(author=request.user,
+                                                     feature_id=feature['feature_id'],
+                                                     comment=comment,
+                                                     project=project)
         # get feature comment
         comments = list(models.Comment.objects.filter(project=project,
                                                       feature_id=feature['feature_id']
