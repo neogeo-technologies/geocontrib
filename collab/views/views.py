@@ -315,7 +315,7 @@ class ProjectFeatureDetail(View):
         project, feature = get_feature_detail(APP_NAME, project_slug, feature_type, feature_pk)
         # get feature comment
         comments = list(models.Comment.objects.filter(project=project,
-                                                feature_id=feature['feature_id']
+                                                feature_id=feature['feature_pk']
                                                 ).values('comment',
                                                 'author__first_name',
                                                 'author__last_name',
