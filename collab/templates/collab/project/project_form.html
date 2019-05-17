@@ -1,35 +1,39 @@
 
 <div class="ui middle aligned stackable grid container">
-     <form class='ui equal width addproject form' method="POST"  enctype="multipart/form-data">
+     <form id='saveform' class='ui form' method=""  enctype="multipart/form-data" >
          {% csrf_token %}
+            <div class="">
+                 <button id="save_project" type="submit" class="green ui compact icon button">
+                  <i class="white large save icon"></i>
+                 </button>
+            </div>
              <div class="ui error message"></div>
              <div class="field">
                  <label>Date de création </label>
-                 <input type="text"  name="creation_date" value="{{project.creation_date}}" />
+                 <input type="text"  name="creation_date" value="{{project.creation_date|date:"d/m/Y"}}" />
              </div>
              <div class="field">
-                 <label>Délai avant archivage </label>
-                 <input type="text"  name="archive_feature" value="{{project.archive_feature}}" />
+                 <label>Délai avant archivage (nb jours) </label>
+                 <input type="text"  name="archive_feature" value="{{project.archive_feature|get_timestamp}}" />
              </div>
              <div class="field">
-                 <label>Délai avant suppression </label>
-                 <input type="text"  name="delete_feature" value="{{project.delete_feature}}" />
+                 <label>Délai avant suppression (nb jours) </label>
+                 <input type="text"  name="delete_feature" value="{{project.delete_feature|get_timestamp}}" />
              </div>
              <div class="field">
                 <label>Illustration</label>
                 <div class="ui action input">
-                     <input type="text"  vallue="{{project.illustration.url}}" readonly>
-                     <input type="file" id='illustration' name="illustration" style="display: none">
-                     <div class="ui icon button iconfile">
+                     <input type="text"  value="{{project.illustration.url}}" readonly>
+                     <input type="file"  name="illustration" style="display: none">
+                     <div class="ui icon button icon_projform">
                        <i class="attach icon"></i>
                      </div>
                 </div>
              </div>
              <div class="inline field">
-                <div class="ui checkbox boolfield">
-                <input type="checkbox"  name="moderation" class="hidden" >
-                <input type='hidden' value='project.moderation' name="moderation">
-                <label>Moderation</label>
+                <div class="ui checkbox moderation">
+                    <input type="checkbox" tabindex="0" name="moderation" class="hidden">
+                    <label>Moderation</label>
                 </div>
              </div>
              <div class="required field">
@@ -43,7 +47,7 @@
                      <i class="dropdown icon"></i>
                      <div class="default text"></div>
                       <div class="menu">
-                       {% for elt in user_type %}
+                       {% for elt in user_type_archive %}
                             <div class="item" data-value={{elt.0}} >{{elt.1}}</div>
                        {% endfor %}
                      </div>
@@ -62,7 +66,6 @@
                      </div>
                   </div>
              </div>
-
     </form>
 </div>
 
@@ -75,4 +78,46 @@
     $('.ui.selection.dropdown.visi_feature')
       .dropdown('set selected', visi_feature)
     ;
+
+    $(".icon_projform").click(function() {
+      $(this).parent().find("input:file").click();
+    });
+
+    $('input:file', '.ui.action.input')
+      .on('change', function(e) {
+        var name = e.target.files[0].name;
+        $('input:text', $(e.target).parent()).val(name);
+      });
+
+    $('.ui.checkbox.moderation')
+      .checkbox()
+    ;
+    var mod = "{{project.moderation}}"
+    if (String(mod).toLowerCase() == 'true'){
+        $('.ui.checkbox.moderation').checkbox('check');
+    }
+
+    $('#saveform').on('submit',function(e){
+        e.preventDefault();
+        url = ''
+        $.ajax({
+          url: url,
+          type: 'POST',
+        //   processData: false,  // Important!
+        //   contentType: false,
+        //   cache: false,
+          data: $('#saveform').serialize(),
+          success: function (result) {
+              $('#project_form').html("");
+              $('#detail').html(result);
+
+          },
+          error: function(err) {
+            console.log('Error occured', err);
+          }
+        });
+
+    });
+
+
 </script >

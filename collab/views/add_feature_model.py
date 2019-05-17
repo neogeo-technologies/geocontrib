@@ -28,17 +28,17 @@ def add_feature_model(request):
                                              request.POST.getlist('field_type', []),
                                              request.user)
             context = message
-            return render(request, APP_NAME + '/add_feature_model.html',
+            return render(request, APP_NAME + '/feature/add_feature_model.html',
                           context=context)
         else:
             projects = custom.Project.objects.all()
             context = {'projects': projects, 'error': "Les paramètres obligatoires sont manquants"}
-            return render(request, APP_NAME + '/add_feature_model.html',
+            return render(request, APP_NAME + '/feature/add_feature_model.html',
                           context=context)
     else:
         projects = custom.Project.objects.all()
         context = {'projects': projects}
-        return render(request, APP_NAME + '/add_feature_model.html',
+        return render(request, APP_NAME + '/feature/add_feature_model.html',
                       context=context)
 
 

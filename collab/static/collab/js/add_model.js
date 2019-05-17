@@ -1,8 +1,9 @@
-$(document).ready(function(){
+$('.ui.selection.dropdown')
+  .dropdown()
+;
 
-    $('.ui.selection.dropdown')
-      .dropdown()
-    ;
+
+$(document).ready(function(){
 
     var counter = 1;
     var limit = 20;

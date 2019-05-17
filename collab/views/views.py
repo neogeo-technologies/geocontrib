@@ -1,5 +1,6 @@
 from collab import models
 from collab.choices import STATUS
+from collab.choices import USER_TYPE
 from collab.choices import USER_TYPE_ARCHIVE
 from collab.db_utils import commit_data
 from collab.forms import ProjectForm
@@ -15,10 +16,16 @@ from collab.views.project_services import project_feature_number
 from collab.views.project_services import project_features_types
 from collections import OrderedDict
 import datetime
+from datetime import timedelta
+import dateutil.parser
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from django.utils import timezone
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import FormView
+
 
 APP_NAME = __package__.split('.')[0]
 
@@ -55,62 +62,105 @@ def index(request):
     return render(request, 'collab/index.html', context)
 
 
+def get_project_fields(project_slug):
+
+    data = models.Project.objects.filter(slug=project_slug).values(
+                                'description', 'illustration', 'title',
+                                'creation_date', 'moderation', 'visi_feature' ,
+                                'visi_archive', 'archive_feature',
+                                'delete_feature', 'slug')
+
+    if data:
+        # visi_archive
+        id = int(data[0]['visi_archive'])
+        data[0]['visi_archive'] = USER_TYPE_ARCHIVE[id][1]
+        data[0]['visibilité_des_signalements_archivés'] = data[0].pop('visi_archive')
+        # visi_feature
+        id = int(data[0]['visi_feature'])
+        data[0]['visi_feature'] = USER_TYPE[id][1]
+        data[0]['visibilité_des_signalements_publiés'] = data[0].pop('visi_feature')
+        # archive_feature
+        data[0]['délai_avant_archivage'] = data[0].pop('archive_feature')
+        # delete_feature
+        data[0]['délai_avant_suppression'] = data[0].pop('delete_feature')
+        # delete_feature
+        data[0]['date_de_création'] = data[0].pop('creation_date')
+        # title
+        data[0]['titre'] = data[0].pop('title')
+    return data
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class ProjectAdminView(View):
     """
         View to administrate a project
-        @param
-        @return JSON
     """
 
     def get(self, request, project_slug):
+        """
+            Get the detail of project fields and edit it
+        """
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
-
-        data = models.Project.objects.filter(slug=project_slug).values(
-                                    'description', 'illustration', 'title',
-                                    'creation_date', 'moderation', 'visi_feature' ,
-                                    'visi_archive', 'archive_feature',
-                                    'delete_feature', 'slug')
-
+        data = get_project_fields(project_slug)
         if data:
-            # visi_archive
-            id = int(data[0]['visi_archive'])
-            data[0]['visi_archive'] = USER_TYPE_ARCHIVE[id][1]
-            data[0]['visibilité_des_signalements_archivés'] = data[0].pop('visi_archive')
-            # visi_feature
-            id = int(data[0]['visi_feature'])
-            data[0]['visi_feature'] = USER_TYPE_ARCHIVE[id][1]
-            data[0]['visibilité_des_signalements_publiés'] = data[0].pop('visi_feature')
-            # archive_feature
-            data[0]['délai_avant_archivage'] = data[0].pop('archive_feature')
-            # delete_feature
-            data[0]['délai_avant_suppression'] = data[0].pop('delete_feature')
-            # delete_feature
-            data[0]['date_de_création'] = data[0].pop('creation_date')
-            # title
-            data[0]['titre'] = data[0].pop('title')
-
             if request.is_ajax():
                 context = {
                     "project": project,
-                    "ajax": True,
-                    "user_type": USER_TYPE_ARCHIVE
+                    "edit": True,
+                    "user_type_archive": USER_TYPE_ARCHIVE,
+                    "user_type": USER_TYPE
                 }
-                return render(request, 'collab/project_form.html', context)
+                return render(request, 'collab/project/project_form.html', context)
             else:
                 context = {
                     "project": project,
                     "data": OrderedDict(sorted(data[0].items())),
                 }
-                return render(request, 'collab/admin_project.html', context)
+                return render(request, 'collab/project/admin_project.html', context)
         else:
-            return render(request, 'collab/admin_project.html', {})
+            return render(request, 'collab/project/admin_project.html', {})
+
+    def post(self, request, project_slug):
+        """
+            View to save modification done to a project
+        """
+        project = get_object_or_404(models.Project,
+                                    slug=project_slug)
+        # update forms fields
+        form_data = request.POST.dict()
+        form_data.pop('csrfmiddlewaretoken')
+        if 'moderation' in form_data:
+            setattr(project, 'moderation', True)
+            form_data.pop('moderation')
+        else:
+            setattr(project, 'moderation', False)
+
+        for key, value in form_data.items():
+
+            if key == "creation_date":
+                creation_date = timezone.make_aware(dateutil.parser.parse(value), timezone.get_current_timezone())
+                setattr(project, key, creation_date)
+                project.save()
+            elif key == "archive_feature" or key == "delete_feature":
+                setattr(project, key, timedelta(days=int(value)))
+            else:
+                setattr(project, key, value)
+            project.save()
+        project.save()
+        # display detail of project
+        data = get_project_fields(project_slug)
+        context = {
+            "project": project,
+            "data": OrderedDict(sorted(data[0].items())),
+        }
+        return render(request, 'collab/project/project_detail.html', context)
 
 
 class ProjectView(FormView):
-    template_name = 'collab/add_project.html'
+    template_name = 'collab/project/add_project.html'
     form_class = ProjectForm
-    success_url = 'collab/add_project.html'
+    success_url = 'collab/project/add_project.html'
 
     def form_valid(self, form):
 
@@ -120,15 +170,15 @@ class ProjectView(FormView):
             context = {'errors':
             {'erreur': ["""Veuillez modifier le titre de votre application,
             une application avec ce titre existe déjà"""]}, 'form': form}
-            return render(self.request, 'collab/add_project.html', context)
+            return render(self.request, 'collab/project/add_project.html', context)
         except Exception as e:
             pass
         dberror = form.create_project()
         if dberror:
             context = {'errors':
             {"Une erreur s'est produite": [dberror]}, 'form': form}
-            return render(self.request, 'collab/add_project.html', context)
-        return render(self.request, 'collab/add_project.html')
+            return render(self.request, 'collab/project/add_project.html', context)
+        return render(self.request, 'collab/project/add_project.html')
 
     def form_invalid(self, form):
         errors = form.errors.copy()
@@ -136,7 +186,7 @@ class ProjectView(FormView):
             label = form.fields[key].label
             errors[label] = errors.pop(key)
         context = {'errors': errors, 'form': form}
-        return render(self.request, 'collab/add_project.html', context)
+        return render(self.request, 'collab/project/add_project.html', context)
 
 
 def my_account(request):
@@ -176,7 +226,7 @@ class ProjectFeature(View):
                                                                        elt)})
         if not features_types:
             context = {"message": "Veuillez créer un type de signalement pour ce projet"}
-            return render(request, 'collab/add_feature.html', context)
+            return render(request, 'collab/feature/add_feature.html', context)
 
         # add info for JS display
         for key, val in res.items():
@@ -185,10 +235,10 @@ class ProjectFeature(View):
                 val['status']['info'] = STATUS
         if request.is_ajax():
             context = {"res": res.get(request.GET.get('name')).items}
-            return render(request, 'collab/form_body.html', context)
+            return render(request, 'collab/feature/form_body.html', context)
         else:
             context = {"project": project, "features_types": features_types}
-            return render(request, 'collab/add_feature.html', context)
+            return render(request, 'collab/feature/add_feature.html', context)
 
     def post(self, request, project_slug):
 
@@ -239,10 +289,10 @@ class ProjectFeature(View):
                                             project=project)
         if creation == True:
             context = {"project": project, 'success': 'Le signalement a bien été ajouté'}
-            return render(request, 'collab/add_feature.html', context)
+            return render(request, 'collab/feature/add_feature.html', context)
         else:
             context = {"project": project, 'error': "Une erreur s'est produite. Veuillez réessayer ultérieurement"}
-            return render(request, 'collab/add_feature.html', context)
+            return render(request, 'collab/feature/add_feature.html', context)
 
 
 def project(request, project_slug):
@@ -288,7 +338,7 @@ def project(request, project_slug):
                "nb_comments": nb_comments,
                "comments": comments,
                "last_features": last_features}
-    return render(request, 'collab/project_home.html', context)
+    return render(request, 'collab/project/project_home.html', context)
 
 
 def project_users(request, project_slug):
@@ -318,7 +368,7 @@ def project_feature_map(request, project_slug):
                                                           project_slug,
                                                           feature_type)
     context = {'project': project, 'feature_list': feature_list}
-    return render(request, 'collab/feature_map.html', context)
+    return render(request, 'collab/feature/feature_map.html', context)
 
 
 def project_feature_list(request, project_slug):
@@ -353,7 +403,7 @@ def project_feature_list(request, project_slug):
 
     context = {'project': project, 'feature_list': feature_list}
 
-    return render(request, 'collab/feature_list.html', context)
+    return render(request, 'collab/feature/feature_list.html', context)
 
 
 class ProjectFeatureDetail(View):
@@ -373,7 +423,7 @@ class ProjectFeatureDetail(View):
                                                 'author__last_name',
                                                 'creation_date'))
         context = {'project': project, 'feature': feature, 'comments': comments}
-        return render(request, 'collab/feature_detail.html', context)
+        return render(request, 'collab/feature/feature_detail.html', context)
 
     def post(self, request, project_slug, feature_type, feature_pk):
         """
@@ -397,7 +447,7 @@ class ProjectFeatureDetail(View):
                                                       'author__last_name',
                                                       'creation_date'))
         context = {'project': project, 'feature': feature, 'comments': comments}
-        return render(request, 'collab/feature_detail.html', context)
+        return render(request, 'collab/feature/feature_detail.html', context)
 
 
 

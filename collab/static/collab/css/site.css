@@ -110,10 +110,18 @@ footer{
 .project_title{
  float: left;
 }
-.edit_object{
+#modify_project.orange.big.edit.icon{
  float: right;
 }
 .project_header{
   padding-bottom: 30px;
   padding-top: 20px;
+}
+
+/*save project*/
+#saveform{
+  width:80%
+}
+#save_project{
+  float: right;
 }

@@ -1,0 +1,58 @@
+<i id="modify_project" class="orange big edit icon "></i>
+<table class="ui very basic table">
+    <tbody>
+    {% for key,val in data.items %}
+
+        {% if key not in 'slug' %}
+            <tr>
+                {% if key == 'délai_avant_suppression' or key == 'délai_avant_archivage'%}
+                    <td><strong>{{key|feature_key_display}} (nb jours)</strong></td>
+                {%else%}
+                    <td><strong>{{key|feature_key_display}}</strong></td>
+                {%endif%}
+                {% if val %}
+                    {%  if key == 'illustration' %}
+                        {{val.url}}
+                        <td> <img  class="ui small image" src="{{project.illustration.url}}" height="100"></td>
+                    {%  elif val == True %}
+                        <td><i class="green check icon"></i></td>
+                    {% elif val == False %}
+                        <td><i class="inverted red remove icon"></i></td>
+                    {% elif key == 'délai_avant_suppression' or key == 'délai_avant_archivage'%}
+                        <td>{{val|get_timestamp}}</td>
+                    {%else%}
+                        <td>{{val|feature_val_display}}</td>
+                    {% endif %}
+                {% else %}
+                   <td><i class="minus icon"></i></td>
+                {%endif%}
+            </tr>
+        {%endif%}
+    {%endfor%}
+    </tbody>
+</table>
+
+
+<script>
+    // modify type of cursor
+    var element = document.getElementById("modify_project");
+    element.style.cursor = "pointer";
+        // form project editable
+        $("#modify_project").on('click', function(e) {
+
+            url = ''
+            $.ajax({
+              url: url,
+              type: 'GET',
+              success: function (data) {
+                  $('#detail').html("");
+                  $('#project_form').html(data);
+              },
+              error: function(err) {
+                console.log('Error occured', err);
+              }
+            });
+
+        });
+
+</script >
