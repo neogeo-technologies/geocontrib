@@ -26,13 +26,16 @@ def feature_val_display(val):
 
 @register.filter
 def get_timestamp(timestamp):
-    try:
+    if timestamp:
         # ts = """{nbjours} Jours {nbmin} Minutes {nbsec} Secondes """.format(
         #    nbjours=timestamp.days,
         #    nbmin=timestamp.seconds // 3600,
         #    nbsec=timestamp.seconds // 60 % 60)
-        ts = """{nbjours}""".format(
-           nbjours=timestamp.days)
-        return ts
-    except ValueError:
-        return None
+        try:
+            ts = """{nbjours}""".format(
+               nbjours=timestamp.days)
+            return ts
+        except Exception as e:
+                return ""
+    else:
+        return ""
