@@ -36,6 +36,6 @@ def get_timestamp(timestamp):
                nbjours=timestamp.days)
             return ts
         except Exception as e:
-                return ""
+                return "0"
     else:
-        return ""
+        return "0"
