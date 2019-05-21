@@ -22,13 +22,19 @@
              </div>
              <div class="field">
                 <label>Illustration</label>
-                <div class="ui action input">
-                     <input type="text"  value="{{project.illustration.url}}" readonly>
-                     <input type="file"  name="illustration" style="display: none">
-                     <div class="ui icon button icon_projform">
-                       <i class="attach icon"></i>
-                     </div>
-                </div>
+
+                  <div class="ui action input">
+                      {% if project.illustration %}
+                        <input type="text"  value="{{project.illustration.url}}" readonly>
+                      {% else %}
+                          <input type="text"  value="" readonly>
+                      {% endif %}
+                       <input type="file"  name="illustration" style="display: none">
+                       <div class="ui icon button icon_projform">
+                         <i class="attach icon"></i>
+                       </div>
+                  </div>
+
              </div>
              <div class="inline field">
                 <div class="ui checkbox moderation">
