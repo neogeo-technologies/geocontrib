@@ -30,7 +30,7 @@
                       <div class="ui selection dropdown feature" id='feature_type'>
                           <input type="hidden"  name="feature" placeholder="" />
                           <i class="dropdown icon"></i>
-                          <div class="default text">Choisisez un signalement</div>
+                          <div class="default text">Choisisez un type de signalement</div>
                            <div class="menu">
                             {% for elt in features_types %}
                                 <div class="item" data-value={{elt}} >{{elt}}</div>
@@ -46,7 +46,7 @@
         </div>
         </div>
     {% else %}
-        <div class="header">Veuillez créer un type de signalement </div>
+        <div class="header">Aucun type de signalement n'a été créé pour ce projet. Veuillez en créer un.</div>
     {% endif %}
 {% endif %}
 {% load staticfiles %}

@@ -8,12 +8,12 @@
 
   {% if projects %}
     <div class="row ">
-      <h2 class="ui header">Creer un nouveau type de signalement</h2>
+      <h2 class="ui header">Créer un nouveau type de signalement</h2>
     </div>
     {% if error %}
       <br>
       <div class="ui error message">
-           <div class="header">Veuillez corriger votre formulaire</div><br>
+           <div class="header">Veuillez corriger les informations saisies dans le formulaire.</div><br>
            <strong>{{error}}</strong>
        </div>
     {% endif %}
@@ -34,11 +34,11 @@
              </div>
         </div>
         <div class="required field">
-            <label>Nom du nouveau signalement</label>
+            <label>Nom du nouveau type de signalement</label>
             <input type="text"  name="feature" placeholder="Nom du signalement" />
         </div>
         <div class="required field">
-            <label>Type de géometrie Associé </label>
+            <label>Type de géometrie associé</label>
             <div class="ui selection dropdown feature">
                 <input type="hidden"  name="geometry" placeholder="Geometrie" />
                 <i class="dropdown icon"></i>

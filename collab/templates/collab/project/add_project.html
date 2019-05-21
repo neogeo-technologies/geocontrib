@@ -14,7 +14,7 @@
             </div>
             {% if errors %}
                 <div class="ui error message">
-                     <div class="header">Veuillez corriger votre formulaire</div><br>
+                     <div class="header">Veuillez corriger les informations saisies dans le formulaire.</div><br>
                     {% for key,val in errors.items %}
                          <strong>{{key}}</strong>: {{val.0}}<br>
                     {% endfor %}
@@ -86,14 +86,14 @@
 
                      <div style="margin-top:10px">
                         <button class="green ui button" type="submit">
-                         Creer votre projet
+                         Créer votre projet
                        </button>
                      </div>
                 </form>
             </div>
         {% else %}
             <div class="ui success message">
-                <div class="header">Votre application a bien été créé</div>
+                <div class="header">Votre application a bien été créée.</div>
             </div>
         {% endif %}
     </div>

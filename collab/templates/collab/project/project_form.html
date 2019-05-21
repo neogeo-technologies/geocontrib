@@ -9,27 +9,27 @@
             </div>
              <div class="ui error message"></div>
              <div class="field">
-                 <label>Date de création </label>
-                 <input type="text"  name="creation_date" value="{{project.creation_date|date:"d/m/Y"}}" />
+                 <label>Date de création</label>
+                 <input type="text" name="creation_date" value="{{project.creation_date|date:"d/m/Y"}}" />
              </div>
              <div class="field">
-                 <label>Délai avant archivage (nb jours) </label>
-                 <input type="text"  name="archive_feature" value="{{project.archive_feature|get_timestamp}}" />
+                 <label>Délai avant archivage (nb jours)</label>
+                 <input type="text" name="archive_feature" value="{{project.archive_feature|get_timestamp}}" />
              </div>
              <div class="field">
-                 <label>Délai avant suppression (nb jours) </label>
-                 <input type="text"  name="delete_feature" value="{{project.delete_feature|get_timestamp}}" />
+                 <label>Délai avant suppression (nb jours)</label>
+                 <input type="text" name="delete_feature" value="{{project.delete_feature|get_timestamp}}" />
              </div>
              <div class="field">
                 <label>Illustration</label>
 
                   <div class="ui action input">
                       {% if project.illustration %}
-                        <input type="text"  value="{{project.illustration.url}}" readonly>
+                        <input type="text" value="{{project.illustration.url}}" readonly>
                       {% else %}
-                          <input type="text"  value="" readonly>
+                          <input type="text" value="" readonly>
                       {% endif %}
-                       <input type="file"  name="illustration" style="display: none">
+                       <input type="file" name="illustration" style="display: none">
                        <div class="ui icon button icon_projform">
                          <i class="attach icon"></i>
                        </div>
@@ -44,12 +44,12 @@
              </div>
              <div class="required field">
                  <label>Titre</label>
-                 <input type="text"  name="title" value="{{project.title}}" />
+                 <input type="text" name="title" value="{{project.title}}" />
              </div>
              <div class="required field">
                  <label>Visibilité des signalements archivés </label>
                  <div class="ui selection dropdown visi_archive">
-                     <input type="hidden"  name="visi_archive" value="" />
+                     <input type="hidden" name="visi_archive" value="" />
                      <i class="dropdown icon"></i>
                      <div class="default text"></div>
                       <div class="menu">
@@ -60,9 +60,9 @@
                   </div>
              </div>
              <div class="required field">
-                 <label>Visibilité des signalements publiés </label>
+                 <label>Visibilité des signalements publiés</label>
                  <div class="ui selection dropdown visi_feature">
-                     <input type="hidden"  name="visi_feature" value="" />
+                     <input type="hidden" name="visi_feature" value="" />
                      <i class="dropdown icon"></i>
                      <div class="default text"></div>
                       <div class="menu">
