@@ -33,7 +33,7 @@ def add_feature_model(request):
                           context=context)
         else:
             projects = custom.Project.objects.all()
-            context = {'projects': projects, 'error': "Les paramètres obligatoires sont manquants"}
+            context = {'projects': projects, 'error': "Les paramètres obligatoires sont manquants."}
             return render(request, APP_NAME + '/feature/add_feature_model.html',
                           context=context)
     else:
@@ -51,18 +51,18 @@ def generate_feature_model(projet_id, feature, geometry, names, types, user):
     # check the fields names given by users
     intersection = list(set(names) & set(DEFAULT_FIELDS))
     if intersection:
-        return {'error': """Le(s) champ(s) suivant(s) font déjà parti du modèle de base
+        return {'error': """Le(s) champ(s) suivant(s) font déjà partie du modèle de base
             d'un signalement, il n'est pas nécessaire de les recréer: """ +  ','.join(intersection)}
     if len(names) != len(set(names)):
-        return {'error': """Veuillez corriger vos champs. Vous avez entré le même nom de champ plusieurs fois"""}
+        return {'error': """Veuillez corriger vos champs. Vous avez entré le même nom de champ plusieurs fois."""}
     # check if this feature name does not exist already
     project_features = project_features_types(APP_NAME, projet.slug)
     if feature in project_features:
-        return {'error': """Un signalement avec ce nom a déjà étè crée"""}
+        return {'error': """Un type de signalement avec ce nom a déjà été créé."""}
     # check title of the feature
     pattern = re.compile("^[a-zA-Z0-9]*$")
     if not pattern.match(feature):
-        return {'error': """Le nom du signalement ne doit être composé que de chiffres et/ou de lettres (sans accent)"""}
+        return {'error': """Le nom du type de signalement ne doit être composé que de chiffres et/ou de lettres (sans accent)."""}
 
     fields = {
         'objects': GeoManager(),
@@ -139,7 +139,7 @@ def generate_feature_model(projet_id, feature, geometry, names, types, user):
                                         'user_id': user.id,
                                         'username': user.username})
         projet.save()
-        return {'success': "Votre signalement a été crée avec succès"}
+        return {'success': "Le type de signalement a été créé avec succès."}
     except Exception as e:
         msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
         logger = logging.getLogger(__name__)
