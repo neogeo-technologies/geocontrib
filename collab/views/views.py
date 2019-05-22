@@ -168,8 +168,8 @@ class ProjectView(FormView):
         try:
             project = models.Project.objects.get(title=form.cleaned_data['title'])
             context = {'errors':
-            {'erreur': ["""Veuillez modifier le titre de votre application,
-            une application avec ce titre existe déjà"""]}, 'form': form}
+            {'erreur': ["""Veuillez modifier le titre de votre projet,
+            un projet avec ce titre existe déjà."""]}, 'form': form}
             return render(self.request, 'collab/project/add_project.html', context)
         except Exception as e:
             pass

@@ -7,7 +7,7 @@ var counter = 1;
 var limit = 20;
 function addInput(divName){
      if (counter == limit)  {
-          alert("Vous avez atteint le nombre maximum de champs complétaires possible (" + counter + " ).");
+          alert("Vous avez atteint le nombre maximum de champs complémentaires possible (" + counter + " ).");
      }
      else {
           var newdiv = document.createElement('div');
