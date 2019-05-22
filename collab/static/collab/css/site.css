@@ -37,7 +37,13 @@ footer{
 .equal-width .label{
     min-width: 8em;
 }
-
+/*disabled link */
+.isDisabled {
+  color: currentColor;
+  cursor: not-allowed;
+  opacity: 0.5;
+  text-decoration: none;
+}
 #maplist {
     background: #f8f4f0;
     height:400px;

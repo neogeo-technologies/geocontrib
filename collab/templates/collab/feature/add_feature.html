@@ -5,51 +5,79 @@
 {% endblock %}
 {% block content %}
 
-{%  if  success or error %}
-    {% if success %}
-        <div class="ui success message">
-            <div class="header">{{success}}</div>
-        </div>
-    {% else %}
-        <div class="ui error message">
-            <div class="header">{{error}}</div>
-        </div>
-    {% endif %}
+{% if rights.feat_creation %}
+  {%  if  success or error %}
+      {% if success %}
+          <div class="ui success message">
+              <div class="header">{{success}}</div>
+          </div>
+      {% elif error %}
+          <div class="ui error message">
+              <div class="header">{{error}}</div>
+          </div>
+      {% endif %}
+  {% else %}
+      {% if features_types %}
+          <div class="ui middle aligned stackable grid container">
+              <div class="row">
+                  <h2 class="ui header">{{project.title}}</h2>
+              </div>
+              <div class="row">
+                  <form class='ui equal width addfeature form' method="POST" >
+                    {% csrf_token %}
+                    <div class="ui error message"></div>
+                    <div class="field">
+                        <label>Type de signalement </label>
+                        <div class="ui selection dropdown feature" id='feature_type'>
+                            <input type="hidden"  name="feature" placeholder="" />
+                            <i class="dropdown icon"></i>
+                            <div class="default text">Choisisez un type de signalement</div>
+                             <div class="menu">
+                              {% for elt in features_types %}
+                                  <div class="item" data-value={{elt}} >{{elt}}</div>
+                              {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div id="form_body">
+                          {% include 'collab/feature/form_body.html' %}
+                    </div>
+                 </form>
+              </div>
+          </div>
+      {% else %}
+          <div class="header">Aucun type de signalement n'a été créé pour ce projet. Veuillez en créer un.</div>
+      {% endif %}
+  {% endif %}
 {% else %}
-    {% if features_types %}
-        <div class="ui middle aligned stackable grid container">
-            <div class="row">
-                <h2 class="ui header">{{project.title}}</h2>
-            </div>
-            <div class="row">
-                <form class='ui equal width addfeature form' method="POST" >
-                  {% csrf_token %}
-                  <div class="ui error message"></div>
-                  <div class="field">
-                      <label>Type de signalement </label>
-                      <div class="ui selection dropdown feature" id='feature_type'>
-                          <input type="hidden"  name="feature" placeholder="" />
-                          <i class="dropdown icon"></i>
-                          <div class="default text">Choisisez un type de signalement</div>
-                           <div class="menu">
-                            {% for elt in features_types %}
-                                <div class="item" data-value={{elt}} >{{elt}}</div>
-                            {% endfor %}
-                          </div>
-                       </div>
-                  </div>
-                  <div id="form_body">
-                        {% include 'collab/feature/form_body.html' %}
-                  </div>
-               </form>
-            </div>
-        </div>
-        </div>
-    {% else %}
-        <div class="header">Aucun type de signalement n'a été créé pour ce projet. Veuillez en créer un.</div>
-    {% endif %}
+  <i class='icon exclamation triangle'></i>
+  <span>Vous ne disposez pas des droits nécessaires.</span>
 {% endif %}
-{% load staticfiles %}
-  <script src="{% static 'collab/js/add_model.js' %}"></script>
 
+<script type="text/javascript">
+
+  $('.ui.selection.dropdown.feature')
+    .dropdown()
+  ;
+  $("#feature_type").change(function () {
+        name = $("input[name=feature]").val();
+
+        url = ''
+        $.ajax({
+          url: url,
+          type: 'GET',
+          data:{
+            name: name
+          },
+          success: function (result) {
+             $('#form_body').html(result);
+          },
+          error: function(err) {
+            console.log('Error occured', err);
+          }
+        });
+
+  });
+
+</script>
 {% endblock %}

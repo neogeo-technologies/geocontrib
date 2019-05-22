@@ -4,6 +4,7 @@
 {% endblock %}
 {% block content %}
 
+{% if user.is_superuser %}
 <div class="ui middle aligned stackable grid container">
 
   {% if projects %}
@@ -91,7 +92,11 @@
            </div>
       {% endif %}
   {% endif %}
-  {% load staticfiles %}
-    <script src="{% static 'collab/js/add_model.js' %}"></script>
-  {% endblock %}
 </div>
+{% else %}
+    <i class='icon exclamation triangle'></i>
+    <span>Vous ne disposez pas des droits nécessaires.</span>
+{% endif %}
+{% load staticfiles %}
+  <script src="{% static 'collab/js/add_model.js' %}"></script>
+{% endblock %}

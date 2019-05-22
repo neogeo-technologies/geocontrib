@@ -5,42 +5,47 @@
 {% endblock %}
 {% block content %}
 
-<div class="project_header">
-    <div class="project_title">
-        <h2 class="ui header">{{project.title|title }}</h2>
-    </div>
-</div>
+{% if project and rights.proj_modification %}
+  <div class="project_header">
+      <div class="project_title">
+          <h2 class="ui header">{{project.title|title }}</h2>
+      </div>
+  </div>
 
-<div id="detail">
-    {% include 'collab/project/project_detail.html' %}
-</div>
-<div id="project_form">
-    {% if edit %}
-        {% include 'collab/projectproject_form.html' %}
-    {% endif %}
-</div>
+  <div id="detail">
+      {% include 'collab/project/project_detail.html' %}
+  </div>
 
-<script>
-// modify type of cursor
-var element = document.getElementById("modify_project");
-element.style.cursor = "pointer";
-    // form project editable
-    $("#modify_project").on('click', function(e) {
+  <div id="project_form">
+      {% if edit %}
+          {% include 'collab/projectproject_form.html' %}
+      {% endif %}
+  </div>
+{% else %}
+    <i class='icon exclamation triangle'></i>
+    <span>Vous ne disposez pas des droits nécessaires.</span>
+{% endif %}
+<script type="text/javascript">
+  // modify type of cursor
+  var element = document.getElementById("modify_project");
+  element.style.cursor = "pointer";
+  // form project editable
+  $("#modify_project").on('click', function(e) {
 
-        url = ''
-        $.ajax({
-          url: url,
-          type: 'GET',
-          success: function (data) {
-              $('#detail').html("");
-              $('#project_form').html(data);
-          },
-          error: function(err) {
-            console.log('Error occured', err);
-          }
-        });
+      url = ''
+      $.ajax({
+        url: url,
+        type: 'GET',
+        success: function (data) {
+            $('#detail').html("");
+            $('#project_form').html(data);
+        },
+        error: function(err) {
+          console.log('Error occured', err);
+        }
+      });
 
-    });
+  });
+</script>
 
-</script >
 {% endblock %}

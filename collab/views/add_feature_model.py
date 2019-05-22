@@ -46,6 +46,7 @@ def generate_feature_model(projet_id, feature, geometry, names, types, user):
 
     # Get project
     projet = custom.Project.objects.get(id=projet_id)
+    
     # check the fields names given by users
     intersection = list(set(names) & set(DEFAULT_FIELDS))
     if intersection:

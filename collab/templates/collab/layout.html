@@ -27,8 +27,12 @@
                 </a>
                 <div class="right menu">
                     <a href="{% url 'help' %}" class="item">Aide</a>
-                    <a href="{% url 'my_account' %}" class="item">Mon compte</a>
-                    <a href="" class="item">Se déconnecter</a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'my_account' %}" class="item">Mon compte</a>
+                        <a href="{% url 'logout' %}" class="item">Se Déconnecter</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="item">Se Connecter</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

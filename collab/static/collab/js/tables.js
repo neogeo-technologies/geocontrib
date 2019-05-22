@@ -1,49 +1,47 @@
 $('.tabular.menu .item').tab();
 
-$(document).ready(function() {
-    var table = $('table.display').DataTable({
-         "scrollX": true,
-         "language": {
-               "url": "../../../static/collab/js/datatables_french.json"
-          },
-          "columnDefs": [
-            {"className": "dt-body-left", "targets": "_all"}
-          ],
-         "dom": 'frtip',
-         "buttons": [
-             {
-                   extend: 'excel',
-                   text: 'Excel',
-                   exportOptions: {
-                       modifier: {
-                           page: 'current'
-                       }
+
+var table = $('table.display').DataTable({
+     "scrollX": true,
+     "language": {
+           "url": "../../../static/collab/js/datatables_french.json"
+      },
+      "columnDefs": [
+        {"className": "dt-body-left", "targets": "_all"}
+      ],
+     "dom": 'frtip',
+     "buttons": [
+         {
+               extend: 'excel',
+               text: 'Excel',
+               exportOptions: {
+                   modifier: {
+                       page: 'current'
                    }
-             },
-             {
-                   extend: 'print',
-                   text: 'Imprimer',
-                   exportOptions: {
-                       modifier: {
-                           page: 'current'
-                       }
+               }
+         },
+         {
+               extend: 'print',
+               text: 'Imprimer',
+               exportOptions: {
+                   modifier: {
+                       page: 'current'
                    }
-             },
-             'csv',
-            {
-              extend: 'csv',
-              text: 'Export CSV de tous les champs',
-              exportOptions: {
-                  modifier: {
-                      selected: null
-                  }
+               }
+         },
+         'csv',
+        {
+          extend: 'csv',
+          text: 'Export CSV de tous les champs',
+          exportOptions: {
+              modifier: {
+                  selected: null
               }
-           }
-            // 'copy',   'pdf'
-         ],
-         "select": true
-    });
-} );
+          }
+       }
+     ],
+     "select": true
+});
 
 
 // $('.tabular.menu .item.carte').one('click', function() {

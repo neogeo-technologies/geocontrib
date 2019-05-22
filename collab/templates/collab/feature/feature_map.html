@@ -5,17 +5,22 @@
 {% endblock %}
 {% block content %}
 
-{% if feature_list %}
-  <h2 class="ui header">
-     CARTE
-  </h2>
-  <div id='maplist' ></div>
-{% else %}
-  <h3 class="ui header">
-      Aucun signalement n'a été créé pour cette application.
-  </h3>
-{% endif %}
 
+{%if rights.feat_consultation%}
+  {% if feature_list %}
+    <h2 class="ui header">
+       CARTE
+    </h2>
+    <div id='maplist' ></div>
+  {% else %}
+    <h3 class="ui header">
+        Aucun signalement n'a été créé pour cette application.
+    </h3>
+  {% endif %}
+{% else %}
+  <i class='icon exclamation triangle'></i>
+  <span>Vous ne disposez pas des droits nécessaires.</span>
+{% endif %}
 {% load staticfiles %}
  <script >
      var maplist = new mapboxgl.Map({

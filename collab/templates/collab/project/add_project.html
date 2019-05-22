@@ -5,8 +5,7 @@
 {% endblock %}
 {% block content %}
 
-
-
+{% if user.is_superuser %}
     <div class="ui middle aligned stackable grid container">
         {% if form %}
             <div class="row">
@@ -14,7 +13,7 @@
             </div>
             {% if errors %}
                 <div class="ui error message">
-                     <div class="header">Veuillez corriger les informations saisies dans le formulaire.</div><br>
+                     <div class="header">Veuillez corriger votre formulaire</div><br>
                     {% for key,val in errors.items %}
                          <strong>{{key}}</strong>: {{val.0}}<br>
                     {% endfor %}
@@ -28,7 +27,7 @@
                           <label>{{form.title.label}}</label>
                           <input type="text"  name="title" placeholder="{{form.title.label}}" />
                       </div>
-                      <div class="field">
+                      <div class="required field">
                          <label>{{form.illustration.label}}</label>
                          <div class="ui action input">
                               <input type="text"  placeholder="Illustration" readonly>
@@ -57,7 +56,7 @@
                               <input type="hidden"  name="visi_archive" placeholder="" />
                               <i class="dropdown icon"></i>
                               <div class="default text"></div>
-                               <div class="menu">
+                              <div class="menu">
                                 {% for value,text in form.visi_archive.field.choices %}
                                     <div class="item" data-value={{value}} >{{text}}</div>
                                 {% endfor %}
@@ -83,22 +82,23 @@
                           <label>{{form.nbday_delete.label}}  (nombre de jours)</label>
                           <input type="number"  step="any" name="nbday_delete" placeholder="" />
                       </div>
-
-                     <div style="margin-top:10px">
+                      <div style="margin-top:10px">
                         <button class="green ui button" type="submit">
-                         Créer votre projet
-                       </button>
-                     </div>
+                         Creer votre projet
+                        </button>
+                      </div>
                 </form>
             </div>
         {% else %}
             <div class="ui success message">
-                <div class="header">Votre application a bien été créée.</div>
+                <div class="header">Votre application a bien été créé</div>
             </div>
         {% endif %}
     </div>
-    </div>
-
+{% else %}
+    <i class='icon exclamation triangle'></i>
+    <span>Vous ne disposez pas des droits nécessaires.</span>
+{% endif %}
 {% load staticfiles %}
 <script src="{% static 'collab/js/project.js' %}"></script>
 {% endblock %}

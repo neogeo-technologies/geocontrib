@@ -20,17 +20,54 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return '%s %s' % (self.first_name, self.last_name.upper())
 
+    def project_right(self, project):
+        """
+            Return the User project rights
+            LEVEL = (
+                ('0', 'Utilisateur anonyme'),
+                ('1', 'Utilisateur connecté'),
+                ('2', 'Contributeur'),
+                ('3', 'Modérateur'),
+                ('4', 'Administrateur'),
+            )
+        """
+        user_right = {'proj_creation': False,
+                      'proj_modification': False,
+                      'proj_consultation': False,
+                      'feat_archive': False,
+                      'feat_creation': False,
+                      'feat_modification': False,
+                      'feat_consultation': False,
+                      'user_admin': False,
+                      'model_creation': False}
+        # modification if admin or super admin
+        try:
+            autorisation = Autorisation.objects.get(user=self,
+                                                    project=project)
+            # Projet
+            # if project and feature are visible
+            if int(autorisation.level) >= int(project.visi_feature):
+                user_right['proj_consultation'] = True
+                user_right['feat_consultation'] = True
+            if int(autorisation.level) >= 4:
+                user_right['proj_modification'] = True
+                user_right['user_admin'] = True
+            if self.is_superuser:
+                user_right['proj_creation'] = True
+                user_right['model_creation'] = True
+            # Feature
+            if int(autorisation.level) >= int(project.visi_archive):
+                user_right['feat_archive'] = True
+            if int(autorisation.level) >= 3:
+                user_right['feat_modification'] = True
+            if int(autorisation.level) >= 2:
+                user_right['feat_creation'] = True
 
+        except Exception as e:
+            # no autorisation
+            pass
 
-class OverwriteStorage(FileSystemStorage):
-    '''
-    Returns a filename that's free on the target storage system, and
-    available for new content to be written to.
-    '''
-    def get_available_name(self, name, max_length=None):
-        if self.exists(name):
-            os.remove(os.path.join(settings.MEDIA_ROOT, name))
-        return name
+        return user_right
 
 
 class Project(models.Model):
@@ -41,8 +78,7 @@ class Project(models.Model):
     creation_date = models.DateTimeField("Date de création du projet",
                                           auto_now_add=True)
     description = models.TextField('Description', blank=True)
-    illustration = models.ImageField('illustration', upload_to="illustrations",  storage=OverwriteStorage(),
-                             null=True)
+    illustration = models.ImageField('illustration', upload_to="illustrations", null=True)
     moderation = models.BooleanField('Modération', default=False)
     visi_feature = models.CharField('Visibilité des signalements publiés',
                                     choices=USER_TYPE,
@@ -100,10 +136,11 @@ class Project(models.Model):
 
 class Autorisation(models.Model):
     LEVEL = (
-        ('0', 'Consultation'),
-        ('1', "Contribution"),
-        ('2', 'Modération'),
-        ('3', "Administration"),
+        ('0', 'Utilisateur anonyme'),
+        ('1', 'Utilisateur connecté'),
+        ('2', "Contribution"),
+        ('3', 'Modération'),
+        ('4', "Administration"),
     )
     level = models.CharField("Niveau d'autorisation",
                              choices=LEVEL,

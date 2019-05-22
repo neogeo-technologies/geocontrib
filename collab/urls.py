@@ -1,6 +1,9 @@
 from django.conf.urls import re_path
+from django.contrib.auth import views as auth_views
 from django.urls import path
 from . import views
+from collab.views.views import LoginView
+from collab.views.views import LogoutView
 from collab.views.views import ProjectAdminView
 from collab.views.views import ProjectFeature
 from collab.views.views import ProjectFeatureDetail
@@ -11,6 +14,8 @@ services = [
 ]
 
 urlpatterns = services + [
+    path('connexion/', LoginView.as_view(), name='login'),
+    path('deconnexion/', LogoutView.as_view(), name='logout'),
     path('ajout_signalement/', views.add_feature_model, name="add_feature"),
     path('', views.index, name='index'),
     path('mon_compte/', views.my_account, name='my_account'),

@@ -36,23 +36,22 @@
   {% if comments%}
     {% for val in comments %}
       <table class="ui celled table">
-        <thead>
-          <tr><th>
-                  <span class="comment_title"> <strong>{{val.author__first_name|title}}
-                                      {{val.author__last_name|title}} <strong>
-                                       Le {{val.creation_date|date:"d/m/Y"}}</span>
-                  {% if forloop.first %}
-                    <i id="addcomment" class=" big green plus square icon"></i>
-                  {% endif %}
-          </th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td data-label="">{{val.comment}}</td>
-          </tr>
-        </tbody>
-     </table>
-
+          <thead>
+            <tr><th>
+                    <span class="comment_title"> <strong>{{val.author__first_name|title}}
+                                        {{val.author__last_name|title}} <strong>
+                                         Le {{val.creation_date|date:"d/m/Y"}}</span>
+                    {% if forloop.first %}
+                      <i id="addcomment" class=" big green plus square icon"></i>
+                    {% endif %}
+            </th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="">{{val.comment}}</td>
+            </tr>
+          </tbody>
+       </table>
     {%endfor%}
   {% else %}
     <br>
@@ -72,10 +71,10 @@
               <textarea name="comment"></textarea>
             </div>
             <div class="actions">
-              <div class="ui cancel button">
-                Annuler
-              </div>
-             <button class="ui button green" type="submit">Ajouter</button>
+                <div class="ui cancel button">
+                  Annuler
+                </div>
+                <button class="ui button green" type="submit">Ajouter</button>
             </div>
         </form>
     </div>
