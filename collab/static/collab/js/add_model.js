@@ -7,7 +7,7 @@ var counter = 1;
 var limit = 20;
 function addInput(divName){
      if (counter == limit)  {
-          alert("You have reached the limit of adding " + counter + " inputs");
+          alert("Vous avez atteint le nombre maximum de champs complétaires possible (" + counter + " ).");
      }
      else {
           var newdiv = document.createElement('div');
@@ -21,11 +21,11 @@ function addInput(divName){
           <div class="default text">Type`
            + `</div>
                 <div class="menu">
-                  <div class="item" data-value="int">Entier</div>
-                  <div class="item" data-value="float">Flottant</div>
+                  <div class="item" data-value="int">Nombre entier</div>
+                  <div class="item" data-value="float">Nombre réel</div>
                   <div class="item" data-value="date">Date</div>
-                  <div class="item"  data-value="string">ChaÎne de caractère</div>
-                  <div class="item"  data-value="text">Text</div>
+                  <div class="item"  data-value="string">Chaîne de caractères</div>
+                  <div class="item"  data-value="text">Texte</div>
                   <div class="item"  data-value="boolean">Booléen</div>
                 </div>
               </div>
@@ -66,7 +66,7 @@ $('.addfeaturemodel')
         rules: [
           {
             type   : 'empty',
-            prompt : 'Veuillez choisir un type de géometrie pour ce signalement'
+            prompt : 'Veuillez choisir un type de géometrie pour ce type de signalement'
           }
         ]
       },
