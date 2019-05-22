@@ -136,3 +136,6 @@ LOGOUT_REDIRECT_URL = '/connexion/'
 
 # A AMELIORER !
 BASE_URL = 'https://signalement.neogeo.fr/'
+
+# Default SRS used to store geometries in database
+DB_SRID = 4326

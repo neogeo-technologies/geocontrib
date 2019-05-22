@@ -12,7 +12,7 @@ from hashlib import md5
 # import re
 
 
-def get_project_feature_geom(app_name, project_slug, feature):
+def get_project_feature_geom_type(app_name, project_slug, feature):
     """
         Return the feature geometry for a type of feature
         @app_name name of  the current application
@@ -25,7 +25,7 @@ def get_project_feature_geom(app_name, project_slug, feature):
         project = models.Project.objects.get(slug=project_slug)
         for elt in project.feature_type:
             if elt.get("feature", "") == feature:
-                return elt.get('geometrie', "Non défini")
+                return elt.get('geom_type', "Non défini")
         return "Non défini"
     except Exception as e:
         return "Non défini"

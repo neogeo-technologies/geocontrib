@@ -3,6 +3,7 @@ from collab import models as custom
 from collab.choices import GEOM_TYPE
 from collab.choices import STATUS
 from collab.views.project_services import project_features_types
+from django.conf import settings
 from django.contrib.gis.db import models
 from django.db import connection
 from django.db.models import Manager as GeoManager
@@ -13,7 +14,7 @@ import logging
 
 APP_NAME = __package__.split('.')[0]
 DEFAULT_FIELDS = ['feature_id', 'date_creation', 'date_modification',
-                  'titre', 'description', 'geometrie', 'status',
+                  'titre', 'description', 'geom', 'status',
                   'date_archivage', 'user', 'project']
 
 
@@ -21,10 +22,10 @@ def add_feature_model(request):
 
     if request.method == 'POST':
         if request.POST.get('project') and request.POST.get('feature') and \
-           request.POST.get('geometry'):
+           request.POST.get('geom_type'):
             message = generate_feature_model(request.POST.get('project'),
                                              request.POST.get('feature'),
-                                             request.POST.get('geometry'),
+                                             request.POST.get('geom_type'),
                                              request.POST.getlist('field_name' , []),
                                              request.POST.getlist('field_type', []),
                                              request.user)
@@ -43,7 +44,7 @@ def add_feature_model(request):
                       context=context)
 
 
-def generate_feature_model(projet_id, feature, geometry, names, types, user):
+def generate_feature_model(projet_id, feature, geom_type, names, types, user):
 
     # Get project
     projet = custom.Project.objects.get(id=projet_id)
@@ -64,6 +65,20 @@ def generate_feature_model(projet_id, feature, geometry, names, types, user):
     if not pattern.match(feature):
         return {'error': """Le nom du type de signalement ne doit être composé que de chiffres et/ou de lettres (sans accent)."""}
 
+    # geometry model class
+    print(geom_type)
+    print(type(geom_type))
+    geom_field = models.PointField
+    if geom_type == GEOM_TYPE[0][0]:
+        print(0)
+        geom_field = models.PointField
+    elif geom_type == GEOM_TYPE[1][0]:
+        print(1)
+        geom_field = models.LineStringField
+    elif geom_type == GEOM_TYPE[2][0]:
+        print(2)
+        geom_field = models.PolygonField
+
     fields = {
         'objects': GeoManager(),
         'feature_id': models.UUIDField(editable=False, max_length=32,
@@ -77,7 +92,7 @@ def generate_feature_model(projet_id, feature, geometry, names, types, user):
         'titre': models.CharField('Titre', max_length=128, null=True,
                                   blank=True),
         'description': models.TextField('Description', blank=True, null=True),
-        'geometrie': models.GeometryField(null=True, blank=True),
+        'geom': geom_field(null=False, srid=settings.DB_SRID, dim=2),
         'status': models.CharField('Status des signalements',
                                    choices=STATUS,
                                    max_length=1, default='0',
@@ -128,13 +143,13 @@ def generate_feature_model(projet_id, feature, geometry, names, types, user):
         table_name = APP_NAME + "_" + projet.slug + '_' + feature
         if not projet.feature_type:
             projet.feature_type = [{'table_name': table_name,
-                                    'geometrie': GEOM_TYPE[int(geometry)][1],
+                                    'geom_type': GEOM_TYPE[int(geom_type)][1],
                                     'feature': feature,
                                     'user_id': user.id,
                                     'username': user.username}]
         else:
             projet.feature_type.append({'table_name': table_name,
-                                        'geometrie': GEOM_TYPE[int(geometry)][1],
+                                        'geom_type': GEOM_TYPE[int(geom_type)][1],
                                         'feature': feature,
                                         'user_id': user.id,
                                         'username': user.username})

@@ -26,7 +26,7 @@
             <div class="ui selection dropdown feature">
                 <input type="hidden"  name="project" placeholder="Projet" />
                 <i class="dropdown icon"></i>
-                <div class="default text">Choisisez le projet associé</div>
+                <div class="default text">Choisissez le projet associé</div>
                  <div class="menu">
                    {% for elt in projects %}
                        <div class="item" data-value={{elt.pk}}>{{elt.title}}</div>
@@ -41,9 +41,9 @@
         <div class="required field">
             <label>Type de géometrie associé</label>
             <div class="ui selection dropdown feature">
-                <input type="hidden"  name="geometry" placeholder="Geometrie" />
+                <input type="hidden"  name="geom_type" placeholder="Géométrie" />
                 <i class="dropdown icon"></i>
-                <div class="default text">Choisisez un type de géométrie</div>
+                <div class="default text">Choisissez un type de géométrie</div>
                  <div class="menu">
                    <div class="item" data-value="0">Point</div>
                    <div class="item" data-value="1">Ligne brisée</div>
@@ -74,7 +74,7 @@
          <div style="margin-top:10px">
             <!-- <input class="ui button" type="button" value="Ajout d'un nouveau champ" onClick="addInput('dynamicInput');"> -->
             <button class="green ui button" type="submit">
-              Créer le signalement
+              Créer le type de signalement
            </button>
          </div>
     </form>
