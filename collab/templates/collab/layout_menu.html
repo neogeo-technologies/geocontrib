@@ -28,132 +28,123 @@
     <link rel="stylesheet" type="text/css" href="{% static 'collab/css/site.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'collab/css/table.css' %}" />
 </head>
-
-
-    <body>
-        <div class="ui fixed inverted menu">
-            <div class="ui container">
-                <a href="{% url 'index' %}" class="header item">
-                    <img id="menu-logo" class="logo" src="{% static 'collab/img/logo.png' %}">
-                    Collab{% if project %}&nbsp;- {{project.title}}{% endif %}
-                </a>
-                <div class="right menu">
-                    <a href="{% url 'help' %}" class="item">Aide</a>
+<body>
+    <div class="ui fixed inverted menu">
+        <div class="ui container">
+            <a href="{% url 'index' %}" class="header item">
+                <img id="menu-logo" class="logo" src="{% static 'collab/img/logo.png' %}">
+                Collab{% if project %}&nbsp;- {{project.title}}{% endif %}
+            </a>
+            <div class="right menu">
+                {% if user.is_authenticated %}
+                    <a href="#" class="item">{{user.first_name}} {{user.last_name}}</a>
+                {% endif %}
+                <a href="{% url 'help' %}" class="item">Aide</a>
+                {% if user.is_authenticated %}
                     <a href="{% url 'my_account' %}" class="item">Mon compte</a>
-                    <a href="" class="item">Se déconnecter</a>
-                </div>
+                    <a href="{% url 'logout' %}" class="item">Se Déconnecter</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="item">Se Connecter</a>
+                {% endif %}
             </div>
         </div>
-
-        <div class="ui main container">
-          <div class="ui top aligned centered grid container">
-            <div class="four wide column left aligned">
-                {% block menu %}
-                    {% if project %}
-                          <div class="item">
-                              {% if project.illustration %}
-                                <img  class="ui small image" src="{{project.illustration.url}}" height="200">
+    </div>
+    <div class="ui main container">
+      <div class="ui top aligned centered grid container">
+        <div class="four wide column left aligned">
+            {% block menu %}
+              <div class="item">
+                  {% if project.illustration and rights.proj_consultation or project.illustration and user.is_superuser %}
+                    <img  class="ui small image" src="{{project.illustration.url}}" height="200">
+                  {% endif %}
+              </div>
+              <div class="ui medium vertical menu">
+                  <div class="item">
+                      <div class="header">Accueil</div>
+                      <div class="menu">
+                          <a class="item" href="{% url 'index'  %}">
+                          <i class="icon home"></i>Page d'accueil</a>
+                      </div>
+                  </div>
+                  <div class="item">
+                      <div class="header">Signalements</div>
+                      <div class="menu">
+                          {% if project and rights.feat_consultation %}
+                            <a class="item" href="{% url 'project_feature_list' project_slug=project.slug %}">
+                          {% else %}
+                            <a class="item isDisabled" href="#"  >
+                          {% endif %}
+                          <i class="icon list"></i>Liste</a>
+                          {% if project and rights.feat_consultation  %}
+                            <a class="item" href="{% url 'project_feature_map' project_slug=project.slug %}">
+                          {% else %}
+                            <a class="item isDisabled" href="#" >
+                          {% endif %}
+                          <i class="icon map"></i>Carte</a>
+                          {% if project and rights.feat_creation %}
+                            <a class="item" href="{% url 'project_add_feature' project_slug=project.slug  %}">
+                          {% else %}
+                            <a class="item isDisabled" href="#" >
+                          {% endif %}
+                          <i class="icon plus"></i>Ajout d'un signalement </a>
+                           {% if rights.model_creation or user.is_superuser %}
+                              <a class="item" href="{% url 'add_feature'  %}">
+                              <i class="icon plus"></i>Créer un nouveau type de signalement</a>
+                           {% endif %}
+                      </div>
+                  </div>
+                  <div class="item">
+                      <div class="header">Import et export</div>
+                      <div class="menu">
+                          <a class="item" href="#">
+                              <i class="icon upload"></i>Importer en masse...</a>
+                          <a class="item" href="#">
+                              <i class="icon camera"></i>Importer une photographie...</a>
+                          <a class="item" href="#">
+                              <i class="icon download"></i>Télécharger...</a>
+                      </div>
+                  </div>
+                  {% if user.is_superuser or rights.proj_modification %}
+                      <div class="item">
+                          <div class="header">Projet</div>
+                          <div class="menu">
+                              <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation</a>
+                              {% if project and rights.proj_modification %}
+                                    <a class="item" href="{% url 'admin_project'  project_slug=project.slug  %}">
+                                    <i class="icon wrench "></i>Administrer le projet</a>
+                              {% else %}
+                                    <a class="item isDisabled " href="#">
+                                    <i class="icon wrench "></i>Administrer le projet</a>
                               {% endif %}
+                              {% if user.is_superuser  %}
+                                  <a class="item" href="{% url 'create_project'  %}">
+                                  <i class="icon plus"></i>Créer un nouveau projet</a>
+                              {% endif %}
+
                           </div>
-                          <div class="ui medium vertical menu">
-                              <div class="item">
-                                  <div class="header">Accueil</div>
-                                  <div class="menu">
-                                      <a class="item" href="{% url 'index'  %}">
-                                      <i class="icon home"></i>Page d'accueil</a>
-                                  </div>
-                              </div>
-                              <div class="item">
-                                  <div class="header">Signalements</div>
-                                  <div class="menu">
-                                      <a class="item" href="{% url 'project_feature_list' project_slug=project.slug %}">
-                                      <i class="icon list"></i>Liste</a>
-                                      <a class="item" href="{% url 'project_feature_map' project_slug=project.slug %}">
-                                      <i class="icon map"></i>Carte</a>
-                                      <a class="item" href="{% url 'project_add_feature' project_slug=project.slug  %}">
-                                      <i class="icon plus"></i>Ajout d'un signalement </a>
-                                      <a class="item" href="{% url 'add_feature'  %}">
-                                      <i class="icon plus"></i>Créer un nouveau type de signalement</a>
-                                  </div>
-                              </div>
-                              <div class="item">
-                                  <div class="header">Import et export</div>
-                                  <div class="menu">
-                                      <a class="item" href="#">
-                                          <i class="icon upload"></i>Importer en masse...</a>
-                                      <a class="item" href="#">
-                                          <i class="icon camera"></i>Importer une photographie...</a>
-                                      <a class="item" href="#">
-                                          <i class="icon download"></i>Télécharger...</a>
-                                  </div>
-                              </div>
-                              <div class="item">
-                                  <div class="header">Projet</div>
-                                  <div class="menu">
-                                      <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation</a>
-                                      <a class="item" href="{% url 'admin_project'  project_slug=project.slug  %}"><i class="icon wrench"></i>Administrer le projet...</a>
-                                      <a class="item" href="{% url 'create_project'  %}">
-                                      <i class="icon plus"></i>Créer un nouveau projet</a>
-
-                                  </div>
-                              </div>
-                          </div>
-                    {% else %}
-                        <div class="ui medium vertical menu">
-                            <div class="item">
-                                <div class="header">Accueil</div>
-                                <div class="menu">
-                                    <a class="item" href="{% url 'index'  %}">
-                                    <i class="icon home"></i>Page d'accueil</a>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="header">Signalements</div>
-                                <div class="menu">
-                                    <a class="item" href="{% url 'add_feature'  %}">
-                                    <i class="icon plus"></i>Créer un nouveau type de signalement</a>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="header">Import et export</div>
-                                <div class="menu">
-                                    <a class="item" href="">
-                                        <i class="icon upload"></i>Importer en masse...</a>
-                                    <a class="item" href="">
-                                        <i class="icon camera"></i>Importer une photographie...</a>
-                                    <a class="item" href="">
-                                        <i class="icon download"></i>Télécharger...</a>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="header">Projet</div>
-                                <div class="menu">
-                                    <a class="item" href="{% url 'create_project'  %}">
-                                    <i class="icon plus"></i>Créer un nouveau projet</a>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endblock %}
-            </div>
-            <div class="twelve wide column">
-                {% block content %}
-                {% endblock %}
-            </div>
-
-          </div>
-
+                      </div>
+                  {% endif %}
+              </div>
+            {% endblock %}
         </div>
-        <!-- BRICOLAGE A AMELIORER !!!!!! -->
-        <div class="ui sixteen wide column" style="height:100px">
-        <div>
-        <footer class="ui bottom fixed inverted menu footer">
-            <div class="ui center aligned container">
-                <div  class="ui horizontal inverted small divided link list">
-                    <a class="item" href="{% url 'legal' %}">Mentions légales</a>
-                </div>
+        <div class="twelve wide column">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+      </div>
+
+    </div>
+    <!-- BRICOLAGE A AMELIORER !!!!!! -->
+    <div class="ui sixteen wide column" style="height:100px">
+    <div>
+    <footer class="ui bottom fixed inverted menu footer">
+        <div class="ui center aligned container">
+            <div  class="ui horizontal inverted small divided link list">
+                <a class="item" href="{% url 'legal' %}">Mentions légales</a>
             </div>
-        </footer>
-    </body>
+        </div>
+    </footer>
+</body>
 
 </html>

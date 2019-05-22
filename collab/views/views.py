@@ -18,26 +18,96 @@ from collections import OrderedDict
 import datetime
 from datetime import timedelta
 import dateutil.parser
+from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
-
 
 APP_NAME = __package__.split('.')[0]
 
 
+def get_anonymous_rights(project):
+    """
+        Return anonymous user rights
+        LEVEL = (
+            ('0', 'Consultation'),
+            ('1', "Contribution"),
+            ('2', 'Modération'),
+            ('3', "Administration"),
+            ('4', "Super Administration"),
+        )
+    """
+    user_right = {'proj_creation': False,
+                  'proj_modification': False,
+                  'proj_consultation': False,
+                  'feat_archive': False,
+                  'feat_creation': False,
+                  'feat_modification': False,
+                  'feat_consultation': False,
+                  'user_admin': False,
+                  'model_creation': False}
+    # visible to anonymous user if feature are visible
+    if int(project.visi_feature) == 0:
+        user_right['proj_consultation'] = True
+        user_right['feat_consultation'] = True
+    if int(project.visi_archive) == 0:
+        user_right['feat_archive'] = True
+    return user_right
+
+
+class LoginView(TemplateView):
+
+    template_name = 'collab/registration/login.html'
+
+    def post(self, request, **kwargs):
+        username = request.POST.get('username', False)
+        password = request.POST.get('password', False)
+        user = authenticate(username=username, password=password)
+        if user is not None and user.is_active:
+            login(request, user)
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+            # return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        return render(request, self.template_name)
+
+    def get(self, request, **kwargs):
+        return render(request, self.template_name)
+
+
+class LogoutView(TemplateView):
+
+    template_name = 'collab/registration/login.html'
+
+    def get(self, request, **kwargs):
+        logout(request)
+        return HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL)
+
+
+# @login_required(login_url='/connexion/')
 def index(request):
     """
         Main page with the current available projects
     """
+
     # list of projects
     data = models.Project.objects.values()
     for elt in data:
         project = models.Project.objects.get(slug=elt['slug'])
+        # get user right on project
+        if request.user.is_authenticated:
+            elt['rights'] = request.user.project_right(project)
+        else:
+            elt['rights'] = get_anonymous_rights(project)
+            # user = authenticate(username='anonymous',
+            #                     password='neogeo2019')
+            # login(request, user)
         elt['visi_feature_type'] = project.get_visi_feature_display()
         # recuperation du nombre de contributeur
         elt['nb_contributors'] = models.Autorisation.objects.filter(
@@ -90,7 +160,7 @@ def get_project_fields(project_slug):
     return data
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+@method_decorator([csrf_exempt], name='dispatch')
 class ProjectAdminView(View):
     """
         View to administrate a project
@@ -102,6 +172,11 @@ class ProjectAdminView(View):
         """
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
+        # get user right on project
+        if request.user.is_authenticated:
+            rights = request.user.project_right(project)
+        else:
+            rights = get_anonymous_rights(project)
         data = get_project_fields(project_slug)
         if data:
             if request.is_ajax():
@@ -109,17 +184,23 @@ class ProjectAdminView(View):
                     "project": project,
                     "edit": True,
                     "user_type_archive": USER_TYPE_ARCHIVE,
-                    "user_type": USER_TYPE
+                    "user_type": USER_TYPE,
+                    "rights": rights
                 }
                 return render(request, 'collab/project/project_form.html', context)
             else:
                 context = {
                     "project": project,
                     "data": OrderedDict(sorted(data[0].items())),
+                    "rights": rights
                 }
                 return render(request, 'collab/project/admin_project.html', context)
         else:
-            return render(request, 'collab/project/admin_project.html', {})
+            context = {
+                "rights": rights
+            }
+            return render(request, 'collab/project/admin_project.html', context)
+
 
     def post(self, request, project_slug):
         """
@@ -127,6 +208,11 @@ class ProjectAdminView(View):
         """
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
+        # get user right on project
+        if request.user.is_authenticated:
+            rights = request.user.project_right(project)
+        else:
+            rights = get_anonymous_rights(project)
         # update forms fields
         form_data = request.POST.dict()
         form_data.pop('csrfmiddlewaretoken')
@@ -153,6 +239,7 @@ class ProjectAdminView(View):
         context = {
             "project": project,
             "data": OrderedDict(sorted(data[0].items())),
+            "rights": rights
         }
         return render(request, 'collab/project/project_detail.html', context)
 
@@ -161,6 +248,7 @@ class ProjectView(FormView):
     template_name = 'collab/project/add_project.html'
     form_class = ProjectForm
     success_url = 'collab/project/add_project.html'
+
 
     def form_valid(self, form):
 
@@ -214,6 +302,11 @@ class ProjectFeature(View):
 
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
+        # get user right on project
+        if request.user.is_authenticated:
+            rights = request.user.project_right(project)
+        else:
+            rights = get_anonymous_rights(project)
         # type of features
         features_types = project_features_types(APP_NAME, project_slug)
         # type of features's fields
@@ -225,7 +318,8 @@ class ProjectFeature(View):
                                                                        project_slug,
                                                                        elt)})
         if not features_types:
-            context = {"message": "Veuillez créer un type de signalement pour ce projet"}
+            context = {"message": "Veuillez créer un type de signalement pour ce projet",
+                       "rights": rights}
             return render(request, 'collab/feature/add_feature.html', context)
 
         # add info for JS display
@@ -234,10 +328,12 @@ class ProjectFeature(View):
                 # char list
                 val['status']['info'] = STATUS
         if request.is_ajax():
-            context = {"res": res.get(request.GET.get('name')).items}
+            context = {"res": res.get(request.GET.get('name')).items,
+                       "rights": rights}
             return render(request, 'collab/feature/form_body.html', context)
         else:
-            context = {"project": project, "features_types": features_types}
+            context = {"project": project, "features_types": features_types,
+                       "rights": rights}
             return render(request, 'collab/feature/add_feature.html', context)
 
     def post(self, request, project_slug):
@@ -302,6 +398,11 @@ def project(request, project_slug):
     # Recuperation du projet
     project = get_object_or_404(models.Project,
                                 slug=project_slug)
+    # get user right on project
+    if request.user.is_authenticated:
+        rights = request.user.project_right(project)
+    else:
+        rights = get_anonymous_rights(project)
     # recuperation des derniers utilisateurs
     users = last_user_registered(project_slug)
     # recuperation du nombre de contributeur
@@ -337,7 +438,8 @@ def project(request, project_slug):
                "nb_features": nb_features,
                "nb_comments": nb_comments,
                "comments": comments,
-               "last_features": last_features}
+               "last_features": last_features,
+               "rights": rights}
     return render(request, 'collab/project/project_home.html', context)
 
 
@@ -358,7 +460,11 @@ def project_feature_map(request, project_slug):
     # get project
     project = get_object_or_404(models.Project,
                                 slug=project_slug)
-
+    # get user right on project
+    if request.user.is_authenticated:
+        rights = request.user.project_right(project)
+    else:
+        rights = get_anonymous_rights(project)
     # list of feature per project
     feature_type = project_features_types(APP_NAME, project_slug)
     feature_list = OrderedDict()
@@ -367,7 +473,7 @@ def project_feature_map(request, project_slug):
         feature_list[feature_type] = get_project_features(APP_NAME,
                                                           project_slug,
                                                           feature_type)
-    context = {'project': project, 'feature_list': feature_list}
+    context = {'rights': rights, 'project': project, 'feature_list': feature_list}
     return render(request, 'collab/feature/feature_map.html', context)
 
 
@@ -379,7 +485,11 @@ def project_feature_list(request, project_slug):
     # get project
     project = get_object_or_404(models.Project,
                                 slug=project_slug)
-
+    # get user right on project
+    if request.user.is_authenticated:
+        rights = request.user.project_right(project)
+    else:
+        rights = get_anonymous_rights(project)
     # list of feature per project
     feature_type = project_features_types(APP_NAME, project_slug)
     feature_list = OrderedDict()
@@ -401,11 +511,12 @@ def project_feature_list(request, project_slug):
                 except Exception as e:
                     elt['utilisateur'] = 'Anonyme'
 
-    context = {'project': project, 'feature_list': feature_list}
+    context = {'rights': rights, 'project': project, 'feature_list': feature_list}
 
     return render(request, 'collab/feature/feature_list.html', context)
 
 
+@method_decorator(login_required(login_url='/connexion/'), name='dispatch')
 class ProjectFeatureDetail(View):
 
     def get(self, request, project_slug, feature_type, feature_pk):
@@ -448,8 +559,6 @@ class ProjectFeatureDetail(View):
                                                       'creation_date'))
         context = {'project': project, 'feature': feature, 'comments': comments}
         return render(request, 'collab/feature/feature_detail.html', context)
-
-
 
 def project_import_issues(request, project_slug):
     # Get project info from slug

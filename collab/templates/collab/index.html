@@ -20,7 +20,8 @@
         </h4>
         <div class="ui divided items">
             {% for project in projects %}
-                <div class="item">
+                {% if project.rights.proj_consultation %}
+                    <div class="item">
                     <div class="ui tiny image">
                         <img src="{{project.illustration}}">
                     </div>
@@ -51,6 +52,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>

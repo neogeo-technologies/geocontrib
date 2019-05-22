@@ -13,15 +13,15 @@ STATUS = (
 )
 
 USER_TYPE = (
-    ('0', 'Contributeur'),
+    ('0', 'Utilisateur anonyme'),
     ('1', 'Utilisateur connecté'),
-    ('2', 'Utilisateur anonyme'),
+    ('2', 'Contributeur'),
 )
 
 USER_TYPE_ARCHIVE = (
-    ('0', 'Administrateur'),
-    ('1', 'Modérateur'),
+    ('0', 'Utilisateur anonyme'),
+    ('1', 'Utilisateur connecté'),
     ('2', 'Contributeur'),
-    ('3', 'Utilisateur connecté'),
-    ('4', 'Utilisateur anonyme'),
+    ('3', 'Modérateur'),
+    ('4', 'Administrateur'),
 )

@@ -54,6 +54,15 @@ $('input:file', '.ui.action.input')
             }
           ]
         },
+        illustration:  {
+          identifier: 'illustration',
+          rules: [
+            {
+              type   : 'empty',
+              prompt : 'Veuillez choisir une illustration pour ce projet'
+            }
+          ]
+        },
       }
     })
   ;

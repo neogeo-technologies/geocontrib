@@ -131,5 +131,8 @@ STATIC_ROOT = "/var/www/html/static/"
 MEDIA_ROOT = '/storage/'
 MEDIA_URL = '/'
 
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/connexion/'
+
 # A AMELIORER !
 BASE_URL = 'https://signalement.neogeo.fr/'
