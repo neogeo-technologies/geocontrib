@@ -9,6 +9,7 @@ from django.db.models import Manager as GeoManager
 from django.shortcuts import render
 from hashlib import md5
 import re
+import logging
 
 APP_NAME = __package__.split('.')[0]
 DEFAULT_FIELDS = ['feature_id', 'date_creation', 'date_modification',
@@ -139,4 +140,7 @@ def generate_feature_model(projet_id, feature, geometry, names, types, user):
         projet.save()
         return {'success': "Votre signalement a été crée avec succès"}
     except Exception as e:
-        return {'error': "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"}
+        msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
+        logger = logging.getLogger(__name__)
+        logger.exception(msg)
+        return {'error': msg}
