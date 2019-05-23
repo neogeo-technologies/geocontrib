@@ -4,6 +4,8 @@
 {{ title }}
 {% endblock %}
 {% block content %}
+
+{% if rights.feat_consultation%}
   <div class="project_header">
     <h2 class="ui header">{{project.title|title}}</h2>
     <h3>{{feature.titre}}</h3>
@@ -41,7 +43,7 @@
                     <span class="comment_title"> <strong>{{val.author__first_name|title}}
                                         {{val.author__last_name|title}} <strong>
                                          Le {{val.creation_date|date:"d/m/Y"}}</span>
-                    {% if forloop.first %}
+                    {% if rights.feat_creation and forloop.first%}
                       <i id="addcomment" class=" big green plus square icon"></i>
                     {% endif %}
             </th></tr>
@@ -55,9 +57,10 @@
     {%endfor%}
   {% else %}
     <br>
-    <i id="addcomment" class=" big green plus square icon"> </i> <strong>Ajouter un commentaire</strong>
+    {% if rights.feat_creation%}
+        <i id="addcomment" class=" big green plus square icon"> </i> <strong>Ajouter un commentaire</strong>
+    {% endif %}
   {% endif %}
-
   <div class="ui small modal comment">
     <i class="close icon"></i>
     <div class="header">
@@ -79,8 +82,10 @@
         </form>
     </div>
   </div>
-
-  {% load staticfiles %}
-   <script src="{% static 'collab/js/feature_detail.js' %}"></script>
-
+{% else %}
+  <i class='icon exclamation triangle'></i>
+  <span>Vous ne disposez pas des droits nécessaires.</span>
+{% endif %}
+{% load staticfiles %}
+ <script src="{% static 'collab/js/feature_detail.js' %}"></script>
 {% endblock %}

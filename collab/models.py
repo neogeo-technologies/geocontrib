@@ -58,8 +58,10 @@ class CustomUser(AbstractUser):
             # Feature
             if int(autorisation.level) >= int(project.visi_archive):
                 user_right['feat_archive'] = True
+            # modify feature
             if int(autorisation.level) >= 3:
                 user_right['feat_modification'] = True
+            # create  feature or comment
             if int(autorisation.level) >= 2:
                 user_right['feat_creation'] = True
 

@@ -516,7 +516,6 @@ def project_feature_list(request, project_slug):
     return render(request, 'collab/feature/feature_list.html', context)
 
 
-@method_decorator(login_required(login_url='/connexion/'), name='dispatch')
 class ProjectFeatureDetail(View):
 
     def get(self, request, project_slug, feature_type, feature_pk):
@@ -526,6 +525,11 @@ class ProjectFeatureDetail(View):
             @return JSON
         """
         project, feature = get_feature_detail(APP_NAME, project_slug, feature_type, feature_pk)
+        # get user right on project
+        if request.user.is_authenticated:
+            rights = request.user.project_right(project)
+        else:
+            rights = get_anonymous_rights(project)
         # get feature comment
         comments = list(models.Comment.objects.filter(project=project,
                                                 feature_id=feature_pk
@@ -533,7 +537,8 @@ class ProjectFeatureDetail(View):
                                                 'author__first_name',
                                                 'author__last_name',
                                                 'creation_date'))
-        context = {'project': project, 'feature': feature, 'comments': comments}
+        context = {'rights': rights, 'project': project,
+                   'feature': feature, 'comments': comments}
         return render(request, 'collab/feature/feature_detail.html', context)
 
     def post(self, request, project_slug, feature_type, feature_pk):
@@ -545,6 +550,11 @@ class ProjectFeatureDetail(View):
         comment = request.POST.get('comment', '')
         project, feature = get_feature_detail(APP_NAME, project_slug,
                                               feature_type, feature_pk)
+        # get user right on project
+        if request.user.is_authenticated:
+            rights = request.user.project_right(project)
+        else:
+            rights = get_anonymous_rights(project)
         # create comment
         obj = models.Comment.objects.create(author=request.user,
                                                      feature_id=feature['feature_id'],
@@ -557,7 +567,7 @@ class ProjectFeatureDetail(View):
                                                       'author__first_name',
                                                       'author__last_name',
                                                       'creation_date'))
-        context = {'project': project, 'feature': feature, 'comments': comments}
+        context = {'rights': rights, 'project': project, 'feature': feature, 'comments': comments}
         return render(request, 'collab/feature/feature_detail.html', context)
 
 def project_import_issues(request, project_slug):
