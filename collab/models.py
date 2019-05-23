@@ -53,30 +53,33 @@ class CustomUser(AbstractUser):
                               'user_admin': True,
                               'model_creation': True}
             else:
-                autorisation = Autorisation.objects.get(user=self,
-                                                        project=project)
+                try:
+                    autorisation = Autorisation.objects.get(user=self,
+                                                            project=project)
+                    level = int(autorisation.level)
+                except Exception as e:
+                    # no autorisation on this project (user connected)
+                    level = 1
                 # Projet
                 # if project and feature are visible
                 # right to vizualize features and comments
-                if int(autorisation.level) >= int(project.visi_feature):
+                if level >= int(project.visi_feature) or \
+                   int(project.visi_feature) < 2:
                     user_right['proj_consultation'] = True
                     user_right['feat_consultation'] = True
                 # right to modify project fields and administrate users
-                if int(autorisation.level) >= 4:
+                if level >= 4:
                     user_right['proj_modification'] = True
                     user_right['user_admin'] = True
-                # # right to create new type of features and new type of model
-                # if self.is_superuser:
-                #     user_right['proj_creation'] = True
-                #     user_right['model_creation'] = True
                 # right to archive features
-                if int(autorisation.level) >= int(project.visi_archive):
+                if level >= int(project.visi_archive)or \
+                   int(project.visi_archive) < 2:
                     user_right['feat_archive'] = True
                 # right to modify feature
-                if int(autorisation.level) >= 3:
+                if level >= 3:
                     user_right['feat_modification'] = True
                 # right to create a feature or a comment
-                if int(autorisation.level) >= 2:
+                if level >= 2:
                     user_right['feat_creation'] = True
 
         except Exception as e:
@@ -152,7 +155,7 @@ class Project(models.Model):
 
 class Autorisation(models.Model):
     LEVEL = (
-        ('0', 'Utilisateur anonyme'),
+        # ('0', 'Utilisateur anonyme'),
         ('1', 'Utilisateur connecté'),
         ('2', "Contribution"),
         ('3', 'Modération'),
