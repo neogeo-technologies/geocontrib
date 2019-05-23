@@ -284,15 +284,19 @@ def my_account(request):
     if request.user.is_authenticated:
         auth_proj = []
         project_info = {}
-        # retrieve user project
-        for elt in models.Autorisation.objects.filter(
-                   user=request.user):
-            project = models.Project.objects.get(id=elt.project.id)
-            auth_proj.append(project)
-            project_info[project.slug] = {"level": elt.get_level_display()}
+
         # open project (can be visualize by anonymous or connected user)
-        project_list = list(set(auth_proj + list(models.Project.objects.filter(
-                     Q(visi_feature='0') | Q(visi_feature='1')))))
+        if request.user.is_superuser:
+            project_list = models.Project.objects.all()
+        else:
+            # retrieve user project
+            for elt in models.Autorisation.objects.filter(
+                       user=request.user):
+                project = models.Project.objects.get(id=elt.project.id)
+                auth_proj.append(project)
+                project_info[project.slug] = {"level": elt.get_level_display()}
+                project_list = list(set(auth_proj + list(models.Project.objects.filter(
+                             Q(visi_feature='0') | Q(visi_feature='1')))))
         # user info
         user = {"username": request.user.username,
                 "name": """{first_name} {last_name}""".format(
@@ -316,7 +320,10 @@ def my_account(request):
                                    project.slug,
                                    feature_type))
             if not project.slug in project_info:
-                project_info[project.slug] = {'level': 'Aucun'}
+                if request.user.is_superuser:
+                    project_info[project.slug] = {'level': 'SuperAdmin'}
+                else:
+                    project_info[project.slug] = {'level': 'Aucun'}
             project_info[project.slug].update({'nb_features': nb_features,
                                                'nb_contributors': nb_contributors,
                                                'nb_comments': nb_comments})
