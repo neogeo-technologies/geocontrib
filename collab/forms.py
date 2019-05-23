@@ -14,7 +14,7 @@ class ProjectForm(forms.Form):
     description = forms.CharField(
                   widget=forms.Textarea(),
                   label='Description', required=False)
-    moderation = forms.BooleanField(label='Modération')
+    moderation = forms.BooleanField(label='Modération', required=False)
     nbday_archive = forms.IntegerField(label='Délai avant archivage',
                                           required=False)
     nbday_delete = forms.IntegerField(label='Délai avant suppression',
