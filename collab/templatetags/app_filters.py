@@ -7,6 +7,12 @@ def get_item(dictionary, key):
     return dictionary.get(key).items()
 
 
+@register.simple_tag
+def get_nested_item(dictionary, key, val):
+    data = dictionary.get(key, '')
+    return data.get(val, '')
+
+
 @register.filter
 def header_display(key):
     return str(key).replace('_', ' ').capitalize()

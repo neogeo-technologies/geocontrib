@@ -18,6 +18,7 @@ from collections import OrderedDict
 import datetime
 from datetime import timedelta
 import dateutil.parser
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -278,8 +279,49 @@ class ProjectView(FormView):
 
 
 def my_account(request):
-    context = {"title": "My account"}
-    return render(request, 'collab/my_account.html', context)
+
+    if request.user.is_authenticated:
+        auth_proj = []
+        # retrieve user project
+        for proj_id in models.Autorisation.objects.filter(
+                   user=request.user).values_list('project', flat=True):
+            auth_proj.append(models.Project.objects.get(id=proj_id))
+        # open project (can be visualize by anonymous or connected user)
+        project_list = list(set(auth_proj + list(models.Project.objects.filter(
+                     Q(visi_feature='0') | Q(visi_feature='1')))))
+        # user info
+        user = {"username": request.user.username,
+                "name": """{first_name} {last_name}""".format(
+                                  first_name=request.user.first_name,
+                                  last_name=request.user.last_name),
+                "email": request.user.email,
+                "is_admin": request.user.is_superuser}
+        project_info = {}
+        for project in project_list:
+            # recuperation du nombre de contributeur
+            nb_contributors = models.Autorisation.objects.filter(
+                                        project__slug=project.slug,
+                                        level="1").count()
+            # recuperation du nombre de commentaire
+            nb_comments = models.Comment.objects.filter(project=project).count()
+            # get number of feature per project
+            list_features = project_features_types(APP_NAME, project.slug)
+            nb_features = 0
+            for feature_type in list_features:
+                nb_features += int(project_feature_number(APP_NAME,
+                                   project.slug,
+                                   feature_type))
+
+            project_info[project.slug] = {'nb_features': nb_features,
+                                          'nb_contributors': nb_contributors,
+                                          'nb_comments': nb_comments}
+        context = {"project_list": project_list, "user": user,
+                   "project_info": project_info}
+        return render(request, 'collab/my_account.html', context)
+    else:
+        context = {"error": "Vous n'avez pas les droits nécessaires pour acceder à cette page"}
+        return render(request, 'collab/my_account.html', context)
+
 
 
 def legal(request):
@@ -557,9 +599,9 @@ class ProjectFeatureDetail(View):
             rights = get_anonymous_rights(project)
         # create comment
         obj = models.Comment.objects.create(author=request.user,
-                                                     feature_id=feature['feature_id'],
-                                                     comment=comment,
-                                                     project=project)
+                                            feature_id=feature['feature_id'],
+                                            comment=comment,
+                                            project=project)
         # get feature comment
         comments = list(models.Comment.objects.filter(project=project,
                                                       feature_id=feature['feature_id']
