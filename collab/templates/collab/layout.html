@@ -26,6 +26,9 @@
                     Collab{% if project %}&nbsp;- {{project.title}}{% endif %}
                 </a>
                 <div class="right menu">
+                    {% if user.is_authenticated %}
+                        <a href="#" class="item">{{user.first_name}} {{user.last_name}}</a>
+                    {% endif %}
                     <a href="{% url 'help' %}" class="item">Aide</a>
                     {% if user.is_authenticated %}
                         <a href="{% url 'my_account' %}" class="item">Mon compte</a>

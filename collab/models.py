@@ -46,22 +46,25 @@ class CustomUser(AbstractUser):
                                                     project=project)
             # Projet
             # if project and feature are visible
+            # right to vizualize features and comments
             if int(autorisation.level) >= int(project.visi_feature):
                 user_right['proj_consultation'] = True
                 user_right['feat_consultation'] = True
+            # right to modify project fields and administrate users
             if int(autorisation.level) >= 4:
                 user_right['proj_modification'] = True
                 user_right['user_admin'] = True
+            # right to create new type of features and new type of model
             if self.is_superuser:
                 user_right['proj_creation'] = True
                 user_right['model_creation'] = True
-            # Feature
+            # right to archive features
             if int(autorisation.level) >= int(project.visi_archive):
                 user_right['feat_archive'] = True
-            # modify feature
+            # right to modify feature
             if int(autorisation.level) >= 3:
                 user_right['feat_modification'] = True
-            # create  feature or comment
+            # right to create a feature or a comment
             if int(autorisation.level) >= 2:
                 user_right['feat_creation'] = True
 
