@@ -19,41 +19,43 @@
             Les projets
         </h4>
         <div class="ui divided items">
-            {% for project in projects %}
-                {% if project.rights.proj_consultation %}
-                    <div class="item">
-                    <div class="ui tiny image">
-                        <img src="{{project.illustration_url}}">
+            {% if projects|length > 0 %}
+                {% for project in projects %}
+            <div class="item">
+                <div class="ui tiny image">
+                    <img src="{{project.illustration_url}}">
+                </div>
+                <div class="middle aligned content">
+                    <a class="header" href="{% url 'project' project_slug=project.slug %}">{{project.title|title }}</a>
+                    <div class="description">
+                        <p>{{project.description}}</p>
                     </div>
-                    <div class="middle aligned content">
-                        <a class="header" href="{% url 'project' project_slug=project.slug %}">{{project.title|title }}</a>
-                        <div class="description">
-                            <p>{{project.description}}</p>
-                        </div>
-                        <div class="meta">
-                            <span class="right floated">
-                                {% if project.moderation %}<strong>Projet modéré</strong>{% else %}<strong>Projet non modéré</strong>{% endif %}
-                            </span>
-                            <span>Niveau d'autorisation requis&nbsp;: {{project.visi_feature_type}} </span>
-                        </div>
-                        <div class="meta">
-                            <span class="right floated" data-tooltip="">
-                                <i class="calendar icon"></i>&nbsp; {{project.creation_date|date:'d/m/Y'}}
-                            </span>
-                            <span data-tooltip="  {{project.nb_contributors}} personnes ont contribué à ce projet">
-                                {{project.nb_contributors}}&nbsp;<i class="user icon"></i>
-                            </span>
-                            <span data-tooltip="{{project.nb_features}} signalements ont été créés pour ce projet">
-                                &nbsp;{{project.nb_features}}&nbsp;<i class="map marker icon"></i>
-                            </span>
-                            <span data-tooltip="{{project.nb_comments}} commentaires ont été créés pour ce projet">
-                                &nbsp;{{project.nb_comments}}&nbsp;<i class="comment icon"></i>
-                            </span>
-                        </div>
+                    <div class="meta">
+                        <span class="right floated">
+                            {% if project.moderation %}<strong>Projet modéré</strong>{% else %}<strong>Projet non modéré</strong>{% endif %}
+                        </span>
+                        <span>Niveau d'autorisation requis&nbsp;: {{project.visi_feature_type}} </span>
+                    </div>
+                    <div class="meta">
+                        <span class="right floated" data-tooltip="">
+                            <i class="calendar icon"></i>&nbsp; {{project.creation_date|date:'d/m/Y'}}
+                        </span>
+                        <span data-tooltip="  {{project.nb_contributors}} personnes ont contribué à ce projet">
+                            {{project.nb_contributors}}&nbsp;<i class="user icon"></i>
+                        </span>
+                        <span data-tooltip="{{project.nb_features}} signalements ont été créés pour ce projet">
+                            &nbsp;{{project.nb_features}}&nbsp;<i class="map marker icon"></i>
+                        </span>
+                        <span data-tooltip="{{project.nb_comments}} commentaires ont été créés pour ce projet">
+                            &nbsp;{{project.nb_comments}}&nbsp;<i class="comment icon"></i>
+                        </span>
                     </div>
                 </div>
-                {% endif %}
-            {% endfor %}
+            </div>
+                {% endfor %}
+            {% else %}
+                Vous n'avez accès à aucun projet.
+            {% endif %}
         </div>
     </div>
 </div>

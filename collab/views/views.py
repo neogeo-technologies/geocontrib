@@ -99,13 +99,10 @@ def index(request):
 
     # list of projects
     data = models.Project.objects.values()
+    projects = []
 
     for elt in data:
         project = models.Project.objects.get(slug=elt['slug'])
-
-        # illustration url
-        if project.illustration:
-            elt['illustration_url'] = project.illustration.url
 
         # get user right on project
         if request.user.is_authenticated:
@@ -115,6 +112,10 @@ def index(request):
             # user = authenticate(username='anonymous',
             #                     password='neogeo2019')
             # login(request, user)
+
+        if not elt['rights'].get("proj_consultation"):
+            continue
+
         elt['visi_feature_type'] = project.get_visi_feature_display()
         # recuperation du nombre de contributeur
         elt['nb_contributors'] = models.Autorisation.objects.filter(
@@ -132,9 +133,15 @@ def index(request):
 
         elt['nb_features'] = nb_features
 
+        # illustration url
+        if project.illustration:
+            elt['illustration_url'] = project.illustration.url
+
+        projects.append(elt)
+
     context = {
         "title": "Collab",
-        "projects": list(data),
+        "projects": projects,
     }
     return render(request, 'collab/index.html', context)
 
