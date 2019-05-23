@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -76,12 +75,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': '',
         'USER': '',
-        'PASSWORD' : '',
+        'PASSWORD': '',
         'HOST': '',
         'PORT': ''
 
@@ -108,6 +106,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Default SRS used to store geometries in database
+DB_SRID = 4326
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
@@ -122,20 +123,18 @@ USE_L10N = True
 
 USE_TZ = True
 
+# App URL
+BASE_URL = 'http://localhost:8000'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-
 STATIC_URL = '/static/'
-STATIC_ROOT = "/var/www/html/static/"
-MEDIA_ROOT = '/storage/'
-MEDIA_URL = '/'
+STATIC_ROOT = '/var/www/html/static/'
 
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Login/logout redirects
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/connexion/'
-
-# A AMELIORER !
-BASE_URL = 'https://signalement.neogeo.fr/'
-
-# Default SRS used to store geometries in database
-DB_SRID = 4326

@@ -102,6 +102,11 @@ def index(request):
 
     for elt in data:
         project = models.Project.objects.get(slug=elt['slug'])
+
+        # illustration url
+        if project.illustration:
+            elt['illustration_url'] = project.illustration.url
+
         # get user right on project
         if request.user.is_authenticated:
             elt['rights'] = request.user.project_right(project)

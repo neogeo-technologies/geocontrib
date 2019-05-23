@@ -23,7 +23,7 @@
                 {% if project.rights.proj_consultation %}
                     <div class="item">
                     <div class="ui tiny image">
-                        <img src="{{project.illustration}}">
+                        <img src="{{project.illustration_url}}">
                     </div>
                     <div class="middle aligned content">
                         <a class="header" href="{% url 'project' project_slug=project.slug %}">{{project.title|title }}</a>
