@@ -42,31 +42,42 @@ class CustomUser(AbstractUser):
                       'model_creation': False}
         # modification if admin or super admin
         try:
-            autorisation = Autorisation.objects.get(user=self,
-                                                    project=project)
-            # Projet
-            # if project and feature are visible
-            # right to vizualize features and comments
-            if int(autorisation.level) >= int(project.visi_feature):
-                user_right['proj_consultation'] = True
-                user_right['feat_consultation'] = True
-            # right to modify project fields and administrate users
-            if int(autorisation.level) >= 4:
-                user_right['proj_modification'] = True
-                user_right['user_admin'] = True
-            # right to create new type of features and new type of model
             if self.is_superuser:
-                user_right['proj_creation'] = True
-                user_right['model_creation'] = True
-            # right to archive features
-            if int(autorisation.level) >= int(project.visi_archive):
-                user_right['feat_archive'] = True
-            # right to modify feature
-            if int(autorisation.level) >= 3:
-                user_right['feat_modification'] = True
-            # right to create a feature or a comment
-            if int(autorisation.level) >= 2:
-                user_right['feat_creation'] = True
+                user_right = {'proj_creation': True,
+                              'proj_modification': True,
+                              'proj_consultation': True,
+                              'feat_archive': True,
+                              'feat_creation': True,
+                              'feat_modification': True,
+                              'feat_consultation': True,
+                              'user_admin': True,
+                              'model_creation': True}
+            else:
+                autorisation = Autorisation.objects.get(user=self,
+                                                        project=project)
+                # Projet
+                # if project and feature are visible
+                # right to vizualize features and comments
+                if int(autorisation.level) >= int(project.visi_feature):
+                    user_right['proj_consultation'] = True
+                    user_right['feat_consultation'] = True
+                # right to modify project fields and administrate users
+                if int(autorisation.level) >= 4:
+                    user_right['proj_modification'] = True
+                    user_right['user_admin'] = True
+                # # right to create new type of features and new type of model
+                # if self.is_superuser:
+                #     user_right['proj_creation'] = True
+                #     user_right['model_creation'] = True
+                # right to archive features
+                if int(autorisation.level) >= int(project.visi_archive):
+                    user_right['feat_archive'] = True
+                # right to modify feature
+                if int(autorisation.level) >= 3:
+                    user_right['feat_modification'] = True
+                # right to create a feature or a comment
+                if int(autorisation.level) >= 2:
+                    user_right['feat_creation'] = True
 
         except Exception as e:
             # no autorisation
