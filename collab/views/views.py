@@ -99,6 +99,7 @@ def index(request):
 
     # list of projects
     data = models.Project.objects.values()
+
     for elt in data:
         project = models.Project.objects.get(slug=elt['slug'])
         # get user right on project
@@ -282,10 +283,13 @@ def my_account(request):
 
     if request.user.is_authenticated:
         auth_proj = []
+        project_info = {}
         # retrieve user project
-        for proj_id in models.Autorisation.objects.filter(
-                   user=request.user).values_list('project', flat=True):
-            auth_proj.append(models.Project.objects.get(id=proj_id))
+        for elt in models.Autorisation.objects.filter(
+                   user=request.user):
+            project = models.Project.objects.get(id=elt.project.id)
+            auth_proj.append(project)
+            project_info[project.slug] = {"level": elt.get_level_display()}
         # open project (can be visualize by anonymous or connected user)
         project_list = list(set(auth_proj + list(models.Project.objects.filter(
                      Q(visi_feature='0') | Q(visi_feature='1')))))
@@ -296,7 +300,7 @@ def my_account(request):
                                   last_name=request.user.last_name),
                 "email": request.user.email,
                 "is_admin": request.user.is_superuser}
-        project_info = {}
+
         for project in project_list:
             # recuperation du nombre de contributeur
             nb_contributors = models.Autorisation.objects.filter(
@@ -311,10 +315,11 @@ def my_account(request):
                 nb_features += int(project_feature_number(APP_NAME,
                                    project.slug,
                                    feature_type))
-
-            project_info[project.slug] = {'nb_features': nb_features,
-                                          'nb_contributors': nb_contributors,
-                                          'nb_comments': nb_comments}
+            if not project.slug in project_info:
+                project_info[project.slug] = {'level': 'Aucun'}
+            project_info[project.slug].update({'nb_features': nb_features,
+                                               'nb_contributors': nb_contributors,
+                                               'nb_comments': nb_comments})
         context = {"project_list": project_list, "user": user,
                    "project_info": project_info}
         return render(request, 'collab/my_account.html', context)

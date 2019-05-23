@@ -58,8 +58,12 @@
                         {% endif %}
                     </tr>
                     <tr>
-                        <td>Administrateur&nbsp;?</td>
-                        <td>{{user.is_admin}}</td>
+                        <td>Administrateur</td>
+                        {% if user.is_admin %}
+                            <td>Oui</td>
+                        {% else %}
+                            <td>Non</td>
+                        {% endif %}
                     </tr>
                 </tbody>
             </table>
@@ -102,8 +106,10 @@
                                   <p>{{project.description}}</p>
                             </div>
                             <div class="meta">
-                                <span class="right floated">Projet non modéré</span>
-                                <span>Mon niveau d'autorisation&nbsp;: Contributeur</span>
+                                <span class="right floated">{% if project.moderation%}Projet modéré {% else %} Projet non modéré {% endif %}</span>
+                                <span>Mon niveau d'autorisation&nbsp;:
+                                    {% get_nested_item project_info project.slug 'level' %}
+                                </span>
                             </div>
                             <div class="meta">
                                 <span class="right floated" data-tooltip="Projet créé le {{project.creation_date|date:'d/m/Y'}}">
