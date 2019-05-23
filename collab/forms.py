@@ -27,7 +27,7 @@ class ProjectForm(forms.Form):
                                      widget=forms.Select())
 
     def create_project(self):
-
+        result = {}
         try:
             # add archive_feature / delete_feature
             nbday = self.cleaned_data.pop('nbday_archive')
@@ -38,6 +38,8 @@ class ProjectForm(forms.Form):
                 self.cleaned_data['delete_feature'] = timedelta(days=nbday)
             obj = Project(**self.cleaned_data)
             obj.save()
-            return ''
+            result["project"] = obj
         except Exception as exp:
-            return str(exp)
+            result["db_error"] = str(exp)
+
+        return result

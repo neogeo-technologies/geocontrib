@@ -14,10 +14,12 @@ from collab.views.project_services import last_user_registered
 from collab.views.project_services import project_feature_type_fields
 from collab.views.project_services import project_feature_number
 from collab.views.project_services import project_features_types
+
 from collections import OrderedDict
 import datetime
 from datetime import timedelta
 import dateutil.parser
+
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -25,6 +27,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.views import View
@@ -263,24 +266,24 @@ class ProjectView(FormView):
     form_class = ProjectForm
     success_url = 'collab/project/add_project.html'
 
-
     def form_valid(self, form):
 
-        # verifie qu'un projet avec ce titre n'existe pas deja
-        try:
-            project = models.Project.objects.get(title=form.cleaned_data['title'])
+        # Vérifie qu'un projet avec ce titre n'existe pas déjà
+        projects_with_this_title = models.Project.objects.filter(title__iexact=form.cleaned_data['title'])
+        if projects_with_this_title:
             context = {'errors':
-            {'erreur': ["""Veuillez modifier le titre de votre projet,
-            un projet avec ce titre existe déjà."""]}, 'form': form}
-            return render(self.request, 'collab/project/add_project.html', context)
-        except Exception as e:
-            pass
-        dberror = form.create_project()
-        if dberror:
+                           {'erreur':
+                                ["Veuillez modifier le titre de votre projet, un projet avec ce titre existe déjà."]},
+                       'form': form}
+            return render(self.request, self.template_name, context)
+
+        result = form.create_project()
+        db_error = result.get("db_error")
+        if db_error:
             context = {'errors':
-            {"Une erreur s'est produite": [dberror]}, 'form': form}
-            return render(self.request, 'collab/project/add_project.html', context)
-        return render(self.request, 'collab/project/add_project.html')
+            {"Une erreur s'est produite": [db_error]}, 'form': form}
+            return render(self.request, self.template_name, context)
+        return redirect('project', project_slug=result["project"].slug)
 
     def form_invalid(self, form):
         errors = form.errors.copy()
@@ -288,7 +291,7 @@ class ProjectView(FormView):
             label = form.fields[key].label
             errors[label] = errors.pop(key)
         context = {'errors': errors, 'form': form}
-        return render(self.request, 'collab/project/add_project.html', context)
+        return render(self.request, self.template_name, context)
 
 
 def my_account(request):
@@ -345,7 +348,6 @@ def my_account(request):
     else:
         context = {"error": "Vous n'avez pas les droits nécessaires pour acceder à cette page"}
         return render(request, 'collab/my_account.html', context)
-
 
 
 def legal(request):
