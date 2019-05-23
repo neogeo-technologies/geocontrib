@@ -586,7 +586,7 @@ class ProjectFeatureDetail(View):
             rights = get_anonymous_rights(project)
         # get feature comment
         comments = list(models.Comment.objects.filter(project=project,
-                                                feature_id=feature_pk
+                                                feature_id=feature.get('feature_id','')
                                                 ).values('comment',
                                                 'author__first_name',
                                                 'author__last_name',
