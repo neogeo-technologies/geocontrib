@@ -573,6 +573,7 @@ def project_feature_list(request, project_slug):
         Display the list of the available features for a
         given project
     """
+
     # get project
     project = get_object_or_404(models.Project,
                                 slug=project_slug)
@@ -616,6 +617,7 @@ class ProjectFeatureDetail(View):
             @return JSON
         """
         project, feature = get_feature_detail(APP_NAME, project_slug, feature_type, feature_pk)
+        labels = project.get_labels(feature_type)
         # get user right on project
         if request.user.is_authenticated:
             rights = request.user.project_right(project)
@@ -629,7 +631,7 @@ class ProjectFeatureDetail(View):
                                                 'author__last_name',
                                                 'creation_date'))
         context = {'rights': rights, 'project': project,
-                   'feature': feature, 'comments': comments}
+                   'feature': feature, 'comments': comments, 'labels': labels}
         return render(request, 'collab/feature/feature_detail.html', context)
 
     def post(self, request, project_slug, feature_type, feature_pk):

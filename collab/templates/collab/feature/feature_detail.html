@@ -16,18 +16,22 @@
     {% for key,val in feature.items %}
         {% if key not in 'id,user_id,project_id,feature_id,titre' %}
             <tr>
-                <td><strong>{{key|feature_key_display}}</strong></td>
-            {% if val %}
-                {% if val == True %}
-                <td><i class="green check icon"></td>
-                {% elif val == False %}
-                <td><i class="inverted red remove icon"></td>
+                {% if key == 'utilisateur' %}
+                    <td><strong>Utilisateur</strong></td>
                 {% else %}
-                <td>{{val|feature_val_display}}</td>
+                    <td><strong>{{labels|get_dict_item:key}}</strong></td>
                 {% endif %}
-            {% else %}
-                <td><i class="minus icon"></td>
-            {% endif %}
+                {% if val %}
+                    {% if val == True %}
+                    <td><i class="green check icon"></td>
+                    {% elif val == False %}
+                    <td><i class="inverted red remove icon"></td>
+                    {% else %}
+                    <td>{{val|feature_val_display}}</td>
+                    {% endif %}
+                {% else %}
+                    <td><i class="minus icon"></td>
+                {% endif %}
             </tr>
         {% endif %}
     {% endfor %}
