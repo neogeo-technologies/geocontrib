@@ -1,150 +1,146 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>{% block title %}{% endblock %}</title>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <title>{% block title %}{% endblock %}</title>
 
-    <!-- jQuery Core 3.3.1 -->
-    <script src="{% static 'collab/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script>
-    <!-- Semantic UI -->
-    <link rel="stylesheet" href="{% static 'collab/resources/semantic-ui-2.4.0/semantic.min.css' %}"/>
-    <script src="{% static 'collab/resources/semantic-ui-2.4.0/semantic.min.js' %}"></script>
-    <!-- DataTables -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-flash-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sc-2.0.0/sl-1.3.0/datatables.min.css"/>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-colvis-1.5.6/b-flash-1.5.6/b-html5-1.5.6/b-print-1.5.6/cr-1.5.0/r-2.2.2/sc-2.0.0/sl-1.3.0/datatables.min.js"></script>
-    <!-- <link rel="stylesheet" href="{% static 'collab/resources/DataTables-1.10.18/datatables.min.css' %}"/>
-    <script src="{% static 'collab/resources/DataTables-1.10.18/datatables.min.js' %}"></script> -->
-    <!-- Mapbox Gl JS -->
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
-    <!--STYLE CSS -->
-    <link rel="stylesheet" type="text/css" href="{% static 'collab/css/site.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'collab/css/table.css' %}" />
-</head>
-<body>
-    <div class="ui fixed inverted menu">
-        <div class="ui container">
-            <a href="{% url 'index' %}" class="header item">
-                <img id="menu-logo" class="logo" src="{% static 'collab/img/logo.png' %}">
-                Collab{% if project %}&nbsp;- {{project.title}}{% endif %}
-            </a>
-            <div class="right menu">
-                {% if request.user.is_authenticated %}
-                    <div class="item">[{{user.username}}]</div>
-                {% endif %}
-                <a href="{% url 'help' %}" class="item">Aide</a>
-                {% if request.user.is_authenticated %}
-                <a href="{% url 'my_account' %}" class="item">Mon compte</a>
-                <a href="{% url 'logout' %}" class="item">Se Déconnecter</a>
-                {% else %}
-                <a href="{% url 'login' %}" class="item">Se Connecter</a>
-                {% endif %}
+        <!-- jQuery Core 3.3.1 -->
+        <script src="{% static 'collab/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script>
+        <!-- Semantic UI -->
+        <link rel="stylesheet" href="{% static 'collab/resources/semantic-ui-2.4.0/semantic.min.css' %}"/>
+        <script src="{% static 'collab/resources/semantic-ui-2.4.0/semantic.min.js' %}"></script>
+        <!-- DataTables -->
+        <link rel="stylesheet" href="{% static 'collab/resources/DataTables-1.10.18/datatables.min.css' %}"/>
+        <script src="{% static 'collab/resources/DataTables-1.10.18/datatables.min.js' %}"></script>
+
+        <!-- Mapbox Gl JS -->
+        <link rel="stylesheet" href="{% static 'collab/resources/mapbox-gl-0.53.1/mapbox-gl.css' %}"/>
+        <script src="{% static 'collab/resources/mapbox-gl-0.53.1/mapbox-gl.js' %}"></script>
+
+        <!--STYLE CSS -->
+        <link rel="stylesheet" type="text/css" href="{% static 'collab/css/site.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'collab/css/table.css' %}" />
+    </head>
+    <body>
+        <div class="ui fixed inverted menu">
+            <div class="ui container">
+                <a href="{% url 'index' %}" class="header item">
+                    <img id="menu-logo" class="logo" src="{% static 'collab/img/logo.png' %}">
+                    Collab{% if project %}&nbsp;- {{project.title}}{% endif %}
+                </a>
+                <div class="right menu">
+                    {% if request.user.is_authenticated %}
+                        <div class="item">[{{user.username}}]</div>
+                    {% endif %}
+                    <a href="{% url 'help' %}" class="item">Aide</a>
+                    {% if request.user.is_authenticated %}
+                    <a href="{% url 'my_account' %}" class="item">Mon compte</a>
+                    <a href="{% url 'logout' %}" class="item">Se Déconnecter</a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="item">Se Connecter</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
-    <div class="ui main container">
-      <div class="ui top aligned centered grid container">
-        <div class="four wide column left aligned">
-            {% block menu %}
-              <div class="item">
-                  {% if project.illustration and rights.proj_consultation or project.illustration and user.is_superuser %}
-                    <img  class="ui small image" src="{{project.illustration.url}}" height="200">
-                  {% endif %}
-              </div>
-              <div class="ui medium vertical menu">
+        <div class="ui main container">
+          <div class="ui top aligned centered grid container">
+            <div class="four wide column left aligned">
+                {% block menu %}
                   <div class="item">
-                      <div class="header">Accueil</div>
-                      <div class="menu">
-                          <a class="item" href="{% url 'index'  %}">
-                          <i class="icon home"></i>Page d'accueil</a>
-                      </div>
+                      {% if project.illustration and rights.proj_consultation or project.illustration and user.is_superuser %}
+                        <img  class="ui small image" src="{{project.illustration.url}}" height="200">
+                      {% endif %}
                   </div>
-                  <div class="item">
-                      <div class="header">Signalements</div>
-                      <div class="menu">
-                          {% if project and rights.feat_consultation %}
-                            <a class="item" href="{% url 'project_feature_list' project_slug=project.slug %}">
-                          {% else %}
-                            <a class="item isDisabled" href="#"  >
-                          {% endif %}
-                          <i class="icon list"></i>Liste</a>
-                          {% if project and rights.feat_consultation  %}
-                            <a class="item" href="{% url 'project_feature_map' project_slug=project.slug %}">
-                          {% else %}
-                            <a class="item isDisabled" href="#" >
-                          {% endif %}
-                          <i class="icon map"></i>Carte</a>
-                          {% if project and rights.feat_creation %}
-                            <a class="item" href="{% url 'project_add_feature' project_slug=project.slug  %}">
-                          {% else %}
-                            <a class="item isDisabled" href="#" >
-                          {% endif %}
-                          <i class="icon plus"></i>Ajout d'un signalement </a>
-                           {% if rights.model_creation or user.is_superuser %}
-                              <a class="item" href="{% url 'add_feature'  %}">
-                              <i class="icon plus"></i>Créer un nouveau type de signalement</a>
-                           {% endif %}
-                      </div>
-                  </div>
-                  <div class="item">
-                      <div class="header">Import et export</div>
-                      <div class="menu">
-                          <a class="item" href="#">
-                              <i class="icon upload"></i>Importer en masse...</a>
-                          <a class="item" href="#">
-                              <i class="icon camera"></i>Importer une photographie...</a>
-                          <a class="item" href="#">
-                              <i class="icon download"></i>Télécharger...</a>
-                      </div>
-                  </div>
-                  {% if request.user.is_superuser or rights.proj_modification %}
+                  <div class="ui medium vertical menu">
                       <div class="item">
-                          <div class="header">Projet</div>
+                          <div class="header">Accueil</div>
                           <div class="menu">
-                              <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation</a>
-                              {% if project and rights.proj_modification %}
-                                    <a class="item" href="{% url 'admin_project'  project_slug=project.slug  %}">
-                                    <i class="icon wrench "></i>Administrer le projet</a>
-                              {% else %}
-                                    <a class="item isDisabled " href="#">
-                                    <i class="icon wrench "></i>Administrer le projet</a>
-                              {% endif %}
-                              {% if request.user.is_superuser  %}
-                                  <a class="item" href="{% url 'create_project'  %}">
-                                  <i class="icon plus"></i>Créer un nouveau projet</a>
-                              {% endif %}
-
+                              <a class="item" href="{% url 'index'  %}">
+                              <i class="icon home"></i>Page d'accueil</a>
                           </div>
                       </div>
-                  {% endif %}
-              </div>
-            {% endblock %}
-        </div>
-        <div class="twelve wide column">
-            {% block content %}
-            {% endblock %}
-        </div>
+                      <div class="item">
+                          <div class="header">Signalements</div>
+                          <div class="menu">
+                              {% if project and rights.feat_consultation %}
+                                <a class="item" href="{% url 'project_feature_list' project_slug=project.slug %}">
+                              {% else %}
+                                <a class="item isDisabled" href="#"  >
+                              {% endif %}
+                              <i class="icon list"></i>Liste</a>
+                              {% if project and rights.feat_consultation  %}
+                                <a class="item" href="{% url 'project_feature_map' project_slug=project.slug %}">
+                              {% else %}
+                                <a class="item isDisabled" href="#" >
+                              {% endif %}
+                              <i class="icon map"></i>Carte</a>
+                              {% if project and rights.feat_creation %}
+                                <a class="item" href="{% url 'project_add_feature' project_slug=project.slug  %}">
+                              {% else %}
+                                <a class="item isDisabled" href="#" >
+                              {% endif %}
+                              <i class="icon plus"></i>Ajout d'un signalement </a>
+                               {% if rights.model_creation or user.is_superuser %}
+                                  <a class="item" href="{% url 'add_feature'  %}">
+                                  <i class="icon plus"></i>Créer un nouveau type de signalement</a>
+                               {% endif %}
+                          </div>
+                      </div>
+                      <div class="item">
+                          <div class="header">Import et export</div>
+                          <div class="menu">
+                              <a class="item" href="#">
+                                  <i class="icon upload"></i>Importer en masse...</a>
+                              <a class="item" href="#">
+                                  <i class="icon camera"></i>Importer une photographie...</a>
+                              <a class="item" href="#">
+                                  <i class="icon download"></i>Télécharger...</a>
+                          </div>
+                      </div>
+                      {% if request.user.is_superuser or rights.proj_modification %}
+                          <div class="item">
+                              <div class="header">Projet</div>
+                              <div class="menu">
+                                  <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation</a>
+                                  {% if project and rights.proj_modification %}
+                                        <a class="item" href="{% url 'admin_project'  project_slug=project.slug  %}">
+                                        <i class="icon wrench "></i>Administrer le projet</a>
+                                  {% else %}
+                                        <a class="item isDisabled " href="#">
+                                        <i class="icon wrench "></i>Administrer le projet</a>
+                                  {% endif %}
+                                  {% if request.user.is_superuser  %}
+                                      <a class="item" href="{% url 'create_project'  %}">
+                                      <i class="icon plus"></i>Créer un nouveau projet</a>
+                                  {% endif %}
 
-      </div>
-
-    </div>
-    <!-- BRICOLAGE A AMELIORER !!!!!! -->
-    <div class="ui sixteen wide column" style="height:100px">
-    <div>
-    <footer class="ui bottom fixed inverted menu footer">
-        <div class="ui center aligned container">
-            <div  class="ui horizontal inverted small divided link list">
-                <a class="item" href="{% url 'legal' %}">Mentions légales</a>
+                              </div>
+                          </div>
+                      {% endif %}
+                  </div>
+                {% endblock %}
             </div>
+            <div class="twelve wide column">
+                {% block content %}
+                {% endblock %}
+            </div>
+
+          </div>
+
         </div>
-    </footer>
-</body>
+        <!-- BRICOLAGE A AMELIORER !!!!!! -->
+        <div class="ui sixteen wide column" style="height:100px">
+        <div>
+        <footer class="ui bottom fixed inverted menu footer">
+            <div class="ui center aligned container">
+                <div  class="ui horizontal inverted small divided link list">
+                    <a class="item" href="{% url 'legal' %}">Mentions légales</a>
+                </div>
+            </div>
+        </footer>
+    </body>
 
 </html>

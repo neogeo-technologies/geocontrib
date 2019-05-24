@@ -4,18 +4,27 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
         <title>{% block title %}{% endblock %}</title>
-        <link rel="stylesheet" type="text/css" href="{% static 'collab/css/site.css' %}" />
+
         <!-- jQuery Core 3.3.1 -->
         <script src="{% static 'collab/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script>
+
         <!-- Semantic UI -->
         <link rel="stylesheet" href="{% static 'collab/resources/semantic-ui-2.4.0/semantic.min.css' %}"/>
         <script src="{% static 'collab/resources/semantic-ui-2.4.0/semantic.min.js' %}"></script>
+
         <!-- DataTables -->
         <link rel="stylesheet" href="{% static 'collab/resources/DataTables-1.10.18/datatables.min.css' %}"/>
         <script src="{% static 'collab/resources/DataTables-1.10.18/datatables.min.js' %}"></script>
+
+        <!-- Mapbox Gl JS -->
+        <link rel="stylesheet" href="{% static 'collab/resources/mapbox-gl-0.53.1/mapbox-gl.css' %}"/>
+        <script src="{% static 'collab/resources/mapbox-gl-0.53.1/mapbox-gl.js' %}"></script>
+
+        <!--STYLE CSS -->
+        <link rel="stylesheet" type="text/css" href="{% static 'collab/css/site.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'collab/css/table.css' %}" />
     </head>
 
     <body>
