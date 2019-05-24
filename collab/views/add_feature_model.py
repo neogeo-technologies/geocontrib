@@ -66,17 +66,12 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
         return {'error': """Le nom du type de signalement ne doit être composé que de chiffres et/ou de lettres (sans accent)."""}
 
     # geometry model class
-    print(geom_type)
-    print(type(geom_type))
     geom_field = models.PointField
     if geom_type == GEOM_TYPE[0][0]:
-        print(0)
         geom_field = models.PointField
     elif geom_type == GEOM_TYPE[1][0]:
-        print(1)
         geom_field = models.LineStringField
     elif geom_type == GEOM_TYPE[2][0]:
-        print(2)
         geom_field = models.PolygonField
 
     fields = {
