@@ -129,23 +129,26 @@
           })
         ;
     }
+
     $('#saveform').on('submit',function(e){
-        e.preventDefault();
-        url = ''
-        $.ajax({
-          url: url,
-          type: 'POST',
-          processData: false,
-          contentType: false,
-          data: new FormData( this ),
-          success: function (result) {
-              $('#project_form').html("");
-              $('#detail').html(result);
-          },
-          error: function(err) {
-            console.log('Error occured', err);
-          }
-        });
+        if( $('#saveform').form('is valid')) {
+            e.preventDefault();
+            url = ''
+            $.ajax({
+              url: url,
+              type: 'POST',
+              processData: false,
+              contentType: false,
+              data: new FormData( this ),
+              success: function (result) {
+                  $('#project_form').html("");
+                  $('#detail').html(result);
+              },
+              error: function(err) {
+                console.log('Error occured', err);
+              }
+            });
+        }
     });
 
     var visi_archive = "{{project.visi_archive}}"
