@@ -157,7 +157,7 @@ def get_project_features(app_name, project_slug, feature_type):
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
     sql = """ SELECT *
               FROM "{table_name}"
-              ORDER BY date_creation DESC ;
+              ORDER BY creation_date DESC ;
           """.format(table_name=table_name)
     data = fetch_raw_data('default', sql)
 
