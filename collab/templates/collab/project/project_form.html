@@ -1,13 +1,17 @@
-
+<div class="project_header">
+    <div class="project_title">
+        <h2 class="ui header">{{project.title|title }}</h2>
+    </div>
+</div>
 <div class="ui middle aligned stackable grid container">
      <form id='saveform' class='ui form' method=""  enctype="multipart/form-data" >
          {% csrf_token %}
+            <div class="ui error message"></div>
             <div class="">
                  <button id="save_project" type="submit" class="green ui compact icon button">
                   <i class="white large save icon"></i>
                  </button>
             </div>
-             <div class="ui error message"></div>
              <div class="field">
                  <label>Date de création</label>
                  <input type="text" name="creation_date" value="{{project.creation_date|date:"d/m/Y"}}" />
@@ -20,12 +24,16 @@
                  <label>Délai avant suppression (nb jours)</label>
                  <input type="text" name="delete_feature" value="{{project.delete_feature|get_timestamp}}" />
              </div>
+             <div class="field">
+               <label >Description</label>
+               <textarea name="description"  value="{{project.description}}">{{project.description}}</textarea>
+             </div>
              <div class="required field">
                 <label>Illustration</label>
 
                   <div class="ui action input">
                       {% if project.illustration %}
-                        <input type="text" value="{{project.illustration.url}}" readonly>
+                        <input type="text" name="file_name" value="{{project.illustration.url}}" readonly>
                       {% else %}
                           <input type="text" value="" readonly>
                       {% endif %}
@@ -76,6 +84,70 @@
 </div>
 
 <script>
+    check_form()
+    function check_form() {
+        $('#saveform')
+          .form({
+            fields: {
+              title:  {
+                identifier: 'title',
+                rules: [
+                  {
+                    type   : 'empty',
+                    prompt : 'Veuillez entrer un titre pour ce projet'
+                  }
+                ]
+              },
+              visi_feature:  {
+                identifier: 'visi_feature',
+                rules: [
+                  {
+                    type   : 'empty',
+                    prompt : 'Veuillez choisir une visibilité pour les signalements publiés'
+                  }
+                ]
+              },
+              visi_archive:  {
+                identifier: 'visi_archive',
+                rules: [
+                  {
+                    type   : 'empty',
+                    prompt : 'Veuillez choisir une visibilité pour les signalements archivés'
+                  }
+                ]
+              },
+              illustration:  {
+                identifier: 'file_name',
+                rules: [
+                  {
+                    type   : 'empty',
+                    prompt : 'Veuillez choisir une illustration pour ce projet'
+                  }
+                ]
+              },
+            }
+          })
+        ;
+    }
+    $('#saveform').on('submit',function(e){
+        e.preventDefault();
+        url = ''
+        $.ajax({
+          url: url,
+          type: 'POST',
+          processData: false,
+          contentType: false,
+          data: new FormData( this ),
+          success: function (result) {
+              $('#project_form').html("");
+              $('#detail').html(result);
+          },
+          error: function(err) {
+            console.log('Error occured', err);
+          }
+        });
+    });
+
     var visi_archive = "{{project.visi_archive}}"
     $('.ui.selection.dropdown.visi_archive')
       .dropdown('set selected', visi_archive)
@@ -103,27 +175,7 @@
         $('.ui.checkbox.moderation').checkbox('check');
     }
 
-    $('#saveform').on('submit',function(e){
-        e.preventDefault();
-        url = ''
-        $.ajax({
-          url: url,
-          type: 'POST',
-        //   processData: false,  // Important!
-        //   contentType: false,
-        //   cache: false,
-          data: $('#saveform').serialize(),
-          success: function (result) {
-              $('#project_form').html("");
-              $('#detail').html(result);
 
-          },
-          error: function(err) {
-            console.log('Error occured', err);
-          }
-        });
-
-    });
 
 
 </script >

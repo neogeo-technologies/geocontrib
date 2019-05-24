@@ -58,7 +58,7 @@ class CustomUser(AbstractUser):
                                                             project=project)
                     level = int(autorisation.level)
                 except Exception as e:
-                    # no autorisation on this project (user connected)
+                    # no autorisation on this project but the user is connected
                     level = 1
                 # Projet
                 # if project and feature are visible

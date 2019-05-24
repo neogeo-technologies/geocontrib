@@ -131,3 +131,7 @@ footer{
 #save_project{
   float: right;
 }
+
+.textarea {
+    white-space: pre-wrap;
+}

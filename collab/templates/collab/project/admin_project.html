@@ -6,11 +6,6 @@
 {% block content %}
 
 {% if project and rights.proj_modification %}
-  <div class="project_header">
-      <div class="project_title">
-          <h2 class="ui header">{{project.title|title }}</h2>
-      </div>
-  </div>
 
   <div id="detail">
       {% include 'collab/project/project_detail.html' %}
@@ -18,7 +13,7 @@
 
   <div id="project_form">
       {% if edit %}
-          {% include 'collab/projectproject_form.html' %}
+          {% include 'collab/project/project_form.html' %}
       {% endif %}
   </div>
 {% else %}

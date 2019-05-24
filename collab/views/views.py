@@ -42,11 +42,11 @@ def get_anonymous_rights(project):
     """
         Return anonymous user rights
         LEVEL = (
-            ('0', 'Consultation'),
-            ('1', "Contribution"),
-            ('2', 'Modération'),
-            ('3', "Administration"),
-            ('4', "Super Administration"),
+            # ('0', 'Utilisateur anonyme'),
+            ('1', 'Utilisateur connecté'),
+            ('2', "Contribution"),
+            ('3', 'Modération'),
+            ('4', "Administration"),
         )
     """
     user_right = {'proj_creation': False,
@@ -94,7 +94,6 @@ class LogoutView(TemplateView):
         return HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL)
 
 
-# @login_required(login_url='/connexion/')
 def index(request):
     """
         Main page with the current available projects
@@ -112,9 +111,6 @@ def index(request):
             elt['rights'] = request.user.project_right(project)
         else:
             elt['rights'] = get_anonymous_rights(project)
-            # user = authenticate(username='anonymous',
-            #                     password='neogeo2019')
-            # login(request, user)
 
         if not elt['rights'].get("proj_consultation"):
             continue
@@ -161,19 +157,19 @@ def get_project_fields(project_slug):
         # visi_archive
         id = int(data[0]['visi_archive'])
         data[0]['visi_archive'] = USER_TYPE_ARCHIVE[id][1]
-        data[0]['visibilité_des_signalements_archivés'] = data[0].pop('visi_archive')
+        data[0]['visibilité_des_signalements_archivés'] = data[0].pop('visi_archive', None)
         # visi_feature
         id = int(data[0]['visi_feature'])
         data[0]['visi_feature'] = USER_TYPE[id][1]
-        data[0]['visibilité_des_signalements_publiés'] = data[0].pop('visi_feature')
+        data[0]['visibilité_des_signalements_publiés'] = data[0].pop('visi_feature', None)
         # archive_feature
-        data[0]['délai_avant_archivage'] = data[0].pop('archive_feature')
+        data[0]['délai_avant_archivage'] = data[0].pop('archive_feature', None)
         # delete_feature
-        data[0]['délai_avant_suppression'] = data[0].pop('delete_feature')
+        data[0]['délai_avant_suppression'] = data[0].pop('delete_feature', None)
         # delete_feature
-        data[0]['date_de_création'] = data[0].pop('creation_date')
+        data[0]['date_de_création'] = data[0].pop('creation_date', None)
         # title
-        data[0]['titre'] = data[0].pop('title')
+        data[0]['titre'] = data[0].pop('title', None)
     return data
 
 
@@ -232,12 +228,16 @@ class ProjectAdminView(View):
             rights = get_anonymous_rights(project)
         # update forms fields
         form_data = request.POST.dict()
-        form_data.pop('csrfmiddlewaretoken')
+        form_data.pop('csrfmiddlewaretoken', None)
         if 'moderation' in form_data:
             setattr(project, 'moderation', True)
-            form_data.pop('moderation')
+            form_data.pop('moderation', None)
         else:
             setattr(project, 'moderation', False)
+        # update image field
+        if 'illustration' in request.FILES:
+            setattr(project, 'illustration', request.FILES.get('illustration'))
+        form_data.pop('illustration', None)
 
         for key, value in form_data.items():
 
@@ -289,7 +289,7 @@ class ProjectView(FormView):
         errors = form.errors.copy()
         for key, val in form.errors.items():
             label = form.fields[key].label
-            errors[label] = errors.pop(key)
+            errors[label] = errors.pop(key, None)
         context = {'errors': errors, 'form': form}
         return render(self.request, self.template_name, context)
 
@@ -418,10 +418,10 @@ class ProjectFeature(View):
         feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
         # remove the csrfmiddlewaretoken key
         try:
-            data.pop('csrfmiddlewaretoken')
-            data.pop('feature')
+            data.pop('csrfmiddlewaretoken', None)
+            data.pop('feature', None)
             # get comment
-            comment = data.pop('comment')
+            comment = data.pop('comment', None)
         except Exception as e:
             pass
         # add data send by the form
@@ -572,7 +572,7 @@ def project_feature_list(request, project_slug):
             if elt.get('status', ''):
                 elt['status'] = STATUS[int(elt['status'])][1]
             if elt.get('user_id', ''):
-                elt['utilisateur'] = elt.pop('user_id')
+                elt['utilisateur'] = elt.pop('user_id', None)
                 try:
                     elt['utilisateur'] = models.CustomUser.objects.get(
                                          id=elt['utilisateur'])
