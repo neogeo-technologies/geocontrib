@@ -24,15 +24,16 @@
         <div class="required field">
             <label>Projet Associé </label>
             <div class="ui selection dropdown feature">
-                <input type="hidden"  name="project" placeholder="Projet" />
+
+                <input type="hidden"  name="project" placeholder="Projet" value="{{projects.0.pk}}"  />
                 <i class="dropdown icon"></i>
-                <div class="default text">Choisissez le projet associé</div>
+                <div class="default text"></div>
                  <div class="menu">
                    {% for elt in projects %}
                        <div class="item" data-value={{elt.pk}}>{{elt.title}}</div>
                    {% endfor %}
                 </div>
-             </div>
+            </div>
         </div>
         <div class="required field">
             <label>Nom du nouveau type de signalement</label>
@@ -41,10 +42,10 @@
         <div class="required field">
             <label>Type de géometrie associé</label>
             <div class="ui selection dropdown feature">
-                <input type="hidden"  name="geom_type" placeholder="Géométrie" />
+                <input type="hidden"  name="geom_type" placeholder="Géométrie" value="0" />
                 <i class="dropdown icon"></i>
-                <div class="default text">Choisissez un type de géométrie</div>
-                 <div class="menu">
+                <div class="default text"></div>
+                <div class="menu">
                    <div class="item" data-value="0">Point</div>
                    <div class="item" data-value="1">Ligne brisée</div>
                    <div class="item" data-value="2">Polygone</div>

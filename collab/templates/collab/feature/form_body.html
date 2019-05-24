@@ -1,20 +1,21 @@
+<div class="field" class='geomfield'>
+    <label>Géometrie de type {{geom_type}}</label><br>
+    <input type="text"  name="geom" placeholder="Point(0 25)" />
+    <!-- <input type="hidden"  name="geom" placeholder="geometrie" /> -->
+    <!-- <div id='mapfeature'></div> -->
+</div>
 {% for key,val in res %}
-    {% if key == 'geom_type' %}
 
-        <div class="field" class='geomfield'>
-            <label>Géometrie de type {{val}}</label><br>
-            <input type="hidden"  name="geom" placeholder="geometrie" />
-            <div id='mapfeature'></div>
-        </div>
-    {% elif val.column_name not in 'id,user_id,project_id,feature_id,date_creation' %}
+    {% if val.column_name not in 'id,user_id,project_id,feature_id,date_creation' %}
 
         {% if val.type == 'varchar' and val.info %}
         <div class="field">
-            <label>{{val.column_name|feature_key_display}}</label>
+            <label>{{labels|get_dict_item:val.column_name}}</label>
             <div class="ui selection dropdown status">
-                <input type="hidden"  name="{{val.column_name}}" placeholder="{{val.column_name}}" />
+
+                <input type="hidden"  name="{{val.column_name}}" placeholder="{{val.column_name}}" value="{{val.info.0.1}}" />
                 <i class="dropdown icon"></i>
-                <div class="default text">{{val.column_name}}</div>
+                <div class="default text"></div>
                 <div class="menu">
                 {% for status in val.info %}
                     <div class="item" data-value={{status.0}}>{{status.1}}</div>
@@ -24,13 +25,13 @@
         </div>
         {% elif val.type == 'varchar' %}
         <div class="field">
-            <label>{{val.column_name|feature_key_display}}</label>
+            <label>{{labels|get_dict_item:val.column_name}}</label>
             <input type="text" maxlength="{{val.char_max_size}}" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
         </div>
         {% elif val.type == 'date' %}
          <div class="field">
             <!-- <div class="ui calendar" id="date-field"> -->
-                <label>{{val.column_name|feature_key_display}}</label>
+                <label>{{labels|get_dict_item:val.column_name}}</label>
                 <div class="ui input left icon">
                     <i class="calendar icon"></i>
                     <input type="text"  name="{{val.column_name}}" placeholder="{{val.column_name}}" />
@@ -39,7 +40,7 @@
         </div>
         {% elif val.type == 'text' %}
         <div class="field">
-            <label>{{val.column_name|feature_key_display}}</label>
+            <label>{{labels|get_dict_item:val.column_name}}</label>
             <textarea name="{{val.column_name}}"></textarea>
         </div>
         {% elif val.data_type == 'boolean' %}
@@ -47,17 +48,17 @@
             <div class="ui checkbox boolfield">
                 <input type="checkbox"  name="{{val.column_name}}" class="hidden" >
                 <input type='hidden' value='0' name="{{val.column_name}}">
-                <label>{{val.column_name|feature_key_display}}</label>
+                <label>{{labels|get_dict_item:val.column_name}}</label>
             </div>
         </div>
         {% elif val.data_type == 'integer' %}
         <div class="field">
-            <label>{{val.column_name|feature_key_display}}</label>
+            <label>{{labels|get_dict_item:val.column_name}}</label>
             <input type="number" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
         </div>
         {% elif val.data_type == 'double precision' %}
         <div class="field">
-            <label>{{val.column_name|feature_key_display}}</label>
+            <label>{{labels|get_dict_item:val.column_name}}</label>
             <input type="number" step="any"  placeholder="{{val.column_name}}" name="{{val.column_name}}" />
         </div>
         {% endif %}
@@ -75,7 +76,6 @@
             </button>
         </div>
 {% endif %}
-{% load staticfiles %}
 
 <script type="text/javascript">
       $('.ui.checkbox.boolfield')
@@ -94,7 +94,8 @@
       }
 
       // form validation
-      $('.addfeature')
+     function check_form(){
+          $('#addfeature')
         .form({
           fields: {
             status:  {
@@ -106,8 +107,8 @@
                 }
               ]
             },
-            titre:  {
-              identifier: 'titre',
+            title:  {
+              identifier: 'title',
               rules: [
                 {
                   type   : 'empty',
@@ -115,17 +116,39 @@
                 }
               ]
             },
-            // commente en attendant la mise en place de la partie carto !!!
-            // geom:  {
-            //   identifier: 'geom',
-            //   rules: [
-            //     {
-            //       type   : 'empty',
-            //       prompt : 'Veuillez localiser ce signalement'
-            //     }
-            //   ]
-            // },
+            geom:  {
+              identifier: 'geom',
+              rules: [
+                {
+                  type   : 'empty',
+                  prompt : 'Veuillez localiser ce signalement'
+                }
+              ]
+            },
           }
-        })
-      ;
+        });
+     }
+     check_form()
+     $('#addfeature').on('submit',function(e){
+       if( $('#addfeature').form('is valid')) {
+           e.preventDefault();
+           url = ''
+           $.ajax({
+             url: url,
+             type: 'POST',
+             processData: false,
+             contentType: false,
+             data: new FormData( this ),
+             success: function (result) {
+                //   voir comment recuperer les variables du context
+                 console.log(result.success)
+                 $('#form_body').html("Le signalement a bien été ajouté");
+             },
+             error: function(err) {
+               console.log('Error occured', err);
+             }
+           });
+       }
+    });
+
 </script>

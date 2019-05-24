@@ -9,7 +9,7 @@
   {%  if  success or error %}
       {% if success %}
           <div class="ui success message">
-              <div class="header">{{success}}</div>
+              <div id="success" class="header">{{success}}</div>
           </div>
       {% elif error %}
           <div class="ui error message">
@@ -23,13 +23,14 @@
                   <h2 class="ui header">{{project.title}}</h2>
               </div>
               <div class="row">
-                  <form class='ui equal width addfeature form' method="POST" >
+                  <form id="addfeature" class='ui equal width addfeature form' method="" >
                     {% csrf_token %}
                     <div class="ui error message"></div>
                     <div class="field">
                         <label>Type de signalement </label>
                         <div class="ui selection dropdown feature" id='feature_type'>
-                            <input type="hidden"  name="feature" placeholder="" />
+                            <!-- <input type="hidden"  name="feature" placeholder="" /> -->
+                            <input type="hidden"  name="feature" placeholder="" value="{{features_types.0}}" />
                             <i class="dropdown icon"></i>
                             <div class="default text">Choisissez un type de signalement</div>
                              <div class="menu">
@@ -61,7 +62,6 @@
   ;
   $("#feature_type").change(function () {
         name = $("input[name=feature]").val();
-
         url = ''
         $.ajax({
           url: url,

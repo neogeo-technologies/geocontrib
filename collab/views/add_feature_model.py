@@ -13,9 +13,9 @@ import re
 import logging
 
 APP_NAME = __package__.split('.')[0]
-DEFAULT_FIELDS = ['feature_id', 'date_creation', 'date_modification',
-                  'titre', 'description', 'geom', 'status',
-                  'date_archivage', 'user', 'project']
+DEFAULT_FIELDS = ['feature_id', 'creation_date', 'modification_date',
+                  'title', 'description', 'geom', 'status',
+                  'archive_date', 'deletion_date', 'user', 'project']
 
 
 def add_feature_model(request):
@@ -48,7 +48,7 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
 
     # Get project
     projet = custom.Project.objects.get(id=projet_id)
-    
+
     # check the fields names given by users
     intersection = list(set(names) & set(DEFAULT_FIELDS))
     if intersection:
@@ -66,8 +66,6 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
         return {'error': """Le nom du type de signalement ne doit être composé que de chiffres et/ou de lettres (sans accent)."""}
 
     # geometry model class
-    print(geom_type)
-    print(type(geom_type))
     geom_field = models.PointField
     if geom_type == GEOM_TYPE[0][0]:
         print(0)
@@ -83,23 +81,23 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
         'objects': GeoManager(),
         'feature_id': models.UUIDField(editable=False, max_length=32,
                                        null=True, blank=True),
-        'date_creation': models.DateTimeField("Date de l'évènement",
+        'creation_date': models.DateTimeField("Date de l'évènement",
                                               auto_now_add=True,
                                               null=True, blank=True),
-        'date_modification': models.DateTimeField("Date de maj",
+        'modification_date': models.DateTimeField("Date de maj",
                                                   auto_now=True,
                                                   null=True, blank=True),
-        'titre': models.CharField('Titre', max_length=128, null=True,
+        'title': models.CharField('Titre', max_length=128, null=True,
                                   blank=True),
         'description': models.TextField('Description', blank=True, null=True),
         'geom': geom_field(null=False, srid=settings.DB_SRID, dim=2),
-        'status': models.CharField('Status des signalements',
+        'status': models.CharField('Statut des signalements',
                                    choices=STATUS,
                                    max_length=1, default='0',
                                    null=True, blank=True),
-        'date_archivage': models.DateField("Date d'archivage automatique",
+        'archive_date': models.DateField("Date d'archivage automatique",
                                            null=True, blank=True),
-        'date_suppression': models.DateField("Date de suppression automatique",
+        'deletion_date': models.DateField("Date de suppression automatique",
                                              null=True, blank=True),
         'user': models.ForeignKey(custom.CustomUser, related_name='models',
                                   on_delete=models.PROTECT,
@@ -109,6 +107,15 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
                                     help_text="Projet"),
         '__str__': lambda self: '%s %s' (self.title),
         }
+
+    labels = {"creation_date": "Date de création",
+              "modification_date": "Date de le dernière mise à jour",
+              "title": "Titre",
+              "description": "Description",
+              "geom": "Geométrie",
+              "status": "Statut des signalements",
+              "archive_date": "Date d'archivage automatique",
+              "deletion_date": "Date de suppression automatique"}
 
     module = 'config.' + APP_NAME
     field_type = []
@@ -128,6 +135,7 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
                 field_type.append(models.TextField(max_length=255,
                                                    blank=True, null=True))
             fields[names[elt]] = field_type[elt]
+            labels[names[elt]] = names[elt]
 
     # creation modele
     model = create_model(projet.slug + '_' + feature, fields,
@@ -141,18 +149,19 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
 
         # ajout du nom de la table
         table_name = APP_NAME + "_" + projet.slug + '_' + feature
-        if not projet.feature_type:
-            projet.feature_type = [{'table_name': table_name,
-                                    'geom_type': GEOM_TYPE[int(geom_type)][1],
-                                    'feature': feature,
-                                    'user_id': user.id,
-                                    'username': user.username}]
+        if not projet.features_info:
+            projet.features_info = {feature: {'table_name': table_name,
+                                              'geom_type': GEOM_TYPE[int(geom_type)][1],
+                                              'feature': feature,
+                                              'user_id': user.id,
+                                              'labels': labels}}
         else:
-            projet.feature_type.append({'table_name': table_name,
+            projet.features_info.update({feature: {
+                                        'table_name': table_name,
                                         'geom_type': GEOM_TYPE[int(geom_type)][1],
                                         'feature': feature,
                                         'user_id': user.id,
-                                        'username': user.username})
+                                        'labels': labels}})
         projet.save()
         return {'success': "Le type de signalement a été créé avec succès."}
     except Exception as e:

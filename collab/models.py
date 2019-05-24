@@ -109,8 +109,8 @@ class Project(models.Model):
                                             null=True)
     delete_feature = models.DurationField('Délai avant suppression',
                                            blank=True, null=True)
-    feature_type = JSONField('Type de signalements disponibles',
-                             blank=True, null=True)
+    features_info = JSONField('Info sur les types de signalements disponibles',
+                                blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -121,7 +121,6 @@ class Project(models.Model):
                                url=settings.BASE_URL+self.illustration.url)
         except Exception as e:
             pass
-
     thumbLink.allow_tags = True
     thumbLink.short_description = "Icône"
 
@@ -133,6 +132,24 @@ class Project(models.Model):
             unique_slug = '{}-{}'.format(slug, num)
             num += 1
         return unique_slug
+
+    def get_labels(self, feature):
+        """Get feature labels"""
+        info = self.features_info.get(feature, '')
+        if info:
+            return info.get('labels')
+        return info
+
+    def get_geom(self, feature):
+        """
+            Return the feature geometry for a type of feature
+            @feature feature name
+            @return type of geom
+        """
+        info = self.features_info.get(feature, '')
+        if info:
+            return info.get('geom_type')
+        return info
 
     def save(self, *args, **kwargs):
         if not self.slug:

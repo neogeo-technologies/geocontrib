@@ -84,7 +84,7 @@
 </div>
 
 <script>
-    check_form()
+
     function check_form() {
         $('#saveform')
           .form({
@@ -129,7 +129,7 @@
           })
         ;
     }
-
+    check_form()
     $('#saveform').on('submit',function(e){
         if( $('#saveform').form('is valid')) {
             e.preventDefault();

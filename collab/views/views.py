@@ -9,7 +9,7 @@ from collab.views.project_services import get_feature
 from collab.views.project_services import get_feature_detail
 from collab.views.project_services import get_last_features
 from collab.views.project_services import get_project_features
-from collab.views.project_services import get_project_feature_geom_type
+# from collab.views.project_services import get_project_feature_geom_type
 from collab.views.project_services import last_user_registered
 from collab.views.project_services import project_feature_type_fields
 from collab.views.project_services import project_feature_number
@@ -24,6 +24,8 @@ from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import Point
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
@@ -34,6 +36,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
+import logging
 
 APP_NAME = __package__.split('.')[0]
 
@@ -102,7 +105,6 @@ def index(request):
     # list of projects
     data = models.Project.objects.values()
     projects = []
-
     for elt in data:
         project = models.Project.objects.get(slug=elt['slug'])
 
@@ -377,53 +379,68 @@ class ProjectFeature(View):
             rights = get_anonymous_rights(project)
         # type of features
         features_types = project_features_types(APP_NAME, project_slug)
-        # type of features's fields
-        res = {}
-        for elt in features_types:
-            res[elt] = project_feature_type_fields(APP_NAME, project_slug, elt)
-            # type of geometry
-            res[elt].update({'geom_type': get_project_feature_geom_type(APP_NAME,
-                                                                       project_slug,
-                                                                       elt)})
         if not features_types:
             context = {"message": "Veuillez créer un type de signalement pour ce projet",
                        "rights": rights}
             return render(request, 'collab/feature/add_feature.html', context)
-
+        # type of features's fields
+        if request.GET.get('name'):
+            res = project_feature_type_fields(APP_NAME, project_slug, request.GET.get('name'))
+        else:
+            res = project_feature_type_fields(APP_NAME, project_slug, features_types[0])
         # add info for JS display
-        for key, val in res.items():
-            if val.get('status'):
-                # char list
-                val['status']['info'] = STATUS
+        if res.get('status', ''):
+            # char list
+            res['status']['info'] = STATUS
         if request.is_ajax():
-            context = {"res": res.get(request.GET.get('name')).items,
-                       "rights": rights}
+            # recuperation des champs descriptifs
+            geom_type = project.get_geom(request.GET.get('name'))
+            labels = project.get_labels(request.GET.get('name'))
+            context = {"res": res.items,
+                       "geom_type": geom_type,
+                       "rights": rights, "labels": labels}
             return render(request, 'collab/feature/form_body.html', context)
         else:
+            # recuperation des champs descriptifs
+            geom_type = project.get_geom(features_types[0])
+            labels = project.get_labels(features_types[0])
             context = {"project": project, "features_types": features_types,
-                       "rights": rights}
+                       "rights": rights, "labels": labels,
+                       "geom_type": geom_type,
+                       "res": res.items}
             return render(request, 'collab/feature/add_feature.html', context)
 
     def post(self, request, project_slug):
 
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
+        # get user right on project
+        if request.user.is_authenticated:
+            rights = request.user.project_right(project)
+        else:
+            rights = get_anonymous_rights(project)
         data = request.POST.dict()
         table_name = """{app_name}_{project_slug}_{feature}""".format(
                         app_name=APP_NAME,
                         project_slug=project_slug,
                         feature=data.get('feature', ''))
         user_id = request.user.id
-        date_creation = datetime.datetime.now()
+        creation_date = datetime.datetime.now()
         feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
         # remove the csrfmiddlewaretoken key
+        data.pop('csrfmiddlewaretoken', None)
+        data.pop('feature', None)
+
+        # get comment
+        comment = data.pop('comment', None)
+        # get geom
         try:
-            data.pop('csrfmiddlewaretoken', None)
-            data.pop('feature', None)
-            # get comment
-            comment = data.pop('comment', None)
+            geom = GEOSGeometry(data.pop('geom', None), srid=settings.DB_SRID)
         except Exception as e:
-            pass
+            context = {"error": "le fromat de votre géométrue est incorrect",
+                       "rights": rights}
+            return render(request, 'collab/feature/form_body.html', context)
+
         # add data send by the form
         # remove empty keys -> A AMELIORER "'" !!!!!!!!!
         data = {k: v for k, v in data.items() if v}
@@ -433,29 +450,35 @@ class ProjectFeature(View):
             data_keys = ' , ' + ' , '.join(list(data.keys()))
         if data.values():
             data_values = " , '" + "' , '".join(list(data.values())) + "'"
+
         # # create with basic keys
-        sql = """INSERT INTO "{table}" (date_creation, date_modification, user_id, project_id, feature_id {data_keys})
-                 VALUES ('{date_creation}','{date_modification}','{user_id}','{project_id}',
-                 '{feature_id}' {data_values});""".format(
-                 date_creation=date_creation,
-                 date_modification=date_creation,
+        sql = """INSERT INTO "{table}" (creation_date, modification_date, user_id, project_id,
+                 feature_id, geom {data_keys})
+                 VALUES ('{creation_date}','{modification_date}','{user_id}','{project_id}',
+                 '{feature_id}', '{geom}' {data_values});""".format(
+                 creation_date=creation_date,
+                 modification_date=creation_date,
                  project_id=project.id,
                  user_id=user_id,
                  table=table_name,
                  feature_id=feature_id,
                  data_keys=data_keys,
-                 data_values=data_values)
+                 data_values=data_values,
+                 geom=geom)
         creation = commit_data('default', sql)
         # create comment
         obj = models.Comment.objects.create(author=request.user,
                                             feature_id=feature_id,
-                                            comment=comment,
-                                            project=project)
+                                            comment=comment, project=project)
+        # recuperation des champs descriptifs
         if creation == True:
-            context = {"project": project, 'success': 'Le signalement a bien été ajouté'}
-            return render(request, 'collab/feature/add_feature.html', context)
+            context = {"rights": rights, "project": project, 'success': 'Le signalement a bien été ajouté'}
+            return render(request, 'collab/feature/form_body.html', context)
         else:
-            context = {"project": project, 'error': "Une erreur s'est produite. Veuillez réessayer ultérieurement"}
+            msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
+            logger = logging.getLogger(__name__)
+            logger.exception(msg)
+            context = {"rights": rights, "project": project, 'error': msg}
             return render(request, 'collab/feature/add_feature.html', context)
 
 

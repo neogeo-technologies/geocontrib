@@ -22,23 +22,23 @@ def get_feature_type_table_name(app_name, project_slug, feature_type):
         feature_type_table_prefix=feature_type_table_prefix, feature_type=feature_type)
 
 
-def get_project_feature_geom_type(app_name, project_slug, feature):
-    """
-        Return the feature geometry for a type of feature
-        @app_name name of  the current application
-        @project_slug slug of the feature project
-        @feature feature name
-        @return type of geom
-    """
-
-    try:
-        project = models.Project.objects.get(slug=project_slug)
-        for elt in project.feature_type:
-            if elt.get("feature", "") == feature:
-                return elt.get('geom_type', "Non défini")
-        return "Non défini"
-    except Exception as e:
-        return "Non défini"
+# def get_project_feature_geom_type(app_name, project_slug, feature):
+#     """
+#         Return the feature geometry for a type of feature
+#         @app_name name of  the current application
+#         @project_slug slug of the feature project
+#         @feature feature name
+#         @return type of geom
+#     """
+#
+#     try:
+#         project = models.Project.objects.get(slug=project_slug)
+#         for elt in project.feature_type:
+#             if elt.get("feature", "") == feature:
+#                 return elt.get('geom_type', "Non défini")
+#         return "Non défini"
+#     except Exception as e:
+#         return "Non défini"
 
 
 def generate_feature_id(app_name, project_slug, feature):
@@ -179,16 +179,15 @@ def get_last_features(app_name, project_slug, feature_type, num=""):
         limit = "  LIMIT " + str(num)
     sql = """ SELECT collab_customuser.id AS userid,
               first_name,last_name,"{table_name}".id as pk,
-              user_id,feature_id,titre,date_creation
+              user_id,feature_id,title,creation_date
               FROM "{table_name}"
               INNER JOIN public.collab_customuser ON
               user_id=collab_customuser.id
-              ORDER BY date_creation DESC {limit};
+              ORDER BY creation_date DESC {limit};
           """.format(table_name=table_name,
                      limit=limit)
     data = fetch_raw_data('default', sql)
     return data
-
 
 def get_feature(app_name, project_slug, feature_type, id):
     """
