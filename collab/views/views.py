@@ -154,25 +154,26 @@ def get_project_fields(project_slug):
                                 'creation_date', 'moderation', 'visi_feature' ,
                                 'visi_archive', 'archive_feature',
                                 'delete_feature', 'slug')
-
+    labels = {
+        'description': 'Description',
+        'illustration': 'Illustration',
+        'title': "Titre",
+        'creation_date': 'Date de création',
+        'moderation': 'Moderation',
+        'visi_feature': "Visibilité des signalements publiés",
+        'visi_archive': "Visibilité des signalements archivés",
+        'archive_feature': "Délai avant archivage",
+        'delete_feature': "Délai avant suppression",
+    }
     if data:
         # visi_archive
         id = int(data[0]['visi_archive'])
         data[0]['visi_archive'] = USER_TYPE_ARCHIVE[id][1]
-        data[0]['visibilité_des_signalements_archivés'] = data[0].pop('visi_archive', None)
         # visi_feature
         id = int(data[0]['visi_feature'])
         data[0]['visi_feature'] = USER_TYPE[id][1]
-        data[0]['visibilité_des_signalements_publiés'] = data[0].pop('visi_feature', None)
-        # archive_feature
-        data[0]['délai_avant_archivage'] = data[0].pop('archive_feature', None)
-        # delete_feature
-        data[0]['délai_avant_suppression'] = data[0].pop('delete_feature', None)
-        # delete_feature
-        data[0]['date_de_création'] = data[0].pop('creation_date', None)
-        # title
-        data[0]['titre'] = data[0].pop('title', None)
-    return data
+
+    return data, labels
 
 
 @method_decorator([csrf_exempt], name='dispatch')
@@ -192,7 +193,7 @@ class ProjectAdminView(View):
             rights = request.user.project_right(project)
         else:
             rights = get_anonymous_rights(project)
-        data = get_project_fields(project_slug)
+        data, labels = get_project_fields(project_slug)
         if data:
             if request.is_ajax():
                 context = {
@@ -200,14 +201,16 @@ class ProjectAdminView(View):
                     "edit": True,
                     "user_type_archive": USER_TYPE_ARCHIVE,
                     "user_type": USER_TYPE,
-                    "rights": rights
+                    "rights": rights,
+                    "labels": labels
                 }
                 return render(request, 'collab/project/project_form.html', context)
             else:
                 context = {
                     "project": project,
                     "data": OrderedDict(sorted(data[0].items())),
-                    "rights": rights
+                    "rights": rights,
+                    "labels": labels
                 }
                 return render(request, 'collab/project/admin_project.html', context)
         else:
@@ -254,12 +257,14 @@ class ProjectAdminView(View):
             project.save()
         project.save()
         # display detail of project
-        data = get_project_fields(project_slug)
+        data, labels = get_project_fields(project_slug)
         context = {
             "project": project,
             "data": OrderedDict(sorted(data[0].items())),
-            "rights": rights
+            "rights": rights,
+            "labels": labels
         }
+
         return render(request, 'collab/project/project_detail.html', context)
 
 

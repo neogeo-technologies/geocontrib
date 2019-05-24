@@ -10,10 +10,10 @@
 
         {% if key not in 'slug' %}
             <tr>
-                {% if key == 'délai_avant_suppression' or key == 'délai_avant_archivage'%}
-                    <td><strong>{{key|feature_key_display}} (nb jours)</strong></td>
+                {% if key == 'delete_feature' or key == 'archive_feature'%}
+                    <td><strong>{{labels|get_dict_item:key}} (nb jours)</strong></td>
                 {%else%}
-                    <td><strong>{{key|feature_key_display}}</strong></td>
+                    <td><strong>{{labels|get_dict_item:key}}</strong></td>
                 {%endif%}
                 {% if val %}
                     {%  if key == 'illustration' %}
@@ -23,7 +23,7 @@
                         <td><i class="green check icon"></i></td>
                     {% elif val == False %}
                         <td><i class="inverted red remove icon"></i></td>
-                    {% elif key == 'délai_avant_suppression' or key == 'délai_avant_archivage'%}
+                    {% elif key == 'delete_feature' or key == 'archive_feature'%}
                         <td>{{val|get_timestamp}}</td>
                     {%else%}
                         <td>{{val|feature_val_display}}</td>
