@@ -13,7 +13,7 @@
             <label>{{labels|get_dict_item:val.column_name}}</label>
             <div class="ui selection dropdown status">
 
-                <input type="hidden"  name="{{val.column_name}}" placeholder="{{val.column_name}}" value="{{val.info.0.1}}" />
+                <input type="hidden"  name="{{val.column_name}}" placeholder="{{labels|get_dict_item:val.column_name}}" value="{{val.info.0.1}}" />
                 <i class="dropdown icon"></i>
                 <div class="default text"></div>
                 <div class="menu">
@@ -26,7 +26,7 @@
         {% elif val.type == 'varchar' %}
         <div class="field">
             <label>{{labels|get_dict_item:val.column_name}}</label>
-            <input type="text" maxlength="{{val.char_max_size}}" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
+            <input type="text" maxlength="{{val.char_max_size}}" placeholder="{{labels|get_dict_item:val.column_name}}" name="{{val.column_name}}" />
         </div>
         {% elif val.type == 'date' %}
          <div class="field">
@@ -34,7 +34,7 @@
                 <label>{{labels|get_dict_item:val.column_name}}</label>
                 <div class="ui input left icon">
                     <i class="calendar icon"></i>
-                    <input type="text"  name="{{val.column_name}}" placeholder="{{val.column_name}}" />
+                    <input type="text"  name="{{val.column_name}}" placeholder="10/10/2019" />
                 </div>
             <!-- </div> -->
         </div>
@@ -47,19 +47,18 @@
         <div class="inline field">
             <div class="ui checkbox boolfield">
                 <input type="checkbox"  name="{{val.column_name}}" class="hidden" >
-                <input type='hidden' value='0' name="{{val.column_name}}">
                 <label>{{labels|get_dict_item:val.column_name}}</label>
             </div>
         </div>
         {% elif val.data_type == 'integer' %}
         <div class="field">
             <label>{{labels|get_dict_item:val.column_name}}</label>
-            <input type="number" placeholder="{{val.column_name}}" name="{{val.column_name}}" />
+            <input type="number" placeholder="{{labels|get_dict_item:val.column_name}}" name="{{val.column_name}}" />
         </div>
         {% elif val.data_type == 'double precision' %}
         <div class="field">
             <label>{{labels|get_dict_item:val.column_name}}</label>
-            <input type="number" step="any"  placeholder="{{val.column_name}}" name="{{val.column_name}}" />
+            <input type="number" step="any"  placeholder="{{labels|get_dict_item:val.column_name}}" name="{{val.column_name}}" />
         </div>
         {% endif %}
     {% endif %}
@@ -125,12 +124,29 @@
                 }
               ]
             },
+            deletion_date: {
+              identifier: 'deletion_date',
+              optional: true,
+              rules: [{
+                type:  "regExp[/^(0[1-9]|[12][0-9]|3[01])[/.](0[1-9]|1[012])[/.](19|20)\\d\\d$/]",
+                prompt: "Veuiller enter une date valide JJ/MM/AAAA"
+              }]
+            },
+            archive_date: {
+              identifier: 'archive_date',
+              optional: true,
+              rules: [{
+                type:  "regExp[/^(0[1-9]|[12][0-9]|3[01])[/.](0[1-9]|1[012])[/.](19|20)\\d\\d$/]",
+                prompt: "Veuiller enter une date valide JJ/MM/AAAA"
+              }]
+            },
           }
         });
      }
      check_form()
      $('#addfeature').on('submit',function(e){
        if( $('#addfeature').form('is valid')) {
+
            e.preventDefault();
            url = ''
            $.ajax({
@@ -140,9 +156,7 @@
              contentType: false,
              data: new FormData( this ),
              success: function (result) {
-                //   voir comment recuperer les variables du context
-                 console.log(result.success)
-                 $('#form_body').html("Le signalement a bien été ajouté");
+                 $('#form_body').html(result.message);
              },
              error: function(err) {
                console.log('Error occured', err);

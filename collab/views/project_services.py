@@ -18,27 +18,8 @@ def get_feature_type_table_prefix(app_name, project_slug):
 
 def get_feature_type_table_name(app_name, project_slug, feature_type):
     feature_type_table_prefix = get_feature_type_table_prefix(app_name, project_slug)
-    return  "{feature_type_table_prefix}_{feature_type}".format(
+    return "{feature_type_table_prefix}_{feature_type}".format(
         feature_type_table_prefix=feature_type_table_prefix, feature_type=feature_type)
-
-
-# def get_project_feature_geom_type(app_name, project_slug, feature):
-#     """
-#         Return the feature geometry for a type of feature
-#         @app_name name of  the current application
-#         @project_slug slug of the feature project
-#         @feature feature name
-#         @return type of geom
-#     """
-#
-#     try:
-#         project = models.Project.objects.get(slug=project_slug)
-#         for elt in project.feature_type:
-#             if elt.get("feature", "") == feature:
-#                 return elt.get('geom_type', "Non défini")
-#         return "Non défini"
-#     except Exception as e:
-#         return "Non défini"
 
 
 def generate_feature_id(app_name, project_slug, feature):

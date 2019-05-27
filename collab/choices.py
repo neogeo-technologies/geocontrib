@@ -12,6 +12,12 @@ STATUS = (
     ('3', 'Archivé'),
 )
 
+STATUS_MODERE = (
+    ('0', 'Brouillon'),
+    ('1', 'En attente de publication'),
+)
+
+
 USER_TYPE = (
     ('0', 'Utilisateur anonyme'),
     ('1', 'Utilisateur connecté'),

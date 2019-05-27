@@ -29,7 +29,6 @@
                     <div class="field">
                         <label>Type de signalement </label>
                         <div class="ui selection dropdown feature" id='feature_type'>
-                            <!-- <input type="hidden"  name="feature" placeholder="" /> -->
                             <input type="hidden"  name="feature" placeholder="" value="{{features_types.0}}" />
                             <i class="dropdown icon"></i>
                             <div class="default text">Choisissez un type de signalement</div>
@@ -60,6 +59,7 @@
   $('.ui.selection.dropdown.feature')
     .dropdown()
   ;
+  // update form regarding the feature choosen
   $("#feature_type").change(function () {
         name = $("input[name=feature]").val();
         url = ''

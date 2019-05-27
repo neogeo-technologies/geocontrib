@@ -1,5 +1,5 @@
 // mouse pointer
-
+// # feature detail
 var element = document.getElementById("addcomment");
 element.style.cursor = "pointer";
 

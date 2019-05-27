@@ -1,5 +1,6 @@
 from collab import models
 from collab.choices import STATUS
+from collab.choices import STATUS_MODERE
 from collab.choices import USER_TYPE
 from collab.choices import USER_TYPE_ARCHIVE
 from collab.db_utils import commit_data
@@ -26,7 +27,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import Point
+from django.forms.models import model_to_dict
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
@@ -393,10 +396,12 @@ class ProjectFeature(View):
             res = project_feature_type_fields(APP_NAME, project_slug, request.GET.get('name'))
         else:
             res = project_feature_type_fields(APP_NAME, project_slug, features_types[0])
-        # add info for JS display
-        if res.get('status', ''):
-            # char list
+        # add info for JS display : do not display the same status depending on project configuration
+        if res.get('status', '') and (rights['feat_modification'] == True or project.moderation == False):
             res['status']['info'] = STATUS
+        elif res.get('status', '') and project.moderation == True:
+            res['status']['info'] = STATUS_MODERE
+
         if request.is_ajax():
             # recuperation des champs descriptifs
             geom_type = project.get_geom(request.GET.get('name'))
@@ -432,21 +437,25 @@ class ProjectFeature(View):
         user_id = request.user.id
         creation_date = datetime.datetime.now()
         feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
-        # remove the csrfmiddlewaretoken key
-        data.pop('csrfmiddlewaretoken', None)
-        data.pop('feature', None)
-
-        # get comment
-        comment = data.pop('comment', None)
         # get geom
         try:
             geom = GEOSGeometry(data.pop('geom', None), srid=settings.DB_SRID)
         except Exception as e:
-            context = {"error": "le fromat de votre géométrue est incorrect",
-                       "rights": rights}
-            return render(request, 'collab/feature/form_body.html', context)
-
+            msg = "Le format de votre géométrie est incorrect. Veuillez le corriger"
+            logger = logging.getLogger(__name__)
+            logger.exception(msg)
+            context = {"rights": rights, 'message': msg}
+            return JsonResponse(context)
+        # remove the csrfmiddlewaretoken key
+        data.pop('csrfmiddlewaretoken', None)
+        data.pop('feature', None)
+        # get comment
+        comment = data.pop('comment', None)
         # add data send by the form
+        # replace 'on' by 'true'
+        for key, val in data.items():
+            if val == "on":
+                data[key] = 'True'
         # remove empty keys -> A AMELIORER "'" !!!!!!!!!
         data = {k: v for k, v in data.items() if v}
         data_keys = " "
@@ -455,7 +464,6 @@ class ProjectFeature(View):
             data_keys = ' , ' + ' , '.join(list(data.keys()))
         if data.values():
             data_values = " , '" + "' , '".join(list(data.values())) + "'"
-
         # # create with basic keys
         sql = """INSERT INTO "{table}" (creation_date, modification_date, user_id, project_id,
                  feature_id, geom {data_keys})
@@ -471,20 +479,23 @@ class ProjectFeature(View):
                  data_values=data_values,
                  geom=geom)
         creation = commit_data('default', sql)
-        # create comment
-        obj = models.Comment.objects.create(author=request.user,
-                                            feature_id=feature_id,
-                                            comment=comment, project=project)
+        if comment:
+            # create comment
+            obj = models.Comment.objects.create(author=request.user,
+                                                feature_id=feature_id,
+                                                comment=comment, project=project)
         # recuperation des champs descriptifs
         if creation == True:
-            context = {"rights": rights, "project": project, 'success': 'Le signalement a bien été ajouté'}
-            return render(request, 'collab/feature/form_body.html', context)
+            project = model_to_dict
+            msg = 'Le signalement a bien été ajouté'
+            context = {"rights": rights,  'message': msg}
+            return JsonResponse(context)
         else:
             msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
             logger = logging.getLogger(__name__)
             logger.exception(msg)
-            context = {"rights": rights, "project": project, 'error': msg}
-            return render(request, 'collab/feature/add_feature.html', context)
+            context = {"rights": rights, "project": project, 'message': msg}
+            return JsonResponse(context)
 
 
 def project(request, project_slug):

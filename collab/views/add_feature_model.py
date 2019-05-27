@@ -8,6 +8,7 @@ from django.contrib.gis.db import models
 from django.db import connection
 from django.db.models import Manager as GeoManager
 from django.shortcuts import render
+from django.utils.text import slugify
 from hashlib import md5
 import re
 import logging
@@ -48,7 +49,6 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
 
     # Get project
     projet = custom.Project.objects.get(id=projet_id)
-
     # check the fields names given by users
     intersection = list(set(names) & set(DEFAULT_FIELDS))
     if intersection:
@@ -57,12 +57,13 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
     if len(names) != len(set(names)):
         return {'error': """Veuillez corriger vos champs. Vous avez entré le même nom de champ plusieurs fois."""}
     # check if this feature name does not exist already
+    feature_slug = slugify(feature)
     project_features = project_features_types(APP_NAME, projet.slug)
-    if feature in project_features:
+    if feature_slug in project_features:
         return {'error': """Un type de signalement avec ce nom a déjà été créé."""}
     # check title of the feature
     pattern = re.compile("^[a-zA-Z0-9]*$")
-    if not pattern.match(feature):
+    if not pattern.match(feature_slug):
         return {'error': """Le nom du type de signalement ne doit être composé que de chiffres et/ou de lettres (sans accent)."""}
 
     # geometry model class
@@ -133,9 +134,8 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
                                                    blank=True, null=True))
             fields[names[elt]] = field_type[elt]
             labels[names[elt]] = names[elt]
-
     # creation modele
-    model = create_model(projet.slug + '_' + feature, fields,
+    model = create_model(projet.slug + '_' + feature_slug, fields,
                          app_label=APP_NAME,
                          module=module,
                          admin_opts={})
@@ -145,18 +145,18 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
             editor.create_model(model)
 
         # ajout du nom de la table
-        table_name = APP_NAME + "_" + projet.slug + '_' + feature
+        table_name = APP_NAME + "_" + projet.slug + '_' + feature_slug
         if not projet.features_info:
-            projet.features_info = {feature: {'table_name': table_name,
+            projet.features_info = {feature_slug: {'table_name': table_name,
                                               'geom_type': GEOM_TYPE[int(geom_type)][1],
-                                              'feature': feature,
+                                              'feature_slug': feature_slug,
                                               'user_id': user.id,
                                               'labels': labels}}
         else:
-            projet.features_info.update({feature: {
+            projet.features_info.update({feature_slug: {
                                         'table_name': table_name,
                                         'geom_type': GEOM_TYPE[int(geom_type)][1],
-                                        'feature': feature,
+                                        'feature_slug': feature_slug,
                                         'user_id': user.id,
                                         'labels': labels}})
         projet.save()
