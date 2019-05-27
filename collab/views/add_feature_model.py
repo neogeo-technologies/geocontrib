@@ -106,7 +106,7 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
         }
 
     labels = {"creation_date": "Date de création",
-              "modification_date": "Date de le dernière mise à jour",
+              "modification_date": "Date de la dernière mise à jour",
               "title": "Titre",
               "description": "Description",
               "geom": "Geométrie",

@@ -170,6 +170,7 @@ def get_last_features(app_name, project_slug, feature_type, num=""):
     data = fetch_raw_data('default', sql)
     return data
 
+
 def get_feature(app_name, project_slug, feature_type, id):
     """
         Return a specific feature
@@ -206,11 +207,10 @@ def get_feature_detail(app_name, project_slug, feature_type, feature_pk):
     if feature.get('status', ''):
         feature['status'] = STATUS[int(feature['status'])][1]
     if feature.get('user_id', ''):
-        feature['utilisateur'] = feature.pop('user_id')
         try:
-            feature['utilisateur'] = models.CustomUser.objects.get(
-                                     id=feature['utilisateur'])
+            utilisateur = models.CustomUser.objects.get(
+                                     id=feature['user_id'])
         except Exception as e:
-            feature['utilisateur'] = 'Anonyme'
+            utilisateur = 'Anonyme'
 
-    return project, feature
+    return project, feature, utilisateur

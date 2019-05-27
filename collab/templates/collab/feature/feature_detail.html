@@ -11,35 +11,44 @@
         <h3>{{feature.titre}}</h3>
     </div>
 
-    <table class="ui very basic table">
-        <tbody>
-    {% for key,val in feature.items %}
-        {% if key not in 'id,user_id,project_id,feature_id,titre' %}
-            <tr>
-                {% if key == 'utilisateur' %}
-                    <td><strong>Utilisateur</strong></td>
-                {% else %}
-                    <td><strong>{{labels|get_dict_item:key}}</strong></td>
-                {% endif %}
-                {% if val %}
-                    {% if val == True %}
-                    <td><i class="green check icon"></td>
-                    {% elif val == False %}
-                    <td><i class="inverted red remove icon"></td>
-                    {% else %}
-                    <td>{{val|feature_val_display}}</td>
-                    {% endif %}
-                {% else %}
-                    <td><i class="minus icon"></td>
-                {% endif %}
-            </tr>
+    <div id="feature_detail">
+
+        {% if rights.feat_modification or request.user.id == feature.user_id  %}
+            <i id="modify_feature" class="orange big edit icon "></i>
         {% endif %}
-    {% endfor %}
-        </tbody>
-    </table>
-    <div id='mapdetail'>
+        <table class="ui very basic table">
+            <tbody>
+              {% for key,val in feature.items %}
+                  {% if key|display_key %}
+                    <tr>
+                          <td><strong>{{labels|get_dict_item:key}}</strong></td>
+                          {% if val %}
+                              {% if val == True %}
+                              <td><i class="green check icon"></td>
+                              {% elif val == False %}
+                              <td><i class="inverted red remove icon"></td>
+                              {% else %}
+                              <td>{{val|feature_val_display}}</td>
+                              {% endif %}
+                          {% else %}
+                              <td><i class="minus icon"></td>
+                          {% endif %}
+                      </tr>
+                  {% endif %}
+              {% endfor %}
+              <tr><td><strong>Utilisateur</strong></td>
+                  <td>{{utilisateur}}</td>
+              <tr>
+            </tbody>
+        </table>
     </div>
-    
+    <div id="edit_feature">
+        <!-- {% if edit %} -->
+            {% include 'collab/feature/edit_feature.html' %}
+        <!-- {% endif %} -->
+    </div>
+    <!--  carte -->
+    <div id='mapdetail'></div>
     {% if comments %}
         {% for val in comments %}
           <table class="ui celled table">
@@ -64,8 +73,8 @@
     {% else %}
     <br>
     {% if rights.feat_creation %}
-    <i id="addcomment" class=" big green plus square icon"> </i>
-    <strong>Ajouter un commentaire</strong>
+        <i id="addcomment" class=" big green plus square icon"> </i>
+        <strong>Ajouter un commentaire</strong>
     {% endif %}
 {% endif %}
     <div class="ui small modal comment">
@@ -92,5 +101,6 @@
     <span>Vous ne disposez pas des droits nécessaires.</span>
 {% endif %}
 {% load staticfiles %}
-    <script src="{% static 'collab/js/feature_detail.js' %}"></script>
+<script src="{% static 'collab/js/feature_detail.js' %}"></script>
+
 {% endblock %}

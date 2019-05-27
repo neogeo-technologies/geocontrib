@@ -1,0 +1,11 @@
+
+<p>en cours</p>
+<table class="ui very basic table">
+    <tbody>
+      {% for key,val in feature.items %}
+             {% if key|display_key %}
+                {% get_nested_item feature_types key 'type' %}
+             {% endif %}
+      {% endfor %}
+    </tbody>
+</table>

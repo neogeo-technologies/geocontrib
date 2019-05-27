@@ -116,6 +116,7 @@ footer{
 .project_title{
  float: left;
 }
+#modify_feature.orange.big.edit.icon,
 #modify_project.orange.big.edit.icon{
  float: right;
 }

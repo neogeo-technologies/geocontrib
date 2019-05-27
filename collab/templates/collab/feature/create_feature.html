@@ -5,9 +5,7 @@
     <!-- <div id='mapfeature'></div> -->
 </div>
 {% for key,val in res %}
-
-    {% if val.column_name not in 'id,user_id,project_id,feature_id,date_creation' %}
-
+    {% if val.column_name|display_key%}
         {% if val.type == 'varchar' and val.info %}
         <div class="field">
             <label>{{labels|get_dict_item:val.column_name}}</label>
@@ -28,7 +26,7 @@
             <label>{{labels|get_dict_item:val.column_name}}</label>
             <input type="text" maxlength="{{val.char_max_size}}" placeholder="{{labels|get_dict_item:val.column_name}}" name="{{val.column_name}}" />
         </div>
-        {% elif val.type == 'date' %}
+        {% elif val.type == 'timestamptz' or val.type == 'date'%}
          <div class="field">
             <!-- <div class="ui calendar" id="date-field"> -->
                 <label>{{labels|get_dict_item:val.column_name}}</label>
@@ -157,7 +155,7 @@
              contentType: false,
              data: new FormData( this ),
              success: function (result) {
-                 $('#form_body').html(result.message);
+                 $('#create_feature').html(result.message);
              },
              error: function(err) {
                console.log('Error occured', err);

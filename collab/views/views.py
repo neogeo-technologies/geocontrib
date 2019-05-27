@@ -397,6 +397,7 @@ class ProjectFeature(View):
             res = project_feature_type_fields(APP_NAME, project_slug, request.GET.get('name'))
         else:
             res = project_feature_type_fields(APP_NAME, project_slug, features_types[0])
+
         # add info for JS display : do not display the same status depending on project configuration
         if res.get('status', '') and (rights['feat_modification'] == True or project.moderation == False):
             res['status']['info'] = STATUS
@@ -410,7 +411,7 @@ class ProjectFeature(View):
             context = {"res": res.items,
                        "geom_type": geom_type,
                        "rights": rights, "labels": labels}
-            return render(request, 'collab/feature/form_body.html', context)
+            return render(request, 'collab/feature/create_feature.html', context)
         else:
             # recuperation des champs descriptifs
             geom_type = project.get_geom(features_types[0])
@@ -641,7 +642,7 @@ class ProjectFeatureDetail(View):
             @param
             @return JSON
         """
-        project, feature = get_feature_detail(APP_NAME, project_slug, feature_type, feature_pk)
+        project, feature, utilisateur = get_feature_detail(APP_NAME, project_slug, feature_type, feature_pk)
         labels = project.get_labels(feature_type)
         # get user right on project
         if request.user.is_authenticated:
@@ -655,9 +656,17 @@ class ProjectFeatureDetail(View):
                                                 'author__first_name',
                                                 'author__last_name',
                                                 'creation_date'))
-        context = {'rights': rights, 'project': project,
+        context = {'rights': rights, 'project': project, 'utilisateur':utilisateur,
                    'feature': feature, 'comments': comments, 'labels': labels}
-        return render(request, 'collab/feature/feature_detail.html', context)
+        # if request is ajax
+        if request.is_ajax():
+            # type of features's fields
+            context['feature_types'] = project_feature_type_fields(APP_NAME, project_slug, feature_type)
+            context['edit'] = True
+            return render(request, 'collab/feature/edit_feature.html', context)
+        else:
+            return render(request, 'collab/feature/feature_detail.html', context)
+
 
     def post(self, request, project_slug, feature_type, feature_pk):
         """
@@ -666,8 +675,9 @@ class ProjectFeatureDetail(View):
             @return JSON
         """
         comment = request.POST.get('comment', '')
-        project, feature = get_feature_detail(APP_NAME, project_slug,
+        project, feature, utilisateur = get_feature_detail(APP_NAME, project_slug,
                                               feature_type, feature_pk)
+        labels = project.get_labels(feature_type)
         # get user right on project
         if request.user.is_authenticated:
             rights = request.user.project_right(project)
@@ -685,8 +695,10 @@ class ProjectFeatureDetail(View):
                                                       'author__first_name',
                                                       'author__last_name',
                                                       'creation_date'))
-        context = {'rights': rights, 'project': project, 'feature': feature, 'comments': comments}
+        context = {'rights': rights, 'labels':labels,'project': project,
+                   'feature': feature, 'comments': comments}
         return render(request, 'collab/feature/feature_detail.html', context)
+
 
 def project_import_issues(request, project_slug):
     # Get project info from slug

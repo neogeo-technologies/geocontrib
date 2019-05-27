@@ -6,7 +6,7 @@
 {% block content %}
 
 {% if rights.feat_creation %}
-  {%  if  success or error %}
+  {% if success or error %}
       {% if success %}
           <div class="ui success message">
               <div id="success" class="header">{{success}}</div>
@@ -39,8 +39,8 @@
                             </div>
                         </div>
                     </div>
-                    <div id="form_body">
-                          {% include 'collab/feature/form_body.html' %}
+                    <div id="create_feature">
+                          {% include 'collab/feature/create_feature.html' %}
                     </div>
                  </form>
               </div>
@@ -70,7 +70,7 @@
             name: name
           },
           success: function (result) {
-             $('#form_body').html(result);
+             $('#create_feature').html(result);
           },
           error: function(err) {
             console.log('Error occured', err);
