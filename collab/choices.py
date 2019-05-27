@@ -1,8 +1,8 @@
 
 GEOM_TYPE = (
-    ('0', 'Point'),
-    ('1', 'Ligne'),
-    ('2', 'Polygone')
+    ('0', 'Point (POINT)'),
+    ('1', 'Ligne (LINESTRING)'),
+    ('2', 'Polygone (POLYGON)')
 )
 
 STATUS = (

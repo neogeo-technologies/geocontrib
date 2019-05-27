@@ -27,6 +27,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import Point
+from django.core.exceptions import ValidationError
 from django.forms.models import model_to_dict
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
@@ -438,10 +439,18 @@ class ProjectFeature(View):
         creation_date = datetime.datetime.now()
         feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
         # get geom
+        geom_type = project.get_geom(data.get('feature', ''))
         try:
             geom = GEOSGeometry(data.pop('geom', None), srid=settings.DB_SRID)
         except Exception as e:
             msg = "Le format de votre géométrie est incorrect. Veuillez le corriger"
+            logger = logging.getLogger(__name__)
+            logger.exception(msg)
+            context = {"rights": rights, 'message': msg}
+            return JsonResponse(context)
+        # test if the geom type is correct
+        if not geom.geom_type.upper() in geom_type.upper():
+            msg = "Le type de géométrie saisie n'est pas celle définie pour ce type de signalement. Veuillez le corriger"
             logger = logging.getLogger(__name__)
             logger.exception(msg)
             context = {"rights": rights, 'message': msg}

@@ -92,7 +92,7 @@
             });
       }
 
-      // form validation
+    //   // form validation
      function check_form(){
           $('#addfeature')
         .form({
@@ -144,10 +144,11 @@
         });
      }
      check_form()
-     $('#addfeature').on('submit',function(e){
-       if( $('#addfeature').form('is valid')) {
 
+     $('#addfeature').submit(function(e){
+       if( $('#addfeature').form('is valid')) {
            e.preventDefault();
+           e.stopImmediatePropagation();
            url = ''
            $.ajax({
              url: url,

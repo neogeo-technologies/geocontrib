@@ -65,7 +65,6 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
     pattern = re.compile("^[a-zA-Z0-9]*$")
     if not pattern.match(feature_slug):
         return {'error': """Le nom du type de signalement ne doit être composé que de chiffres et/ou de lettres (sans accent)."""}
-
     # geometry model class
     geom_field = models.PointField
     if geom_type == GEOM_TYPE[0][0]:
@@ -120,7 +119,7 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
     for elt in range(0, len(types)):
         if names[elt] and types[elt]:
             if types[elt] == 'string':
-                field_type.append(models.CharField(max_length=255, blank=True))
+                field_type.append(models.CharField(max_length=255, blank=True, null=True))
             elif types[elt] == 'date':
                 field_type.append(models.DateTimeField(blank=True, null=True))
             elif types[elt] == 'int':
