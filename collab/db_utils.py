@@ -14,7 +14,7 @@ def commit_data(database, sql):
         connections[database].cursor().execute(sql)
         connections[database].commit()
     except Exception as e:
-        status = False
+        status = str(e)
     finally:
         connections[database].cursor().close()
         return status

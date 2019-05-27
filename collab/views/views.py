@@ -494,7 +494,7 @@ class ProjectFeature(View):
             msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
             logger = logging.getLogger(__name__)
             logger.exception(msg)
-            context = {"rights": rights, 'message': msg}
+            context = {"rights": rights, 'message': msg,'creation': creation}
             return JsonResponse(context)
 
 
