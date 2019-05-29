@@ -41,6 +41,7 @@
           type: 'GET',
           success: function (data) {
               $('#feature_detail').html("");
+              $('#comments').html("");
               $('#edit_feature').html(data);
           },
           error: function(err) {

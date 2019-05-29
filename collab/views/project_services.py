@@ -211,7 +211,6 @@ def get_feature_detail(app_name, project_slug, feature_type, feature_pk):
                                      id=feature['user_id'])
         except Exception as e:
             utilisateur = 'Anonyme'
-
     return project, feature, utilisateur
 
 

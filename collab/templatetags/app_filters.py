@@ -13,12 +13,18 @@ def display_key(key):
 
 @register.filter
 def get_dict_item(dictionary, key):
-    return dictionary.get(key, ' ')
+    if dictionary.get(key, ' '):
+        return dictionary.get(key, ' ').capitalize()
+    else:
+        return ''
 
 
 @register.filter
 def get_item(dictionary, key):
-    return dictionary.get(key).items()
+    if dictionary.get(key, ''):
+        return dictionary.get(key).items()
+    else:
+        return ''
 
 
 @register.simple_tag

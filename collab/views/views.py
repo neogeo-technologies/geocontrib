@@ -718,6 +718,7 @@ class ProjectFeatureDetail(View):
 
         # get comment
         comment = data.pop('comment', None)
+
         # get sql for additonal field
         add_sql = edit_feature_sql(data)
         # # create with basic keys
