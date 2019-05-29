@@ -732,8 +732,16 @@ class ProjectFeatureDetail(View):
                  geom=geom)
 
         creation = commit_data('default', sql)
-        return redirect('project_feature_detail', project_slug=project_slug,
-                        feature_type=feature_type, feature_pk=feature_pk)
+        if creation == True:
+            return redirect('project_feature_detail', project_slug=project_slug,
+                            feature_type=feature_type, feature_pk=feature_pk)
+        else:
+            msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
+            logger = logging.getLogger(__name__)
+            logger.exception(creation)
+            return redirect('project_feature_detail', project_slug=project_slug,
+                            feature_type=feature_type, feature_pk=feature_pk)
+
 
 
 def project_import_issues(request, project_slug):

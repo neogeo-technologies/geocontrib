@@ -79,15 +79,14 @@ def edit_feature_sql(data):
     date_pattern = re.compile('^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$')
     # replace 'on' by 'true'
     for key, val in data.items():
-        if date_pattern.match(str(val)):
-            if val:
-                format_date = timezone.make_aware(dateutil.parser.parse(val), timezone.get_current_timezone())
-                add_sql += """,{key}='{format_date}'""".format(
+        if not val:
+            add_sql += """,{key}=NULL""".format(
+                       key=str(key))
+        elif date_pattern.match(str(val)):
+            format_date = timezone.make_aware(dateutil.parser.parse(val), timezone.get_current_timezone())
+            add_sql += """,{key}='{format_date}'""".format(
                            key=str(key),
                            format_date=str(format_date))
-            else:
-                add_sql += """,{key}=NULL""".format(
-                           key=str(key))
         elif val == "on":
             add_sql += """,{key}={val}""".format(
                     key=str(key),
