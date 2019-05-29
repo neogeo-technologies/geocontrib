@@ -1,3 +1,7 @@
+.ui.stacked.secondary.segment:after{
+    border-top: none;
+}
+
 body {
     background-color: #FFFFFF;
     height:auto;
