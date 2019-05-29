@@ -57,10 +57,11 @@ class CustomUser(AbstractUser):
                    int(project.visi_feature) < 2:
                     user_right['proj_consultation'] = True
                     user_right['feat_consultation'] = True
-                # right to modify project fields and administrate users
+                # right to modify project fields and administrate users and add new type of feature
                 if level >= 4:
                     user_right['proj_modification'] = True
                     user_right['user_admin'] = True
+                    user_right['model_creation'] = True
                 # right to archive features
                 if level >= int(project.visi_archive)or \
                    int(project.visi_archive) < 2:

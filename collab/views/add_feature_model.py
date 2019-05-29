@@ -21,6 +21,19 @@ DEFAULT_FIELDS = ['feature_id', 'creation_date', 'modification_date',
 
 def add_feature_model(request):
 
+    # get user right on project
+    if not request.user.is_authenticated:
+        return render(request, APP_NAME + '/feature/add_feature_model.html')
+    else:
+        if request.user.is_superuser:
+            projects = custom.Project.objects.all()
+        else:
+            projects = custom.Autorisation.objects.filter(user=request.user,
+                       level='4').values('project__id','project__title')
+
+    if not projects:
+        return render(request, APP_NAME + '/feature/add_feature_model.html')
+
     if request.method == 'POST':
         if request.POST.get('project') and request.POST.get('feature') and \
            request.POST.get('geom_type'):
@@ -30,16 +43,18 @@ def add_feature_model(request):
                                              request.POST.getlist('field_name' , []),
                                              request.POST.getlist('field_type', []),
                                              request.user)
-            context = message
+            context = {'projects': projects}
+            if message.get('error', ''):
+                context['error'] = message.get('error', '')
+            if message.get('success', ''):
+                context['success'] = message.get('success', '')
             return render(request, APP_NAME + '/feature/add_feature_model.html',
                           context=context)
         else:
-            projects = custom.Project.objects.all()
             context = {'projects': projects, 'error': "Les paramètres obligatoires sont manquants."}
             return render(request, APP_NAME + '/feature/add_feature_model.html',
                           context=context)
     else:
-        projects = custom.Project.objects.all()
         context = {'projects': projects}
         return render(request, APP_NAME + '/feature/add_feature_model.html',
                       context=context)

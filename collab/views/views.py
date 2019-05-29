@@ -662,13 +662,15 @@ class ProjectFeatureDetail(View):
         context = {'rights': rights, 'project': project, 'utilisateur': utilisateur,
                    'comments': comments, 'labels': labels}
         # A AMELIORER
-        if request.session.get('error', ''):
+        if request.session.get('error', '') or not request.is_ajax():
+            if request.session.get('error', ''):
+                context['error'] = request.session.pop('error', '')
+            geom_to_wkt = feature.get('geom', '')
+            feature['geom'] = GEOSGeometry(geom_to_wkt).wkt
             context['feature'] = feature
-            context['error'] = request.session.pop('error', '')
             return render(request, 'collab/feature/feature.html', context)
-
         # if request is ajax
-        if request.is_ajax():
+        elif request.is_ajax():
             # type of features's fields
             data = project_feature_type_fields(APP_NAME, project_slug, feature_type)
             for key, val in data.items():
@@ -686,11 +688,7 @@ class ProjectFeatureDetail(View):
             # type de géometrie
             context['geom_type'] = project.get_geom(feature_type)
             return render(request, 'collab/feature/edit_feature.html', context)
-        else:
-            geom_to_wkt = feature.get('geom', '')
-            feature['geom'] = GEOSGeometry(geom_to_wkt).wkt
-            context['feature'] = feature
-            return render(request, 'collab/feature/feature.html', context)
+        
 
     def post(self, request, project_slug, feature_type, feature_pk):
         """

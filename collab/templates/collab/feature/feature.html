@@ -4,17 +4,7 @@
 {{ title }}
 {% endblock %}
 {% block content %}
-{% if success or error %}
-    {% if success %}
-        <div class="ui success message">
-            <div id="success" class="header">{{success}}</div>
-        </div>
-    {% elif error %}
-        <div class="ui error message">
-            <div class="header">{{error}}</div>
-        </div>
-    {% endif %}
-{%endif %}
+
 {% if rights.feat_consultation %}
     <div class="project_header">
         <h2 class="ui header">{{project.title|title}}</h2>
@@ -22,6 +12,17 @@
     </div>
 
     <div id="feature_detail">
+      {% if success or error %}
+          {% if success %}
+              <div class="ui success message">
+                  <div id="success" class="header">{{success}}</div>
+              </div>
+          {% elif error %}
+              <div class="ui error message">
+                  <div class="header">{{error}}</div>
+              </div>
+          {% endif %}
+       {%endif %}
         {% include 'collab/feature/feature_detail.html' %}
     </div>
     <div id="edit_feature">
