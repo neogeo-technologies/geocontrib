@@ -5,6 +5,7 @@ from . import views
 from collab.views.views import LoginView
 from collab.views.views import LogoutView
 from collab.views.views import ProjectAdminView
+from collab.views.views import ProjectComments
 from collab.views.views import ProjectFeature
 from collab.views.views import ProjectFeatureDetail
 from collab.views.views import ProjectView
@@ -26,6 +27,8 @@ urlpatterns = services + [
     path('projet/<slug:project_slug>/', views.project, name='project'),
     path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),
     path('projet/<slug:project_slug>/ajout/', ProjectFeature.as_view(), name='project_add_feature'),
+    path('projet/<slug:project_slug>/<slug:feature_type>/<int:feature_pk>/commentaire', ProjectComments.as_view(),
+         name='project_add_comment'),
     path('projet/<slug:project_slug>/liste/', views.project_feature_list, name='project_feature_list'),
     path('projet/<slug:project_slug>/carte/', views.project_feature_map, name='project_feature_map'),
     path('projet/<slug:project_slug>/<slug:feature_type>/<int:feature_pk>', ProjectFeatureDetail.as_view(),

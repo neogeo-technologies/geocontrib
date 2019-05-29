@@ -1,0 +1,43 @@
+{% extends "collab/layout_menu.html" %}
+{% load app_filters %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+{% if success or error %}
+    {% if success %}
+        <div class="ui success message">
+            <div id="success" class="header">{{success}}</div>
+        </div>
+    {% elif error %}
+        <div class="ui error message">
+            <div class="header">{{error}}</div>
+        </div>
+    {% endif %}
+{%endif %}
+{% if rights.feat_consultation %}
+    <div class="project_header">
+        <h2 class="ui header">{{project.title|title}}</h2>
+        <h3>{{feature.titre}}</h3>
+    </div>
+
+    <div id="feature_detail">
+        {% include 'collab/feature/feature_detail.html' %}
+    </div>
+    <div id="edit_feature">
+        <!-- {% if edit %} -->
+            {% include 'collab/feature/edit_feature.html' %}
+        <!-- {% endif %} -->
+    </div>
+    <!--  carte -->
+    <div id='mapdetail'></div>
+    <!--  comments -->
+    {% include 'collab/feature/comments.html' %}
+
+{% else %}
+    <i class='icon exclamation triangle'></i>
+    <span>Vous ne disposez pas des droits nécessaires.</span>
+{% endif %}
+{% load staticfiles %}
+<script src="{% static 'collab/js/feature.js' %}"></script>
+{% endblock %}

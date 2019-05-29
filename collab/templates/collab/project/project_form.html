@@ -4,14 +4,12 @@
     </div>
 </div>
 <div class="ui middle aligned stackable grid container">
-     <form id='saveform' class='ui form' method=""  enctype="multipart/form-data" >
+     <form id='save_project' class='ui form' method=""  enctype="multipart/form-data" >
          {% csrf_token %}
             <div class="ui error message"></div>
-            <div class="">
-                 <button id="save_project" type="submit" class="green ui compact icon button">
-                  <i class="white large save icon"></i>
-                 </button>
-            </div>
+            <button id="btn_project_save" type="submit" class="green ui compact icon button">
+                <i class="white large save icon"></i>
+            </button>
              <div class="field">
                  <label>Date de création</label>
                  <input type="text" name="creation_date" value="{{project.creation_date|date:"d/m/Y"}}" />
@@ -86,7 +84,7 @@
 <script>
 
     function check_form() {
-        $('#saveform')
+        $('#save_project')
           .form({
             fields: {
               title:  {
@@ -130,8 +128,8 @@
         ;
     }
     check_form()
-    $('#saveform').on('submit',function(e){
-        if( $('#saveform').form('is valid')) {
+    $('#save_project').on('submit',function(e){
+        if( $('#save_project').form('is valid')) {
             e.preventDefault();
             url = ''
             $.ajax({

@@ -3,7 +3,7 @@
         <h2 class="ui header">{{project.title|title }}</h2>
     </div>
 </div>
-<i id="modify_project" class="orange big edit icon "></i>
+<i id="btn_project_edit" class="orange big edit icon "></i>
 <table class="ui very basic table">
     <tbody>
     {% for key,val in data.items %}
@@ -40,9 +40,9 @@
 
 <script>
     // modify type of cursor
-    var element = document.getElementById("modify_project");
+    var element = document.getElementById("btn_project_edit");
     element.style.cursor = "pointer";
-        $("#modify_project").on('click', function(e) {
+        $("#btn_project_edit").on('click', function(e) {
             url = ''
             $.ajax({
               url: url,

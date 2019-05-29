@@ -1,106 +1,53 @@
-{% extends "collab/layout_menu.html" %}
-{% load app_filters %}
-{% block title %}
-{{ title }}
-{% endblock %}
-{% block content %}
 
-{% if rights.feat_consultation %}
-    <div class="project_header">
-        <h2 class="ui header">{{project.title|title}}</h2>
-        <h3>{{feature.titre}}</h3>
-    </div>
-
-    <div id="feature_detail">
-
-        {% if rights.feat_modification or request.user.id == feature.user_id  %}
-            <i id="modify_feature" class="orange big edit icon "></i>
-        {% endif %}
-        <table class="ui very basic table">
-            <tbody>
-              {% for key,val in feature.items %}
-                  {% if key|display_key %}
-                    <tr>
-                          <td><strong>{{labels|get_dict_item:key}}</strong></td>
-                          {% if val %}
-                              {% if val == True %}
-                              <td><i class="green check icon"></td>
-                              {% elif val == False %}
-                              <td><i class="inverted red remove icon"></td>
-                              {% else %}
-                              <td>{{val|feature_val_display}}</td>
-                              {% endif %}
-                          {% else %}
-                              <td><i class="minus icon"></td>
-                          {% endif %}
-                      </tr>
-                  {% endif %}
-              {% endfor %}
-              <tr><td><strong>Utilisateur</strong></td>
-                  <td>{{utilisateur}}</td>
-              <tr>
-            </tbody>
-        </table>
-    </div>
-    <div id="edit_feature">
-        <!-- {% if edit %} -->
-            {% include 'collab/feature/edit_feature.html' %}
-        <!-- {% endif %} -->
-    </div>
-    <!--  carte -->
-    <div id='mapdetail'></div>
-    {% if comments %}
-        {% for val in comments %}
-          <table class="ui celled table">
-        <thead>
-            <tr><th>
-                <span class="comment_title">
-                    <strong>{{val.author__first_name|title}}{{val.author__last_name|title}} <strong>
-                        Le {{val.creation_date|date:"d/m/Y"}}
-                </span>
-            {% if rights.feat_creation and forloop.first %}
-                <i id="addcomment" class=" big green plus square icon"></i>
-            {% endif %}
-            </th></tr>
-        </thead>
+<div id="feature_detail">
+    {% if rights.feat_modification or request.user.id == feature.user_id  %}
+        <i id="btn_feature_edit" class="orange big edit icon "></i>
+    {% endif %}
+    <table class="ui very basic table">
         <tbody>
-            <tr>
-                <td data-label="">{{val.comment}}</td>
-            </tr>
+          {% for key,val in feature.items %}
+              {% if key|display_key %}
+                <tr>
+                      <td><strong>{{labels|get_dict_item:key}}</strong></td>
+
+                      {% if val %}
+                          {% if val == True %}
+                            <td><i class="green check icon"></td>
+                          {% elif val == False %}
+                            <td><i class="inverted red remove icon"></td>
+                          {% else %}
+                            <td>{{val|feature_val_display}}</td>
+                          {% endif %}
+                      {% else %}
+                          <td><i class="minus icon"></td>
+                      {% endif %}
+                  </tr>
+              {% endif %}
+          {% endfor %}
+          <tr><td><strong>Utilisateur</strong></td>
+              <td>{{utilisateur}}</td>
+          <tr>
         </tbody>
     </table>
-        {% endfor %}
-    {% else %}
-    <br>
-    {% if rights.feat_creation %}
-        <i id="addcomment" class=" big green plus square icon"> </i>
-        <strong>Ajouter un commentaire</strong>
-    {% endif %}
-{% endif %}
-    <div class="ui small modal comment">
-        <i class="close icon"></i>
-        <div class="header">
-            Ajouter un commentaire
-        </div>
-        <div class="content">
-            <form class="ui form comment_form" method="POST">
-            {% csrf_token %}
-                <div class="ui error message"></div>
-                <div class="required field">
-                    <textarea name="comment"></textarea>
-                </div>
-                <div class="actions">
-                    <div class="ui cancel button">Annuler</div>
-                    <button class="ui button green" type="submit">Ajouter</button>
-                </div>
-            </form>
-        </div>
-    </div>
-{% else %}
-    <i class='icon exclamation triangle'></i>
-    <span>Vous ne disposez pas des droits nécessaires.</span>
-{% endif %}
-{% load staticfiles %}
-<script src="{% static 'collab/js/feature_detail.js' %}"></script>
+</div>
+<script>
+    // modify type of cursor
+    var element = document.getElementById("btn_feature_edit");
+    element.style.cursor = "pointer";
+    $("#btn_feature_edit").on('click', function(e) {
+        url = ''
+        $.ajax({
+          url: url,
+          type: 'GET',
+          success: function (data) {
+              $('#feature_detail').html("");
+              $('#edit_feature').html(data);
+          },
+          error: function(err) {
+            console.log('Error occured', err);
+          }
+        });
 
-{% endblock %}
+    });
+
+</script>

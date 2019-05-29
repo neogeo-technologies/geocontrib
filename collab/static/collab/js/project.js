@@ -24,7 +24,7 @@ $('input:file', '.ui.action.input')
 
 
   // form validation
-  $('.addproject')
+  $('.add_project')
     .form({
       fields: {
         title:  {

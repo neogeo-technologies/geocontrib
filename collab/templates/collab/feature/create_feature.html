@@ -1,60 +1,61 @@
-<div class="field" class='geomfield'>
-    <label>Géometrie de type {{geom_type}}</label><br>
-    <input type="text"  name="geom" placeholder="Point(0 25)" />
-    <!-- <input type="hidden"  name="geom" placeholder="geometrie" /> -->
-    <!-- <div id='mapfeature'></div> -->
-</div>
+
 {% for key,val in res %}
     {% if val.column_name|display_key%}
-        {% if val.type == 'varchar' and val.info %}
-        <div class="field">
-            <label>{{labels|get_dict_item:val.column_name}}</label>
-            <div class="ui selection dropdown status">
-
-                <input type="hidden"  name="{{val.column_name}}" placeholder="{{labels|get_dict_item:val.column_name}}" value="{{val.info.0.1}}" />
-                <i class="dropdown icon"></i>
-                <div class="default text"></div>
-                <div class="menu">
-                {% for status in val.info %}
-                    <div class="item" data-value={{status.0}}>{{status.1}}</div>
-                {% endfor %}
+        {% if val.type == 'geometry' %}
+            <div class="field" class='geomfield'>
+                <label>Géometrie de type {{geom_type}}</label><br>
+                <input type="text"  name="geom" placeholder="Point(0 25)" />
+                <!-- <input type="hidden"  name="geom" placeholder="geometrie" /> -->
+                <!-- <div id='mapfeature'></div> -->
+            </div>
+        {% elif val.type == 'varchar' and val.choices %}
+            <div class="field">
+                <label>{{labels|get_dict_item:val.column_name}}</label>
+                <div class="ui selection dropdown status">
+                    <input type="hidden"  name="{{val.column_name}}" placeholder="{{labels|get_dict_item:val.column_name}}" value="{{val.choices.0.1}}" />
+                    <i class="dropdown icon"></i>
+                    <div class="default text"></div>
+                    <div class="menu">
+                    {% for status in val.choices %}
+                        <div class="item" data-value={{status.0}}>{{status.1}}</div>
+                    {% endfor %}
+                    </div>
                 </div>
             </div>
-        </div>
         {% elif val.type == 'varchar' %}
-        <div class="field">
+            <div class="field">
             <label>{{labels|get_dict_item:val.column_name}}</label>
             <input type="text" maxlength="{{val.char_max_size}}" placeholder="{{labels|get_dict_item:val.column_name}}" name="{{val.column_name}}" />
         </div>
         {% elif val.type == 'timestamptz' or val.type == 'date'%}
-         <div class="field">
-            <!-- <div class="ui calendar" id="date-field"> -->
-                <label>{{labels|get_dict_item:val.column_name}}</label>
-                <div class="ui input left icon">
-                    <i class="calendar icon"></i>
-                    <input type="text"  name="{{val.column_name}}" placeholder="10/10/2019" />
-                </div>
-            <!-- </div> -->
-        </div>
+             <div class="field">
+                <!-- <div class="ui calendar" id="date-field"> -->
+                    <label>{{labels|get_dict_item:val.column_name}}</label>
+                    <div class="ui input left icon">
+                        <i class="calendar icon"></i>
+                        <input type="text"  name="{{val.column_name}}" placeholder="10/10/2019" />
+                    </div>
+                <!-- </div> -->
+            </div>
         {% elif val.type == 'text' %}
-        <div class="field">
+            <div class="field">
             <label>{{labels|get_dict_item:val.column_name}}</label>
             <textarea name="{{val.column_name}}"></textarea>
         </div>
         {% elif val.data_type == 'boolean' %}
-        <div class="inline field">
+            <div class="inline field">
             <div class="ui checkbox boolfield">
                 <input type="checkbox"  name="{{val.column_name}}" class="hidden" >
                 <label>{{labels|get_dict_item:val.column_name}}</label>
             </div>
         </div>
         {% elif val.data_type == 'integer' %}
-        <div class="field">
+            <div class="field">
             <label>{{labels|get_dict_item:val.column_name}}</label>
             <input type="number" placeholder="{{labels|get_dict_item:val.column_name}}" name="{{val.column_name}}" />
         </div>
         {% elif val.data_type == 'double precision' %}
-        <div class="field">
+            <div class="field">
             <label>{{labels|get_dict_item:val.column_name}}</label>
             <input type="number" step="any"  placeholder="{{labels|get_dict_item:val.column_name}}" name="{{val.column_name}}" />
         </div>
@@ -90,7 +91,7 @@
             });
       }
 
-    //   // form validation
+    // form validation
      function check_form(){
           $('#addfeature')
         .form({
@@ -143,25 +144,25 @@
      }
      check_form()
 
-     $('#addfeature').submit(function(e){
-       if( $('#addfeature').form('is valid')) {
-           e.preventDefault();
-           e.stopImmediatePropagation();
-           url = ''
-           $.ajax({
-             url: url,
-             type: 'POST',
-             processData: false,
-             contentType: false,
-             data: new FormData( this ),
-             success: function (result) {
-                 $('#create_feature').html(result.message);
-             },
-             error: function(err) {
-               console.log('Error occured', err);
-             }
-           });
-       }
-    });
+    //  $('#addfeature').submit(function(e){
+    //    if( $('#addfeature').form('is valid')) {
+    //        e.preventDefault();
+    //        e.stopImmediatePropagation();
+    //        url = ''
+    //        $.ajax({
+    //          url: url,
+    //          type: 'POST',
+    //          processData: false,
+    //          contentType: false,
+    //          data: new FormData( this ),
+    //          success: function (result) {
+    //              window.location.href = result.url;
+    //          },
+    //          error: function(err) {
+    //            console.log('Error occured', err);
+    //          }
+    //        });
+    //    }
+    // });
 
 </script>

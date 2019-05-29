@@ -63,7 +63,6 @@ def last_user_registered(project_slug, nbuser=None):
                                                   'user__first_name',
                                                   'user__last_name')
 
-
 def project_features_types(app_name, project_slug):
     """
         List the feature types for a given project
@@ -214,3 +213,35 @@ def get_feature_detail(app_name, project_slug, feature_type, feature_pk):
             utilisateur = 'Anonyme'
 
     return project, feature, utilisateur
+
+
+def get_feature_pk(table_name, feature_id):
+    """
+        Return the pk of a specific feature
+        @param table_name table name
+        @param feature_id uuid of the feature
+        @return JSON
+    """
+
+    sql = """ SELECT id AS pk
+              FROM "{table_name}"
+              WHERE feature_id='{feature_id}';
+          """.format(table_name=table_name, feature_id=feature_id)
+    data = fetch_first_row('default', sql)
+    return data.get('pk', '')
+
+
+def get_feature_uuid(table_name, feature_pk):
+    """
+        Return the pk of a specific feature
+        @param table_name table name
+        @param feature_pk pk of the feature
+        @return feature_id uuid of the feature
+    """
+
+    sql = """ SELECT feature_id
+              FROM "{table_name}"
+              WHERE id='{id}';
+          """.format(table_name=table_name, id=id)
+    data = fetch_first_row('default', sql)
+    return data.get('feature_id', '')

@@ -1,0 +1,77 @@
+{% if comments %}
+    {% for val in comments %}
+      <table class="ui celled table">
+            <thead>
+                <tr><th>
+                    <span class="comment_title">
+                        <strong>{{val.author__first_name|title}}{{val.author__last_name|title}} <strong>
+                            Le {{val.creation_date|date:"d/m/Y"}}
+                    </span>
+                {% if rights.feat_creation and forloop.first %}
+                    <i id="addcomment" class=" big green plus square icon"></i>
+                {% endif %}
+                </th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="">{{val.comment}}</td>
+                </tr>
+            </tbody>
+      </table>
+    {% endfor %}
+{% else %}
+    <br>
+    {% if rights.feat_creation %}
+        <i id="addcomment" class=" big green plus square icon"> </i>
+        <strong>Ajouter un commentaire</strong>
+    {% endif %}
+{% endif %}
+
+<div class="ui small modal comment">
+    <i class="close icon"></i>
+    <div class="header">
+        Ajouter un commentaire
+    </div>
+
+    <div class="content">
+
+        <form action="{% url 'project_add_comment' project_slug=project.slug feature_type=request.resolver_match.kwargs.feature_type  feature_pk=request.resolver_match.kwargs.feature_pk%}" class="ui form comment_form" method="POST">
+        {% csrf_token %}
+            <div class="ui error message"></div>
+            <div class="required field">
+                <textarea name="comment"></textarea>
+            </div>
+            <div class="actions">
+                <div class="ui cancel button">Annuler</div>
+                <button class="ui button green" type="submit">Ajouter</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+
+  $(function(){
+  	$("#addcomment").click(function(){
+  		$(".comment").modal('show');
+  	});
+  	$(".comment").modal({
+  		closable: true
+  	});
+  });
+
+  $('.comment_form')
+    .form({
+      fields: {
+        comment     :  {
+          identifier: 'comment',
+          rules: [
+            {
+              type   : 'empty',
+              prompt : 'Veuillez entrer un commentaire'
+            }
+          ]
+        }
+      }
+    })
+  ;
+</script>
