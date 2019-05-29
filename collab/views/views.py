@@ -730,7 +730,7 @@ class ProjectFeatureDetail(View):
                  feature_pk=feature_pk,
                  add_sql=add_sql,
                  geom=geom)
-        import pdb; pdb.set_trace()
+
         creation = commit_data('default', sql)
         return redirect('project_feature_detail', project_slug=project_slug,
                         feature_type=feature_type, feature_pk=feature_pk)
