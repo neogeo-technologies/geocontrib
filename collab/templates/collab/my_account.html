@@ -93,8 +93,9 @@
             </h4>
             <div class="ui divided items">
                 {% for project in project_list%}
-
-                    <div class="item">
+                    {% get_nested_item rights project.slug 'proj_consultation' as proj_consultation  %}
+                    {% if proj_consultation %}
+                        <div class="item">
                         <div class="ui tiny image">
                             {% if project.illustration %}
                               <img  class="ui small image" src="{{project.illustration.url}}" height="200">
@@ -127,6 +128,8 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
+
                 {% endfor %}
             </div>
 

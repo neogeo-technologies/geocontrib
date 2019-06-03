@@ -315,21 +315,17 @@ class ProjectView(FormView):
 def my_account(request):
 
     if request.user.is_authenticated:
-        auth_proj = []
+        rights = {}
         project_info = {}
 
         # open project (can be visualize by anonymous or connected user)
-        if request.user.is_superuser:
-            project_list = models.Project.objects.all()
-        else:
-            # retrieve user project
-            for elt in models.Autorisation.objects.filter(
-                       user=request.user):
-                project = models.Project.objects.get(id=elt.project.id)
-                auth_proj.append(project)
-                project_info[project.slug] = {"level": elt.get_level_display()}
-                project_list = list(set(auth_proj + list(models.Project.objects.filter(
-                             Q(visi_feature='0') | Q(visi_feature='1')))))
+        project_list = models.Project.objects.all()
+        for elt in project_list:
+            if request.user.is_authenticated:
+                rights[elt.slug] = request.user.project_right(elt)
+            else:
+                rights[elt.slug] = get_anonymous_rights(elt)
+
         # user info
         user = {"username": request.user.username,
                 "name": """{first_name} {last_name}""".format(
@@ -381,7 +377,7 @@ def my_account(request):
         features.sort(key=lambda item: item['modification_date'], reverse=True)
         if len(features) > 3:
             features = features[0:3]
-        context = {"project_list": project_list, "user": user,
+        context = {"project_list": project_list, "rights": rights, "user": user,
                    "feature_pk": feature_pk, "project_info": project_info,
                    "last_comment": last_comment, "features": features}
         return render(request, 'collab/my_account.html', context)
