@@ -10,7 +10,6 @@
         <h2 class="ui header">{{project.title|title}}</h2>
         <h3>{{feature.titre}}</h3>
     </div>
-
     <div id="feature_detail">
       {% if success or error %}
           {% if success %}
@@ -26,15 +25,28 @@
         {% include 'collab/feature/feature_detail.html' %}
     </div>
     <div id="edit_feature">
-        <!-- {% if edit %} -->
-            {% include 'collab/feature/edit_feature.html' %}
-        <!-- {% endif %} -->
+        {% include 'collab/feature/edit_feature.html' %}
     </div>
     <!--  carte -->
     <div id='mapdetail'></div>
+    {% if rights.feat_creation %}
+        <button id="addcomment" role="button" class="ui basic green tiny button">
+          <i class="plus icon"></i>
+            Ajouter un commentaire
+        </button>
+        <button id="addattachment" role="button" class="ui basic green tiny button">
+          <i class="plus icon"></i>
+            Ajouter une piece jointe
+        </button>
+    {% endif %}
+
     <!--  comments -->
     <div id="comments">
       {% include 'collab/feature/comments.html' %}
+    </div>
+    <!--  attachment -->
+    <div id="attachment">
+      {% include 'collab/feature/attachment.html' %}
     </div>
 
 {% else %}

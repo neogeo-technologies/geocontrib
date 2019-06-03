@@ -8,19 +8,19 @@
     <div class="top aligned row">
         <div class="four wide column">
             <div class="ui secondary vertical pointing menu">
-                <a class="active item">
+                <a href="#profil" class="item">
                     Mon profil
                 </a>
-                <a class="item">
+                <a  href="#projets" class="item">
                     Mes projets
                 </a>
-                <a class="item">
+                <a href="#notifications"  class="item">
                     Notifications reçues
                 </a>
-                <a class="item">
+                <a href="#signalements" class="item">
                     Mes signalements
                 </a>
-                <a class="item">
+                <a href="#commentaires" class="item">
                     Mes commentaires
                 </a>
             </div>
@@ -28,6 +28,7 @@
 
         <div class="twelve wide column">
             <h4 id="profil_utilisateur" class="ui horizontal divider header">
+                <a name="profil"></a>
                 <i class="user icon"></i>
                 Mon profil
             </h4>
@@ -88,6 +89,7 @@
 
 
             <h4 id="mes_projets" class="ui horizontal divider header">
+                <a name="projets"></a>
                 <i class="users icon"></i>
                 Mes projets
             </h4>
@@ -134,26 +136,11 @@
             </div>
 
             <h4 id="dernieres_notifications" class="ui horizontal divider header">
+                <a name="notifications"></a>
                 <i class="bullhorn icon"></i>
                 Dernières notifications reçues
             </h4>
             <div class="ui list">
-                <div class="item">
-                    <i class="map marker icon"></i>
-                    <div class="content">
-                        <a class="header">
-                            12/03/2019 - 12:08 - Projet - Auteur [Signalement en attente de publication]</a>
-                        <div class="description">Titre du signalement</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <i class="map marker icon"></i>
-                    <div class="content">
-                        <a class="header">
-                            12/03/2019 - 12:05 - Projet - Auteur [Signalement publié]</a>
-                        <div class="description">Titre du signalement</div>
-                    </div>
-                </div>
                 <div class="item">
                     <i class="comment icon"></i>
                     <div class="content">
@@ -163,25 +150,10 @@
                         <div class="description">Début du texte du commentaire</div>
                     </div>
                 </div>
-                <div class="item">
-                    <i class="map marker icon"></i>
-                    <div class="content">
-                        <a class="header">
-                            11/03/2019 - 11:52 - Projet - Auteur [Signalement modifié]</a>
-                        <div class="description">Modification de localisation</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <i class="user icon"></i>
-                    <div class="content">
-                        <a class="header">
-                            09/03/2019 - 17:25 - Projet - Auteur [Demande de droits]</a>
-                        <div class="description">Niveau de droit demandé&nbsp;: Collaborateur</div>
-                    </div>
-                </div>
             </div>
 
             <h4 id="mes_derniers_signalements" class="ui horizontal divider header">
+                <a name="signalements"></a>
                 <i class="map marker alternate icon"></i>
                 Mes derniers signalements
             </h4>
@@ -197,8 +169,8 @@
                     </div>
                 {% endfor %}
             </div>
-
             <h4 id="mes_derniers_commentaires" class="ui horizontal divider header">
+                <a name="commentaires"></a>
                 <i class="comments icon"></i>
                 Mes derniers commentaires
             </h4>

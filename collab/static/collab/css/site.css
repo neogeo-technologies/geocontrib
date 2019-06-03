@@ -115,6 +115,12 @@ footer{
   float:right;
 }
 
+#addcomment{
+  margin: 10px 0px 10px 0px;
+}
+#addattachment{
+  margin: 10px 0px 10px 0px;
+}
 .comment_title{
   color:gray;
 }
@@ -141,4 +147,37 @@ footer{
 
 .textarea {
     white-space: pre-wrap;
+}
+
+/* atatchment */
+.drop-area {
+  width: auto;
+  height: auto;
+  background: #f5f5f5;
+  border: 2px dashed #cccccc;
+  border-radius: 5px;
+  text-align: center;
+  padding: 1.5em;
+  margin-bottom: 10px;
+}
+
+.drop-area label {
+  cursor: pointer !important;
+  color: #106eab !important;
+  font-weight: bold !important;
+}
+.drop-area label:hover {
+  color: #0c5584 !important;
+}
+
+.drop-area .input-file {
+  display: none;
+}
+
+.drop-area .attachment_filename {
+  margin: 20px 15px 0px 15px;
+  padding-top: 20px;
+  border-top: 1px solid #ffffff;
+  font-style: italic;
+  font-size: 12px;
 }

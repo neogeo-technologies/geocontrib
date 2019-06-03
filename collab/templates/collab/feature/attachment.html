@@ -1,0 +1,87 @@
+<div class="ui small modal attachment">
+    <i class="close icon"></i>
+    <div class="header">
+        Ajouter une pièce jointe
+    </div>
+
+    <div class="content">
+
+        <form action="{% url 'project_add_attachment' project_slug=project.slug feature_type=request.resolver_match.kwargs.feature_type  feature_pk=request.resolver_match.kwargs.feature_pk%}" enctype="multipart/form-data" class="ui form attachment_form" method="POST">
+        {% csrf_token %}
+            <div class="ui error message"></div>
+            <div class="required field">
+                <label>Titre</label>
+                <input type="text" name='title' />
+            </div>
+            <div ondrop="drop(event)" class="drop-area field" ondragover="allowDrop(event)">
+                  <label for="add_file">Choisir un document </label><br>
+                  <input class="input-file" type="file" id="add_file" name="file" accept=".pdf">
+                  ou<br>
+                  le glisser ici
+                  <div class="attachment_filename">
+                    Aucun document sélectionné
+                  </div>
+            </div>
+            <div class="field">
+                <label>Information additonelle</label>
+                <textarea name="info"></textarea>
+            </div>
+            <div class="actions">
+                <div class="ui cancel button">Annuler</div>
+                <button class="ui button green" id="submit_attachment" type="submit">Ajouter</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+  var current_file_upload;
+    $(".input-file").on("change", function (e) {
+      var input_file = document.querySelector('.drop-area .input-file');
+      current_file_upload = input_file.files[0];
+      $(".drop-area .attachment_filename").html(input_file.files[0].name);
+    });
+  function allowDrop(event) {
+    event.preventDefault();
+  }
+  function drop(event) {
+    event.preventDefault();
+    var dropped_file = event.dataTransfer.files[0];
+    $(".drop-area .attachment_filename").html(dropped_file.name);
+    current_file_upload = dropped_file;
+  }
+
+	$("#addattachment").click(function(){
+		$(".attachment").modal('show');
+	});
+	$(".attachment").modal({
+		closable: true
+	});
+  $("#submit_attachment").on("click", function () {
+      var formData = new FormData();
+      formData.append("document", current_file_upload);
+  });
+  $('.attachment_form')
+    .form({
+      fields: {
+        title     :  {
+          identifier: 'title',
+          rules: [
+            {
+              type   : 'empty',
+              prompt : 'Veuillez entrer un titre'
+            }
+          ]
+        },
+        // file     :  {
+        //   identifier: 'file',
+        //   rules: [
+        //     {
+        //       type   : 'empty',
+        //       prompt : 'Veuillez fournir un document'
+        //     }
+        //   ]
+        // }
+      }
+    })
+  ;
+</script>

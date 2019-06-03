@@ -1,7 +1,7 @@
 from django.db import models
 from collab.models.comment import Comment
+from collab.models.customuser import CustomUser
 from collab.models.project import Project
-
 
 class Attachment(models.Model):
 
@@ -26,9 +26,13 @@ class Attachment(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
     info = models.TextField('Info', blank=True)
+    author = models.ForeignKey(CustomUser, verbose_name="Auteur",
+                               on_delete=models.PROTECT,
+                               help_text="Auteur du commentaire")
 
     def __str__(self):
-        return self.titre
+        if self.title:
+            return self.title
 
     class Meta:
         verbose_name = "Pièce Jointe"

@@ -7,9 +7,9 @@
                         <strong>{{val.author__first_name|title}}{{val.author__last_name|title}} <strong>
                             Le {{val.creation_date|date:"d/m/Y"}}
                     </span>
-                {% if rights.feat_creation and forloop.first %}
+                <!-- {% if rights.feat_creation and forloop.first %}
                     <i id="addcomment" class=" big green plus square icon"></i>
-                {% endif %}
+                {% endif %} -->
                 </th></tr>
             </thead>
             <tbody>
@@ -19,12 +19,6 @@
             </tbody>
       </table>
     {% endfor %}
-{% else %}
-    <br>
-    {% if rights.feat_creation %}
-        <i id="addcomment" class=" big green plus square icon"> </i>
-        <strong>Ajouter un commentaire</strong>
-    {% endif %}
 {% endif %}
 
 <div class="ui small modal comment">

@@ -1,5 +1,5 @@
-
-<form id="modify_feature" class='ui equal width form modify_feature' method="POST" >
+{% if edit %}
+  <form id="modify_feature" class='ui equal width form modify_feature' method="POST" >
     {% csrf_token %}
     <div class="ui error message"></div>
     <button id="btn_feature_save" type="submit" class="green ui compact icon button">
@@ -76,7 +76,7 @@
        <input type="text"  value="{{utilisateur}}"  readonly />
    </div>
 </form>
-
+{% endif %}
 <script>
     // modify feature
 

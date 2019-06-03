@@ -2,6 +2,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm
 from django.contrib import admin
 from django.apps import apps
+from collab.models import Attachment
 from collab.models import Autorisation
 from collab.models import CustomUser
 from collab.models import Comment
@@ -16,6 +17,13 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ('project', 'author', 'creation_date')
     empty_value_display = '-aucun-'
 admin.site.register(Comment, CommentAdmin)
+
+
+class AttachmentAdmin(admin.ModelAdmin):
+    readonly_fields = ('feature_id','comment')
+    list_display = ('title', 'project', 'author')
+    empty_value_display = '-aucun-'
+admin.site.register(Attachment, AttachmentAdmin)
 
 class ProjectAdmin(admin.ModelAdmin):
     readonly_fields = ('slug', 'features_info')

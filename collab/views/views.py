@@ -318,7 +318,6 @@ def my_account(request):
         rights = {}
         project_info = {}
 
-        # open project (can be visualize by anonymous or connected user)
         project_list = models.Project.objects.all()
         for elt in project_list:
             if request.user.is_authenticated:
