@@ -12,6 +12,7 @@ class Comment(models.Model):
                                help_text="Auteur du commentaire")
     feature_id = models.UUIDField("Identifiant du signalement",
                                   editable=False, max_length=32)
+    feature_slug = models.SlugField('Feature slug', max_length=128)
     comment = models.TextField('Commentaire', blank=True)
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)

@@ -71,7 +71,7 @@ def project_features_types(app_name, project_slug):
         @return JSON
     """
     feature_type_table_prefix = get_feature_type_table_prefix(app_name, project_slug)
-    sql = """ SELECT table_name
+    sql = """ SELECT  table_name
             FROM information_schema.tables
             WHERE table_type='BASE TABLE'
             AND table_schema='public' AND table_name LIKE '{feature_type_table_prefix}%';

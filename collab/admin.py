@@ -4,15 +4,21 @@ from django.contrib import admin
 from django.apps import apps
 from collab.models import Autorisation
 from collab.models import CustomUser
+from collab.models import Comment
 from collab.models import Project
 # from collab.models import Status
 from collab.models import Subscription
 
 app = apps.get_app_config('collab')
 
+class CommentAdmin(admin.ModelAdmin):
+    readonly_fields = ('feature_slug',)
+    list_display = ('project', 'author', 'creation_date')
+    empty_value_display = '-aucun-'
+admin.site.register(Comment, CommentAdmin)
 
 class ProjectAdmin(admin.ModelAdmin):
-    readonly_fields = ('slug',)
+    readonly_fields = ('slug', 'features_info')
     list_display = ('title', 'thumbLink', 'moderation')
     empty_value_display = '-aucun-'
 admin.site.register(Project, ProjectAdmin)

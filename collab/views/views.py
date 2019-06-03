@@ -7,6 +7,12 @@ from collab.db_utils import commit_data
 from collab.db_utils import create_feature_sql
 from collab.db_utils import edit_feature_sql
 from collab.forms import ProjectForm
+
+from collab.views.user_services import get_last_user_comments
+from collab.views.user_services import get_last_user_feature
+from collab.views.user_services import get_last_user_registered
+from collab.views.user_services import get_user_feature
+
 from collab.views.project_services import generate_feature_id
 from collab.views.project_services import get_feature
 from collab.views.project_services import get_feature_detail
@@ -14,8 +20,6 @@ from collab.views.project_services import get_feature_pk
 from collab.views.project_services import get_feature_uuid
 from collab.views.project_services import get_last_features
 from collab.views.project_services import get_project_features
-# from collab.views.project_services import get_project_feature_geom_type
-from collab.views.project_services import last_user_registered
 from collab.views.project_services import project_feature_type_fields
 from collab.views.project_services import project_feature_number
 from collab.views.project_services import project_features_types
@@ -356,8 +360,30 @@ def my_account(request):
             project_info[project.slug].update({'nb_features': nb_features,
                                                'nb_contributors': nb_contributors,
                                                'nb_comments': nb_comments})
+        # get 3 last user comments
+        last_comment = get_last_user_comments(request.user, 3)
+        # get feature pk
+        feature_pk = {}
+        for elt in last_comment:
+            table_name = """{app_name}_{project_slug}_{feature_type}""".format(
+                            app_name=APP_NAME,
+                            project_slug=elt.project.slug,
+                            feature_type=elt.feature_slug)
+            feature_pk[elt.feature_id] = get_feature_pk(table_name, elt.feature_id)
+        # get 3 last user feature
+        tables_names = get_user_feature(APP_NAME, request.user)
+        features = []
+        for elt in tables_names:
+            data = get_last_user_feature(request.user, APP_NAME,
+                                         elt['project'], elt['feature_type'])
+            if data:
+                features.append(data)
+        features.sort(key=lambda item: item['modification_date'], reverse=True)
+        if len(features) > 3:
+            features = features[0:3]
         context = {"project_list": project_list, "user": user,
-                   "project_info": project_info}
+                   "feature_pk": feature_pk, "project_info": project_info,
+                   "last_comment": last_comment, "features": features}
         return render(request, 'collab/my_account.html', context)
     else:
         context = {"error": "Vous n'avez pas les droits nécessaires pour acceder à cette page"}
@@ -476,6 +502,7 @@ class ProjectFeature(View):
             # create comment
             obj = models.Comment.objects.create(author=request.user,
                                                 feature_id=feature_id,
+                                                feature_slug=feature_type,
                                                 comment=comment, project=project)
         # recuperation des champs descriptifs
         if creation == True:
@@ -503,7 +530,7 @@ def project(request, project_slug):
     else:
         rights = get_anonymous_rights(project)
     # recuperation des derniers utilisateurs
-    users = last_user_registered(project_slug)
+    users = get_last_user_registered(project_slug)
     # recuperation du nombre de contributeur
     nb_contributors = models.Autorisation.objects.filter(
                       project__slug=project_slug,
@@ -630,6 +657,7 @@ class ProjectComments(View):
         # create comment
         obj = models.Comment.objects.create(author=request.user,
                                             feature_id=feature['feature_id'],
+                                            feature_slug=feature_type,
                                             comment=comment,
                                             project=project)
 
@@ -688,7 +716,7 @@ class ProjectFeatureDetail(View):
             # type de géometrie
             context['geom_type'] = project.get_geom(feature_type)
             return render(request, 'collab/feature/edit_feature.html', context)
-        
+
 
     def post(self, request, project_slug, feature_type, feature_pk):
         """

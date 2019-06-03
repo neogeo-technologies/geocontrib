@@ -183,46 +183,16 @@
                 Mes derniers signalements
             </h4>
             <div class="ui list">
-                <div class="item">
-                    <i class="map marker icon"></i>
-                    <div class="content">
-                        <a class="header">Projet - Titre du signalement</a>
-                        <div class="description">Début de la description</div>
-                        <div class="description">Date de dernière modification&nbsp;: 12/03/2019 - 13:18 [Création]</div>
+                {% for elt in features %}
+                    <div class="item">
+                        <i class="map marker icon"></i>
+                        <div class="content">
+                            <a  href="{% url 'project_feature_detail' project_slug=elt.project feature_type=elt.feature_type  feature_pk=elt.id %}" class="header">{{elt.project}} - {{elt.title}}</a>
+                            <div class="description">{{elt.description|slice:":150"}}</div>
+                            <div class="description">Date de dernière modification&nbsp;: {{elt.modification_date}}</div>
+                        </div>
                     </div>
-                </div>
-                <div class="item">
-                    <i class="map marker icon"></i>
-                    <div class="content">
-                        <a class="header">Projet - Titre du signalement</a>
-                        <div class="description">Début de la description</div>
-                        <div class="description">Date de dernière modification&nbsp;: 12/03/2019 - 12:05 [Changement de statut]</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <i class="map marker  icon"></i>
-                    <div class="content">
-                        <a class="header">Projet - Titre du signalement</a>
-                        <div class="description">Début de la description</div>
-                        <div class="description">Date de dernière modification&nbsp;: 10/03/2019 - 9:25 [Modification de la localisation]</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <i class="map marker icon"></i>
-                    <div class="content">
-                        <a class="header">Projet - Titre du signalement</a>
-                        <div class="description">Début de la description</div>
-                        <div class="description">Date de dernière modification&nbsp;: 11/03/2019 - 11:52 [Modification d'un attribut]</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <i class="map marker  icon"></i>
-                    <div class="content">
-                        <a class="header">Projet - Titre du signalement</a>
-                        <div class="description">Début de la description</div>
-                        <div class="description">Date de dernière modification&nbsp;: 09/03/2019 - 17:25 [Supression]</div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
 
             <h4 id="mes_derniers_commentaires" class="ui horizontal divider header">
@@ -230,46 +200,16 @@
                 Mes derniers commentaires
             </h4>
             <div class="ui list">
-                <div class="item">
-                    <i class="comment icon"></i>
-                    <div class="content">
-                        <a class="header">Projet - Titre du signalement</a>
-                        <div class="description">Début du commentaire</div>
-                        <div class="description">Date du commentaire&nbsp;: 12/03/2019 - 13:18</div>
+                {% for elt in last_comment %}
+                    <div class="item">
+                        <i class="comment icon"></i>
+                        <div class="content">
+                            <a   href="{% url 'project_feature_detail' project_slug=elt.project.slug feature_type=elt.feature_slug  feature_pk=feature_pk|get_dict_item:elt.feature_id %}" > {{elt.project.title}} - {{elt.feature_slug}}</a>
+                            <div class="description">{{elt.comment|slice:":150"}}</div>
+                            <div class="description">Date du commentaire&nbsp;: {{elt.creation_date}}</div>
+                        </div>
                     </div>
-                </div>
-                <div class="item">
-                    <i class="comment icon"></i>
-                    <div class="content">
-                        <a class="header">Projet - Titre du signalement</a>
-                        <div class="description">Début du commentaire</div>
-                        <div class="description">Date du commentaire&nbsp;: 12/03/2019 - 12:05</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <i class="comment icon"></i>
-                    <div class="content">
-                        <a class="header">Projet - Titre du signalement</a>
-                        <div class="description">Début du commentaire</div>
-                        <div class="description">Date du commentaire&nbsp;: 10/03/2019 - 9:25</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <i class="comment icon"></i>
-                    <div class="content">
-                        <a class="header">Projet - Titre du signalement</a>
-                        <div class="description">Début du commentaire</div>
-                        <div class="description">Date du commentaire&nbsp;: 11/03/2019 - 11:52</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <i class="comment icon"></i>
-                    <div class="content">
-                        <a class="header">Projet - Titre du signalement</a>
-                        <div class="description">Début du commentaire</div>
-                        <div class="description">Date du commentaire&nbsp;: 09/03/2019 - 17:25</div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
 
         </div>

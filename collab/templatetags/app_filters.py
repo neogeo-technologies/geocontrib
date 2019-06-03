@@ -14,7 +14,10 @@ def display_key(key):
 @register.filter
 def get_dict_item(dictionary, key):
     if dictionary.get(key, ' '):
-        return dictionary.get(key, ' ').capitalize()
+        if str(dictionary.get(key, ' ')).isdigit():
+            return dictionary.get(key, ' ')
+        else:
+            return dictionary.get(key, ' ').capitalize()
     else:
         return ''
 
