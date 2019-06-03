@@ -83,18 +83,18 @@ class Autorisation(models.Model):
     LEVEL = (
         # ('0', 'Utilisateur anonyme'),
         ('1', 'Utilisateur connecté'),
-        ('2', "Contribution"),
-        ('3', 'Modération'),
-        ('4', "Administration"),
+        ('2', "Contributeur"),
+        ('3', 'Modérateur'),
+        ('4', "Administrateur"),
     )
     level = models.CharField("Niveau d'autorisation",
                              choices=LEVEL,
                              max_length=1)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    creation_date = models.DateTimeField("Date de création de l'Abonnement",
+    creation_date = models.DateTimeField("Date de création de l'abonnement",
                                          auto_now_add=True)
-    modification_date = models.DateTimeField("Date de modifictaion de l'Abonnement",
+    modification_date = models.DateTimeField("Date de modification de l'abonnement",
                                          auto_now=True)
 
     class Meta:
