@@ -12,9 +12,9 @@
      <div class="four wide column">
         <div class="ui card">
             <div class="image">
-              {% if 'pdf' in attachment.file.url %}
+              {% if 'pdf' in attachment.file.url and attachment.file %}
                 <img alt='pdf' src="{% static 'collab/img/pdf.png' %}" >
-              {% else %}
+              {% elif attachment.file%}
                 <img alt='image'  src="{{attachment.file.url}}" >
               {%endif %}
             </div>
