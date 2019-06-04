@@ -15,7 +15,7 @@ class Event(models.Model):
     )
     creation_date = models.DateTimeField("Date de l'évènement",
                                          auto_now_add=True)
-    user = models.ForeignKey(CustomUser, verbose_name="utilisateur",
+    user = models.ForeignKey(CustomUser, verbose_name="Utilisateur",
                              on_delete=models.CASCADE)
     feature_id = models.UUIDField("Identifiant du signalement",
                                   editable=False, max_length=32)

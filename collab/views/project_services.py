@@ -207,11 +207,11 @@ def get_feature_detail(app_name, project_slug, feature_type, feature_pk):
         feature['status'] = STATUS[int(feature['status'])][1]
     if feature.get('user_id', ''):
         try:
-            utilisateur = models.CustomUser.objects.get(
+            user = models.CustomUser.objects.get(
                                      id=feature['user_id'])
         except Exception as e:
-            utilisateur = 'Anonyme'
-    return project, feature, utilisateur
+            user = 'Anonyme'
+    return project, feature, user
 
 
 def get_feature_pk(table_name, feature_id):

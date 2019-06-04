@@ -626,12 +626,12 @@ def project_feature_list(request, project_slug):
             if elt.get('status', ''):
                 elt['status'] = STATUS[int(elt['status'])][1]
             if elt.get('user_id', ''):
-                elt['utilisateur'] = elt.pop('user_id', None)
+                elt['author'] = elt.pop('user_id', None)
                 try:
-                    elt['utilisateur'] = models.CustomUser.objects.get(
-                                         id=elt['utilisateur'])
+                    elt['author'] = models.CustomUser.objects.get(
+                                         id=elt['author'])
                 except Exception as e:
-                    elt['utilisateur'] = 'Anonyme'
+                    elt['author'] = 'Anonyme'
 
     context = {'rights': rights, 'project': project, 'feature_list': feature_list}
 
@@ -647,7 +647,7 @@ class ProjectComments(View):
             @return JSON
         """
         comment = request.POST.get('comment', '')
-        project, feature, utilisateur = get_feature_detail(APP_NAME, project_slug,
+        project, feature, user = get_feature_detail(APP_NAME, project_slug,
                                                            feature_type, feature_pk)
         # create comment
         obj = models.Comment.objects.create(author=request.user,
@@ -668,7 +668,7 @@ class ProjectFeatureDetail(View):
             @param
             @return JSON
         """
-        project, feature, utilisateur = get_feature_detail(APP_NAME, project_slug, feature_type, feature_pk)
+        project, feature, user = get_feature_detail(APP_NAME, project_slug, feature_type, feature_pk)
         labels = project.get_labels(feature_type)
         # get user right on project
         if request.user.is_authenticated:
@@ -682,7 +682,7 @@ class ProjectFeatureDetail(View):
                                                 'author__first_name',
                                                 'author__last_name',
                                                 'creation_date'))
-        context = {'rights': rights, 'project': project, 'utilisateur': utilisateur,
+        context = {'rights': rights, 'project': project, 'author': user,
                    'comments': comments, 'labels': labels}
         # A AMELIORER
         if request.session.get('error', '') or not request.is_ajax():
