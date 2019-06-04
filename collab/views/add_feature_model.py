@@ -124,7 +124,7 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
               "modification_date": "Date de la dernière mise à jour",
               "title": "Titre",
               "description": "Description",
-              "geom": "Geométrie",
+              "geom": "Géométrie",
               "status": "Statut des signalements",
               "archive_date": "Date d'archivage automatique",
               "deletion_date": "Date de suppression automatique"}
