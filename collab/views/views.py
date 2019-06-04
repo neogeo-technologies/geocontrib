@@ -237,11 +237,6 @@ class ProjectAdminView(View):
         """
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
-        # get user right on project
-        if request.user.is_authenticated:
-            rights = request.user.project_right(project)
-        else:
-            rights = get_anonymous_rights(project)
         # update forms fields
         form_data = request.POST.dict()
         form_data.pop('csrfmiddlewaretoken', None)
@@ -267,16 +262,7 @@ class ProjectAdminView(View):
                 setattr(project, key, value)
             project.save()
         project.save()
-        # display detail of project
-        data, labels = get_project_fields(project_slug)
-        context = {
-            "project": project,
-            "data": OrderedDict(sorted(data[0].items())),
-            "rights": rights,
-            "labels": labels
-        }
-
-        return render(request, 'collab/project/project_detail.html', context)
+        return redirect('project', project_slug=project_slug)
 
 
 class ProjectView(FormView):
@@ -402,7 +388,6 @@ class ProjectFeature(View):
         @return JSON
     """
     def get(self, request, project_slug):
-
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
         # get user right on project
@@ -413,7 +398,8 @@ class ProjectFeature(View):
         # type of features
         features_types = project_features_types(APP_NAME, project_slug)
         if not features_types:
-            context = {"message": "Veuillez créer un type de signalement pour ce projet",
+            context = {"error": "Veuillez créer un type de signalement pour ce projet",
+                       "project":project,
                        "rights": rights}
             return render(request, 'collab/feature/add_feature.html', context)
         # type of features's fields
@@ -508,8 +494,9 @@ class ProjectFeature(View):
             msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
             logger = logging.getLogger(__name__)
             logger.exception(msg)
-            context = {"rights": rights, 'message': msg,'creation': creation}
-            return JsonResponse(context)
+            request.session['error'] = msg
+            return redirect('project_add_feature', project_slug=project_slug)
+
 
 
 def project(request, project_slug):
@@ -762,6 +749,7 @@ class ProjectFeatureDetail(View):
             msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
             logger = logging.getLogger(__name__)
             logger.exception(creation)
+            request.session['error'] = msg
             return redirect('project_feature_detail', project_slug=project_slug,
                             feature_type=feature_type, feature_pk=feature_pk)
 

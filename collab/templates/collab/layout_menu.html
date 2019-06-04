@@ -83,7 +83,7 @@
                                 <a class="item isDisabled" href="#" >
                               {% endif %}
                               <i class="icon plus"></i>Ajout d'un signalement </a>
-                               {% if rights.model_creation or user.is_superuser %}
+                               {% if rights.model_creation and project or user.is_superuser and project %}
                                   <a class="item" href="{% url 'add_feature_model'  project_slug=project.slug  %}">
                                   <i class="icon plus"></i>Créer un nouveau type de signalement</a>
                                {% endif %}
@@ -100,18 +100,17 @@
                                   <i class="icon download"></i>Télécharger...</a>
                           </div>
                       </div>
-                      {% if request.user.is_superuser or rights.proj_modification %}
+                      {% if request.user.is_superuser or rights.proj_consultation %}
                           <div class="item">
                               <div class="header">Projet</div>
                               <div class="menu">
-                                  <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation</a>
-                                  {% if project and rights.proj_modification %}
-                                        <a class="item" href="{% url 'admin_project'  project_slug=project.slug  %}">
-                                        <i class="icon wrench "></i>Administrer le projet</a>
+                                  {% if project %}
+                                    <a class="item" href="{% url 'project' project_slug=project.slug   %}">
                                   {% else %}
-                                        <a class="item isDisabled " href="#">
-                                        <i class="icon wrench "></i>Administrer le projet</a>
+                                    <a class="item" href="#">
                                   {% endif %}
+                                  <i class="icon home"></i>Page d'accueil du projet</a>
+                                  <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation</a>
                                   {% if request.user.is_superuser  %}
                                       <a class="item" href="{% url 'create_project'  %}">
                                       <i class="icon plus"></i>Créer un nouveau projet</a>

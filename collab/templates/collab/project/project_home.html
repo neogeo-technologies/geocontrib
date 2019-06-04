@@ -4,108 +4,153 @@
 {{ title }}
 {% endblock %}
 {% block content %}
+
     {% if rights.proj_consultation %}
         <div class="project_header">
           <h2 class="ui header">{{project.title|title }}</h2>
         </div>
-        <p>{{project.description}}</p>
-
-        <table class="ui very basic table">
-            <tbody>
-              <tr>
-                  <td>Date de création du projet</td>
-                  <td><strong>{{project.creation_date|date:'d/m/Y'}}</strong></td>
-              </tr>
-              <tr>
-                  <td>Niveau de droit requis</td>
-                  <td><strong>{{project.get_visi_feature_display}}</strong></td>
-              </tr>
-              <tr>
-                  <td>Nombre de contributeurs</td>
-                  <td><strong>{{nb_contributors}}</strong></td>
-              </tr>
-              <tr>
-                  <td>Nombre de signalements</td>
-                  <td><strong>{{nb_features}}</strong></td>
-              </tr>
-              <tr>
-                  <td>Nombre de commentaires</td>
-                  <td><strong>{{nb_comments}}</strong></td>
-              </tr>
-              <tr>
-                  <td>Modération activée&nbsp;?</td>
-                  <td>{% if project.moderation %}<strong>Oui</strong>{% else %}<strong>Non</strong>{% endif %}</td>
-              </tr>
-            </tbody>
-        </table>
-        <br>
-        <h3 class="ui header">Derniers utilisateurs inscrits</h3>
-            {% if  users %}
-              <table class="ui very basic table">
-                  {% for elt in users %}
-                      <tr>
-                          <td> <i class="user icon"></i>{{elt.user__last_name|title}} {{elt.user__first_name|title}}</td>
-                      </tr>
-                  {% endfor %}
-              </table>
-            {% else %}
-                Aucun utilisateur n'est inscrit à de projet
+        <div id='detail'>
+            {% if project and rights.proj_modification %}
+                <i id="btn_project_edit" class="orange big edit icon "></i>
             {% endif %}
-        <br>
-        <h3 class="ui header">Derniers signalements</h3>
-          {% if  last_features %}
-           <table class="ui very basic table">
-               {% for key,val in last_features.items %}
-                    <tr><td>
-                        <img class="ui avatar image" src="{{project.illustration.url}}"><strong>{{key|title}}</strong></td>
-                        <td>
-                            {% if val %}
-                                <div class="ui list">
-                                    {% for elt in val %}
-                                        <div class="content">
-                                             <a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=elt.pk  %}" class="header">{{elt.titre|title}}</a>
-                                             <div class="description">Créé par {{elt.last_name|title}} {{elt.first_name|title}} le {{elt.creation_date|date:"d/m/Y"}}</div>
-                                         </div>
-                                         <br>
-                                    {% endfor %}
-                                 </div>
-                            {% else %}
-                                 <div class="description"><span>Aucun signalement de ce type n'a été créé</span></div>
-                                 <br>
-                            {% endif %}
-                        </td>
-                     </td></tr>
-               {% endfor %}
-           </table>
-          {% else%}
-                Aucun signalement n'est disponible
-          {% endif %}
-        <br>
-        <h3 class="ui header">Derniers commentaires</h3>
-         {% if comments %}
-            <div class="ui bulleted list">
-                  {% for elt in comments %}
-                      <table class="ui celled table">
-                        <thead>
-                          <tr><th>
-                                  <span class="comment_title"> <strong>{{elt.author__first_name|title}}
-                                                      {{elt.author__last_name|title}} <strong>
-                                                       Le {{elt.creation_date|date:"d M Y"}}</span>
-                          </th></tr>
-                        </thead>
-                        <tbody>
+            <table class="ui very basic table">
+                <tbody>
+                  <tr>
+                      <td>Date de création du projet</td>
+                      <td><strong>{{project.creation_date|date:'d/m/Y'}}</strong></td>
+                  </tr>
+                  <tr>
+                      <td>Délai avant archivage (nb jours)</td>
+                      <td><strong>{{project.archive_feature|get_timestamp}}</strong></td>
+                  </tr>
+                  <tr>
+                      <td>Délai avant suppression (nb jours)</td>
+                      <td><strong>{{project.delete_feature|get_timestamp}}</strong></td>
+                  </tr>
+                  <tr>
+                      <td>Description</td>
+                      <td><strong>{{project.description}}</strong></td>
+                  </tr>
+                  <tr>
+                      <td>Visibilité des signalements publiés</td>
+                      <td><strong>{{project.visi_feature}}</strong></td>
+                  </tr>
+                  <tr>
+                      <td>Visibilité des signalements archivés</td>
+                      <td><strong>{{project.visi_archive}}</strong></td>
+                  </tr>
+                  <tr>
+                      <td>Modération activée&nbsp;?</td>
+                      <td>{% if project.moderation %}<strong>Oui</strong>{% else %}<strong>Non</strong>{% endif %}</td>
+                  </tr>
+                  <tr>
+                      <td>Nombre de signalements</td>
+                      <td><strong>{{nb_features}}</strong></td>
+                  </tr>
+                  <tr>
+                      <td>Nombre de commentaires</td>
+                      <td><strong>{{nb_comments}}</strong></td>
+                  </tr>
+                </tbody>
+            </table>
+            <br>
+            <h3 class="ui header">Derniers utilisateurs inscrits</h3>
+                {% if  users %}
+                  <table class="ui very basic table">
+                      {% for elt in users %}
                           <tr>
-                            <td data-label="">{{elt.comment}}</td>
+                              <td> <i class="user icon"></i>{{elt.user__last_name|title}} {{elt.user__first_name|title}}</td>
                           </tr>
-                        </tbody>
-                     </table>
-                  {% endfor %}
-            </div>
-        {% else %}
-            <span>Aucun commentaire n'a été ajouté</span>
-        {% endif %}
+                      {% endfor %}
+                  </table>
+                {% else %}
+                    Aucun utilisateur n'est inscrit à de projet
+                {% endif %}
+            <br>
+            <h3 class="ui header">Derniers signalements</h3>
+              {% if  last_features %}
+               <table class="ui very basic table">
+                   {% for key,val in last_features.items %}
+                        <tr><td>
+                            <img class="ui avatar image" src="{{project.illustration.url}}"><strong>{{key|title}}</strong></td>
+                            <td>
+                                {% if val %}
+                                    <div class="ui list">
+                                        {% for elt in val %}
+                                            <div class="content">
+                                                 <a href="{% url 'project_feature_detail' project_slug=project.slug feature_type=key feature_pk=elt.pk  %}" class="header">{{elt.titre|title}}</a>
+                                                 <div class="description">Créé par {{elt.last_name|title}} {{elt.first_name|title}} le {{elt.creation_date|date:"d/m/Y"}}</div>
+                                             </div>
+                                             <br>
+                                        {% endfor %}
+                                     </div>
+                                {% else %}
+                                     <div class="description"><span>Aucun signalement de ce type n'a été créé</span></div>
+                                     <br>
+                                {% endif %}
+                            </td>
+                         </td></tr>
+                   {% endfor %}
+               </table>
+              {% else%}
+                    Aucun signalement n'est disponible
+              {% endif %}
+            <br>
+            <h3 class="ui header">Derniers commentaires</h3>
+             {% if comments %}
+                <div class="ui bulleted list">
+                      {% for elt in comments %}
+                          <table class="ui celled table">
+                            <thead>
+                              <tr><th>
+                                      <span class="comment_title"> <strong>{{elt.author__first_name|title}}
+                                                          {{elt.author__last_name|title}} <strong>
+                                                           Le {{elt.creation_date|date:"d M Y"}}</span>
+                              </th></tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td data-label="">{{elt.comment}}</td>
+                              </tr>
+                            </tbody>
+                         </table>
+                      {% endfor %}
+                </div>
+            {% else %}
+                <span>Aucun commentaire n'a été ajouté</span>
+            {% endif %}
+        </div>
+        <div id="project_form">
+            {% if edit %}
+                {% include 'collab/project/project_form.html' %}
+            {% endif %}
+        </div>
     {% else %}
             <i class='icon exclamation triangle'></i>
             <span>Vous ne disposez pas des droits nécessaires.</span>
     {% endif %}
+
+<script>
+    // modify type of cursor
+    var element = document.getElementById("btn_project_edit");
+    element.style.cursor = "pointer";
+    var project_slug ="{{project.slug}}"
+    $("#btn_project_edit").on('click', function(e) {
+        url =  "/admin_projet/"+ project_slug + "/"
+        console.log(url)
+        $.ajax({
+          url: url,
+          type: 'GET',
+          success: function (data) {
+              $('#detail').html("");
+              $('#project_form').html(data);
+          },
+          error: function(err) {
+            console.log('Error occured', err);
+          }
+        });
+
+    });
+
+</script >
 {% endblock %}
