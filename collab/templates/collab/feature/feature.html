@@ -5,6 +5,7 @@
 {% endblock %}
 {% block content %}
 
+
 {% if rights.feat_consultation %}
     <div class="project_header">
         <h2 class="ui header">{{project.title|title}}</h2>
@@ -29,24 +30,17 @@
     </div>
     <!--  carte -->
     <div id='mapdetail'></div>
-    {% if rights.feat_creation %}
-        <button id="addcomment" role="button" class="ui basic green tiny button">
-          <i class="plus icon"></i>
-            Ajouter un commentaire
-        </button>
-        <button id="addattachment" role="button" class="ui basic green tiny button">
-          <i class="plus icon"></i>
-            Ajouter une piece jointe
-        </button>
-    {% endif %}
-
+    <div class="ui top attached tabular menu" id="feature_menu">
+      <div class="item active" data-tab="comment">Commentaires</div>
+      <div class="item" data-tab="attachment">Pièces Jointes</div>
+    </div>
     <!--  comments -->
-    <div id="comments">
-      {% include 'collab/feature/comments.html' %}
+    <div class="ui bottom attached tab segment active" id="comments" data-tab="comment">
+        {% include 'collab/feature/comments.html' %}
     </div>
     <!--  attachment -->
-    <div id="attachment">
-      {% include 'collab/feature/attachment.html' %}
+    <div class="ui bottom attached tab segment" id="attachments" data-tab="attachment">
+        {% include 'collab/feature/attachment.html' %}
     </div>
 
 {% else %}

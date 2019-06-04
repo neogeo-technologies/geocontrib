@@ -669,10 +669,14 @@ class ProjectFeatureDetail(View):
                                                 'author__first_name',
                                                 'author__last_name',
                                                 'creation_date'))
+        # get feature attachment
+        attachments = list(models.Attachment.objects.filter(project=project,
+                                                feature_id=feature.get('feature_id', '')))
         context = {'rights': rights, 'project': project, 'author': user,
-                   'comments': comments, 'labels': labels}
+                   'comments': comments, 'attachments': attachments,
+                   'labels': labels}
         # A AMELIORER
-        if request.session.get('error', '') or not request.is_ajax():
+        if not request.is_ajax() or request.session.get('error', ''):
             if request.session.get('error', ''):
                 context['error'] = request.session.pop('error', '')
             geom_to_wkt = feature.get('geom', '')

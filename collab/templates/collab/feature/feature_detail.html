@@ -41,7 +41,9 @@
           type: 'GET',
           success: function (data) {
               $('#feature_detail').html("");
-              $('#comments').html("");
+              $('#feature_menu').hide();
+              $('#comments').hide();
+              $('#attachments').hide();
               $('#edit_feature').html(data);
           },
           error: function(err) {

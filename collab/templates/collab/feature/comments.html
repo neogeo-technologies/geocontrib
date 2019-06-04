@@ -1,3 +1,9 @@
+{% if rights.feat_creation %}
+   <button id="addcomment" role="button" class="ui basic green tiny button">
+      <i class="plus icon"></i>
+        Ajouter un commentaire
+    </button>
+{% endif %}
 {% if comments %}
     {% for val in comments %}
       <table class="ui celled table">
@@ -19,6 +25,7 @@
             </tbody>
       </table>
     {% endfor %}
+
 {% endif %}
 
 <div class="ui small modal comment">

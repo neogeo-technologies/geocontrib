@@ -1,8 +1,13 @@
+// tabs
+$('.menu .item')
+  .tab()
+;
+
 // mouse pointer
 // # feature detail
 $( document ).ready(function() {
-  var element = document.getElementById("addcomment");
-  element.style.cursor = "pointer";
+  // var element = document.getElementById("addcomment");
+  // element.style.cursor = "pointer";
 
   if(document.getElementById("mapdetail")){
     let mapdetail = new mapboxgl.Map({

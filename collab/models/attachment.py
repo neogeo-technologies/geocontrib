@@ -9,7 +9,8 @@ class Attachment(models.Model):
         ('0', 'Signalement'),
         ('1', 'Commentaire'),
     )
-
+    creation_date = models.DateTimeField("Date de création de la pièce jointe",
+                                         auto_now_add=True)
     title = models.CharField('Titre', max_length=128)
 
     type_objet = models.CharField("Type d'objet concerné",
