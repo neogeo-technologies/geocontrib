@@ -708,6 +708,7 @@ class ProjectFeatureDetail(View):
                     elif project.moderation == True:
                         data[key]['choices'] = STATUS_MODERE
             context['feature'] = data
+            context['edit'] = True
             # type de géometrie
             context['geom_type'] = project.get_geom(feature_type)
             return render(request, 'collab/feature/edit_feature.html', context)

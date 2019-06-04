@@ -3,6 +3,7 @@ from collab import models as custom
 from collab.choices import GEOM_TYPE
 from collab.choices import STATUS
 from collab.views.project_services import project_features_types
+from collab.views.views import get_anonymous_rights
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.db import connection
@@ -19,31 +20,33 @@ DEFAULT_FIELDS = ['feature_id', 'creation_date', 'modification_date',
                   'archive_date', 'deletion_date', 'user', 'project']
 
 
-def add_feature_model(request):
+def add_feature_model(request, project_slug):
 
+    try:
+        project = custom.Project.objects.get(slug=project_slug)
+    except Exception as e:
+        context = {"error": "Le projest est introuvable"}
+        return render(request, APP_NAME + '/feature/add_feature_model.html',
+                      context=context)
     # get user right on project
     if not request.user.is_authenticated:
-        return render(request, APP_NAME + '/feature/add_feature_model.html')
+        rights = get_anonymous_rights(project)
+        context = {"rights": rights}
+        return render(request, APP_NAME + '/feature/add_feature_model.html',
+                      context=context)
     else:
-        if request.user.is_superuser:
-            projects = custom.Project.objects.all()
-        else:
-            projects = custom.Autorisation.objects.filter(user=request.user,
-                       level='4').values('project__id','project__title')
-
-    if not projects:
-        return render(request, APP_NAME + '/feature/add_feature_model.html')
+        rights = request.user.project_right(project)
 
     if request.method == 'POST':
-        if request.POST.get('project') and request.POST.get('feature') and \
+        if project and request.POST.get('feature') and \
            request.POST.get('geom_type'):
-            message = generate_feature_model(request.POST.get('project'),
+            message = generate_feature_model(project,
                                              request.POST.get('feature'),
                                              request.POST.get('geom_type'),
                                              request.POST.getlist('field_name' , []),
                                              request.POST.getlist('field_type', []),
                                              request.user)
-            context = {'projects': projects}
+            context = {'project': project, 'rights': rights}
             if message.get('error', ''):
                 context['error'] = message.get('error', '')
             if message.get('success', ''):
@@ -51,19 +54,17 @@ def add_feature_model(request):
             return render(request, APP_NAME + '/feature/add_feature_model.html',
                           context=context)
         else:
-            context = {'projects': projects, 'error': "Les paramètres obligatoires sont manquants."}
+            context = {'project': project, 'rights': rights, 'error': "Les paramètres obligatoires sont manquants."}
             return render(request, APP_NAME + '/feature/add_feature_model.html',
                           context=context)
     else:
-        context = {'projects': projects}
+        context = {'project': project, 'rights': rights}
         return render(request, APP_NAME + '/feature/add_feature_model.html',
                       context=context)
 
 
-def generate_feature_model(projet_id, feature, geom_type, names, types, user):
+def generate_feature_model(project, feature, geom_type, names, types, user):
 
-    # Get project
-    projet = custom.Project.objects.get(id=projet_id)
     # check the fields names given by users
     intersection = list(set(names) & set(DEFAULT_FIELDS))
     if intersection:
@@ -73,7 +74,7 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
         return {'error': """Veuillez corriger vos champs. Vous avez entré le même nom de champ plusieurs fois."""}
     # check if this feature name does not exist already
     feature_slug = slugify(feature)
-    project_features = project_features_types(APP_NAME, projet.slug)
+    project_features = project_features_types(APP_NAME, project.slug)
     if feature_slug in project_features:
         return {'error': """Un type de signalement avec ce nom a déjà été créé."""}
     # check title of the feature
@@ -149,7 +150,7 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
             fields[names[elt]] = field_type[elt]
             labels[names[elt]] = names[elt]
     # creation modele
-    model = create_model(projet.slug + '_' + feature_slug, fields,
+    model = create_model(project.slug + '_' + feature_slug, fields,
                          app_label=APP_NAME,
                          module=module,
                          admin_opts={})
@@ -159,21 +160,21 @@ def generate_feature_model(projet_id, feature, geom_type, names, types, user):
             editor.create_model(model)
 
         # ajout du nom de la table
-        table_name = APP_NAME + "_" + projet.slug + '_' + feature_slug
-        if not projet.features_info:
-            projet.features_info = {feature_slug: {'table_name': table_name,
+        table_name = APP_NAME + "_" + project.slug + '_' + feature_slug
+        if not project.features_info:
+            project.features_info = {feature_slug: {'table_name': table_name,
                                               'geom_type': GEOM_TYPE[int(geom_type)][1],
                                               'feature_slug': feature_slug,
                                               'user_id': user.id,
                                               'labels': labels}}
         else:
-            projet.features_info.update({feature_slug: {
+            project.features_info.update({feature_slug: {
                                         'table_name': table_name,
                                         'geom_type': GEOM_TYPE[int(geom_type)][1],
                                         'feature_slug': feature_slug,
                                         'user_id': user.id,
                                         'labels': labels}})
-        projet.save()
+        project.save()
         return {'success': "Le type de signalement a été créé avec succès."}
     except Exception as e:
         msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"

@@ -84,7 +84,7 @@
                               {% endif %}
                               <i class="icon plus"></i>Ajout d'un signalement </a>
                                {% if rights.model_creation or user.is_superuser %}
-                                  <a class="item" href="{% url 'add_feature'  %}">
+                                  <a class="item" href="{% url 'add_feature_model'  project_slug=project.slug  %}">
                                   <i class="icon plus"></i>Créer un nouveau type de signalement</a>
                                {% endif %}
                           </div>

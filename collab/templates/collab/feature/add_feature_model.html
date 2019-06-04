@@ -17,7 +17,7 @@
      </div>
 {% endif %}
 
-{% if projects %}
+{% if project %}
     <div class="ui middle aligned stackable grid container">
 
         <div class="row ">
@@ -26,28 +26,6 @@
         <form class='ui equal width addfeaturemodel form' method="POST">
             {% csrf_token %}
             <div class="ui error message"></div>
-            <div class="required field">
-                <label>Projet Associé </label>
-                <div class="ui selection dropdown feature">
-                    {% if request.user.is_superuser %}
-                        <input type="hidden"  name="project" placeholder="Projet" value="{{projects.0.id}}"  />
-                    {% else %}
-                        <input type="hidden"  name="project" placeholder="Projet" value="{{projects.0.project__id}}"  />
-                    {% endif %}
-                    <i class="dropdown icon"></i>
-                    <div class="default text"></div>
-                     <div class="menu">
-
-                       {% for elt in projects %}
-                          {% if request.user.is_superuser %}
-                              <div class="item" data-value={{elt.id}}>{{elt.title}}</div>
-                          {% else %}
-                              <div class="item" data-value={{elt.project__id}}>{{elt.project__title}}</div>
-                          {% endif %}
-                       {% endfor %}
-                    </div>
-                </div>
-            </div>
             <div class="required field">
                 <label>Nom du nouveau type de signalement</label>
                 <input type="text"  name="feature" placeholder="Nom du signalement" />
