@@ -25,7 +25,8 @@
             <tr>
               <td >
                 <span>Pièce Jointe</span>
-                <div class="ui card">
+                {% if com_att%}
+                  <div class="ui card">
 
                     <div class="image">
                       {% if 'pdf' in com_att.url and com_att.file %}
@@ -44,6 +45,7 @@
                       <i class="user icon"></i> Par {{com_att.author.first_name|title}} {{com_att.author.last_name|title}}
                     </div>
                 </div>
+                {% endif %}
               </td>
             </tr>
             </tbody>
