@@ -190,6 +190,6 @@ footer{
 
 .ui.card>.image>img{
   display: block;
-  width: 100%;
-  height:150px;
+  width: 100px;
+  height:100px;
 }

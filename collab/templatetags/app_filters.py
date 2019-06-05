@@ -28,7 +28,9 @@ def get_item(dictionary, key):
 
 
 @register.simple_tag
-def get_nested_item(dictionary, key, val):
+def get_nested_item(dictionary, key, val=""):
+    if not val:
+        return dictionary.get(key, '')
     data = dictionary.get(key, '')
     return data.get(val, '')
 

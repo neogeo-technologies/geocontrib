@@ -22,10 +22,10 @@ class Attachment(models.Model):
         # validators=[] -> TO DO VALIDER L'extension + Taille du fichier
     )
 
-    feature_id = models.UUIDField("Identifiant du signalement",
+    feature_id = models.UUIDField("Identifiant du signalement", null=True,
                                   editable=False, max_length=32, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True)
     info = models.TextField('Info', blank=True)
     author = models.ForeignKey(CustomUser, verbose_name="Auteur",
                                on_delete=models.PROTECT,

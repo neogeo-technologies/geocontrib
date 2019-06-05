@@ -3,10 +3,10 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from . import views
 from collab.views.attachment import ProjectAttachment
+from collab.views.comment import ProjectComment
 from collab.views.views import LoginView
 from collab.views.views import LogoutView
 from collab.views.views import ProjectAdminView
-from collab.views.views import ProjectComments
 from collab.views.views import ProjectFeature
 from collab.views.views import ProjectFeatureDetail
 from collab.views.views import ProjectView
@@ -28,7 +28,7 @@ urlpatterns = services + [
     path('projet/<slug:project_slug>/', views.project, name='project'),
     path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),
     path('projet/<slug:project_slug>/ajout/', ProjectFeature.as_view(), name='project_add_feature'),
-    path('projet/<slug:project_slug>/<slug:feature_type>/<int:feature_pk>/commentaire', ProjectComments.as_view(),
+    path('projet/<slug:project_slug>/<slug:feature_type>/<int:feature_pk>/commentaire', ProjectComment.as_view(),
          name='project_add_comment'),
     path('projet/<slug:project_slug>/<slug:feature_type>/<int:feature_pk>/attachment', ProjectAttachment.as_view(),
          name='project_add_attachment'),

@@ -1,3 +1,4 @@
+{% load staticfiles %}
 {% if rights.feat_creation %}
    <button id="addcomment" role="button" class="ui basic green tiny button">
       <i class="plus icon"></i>
@@ -13,15 +14,38 @@
                         <strong>{{val.author__first_name|title}}{{val.author__last_name|title}} <strong>
                             Le {{val.creation_date|date:"d/m/Y"}}
                     </span>
-                <!-- {% if rights.feat_creation and forloop.first %}
-                    <i id="addcomment" class=" big green plus square icon"></i>
-                {% endif %} -->
                 </th></tr>
             </thead>
             <tbody>
                 <tr>
                     <td data-label="">{{val.comment}}</td>
                 </tr>
+
+            {% get_nested_item com_attachment val.id  as com_att  %}
+            <tr>
+              <td >
+                <span>Pièce Jointe</span>
+                <div class="ui card">
+
+                    <div class="image">
+                      {% if 'pdf' in com_att.url and com_att.file %}
+                        <img  alt='pdf' src="{% static 'collab/img/pdf.png' %}" >
+                      {% elif com_att.file%}
+                        <img  alt='image'  src="{{com_att.url}}" >
+                      {%endif %}
+                    </div>
+                    <div class="content">
+                      {% if com_att.file %}
+                          <a href="{{com_att.file.url}}" class="header">{{com_att.title}}</a>
+                      {%endif %}
+                    </div>
+                    <div class="extra content">
+                      Ajouter le {{com_att.creation_date|date:"d/m/Y"}} <br>
+                      <i class="user icon"></i> Par {{com_att.author.first_name|title}} {{com_att.author.last_name|title}}
+                    </div>
+                </div>
+              </td>
+            </tr>
             </tbody>
       </table>
     {% endfor %}
@@ -36,29 +60,126 @@
 
     <div class="content">
 
-        <form action="{% url 'project_add_comment' project_slug=project.slug feature_type=request.resolver_match.kwargs.feature_type  feature_pk=request.resolver_match.kwargs.feature_pk%}" class="ui form comment_form" method="POST">
+        <form id="commentform" action="{% url 'project_add_comment' project_slug=project.slug feature_type=request.resolver_match.kwargs.feature_type  feature_pk=request.resolver_match.kwargs.feature_pk%}" class="ui form comment_form" method="POST">
         {% csrf_token %}
+            <div class="ui positive message hidden" id="positive_message">
+              <div class="header">
+                Le commentaire a bien  été ajouté
+              </div>
+            </div>
+            <div class="ui negative message hidden" id="error_comment"></div>
             <div class="ui error message"></div>
             <div class="required field">
                 <textarea name="comment"></textarea>
             </div>
+            <div class="field">
+                <label>Titre de la pièce jointe</label>
+                <input type="text" name='title' id='title'/>
+            </div>
+            <div ondrop="drop(event)" class="drop-area field" ondragover="allowDrop(event)">
+                  <label for="add_file">Choisir un document </label><br>
+                  <input class="input-file" type="file" id="add_file" name="file" >
+                  ou<br>
+                  le glisser ici
+                  <div class="attachment_filename">
+                    Aucun document sélectionné
+                  </div>
+            </div>
+            <div class="field">
+                <label>Information additonelle (pièce jointe)</label>
+                <textarea name="info" id='infotxt'></textarea>
+            </div>
             <div class="actions">
                 <div class="ui cancel button">Annuler</div>
-                <button class="ui button green" type="submit">Ajouter</button>
+                <button class="ui button green" type="submit"  >Ajouter</button>
             </div>
         </form>
     </div>
 </div>
 <script>
 
-  $(function(){
-  	$("#addcomment").click(function(){
-  		$(".comment").modal('show');
-  	});
-  	$(".comment").modal({
-  		closable: true
-  	});
+  var current_attach_file;
+    $(".input-file").on("change", function (e) {
+      var input_file = document.querySelector('.drop-area .input-file');
+      current_attach_file = input_file.files[0];
+      $(".drop-area .attachment_filename").html(input_file.files[0].name);
   });
+
+  function allowDrop(event) {
+    event.preventDefault();
+  }
+
+  function drop(event) {
+    event.preventDefault();
+    var dropped_file = event.dataTransfer.files[0];
+    $(".drop-area .attachment_filename").html(dropped_file.name);
+    current_attach_file = dropped_file;
+  }
+
+  var comment_form = document.getElementById('commentform');
+  function isEmpty(value){
+    return (value == null || value === '');
+  }
+  comment_form.onsubmit = function(event) {
+      event.preventDefault();
+      // check form
+      var title =  $('#title').val();
+      var info =  $("#infotxt").val();
+      if(current_attach_file && title === ""){
+            $('#error_comment').html('<span>Veuillez entrer un titre pour cette piece jointe</span>');
+            $( "#error_comment").show();
+            return false
+      }
+
+      if( (isEmpty(current_attach_file) && title) || (isEmpty(current_attach_file) && info)){
+            $('#error_comment').html('<span>Veuillez fournir une piece jointe</span>');
+            $("#error_comment").show();
+            return false
+      }
+      // verif size and allowed format
+
+      if(current_attach_file){
+        if(current_attach_file.size >20000000) {
+          $('#error_comment').html('<span>Le fichier est trop volumineux, la taille maximale est de 10 Mo.</span>');
+          $( "#error_comment").show();
+          return false
+        }
+        var img_format = "{{img_format}}";
+        img_format = img_format.split(',');
+        if(!img_format.includes(current_attach_file.type )){
+          $('#error_comment').html('<span>Le document doit être au format '+ img_format +' .</span>');
+          $( "#error_comment").show();
+          return false
+        }
+      }
+
+      var formData =new FormData(document.getElementById('commentform'))
+      formData.append("file", current_attach_file);
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", comment_form.action);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          window.location.replace(window.location.href);
+        } else {
+          $( "#error_comment").show();
+        }
+      };
+      xhr.send(formData);
+  }
+  $(".close.icon").click(function(){
+      $('#commentform').form('reset');
+      $( "#positive_message").hide();
+      $( "#error_comment").hide();
+  });
+
+	$("#addcomment").click(function(){
+		$(".comment").modal('show');
+	});
+	$(".comment").modal({
+		closable: true
+	});
+
+
 
   $('.comment_form')
     .form({

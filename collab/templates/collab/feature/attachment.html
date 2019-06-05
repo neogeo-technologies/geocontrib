@@ -5,7 +5,7 @@
         Ajouter une piece jointe
     </button>
 {% endif %}
-{{attachments.file.url}}
+
 {% if attachments %}
   <div class="ui grid">
     {% for attachment in attachments %}
@@ -19,7 +19,9 @@
               {%endif %}
             </div>
             <div class="content">
-              <a href="{{attachment.file.url}}" class="header">{{attachment.title}}</a>
+              {% if attachment.file %}
+                  <a href="{{attachment.file.url}}" class="header">{{attachment.title}}</a>
+              {%endif %}
             </div>
             <div class="extra content">
               Ajouter le {{attachment.creation_date|date:"d/m/Y"}} <br>
@@ -39,12 +41,21 @@
 
     <div class="content">
 
-        <form action="{% url 'project_add_attachment' project_slug=project.slug feature_type=request.resolver_match.kwargs.feature_type  feature_pk=request.resolver_match.kwargs.feature_pk%}" enctype="multipart/form-data" class="ui form attachment_form" method="POST">
-        {% csrf_token %}
+        <form id="add_form" action="{% url 'project_add_attachment' project_slug=project.slug feature_type=request.resolver_match.kwargs.feature_type  feature_pk=request.resolver_match.kwargs.feature_pk%}" enctype="multipart/form-data" class="ui form attachment_form" method="POST">
+            {% csrf_token %}
+            <div class="ui positive message hidden" id="positive_message">
+              <div class="header">
+                La pièce jointe a bien  été ajouté
+              </div>
+            </div>
+            <div class="ui negative message hidden" id="error_message">
+                <div class="header">
+                </div>
+            </div>
             <div class="ui error message"></div>
             <div class="required field">
                 <label>Titre</label>
-                <input type="text" name='title' />
+                <input type="text" name='title' id="title_attachment" />
             </div>
             <div ondrop="drop(event)" class="drop-area field" ondragover="allowDrop(event)">
                   <label for="add_file">Choisir un document </label><br>
@@ -57,7 +68,7 @@
             </div>
             <div class="field">
                 <label>Information additonelle</label>
-                <textarea name="info"></textarea>
+                <textarea name="info" ></textarea>
             </div>
             <div class="actions">
                 <div class="ui cancel button">Annuler</div>
@@ -89,33 +100,54 @@
 	$(".attachment").modal({
 		closable: true
 	});
-  $("#submit_attachment").on("click", function () {
-      var formData = new FormData();
-      formData.append("document", current_file_upload);
-  });
-
-  $('.attachment_form')
-    .form({
-      fields: {
-        title     :  {
-          identifier: 'title',
-          rules: [
-            {
-              type   : 'empty',
-              prompt : 'Veuillez entrer un titre'
-            }
-          ]
-        }
-        // file     :  {
-        //   identifier: 'file',
-        //   rules: [
-        //     {
-        //       type   : 'empty',
-        //       prompt : 'Veuillez fournir un document'
-        //     }
-        //   ]
-        // }
+  var form = document.getElementById('add_form');
+  function isEmpty(value){
+    return (value == null || value === '');
+  }
+  form.onsubmit = function(event) {
+      event.preventDefault();
+      // check form
+      var title_attachment =  $('#title_attachment').val();
+      console.log(title_attachment);
+      if(isEmpty(current_file_upload) ||  title_attachment === ""){
+            $('#error_message').html('<span>Veuillez entrer un titre/pièce jointe</span>');
+            $( "#error_message").show();
+            return false
       }
-    })
+      // verif size and allowed format
+
+      if(current_file_upload){
+        if(current_file_upload.size >20000000) {
+          $('#error_message').html('<span>Le fichier est trop volumineux, la taille maximale est de 10 Mo.</span>');
+          $( "#error_message").show();
+          return false
+        }
+        var img_format = "{{img_format}}";
+        img_format = img_format.split(',');
+        if(!img_format.includes(current_file_upload.type )){
+          $('#error_message').html('<span>Le document doit être au format '+ img_format +' .</span>');
+          $( "#error_message").show();
+          return false
+        }
+      }
+      var formData =new FormData(document.getElementById('add_form'))
+      formData.append("file", current_file_upload);
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", form.action);
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          window.location.replace(window.location.href);
+        } else {
+          $('#error_message').html("<span>Une erreur s'est produite. Veuillez réessayer ultérieurement.</span>");
+          $( "#error_message").show();
+        }
+      };
+      xhr.send(formData);
+  }
+  $(".close.icon").click(function(){
+      $('#add_form').form('reset');
+      $( "#positive_message").hide();
+      $( "#error_message").hide();
+  });
   ;
 </script>

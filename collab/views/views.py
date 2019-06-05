@@ -385,7 +385,7 @@ class ProjectFeature(View):
     """
         Function to add a feature to a project
         @param
-        @return JSON
+        @return Comment
     """
     def get(self, request, project_slug):
         project = get_object_or_404(models.Project,
@@ -625,28 +625,6 @@ def project_feature_list(request, project_slug):
     return render(request, 'collab/feature/feature_list.html', context)
 
 
-class ProjectComments(View):
-
-    def post(self, request, project_slug, feature_type, feature_pk):
-        """
-            Add feature comment
-            @param
-            @return JSON
-        """
-        comment = request.POST.get('comment', '')
-        project, feature, user = get_feature_detail(APP_NAME, project_slug,
-                                                           feature_type, feature_pk)
-        # create comment
-        obj = models.Comment.objects.create(author=request.user,
-                                            feature_id=feature['feature_id'],
-                                            feature_slug=feature_type,
-                                            comment=comment,
-                                            project=project)
-
-        return redirect('project_feature_detail', project_slug=project_slug,
-                        feature_type=feature_type, feature_pk=feature_pk)
-
-
 class ProjectFeatureDetail(View):
 
     def get(self, request, project_slug, feature_type, feature_pk):
@@ -668,13 +646,23 @@ class ProjectFeatureDetail(View):
                                                 ).values('comment',
                                                 'author__first_name',
                                                 'author__last_name',
-                                                'creation_date'))
+                                                'creation_date','id'))
+        com_attachment = {}
+        for com in comments:
+            try:
+                obj_comment = models.Comment.objects.get(id=com.get('id', ''))
+                obj_attachment = models.Attachment.objects.get(comment=obj_comment)
+                com_attachment[com.get('id', '')] = obj_attachment.__dict__
+                com_attachment[com.get('id', '')].update({'url': obj_attachment.file.url})
+            except Exception as e:
+                pass
         # get feature attachment
         attachments = list(models.Attachment.objects.filter(project=project,
                                                 feature_id=feature.get('feature_id', '')))
         context = {'rights': rights, 'project': project, 'author': user,
                    'comments': comments, 'attachments': attachments,
-                   'labels': labels}
+                   'com_attachment': com_attachment,
+                   'labels': labels, 'img_format': settings.IMAGE_FORMAT}
         # A AMELIORER
         if not request.is_ajax() or request.session.get('error', ''):
             if request.session.get('error', ''):

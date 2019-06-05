@@ -1,11 +1,15 @@
 from collab import models
 from collab.views.project_services import get_feature_detail
+from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 
 APP_NAME = __package__.split('.')[0]
 
 
+@method_decorator([csrf_exempt], name='dispatch')
 class ProjectAttachment(View):
 
     def post(self, request, project_slug, feature_type, feature_pk):
@@ -26,5 +30,9 @@ class ProjectAttachment(View):
                                                info=form_data.get('info', ''),
                                                project=project,
                                                file=request.FILES.get('file', ''))
-        return redirect('project_feature_detail', project_slug=project_slug,
-                        feature_type=feature_type, feature_pk=feature_pk)
+
+        context = {'project_slug': project_slug,
+                   'feature_type': feature_type, 'feature_pk': feature_pk}
+        return JsonResponse(context)
+        # return redirect('project_feature_detail', project_slug=project_slug,
+        #                 feature_type=feature_type, feature_pk=feature_pk)
