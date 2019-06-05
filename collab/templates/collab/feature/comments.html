@@ -22,33 +22,35 @@
                 </tr>
 
             {% get_nested_item com_attachment val.id  as com_att  %}
-            <tr>
-              <td >
+
 
                 {% if com_att%}
-                 <span>Pièce Jointe</span>
-                  <div class="ui card">
+                  <tr>
+                    <td>
+                       <span>Pièce Jointe</span>
+                        <div class="ui card">
 
-                    <div class="image">
-                      {% if 'pdf' in com_att.url and com_att.file %}
-                        <img  alt='pdf' src="{% static 'collab/img/pdf.png' %}" >
-                      {% elif com_att.file%}
-                        <img  alt='image'  src="{{com_att.url}}" >
-                      {%endif %}
-                    </div>
-                    <div class="content">
-                      {% if com_att.file %}
-                          <a href="{{com_att.file.url}}" class="header">{{com_att.title}}</a>
-                      {%endif %}
-                    </div>
-                    <div class="extra content">
-                      Ajouter le {{com_att.creation_date|date:"d/m/Y"}} <br>
-                      <i class="user icon"></i> Par {{com_att.author.first_name|title}} {{com_att.author.last_name|title}}
-                    </div>
-                </div>
+                          <div class="image">
+                            {% if 'pdf' in com_att.url and com_att.file %}
+                              <img  alt='pdf' src="{% static 'collab/img/pdf.png' %}" >
+                            {% elif com_att.file%}
+                              <img  alt='image'  src="{{com_att.url}}" >
+                            {%endif %}
+                          </div>
+                          <div class="content">
+                            {% if com_att.file %}
+                                <a href="{{com_att.file.url}}" class="header">{{com_att.title}}</a>
+                            {%endif %}
+                          </div>
+                          <div class="extra content">
+                            Ajouter le {{com_att.creation_date|date:"d/m/Y"}} <br>
+                            <i class="user icon"></i> Par {{com_att.author.first_name|title}} {{com_att.author.last_name|title}}
+                          </div>
+                      </div>
+                    </td>
+                  </tr>
                 {% endif %}
-              </td>
-            </tr>
+
             </tbody>
       </table>
     {% endfor %}
