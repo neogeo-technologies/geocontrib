@@ -45,6 +45,7 @@ def add_feature_model(request, project_slug):
                                              request.POST.get('geom_type'),
                                              request.POST.getlist('field_name' , []),
                                              request.POST.getlist('field_type', []),
+                                             request.POST.getlist('labels' , []),
                                              request.user)
             context = {'project': project, 'rights': rights}
             if message.get('error', ''):
@@ -63,7 +64,7 @@ def add_feature_model(request, project_slug):
                       context=context)
 
 
-def generate_feature_model(project, feature, geom_type, names, types, user):
+def generate_feature_model(project, feature, geom_type, names, types, labels, user):
 
     # check the fields names given by users
     intersection = list(set(names) & set(DEFAULT_FIELDS))
@@ -121,14 +122,7 @@ def generate_feature_model(project, feature, geom_type, names, types, user):
         '__str__': lambda self: '%s %s' (self.title),
         }
 
-    labels = {"creation_date": "Date de création",
-              "modification_date": "Date de la dernière mise à jour",
-              "title": "Titre",
-              "description": "Description",
-              "geom": "Géométrie",
-              "status": "Statut des signalements",
-              "archive_date": "Date d'archivage automatique",
-              "deletion_date": "Date de suppression automatique"}
+    dict_labels = {}
 
     module = 'config.' + APP_NAME
     field_type = []
@@ -148,7 +142,7 @@ def generate_feature_model(project, feature, geom_type, names, types, user):
                 field_type.append(models.TextField(max_length=255,
                                                    blank=True, null=True))
             fields[names[elt]] = field_type[elt]
-            labels[names[elt]] = names[elt]
+            dict_labels[names[elt]] = labels[elt]
     # creation modele
     model = create_model(project.slug + '_' + feature_slug, fields,
                          app_label=APP_NAME,
@@ -166,14 +160,14 @@ def generate_feature_model(project, feature, geom_type, names, types, user):
                                               'geom_type': GEOM_TYPE[int(geom_type)][1],
                                               'feature_slug': feature_slug,
                                               'user_id': user.id,
-                                              'labels': labels}}
+                                              'labels': dict_labels}}
         else:
             project.features_info.update({feature_slug: {
                                         'table_name': table_name,
                                         'geom_type': GEOM_TYPE[int(geom_type)][1],
                                         'feature_slug': feature_slug,
                                         'user_id': user.id,
-                                        'labels': labels}})
+                                        'labels': dict_labels}})
         project.save()
         return {'success': "Le type de signalement a été créé avec succès."}
     except Exception as e:

@@ -29,7 +29,9 @@ function addInput(divName){
                   <div class="item"  data-value="boolean">Booléen</div>
                 </div>
               </div>
-          `;
+          <div class="ui input">
+            <input type="text"  placeholder="Libelllé du champ" name="labels">
+          </div>`
           document.getElementById(divName).appendChild(newdiv);
           counter++;
           $('.ui.selection.dropdown')
