@@ -485,9 +485,31 @@ class ProjectFeature(View):
                                                 feature_id=feature_id,
                                                 feature_slug=feature_type,
                                                 comment=comment, project=project)
+
+            # Ajout d'un evenement de création d'un commentaire:
+            # @cbenhabib: comment différencier une crea de commentaire
+            # ... et une création de signalement
+            models.Event.objects.create(
+                user=request.user,
+                object_type='0',  # 'Création'
+                project_slug=project.slug,
+                feature_id=feature_id,
+                data={}
+            )
+
         # recuperation des champs descriptifs
         if creation == True:
             feature_pk = get_feature_pk(table_name, feature_id)
+
+            # Ajout d'un evenement de création d'un signalement:
+            models.Event.objects.create(
+                user=request.user,
+                object_type='0',  # 'Création'
+                project_slug=project.slug,
+                feature_id=feature_id,
+                data={}
+            )
+
             return redirect('project_feature_detail', project_slug=project_slug,
                             feature_type=feature_type, feature_pk=feature_pk)
         else:
