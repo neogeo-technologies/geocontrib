@@ -399,7 +399,7 @@ class ProjectFeature(View):
         features_types = project_features_types(APP_NAME, project_slug)
         if not features_types:
             context = {"error": "Veuillez créer un type de signalement pour ce projet",
-                       "project":project,
+                       "project": project,
                        "rights": rights}
             return render(request, 'collab/feature/add_feature.html', context)
         # type of features's fields
@@ -437,8 +437,7 @@ class ProjectFeature(View):
 
     def post(self, request, project_slug):
 
-        project = get_object_or_404(models.Project,
-                                    slug=project_slug)
+        project = get_object_or_404(models.Project, slug=project_slug)
         # get user right on project
         if request.user.is_authenticated:
             rights = request.user.project_right(project)
@@ -491,7 +490,8 @@ class ProjectFeature(View):
             # ... et une création de signalement
             models.Event.objects.create(
                 user=request.user,
-                object_type='0',  # 'Création'
+                event_type='create',
+                object_type='comment',
                 project_slug=project.slug,
                 feature_id=feature_id,
                 data={}
@@ -504,7 +504,8 @@ class ProjectFeature(View):
             # Ajout d'un evenement de création d'un signalement:
             models.Event.objects.create(
                 user=request.user,
-                object_type='0',  # 'Création'
+                event_type='create',
+                object_type='feature',
                 project_slug=project.slug,
                 feature_id=feature_id,
                 data={}
