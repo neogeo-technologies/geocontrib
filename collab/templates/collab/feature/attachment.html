@@ -41,7 +41,7 @@
 
     <div class="content">
 
-        <form id="add_form" action="{% url 'project_add_attachment' project_slug=project.slug feature_type=request.resolver_match.kwargs.feature_type  feature_pk=request.resolver_match.kwargs.feature_pk%}" enctype="multipart/form-data" class="ui form attachment_form" method="POST">
+        <form id="add_form" action="{% url 'project_add_attachment' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug  feature_id=request.resolver_match.kwargs.feature_id%}" enctype="multipart/form-data" class="ui form attachment_form" method="POST">
             {% csrf_token %}
             <div class="ui positive message hidden" id="positive_message">
               <div class="header">

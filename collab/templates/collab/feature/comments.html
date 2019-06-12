@@ -65,7 +65,7 @@
 
     <div class="content">
 
-        <form id="commentform" action="{% url 'project_add_comment' project_slug=project.slug feature_type=request.resolver_match.kwargs.feature_type  feature_pk=request.resolver_match.kwargs.feature_pk%}" class="ui form comment_form" method="POST">
+        <form id="commentform" action="{% url 'project_add_comment' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug  feature_id=request.resolver_match.kwargs.feature_id%}" class="ui form comment_form" method="POST">
         {% csrf_token %}
             <div class="ui positive message hidden" id="positive_message">
               <div class="header">

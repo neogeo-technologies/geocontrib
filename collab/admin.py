@@ -8,19 +8,19 @@ from collab.models import CustomUser
 from collab.models import Comment
 from collab.models import Project
 # from collab.models import Status
-from collab.models import Subscription
+# from collab.models import Subscription
 
 app = apps.get_app_config('collab')
 
 class CommentAdmin(admin.ModelAdmin):
-    readonly_fields = ('feature_slug',)
+    readonly_fields = ('feature_type_slug',)
     list_display = ('project', 'author', 'creation_date')
     empty_value_display = '-aucun-'
 admin.site.register(Comment, CommentAdmin)
 
 
 class AttachmentAdmin(admin.ModelAdmin):
-    readonly_fields = ('feature_id','comment')
+    readonly_fields = ('feature_id', 'comment')
     list_display = ('title', 'project', 'author')
     empty_value_display = '-aucun-'
 admin.site.register(Attachment, AttachmentAdmin)
@@ -52,7 +52,7 @@ class CustomUserChangeForm(UserChangeForm):
 class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm
     fieldsets = UserAdmin.fieldsets + (
-            (None, {'fields': ('nickname',)}),
+        (None, {'fields': ('nickname',)}),
     )
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
     list_filters = ('is_active',)

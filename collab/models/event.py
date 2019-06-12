@@ -28,6 +28,10 @@ class Event(models.Model):
     feature_id = models.UUIDField("Identifiant du signalement",
                                   editable=False, max_length=32)
 
+    comment_id = models.UUIDField("Identifiant du commentaire",
+                                  editable=False, max_length=32,
+                                  blank=True, null=True)
+
     object_type = models.CharField("Type de l'objet lié",
                                    choices=OBJ_TYPES,
                                    max_length=100)
@@ -37,6 +41,8 @@ class Event(models.Model):
                                   max_length=100)
 
     project_slug = models.SlugField('Slug', max_length=128)
+
+    feature_type_slug = models.SlugField('Slug', max_length=128)
 
     data = JSONField()
 

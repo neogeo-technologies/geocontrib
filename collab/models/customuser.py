@@ -79,6 +79,7 @@ class CustomUser(AbstractUser):
 
         return user_right
 
+
 class Autorisation(models.Model):
     LEVEL = (
         # ('0', 'Utilisateur anonyme'),

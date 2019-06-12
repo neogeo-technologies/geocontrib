@@ -1,3 +1,4 @@
+import uuid
 from collab import models
 from collab.choices import STATUS
 from collab.choices import STATUS_MODERE
@@ -13,11 +14,11 @@ from collab.views.user_services import get_last_user_feature
 from collab.views.user_services import get_last_user_registered
 from collab.views.user_services import get_user_feature
 
-from collab.views.project_services import generate_feature_id
-from collab.views.project_services import get_feature
+# from collab.views.project_services import generate_feature_id
+# from collab.views.project_services import get_feature
 from collab.views.project_services import get_feature_detail
 from collab.views.project_services import get_feature_pk
-from collab.views.project_services import get_feature_uuid
+# from collab.views.project_services import get_feature_uuid
 from collab.views.project_services import get_last_features
 from collab.views.project_services import get_project_features
 from collab.views.project_services import project_feature_type_fields
@@ -31,13 +32,13 @@ import datetime
 from datetime import timedelta
 import dateutil.parser
 
-from django.db.models import Q
+# from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import GEOSGeometry
 from django.http import HttpResponseRedirect
-from django.http import JsonResponse
+# from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
@@ -346,17 +347,17 @@ def my_account(request):
         # get feature pk
         feature_pk = {}
         for elt in last_comment:
-            table_name = """{app_name}_{project_slug}_{feature_type}""".format(
+            table_name = """{app_name}_{project_slug}_{feature_type_slug}""".format(
                             app_name=APP_NAME,
                             project_slug=elt.project.slug,
-                            feature_type=elt.feature_slug)
+                            feature_type_slug=elt.feature_type_slug)
             feature_pk[elt.feature_id] = get_feature_pk(table_name, elt.feature_id)
         # get 3 last user feature
         tables_names = get_user_feature(APP_NAME, request.user)
         features = []
         for elt in tables_names:
             data = get_last_user_feature(request.user, APP_NAME,
-                                         elt['project'], elt['feature_type'])
+                                         elt['project'], elt['feature_type_slug'])
             if data:
                 features.append(data)
         features.sort(key=lambda item: item['modification_date'], reverse=True)
@@ -436,7 +437,6 @@ class ProjectFeature(View):
             return render(request, 'collab/feature/add_feature.html', context)
 
     def post(self, request, project_slug):
-
         project = get_object_or_404(models.Project, slug=project_slug)
         # get user right on project
         if request.user.is_authenticated:
@@ -444,17 +444,18 @@ class ProjectFeature(View):
         else:
             rights = get_anonymous_rights(project)
         data = request.POST.dict()
-        feature_type = data.get('feature', '')
-        table_name = """{app_name}_{project_slug}_{feature_type}""".format(
+        feature_type_slug = data.get('feature', '')
+        table_name = """{app_name}_{project_slug}_{feature_type_slug}""".format(
                         app_name=APP_NAME,
                         project_slug=project_slug,
-                        feature_type=feature_type)
+                        feature_type_slug=feature_type_slug)
         user_id = request.user.id
         creation_date = datetime.datetime.now()
-        feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
+        # feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
+        feature_id = str(uuid.uuid4())
         # get geom
         data_geom = data.pop('geom', None)
-        geom, msg = validate_geom(data_geom, feature_type, project)
+        geom, msg = validate_geom(data_geom, feature_type_slug, project)
         if msg:
             request.session['error'] = msg
             return redirect('project_add_feature', project_slug=project_slug)
@@ -464,42 +465,44 @@ class ProjectFeature(View):
         # get sql for additonal field
         data_keys, data_values = create_feature_sql(data)
         # create feature
-        sql = """INSERT INTO "{table}" (creation_date, modification_date, user_id, project_id,
-                 feature_id, geom {data_keys})
-                 VALUES ('{creation_date}','{modification_date}','{user_id}','{project_id}',
-                 '{feature_id}', '{geom}' {data_values});""".format(
-                 creation_date=creation_date,
-                 modification_date=creation_date,
-                 project_id=project.id,
-                 user_id=user_id,
-                 table=table_name,
-                 feature_id=feature_id,
-                 data_keys=data_keys,
-                 data_values=data_values,
-                 geom=geom)
+        sql = """INSERT INTO "{table}" (feature_id, creation_date,
+            modification_date, user_id, project_id, geom {data_keys})
+            VALUES ('{feature_id}', '{creation_date}', '{modification_date}',
+            '{user_id}', '{project_id}', '{geom}' {data_values});""".format(
+            feature_id=feature_id,
+            creation_date=creation_date,
+            modification_date=creation_date,
+            project_id=project.id,
+            user_id=user_id,
+            table=table_name,
+            data_keys=data_keys,
+            data_values=data_values,
+            geom=geom)
+
         creation = commit_data('default', sql)
         if comment and creation:
             # create comment
             obj = models.Comment.objects.create(author=request.user,
                                                 feature_id=feature_id,
-                                                feature_slug=feature_type,
+                                                feature_type_slug=feature_type_slug,
                                                 comment=comment, project=project)
 
             # Ajout d'un evenement de création d'un commentaire:
-            # @cbenhabib: comment différencier une crea de commentaire
-            # ... et une création de signalement
             models.Event.objects.create(
                 user=request.user,
                 event_type='create',
                 object_type='comment',
                 project_slug=project.slug,
                 feature_id=feature_id,
+                comment_id=obj.comment_id,
+                feature_type_slug=feature_type_slug,
                 data={}
             )
 
         # recuperation des champs descriptifs
         if creation == True:
-            feature_pk = get_feature_pk(table_name, feature_id)
+            # @cbenhabib on passe par le feature_id
+            # feature_pk = get_feature_pk(table_name, feature_id)
 
             # Ajout d'un evenement de création d'un signalement:
             models.Event.objects.create(
@@ -508,11 +511,12 @@ class ProjectFeature(View):
                 object_type='feature',
                 project_slug=project.slug,
                 feature_id=feature_id,
+                feature_type_slug=feature_type_slug,
                 data={}
             )
 
             return redirect('project_feature_detail', project_slug=project_slug,
-                            feature_type=feature_type, feature_pk=feature_pk)
+                            feature_type_slug=feature_type_slug, feature_id=feature_id)
         else:
             msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
             logger = logging.getLogger(__name__)
@@ -650,33 +654,34 @@ def project_feature_list(request, project_slug):
 
 class ProjectFeatureDetail(View):
 
-    def get(self, request, project_slug, feature_type, feature_pk):
+    def get(self, request, project_slug, feature_type_slug, feature_id):
         """
             Display the detail of a given feature
             @param
             @return JSON
         """
-        project, feature, user = get_feature_detail(APP_NAME, project_slug, feature_type, feature_pk)
-        labels = project.get_labels(feature_type)
+        project, feature, user = get_feature_detail(APP_NAME, project_slug, feature_type_slug, feature_id)
+        labels = project.get_labels(feature_type_slug)
         # get user right on project
         if request.user.is_authenticated:
             rights = request.user.project_right(project)
         else:
             rights = get_anonymous_rights(project)
         # get feature comment
-        comments = list(models.Comment.objects.filter(project=project,
-                                                feature_id=feature.get('feature_id','')
-                                                ).values('comment',
-                                                'author__first_name',
-                                                'author__last_name',
-                                                'creation_date','id'))
+        comments = list(
+            models.Comment.objects.filter(
+                project=project, feature_id=feature.get('feature_id', '')
+            ).values(
+                'comment', 'author__first_name', 'author__last_name',
+                'creation_date', 'comment_id'))
+
         com_attachment = {}
         for com in comments:
             try:
-                obj_comment = models.Comment.objects.get(id=com.get('id', ''))
+                obj_comment = models.Comment.objects.get(comment_id=com.get('comment_id', ''))
                 obj_attachment = models.Attachment.objects.get(comment=obj_comment)
-                com_attachment[com.get('id', '')] = obj_attachment.__dict__
-                com_attachment[com.get('id', '')].update({'url': obj_attachment.file.url})
+                com_attachment[com.get('comment_id', '')] = obj_attachment.__dict__
+                com_attachment[com.get('comment_id', '')].update({'url': obj_attachment.file.url})
             except Exception as e:
                 pass
         # get feature attachment
@@ -715,8 +720,7 @@ class ProjectFeatureDetail(View):
             context['geom_type'] = project.get_geom(feature_type)
             return render(request, 'collab/feature/edit_feature.html', context)
 
-
-    def post(self, request, project_slug, feature_type, feature_pk):
+    def post(self, request, project_slug, feature_type_slug, feature_id):
         """
             Modify feature fields
             @param
@@ -726,19 +730,19 @@ class ProjectFeatureDetail(View):
                                     slug=project_slug)
         # get user right on project
         data = request.POST.dict()
-        table_name = """{app_name}_{project_slug}_{feature_type}""".format(
+        table_name = """{app_name}_{project_slug}_{feature_type_slug}""".format(
                         app_name=APP_NAME,
                         project_slug=project_slug,
-                        feature_type=feature_type)
+                        feature_type_slug=feature_type_slug)
 
         modification_date = datetime.datetime.now()
         # get geom
         data_geom = data.pop('geom', None)
-        geom, msg = validate_geom(data_geom, feature_type, project)
+        geom, msg = validate_geom(data_geom, feature_type_slug, project)
         if msg:
             request.session['error'] = msg
             return redirect('project_feature_detail', project_slug=project_slug,
-                            feature_type=feature_type, feature_pk=feature_pk)
+                            feature_type_slug=feature_type_slug, feature_id=feature_id)
 
         # get comment
         comment = data.pop('comment', None)
@@ -749,25 +753,24 @@ class ProjectFeatureDetail(View):
         sql = """UPDATE "{table}"
                  SET  modification_date='{modification_date}',
                       geom='{geom}' {add_sql}
-                 WHERE id={feature_pk};""".format(
+                 WHERE feature_id='{feature_id}';""".format(
                  modification_date=modification_date,
                  table=table_name,
-                 feature_pk=feature_pk,
+                 feature_id=feature_id,
                  add_sql=add_sql,
                  geom=geom)
 
         creation = commit_data('default', sql)
         if creation == True:
             return redirect('project_feature_detail', project_slug=project_slug,
-                            feature_type=feature_type, feature_pk=feature_pk)
+                            feature_type_slug=feature_type_slug, feature_id=feature_id)
         else:
             msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
             logger = logging.getLogger(__name__)
             logger.exception(creation)
             request.session['error'] = msg
             return redirect('project_feature_detail', project_slug=project_slug,
-                            feature_type=feature_type, feature_pk=feature_pk)
-
+                            feature_type_slug=feature_type_slug, feature_id=feature_id)
 
 
 def project_import_issues(request, project_slug):

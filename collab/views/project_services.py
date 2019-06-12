@@ -63,6 +63,7 @@ def last_user_registered(project_slug, nbuser=None):
                                                   'user__first_name',
                                                   'user__last_name')
 
+
 def project_features_types(app_name, project_slug):
     """
         List the feature types for a given project
@@ -158,7 +159,7 @@ def get_last_features(app_name, project_slug, feature_type, num=""):
     if num:
         limit = "  LIMIT " + str(num)
     sql = """ SELECT collab_customuser.id AS userid,
-              first_name,last_name,"{table_name}".id as pk,
+              first_name,last_name,"{table_name}".feature_id as pk,
               user_id,feature_id,title,creation_date
               FROM "{table_name}"
               INNER JOIN public.collab_customuser ON
@@ -170,7 +171,7 @@ def get_last_features(app_name, project_slug, feature_type, num=""):
     return data
 
 
-def get_feature(app_name, project_slug, feature_type, id):
+def get_feature(app_name, project_slug, feature_type, feature_id):
     """
         Return a specific feature
         @param app_name name of the application
@@ -182,13 +183,13 @@ def get_feature(app_name, project_slug, feature_type, id):
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
     sql = """ SELECT *
               FROM "{table_name}"
-              WHERE id={id};
-          """.format(table_name=table_name, id=id)
+              WHERE feature_id='{feature_id}';
+          """.format(table_name=table_name, feature_id=feature_id)
     data = fetch_first_row('default', sql)
     return OrderedDict(sorted(data.items()))
 
 
-def get_feature_detail(app_name, project_slug, feature_type, feature_pk):
+def get_feature_detail(app_name, project_slug, feature_type, feature_id):
     """
         Return the detail of a specific feature
         @param app_name name of the application
@@ -202,7 +203,7 @@ def get_feature_detail(app_name, project_slug, feature_type, feature_pk):
     project = get_object_or_404(models.Project,
                                 slug=project_slug)
     # get features fields
-    feature = get_feature(app_name, project_slug, feature_type, feature_pk)
+    feature = get_feature(app_name, project_slug, feature_type, feature_id)
     if feature.get('status', ''):
         feature['status'] = STATUS[int(feature['status'])][1]
     if feature.get('user_id', ''):
@@ -222,7 +223,7 @@ def get_feature_pk(table_name, feature_id):
         @return JSON
     """
 
-    sql = """ SELECT id AS pk
+    sql = """ SELECT feature_id AS pk
               FROM "{table_name}"
               WHERE feature_id='{feature_id}';
           """.format(table_name=table_name, feature_id=feature_id)

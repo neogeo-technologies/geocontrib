@@ -8,7 +8,7 @@ APP_NAME = __package__.split('.')[0]
 
 class ProjectComment(View):
 
-    def post(self, request, project_slug, feature_type, feature_pk):
+    def post(self, request, project_slug, feature_type_slug, feature_id):
         """
             Add feature comment
             @param
@@ -16,18 +16,18 @@ class ProjectComment(View):
         """
         comment = request.POST.get('comment', '')
         project, feature, user = get_feature_detail(APP_NAME, project_slug,
-                                                           feature_type, feature_pk)
+                                                    feature_type_slug, feature_id)
         # create comment
         comment_obj = models.Comment.objects.create(author=request.user,
                                             feature_id=feature['feature_id'],
-                                            feature_slug=feature_type,
+                                            feature_type_slug=feature_type_slug,
                                             comment=comment,
                                             project=project)
         # create attachement
         if request.FILES.get('file', ''):
             form_data = request.POST.dict()
             project, feature, utilisateur = get_feature_detail(APP_NAME, project_slug,
-                                                               feature_type, feature_pk)
+                                                               feature_type_slug, feature_id)
             # create comment
             form_data = request.POST.dict()
             obj = models.Attachment.objects.create(author=request.user,
@@ -39,5 +39,5 @@ class ProjectComment(View):
                                                    file=request.FILES.get('file', ''))
 
         context = {'project_slug': project_slug,
-                   'feature_type': feature_type, 'feature_pk': feature_pk}
+                   'feature_type_slug': feature_type_slug, 'feature_id': feature_id}
         return JsonResponse(context)

@@ -1,3 +1,4 @@
+import uuid
 from ..actions import create_model
 from collab import models as custom
 from collab.choices import GEOM_TYPE
@@ -93,8 +94,8 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
 
     fields = {
         'objects': GeoManager(),
-        'feature_id': models.UUIDField(editable=False, max_length=32,
-                                       null=True, blank=True),
+        'feature_id': models.UUIDField(primary_key=True, editable=False,
+                                       default=uuid.uuid4, null=True),
         'creation_date': models.DateTimeField("Date de l'évènement",
                                               auto_now_add=True,
                                               null=True, blank=True),
