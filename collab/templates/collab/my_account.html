@@ -179,7 +179,7 @@
                     <div class="item">
                         <i class="comment icon"></i>
                         <div class="content">
-                            <a   href="{% url 'project_feature_detail' project_slug=elt.project.slug feature_type_slug=elt.feature_type_slug  feature_id=feature_id|get_dict_item:elt.feature_id %}" > {{elt.project.title}} - {{elt.feature_slug}}</a>
+                            <a   href="{% url 'project_feature_detail' project_slug=elt.project.slug feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" > {{elt.project.title}} - {{elt.feature_slug}}</a>
                             <div class="description">{{elt.comment|slice:":150"}}</div>
                             <div class="description">Date du commentaire&nbsp;: {{elt.creation_date}}</div>
                         </div>
