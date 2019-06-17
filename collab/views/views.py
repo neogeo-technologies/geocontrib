@@ -702,7 +702,7 @@ class ProjectFeatureDetail(View):
         # if request is ajax
         elif request.is_ajax():
             # type of features's fields
-            data = project_feature_type_fields(APP_NAME, project_slug, feature_type)
+            data = project_feature_type_fields(APP_NAME, project_slug, feature_type_slug)
             for key, val in data.items():
                 if key == 'geom':
                     data[key]['value'] = GEOSGeometry(feature.get(key, '')).wkt
@@ -717,7 +717,7 @@ class ProjectFeatureDetail(View):
             context['feature'] = data
             context['edit'] = True
             # type de géometrie
-            context['geom_type'] = project.get_geom(feature_type)
+            context['geom_type'] = project.get_geom(feature_type_slug)
             return render(request, 'collab/feature/edit_feature.html', context)
 
     def post(self, request, project_slug, feature_type_slug, feature_id):

@@ -105,15 +105,15 @@ def project_feature_number(app_name, project_slug, feature_type):
     return num.get('count', 0)
 
 
-def project_feature_type_fields(app_name, project_slug, feature_type):
+def project_feature_type_fields(app_name, project_slug, feature_type_slug):
     """
         Type of fields for a given feature type
         @param app_name name of the application
         @param project_slug project slug
-        @param feature_type type of the feature
+        @param feature_type_slug type of the feature
         @return JSON
     """
-    table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
+    table_name = get_feature_type_table_name(app_name, project_slug, feature_type_slug)
     sql = """ SELECT column_name,data_type,udt_name as type,
               character_maximum_length as char_max_size,
               null As info

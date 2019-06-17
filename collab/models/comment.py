@@ -7,7 +7,7 @@ from collab.models.project import Project
 class Comment(models.Model):
 
     comment_id = models.UUIDField(
-        "Identifiant du signalement", primary_key=True, default=uuid.uuid4,
+        "Identifiant du commentaire", primary_key=True, default=uuid.uuid4,
         editable=False)
 
     comment = models.TextField('Commentaire', blank=True)
