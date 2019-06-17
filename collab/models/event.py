@@ -40,9 +40,9 @@ class Event(models.Model):
                                   choices=EVENT_TYPES,
                                   max_length=100)
 
-    project_slug = models.SlugField('Slug', max_length=128)
+    project_slug = models.SlugField('Project Slug', max_length=128)
 
-    feature_type_slug = models.SlugField('Slug', max_length=128)
+    feature_type_slug = models.SlugField('Feature Slug', max_length=128)
 
     data = JSONField()
 

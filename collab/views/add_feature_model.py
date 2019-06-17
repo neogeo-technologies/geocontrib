@@ -123,7 +123,15 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
         '__str__': lambda self: '%s %s' (self.title),
         }
 
-    dict_labels = {}
+    dict_labels = {"creation_date": "Date de création",
+                   "modification_date": "Date de la dernière mise à jour",
+                   "title": "Titre",
+                   "description": "Description",
+                   "geom": "Géométrie",
+                   "status": "Statut des signalements",
+                   "archive_date": "Date d'archivage automatique",
+                   "deletion_date": "Date de suppression automatique"}
+
 
     module = 'config.' + APP_NAME
     field_type = []
@@ -143,7 +151,8 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
                 field_type.append(models.TextField(max_length=255,
                                                    blank=True, null=True))
             fields[names[elt]] = field_type[elt]
-            dict_labels[names[elt]] = labels[elt]
+            dict_labels.update({names[elt]: labels[elt]})
+            # dict_labels[names[elt]] = labels[elt]
     # creation modele
     model = create_model(project.slug + '_' + feature_slug, fields,
                          app_label=APP_NAME,
