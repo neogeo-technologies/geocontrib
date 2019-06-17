@@ -690,6 +690,7 @@ class ProjectFeatureDetail(View):
         context = {'rights': rights, 'project': project, 'author': user,
                    'comments': comments, 'attachments': attachments,
                    'com_attachment': com_attachment,
+                   'file_max_size': settings.FILE_MAX_SIZE,
                    'labels': labels, 'img_format': settings.IMAGE_FORMAT}
         # A AMELIORER
         if not request.is_ajax() or request.session.get('error', ''):

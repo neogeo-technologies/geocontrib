@@ -108,7 +108,6 @@
       event.preventDefault();
       // check form
       var title_attachment =  $('#title_attachment').val();
-      console.log(title_attachment);
       if(isEmpty(current_file_upload) ||  title_attachment === ""){
             $('#error_message').html('<span>Veuillez entrer un titre/pièce jointe</span>');
             $( "#error_message").show();
@@ -117,7 +116,8 @@
       // verif size and allowed format
 
       if(current_file_upload){
-        if(current_file_upload.size >20000000) {
+        var file_max_size = "{{file_max_size}}";
+        if(parseFloat(current_file_upload.size) > parseFloat("{{file_max_size}}")) {
           $('#error_message').html('<span>Le fichier est trop volumineux, la taille maximale est de 10 Mo.</span>');
           $( "#error_message").show();
           return false

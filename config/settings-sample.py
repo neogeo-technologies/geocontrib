@@ -138,6 +138,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Login/logout redirects
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/connexion/'
+FILE_MAX_SIZE = 10000000
 IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
-
 AUTH_USER_MODEL = 'collab.CustomUser'

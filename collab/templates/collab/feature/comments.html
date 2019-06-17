@@ -144,7 +144,8 @@
       // verif size and allowed format
 
       if(current_attach_file){
-        if(current_attach_file.size >20000000) {
+        var file_max_size = "{{file_max_size}}";
+        if(parseFloat(current_attach_file.size) > parseFloat(file_max_size)) {
           $('#error_comment').html('<span>Le fichier est trop volumineux, la taille maximale est de 10 Mo.</span>');
           $( "#error_comment").show();
           return false
