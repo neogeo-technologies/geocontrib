@@ -6,17 +6,20 @@ from django.contrib.postgres.fields import JSONField
 class Event(models.Model):
 
     EVENT_TYPES = (
-        ('create', 'Création'),
+        ('create_feature', "Création d'un signalement"),
+        ('create_comment', "Création d'un commentaire"),
+        ('create_project', 'Création de projet'),
         ('update_attachment', "Modification d'une pièce jointe"),
         ('update_loc', 'Modification de la localisation'),
         ('update_attrs', "Modification d’un attribut"),
-        ('delete', 'Suppression'),
         ('update_status', "Changement de statut"),
+        ('delete', 'Suppression'),
     )
 
     OBJ_TYPES = (
         ('feature', 'Signalement'),
         ('comment', 'Commentaire'),
+        ('project', 'Projet'),
     )
 
     creation_date = models.DateTimeField("Date de l'évènement",
@@ -26,7 +29,8 @@ class Event(models.Model):
                              on_delete=models.CASCADE)
 
     feature_id = models.UUIDField("Identifiant du signalement",
-                                  editable=False, max_length=32)
+                                  editable=False, max_length=32,
+                                  blank=True, null=True)
 
     comment_id = models.UUIDField("Identifiant du commentaire",
                                   editable=False, max_length=32,
@@ -40,9 +44,9 @@ class Event(models.Model):
                                   choices=EVENT_TYPES,
                                   max_length=100)
 
-    project_slug = models.SlugField('Slug', max_length=128)
+    project_slug = models.SlugField('Slug', max_length=256, blank=True, null=True)
 
-    feature_type_slug = models.SlugField('Slug', max_length=128)
+    feature_type_slug = models.SlugField('Slug', max_length=256, blank=True, null=True)
 
     data = JSONField()
 
