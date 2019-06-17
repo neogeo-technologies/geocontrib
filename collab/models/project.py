@@ -1,11 +1,29 @@
 from django.db import models
 from collab.choices import USER_TYPE
 from collab.choices import USER_TYPE_ARCHIVE
+from collab.choices import GEOM_TYPE
+from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.utils.html import format_html
-
-from django.conf import settings
 from django.utils.text import slugify
+
+
+class FeatureType(models.Model):
+
+    name = models.CharField("Nom", max_length=128)
+
+    feature_type_slug = models.SlugField("Slug", max_length=256, null=True, blank=True)
+
+    geom_type = models.CharField(
+        "Type de champs géometrique", choices=GEOM_TYPE, max_length=50,
+        default="0", null=True, blank=True)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "Type de signalement"
+        verbose_name_plural = "Types de signalements"
 
 
 class Project(models.Model):
@@ -30,6 +48,8 @@ class Project(models.Model):
                                            blank=True, null=True)
     features_info = JSONField('Info sur les types de signalements disponibles',
                               blank=True, null=True)
+    feature_type = models.ForeignKey(
+        "collab.FeatureType", on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.title

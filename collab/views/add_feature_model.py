@@ -3,6 +3,7 @@ from ..actions import create_model
 from collab import models as custom
 from collab.choices import GEOM_TYPE
 from collab.choices import STATUS
+from collab.models import FeatureType
 from collab.views.project_services import project_features_types
 from collab.views.views import get_anonymous_rights
 from django.conf import settings
@@ -178,8 +179,15 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
                                         'feature_slug': feature_slug,
                                         'user_id': user.id,
                                         'labels': dict_labels}})
+
+        project.feature_type = FeatureType.objects.create(
+            name=feature, user=user, geom_type=geom_type,
+            feature_type_slug=feature_slug)
+
         project.save()
+
         return {'success': "Le type de signalement a été créé avec succès."}
+
     except Exception as e:
         msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
         logger = logging.getLogger(__name__)

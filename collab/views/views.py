@@ -288,6 +288,14 @@ class ProjectView(FormView):
             context = {'errors':
             {"Une erreur s'est produite": [db_error]}, 'form': form}
             return render(self.request, self.template_name, context)
+
+        models.Event.objects.create(
+            user=self.request.user,
+            event_type='create_project',
+            object_type='project',
+            project_slug=result["project"].slug,
+            data={}
+        )
         return redirect('project', project_slug=result["project"].slug)
 
     def form_invalid(self, form):
@@ -490,7 +498,7 @@ class ProjectFeature(View):
             # Ajout d'un evenement de création d'un commentaire:
             models.Event.objects.create(
                 user=request.user,
-                event_type='create',
+                event_type='create_comment',
                 object_type='comment',
                 project_slug=project.slug,
                 feature_id=feature_id,
@@ -507,7 +515,7 @@ class ProjectFeature(View):
             # Ajout d'un evenement de création d'un signalement:
             models.Event.objects.create(
                 user=request.user,
-                event_type='create',
+                event_type='create_feature',
                 object_type='feature',
                 project_slug=project.slug,
                 feature_id=feature_id,

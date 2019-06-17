@@ -19,10 +19,21 @@ class ProjectComment(View):
                                                     feature_type_slug, feature_id)
         # create comment
         comment_obj = models.Comment.objects.create(author=request.user,
-                                                    feature_id=feature['feature_id'],
-                                                    feature_type_slug=feature_type_slug,
-                                                    comment=comment,
-                                                    project=project)
+                                            feature_id=feature['feature_id'],
+                                            feature_type_slug=feature_type_slug,
+                                            comment=comment,
+                                            project=project)
+        models.Event.objects.create(
+            user=request.user,
+            event_type='create_comment',
+            object_type='comment',
+            project_slug=project.slug,
+            feature_id=feature['feature_id'],
+            comment_id=comment_obj.comment_id,
+            feature_type_slug=feature_type_slug,
+            data={}
+        )
+
         # create attachement
         if request.FILES.get('file', ''):
             form_data = request.POST.dict()
