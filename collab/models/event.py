@@ -9,6 +9,7 @@ class Event(models.Model):
         ('create_feature', "Création d'un signalement"),
         ('create_comment', "Création d'un commentaire"),
         ('create_project', 'Création de projet'),
+        ('create_attachment', "Création d'une piece jointe"),
         ('update_attachment', "Modification d'une pièce jointe"),
         ('update_loc', 'Modification de la localisation'),
         ('update_attrs', "Modification d’un attribut"),
@@ -36,6 +37,9 @@ class Event(models.Model):
     comment_id = models.UUIDField("Identifiant du commentaire",
                                   editable=False, max_length=32,
                                   blank=True, null=True)
+    attachment_id = models.UUIDField("Identifiant de la pièce jointe",
+                                     editable=False, max_length=32,
+                                     blank=True, null=True)
 
     object_type = models.CharField("Type de l'objet lié",
                                    choices=OBJ_TYPES,
@@ -45,9 +49,9 @@ class Event(models.Model):
                                   choices=EVENT_TYPES,
                                   max_length=100)
 
-    project_slug = models.SlugField('Slug', max_length=256, blank=True, null=True)
+    project_slug = models.SlugField('Slug Projet', max_length=256, blank=True, null=True)
 
-    feature_type_slug = models.SlugField('Slug', max_length=256, blank=True, null=True)
+    feature_type_slug = models.SlugField('Slug Feature', max_length=256, blank=True, null=True)
 
     data = JSONField()
 

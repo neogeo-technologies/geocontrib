@@ -30,6 +30,17 @@ class ProjectAttachment(View):
                                                info=form_data.get('info', ''),
                                                project=project,
                                                file=request.FILES.get('file', ''))
+        # Ajout d'une piece jointe
+        models.Event.objects.create(
+            user=request.user,
+            event_type='create_attachment',
+            object_type='attachment',
+            project_slug=project.slug,
+            feature_id=feature['feature_id'],
+            attachment_id=obj.attachment_id,
+            feature_type_slug=feature_type_slug,
+            data={}
+        )
 
         context = {'project_slug': project_slug,
                    'feature_type_slug': feature_type_slug, 'feature_id': feature_id}

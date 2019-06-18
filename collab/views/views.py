@@ -15,7 +15,7 @@ from collab.views.user_services import get_last_user_registered
 from collab.views.user_services import get_user_feature
 
 # from collab.views.project_services import generate_feature_id
-# from collab.views.project_services import get_feature
+from collab.views.project_services import get_feature
 from collab.views.project_services import get_feature_detail
 from collab.views.project_services import get_feature_pk
 # from collab.views.project_services import get_feature_uuid
@@ -25,6 +25,7 @@ from collab.views.project_services import project_feature_type_fields
 from collab.views.project_services import project_feature_number
 from collab.views.project_services import project_features_types
 
+from collab.views.validation_services import diff_data
 from collab.views.validation_services import validate_geom
 
 from collections import OrderedDict
@@ -243,6 +244,7 @@ class ProjectAdminView(View):
         """
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
+        prev_proj = project.__dict__.copy()
         # update forms fields
         form_data = request.POST.dict()
         form_data.pop('csrfmiddlewaretoken', None)
@@ -268,6 +270,16 @@ class ProjectAdminView(View):
                 setattr(project, key, value)
             project.save()
         project.save()
+        # log de l'event de modification d'un projet
+        data_modify = diff_data(prev_proj, project.__dict__)
+        # data Modify
+        models.Event.objects.create(
+            user=request.user,
+            event_type='update_attrs',
+            object_type='project',
+            project_slug=project.slug,
+            data=data_modify
+        )
         return redirect('project', project_slug=project_slug)
 
 
@@ -757,6 +769,7 @@ class ProjectFeatureDetail(View):
         """
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
+        prev_feature = get_feature(APP_NAME, project_slug, feature_type_slug, feature_id)
         # get user right on project
         data = request.POST.dict()
         table_name = """{app_name}_{project_slug}_{feature_type_slug}""".format(
@@ -775,7 +788,6 @@ class ProjectFeatureDetail(View):
 
         # get comment
         comment = data.pop('comment', None)
-
         # get sql for additonal field
         add_sql = edit_feature_sql(data)
         # # create with basic keys
@@ -791,6 +803,21 @@ class ProjectFeatureDetail(View):
 
         creation = commit_data('default', sql)
         if creation == True:
+            # log de l'event de modification d'un projet
+            data_modify = {}
+            curr_feature = get_feature(APP_NAME, project_slug, feature_type_slug, feature_id)
+            import pdb; pdb.set_trace()
+            data_modify = diff_data(prev_feature, curr_feature)
+            # data Modify
+            models.Event.objects.create(
+                user=request.user,
+                event_type='update_attrs',
+                object_type='feature',
+                project_slug=project.slug,
+                feature_id=feature_id,
+                data=data_modify
+            )
+
             return redirect('project_feature_detail', project_slug=project_slug,
                             feature_type_slug=feature_type_slug, feature_id=feature_id)
         else:

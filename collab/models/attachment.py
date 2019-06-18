@@ -2,6 +2,8 @@ from django.db import models
 from collab.models.comment import Comment
 from collab.models.customuser import CustomUser
 from collab.models.project import Project
+import uuid
+
 
 class Attachment(models.Model):
 
@@ -9,6 +11,9 @@ class Attachment(models.Model):
         ('0', 'Signalement'),
         ('1', 'Commentaire'),
     )
+    attachment_id = models.UUIDField(
+        "Identifiant de la pièce jointe", primary_key=True, default=uuid.uuid4,
+        editable=False)
     creation_date = models.DateTimeField("Date de création de la pièce jointe",
                                          auto_now_add=True)
     title = models.CharField('Titre', max_length=128)

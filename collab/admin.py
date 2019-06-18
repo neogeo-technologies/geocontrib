@@ -6,6 +6,7 @@ from collab.models import Attachment
 from collab.models import Autorisation
 from collab.models import CustomUser
 from collab.models import Comment
+from collab.models import Event
 from collab.models import Project
 # from collab.models import Status
 # from collab.models import Subscription
@@ -42,7 +43,11 @@ admin.site.register(Autorisation, AutorisationAdmin)
 #     readonly_fields = ('slug',)
 #     empty_value_display = '-aucun-'
 # admin.site.register(Subscription, SubscriptionAdmin)
-
+class EventAdmin(admin.ModelAdmin):
+    readonly_fields = ('project_slug', 'feature_type_slug')
+    list_display = ('project_slug', 'event_type', 'creation_date')
+    empty_value_display = '-aucun-'
+admin.site.register(Event, EventAdmin)
 
 class CustomUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):

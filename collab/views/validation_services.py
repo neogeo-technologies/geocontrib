@@ -5,6 +5,24 @@ from django.conf import settings
 import logging
 
 
+def diff_data(prev_dict, cur_dict):
+    """
+        Compare the current and the previous
+        field values
+        @return the list of modify keys
+    """
+    diff = [key for key, val in prev_dict.items() if cur_dict.get(key, None) != val ]
+    data_modify = []
+    for elt in diff:
+        data_modify.append({
+            'key': elt,
+            'previous_value': str(prev_dict.get(elt, '')),
+            'current_value': str(cur_dict.get(elt, ''))
+        })
+
+    return data_modify
+
+
 def validate_geom(geom, feature, project):
     """
         Validate the geom field
