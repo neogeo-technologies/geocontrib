@@ -170,6 +170,14 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
                                wording=dict_labels)
 
         project.save()
+        # create new feature type
+        custom.Event.objects.create(
+            user=user,
+            event_type='create_feature_type',
+            object_type='feature',
+            project_slug=project.slug,
+            feature_type_slug=feature_slug,
+        )
 
         return {'success': "Le type de signalement a été créé avec succès."}
 

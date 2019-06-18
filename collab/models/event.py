@@ -6,6 +6,7 @@ from django.contrib.postgres.fields import JSONField
 class Event(models.Model):
 
     EVENT_TYPES = (
+        ('create_feature_type', "Création d'un type signalement"),
         ('create_feature', "Création d'un signalement"),
         ('create_comment', "Création d'un commentaire"),
         ('create_project', 'Création de projet'),
@@ -53,7 +54,7 @@ class Event(models.Model):
 
     feature_type_slug = models.SlugField('Slug Feature', max_length=256, blank=True, null=True)
 
-    data = JSONField()
+    data = JSONField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Évènement"
