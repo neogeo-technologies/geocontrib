@@ -806,7 +806,6 @@ class ProjectFeatureDetail(View):
             # log de l'event de modification d'un projet
             data_modify = {}
             curr_feature = get_feature(APP_NAME, project_slug, feature_type_slug, feature_id)
-            import pdb; pdb.set_trace()
             data_modify = diff_data(prev_feature, curr_feature)
             # data Modify
             models.Event.objects.create(
