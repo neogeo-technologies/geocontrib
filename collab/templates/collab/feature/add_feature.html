@@ -13,7 +13,7 @@
           </div>
       {% elif error %}
           <div class="ui error message">
-              <div class="header">{{error}}</div>
+              <div id="error_feature" class="header">{{error}}</div>
           </div>
       {% endif %}
   {% else %}
@@ -23,25 +23,25 @@
                   <h2 class="ui header">{{project.title}}</h2>
               </div>
               <div class="row">
-                  <form id="addfeature" class='ui equal width form add_feature' method="POST" >
-                    {% csrf_token %}
-                    <div class="ui error message"></div>
-                    <div class="field">
-                        <label>Type de signalement </label>
-                        <div class="ui selection dropdown feature" id='feature_type'>
-                            <input type="hidden"  name="feature" placeholder="" value="{{features_types.0}}" />
-                            <i class="dropdown icon"></i>
-                            <div class="default text">Choisissez un type de signalement</div>
-                             <div class="menu">
-                              {% for elt in features_types %}
-                                  <div class="item" data-value={{elt}} >{{elt}}</div>
-                              {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    <div id="create_feature">
-                          {% include 'collab/feature/create_feature.html' %}
-                    </div>
+                  <form id="addfeature" class='ui equal width form add_feature' method="POST" enctype="multipart/form-data" >
+                      {% csrf_token %}
+                      <div class="ui error message"></div>
+                      <div class="field">
+                          <label>Type de signalement </label>
+                          <div class="ui selection dropdown feature" id='feature_type'>
+                              <input type="hidden"  name="feature" placeholder="" value="{{features_types.0}}" />
+                              <i class="dropdown icon"></i>
+                              <div class="default text">Choisissez un type de signalement</div>
+                               <div class="menu">
+                                {% for elt in features_types %}
+                                    <div class="item" data-value={{elt}} >{{elt}}</div>
+                                {% endfor %}
+                              </div>
+                          </div>
+                      </div>
+                      <div id="create_feature">
+                            {% include 'collab/feature/create_feature.html' %}
+                      </div>
                  </form>
               </div>
           </div>

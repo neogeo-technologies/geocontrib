@@ -37,6 +37,8 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 # from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import GEOSGeometry
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect
 # from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -48,7 +50,10 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
+from collab.exif import exif
+
 import logging
+import os
 
 APP_NAME = __package__.split('.')[0]
 
@@ -397,6 +402,7 @@ class ProjectFeature(View):
         @return Comment
     """
     def get(self, request, project_slug):
+
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
         # get user right on project
@@ -461,9 +467,23 @@ class ProjectFeature(View):
         creation_date = datetime.datetime.now()
         # feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
         feature_id = str(uuid.uuid4())
-        # get geom
-        data_geom = data.pop('geom', None)
-        geom, msg = validate_geom(data_geom, feature_type_slug, project)
+        if request.FILES.get('geo_file', ''):
+            geo_file = request.FILES.get('geo_file', '')
+            path = default_storage.save('tmp/'+geo_file.name, ContentFile(geo_file.read()))
+            real_path = os.path.join(settings.MEDIA_ROOT, path)
+            try:
+                data_geom_wkt = exif.get_image_geoloc_as_wkt(real_path, with_alt=False, ewkt=False)
+            except Exception as e:
+                path = default_storage.delete('tmp/'+geo_file.name)
+                request.session['error'] = "Votre image n'est géolocalisée"
+                return redirect('project_add_feature', project_slug=project_slug)
+            path = default_storage.delete('tmp/'+geo_file.name)
+            # get geom ( à ameliore si les 2 infos de geometrie sont fournis)
+            data.pop('geom', None)
+        else:
+            # get geom
+            data_geom_wkt = data.pop('geom', None)
+        geom, msg = validate_geom(data_geom_wkt, feature_type_slug, project)
         if msg:
             request.session['error'] = msg
             return redirect('project_add_feature', project_slug=project_slug)

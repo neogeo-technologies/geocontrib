@@ -21,6 +21,9 @@ class FeatureType(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    wording = JSONField('Libelle du type de signalement',
+                        blank=True, null=True)
+
     class Meta:
         verbose_name = "Type de signalement"
         verbose_name_plural = "Types de signalements"
@@ -46,8 +49,6 @@ class Project(models.Model):
                                             null=True)
     delete_feature = models.DurationField('Délai avant suppression',
                                            blank=True, null=True)
-    features_info = JSONField('Info sur les types de signalements disponibles',
-                              blank=True, null=True)
     feature_type = models.ForeignKey(
         "collab.FeatureType", on_delete=models.CASCADE, blank=True, null=True)
 
@@ -73,23 +74,25 @@ class Project(models.Model):
             num += 1
         return unique_slug
 
-    def get_labels(self, feature):
+    def get_labels(self, feature_slug):
         """Get feature labels"""
-        info = self.features_info.get(feature, '')
-        if info:
-            return info.get('labels')
-        return info
+        try:
+            wording = FeatureType.objects.get(feature_type_slug=feature_slug).wording
+            return wording
+        except Exception as e:
+            return {}
 
-    def get_geom(self, feature):
+    def get_geom(self, feature_slug):
         """
             Return the feature geometry for a type of feature
-            @feature feature name
+            @feature_slug feature slug
             @return type of geom
         """
-        info = self.features_info.get(feature, '')
-        if info:
-            return info.get('geom_type')
-        return info
+        try:
+            geom = FeatureType.objects.get(feature_type_slug=feature_slug).get_geom_type_display()
+            return geom
+        except Exception as e:
+            return 'Not Defined'
 
     def save(self, *args, **kwargs):
         if not self.slug:

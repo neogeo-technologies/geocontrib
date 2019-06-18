@@ -164,25 +164,10 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
         with connection.schema_editor() as editor:
             editor.create_model(model)
 
-        # ajout du nom de la table
-        table_name = APP_NAME + "_" + project.slug + '_' + feature_slug
-        if not project.features_info:
-            project.features_info = {feature_slug: {'table_name': table_name,
-                                              'geom_type': GEOM_TYPE[int(geom_type)][1],
-                                              'feature_slug': feature_slug,
-                                              'user_id': user.id,
-                                              'labels': dict_labels}}
-        else:
-            project.features_info.update({feature_slug: {
-                                        'table_name': table_name,
-                                        'geom_type': GEOM_TYPE[int(geom_type)][1],
-                                        'feature_slug': feature_slug,
-                                        'user_id': user.id,
-                                        'labels': dict_labels}})
-
         project.feature_type = FeatureType.objects.create(
-            name=feature, user=user, geom_type=geom_type,
-            feature_type_slug=feature_slug)
+                               name=feature, user=user, geom_type=geom_type,
+                               feature_type_slug=feature_slug,
+                               wording=dict_labels)
 
         project.save()
 

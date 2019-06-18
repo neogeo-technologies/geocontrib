@@ -4,9 +4,20 @@
         {% if val.type == 'geometry' %}
             <div class="field" class='geomfield'>
                 <label>Géometrie de type {{geom_type}}</label><br>
-                <input type="text"  name="geom" placeholder="Point(0 25)" />
+                <input type="text"  id="geom" name="geom" placeholder="Point(0 25)" />
                 <!-- <input type="hidden"  name="geom" placeholder="geometrie" /> -->
                 <!-- <div id='mapfeature'></div> -->
+            </div>
+            OU </br>
+            <div class="field">
+                <label>Image géoréférencée</label>
+                <div class="ui action input">
+                    <input type="text"  placeholder="Image" readonly>
+                    <input type="file" id='geo_file' name="geo_file" style="display: none">
+                    <div class="ui icon button iconfile">
+                        <i class="attach icon"></i>
+                    </div>
+                </div>
             </div>
         {% elif val.type == 'varchar' and val.choices %}
             <div class="field">
@@ -76,6 +87,17 @@
 {% endif %}
 
 <script type="text/javascript">
+    // ajout image georeferencee
+    $(".iconfile").click(function() {
+      $(this).parent().find("input:file").click();
+    });
+
+    $('input:file', '.ui.action.input')
+      .on('change', function(e) {
+        var name = e.target.files[0].name;
+        $('input:text', $(e.target).parent()).val(name);
+      });
+
       $('.ui.checkbox.boolfield')
         .checkbox()
       ;
@@ -92,8 +114,22 @@
       }
 
     // form validation
-     function check_form(){
-          $('#addfeature')
+    function check_form(){
+         // test if geom or at least image localisated
+         // check form
+        //  function isEmpty(value){
+        //    return (value == null || value === '');
+        //  }
+        //  var geom_field =  $('#geom').val();
+        //  var geo_file =  $("#geo_file").val();
+        //  console.log(isEmpty(geom_field),isEmpty(geo_file))
+        //  if(isEmpty(geom_field) && isEmpty(geo_file)){
+        //      console.log(geom_field,geo_file)
+        //      $('#error_feature').html('<span>Veuillez fournir une localisation ou une image géoréférencée</span>');
+        //      $( "#error_feature").show();
+        //      return false
+        //  }
+        $('#addfeature')
         .form({
           fields: {
             status:  {
@@ -114,15 +150,15 @@
                 }
               ]
             },
-            geom:  {
-              identifier: 'geom',
-              rules: [
-                {
-                  type   : 'empty',
-                  prompt : 'Veuillez localiser ce signalement'
-                }
-              ]
-            },
+            // geom:  {
+            //   identifier: 'geom',
+            //   rules: [
+            //     {
+            //       type   : 'empty',
+            //       prompt : 'Veuillez localiser ce signalement'
+            //     }
+            //   ]
+            // },
             deletion_date: {
               identifier: 'deletion_date',
               optional: true,

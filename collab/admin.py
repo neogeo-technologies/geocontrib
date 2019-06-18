@@ -26,7 +26,7 @@ class AttachmentAdmin(admin.ModelAdmin):
 admin.site.register(Attachment, AttachmentAdmin)
 
 class ProjectAdmin(admin.ModelAdmin):
-    readonly_fields = ('slug', 'features_info')
+    readonly_fields = ('slug',)
     list_display = ('title', 'thumbLink', 'moderation')
     empty_value_display = '-aucun-'
 admin.site.register(Project, ProjectAdmin)
@@ -60,12 +60,6 @@ admin.site.register(CustomUser, CustomUserAdmin)
 
 
 for model_name, model in app.models.items():
-
     if 'auth' not in model_name and 'django' not in model_name and 'customuser_' not in model_name:
         if not admin.site._registry.get(model, ''):
-
-            if 'feature' in model_name:
-                model_admin = type(model_name + "Admin", (admin.ModelAdmin, ), {'list_display': tuple([field.name for field in model._meta.fields]),  'readonly_fields':('feature_id',)})
-                admin.site.register(model, model_admin)
-            else:
-                admin.site.register(model)
+            admin.site.register(model)
