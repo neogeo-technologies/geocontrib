@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.apps import apps
+from django.dispatch import receiver
 
 
 class Event(models.Model):
@@ -55,3 +57,21 @@ class Event(models.Model):
     class Meta:
         verbose_name = "Évènement"
         verbose_name_plural = "Évènements"
+
+
+@receiver(models.signals.post_save, sender=Event)
+def trigger_emails(sender, instance, created, **kwargs):
+
+    if created and instance.feature_id:
+
+        Subscription = apps.get_model(app_label='collab', model_name="Subscription")
+        defaults = {
+            "feature_id": str(instance.feature_id),
+            "context": {
+                "object_type": instance.get_object_type_display(),
+                "event_type": instance.event_type,
+                "identifiant": str(instance.feature_id),
+                "url": "http://url-de-l-objet.collab.fr/{}".format(instance.feature_id)
+            }
+        }
+        Subscription.notify(**defaults)
