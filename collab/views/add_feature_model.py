@@ -173,7 +173,7 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
         # create new feature type
         custom.Event.objects.create(
             user=user,
-            event_type='create_feature_type',
+            event_type='create',
             object_type='feature',
             project_slug=project.slug,
             feature_type_slug=feature_slug,

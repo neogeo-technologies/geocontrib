@@ -6,11 +6,7 @@ from django.contrib.postgres.fields import JSONField
 class Event(models.Model):
 
     EVENT_TYPES = (
-        ('create_feature_type', "Création d'un type signalement"),
-        ('create_feature', "Création d'un signalement"),
-        ('create_comment', "Création d'un commentaire"),
-        ('create_project', 'Création de projet'),
-        ('create_attachment', "Création d'une piece jointe"),
+        ('create', "Création"),
         ('update_attachment', "Modification d'une pièce jointe"),
         ('update_loc', 'Modification de la localisation'),
         ('update_attrs', "Modification d’un attribut"),

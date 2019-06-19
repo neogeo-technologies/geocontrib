@@ -287,7 +287,7 @@ class ProjectView(FormView):
 
         models.Event.objects.create(
             user=self.request.user,
-            event_type='create_project',
+            event_type='create',
             object_type='project',
             project_slug=result["project"].slug,
             data={}

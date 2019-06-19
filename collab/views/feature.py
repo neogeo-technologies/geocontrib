@@ -29,7 +29,7 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-# from django.http import JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
@@ -65,7 +65,6 @@ def project_feature_map(request, project_slug):
                                                           feature_type)
     context = {'rights': rights, 'project': project, 'feature_list': feature_list}
     return render(request, 'collab/feature/feature_map.html', context)
-
 
 def project_feature_list(request, project_slug):
     """
@@ -378,7 +377,7 @@ class ProjectFeature(View):
             # Ajout d'un evenement de création d'un commentaire:
             models.Event.objects.create(
                 user=request.user,
-                event_type='create_comment',
+                event_type='create',
                 object_type='comment',
                 project_slug=project.slug,
                 feature_id=feature_id,
@@ -395,7 +394,7 @@ class ProjectFeature(View):
             # Ajout d'un evenement de création d'un signalement:
             models.Event.objects.create(
                 user=request.user,
-                event_type='create_feature',
+                event_type='create',
                 object_type='feature',
                 project_slug=project.slug,
                 feature_id=feature_id,

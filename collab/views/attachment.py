@@ -33,7 +33,7 @@ class ProjectAttachment(View):
         # Ajout d'une piece jointe
         models.Event.objects.create(
             user=request.user,
-            event_type='create_attachment',
+            event_type='create',
             object_type='attachment',
             project_slug=project.slug,
             feature_id=feature['feature_id'],
