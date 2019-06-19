@@ -14,6 +14,7 @@ from collab.views.views import ProjectView
 
 services = [
     path('api/liste_projet/', views.project_list),
+    path('api/export/', feature.export),
 ]
 
 urlpatterns = services + [

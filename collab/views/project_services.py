@@ -182,7 +182,7 @@ def get_feature(app_name, project_slug, feature_type, feature_id):
         @return JSON
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
-    sql = """ SELECT *
+    sql = """ SELECT *, ST_AsGeoJSON(geom) as geom
               FROM "{table_name}"
               WHERE feature_id='{feature_id}';
           """.format(table_name=table_name, feature_id=feature_id)

@@ -13,6 +13,7 @@ from collab.models import Project
 
 app = apps.get_app_config('collab')
 
+
 class CommentAdmin(admin.ModelAdmin):
     readonly_fields = ('feature_type_slug',)
     list_display = ('project', 'author', 'creation_date')
@@ -43,11 +44,15 @@ admin.site.register(Autorisation, AutorisationAdmin)
 #     readonly_fields = ('slug',)
 #     empty_value_display = '-aucun-'
 # admin.site.register(Subscription, SubscriptionAdmin)
+
+
 class EventAdmin(admin.ModelAdmin):
-    readonly_fields = ('project_slug', 'feature_type_slug')
+    readonly_fields = ('project_slug', 'feature_type_slug', 'feature_id',
+                       'comment_id', 'attachment_id')
     list_display = ('project_slug', 'event_type', 'creation_date')
     empty_value_display = '-aucun-'
 admin.site.register(Event, EventAdmin)
+
 
 class CustomUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):

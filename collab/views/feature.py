@@ -5,6 +5,7 @@ from collab.choices import STATUS_MODERE
 from collab.db_utils import commit_data
 from collab.db_utils import create_feature_sql
 from collab.db_utils import edit_feature_sql
+from collab.models import CustomUser
 from collab.views.views import get_anonymous_rights
 
 # from collab.views.project_services import generate_feature_id
@@ -34,12 +35,38 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.views import View
+from collab.choices import STATUS
 from collab.exif import exif
-
+import json
 import logging
 import os
 
 APP_NAME = __package__.split('.')[0]
+
+
+def export(request):
+    """
+        Export list of feature
+    """
+    project_slug = 'ddddd'
+    feature_type = 'zzz'
+    list_uuid = ['d484ff55-0f03-4ddb-8768-e2a4f80f1cb5',
+                 'ea16e927-6c72-47b7-b251-da6d9d73d964']
+    res = []
+    for feature_id in list_uuid:
+        feature = get_feature(APP_NAME, project_slug, feature_type, feature_id)
+        # export only the features which have been published
+        if int(feature['status']) > 1:
+            feature['geom'] = json.loads(feature['geom'])
+            feature['status'] = STATUS[int(feature['status'])][1]
+            feature['user'] = CustomUser.objects.get(id=feature['user_id']).username
+            feature['link'] = """{domain}projet/{project_slug}/{feature_type}/{feature_id}""".format(
+                              domain=request.build_absolute_uri('/'),
+                              project_slug=project_slug,
+                              feature_type=feature_type,
+                              feature_id=feature_id)
+            res.append(feature)
+    return JsonResponse(res, safe=False)
 
 
 def project_feature_map(request, project_slug):
