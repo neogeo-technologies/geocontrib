@@ -7,6 +7,7 @@ from collab.models import Autorisation
 from collab.models import CustomUser
 from collab.models import Comment
 from collab.models import Event
+from collab.models import FeatureType
 from collab.models import Project
 # from collab.models import Status
 # from collab.models import Subscription
@@ -45,11 +46,26 @@ admin.site.register(Autorisation, AutorisationAdmin)
 #     empty_value_display = '-aucun-'
 # admin.site.register(Subscription, SubscriptionAdmin)
 
+class ProjectInline(admin.TabularInline):
+    fields = ['title', 'slug']
+    readonly_fields = ['title', 'slug']
+    model = Project
+
+class FeatureTypeAdmin(admin.ModelAdmin):
+    inlines = [
+        ProjectInline,
+    ]
+    readonly_fields = ('name', 'feature_type_slug', 'geom_type',
+                       'user', 'wording')
+    list_display = ('name', 'feature_type_slug', 'geom_type',)
+    empty_value_display = '-aucun-'
+admin.site.register(FeatureType, FeatureTypeAdmin)
 
 class EventAdmin(admin.ModelAdmin):
+
     readonly_fields = ('project_slug', 'feature_type_slug', 'feature_id',
                        'comment_id', 'attachment_id')
-    list_display = ('project_slug', 'event_type', 'creation_date')
+    list_display = ('project_slug', 'event_type', 'creation_date',)
     empty_value_display = '-aucun-'
 admin.site.register(Event, EventAdmin)
 

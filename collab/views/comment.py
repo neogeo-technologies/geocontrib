@@ -1,5 +1,5 @@
 from collab import models
-from collab.views.project_services import get_feature_detail
+from collab.views.services.project_services import get_feature_detail
 from django.http import JsonResponse
 from django.views import View
 

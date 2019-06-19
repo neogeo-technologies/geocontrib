@@ -3,18 +3,17 @@ from collab.choices import USER_TYPE
 from collab.choices import USER_TYPE_ARCHIVE
 from collab.forms import ProjectForm
 
-from collab.views.user_services import get_last_user_comments
-from collab.views.user_services import get_last_user_feature
-from collab.views.user_services import get_last_user_registered
-from collab.views.user_services import get_user_feature
+from collab.views.services.user_services import get_last_user_comments
+from collab.views.services.user_services import get_last_user_feature
+from collab.views.services.user_services import get_last_user_registered
+from collab.views.services.user_services import get_user_feature
 
-from collab.views.project_services import get_feature_pk
-# from collab.views.project_services import get_feature_uuid
-from collab.views.project_services import get_last_features
-from collab.views.project_services import project_feature_number
-from collab.views.project_services import project_features_types
+from collab.views.services.project_services import get_feature_pk
+from collab.views.services.project_services import get_last_features
+from collab.views.services.project_services import project_feature_number
+from collab.views.services.project_services import project_features_types
 
-from collab.views.validation_services import diff_data
+from collab.views.services.validation_services import diff_data
 
 from collections import OrderedDict
 from datetime import timedelta

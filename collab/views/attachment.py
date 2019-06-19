@@ -1,7 +1,6 @@
 from collab import models
-from collab.views.project_services import get_feature_detail
+from collab.views.services.project_services import get_feature_detail
 from django.http import JsonResponse
-# from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt

@@ -1,7 +1,7 @@
 from collab import models
 from collab.db_utils import fetch_raw_data
-from collab.views.project_services import get_feature_type_table_name
-from collab.views.project_services import project_features_types
+from collab.views.services.project_services import get_feature_type_table_name
+from collab.views.services.project_services import project_features_types
 
 
 def get_last_user_registered(project_slug, nbuser=None):

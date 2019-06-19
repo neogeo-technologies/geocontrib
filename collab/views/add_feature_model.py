@@ -4,7 +4,7 @@ from collab import models as custom
 from collab.choices import GEOM_TYPE
 from collab.choices import STATUS
 from collab.models import FeatureType
-from collab.views.project_services import project_features_types
+from collab.views.services.project_services import project_features_types
 from collab.views.views import get_anonymous_rights
 from django.conf import settings
 from django.contrib.gis.db import models

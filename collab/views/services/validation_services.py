@@ -1,4 +1,3 @@
-from collab import models
 from django.contrib.gis.geos import GEOSGeometry
 from django.conf import settings
 

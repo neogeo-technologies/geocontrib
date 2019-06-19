@@ -9,20 +9,19 @@ from collab.models import CustomUser
 from collab.views.views import get_anonymous_rights
 
 # from collab.views.project_services import generate_feature_id
-from collab.views.project_services import delete_feature
-from collab.views.project_services import get_feature
-from collab.views.project_services import get_feature_detail
+from collab.views.services.project_services import delete_feature
+from collab.views.services.project_services import get_feature
+from collab.views.services.project_services import get_feature_detail
 # from collab.views.project_services import get_feature_uuid
-from collab.views.project_services import get_project_features
-from collab.views.project_services import project_feature_type_fields
-from collab.views.project_services import project_features_types
+from collab.views.services.project_services import get_project_features
+from collab.views.services.project_services import project_feature_type_fields
+from collab.views.services.project_services import project_features_types
 
-from collab.views.validation_services import diff_data
-from collab.views.validation_services import validate_geom
+from collab.views.services.validation_services import diff_data
+from collab.views.services.validation_services import validate_geom
 
 from collections import OrderedDict
 import datetime
-
 
 # from django.db.models import Q
 from django.conf import settings
@@ -92,6 +91,7 @@ def project_feature_map(request, project_slug):
                                                           feature_type)
     context = {'rights': rights, 'project': project, 'feature_list': feature_list}
     return render(request, 'collab/feature/feature_map.html', context)
+
 
 def project_feature_list(request, project_slug):
     """
@@ -278,7 +278,6 @@ class ProjectFeatureDetail(View):
             request.session['error'] = msg
             return redirect('project_feature_detail', project_slug=project_slug,
                             feature_type_slug=feature_type_slug, feature_id=feature_id)
-
 
 
 class ProjectFeature(View):
