@@ -1,7 +1,7 @@
 from collab import models
 import datetime
 from django.core.management.base import BaseCommand
-from collab.views.services.deletion_archive_services import delete_all_features
+from collab.views.services.feature_services import delete_all_features
 
 APP_NAME = __package__.split('.')[0]
 

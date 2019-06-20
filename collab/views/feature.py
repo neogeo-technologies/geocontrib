@@ -8,9 +8,9 @@ from collab.db_utils import edit_feature_sql
 from collab.models import CustomUser
 from collab.views.views import get_anonymous_rights
 
-from collab.views.services.deletion_archive_services import delete_feature
-from collab.views.services.project_services import get_feature
-from collab.views.services.project_services import get_feature_detail
+from collab.views.services.feature_services import delete_feature
+from collab.views.services.feature_services import get_feature
+from collab.views.services.feature_services import get_feature_detail
 
 from collab.views.services.project_services import get_project_features
 from collab.views.services.project_services import project_feature_type_fields

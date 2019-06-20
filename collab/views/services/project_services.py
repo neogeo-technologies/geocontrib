@@ -1,14 +1,9 @@
-from collab.choices import STATUS
 from collab.db_utils import fetch_first_row
 from collab.db_utils import fetch_raw_data
 from collab import models
 from collections import OrderedDict
 from django.core import serializers
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.utils import timezone
-from django.utils.crypto import get_random_string
-from hashlib import md5
 # import re
 
 
@@ -20,21 +15,6 @@ def get_feature_type_table_name(app_name, project_slug, feature_type):
     feature_type_table_prefix = get_feature_type_table_prefix(app_name, project_slug)
     return "{feature_type_table_prefix}_{feature_type}".format(
         feature_type_table_prefix=feature_type_table_prefix, feature_type=feature_type)
-
-
-def generate_feature_id(app_name, project_slug, feature):
-    """
-        Generate a unique uuid for a feature based on
-        feature parameters
-        @app_name name of  the current application
-        @project_slug slug of the feature project
-        @feature feature name
-        @return unique uuid
-    """
-    tz = str(timezone.now())
-    random = get_random_string(8).lower()
-    feature_id = (app_name + project_slug + feature + random + tz).encode('utf-8')
-    return md5(feature_id).hexdigest()
 
 
 def project_list(request):
@@ -169,79 +149,3 @@ def get_last_features(app_name, project_slug, feature_type, num=""):
                      limit=limit)
     data = fetch_raw_data('default', sql)
     return data
-
-
-def get_feature(app_name, project_slug, feature_type, feature_id):
-    """
-        Return a specific feature
-        @param app_name name of the application
-        @param project_slug project slug
-        @param feature_type type of the feature
-        @param id id of the feature
-        @return JSON
-    """
-    table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
-    sql = """ SELECT *, ST_AsGeoJSON(geom) as geom
-              FROM "{table_name}"
-              WHERE feature_id='{feature_id}';
-          """.format(table_name=table_name, feature_id=feature_id)
-    data = fetch_first_row('default', sql)
-    return OrderedDict(sorted(data.items()))
-
-
-def get_feature_detail(app_name, project_slug, feature_type, feature_id):
-    """
-        Return the detail of a specific feature
-        @param app_name name of the application
-        @param project_slug project slug
-        @param feature_type type of the feature
-        @param feature_pk pk of the feature
-        @return JSON
-    """
-    # Get project info from slug
-    # get project
-    project = get_object_or_404(models.Project,
-                                slug=project_slug)
-    # get features fields
-    feature = get_feature(app_name, project_slug, feature_type, feature_id)
-    if feature.get('status', ''):
-        feature['status'] = STATUS[int(feature['status'])][1]
-    if feature.get('user_id', ''):
-        try:
-            user = models.CustomUser.objects.get(
-                                     id=feature['user_id'])
-        except Exception as e:
-            user = 'Anonyme'
-    return project, feature, user
-
-
-def get_feature_pk(table_name, feature_id):
-    """
-        Return the pk of a specific feature
-        @param table_name table name
-        @param feature_id uuid of the feature
-        @return JSON
-    """
-
-    sql = """ SELECT feature_id AS pk
-              FROM "{table_name}"
-              WHERE feature_id='{feature_id}';
-          """.format(table_name=table_name, feature_id=feature_id)
-    data = fetch_first_row('default', sql)
-    return data.get('pk', '')
-
-
-def get_feature_uuid(table_name, feature_pk):
-    """
-        Return the pk of a specific feature
-        @param table_name table name
-        @param feature_pk pk of the feature
-        @return feature_id uuid of the feature
-    """
-
-    sql = """ SELECT feature_id
-              FROM "{table_name}"
-              WHERE id='{id}';
-          """.format(table_name=table_name, id=id)
-    data = fetch_first_row('default', sql)
-    return data.get('feature_id', '')

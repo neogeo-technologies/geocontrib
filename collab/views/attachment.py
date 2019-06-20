@@ -1,5 +1,5 @@
 from collab import models
-from collab.views.services.project_services import get_feature_detail
+from collab.views.services.feature_services import get_feature_detail
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
