@@ -6,7 +6,7 @@
     </button>
 {% endif %}
 {% if comments %}
-   <div class="ui three column grid">
+   <div class="ui one column grid">
        {% for val in comments %}
           <div class="column">
              <div class="ui fluid card">
@@ -16,6 +16,7 @@
                     </div>
                  </div>
                  <div class="content">
+                    {% get_nested_item com_attachment val.comment_id  as com_att  %}
                     {% if com_att.file%}
                         <i class="green paperclip  fitted icon">
                            <a href="{{com_att.file.url}}" class="header">{{com_att.title}}</a>
