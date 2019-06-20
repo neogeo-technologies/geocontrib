@@ -152,7 +152,7 @@ class ProjectFeatureDetail(View):
             models.Comment.objects.filter(
                 project=project, feature_id=feature.get('feature_id', '')
             ).values(
-                'comment', 'author__first_name', 'author__last_name',
+                'comment', 'author__username', 'author__first_name', 'author__last_name',
                 'creation_date', 'comment_id'))
 
         com_attachment = {}
@@ -162,11 +162,14 @@ class ProjectFeatureDetail(View):
                 obj_attachment = models.Attachment.objects.get(comment=obj_comment)
                 com_attachment[com.get('comment_id', '')] = obj_attachment.__dict__
                 com_attachment[com.get('comment_id', '')].update({'url': obj_attachment.file.url})
+                com_attachment[com.get('comment_id', '')].update({'author': models.CustomUser.objects.get(id=obj_comment.author_id)})
             except Exception as e:
                 pass
+
         # get feature attachment
         attachments = list(models.Attachment.objects.filter(project=project,
-                                                feature_id=feature.get('feature_id', '')))
+                                                feature_id=feature.get('feature_id',
+                                                 '')).select_related('author'))
         context = {'rights': rights, 'project': project, 'author': user,
                    'comments': comments, 'attachments': attachments,
                    'com_attachment': com_attachment,

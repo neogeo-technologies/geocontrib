@@ -7,25 +7,38 @@
 {% endif %}
 
 {% if attachments %}
-  <div class="ui grid">
+  <div class="ui three column grid">
     {% for attachment in attachments %}
-     <div class="four wide column">
-        <div class="ui card">
-            <div class="image">
-              {% if 'pdf' in attachment.file.url and attachment.file %}
-                <img alt='pdf' src="{% static 'collab/img/pdf.png' %}" >
-              {% elif attachment.file%}
-                <img alt='image'  src="{{attachment.file.url}}" >
-              {%endif %}
-            </div>
-            <div class="content">
-              {% if attachment.file %}
-                  <a href="{{attachment.file.url}}" class="header">{{attachment.title}}</a>
-              {%endif %}
-            </div>
+     <div class="column">
+        <div class="ui fluid card">
+          <div class="content">
+              {% if attachment.file%}
+                  <i class="green paperclip  fitted icon">
+                     <a href="{{attachment.file.url}}" class="header">{{attachment.title}}</a>
+                  </i>
+              {% else%}
+                  <i class="grey paperclip  fitted icon">
+                        <a href="#" class="header">Aucune pièce jointe</a>
+                  </i>
+              {% endif %}
+           </div>
             <div class="extra content">
-              Ajouter le {{attachment.creation_date|date:"d/m/Y"}} <br>
-              <i class="user icon"></i> Par {{attachment.author.first_name|title}} {{attachment.author.last_name|title}}
+              <div class="left floated">
+                  <i class="user icon"></i>
+                  {{attachment.author}}
+                  Ajouter par {{attachment.author.username|title}} <br>
+                  le {{attachment.creation_date|date:"d/m/Y"}}
+              </div>
+              {% if rights.feat_modification %}
+                 <form action="{% url 'project_add_attachment' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug feature_id=request.resolver_match.kwargs.feature_id %}" method='POST'>
+                   {% csrf_token %}
+                   <input type="hidden" name="_method" value="delete">
+                   <input type="hidden" name="attachment_id" value={{attachment.attachment_id}}>
+                   <button type='submit' role="button" id="btn_remove_attachment" class="ui basic red icon mini button">
+                      <i class="trash alternate icon"></i>
+                   </button>
+                 </form>
+              {% endif %}
             </div>
         </div>
      </div>

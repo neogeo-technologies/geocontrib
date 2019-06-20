@@ -147,7 +147,9 @@ footer{
 }
 #btn_project_save, #btn_project_edit,
 #btn_feature_edit, #btn_feature_save,
-#btn_feature_delete{
+#btn_feature_delete,
+#btn_remove_attachment
+#btn_remove_comment{
   float: right;
 }
 
@@ -176,7 +178,7 @@ footer{
   color: #0c5584 !important;
 }
 
-.drop-area .input-file,.drop-area-comment .input-file  {
+.drop-area .input-file,.drop-area-comment .input-file-comment  {
   display: none;
 }
 
@@ -194,6 +196,10 @@ footer{
   display: block;
   width: 100px;
   height:100px;
+}
+.content a{
+  color: black;
+  font-size: 1em;
 }
 
 

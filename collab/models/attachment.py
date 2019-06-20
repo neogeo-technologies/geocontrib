@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from collab.models.comment import Comment
 from collab.models.customuser import CustomUser
 from collab.models.project import Project
@@ -43,3 +45,8 @@ class Attachment(models.Model):
     class Meta:
         verbose_name = "Pièce Jointe"
         verbose_name_plural = "Pièces Jointes"
+
+
+@receiver(post_delete, sender=Attachment)
+def submission_delete(sender, instance, **kwargs):
+    instance.file.delete(False)

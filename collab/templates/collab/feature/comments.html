@@ -6,54 +6,48 @@
     </button>
 {% endif %}
 {% if comments %}
-    {% for val in comments %}
-      <table class="ui celled table">
-            <thead>
-                <tr><th>
-                    <span class="comment_title">
-                        <strong>{{val.author__first_name|title}}{{val.author__last_name|title}} <strong>
-                            Le {{val.creation_date|date:"d/m/Y"}}
-                    </span>
-                </th></tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td data-label="">{{val.comment}}</td>
-                </tr>
-
-            {% get_nested_item com_attachment val.comment_id  as com_att  %}
-
-
-                {% if com_att%}
-                  <tr>
-                    <td>
-                       <span>Pièce Jointe</span>
-                        <div class="ui card">
-
-                          <div class="image">
-                            {% if 'pdf' in com_att.url and com_att.file %}
-                              <img  alt='pdf' src="{% static 'collab/img/pdf.png' %}" >
-                            {% elif com_att.file%}
-                              <img  alt='image'  src="{{com_att.url}}" >
-                            {%endif %}
-                          </div>
-                          <div class="content">
-                            {% if com_att.file %}
-                                <a href="{{com_att.file.url}}" class="header">{{com_att.title}}</a>
-                            {%endif %}
-                          </div>
-                          <div class="extra content">
-                            Ajouter le {{com_att.creation_date|date:"d/m/Y"}} <br>
-                            <i class="user icon"></i> Par {{com_att.author.first_name|title}} {{com_att.author.last_name|title}}
-                          </div>
+   <div class="ui three column grid">
+       {% for val in comments %}
+          <div class="column">
+             <div class="ui fluid card">
+                 <div class="content">
+                    <div class="description">
+                      {{val.comment}}
+                    </div>
+                 </div>
+                 <div class="content">
+                    {% if com_att.file%}
+                        <i class="green paperclip  fitted icon">
+                           <a href="{{com_att.file.url}}" class="header">{{com_att.title}}</a>
+                        </i>
+                   {% else%}
+                        <i class="grey paperclip  fitted icon">
+                              <a href="#" class="header">Aucune pièce jointe</a>
+                        </i>
+                  {% endif %}
+                 </div>
+                 <div class="extra content">
+                      <div class="left floated">
+                         <i class="user icon"></i>
+                         Ajouter par {{val.author__username|title}} <br>
+                         le {{val.creation_date|date:"d/m/Y"}}
                       </div>
-                    </td>
-                  </tr>
-                {% endif %}
+                      {% if rights.feat_modification %}
+                         <form action="{% url 'project_add_comment' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug feature_id=request.resolver_match.kwargs.feature_id %}" method='POST'>
+                           {% csrf_token %}
+                           <input type="hidden" name="_method" value="delete">
+                           <input type="hidden" name="comment_id" value={{val.comment_id}}>
+                           <button type='submit' role="button" id="btn_remove_comment" class="ui basic red icon mini button">
+                              <i class="trash alternate icon"></i>
+                           </button>
+                         </form>
 
-            </tbody>
-      </table>
-    {% endfor %}
+                      {% endif %}
+                </div>
+             </div>
+         </div>
+       {% endfor %}
+   </div>
 
 {% endif %}
 
@@ -83,7 +77,7 @@
             </div>
             <div ondrop="drop_comment(event)" class="drop-area-comment field" ondragover="allowDropComment(event)">
                   <label for="add_file_comment">Choisir un document </label><br>
-                  <input class="input-file" type="file" id="add_file_comment" name="file" >
+                  <input class="input-file-comment" type="file" id="add_file_comment" name="file" >
                   ou<br>
                   le glisser ici
                   <div class="attachment_filename_comment">
@@ -104,8 +98,8 @@
 <script>
 
   var current_attach_file;
-    $(".input-file").on("change", function (e) {
-      var input_file = document.querySelector('.drop-area .input-file');
+    $(".input-file-comment").on("change", function (e) {
+      var input_file = document.querySelector('.drop-area-comment .input-file-comment');
       current_attach_file = input_file.files[0];
       $(".drop-area-comment .attachment_filename_comment").html(input_file.files[0].name);
   });
