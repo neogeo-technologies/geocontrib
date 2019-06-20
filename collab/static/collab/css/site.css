@@ -148,7 +148,7 @@ footer{
 #btn_project_save, #btn_project_edit,
 #btn_feature_edit, #btn_feature_save,
 #btn_feature_delete,
-#btn_remove_attachment
+#btn_remove_attachment,
 #btn_remove_comment{
   float: right;
 }
