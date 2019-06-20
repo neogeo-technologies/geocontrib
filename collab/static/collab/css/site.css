@@ -156,7 +156,7 @@ footer{
 }
 
 /* atatchment */
-.drop-area {
+.drop-area,.drop-area-comment {
   width: auto;
   height: auto;
   background: #f5f5f5;
@@ -167,20 +167,20 @@ footer{
   margin-bottom: 10px;
 }
 
-.drop-area label {
+.drop-area label,.drop-area-comment label{
   cursor: pointer !important;
   color: #106eab !important;
   font-weight: bold !important;
 }
-.drop-area label:hover {
+.drop-area label:hover, .drop-area-comment label:hover {
   color: #0c5584 !important;
 }
 
-.drop-area .input-file {
+.drop-area .input-file,.drop-area-comment .input-file  {
   display: none;
 }
 
-.drop-area .attachment_filename {
+.drop-area .attachment_filename, .drop-area-comment .attachment_filename_comment {
   margin: 20px 15px 0px 15px;
   padding-top: 20px;
   border-top: 1px solid #ffffff;

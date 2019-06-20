@@ -81,12 +81,12 @@
                 <label>Titre de la pièce jointe</label>
                 <input type="text" name='title' id='title'/>
             </div>
-            <div ondrop="drop(event)" class="drop-area field" ondragover="allowDrop(event)">
-                  <label for="add_file">Choisir un document </label><br>
-                  <input class="input-file" type="file" id="add_file" name="file" >
+            <div ondrop="drop_comment(event)" class="drop-area-comment field" ondragover="allowDropComment(event)">
+                  <label for="add_file_comment">Choisir un document </label><br>
+                  <input class="input-file" type="file" id="add_file_comment" name="file" >
                   ou<br>
                   le glisser ici
-                  <div class="attachment_filename">
+                  <div class="attachment_filename_comment">
                     Aucun document sélectionné
                   </div>
             </div>
@@ -107,17 +107,17 @@
     $(".input-file").on("change", function (e) {
       var input_file = document.querySelector('.drop-area .input-file');
       current_attach_file = input_file.files[0];
-      $(".drop-area .attachment_filename").html(input_file.files[0].name);
+      $(".drop-area-comment .attachment_filename_comment").html(input_file.files[0].name);
   });
 
-  function allowDrop(event) {
+  function allowDropComment(event) {
     event.preventDefault();
   }
 
-  function drop(event) {
+  function drop_comment(event) {
     event.preventDefault();
     var dropped_file = event.dataTransfer.files[0];
-    $(".drop-area .attachment_filename").html(dropped_file.name);
+    $(".drop-area-comment .attachment_filename_comment").html(dropped_file.name);
     current_attach_file = dropped_file;
   }
 

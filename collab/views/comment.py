@@ -19,10 +19,10 @@ class ProjectComment(View):
                                                     feature_type_slug, feature_id)
         # create comment
         comment_obj = models.Comment.objects.create(author=request.user,
-                                            feature_id=feature['feature_id'],
-                                            feature_type_slug=feature_type_slug,
-                                            comment=comment,
-                                            project=project)
+                                                    feature_id=feature['feature_id'],
+                                                    feature_type_slug=feature_type_slug,
+                                                    comment=comment,
+                                                    project=project)
         models.Event.objects.create(
             user=request.user,
             event_type='create',
