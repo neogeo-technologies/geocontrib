@@ -4,7 +4,7 @@ from django.template.defaulttags import register
 
 @register.filter
 def display_key(key):
-    key_list = ['id', 'user_id', 'project_id', 'feature_id', 'creation_date', 'modification_date', 'user']
+    key_list = ['id', 'user_id', 'project_id', 'feature_id', 'creation_date', 'deletion_date', 'archive_date', 'modification_date', 'user']
     if key not in key_list:
         return True
     else:

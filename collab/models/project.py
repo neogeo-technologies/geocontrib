@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from collab.choices import USER_TYPE
 from collab.choices import USER_TYPE_ARCHIVE
@@ -93,6 +94,7 @@ class Project(models.Model):
             return geom
         except Exception as e:
             return 'Not Defined'
+
 
     def save(self, *args, **kwargs):
         if not self.slug:

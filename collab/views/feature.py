@@ -8,11 +8,10 @@ from collab.db_utils import edit_feature_sql
 from collab.models import CustomUser
 from collab.views.views import get_anonymous_rights
 
-# from collab.views.project_services import generate_feature_id
-from collab.views.services.project_services import delete_feature
+from collab.views.services.deletion_archive_services import delete_feature
 from collab.views.services.project_services import get_feature
 from collab.views.services.project_services import get_feature_detail
-# from collab.views.project_services import get_feature_uuid
+
 from collab.views.services.project_services import get_project_features
 from collab.views.services.project_services import project_feature_type_fields
 from collab.views.services.project_services import project_features_types
@@ -34,7 +33,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.views import View
-from collab.choices import STATUS
+
 from collab.exif import exif
 import json
 import logging
@@ -349,7 +348,16 @@ class ProjectFeature(View):
                         project_slug=project_slug,
                         feature_type_slug=feature_type_slug)
         user_id = request.user.id
+        # date
         creation_date = datetime.datetime.now()
+        deletion_date = "NULL"
+        archive_date= "NULL"
+        if project.archive_feature:
+            archive_date = creation_date + project.archive_feature
+            archive_date = "'" +  str(archive_date.date()) + "'"
+        if project.delete_feature:
+            deletion_date = creation_date + project.delete_feature
+            deletion_date = "'" +  str(deletion_date.date()) + "'"
         # feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
         feature_id = str(uuid.uuid4())
         if request.FILES.get('geo_file', ''):
@@ -372,19 +380,21 @@ class ProjectFeature(View):
         if msg:
             request.session['error'] = msg
             return redirect('project_add_feature', project_slug=project_slug)
-
         # get comment
         comment = data.pop('comment', None)
         # get sql for additonal field
         data_keys, data_values = create_feature_sql(data)
         # create feature
         sql = """INSERT INTO "{table}" (feature_id, creation_date,
-            modification_date, user_id, project_id, geom {data_keys})
-            VALUES ('{feature_id}', '{creation_date}', '{modification_date}',
-            '{user_id}', '{project_id}', '{geom}' {data_values});""".format(
+            modification_date, user_id, deletion_date, archive_date, project_id, geom {data_keys})
+            VALUES ('{feature_id}', '{creation_date}', '{modification_date}','{user_id}',
+            {deletion_date}, {archive_date},
+            '{project_id}', '{geom}' {data_values});""".format(
             feature_id=feature_id,
             creation_date=creation_date,
             modification_date=creation_date,
+            deletion_date=deletion_date,
+            archive_date=archive_date,
             project_id=project.id,
             user_id=user_id,
             table=table_name,

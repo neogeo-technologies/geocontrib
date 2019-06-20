@@ -1,5 +1,4 @@
 from collab.choices import STATUS
-from collab.db_utils import commit_data
 from collab.db_utils import fetch_first_row
 from collab.db_utils import fetch_raw_data
 from collab import models
@@ -76,7 +75,7 @@ def project_features_types(app_name, project_slug):
     sql = """ SELECT  table_name
             FROM information_schema.tables
             WHERE table_type='BASE TABLE'
-            AND table_schema='public' AND table_name LIKE '{feature_type_table_prefix}%';
+            AND table_schema='public' AND table_name LIKE '{feature_type_table_prefix}\_%';
           """.format(feature_type_table_prefix=feature_type_table_prefix)
     res = fetch_raw_data('default', sql)
     list_feature = []
@@ -246,35 +245,3 @@ def get_feature_uuid(table_name, feature_pk):
           """.format(table_name=table_name, id=id)
     data = fetch_first_row('default', sql)
     return data.get('feature_id', '')
-
-
-def delete_feature(app_name, project_slug, feature_type, feature_id, user):
-    """
-        Delete a specific feature and link data
-        @param app_name name of the application
-        @param project_slug project slug
-        @param feature_type type of the feature
-        @param feature_id uuid of the feature
-        @param user user
-    """
-    table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
-    sql = """ DELETE
-              FROM "{table_name}"
-              WHERE feature_id='{feature_id}';
-          """.format(table_name=table_name, feature_id=feature_id)
-    deletion = commit_data('default', sql)
-
-    # attachment
-    models.Attachment.objects.filter(feature_id=feature_id).delete()
-    # comments
-    models.Comment.objects.filter(feature_id=feature_id).delete()
-    models.Event.objects.create(
-        user=user,
-        event_type='delete',
-        object_type='feature',
-        project_slug=project_slug,
-        feature_id=feature_id,
-        feature_type_slug=feature_type,
-        data={}
-    )
-    return deletion
