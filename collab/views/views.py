@@ -8,7 +8,9 @@ from collab.views.services.user_services import get_last_user_feature
 from collab.views.services.user_services import get_last_user_registered
 from collab.views.services.user_services import get_user_feature
 
+from collab.views.services.feature_services import delete_feature_table
 from collab.views.services.feature_services import get_feature_pk
+
 from collab.views.services.project_services import get_last_features
 from collab.views.services.project_services import project_feature_number
 from collab.views.services.project_services import project_features_types
@@ -23,7 +25,7 @@ import dateutil.parser
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
-# from django.http import JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
@@ -141,6 +143,31 @@ def index(request):
         "projects": projects,
     }
     return render(request, 'collab/index.html', context)
+
+
+@method_decorator([csrf_exempt], name='dispatch')
+class ProjectServiceView(View):
+    """
+        Remove a specific project
+        @param
+        @return JSON
+    """
+    def delete(self, request):
+        import pdb; pdb.set_trace()
+        if request.GET.get('projet_slug', ''):
+            project_slug = request.GET.get('projet_slug', '')
+            project = get_object_or_404(models.Project,
+                                        slug=project_slug)
+            # remove all project tables
+            feature_slug_list = project_features_types(APP_NAME, project_slug)
+            for feature_type_slug in feature_slug_list:
+                deletion = delete_feature_table(APP_NAME, project_slug, feature_type_slug)
+            # remove the project
+            project.delete()
+            return JsonResponse({'success': 'Le projet a été supprimé'})
+        else:
+            return JsonResponse({'error': 'Veuillez fournir le slug du projet'},
+                                status='400')
 
 
 def get_project_fields(project_slug):

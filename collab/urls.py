@@ -10,11 +10,13 @@ from collab.views.views import LogoutView
 from collab.views.views import ProjectAdminView
 from collab.views.feature import ProjectFeature
 from collab.views.feature import ProjectFeatureDetail
+from collab.views.views import ProjectServiceView
 from collab.views.views import ProjectView
 
 services = [
     path('api/liste_projet/', views.project_list),
     path('api/export/', feature.export),
+    path('api/projet/', ProjectServiceView.as_view()),
 ]
 
 urlpatterns = services + [

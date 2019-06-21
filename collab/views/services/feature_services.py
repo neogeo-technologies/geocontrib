@@ -26,6 +26,22 @@ def generate_feature_id(app_name, project_slug, feature):
     return md5(feature_id).hexdigest()
 
 
+def delete_feature_table(app_name, project_slug, feature_type_slug):
+    """
+        Delete a specific table
+        @param app_name name of the application
+        @param project_slug project slug
+        @param feature_type_slug type of the feature
+        @return JSON
+    """
+    table_name = get_feature_type_table_name(app_name, project_slug, feature_type_slug)
+    # liste ids to delete
+    sql = """ DROP TABLE "{table_name}";
+          """.format(table_name=table_name)
+    deletion = commit_data('default', sql)
+    return deletion
+
+
 def delete_all_features(app_name, project_slug, feature_type, deletion_date=None):
     """
         Delete all feature regardiing a specific date if given
