@@ -153,7 +153,7 @@ class ProjectServiceView(View):
         @return JSON
     """
     def delete(self, request):
-        import pdb; pdb.set_trace()
+
         if request.GET.get('projet_slug', ''):
             project_slug = request.GET.get('projet_slug', '')
             project = get_object_or_404(models.Project,
