@@ -42,9 +42,28 @@ def delete_feature_table(app_name, project_slug, feature_type_slug):
     return deletion
 
 
+def archive_all_features(app_name, project_slug, feature_type, archive_date=None):
+    """
+        Archive all feature regarding a specific date if given
+        @param app_name name of the application
+        @param project_slug project slug
+        @param feature_type type of the feature
+        @param archive_date archive date for a given project
+        @param user user
+    """
+    table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
+    # liste ids to archive
+    sql = """ UPDATE {table_name}
+              SET status='3'
+              WHERE archive_date < '{archive_date}';
+          """.format(table_name=table_name, archive_date=archive_date)
+    modification = commit_data('default', sql)
+    return modification
+
+
 def delete_all_features(app_name, project_slug, feature_type, deletion_date=None):
     """
-        Delete all feature regardiing a specific date if given
+        Delete all feature regarding a specific date if given
         @param app_name name of the application
         @param project_slug project slug
         @param feature_type type of the feature

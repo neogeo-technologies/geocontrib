@@ -11,9 +11,6 @@ class Subscription(models.Model):
                                   editable=False, max_length=32)
     project_slug = models.SlugField('Slug', max_length=128)
 
-    # user = models.ForeignKey(CustomUser, verbose_name="Utilisateur",
-    #                          on_delete=models.CASCADE,
-    #                          help_text="Utilisateur abonné")
     users = models.ManyToManyField(
         CustomUser, verbose_name="Utilisateurs", help_text="Utilisateurs abonnés")
 
