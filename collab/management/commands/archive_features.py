@@ -16,9 +16,9 @@ class Command(BaseCommand):
             project = feature_type.project_set.all()
             if project:
                 project_slug = project[0].slug
-                from datetime import date
-                archive_date = date(2050, 1, 1)
-                # archive_date = datetime.datetime.now().date()
+                # from datetime import date
+                # archive_date = date(2050, 1, 1)
+                archive_date = datetime.datetime.now().date()
                 feature_slug = feature_type.feature_type_slug
                 list_ids = archive_all_features(APP_NAME, project_slug,
                                                 feature_slug, archive_date)
