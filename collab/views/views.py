@@ -35,6 +35,11 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
+from django.contrib.auth.decorators import login_required
+from django.forms import modelformset_factory
+from collab.forms import AutorisationForm
+from collab.forms import ExtendedBaseFS
+
 
 APP_NAME = __package__.split('.')[0]
 
@@ -470,6 +475,7 @@ def project_users(request, project_slug):
         "title": "Nom du projet",
         "content": "{} project : users".format(project_slug),
     }
+
     return render(request, 'collab/empty.html', context)
 
 
@@ -498,3 +504,72 @@ def project_download_issues(request, project_slug):
         "content": "{} project : download issues".format(project_slug),
     }
     return render(request, 'collab/empty.html', context)
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def project_members(request, project_slug):
+
+    project = get_object_or_404(models.Project, slug=project_slug)
+    rights = request.user.project_right(project)
+    authorised = models.Autorisation.objects.filter(project=project)
+
+    AutorisationFormSet = modelformset_factory(
+        models.Autorisation,
+        can_delete=True,
+        form=AutorisationForm,
+        formset=ExtendedBaseFS,
+        extra=0,
+        fields=('first_name', 'last_name', 'username', 'email', 'level'),
+    )
+
+    if request.method == 'POST':
+        formset = AutorisationFormSet(request.POST or None)
+        if formset.is_valid():
+
+            for data in formset.cleaned_data:
+                # id contient l'instance si existante
+                autorisation = data.pop("id", None)
+                if data.get("DELETE"):
+                    if autorisation:
+                        # Doit on desactivé un utilisateur decoché depuis cette vue?
+                        # Pour le moment je supprime que les non admin
+                        if not autorisation.user.is_superuser:
+                            autorisation.user.delete()
+                        autorisation.delete()
+                    else:
+                        continue
+
+                elif autorisation:
+                    autorisation.user.first_name = data.get('first_name')
+                    autorisation.user.last_name = data.get('last_name')
+                    autorisation.user.email = data.get('email')
+                    autorisation.user.save()
+
+                elif not autorisation and not data.get("DELETE"):
+
+                    user = models.CustomUser.objects.create(
+                        first_name=data["first_name"],
+                        last_name=data["last_name"],
+                        username=data["username"],
+                        email=data["email"],
+                        # Doit on activer le nouvel utilsateur
+                        is_active=False
+                    )
+                    models.Autorisation.objects.create(
+                        user=user,
+                        project=project
+                    )
+
+            return redirect('project_members', project_slug=project_slug)
+    else:
+        formset = AutorisationFormSet(
+            queryset=models.Autorisation.objects.filter(project=project))
+
+    context = {
+        "title": "Gestion des membres du projet {}".format(project.title),
+        'authorised': authorised,
+        'rights': rights,
+        'formset': formset
+    }
+
+    return render(request, 'collab/project/admin_members.html', context)

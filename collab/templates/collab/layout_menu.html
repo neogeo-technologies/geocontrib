@@ -115,7 +115,10 @@
                                       <a class="item" href="{% url 'create_project'  %}">
                                       <i class="icon plus"></i>Créer un nouveau projet</a>
                                   {% endif %}
-
+                                  {% if request.user.is_superuser and project %}
+                                    <a class="item" href="{% url 'project_members' project_slug=project.slug  %}">
+                                    <i class="icon users"></i>Administrer les membres</a>
+                                  {% endif %}
                               </div>
                           </div>
                       {% endif %}

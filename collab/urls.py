@@ -31,6 +31,7 @@ urlpatterns = services + [
     path('projet/<slug:project_slug>/ajouter_type_signalement/', views.add_feature_model, name="add_feature_model"),
     path('projet/<slug:project_slug>/', views.project, name='project'),
     path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),
+    path('projet/<slug:project_slug>/membres/', views.project_members, name='project_members'),
     path('projet/<slug:project_slug>/ajout/', ProjectFeature.as_view(), name='project_add_feature'),
     path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/commentaire', ProjectComment.as_view(),
          name='project_add_comment'),
