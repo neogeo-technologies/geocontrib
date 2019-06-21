@@ -1,0 +1,60 @@
+{% extends "collab/layout_menu.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<h3 class="ui header">Utilisateurs inscrits</h3>
+<form action="." method="post">
+{% csrf_token %}
+
+
+
+<table class="ui celled padded table">
+  {{ formset.management_form }}
+  <div id="form_set">
+  {% for form in formset %}
+
+      {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+      {% endfor %}
+
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger" role="alert">
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% for field in form.visible_fields %}
+      <tr>
+        <th>{{ field.label_tag }}</th>
+        <td>
+          {{ field }}
+          {{ field.errors }}
+          {{ field.help_text }}
+        </td>
+      </tr>
+      {% endfor %}
+
+  {% endfor %}
+  </div>
+</table>
+<input type="button" value="+" id="add_more">
+<button type="submit" class="btn btn-block btn-primary">Valider</button>
+<div id="empty_form" style="display:none">
+  <table class='ui very basic table'>
+    {{ formset.empty_form.as_table }}
+  </table>
+</div>
+</form>
+
+<script>
+$('#add_more').click(function() {
+	var form_idx = $('#id_form-TOTAL_FORMS').val();
+	$('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+	$('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+});
+</script>
+{% endblock %}
