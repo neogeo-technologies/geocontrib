@@ -13,10 +13,9 @@ class Command(BaseCommand):
 
         res = []
         for feature_type in models.FeatureType.objects.all():
-
-            project = feature_type.project_set.all()
+            project = feature_type.project
             if project:
-                project_slug = project[0].slug
+                project_slug = project.slug
                 # from datetime import date, time, datetime
                 # deletion_date = date(2050, 1, 1)
                 deletion_date = datetime.datetime.now().date()

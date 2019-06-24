@@ -11,6 +11,7 @@ def delete_project(modeladmin, request, queryset):
         delete project and associated features tables
     """
     for project in queryset:
+
         # remove all project tables
         feature_slug_list = project_features_types(APP_NAME, project.slug)
         for feature_type_slug in feature_slug_list:
