@@ -7,27 +7,9 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.utils.html import format_html
 from django.utils.text import slugify
-
-
-class FeatureType(models.Model):
-
-    name = models.CharField("Nom", max_length=128)
-
-    feature_type_slug = models.SlugField("Slug", max_length=256, null=True, blank=True)
-
-    geom_type = models.CharField(
-        "Type de champs géometrique", choices=GEOM_TYPE, max_length=50,
-        default="0", null=True, blank=True)
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
-    wording = JSONField('Libelle du type de signalement',
-                        blank=True, null=True)
-
-    class Meta:
-        verbose_name = "Type de signalement"
-        verbose_name_plural = "Types de signalements"
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+APP_NAME = __package__.split('.')[0]
 
 
 class Project(models.Model):
@@ -50,8 +32,7 @@ class Project(models.Model):
                                             null=True)
     delete_feature = models.DurationField('Délai avant suppression',
                                            blank=True, null=True)
-    feature_type = models.ForeignKey(
-        "collab.FeatureType", on_delete=models.CASCADE, blank=True, null=True)
+
 
     def __str__(self):
         return self.title
@@ -104,3 +85,26 @@ class Project(models.Model):
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"
+
+
+class FeatureType(models.Model):
+
+    name = models.CharField("Nom", max_length=128)
+
+    feature_type_slug = models.SlugField("Slug", max_length=256, null=True, blank=True)
+
+    geom_type = models.CharField(
+        "Type de champs géometrique", choices=GEOM_TYPE, max_length=50,
+        default="0", null=True, blank=True)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+
+    wording = JSONField('Libelle du type de signalement',
+                         blank=True, null=True)
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "Type de signalement"
+        verbose_name_plural = "Types de signalements"

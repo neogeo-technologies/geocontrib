@@ -11,6 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        res = []
         for feature_type in models.FeatureType.objects.all():
 
             project = feature_type.project_set.all()
@@ -21,8 +22,18 @@ class Command(BaseCommand):
                 deletion_date = datetime.datetime.now().date()
                 feature_slug = feature_type.feature_type_slug
                 if deletion_date:
-                    list_ids = delete_all_features(APP_NAME, project_slug,
-                                                   feature_slug, deletion_date)
-
-
+                    data = delete_all_features(APP_NAME, project_slug,
+                                               feature_slug, deletion_date)
+                    # data to save in event template
+                    res.append({
+                        'project_slug': project_slug,
+                        'feature_slug': feature_slug,
+                        'features': data
+                    })
+        # Log delete event
+        models.Event.objects.create(
+            event_type='delete',
+            object_type='feature',
+            data=res
+        )
         self.stdout.write(self.style.SUCCESS('FIN DU TRAITEMENT DE SUPPRESSION DES SIGNALEMENTS.'))

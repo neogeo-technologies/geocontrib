@@ -1,41 +1,22 @@
+from collab.views.services.feature_services import delete_feature_table
+from collab.views.services.project_services import project_features_types
 from django.db import models
-from django.contrib import admin
+
+from django.shortcuts import get_object_or_404
+APP_NAME = __package__.split('.')[0]
 
 
-def create_model(name, fields=None, app_label='', module='', options=None, admin_opts=None):
+def delete_project(modeladmin, request, queryset):
     """
-    Create specified model
+        delete project and associated features tables
     """
-    class Meta:
-        # Using type('Meta', ...) gives a dictproxy error during model creation
-        pass
-
-    if app_label:
-        # app_label must be set using the Meta inner class
-        setattr(Meta, 'app_label', app_label)
-
-    # Update Meta with any options that were provided
-    if options is not None:
-
-        for key, value in options.iteritems():
-            setattr(Meta, key, value)
-
-    # Set up a dictionary to simulate declarations within a class
-    attrs = {'__module__': module, 'Meta': Meta}
-
-    # Add in any fields that were provided
-    if fields:
-        attrs.update(fields)
-
-    # Create the class, which automatically triggers ModelBase processing
-    model = type(name, (models.Model,), attrs)
-
-    # Create an Admin class if admin options were provided
-    if admin_opts is not None:
-        class Admin(admin.ModelAdmin):
-            pass
-        for key, value in admin_opts:
-            setattr(Admin, key, value)
-        admin.site.register(model, Admin)
-
-    return model
+    for project in queryset:
+        # remove all project tables
+        feature_slug_list = project_features_types(APP_NAME, project.slug)
+        for feature_type_slug in feature_slug_list:
+            deletion = delete_feature_table(APP_NAME, project.slug, feature_type_slug)
+        message = "le(s) projet(s) a/ont été supprimé "
+        modeladmin.message_user(request, "%s." % message)
+        # remove the project
+        project.delete()
+delete_project.short_description = """Supprimer le(s) projet(s) et les tables des signalements"""

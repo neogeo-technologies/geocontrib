@@ -72,12 +72,13 @@ def delete_all_features(app_name, project_slug, feature_type, deletion_date=None
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
     # liste ids to delete
-    sql = """ SELECT feature_id
+    sql = """ SELECT feature_id::varchar,title
               FROM "{table_name}"
               WHERE deletion_date < '{deletion_date}';
           """.format(table_name=table_name, deletion_date=deletion_date)
     data = fetch_raw_data('default', sql)
     list_ids = []
+
     if data:
         list_ids = [d['feature_id'] for d in data]
         # deletion
@@ -90,7 +91,7 @@ def delete_all_features(app_name, project_slug, feature_type, deletion_date=None
         models.Attachment.objects.filter(feature_id__in=list_ids).delete()
         # comments
         models.Comment.objects.filter(feature_id__in=list_ids).delete()
-    return list_ids
+    return data
 
 
 def delete_feature(app_name, project_slug, feature_type, feature_id, user):

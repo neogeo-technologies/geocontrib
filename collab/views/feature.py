@@ -261,6 +261,11 @@ class ProjectFeatureDetail(View):
             data_modify = {}
             curr_feature = get_feature(APP_NAME, project_slug, feature_type_slug, feature_id)
             data_modify = diff_data(prev_feature, curr_feature)
+            # if the status has changed from something to published -> notification
+            # if 'status' in curr_feature.keys():
+            #     if curr_feature['status'] == '2':
+            #         # to do notification to subscribers
+
             # data Modify
             models.Event.objects.create(
                 user=request.user,
@@ -354,7 +359,7 @@ class ProjectFeature(View):
         # date
         creation_date = datetime.datetime.now()
         deletion_date = "NULL"
-        archive_date= "NULL"
+        archive_date = "NULL"
         if project.archive_feature:
             archive_date = creation_date + project.archive_feature
             archive_date = "'" +  str(archive_date.date()) + "'"
@@ -363,6 +368,8 @@ class ProjectFeature(View):
             deletion_date = "'" +  str(deletion_date.date()) + "'"
         # feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
         feature_id = str(uuid.uuid4())
+
+        # handle geo image or geometrie
         if request.FILES.get('geo_file', ''):
             geo_file = request.FILES.get('geo_file', '')
             path = default_storage.save('tmp/'+geo_file.name, ContentFile(geo_file.read()))

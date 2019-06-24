@@ -27,6 +27,7 @@ class Event(models.Model):
                                          auto_now_add=True)
 
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL, verbose_name="Utilisateur",
+                             blank=True, null=True,
                              on_delete=models.CASCADE)
 
     feature_id = models.UUIDField("Identifiant du signalement",

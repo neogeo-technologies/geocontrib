@@ -1,3 +1,5 @@
+from collab.actions import delete_project
+from django.contrib.admin import site
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm
 from django.contrib import admin
@@ -28,10 +30,20 @@ class AttachmentAdmin(admin.ModelAdmin):
     empty_value_display = '-aucun-'
 admin.site.register(Attachment, AttachmentAdmin)
 
+
+
+
 class ProjectAdmin(admin.ModelAdmin):
     readonly_fields = ('slug',)
     list_display = ('title', 'thumbLink', 'moderation')
     empty_value_display = '-aucun-'
+    actions = [delete_project]
+    # supprimer l'action de base de suppression d'un projet
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 admin.site.register(Project, ProjectAdmin)
 
 
@@ -46,18 +58,18 @@ admin.site.register(Autorisation, AutorisationAdmin)
 #     empty_value_display = '-aucun-'
 # admin.site.register(Subscription, SubscriptionAdmin)
 
-class ProjectInline(admin.TabularInline):
-    fields = ['title', 'slug']
-    readonly_fields = ['title', 'slug']
-    model = Project
+# class ProjectInline(admin.TabularInline):
+#     fields = ['title', 'slug']
+#     readonly_fields = ['title', 'slug']
+#     model = Project
 
 class FeatureTypeAdmin(admin.ModelAdmin):
-    inlines = [
-        ProjectInline,
-    ]
+    # inlines = [
+    #     ProjectInline,
+    # ]
     readonly_fields = ('name', 'feature_type_slug', 'geom_type',
                        'user', 'wording')
-    list_display = ('name', 'feature_type_slug', 'geom_type',)
+    list_display = ('name', 'feature_type_slug', 'project', 'geom_type',)
     empty_value_display = '-aucun-'
 admin.site.register(FeatureType, FeatureTypeAdmin)
 

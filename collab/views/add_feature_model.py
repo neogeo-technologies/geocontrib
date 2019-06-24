@@ -1,5 +1,4 @@
 import uuid
-from ..actions import create_model
 from collab import models as custom
 from collab.choices import GEOM_TYPE
 from collab.choices import STATUS
@@ -7,6 +6,7 @@ from collab.models import FeatureType
 from collab.views.services.project_services import project_features_types
 from collab.views.views import get_anonymous_rights
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.gis.db import models
 from django.db import connection
 from django.db.models import Manager as GeoManager
@@ -20,6 +20,45 @@ APP_NAME = __package__.split('.')[0]
 DEFAULT_FIELDS = ['feature_id', 'creation_date', 'modification_date',
                   'title', 'description', 'geom', 'status',
                   'archive_date', 'deletion_date', 'user', 'project']
+
+
+def create_model(name, fields=None, app_label='', module='', options=None, admin_opts=None):
+    """
+    Create specified model
+    """
+    class Meta:
+        # Using type('Meta', ...) gives a dictproxy error during model creation
+        pass
+
+    if app_label:
+        # app_label must be set using the Meta inner class
+        setattr(Meta, 'app_label', app_label)
+
+    # Update Meta with any options that were provided
+    if options is not None:
+
+        for key, value in options.iteritems():
+            setattr(Meta, key, value)
+
+    # Set up a dictionary to simulate declarations within a class
+    attrs = {'__module__': module, 'Meta': Meta}
+
+    # Add in any fields that were provided
+    if fields:
+        attrs.update(fields)
+
+    # Create the class, which automatically triggers ModelBase processing
+    model = type(name, (models.Model,), attrs)
+
+    # Create an Admin class if admin options were provided
+    if admin_opts is not None:
+        class Admin(admin.ModelAdmin):
+            pass
+        for key, value in admin_opts:
+            setattr(Admin, key, value)
+        admin.site.register(model, Admin)
+
+    return model
 
 
 def add_feature_model(request, project_slug):
@@ -164,10 +203,11 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
         with connection.schema_editor() as editor:
             editor.create_model(model)
 
-        project.feature_type = FeatureType.objects.create(
-                               name=feature, user=user, geom_type=geom_type,
-                               feature_type_slug=feature_slug,
-                               wording=dict_labels)
+        FeatureType.objects.create(name=feature, user=user,
+                                   project=project,
+                                   geom_type=geom_type,
+                                   feature_type_slug=feature_slug,
+                                   wording=dict_labels)
 
         project.save()
         # create new feature type
