@@ -1,3 +1,4 @@
+from collab import models
 from collab.choices import STATUS
 from collab.views.services.validation_services import diff_data
 from .project_services import get_feature_type_table_name
@@ -6,8 +7,11 @@ from collab.db_utils import fetch_first_row
 from collab.db_utils import fetch_raw_data
 from collab import models
 from collections import OrderedDict
-from django.shortcuts import get_object_or_404
+import dateutil.parser
 from django.utils import timezone
+import re
+
+from django.shortcuts import get_object_or_404
 from django.utils.crypto import get_random_string
 from hashlib import md5
 
@@ -205,6 +209,15 @@ def get_feature_uuid(table_name, feature_pk):
 
 
 def feature_update_events(curr_feature, prev_feature, project, user, feature_id):
+    """
+        Create events when a feature is updated
+        @param curr_feature feature  after update
+        @param prev_feature feature before update
+        @param project  project
+        @param user user at the origine of the feature update
+        @param feature_id id of the modify fetaure
+        @return
+    """
     data_modify = {}
     curr_feature.pop('modification_date', 'None')
     prev_feature.pop('modification_date', 'None')
@@ -252,3 +265,72 @@ def feature_update_events(curr_feature, prev_feature, project, user, feature_id)
             project_slug=project.slug,
             feature_id=feature_id,
             data=data_modify)
+
+
+def edit_feature_sql(data):
+    """
+        Get sql for the modification of a feature
+    """
+    # remove the csrfmiddlewaretoken key
+    data.pop('csrfmiddlewaretoken', None)
+    data.pop('feature', None)
+    add_sql = ""
+    date_pattern = re.compile('^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$')
+    # replace 'on' by 'true'
+    for key, val in data.items():
+        if not val:
+            add_sql += """,{key}=NULL""".format(
+                       key=str(key))
+        elif date_pattern.match(str(val)):
+            format_date = timezone.make_aware(dateutil.parser.parse(val), timezone.get_current_timezone())
+            add_sql += """,{key}='{format_date}'""".format(
+                           key=str(key),
+                           format_date=str(format_date))
+        elif val == "on":
+            add_sql += """,{key}={val}""".format(
+                    key=str(key),
+                    val=True)
+        else:
+            add_sql += """,{key}='{val}'""".format(
+                    key=str(key),
+                    val=str(val))
+
+    return add_sql
+
+
+def create_feature_sql(data):
+    """
+        Get sql for the creation of a feature
+     """
+    # remove the csrfmiddlewaretoken key
+    data.pop('csrfmiddlewaretoken', None)
+    data.pop('feature', None)
+    # replace 'on' by 'true'
+    for key, val in data.items():
+        if val == "on":
+            data[key] = 'True'
+    # remove empty keys -> A AMELIORER "'" !!!!!!!!!
+    data = {k: v for k, v in data.items() if v}
+    data_keys = " "
+    data_values = " "
+    if data.keys():
+        data_keys = ' , ' + ' , '.join(list(data.keys()))
+    if data.values():
+        data_values = " , '" + "' , '".join(list(data.values())) + "'"
+
+    return data_keys, data_values
+
+
+def get_feature_event(feature_id, nb_event=3):
+    """
+        Get all the event which append on a feature
+        @param feature_id id of the feature
+        @param nb_event number of event
+        @return events
+    """
+
+    events = models.Event.objects.filter(feature_id=feature_id).order_by('-creation_date')
+    if len(events) > nb_event:
+        return events[0:nb_event]
+    else:
+        return events

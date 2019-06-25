@@ -3,14 +3,15 @@ from collab import models
 from collab.choices import STATUS
 from collab.choices import STATUS_MODERE
 from collab.db_utils import commit_data
-from collab.db_utils import create_feature_sql
-from collab.db_utils import edit_feature_sql
 from collab.models import CustomUser
 from collab.views.views import get_anonymous_rights
 
+from collab.views.services.feature_services import create_feature_sql
 from collab.views.services.feature_services import delete_feature
+from collab.views.services.feature_services import edit_feature_sql
 from collab.views.services.feature_services import get_feature
 from collab.views.services.feature_services import get_feature_detail
+from collab.views.services.feature_services import get_feature_event
 from collab.views.services.feature_services import feature_update_events
 
 from collab.views.services.project_services import get_project_features
@@ -168,13 +169,18 @@ class ProjectFeatureDetail(View):
 
         # get feature attachment
         attachments = list(models.Attachment.objects.filter(project=project,
-                                                feature_id=feature.get('feature_id',
-                                                 '')).select_related('author'))
+                      feature_id=feature.get('feature_id',
+                      '')).select_related('author'))
+        # get feature events
+        events = get_feature_event(feature.get('feature_id', ''))
+        # context
         context = {'rights': rights, 'project': project, 'author': user,
                    'comments': comments, 'attachments': attachments,
+                   'events': events,
                    'com_attachment': com_attachment,
                    'file_max_size': settings.FILE_MAX_SIZE,
                    'labels': labels, 'img_format': settings.IMAGE_FORMAT}
+
         # A AMELIORER
         if not request.is_ajax() or request.session.get('error', ''):
             if request.session.get('error', ''):
@@ -245,7 +251,7 @@ class ProjectFeatureDetail(View):
         comment = data.pop('comment', None)
         # get sql for additonal field
         add_sql = edit_feature_sql(data)
-        # # create with basic keys
+        # create with basic keys
         sql = """UPDATE "{table}"
                  SET  modification_date='{modification_date}',
                       geom='{geom}' {add_sql}
