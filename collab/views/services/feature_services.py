@@ -1,4 +1,5 @@
 from collab.choices import STATUS
+from collab.views.services.validation_services import diff_data
 from .project_services import get_feature_type_table_name
 from collab.db_utils import commit_data
 from collab.db_utils import fetch_first_row
@@ -201,3 +202,53 @@ def get_feature_uuid(table_name, feature_pk):
           """.format(table_name=table_name, id=id)
     data = fetch_first_row('default', sql)
     return data.get('feature_id', '')
+
+
+def feature_update_events(curr_feature, prev_feature, project, user, feature_id):
+    data_modify = {}
+    curr_feature.pop('modification_date', 'None')
+    prev_feature.pop('modification_date', 'None')
+    # log modification of geometrie
+    if 'geom' in curr_feature.keys():
+        if prev_feature['geom'] != curr_feature['geom']:
+            # status Modify
+            models.Event.objects.create(
+                user=user,
+                event_type='update_loc',
+                object_type='feature',
+                project_slug=project.slug,
+                feature_id=feature_id,
+                data={
+                    'key': str(feature_id),
+                    'previous_value': prev_feature['geom'],
+                    'current_value': curr_feature['geom']})
+            # remove status from dict
+            prev_feature.pop('geom', 'None')
+            curr_feature.pop('geom', 'None')
+    # log modification of status
+    if 'status' in curr_feature.keys():
+        if prev_feature['status'] != curr_feature['status']:
+            # status Modify
+            models.Event.objects.create(
+                user=user,
+                event_type='update_status',
+                object_type='feature',
+                project_slug=project.slug,
+                feature_id=feature_id,
+                data={
+                    'key': str(feature_id),
+                    'previous_value': STATUS[int(prev_feature['status'])][1],
+                    'current_value': STATUS[int(curr_feature['status'])][1]})
+            # remove status from dict
+            prev_feature.pop('status', 'None')
+            curr_feature.pop('status', 'None')
+    # data Modify
+    data_modify = diff_data(prev_feature, curr_feature)
+    if data_modify:
+        models.Event.objects.create(
+            user=user,
+            event_type='update_attrs',
+            object_type='feature',
+            project_slug=project.slug,
+            feature_id=feature_id,
+            data=data_modify)

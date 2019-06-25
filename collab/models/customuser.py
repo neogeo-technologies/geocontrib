@@ -8,7 +8,7 @@ class CustomUser(AbstractUser):
     nickname = models.CharField('nickname', max_length=15, blank=True)
 
     def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name.upper())
+        return '%s' % (self.username)
 
     def project_right(self, project):
         """

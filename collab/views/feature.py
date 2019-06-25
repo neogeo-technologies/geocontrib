@@ -11,12 +11,12 @@ from collab.views.views import get_anonymous_rights
 from collab.views.services.feature_services import delete_feature
 from collab.views.services.feature_services import get_feature
 from collab.views.services.feature_services import get_feature_detail
+from collab.views.services.feature_services import feature_update_events
 
 from collab.views.services.project_services import get_project_features
 from collab.views.services.project_services import project_feature_type_fields
 from collab.views.services.project_services import project_features_types
 
-from collab.views.services.validation_services import diff_data
 from collab.views.services.validation_services import validate_geom
 
 from collections import OrderedDict
@@ -228,6 +228,7 @@ class ProjectFeatureDetail(View):
 
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
+        # get feature before update
         prev_feature = get_feature(APP_NAME, project_slug, feature_type_slug, feature_id)
         # get user right on project
         data = request.POST.dict()
@@ -258,24 +259,8 @@ class ProjectFeatureDetail(View):
         creation = commit_data('default', sql)
         if creation == True:
             # log de l'event de modification d'un projet
-            data_modify = {}
             curr_feature = get_feature(APP_NAME, project_slug, feature_type_slug, feature_id)
-            data_modify = diff_data(prev_feature, curr_feature)
-            # if the status has changed from something to published -> notification
-            # if 'status' in curr_feature.keys():
-            #     if curr_feature['status'] == '2':
-            #         # to do notification to subscribers
-
-            # data Modify
-            models.Event.objects.create(
-                user=request.user,
-                event_type='update_attrs',
-                object_type='feature',
-                project_slug=project.slug,
-                feature_id=feature_id,
-                data=data_modify
-            )
-
+            feature_update_events(curr_feature, prev_feature, project, request.user, feature_id)
             return redirect('project_feature_detail', project_slug=project_slug,
                             feature_type_slug=feature_type_slug, feature_id=feature_id)
         else:
@@ -378,7 +363,7 @@ class ProjectFeature(View):
                 data_geom_wkt = exif.get_image_geoloc_as_wkt(real_path, with_alt=False, ewkt=False)
             except Exception as e:
                 path = default_storage.delete('tmp/'+geo_file.name)
-                request.session['error'] = "Votre image n'est géolocalisée"
+                request.session['error'] = "Votre image n'est pas géolocalisée"
                 return redirect('project_add_feature', project_slug=project_slug)
             path = default_storage.delete('tmp/'+geo_file.name)
             # get geom ( à ameliore si les 2 infos de geometrie sont fournis)
