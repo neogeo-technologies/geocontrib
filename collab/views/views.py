@@ -6,7 +6,6 @@ from collab.forms import ProjectForm
 from collab.views.services.user_services import get_last_user_comments
 from collab.views.services.user_services import get_last_user_feature
 from collab.views.services.user_services import get_last_user_registered
-from collab.views.services.user_services import get_user_feature
 
 from collab.views.services.feature_services import delete_feature_table
 from collab.views.services.feature_services import get_feature_pk
@@ -349,7 +348,7 @@ def my_account(request):
     if request.user.is_authenticated:
         rights = {}
         project_info = {}
-
+        last_features = []
         project_list = models.Project.objects.all()
         for elt in project_list:
             if request.user.is_authenticated:
@@ -375,10 +374,15 @@ def my_account(request):
             # get number of feature per project
             list_features = project_features_types(APP_NAME, project.slug)
             nb_features = 0
-            for feature_type in list_features:
+
+            for feature_type_slug in list_features:
                 nb_features += int(project_feature_number(APP_NAME,
                                    project.slug,
-                                   feature_type))
+                                   feature_type_slug))
+                # get user features
+                res_feature = get_last_user_feature(request.user, APP_NAME, project.slug, feature_type_slug)
+                if res_feature:
+                    last_features.append(res_feature)
             if not project.slug in project_info:
                 if request.user.is_superuser:
                     project_info[project.slug] = {'level': 'SuperAdmin'}
@@ -387,30 +391,18 @@ def my_account(request):
             project_info[project.slug].update({'nb_features': nb_features,
                                                'nb_contributors': nb_contributors,
                                                'nb_comments': nb_comments})
+        # get 3 last user feature
+        last_features.sort(key=lambda item: item['modification_date'], reverse=True)
+        if len(last_features) > 3:
+            last_features = last_features[0:3]
+
         # get 3 last user comments
         last_comment = get_last_user_comments(request.user, 3)
         # get feature pk
         feature_pk = {}
-        for elt in last_comment:
-            table_name = """{app_name}_{project_slug}_{feature_type_slug}""".format(
-                            app_name=APP_NAME,
-                            project_slug=elt.project.slug,
-                            feature_type_slug=elt.feature_type_slug)
-            feature_pk[elt.feature_id] = get_feature_pk(table_name, elt.feature_id)
-        # get 3 last user feature
-        tables_names = get_user_feature(APP_NAME, request.user)
-        features = []
-        for elt in tables_names:
-            data = get_last_user_feature(request.user, APP_NAME,
-                                         elt['project'], elt['feature_type_slug'])
-            if data:
-                features.append(data)
-        features.sort(key=lambda item: item['modification_date'], reverse=True)
-        if len(features) > 3:
-            features = features[0:3]
         context = {"project_list": project_list, "rights": rights, "user": user,
                    "feature_pk": feature_pk, "project_info": project_info,
-                   "last_comment": last_comment, "features": features}
+                   "last_comment": last_comment, "last_features": last_features}
         return render(request, 'collab/my_account.html', context)
     else:
         context = {"error": "Vous n'avez pas les droits nécessaires pour acceder à cette page"}

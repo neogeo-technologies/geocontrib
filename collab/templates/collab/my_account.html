@@ -158,16 +158,20 @@
                 Mes derniers signalements
             </h4>
             <div class="ui list">
-                {% for elt in features %}
-                    <div class="item">
-                        <i class="map marker icon"></i>
-                        <div class="content">
-                            <a  href="{% url 'project_feature_detail' project_slug=elt.project feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" class="header">{{elt.project}} - {{elt.title}}</a>
-                            <div class="description">{{elt.description|slice:":150"}}</div>
-                            <div class="description">Date de dernière modification&nbsp;: {{elt.modification_date}}</div>
+                {% if last_features %}
+                    {% for elt in last_features %}
+                        <div class="item">
+                            <i class="map marker icon"></i>
+                            <div class="content">
+                                <a  href="{% url 'project_feature_detail' project_slug=elt.project feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" class="header">{{elt.project}} - {{elt.title}}</a>
+                                <div class="description">{{elt.description|slice:":150"}}</div>
+                                <div class="description">Date de dernière modification&nbsp;: {{elt.modification_date}}</div>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    Pas de signalement
+                {% endif %}
             </div>
             <h4 id="mes_derniers_commentaires" class="ui horizontal divider header">
                 <a name="commentaires"></a>
@@ -175,16 +179,20 @@
                 Mes derniers commentaires
             </h4>
             <div class="ui list">
-                {% for elt in last_comment %}
-                    <div class="item">
-                        <i class="comment icon"></i>
-                        <div class="content">
-                            <a   href="{% url 'project_feature_detail' project_slug=elt.project.slug feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" > {{elt.project.title}} - {{elt.feature_slug}}</a>
-                            <div class="description">{{elt.comment|slice:":150"}}</div>
-                            <div class="description">Date du commentaire&nbsp;: {{elt.creation_date}}</div>
+                {% if last_comment %}
+                    {% for elt in last_comment %}
+                        <div class="item">
+                            <i class="comment icon"></i>
+                            <div class="content">
+                                <a   href="{% url 'project_feature_detail' project_slug=elt.project.slug feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" > {{elt.project.title}} - {{elt.feature_type_slug}}</a>
+                                <div class="description">{{elt.comment|slice:":150"}}</div>
+                                <div class="description">Date du commentaire&nbsp;: {{elt.creation_date}}</div>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    Pas de commentaires
+                {% endif %}
             </div>
 
         </div>

@@ -45,37 +45,22 @@ def get_last_user_comments(user, nbcom=None):
                    ).order_by('creation_date')
 
 
-def get_last_user_feature(user, app_name, project_slug, feature_type):
+def get_last_user_feature(user, app_name, project_slug, feature_type_slug):
     """
         List of the last user features's
         @param table_name table name
         @param user user
         @return JSON
     """
-    table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
-    sql = """ SELECT DISTINCT *
+    table_name = get_feature_type_table_name(app_name, project_slug, feature_type_slug)
+    sql = """ SELECT DISTINCT *, feature_id::varchar
               FROM {table_name} WHERE user_id='{user_id}';
           """.format(table_name=table_name, user_id=user.id)
     data = fetch_raw_data('default', sql)
     if data:
         for elt in data:
             elt['project'] = project_slug
-            elt['feature_type'] = feature_type
+            elt['feature_type_slug'] = feature_type_slug
         return data[0]
     else:
         return ""
-
-
-def get_user_feature(app_name, user):
-    projects = models.Autorisation.objects.filter(user=user).values('project__slug')
-    tables_names = []
-    for elt in projects:
-        for feature_type in project_features_types(app_name, elt['project__slug']):
-            tables_names.append({'table_name': """{app_name}_{project_slug}_{feature_type}""".format(
-                                  app_name=app_name,
-                                  project_slug=elt['project__slug'],
-                                  feature_type=feature_type),
-                                  'feature_type': feature_type,
-                                  'project': elt['project__slug']})
-
-    return tables_names
