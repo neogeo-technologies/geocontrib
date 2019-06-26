@@ -71,7 +71,7 @@ def archive_all_features(app_name, project_slug, feature_type, archive_date=None
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
     # liste ids to archive
-    sql = """ UPDATE {table_name}
+    sql = """ UPDATE "{table_name}"
               SET status='3'
               WHERE archive_date < '{archive_date}';
           """.format(table_name=table_name, archive_date=archive_date)
