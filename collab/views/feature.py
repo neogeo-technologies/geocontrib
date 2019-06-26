@@ -273,7 +273,7 @@ class ProjectFeatureDetail(View):
         if creation == True:
             # log de l'event de modification d'un projet
             curr_feature = get_feature(APP_NAME, project_slug, feature_type_slug, feature_id)
-            feature_update_events(curr_feature, prev_feature, project, request.user, feature_id)
+            feature_update_events(curr_feature, prev_feature, project, request.user, feature_type_slug, feature_id)
             return redirect('project_feature_detail', project_slug=project_slug,
                             feature_type_slug=feature_type_slug, feature_id=feature_id)
         else:

@@ -1,0 +1,29 @@
+{% load app_filters %}
+<span style="color:rgb(64, 64, 64)">
+  {% if first_name and last_name %}
+    Bonjour {{first_name }} {{last_name|upper }},<br>
+  {% else %}
+    Bonjour {{username}},<br>
+  {% endif %}
+  Nous vous informons des opérations ont été appliqué sur les signalements d'un projet auxquels vous êtes abonné:
+  {% for key,val in res.items%}
+      {% get_nested_item val 'events' as events  %}
+        {% if events %}
+         <h2><strong>Projet: {{val|get_dict_item:'project'|upper}}</strong></h2><br>
+         <h2>Identifiant: {{val|get_dict_item:'identifiant'}}</h2> <br>
+         <h2>Url du signalement: {{val|get_dict_item:'url'}}<h2> <br>
+           -Évenements:
+           {% for elt in events%}
+              <br>
+              <ul>
+                  <li>-Objet concerné: {{elt.object_type}}</li>
+                  <li>-Date de l'évenement: {{elt.creation_date}}</li>
+                  <li>-Type de modification: {{elt.event_type}}</li>
+              </ul>
+           {% endfor %}
+         {% endif %}
+{% endfor %}
+<span style="font-family:verdana,geneva,sans-serif; font-size:11px">
+  ----------  Ce message a été automatiquement envoyé par le site Collab. ----------
+</span>
+</span>

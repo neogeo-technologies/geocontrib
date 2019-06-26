@@ -9,7 +9,9 @@ class Subscription(models.Model):
                                           auto_now_add=True)
     feature_id = models.UUIDField("Identifiant du signalement",
                                   editable=False, max_length=32)
-    project_slug = models.SlugField('Slug', max_length=128)
+    project_slug = models.SlugField('Porject Slug', max_length=256)
+
+    feature_type_slug = models.SlugField('Feature Slug', max_length=256, blank=True, null=True)
 
     users = models.ManyToManyField(
         CustomUser, verbose_name="Utilisateurs", help_text="Utilisateurs abonnés")

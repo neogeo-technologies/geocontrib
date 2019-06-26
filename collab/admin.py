@@ -86,7 +86,7 @@ admin.site.register(Event, EventAdmin)
 class SubscriptionAdmin(admin.ModelAdmin):
 
     readonly_fields = ('creation_date', 'feature_id',
-                       'project_slug', 'users')
+                       'project_slug', 'users', 'feature_type_slug')
     list_display = ('creation_date', 'feature_id', 'project_slug')
     empty_value_display = '-aucun-'
 admin.site.register(Subscription, SubscriptionAdmin)

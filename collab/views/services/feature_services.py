@@ -208,16 +208,18 @@ def get_feature_uuid(table_name, feature_pk):
     return data.get('feature_id', '')
 
 
-def feature_update_events(curr_feature, prev_feature, project, user, feature_id):
+def feature_update_events(curr_feature, prev_feature, project, user, feature_type_slug, feature_id):
     """
         Create events when a feature is updated
         @param curr_feature feature  after update
         @param prev_feature feature before update
         @param project  project
         @param user user at the origine of the feature update
+        @param feature_type_slug feature slug
         @param feature_id id of the modify fetaure
         @return
     """
+
     data_modify = {}
     curr_feature.pop('modification_date', 'None')
     prev_feature.pop('modification_date', 'None')
@@ -230,6 +232,7 @@ def feature_update_events(curr_feature, prev_feature, project, user, feature_id)
                 event_type='update_loc',
                 object_type='feature',
                 project_slug=project.slug,
+                feature_type_slug=feature_type_slug,
                 feature_id=feature_id,
                 data={
                     'key': str(feature_id),
@@ -247,6 +250,7 @@ def feature_update_events(curr_feature, prev_feature, project, user, feature_id)
                 event_type='update_status',
                 object_type='feature',
                 project_slug=project.slug,
+                feature_type_slug=feature_type_slug,
                 feature_id=feature_id,
                 data={
                     'key': str(feature_id),
@@ -263,6 +267,7 @@ def feature_update_events(curr_feature, prev_feature, project, user, feature_id)
             event_type='update_attrs',
             object_type='feature',
             project_slug=project.slug,
+            feature_type_slug=feature_type_slug,
             feature_id=feature_id,
             data=data_modify)
 

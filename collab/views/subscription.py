@@ -22,7 +22,8 @@ class Subscription(View):
         form_data = request.POST.dict()
         if 'subscribe' in form_data:
             obj, _created = models.Subscription.objects.get_or_create(feature_id=feature_id,
-                                                            project_slug=project_slug)
+                                                                      feature_type_slug=feature_type_slug,
+                                                                      project_slug=project_slug)
             # Add user
             if request.user:
                 obj.users.add(request.user)
@@ -30,6 +31,7 @@ class Subscription(View):
         else:
             try:
                 obj = models.Subscription.objects.get(feature_id=feature_id,
+                                                      feature_type_slug=feature_type_slug,
                                                       project_slug=project_slug)
                 # remove user
                 if request.user:
