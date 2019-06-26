@@ -175,10 +175,11 @@ class ProjectFeatureDetail(View):
         events = get_feature_event(feature.get('feature_id', ''))
         # user Subscription
         subscription = False
-        if models.Subscription.objects.filter(users=request.user,
-                                 feature_id=feature.get('feature_id', ''),
-                                 project_slug=project.slug):
-            subscription = True
+        if request.user.is_authenticated:
+            if models.Subscription.objects.filter(users=request.user,
+                                     feature_id=feature.get('feature_id', ''),
+                                     project_slug=project.slug):
+                subscription = True
         # context
         context = {'rights': rights, 'project': project, 'author': user,
                    'comments': comments, 'attachments': attachments,
@@ -190,6 +191,7 @@ class ProjectFeatureDetail(View):
 
         # A AMELIORER
         if not request.is_ajax() or request.session.get('error', ''):
+
             if request.session.get('error', ''):
                 context['error'] = request.session.pop('error', '')
             geom_to_wkt = feature.get('geom', '')
