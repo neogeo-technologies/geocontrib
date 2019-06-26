@@ -39,11 +39,22 @@ def delete_feature_table(app_name, project_slug, feature_type_slug):
         @param feature_type_slug type of the feature
         @return JSON
     """
+    import pdb; pdb.set_trace()
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type_slug)
     # liste ids to delete
     sql = """ DROP TABLE "{table_name}";
           """.format(table_name=table_name)
     deletion = commit_data('default', sql)
+    # attachment
+    models.Attachment.objects.filter(feature_type_slug=feature_type_slug).delete()
+    # comments
+    models.Comment.objects.filter(feature_type_slug=feature_type_slug).delete()
+    # delete events
+    models.Event.objects.filter(feature_type_slug=feature_type_slug).delete()
+    # delete type of feature
+    models.FeatureType.objects.filter(feature_type_slug=feature_type_slug).delete()
+    # delete subscription
+    models.Subscription.objects.filter(feature_type_slug=feature_type_slug).delete()
     return deletion
 
 
@@ -96,6 +107,11 @@ def delete_all_features(app_name, project_slug, feature_type, deletion_date=None
         models.Attachment.objects.filter(feature_id__in=list_ids).delete()
         # comments
         models.Comment.objects.filter(feature_id__in=list_ids).delete()
+        # delete events
+        models.Event.objects.filter(feature_id__in=list_ids).delete()
+        # delete subscription
+        models.Subscription.objects.filter(feature_id__in=list_ids).delete()
+        return deletion
     return data
 
 
@@ -114,21 +130,24 @@ def delete_feature(app_name, project_slug, feature_type, feature_id, user):
               WHERE feature_id='{feature_id}';
           """.format(table_name=table_name, feature_id=feature_id)
     deletion = commit_data('default', sql)
-
     # attachment
     models.Attachment.objects.filter(feature_id=feature_id).delete()
     # comments
     models.Comment.objects.filter(feature_id=feature_id).delete()
+    # delete events
+    models.Event.objects.filter(feature_id=feature_id).delete()
+    # delete subscription
+    models.Subscription.objects.filter(feature_id=feature_id).delete()
     # à voir si il faut logger cette evenement
-    # models.Event.objects.create(
-    #     user=user,
-    #     event_type='delete',
-    #     object_type='feature',
-    #     project_slug=project_slug,
-    #     feature_id=feature_id,
-    #     feature_type_slug=feature_type,
-    #     data={}
-    # )
+    models.Event.objects.create(
+        user=user,
+        event_type='delete',
+        object_type='feature',
+        project_slug=project_slug,
+        feature_id=feature_id,
+        feature_type_slug=feature_type,
+        data={}
+    )
     return deletion
 
 

@@ -159,7 +159,17 @@ class ProjectServiceView(View):
     """
     def delete(self, request):
 
-        if request.GET.get('projet_slug', ''):
+        if request.GET.get('feature_type_slug', '') and request.GET.get('projet_slug', '') :
+            project_slug = request.GET.get('projet_slug', '')
+            feature_type_slug = request.GET.get('feature_type_slug', '')
+            deletion = delete_feature_table(APP_NAME, project_slug, feature_type_slug)
+            if deletion:
+                return JsonResponse({'success': 'Le type de signalement a été supprimé'})
+            else:
+                return JsonResponse({'error': "Le type de signalement n'a pu être supprimé"},
+                                    status='400')
+
+        elif request.GET.get('projet_slug', ''):
             project_slug = request.GET.get('projet_slug', '')
             project = get_object_or_404(models.Project,
                                         slug=project_slug)

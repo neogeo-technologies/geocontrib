@@ -42,6 +42,7 @@ class Attachment(View):
             # create comment
             obj = models.Attachment.objects.create(author=request.user,
                                                    feature_id=feature['feature_id'],
+                                                   feature_type_slug=feature_type_slug,
                                                    title=form_data.get('title', ''),
                                                    type_objet='0',
                                                    info=form_data.get('info', ''),

@@ -31,6 +31,7 @@ class Attachment(models.Model):
 
     feature_id = models.UUIDField("Identifiant du signalement", null=True,
                                   editable=False, max_length=32, blank=True)
+    feature_type_slug = models.SlugField('Slug du type de signalement', max_length=128)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True)
     info = models.TextField('Info', blank=True)

@@ -91,7 +91,7 @@ class FeatureType(models.Model):
 
     name = models.CharField("Nom", max_length=128)
 
-    feature_type_slug = models.SlugField("Slug", max_length=256, null=True, blank=True)
+    feature_type_slug = models.SlugField("Feature Slug", max_length=256, null=True, blank=True)
 
     geom_type = models.CharField(
         "Type de champs géometrique", choices=GEOM_TYPE, max_length=50,
