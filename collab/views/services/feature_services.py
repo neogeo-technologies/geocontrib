@@ -14,6 +14,7 @@ import re
 from django.shortcuts import get_object_or_404
 from django.utils.crypto import get_random_string
 from hashlib import md5
+import logging
 
 
 def generate_feature_id(app_name, project_slug, feature):
@@ -39,12 +40,13 @@ def delete_feature_table(app_name, project_slug, feature_type_slug):
         @param feature_type_slug type of the feature
         @return JSON
     """
-    import pdb; pdb.set_trace()
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type_slug)
     # liste ids to delete
     sql = """ DROP TABLE "{table_name}";
           """.format(table_name=table_name)
     deletion = commit_data('default', sql)
+    logger = logging.getLogger(__name__)
+    logger.exception(deletion)
     # attachment
     models.Attachment.objects.filter(feature_type_slug=feature_type_slug).delete()
     # comments
