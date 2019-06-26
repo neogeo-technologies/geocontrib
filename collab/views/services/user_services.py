@@ -4,6 +4,16 @@ from collab.views.services.project_services import get_feature_type_table_name
 from collab.views.services.project_services import project_features_types
 
 
+def get_user_subscriptions(user):
+    """
+        List of user subscription's
+        @param user user
+        @return list of features ids
+    """
+    list_ids = []
+    return list_ids
+
+
 def get_last_user_registered(project_slug, nbuser=None):
     """
         List of user registered within a project
@@ -19,7 +29,6 @@ def get_last_user_registered(project_slug, nbuser=None):
                ).order_by('creation_date').values('user__username',
                                                   'user__first_name',
                                                   'user__last_name')
-
 
 def get_last_user_comments(user, nbcom=None):
     """

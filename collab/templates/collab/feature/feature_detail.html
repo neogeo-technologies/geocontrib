@@ -1,9 +1,19 @@
 
 <div id="feature_detail">
     {% if rights.feat_modification or request.user.id == feature.user_id  %}
-
-        <i id="btn_feature_edit" class="orange big edit icon "></i>
-        <i id="btn_feature_delete" class="trash red big alternate icon "></i>
+        <!-- <i id="btn_feature_subscribe" class="big icons">
+            <i class="blue envelope outline icon "></i>
+            <i class="mini at icon "></i>
+        </i> -->
+        <span id="btn_feature_edit"   data-tooltip="Modifier le signalement">
+            <i class="orange big edit icon "></i>
+        </span>
+        <span id="btn_feature_delete"  data-tooltip="Supprimer le signalement" >
+            <i  class="trash red big alternate icon "></i>
+        </span>
+        <span id="btn_feature_subscribe" data-tooltip="Abonnez-vous aux Modifications" >
+            <i class="big blue envelope outline icon "></i>
+        </span>
     {% endif %}
     <table class="ui very basic table">
         <tbody>
@@ -33,7 +43,7 @@
     </table>
 </div>
 
-<div class="ui mini modal">
+<div class="ui mini modal deletion">
       <div class="header">Suppression du signalement</div>
       <div class="content">
          <p>Êtes-vous sûr/sure de vouloir supprimer ce signalement&nbsp;?</p>
@@ -52,10 +62,49 @@
           </form>
     </div>
 </div>
+<div class="ui mini modal subscription">
+      <div class="header">Abonnement aux notifications</div>
+      <i class="close icon"></i>
+      <div class="content">
+          <form action="{% url 'project_subscription' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug feature_id=request.resolver_match.kwargs.feature_id %}" method='POST'>
+              {% csrf_token %}
+              <div class="inline field">
+                   <div class="ui checkbox subscribe_checkbox">
+                     <label>Inscription</label>
+                     <input type="checkbox" tabindex="0" name="subscribe" class="hidden">
+                   </div>
+              </div>
+              </br>
+              <div class="actions">
+                <button type='submit' class="ui positive right labeled icon button">
+                  OK
+                  <i class="checkmark icon"></i>
+                </button>
+              </div>
+          </form>
+      </div>
+
+</div>
 <script>
+    // checkbox
+    $('.ui.checkbox.subscribe_checkbox')
+      .checkbox()
+    ;
+
+    var subscribe = "{{subscription}}"
+    if (String(subscribe).toLowerCase() == 'true'){
+        $('.ui.checkbox.subscribe_checkbox').checkbox('check');
+    }
+    // modal confirmation before subscription
+    $('#btn_feature_subscribe').click(function(){
+        $('.mini.modal.subscription')
+          .modal('show')
+        ;
+    });
+
     // modal confirmation before deletion of feature
     $('#btn_feature_delete').click(function(){
-        $('.mini.modal')
+        $('.mini.modal.deletion')
           .modal('show')
         ;
     });
@@ -82,7 +131,6 @@
             console.log('Error occured', err);
           }
         });
-
     });
 
 </script>

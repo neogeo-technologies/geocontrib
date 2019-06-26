@@ -3,13 +3,14 @@ from django.conf.urls.static import static
 from django.conf import settings
 from . import views
 import collab.views.feature as feature
-from collab.views.attachment import ProjectAttachment
-from collab.views.comment import ProjectComment
+from collab.views.feature import ProjectFeature
+from collab.views.feature import ProjectFeatureDetail
+from collab.views.attachment import Attachment
+from collab.views.comment import Comment
+from collab.views.subscription import Subscription
 from collab.views.views import LoginView
 from collab.views.views import LogoutView
 from collab.views.views import ProjectAdminView
-from collab.views.feature import ProjectFeature
-from collab.views.feature import ProjectFeatureDetail
 from collab.views.views import ProjectServiceView
 from collab.views.views import ProjectView
 
@@ -33,10 +34,12 @@ urlpatterns = services + [
     path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),
     path('projet/<slug:project_slug>/membres/', views.project_members, name='project_members'),
     path('projet/<slug:project_slug>/ajout/', ProjectFeature.as_view(), name='project_add_feature'),
-    path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/commentaire', ProjectComment.as_view(),
-         name='project_add_comment'),
-    path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/attachment', ProjectAttachment.as_view(),
-         name='project_add_attachment'),
+    path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/commentaire', Comment.as_view(),
+         name='project_comment'),
+    path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/attachment', Attachment.as_view(),
+         name='project_attachment'),
+    path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/abonnement', Subscription.as_view(),
+          name='project_subscription'),
     path('projet/<slug:project_slug>/liste/', feature.project_feature_list, name='project_feature_list'),
     path('projet/<slug:project_slug>/carte/', feature.project_feature_map, name='project_feature_map'),
     path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>', ProjectFeatureDetail.as_view(),

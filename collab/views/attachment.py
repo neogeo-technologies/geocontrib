@@ -10,7 +10,7 @@ APP_NAME = __package__.split('.')[0]
 
 
 @method_decorator([csrf_exempt], name='dispatch')
-class ProjectAttachment(View):
+class Attachment(View):
 
     def post(self, request, project_slug, feature_type_slug, feature_id):
         """

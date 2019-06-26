@@ -12,7 +12,7 @@ from collab.models import Event
 from collab.models import FeatureType
 from collab.models import Project
 # from collab.models import Status
-# from collab.models import Subscription
+from collab.models import Subscription
 
 app = apps.get_app_config('collab')
 
@@ -73,6 +73,7 @@ class FeatureTypeAdmin(admin.ModelAdmin):
     empty_value_display = '-aucun-'
 admin.site.register(FeatureType, FeatureTypeAdmin)
 
+
 class EventAdmin(admin.ModelAdmin):
 
     readonly_fields = ('project_slug', 'feature_type_slug', 'feature_id',
@@ -80,6 +81,15 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ('project_slug', 'event_type', 'creation_date',)
     empty_value_display = '-aucun-'
 admin.site.register(Event, EventAdmin)
+
+
+class SubscriptionAdmin(admin.ModelAdmin):
+
+    readonly_fields = ('creation_date', 'feature_id',
+                       'project_slug', 'users')
+    list_display = ('creation_date', 'feature_id', 'project_slug')
+    empty_value_display = '-aucun-'
+admin.site.register(Subscription, SubscriptionAdmin)
 
 
 class CustomUserChangeForm(UserChangeForm):
@@ -97,7 +107,7 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(CustomUser, CustomUserAdmin)
 
 
-for model_name, model in app.models.items():
-    if 'auth' not in model_name and 'django' not in model_name and 'customuser_' not in model_name:
-        if not admin.site._registry.get(model, ''):
-            admin.site.register(model)
+# for model_name, model in app.models.items():
+#     if 'auth' not in model_name and 'django' not in model_name and 'customuser_' not in model_name:
+#         if not admin.site._registry.get(model, ''):
+#             admin.site.register(model)

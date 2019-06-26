@@ -3,6 +3,7 @@ from .views import *
 from .services.project_services import *
 from .services.validation_services import *
 from .services.user_services import *
-from .attachment import ProjectAttachment
-from .comment import ProjectComment
+from .attachment import Attachment
+from .comment import Comment
+from .subscription import Subscription
 from .feature import *

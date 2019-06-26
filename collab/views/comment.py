@@ -8,7 +8,7 @@ import logging
 APP_NAME = __package__.split('.')[0]
 
 
-class ProjectComment(View):
+class Comment(View):
 
     def post(self, request, project_slug, feature_type_slug, feature_id):
         """

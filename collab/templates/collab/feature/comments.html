@@ -34,7 +34,7 @@
                          le {{val.creation_date|date:"d/m/Y"}}
                       </div>
                       {% if rights.feat_modification %}
-                         <form action="{% url 'project_add_comment' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug feature_id=request.resolver_match.kwargs.feature_id %}" method='POST'>
+                         <form action="{% url 'project_comment' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug feature_id=request.resolver_match.kwargs.feature_id %}" method='POST'>
                            {% csrf_token %}
                            <input type="hidden" name="_method" value="delete">
                            <input type="hidden" name="comment_id" value={{val.comment_id}}>
@@ -60,7 +60,7 @@
 
     <div class="content">
 
-        <form id="commentform" action="{% url 'project_add_comment' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug  feature_id=request.resolver_match.kwargs.feature_id%}" class="ui form comment_form" method="POST">
+        <form id="commentform" action="{% url 'project_comment' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug  feature_id=request.resolver_match.kwargs.feature_id%}" class="ui form comment_form" method="POST">
         {% csrf_token %}
             <div class="ui positive message hidden" id="positive_message">
               <div class="header">

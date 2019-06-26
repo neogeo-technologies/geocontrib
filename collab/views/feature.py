@@ -173,10 +173,17 @@ class ProjectFeatureDetail(View):
                       '')).select_related('author'))
         # get feature events
         events = get_feature_event(feature.get('feature_id', ''))
+        # user Subscription
+        subscription = False
+        if models.Subscription.objects.filter(users=request.user,
+                                 feature_id=feature.get('feature_id', ''),
+                                 project_slug=project.slug):
+            subscription = True
         # context
         context = {'rights': rights, 'project': project, 'author': user,
                    'comments': comments, 'attachments': attachments,
                    'events': events,
+                   'subscription': subscription,
                    'com_attachment': com_attachment,
                    'file_max_size': settings.FILE_MAX_SIZE,
                    'labels': labels, 'img_format': settings.IMAGE_FORMAT}
