@@ -10,7 +10,7 @@ def diff_data(prev_dict, cur_dict):
         field values
         @return the list of modify keys
     """
-    diff = [key for key, val in prev_dict.items() if cur_dict.get(key, None) != val ]
+    diff = [key for key, val in prev_dict.items() if str(cur_dict.get(key, "")) != str(val)]
     data_modify = []
     for elt in diff:
         data_modify.append({
