@@ -79,7 +79,7 @@ def project_feature_number(app_name, project_slug, feature_type):
         @return JSON
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
-    sql = """ SELECT COUNT(*) FROM '{table_name}' ;
+    sql = """ SELECT COUNT(*) FROM "{table_name}" ;
           """.format(table_name=table_name)
     num = fetch_first_row('default', sql)
     return num.get('count', 0)
@@ -98,7 +98,7 @@ def project_feature_type_fields(app_name, project_slug, feature_type_slug):
               character_maximum_length as char_max_size,
               null As info
               from information_schema.columns WHERE table_schema='public'
-              AND table_name = '{table_name}';
+              AND table_name = "{table_name}";
           """.format(table_name=table_name)
     data = fetch_raw_data('default', sql)
     res = {}
@@ -117,7 +117,7 @@ def get_project_features(app_name, project_slug, feature_type):
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
     sql = """ SELECT *
-              FROM '{table_name}'
+              FROM "{table_name}"
               ORDER BY creation_date DESC ;
           """.format(table_name=table_name)
     data = fetch_raw_data('default', sql)
@@ -139,9 +139,9 @@ def get_last_features(app_name, project_slug, feature_type, num=""):
     if num:
         limit = "  LIMIT " + str(num)
     sql = """ SELECT collab_customuser.id AS userid,
-              first_name,last_name,'{table_name}'.feature_id as pk,
+              first_name,last_name,"{table_name}".feature_id as pk,
               user_id,feature_id,title,creation_date
-              FROM '{table_name}'
+              FROM "{table_name}"
               INNER JOIN public.collab_customuser ON
               user_id=collab_customuser.id
               ORDER BY creation_date DESC {limit};

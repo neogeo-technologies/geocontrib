@@ -42,7 +42,7 @@ def delete_feature_table(app_name, project_slug, feature_type_slug):
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type_slug)
     # liste ids to delete
-    sql = """ DROP TABLE '{table_name}';
+    sql = """ DROP TABLE "{table_name}";
           """.format(table_name=table_name)
     deletion = commit_data('default', sql)
     logger = logging.getLogger(__name__)
@@ -71,7 +71,7 @@ def archive_all_features(app_name, project_slug, feature_type, archive_date=None
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
     # liste ids to archive
-    sql = """ UPDATE '{table_name}'
+    sql = """ UPDATE "{table_name}"
               SET status='3'
               WHERE archive_date < '{archive_date}';
           """.format(table_name=table_name, archive_date=archive_date)
@@ -91,7 +91,7 @@ def delete_all_features(app_name, project_slug, feature_type, deletion_date=None
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
     # liste ids to delete
     sql = """ SELECT feature_id::varchar,title
-              FROM '{table_name}'
+              FROM "{table_name}"
               WHERE deletion_date < '{deletion_date}';
           """.format(table_name=table_name, deletion_date=deletion_date)
     data = fetch_raw_data('default', sql)
@@ -101,7 +101,7 @@ def delete_all_features(app_name, project_slug, feature_type, deletion_date=None
         list_ids = [d['feature_id'] for d in data]
         # deletion
         sql = """ DELETE
-                  FROM '{table_name}'
+                  FROM "{table_name}"
                   WHERE deletion_date < '{deletion_date}';
               """.format(table_name=table_name, deletion_date=deletion_date)
         deletion = commit_data('default', sql)
@@ -128,7 +128,7 @@ def delete_feature(app_name, project_slug, feature_type, feature_id, user):
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
     sql = """ DELETE
-              FROM '{table_name}'
+              FROM "{table_name}"
               WHERE feature_id='{feature_id}';
           """.format(table_name=table_name, feature_id=feature_id)
     deletion = commit_data('default', sql)
@@ -164,7 +164,7 @@ def get_feature(app_name, project_slug, feature_type, feature_id):
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
     sql = """ SELECT *, ST_AsGeoJSON(geom) as geom
-              FROM '{table_name}'
+              FROM "{table_name}"
               WHERE feature_id='{feature_id}';
           """.format(table_name=table_name, feature_id=feature_id)
     data = fetch_first_row('default', sql)
@@ -206,7 +206,7 @@ def get_feature_pk(table_name, feature_id):
     """
 
     sql = """ SELECT feature_id AS pk
-              FROM '{table_name}'
+              FROM "{table_name}"
               WHERE feature_id='{feature_id}';
           """.format(table_name=table_name, feature_id=feature_id)
     data = fetch_first_row('default', sql)
@@ -222,7 +222,7 @@ def get_feature_uuid(table_name, feature_pk):
     """
 
     sql = """ SELECT feature_id
-              FROM '{table_name}'
+              FROM "{table_name}"
               WHERE id='{id}';
           """.format(table_name=table_name, id=id)
     data = fetch_first_row('default', sql)

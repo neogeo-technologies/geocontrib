@@ -54,7 +54,7 @@ def get_last_user_feature(user, app_name, project_slug, feature_type_slug):
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type_slug)
     sql = """ SELECT DISTINCT *, feature_id::varchar
-              FROM '{table_name}' WHERE user_id='{user_id}';
+              FROM "{table_name}" WHERE user_id='{user_id}';
           """.format(table_name=table_name, user_id=user.id)
     data = fetch_raw_data('default', sql)
     if data:
