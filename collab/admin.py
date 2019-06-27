@@ -11,6 +11,7 @@ from collab.models import Comment
 from collab.models import Event
 from collab.models import FeatureType
 from collab.models import Project
+from collab.models import Layer
 # from collab.models import Status
 from collab.models import Subscription
 
@@ -31,11 +32,15 @@ class AttachmentAdmin(admin.ModelAdmin):
 admin.site.register(Attachment, AttachmentAdmin)
 
 
-
+class LayerInline(admin.TabularInline):
+    extra = 0
+    ordering = ('order', )
+    model = Layer
 
 class ProjectAdmin(admin.ModelAdmin):
     readonly_fields = ('slug',)
     list_display = ('title', 'thumbLink', 'moderation')
+    inlines = (LayerInline, )
     empty_value_display = '-aucun-'
     actions = [delete_project]
     # supprimer l'action de base de suppression d'un projet

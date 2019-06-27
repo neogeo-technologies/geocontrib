@@ -19,7 +19,9 @@ from collab.views.services.validation_services import diff_data
 from collections import OrderedDict
 from datetime import timedelta
 import dateutil.parser
+import json
 
+from django.db.models import F
 # from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
@@ -533,10 +535,11 @@ def project_members(request, project_slug):
                 autorisation = data.pop("id", None)
                 if data.get("DELETE"):
                     if autorisation:
-                        # Doit on desactivé un utilisateur decoché depuis cette vue?
-                        # Pour le moment je supprime que les non admin
+                        # On ne supprime pas l'utilisateur, mais on cache
+                        # ses references dans le signalement
                         if not autorisation.user.is_superuser:
-                            autorisation.user.delete()
+                            # hide_feature_user(project, user)
+                            pass
                         autorisation.delete()
                     else:
                         continue
@@ -548,14 +551,11 @@ def project_members(request, project_slug):
                     autorisation.user.save()
 
                 elif not autorisation and not data.get("DELETE"):
-
-                    user = models.CustomUser.objects.create(
-                        first_name=data["first_name"],
-                        last_name=data["last_name"],
+                    # On ne crée pas d'utilisateur: il est choisi parmi ceux existants
+                    user = models.CustomUser.objects.get(
                         username=data["username"],
                         email=data["email"],
-                        # Doit on activer le nouvel utilsateur
-                        is_active=False
+                        is_active=True
                     )
                     models.Autorisation.objects.create(
                         user=user,
@@ -575,3 +575,32 @@ def project_members(request, project_slug):
     }
 
     return render(request, 'collab/project/admin_members.html', context)
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def user_list(request, project_slug):
+    project = get_object_or_404(models.Project, slug=project_slug)
+    members = models.Autorisation.objects.filter(project=project).annotate(
+        user_pk=F('user__pk'),
+        email=F('user__email'),
+        username=F('user__username'),
+        first_name=F('user__first_name'),
+        last_name=F('user__last_name'),
+    ).values(
+        'user_pk', 'email', 'username', 'first_name', 'last_name',
+    )
+
+    others = models.CustomUser.objects.filter(
+        is_active=True
+    ).exclude(
+        pk__in=[mem.get('user_pk') for mem in members]
+    ).values(
+        'pk', 'email', 'username', 'first_name', 'last_name'
+    )
+
+    if request.method == 'GET':
+        data = {
+            'members': list(members),
+            'others': list(others),
+        }
+        return JsonResponse(data=data, status=200)

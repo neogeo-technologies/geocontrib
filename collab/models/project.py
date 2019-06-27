@@ -7,9 +7,33 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.utils.html import format_html
 from django.utils.text import slugify
-from django.db.models.signals import post_delete
-from django.dispatch import receiver
 APP_NAME = __package__.split('.')[0]
+
+
+class Layer(models.Model):
+    SCHEMAS = (
+        ('wms', 'WMS'),
+        ('tms', 'TMS')
+    )
+    name = models.CharField('Nom', max_length=256, blank=True, null=True)
+    title = models.CharField('Titre', max_length=256, blank=True, null=True)
+    style = models.CharField('Style', max_length=256, blank=True, null=True)
+    service = models.URLField('Service')
+    order = models.PositiveSmallIntegerField("Numéro d'ordre", default=0)
+    schema_type = models.CharField(
+        "Type de couche", choices=SCHEMAS, max_length=50, default="wms")
+    project = models.ForeignKey('collab.Project', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Couche'
+        verbose_name_plural = 'Couches'
+        unique_together = ('project', 'order')
+
+    def __str__(self):
+        if self.title:
+            return " ".format(self.pk, self.title)
+        else:
+            return "{}- {}".format(self.pk, self.service[0:25])
 
 
 class Project(models.Model):

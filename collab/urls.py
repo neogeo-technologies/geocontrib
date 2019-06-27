@@ -18,6 +18,7 @@ services = [
     path('api/liste_projet/', views.project_list),
     path('api/export/', feature.export),
     path('api/projet/', ProjectServiceView.as_view()),
+    path('api/liste_utilisateur/<slug:project_slug>', views.user_list),
 ]
 
 urlpatterns = services + [
