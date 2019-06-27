@@ -59,9 +59,9 @@ class AutorisationForm(forms.ModelForm):
 
     first_name = forms.CharField(label="Nom", required=False)
     last_name = forms.CharField(label="Prenom", required=False)
-    username = forms.CharField(label="Nom d'utilisateur", required=False)
-    email = forms.EmailField(label="Adresse email", required=False)
-    level = forms.ChoiceField(label="Niveau d'autorisation", choices=Autorisation.LEVEL, required=False)
+    username = forms.CharField(label="Nom d'utilisateur")
+    email = forms.EmailField(label="Adresse email")
+    level = forms.ChoiceField(label="Niveau d'autorisation", choices=Autorisation.LEVEL)
 
     def __init__(self, *args, **kwargs):
 
@@ -70,44 +70,13 @@ class AutorisationForm(forms.ModelForm):
             self.fields['email'].initial = self.instance.user.email
             self.fields['first_name'].initial = self.instance.user.first_name
             self.fields['last_name'].initial = self.instance.user.last_name
-            self.fields['username'].initial = self.instance.user.username
-            self.fields['username'].disabled = True
             self.fields['level'].initial = self.instance.level
+            self.fields['username'].initial = self.instance.user.username
+            self.fields['first_name'].disabled = True
+            self.fields['last_name'].disabled = True
+            self.fields['email'].disabled = True
+            self.fields['username'].disabled = True
 
-    def clean(self):
-        if self.cleaned_data.get('DELETE') and not self.instance.pk:
-            return None
-        required = [
-            'email',
-            'first_name',
-            'username',
-            'level'
-        ]
-        for field in required:
-            if not self.cleaned_data[field]:
-                raise forms.ValidationError("Tous les champs sont requis.")
-
-    def clean_username(self):
-        username = self.cleaned_data['username']
-        if self.instance.pk:
-            if self.instance.user.username != self.cleaned_data.get('username') \
-                    and CustomUser.objects.filter(username=username).exists():
-                raise forms.ValidationError("Ce nom d'utilisateur est réservé")
-        elif CustomUser.objects.filter(username=username).exists():
-            raise forms.ValidationError("Ce nom d'utilisateur est réservé.")
-        return username
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email', None)
-        if self.instance.pk:
-            if self.instance.user.email != self.cleaned_data.get('email') \
-                    and CustomUser.objects.filter(email=email).exists():
-                raise forms.ValidationError("Cette adresse est reservée.")
-
-        elif CustomUser.objects.filter(email=email).exists():
-            raise forms.ValidationError("Cette adresse est reservée.")
-
-        return email
 
     class Meta:
         models = Autorisation
