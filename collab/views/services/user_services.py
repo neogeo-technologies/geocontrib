@@ -4,16 +4,6 @@ from collab.views.services.project_services import get_feature_type_table_name
 from collab.views.services.project_services import project_features_types
 
 
-def get_user_subscriptions(user):
-    """
-        List of user subscription's
-        @param user user
-        @return list of features ids
-    """
-    list_ids = []
-    return list_ids
-
-
 def get_last_user_registered(project_slug, nbuser=None):
     """
         List of user registered within a project
@@ -30,6 +20,7 @@ def get_last_user_registered(project_slug, nbuser=None):
                                                   'user__first_name',
                                                   'user__last_name')
 
+
 def get_last_user_comments(user, nbcom=None):
     """
         List of the last user comment's
@@ -37,12 +28,12 @@ def get_last_user_comments(user, nbcom=None):
         @param nbcom number of comments wanted
         @return JSON
     """
-    if nbcom:
-        return models.Comment.objects.filter(author=user
-                   ).order_by('creation_date')[0:nbcom]
+    comments = models.Comment.objects.filter(author=user
+               ).order_by('-creation_date')
+    if comments.count() > nbcom:
+        return comments[0:nbcom]
     else:
-        return models.Comment.objects.filter(author=user
-                   ).order_by('creation_date')
+        return comments
 
 
 def get_last_user_feature(user, app_name, project_slug, feature_type_slug):
@@ -64,3 +55,23 @@ def get_last_user_feature(user, app_name, project_slug, feature_type_slug):
         return data[0]
     else:
         return ""
+
+
+def get_last_user_events(user, nbevents=None):
+    """
+        List of the last user comment's
+        @param user user
+        @param nbevents number of events wanted
+        @return JSON
+    """
+    events = []
+    for subscription in user.subscription_set.all():
+        events.extend(list(models.Event.objects.filter(feature_id=subscription.feature_id)))
+    if events:
+        sorted_events = sorted(events, key = lambda x: x.creation_date, reverse=True)
+        if len(sorted_events) > nbevents:
+            return sorted_events[0:nbevents]
+        else:
+            return sorted_events
+    else:
+        return events

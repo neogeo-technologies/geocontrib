@@ -4,11 +4,11 @@ from collab.choices import USER_TYPE_ARCHIVE
 from collab.forms import ProjectForm
 
 from collab.views.services.user_services import get_last_user_comments
+from collab.views.services.user_services import get_last_user_events
 from collab.views.services.user_services import get_last_user_feature
 from collab.views.services.user_services import get_last_user_registered
 
 from collab.views.services.feature_services import delete_feature_table
-from collab.views.services.feature_services import get_feature_pk
 
 from collab.views.services.project_services import get_last_features
 from collab.views.services.project_services import project_feature_number
@@ -400,10 +400,11 @@ def my_account(request):
 
         # get 3 last user comments
         last_comment = get_last_user_comments(request.user, 3)
-        # get feature pk
-        feature_pk = {}
+        # get 3 last events
+        last_events = get_last_user_events(request.user, 3)
         context = {"project_list": project_list, "rights": rights, "user": user,
-                   "feature_pk": feature_pk, "project_info": project_info,
+                   "project_info": project_info,
+                   "last_events": last_events,
                    "last_comment": last_comment, "last_features": last_features}
         return render(request, 'collab/my_account.html', context)
     else:
