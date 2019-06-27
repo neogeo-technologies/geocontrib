@@ -58,13 +58,19 @@
                 {% if  users %}
                   <table class="ui very basic table">
                       {% for elt in users %}
-                          <tr>
-                              <td> <i class="user icon"></i>{{elt.user__last_name|title}} {{elt.user__first_name|title}}</td>
-                          </tr>
+                         {% if  elt.user__last_name and elt.user__first_name %}
+                              <tr>
+                                  <td> <i class="user icon"></i>{{elt.user__last_name|title}} {{elt.user__first_name|title}}</td>
+                              </tr>
+                         {% else %}
+                             <tr>
+                                 <td> <i class="user icon"></i>{{elt.user__username|title}} </td>
+                             </tr>
+                         {% endif %}
                       {% endfor %}
                   </table>
                 {% else %}
-                    Aucun utilisateur n'est inscrit à de projet
+                    Aucun utilisateur n'est inscrit à ce projet
                 {% endif %}
             <br>
             <h3 class="ui header">Derniers signalements</h3>
@@ -103,8 +109,7 @@
                           <table class="ui celled table">
                             <thead>
                               <tr><th>
-                                      <span class="comment_title"> <strong>{{elt.author__first_name|title}}
-                                                          {{elt.author__last_name|title}} <strong>
+                                      <span class="comment_title"> <strong>{{elt.author__username|title}} <strong>
                                                            Le {{elt.creation_date|date:"d M Y"}}</span>
                               </th></tr>
                             </thead>

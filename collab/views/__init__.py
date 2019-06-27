@@ -7,3 +7,4 @@ from .attachment import Attachment
 from .comment import Comment
 from .subscription import Subscription
 from .feature import *
+from .import_export import *

@@ -2,11 +2,12 @@ from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
 from . import views
+from collab.views.attachment import Attachment
+from collab.views.comment import Comment
 import collab.views.feature as feature
 from collab.views.feature import ProjectFeature
 from collab.views.feature import ProjectFeatureDetail
-from collab.views.attachment import Attachment
-from collab.views.comment import Comment
+import collab.views.import_export as import_export
 from collab.views.subscription import Subscription
 from collab.views.views import LoginView
 from collab.views.views import LogoutView
@@ -16,7 +17,9 @@ from collab.views.views import ProjectView
 
 services = [
     path('api/liste_projet/', views.project_list),
-    path('api/export/', feature.export),
+    path('api/export/', import_export.export_data),
+    path('api/import/', import_export.import_data),
+    path('api/json_feature_model/', import_export.get_json_feature_model),
     path('api/projet/', ProjectServiceView.as_view()),
     path('api/liste_utilisateur/<slug:project_slug>', views.user_list),
 ]

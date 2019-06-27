@@ -43,31 +43,6 @@ import os
 APP_NAME = __package__.split('.')[0]
 
 
-def export(request):
-    """
-        Export list of feature
-    """
-    project_slug = 'ddddd'
-    feature_type = 'zzz'
-    list_uuid = ['d484ff55-0f03-4ddb-8768-e2a4f80f1cb5',
-                 'ea16e927-6c72-47b7-b251-da6d9d73d964']
-    res = []
-    for feature_id in list_uuid:
-        feature = get_feature(APP_NAME, project_slug, feature_type, feature_id)
-        # export only the features which have been published
-        if int(feature['status']) > 1:
-            feature['geom'] = json.loads(feature['geom'])
-            feature['status'] = STATUS[int(feature['status'])][1]
-            feature['user'] = CustomUser.objects.get(id=feature['user_id']).username
-            feature['link'] = """{domain}projet/{project_slug}/{feature_type}/{feature_id}""".format(
-                              domain=request.build_absolute_uri('/'),
-                              project_slug=project_slug,
-                              feature_type=feature_type,
-                              feature_id=feature_id)
-            res.append(feature)
-    return JsonResponse(res, safe=False)
-
-
 def project_feature_map(request, project_slug):
     """
         Display the list of the available features for a
@@ -89,6 +64,8 @@ def project_feature_map(request, project_slug):
         feature_list[feature_type] = get_project_features(APP_NAME,
                                                           project_slug,
                                                           feature_type)
+
+
     context = {'rights': rights, 'project': project, 'feature_list': feature_list}
     return render(request, 'collab/feature/feature_map.html', context)
 

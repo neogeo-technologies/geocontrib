@@ -445,7 +445,7 @@ def project(request, project_slug):
     # recuperation du nombre de commentaire
     nb_comments = comments.count()
     comments = comments.values('author__first_name', 'author__last_name',
-                               'comment', 'creation_date')
+                               'author__username','comment', 'creation_date')
     if comments:
         # get list of last comment
         if nb_comments > 3:
