@@ -116,7 +116,7 @@ def get_project_features(app_name, project_slug, feature_type):
         @return JSON
     """
     table_name = get_feature_type_table_name(app_name, project_slug, feature_type)
-    sql = """ SELECT *
+    sql = """ SELECT *,feature_id::varchar, ST_AsGeoJSON(geom) as geom
               FROM "{table_name}"
               ORDER BY creation_date DESC ;
           """.format(table_name=table_name)
