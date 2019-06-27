@@ -317,6 +317,9 @@ def edit_feature_sql(data):
                     key=str(key),
                     val=True)
         else:
+            # escape values
+            if "'" in val:
+                val = val.replace("'", "''")
             add_sql += """,{key}='{val}'""".format(
                     key=str(key),
                     val=str(val))
@@ -328,6 +331,7 @@ def create_feature_sql(data):
     """
         Get sql for the creation of a feature
      """
+
     # remove the csrfmiddlewaretoken key
     data.pop('csrfmiddlewaretoken', None)
     data.pop('feature', None)
@@ -335,14 +339,19 @@ def create_feature_sql(data):
     for key, val in data.items():
         if val == "on":
             data[key] = 'True'
+        # escape values
+        if "'" in val:
+            data[key] = val.replace("'", "''")
     # remove empty keys -> A AMELIORER "'" !!!!!!!!!
     data = {k: v for k, v in data.items() if v}
+    # escape string
     data_keys = " "
     data_values = " "
+
     if data.keys():
-        data_keys = ' , ' + ' , '.join(list(data.keys()))
+        data_keys = ',' + ','.join(list(data.keys()))
     if data.values():
-        data_values = " , '" + "' , '".join(list(data.values())) + "'"
+        data_values = ",'" + "','".join(list(data.values())) + "'"
 
     return data_keys, data_values
 

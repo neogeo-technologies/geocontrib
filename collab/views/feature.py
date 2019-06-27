@@ -395,11 +395,11 @@ class ProjectFeature(View):
         # get sql for additonal field
         data_keys, data_values = create_feature_sql(data)
         # create feature
-        sql = """INSERT INTO "{table}" (feature_id, creation_date,
-            modification_date, user_id, deletion_date, archive_date, project_id, geom {data_keys})
-            VALUES ('{feature_id}', '{creation_date}', '{modification_date}','{user_id}',
-            {deletion_date}, {archive_date},
-            '{project_id}', '{geom}' {data_values});""".format(
+        sql = """INSERT INTO "{table}" (feature_id,creation_date,
+            modification_date, user_id,deletion_date,archive_date,project_id,geom {data_keys})
+            VALUES ('{feature_id}','{creation_date}','{modification_date}','{user_id}',
+            {deletion_date},{archive_date},
+            '{project_id}','{geom}' {data_values});""".format(
             feature_id=feature_id,
             creation_date=creation_date,
             modification_date=creation_date,
