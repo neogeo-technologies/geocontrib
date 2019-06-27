@@ -310,7 +310,7 @@ class ProjectFeature(View):
                        "rights": rights}
             return render(request, 'collab/feature/add_feature.html', context)
         # type of features's fields
-        if request.GET.get('name'):
+        if request.GET.get('name', ''):
             res = project_feature_type_fields(APP_NAME, project_slug, request.GET.get('name'))
         else:
             res = project_feature_type_fields(APP_NAME, project_slug, features_types[0])
