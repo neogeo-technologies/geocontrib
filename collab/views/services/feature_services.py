@@ -310,10 +310,10 @@ def edit_feature(data, geom, table_name, feature_id):
     # data['deletion_date'] = None
     # data['archive_date'] = None
     # if project.archive_feature:
-    #     archive_date = data['creation_date'] + project.archive_feature
+    #     archive_date = datetime.datetime.now() + project.archive_feature
     #     data['archive_date'] = str(archive_date.date())
     # if project.delete_feature:
-    #     deletion_date = data['creation_date'] + project.delete_feature
+    #     deletion_date = datetime.datetime.now() + project.delete_feature
     #     data['deletion_date'] = str(deletion_date.date())
     # escape simple quote and empty values
     feature_keys = []
@@ -355,10 +355,10 @@ def add_feature(data, geom, table_name, project, user_id, feature_id):
     data['deletion_date'] = None
     data['archive_date'] = None
     if project.archive_feature:
-        archive_date = data['creation_date'] + project.archive_feature
+        archive_date = datetime.datetime.now() + project.archive_feature
         data['archive_date'] = str(archive_date.date())
     if project.delete_feature:
-        deletion_date = data['creation_date'] + project.delete_feature
+        deletion_date = datetime.datetime.now() + project.delete_feature
         data['deletion_date'] = str(deletion_date.date())
     # escape simple quote and empty values
     for key, val in data.items():
