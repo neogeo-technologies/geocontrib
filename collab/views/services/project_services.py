@@ -17,16 +17,6 @@ def get_feature_type_table_name(app_name, project_slug, feature_type):
         feature_type_table_prefix=feature_type_table_prefix, feature_type=feature_type)
 
 
-def project_list(request):
-    """
-        List of available projects
-        @param
-        @return JSON
-    """
-    qs_json = serializers.serialize('json', models.Project.objects.all())
-    return HttpResponse(qs_json, content_type='application/json')
-
-
 def last_user_registered(project_slug, nbuser=None):
     """
         List of user registered within a project

@@ -26,6 +26,8 @@ from django.db.models import F
 # from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
+from django.core import serializers
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -591,7 +593,16 @@ def project_members(request, project_slug):
     return render(request, 'collab/project/admin_members.html', context)
 
 
-@login_required(login_url=settings.LOGIN_URL)
+def project_list(request):
+    """
+        List of available projects
+        @param
+        @return JSON
+    """
+    qs_json = serializers.serialize('json', models.Project.objects.all())
+    return HttpResponse(qs_json, content_type='application/json')
+
+
 def user_list(request, project_slug):
     project = get_object_or_404(models.Project, slug=project_slug)
     members = models.Autorisation.objects.filter(project=project).annotate(
