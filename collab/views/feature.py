@@ -6,7 +6,7 @@ from collab.db_utils import commit_data
 from collab.models import CustomUser
 from collab.views.views import get_anonymous_rights
 
-from collab.views.services.feature_services import create_feature_sql
+from collab.views.services.feature_services import add_feature
 from collab.views.services.feature_services import delete_feature
 from collab.views.services.feature_services import edit_feature_sql
 from collab.views.services.feature_services import get_feature
@@ -332,19 +332,6 @@ class ProjectFeature(View):
                         app_name=APP_NAME,
                         project_slug=project_slug,
                         feature_type_slug=feature_type_slug)
-        user_id = request.user.id
-        # date
-        creation_date = datetime.datetime.now()
-        deletion_date = "NULL"
-        archive_date = "NULL"
-        if project.archive_feature:
-            archive_date = creation_date + project.archive_feature
-            archive_date = "'" +  str(archive_date.date()) + "'"
-        if project.delete_feature:
-            deletion_date = creation_date + project.delete_feature
-            deletion_date = "'" +  str(deletion_date.date()) + "'"
-        # feature_id = generate_feature_id(APP_NAME, project_slug, data.get('feature', ''))
-        feature_id = str(uuid.uuid4())
 
         # handle geo image or geometrie
         if request.FILES.get('geo_file', ''):
@@ -369,27 +356,12 @@ class ProjectFeature(View):
             return redirect('project_add_feature', project_slug=project_slug)
         # get comment
         comment = data.pop('comment', None)
-        # get sql for additonal field
-        data_keys, data_values = create_feature_sql(data)
-        # create feature
-        sql = """INSERT INTO "{table}" (feature_id,creation_date,
-            modification_date, user_id,deletion_date,archive_date,project_id,geom {data_keys})
-            VALUES ('{feature_id}','{creation_date}','{modification_date}','{user_id}',
-            {deletion_date},{archive_date},
-            '{project_id}','{geom}' {data_values});""".format(
-            feature_id=feature_id,
-            creation_date=creation_date,
-            modification_date=creation_date,
-            deletion_date=deletion_date,
-            archive_date=archive_date,
-            project_id=project.id,
-            user_id=user_id,
-            table=table_name,
-            data_keys=data_keys,
-            data_values=data_values,
-            geom=geom)
-
-        creation = commit_data('default', sql)
+        # remove csrfmiddlewaretoken
+        data.pop('csrfmiddlewaretoken', None)
+        # create feature in the database
+        feature_id = str(uuid.uuid4())
+        user_id = request.user.id
+        creation = add_feature(data, geom, table_name, project, user_id, feature_id)
         if comment and creation:
             # create comment
             obj = models.Comment.objects.create(author=request.user,
@@ -411,9 +383,6 @@ class ProjectFeature(View):
 
         # recuperation des champs descriptifs
         if creation == True:
-            # @cbenhabib on passe par le feature_id
-            # feature_pk = get_feature_pk(table_name, feature_id)
-
             # Ajout d'un evenement de création d'un signalement:
             models.Event.objects.create(
                 user=request.user,

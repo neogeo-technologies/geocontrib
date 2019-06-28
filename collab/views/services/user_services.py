@@ -1,7 +1,21 @@
+import base64
 from collab import models
 from collab.db_utils import fetch_raw_data
 from collab.views.services.project_services import get_feature_type_table_name
 from collab.views.services.project_services import project_features_types
+from django.contrib.auth import authenticate
+
+
+def authenticate_user(auth):
+    user = ""
+    if len(auth) == 1:
+        username, password = base64.b64decode(auth[0]).decode("utf-8").split(':', 1)
+        user = authenticate(username=username, password=password)
+    elif len(auth) == 2:
+        if auth[0].lower() == "basic":
+            username, password = base64.b64decode(auth[1]).decode("utf-8").split(':', 1)
+            user = authenticate(username=username, password=password)
+    return user
 
 
 def get_last_user_registered(project_slug, nbuser=None):

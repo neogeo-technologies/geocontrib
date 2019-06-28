@@ -7,14 +7,16 @@ from collab.db_utils import fetch_first_row
 from collab.db_utils import fetch_raw_data
 from collab import models
 from collections import OrderedDict
+import datetime
 import dateutil.parser
-from django.utils import timezone
-import re
-
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.utils.crypto import get_random_string
 from hashlib import md5
+import json
 import logging
+import re
+import uuid
 
 
 def generate_feature_id(app_name, project_slug, feature):
@@ -186,6 +188,7 @@ def get_feature_detail(app_name, project_slug, feature_type, feature_id):
                                 slug=project_slug)
     # get features fields
     feature = get_feature(app_name, project_slug, feature_type, feature_id)
+    user = ""
     if feature.get('status', ''):
         feature['status'] = STATUS[int(feature['status'])][1]
     if feature.get('user_id', ''):
@@ -325,6 +328,43 @@ def edit_feature_sql(data):
                     val=str(val))
 
     return add_sql
+
+
+def add_feature(data, geom, table_name, project, user_id, feature_id):
+    """
+         Add feature to database
+    """
+    # clé auto généré
+    data['project_id'] = str(project.id)
+    data['user_id'] = str(user_id)
+    data['creation_date'] = str(datetime.datetime.now())
+    data['modification_date'] = str(datetime.datetime.now())
+    data['feature_id'] = feature_id
+    # geom
+    data['geom'] = str(geom)
+    # date in number of days
+    data['deletion_date'] = None
+    data['archive_date'] = None
+    if project.archive_feature:
+        archive_date = data['creation_date'] + project.archive_feature
+        data['archive_date'] = str(archive_date.date())
+    if project.delete_feature:
+        deletion_date = data['creation_date'] + project.delete_feature
+        data['deletion_date'] = str(deletion_date.date())
+    # escape simple quote and empty values
+    for key, val in data.items():
+        if not val:
+            data[key] = None
+        elif "'" in val:
+            data[key] = val.replace("'", "''")
+    # insert data
+    sql = """INSERT INTO {table_name}  SELECT *
+             FROM json_populate_record(NULL::{table_name}, '{feature}');""".format(
+                table_name=table_name,
+                feature=json.dumps(data)
+           )
+    creation = commit_data('default', sql)
+    return creation
 
 
 def create_feature_sql(data):
