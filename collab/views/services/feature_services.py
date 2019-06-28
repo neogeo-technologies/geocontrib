@@ -364,6 +364,8 @@ def add_feature(data, geom, table_name, project, user_id, feature_id):
                 feature=json.dumps(data)
            )
     creation = commit_data('default', sql)
+    logger = logging.getLogger(__name__)
+    logger.exception(creation)
     return creation
 
 
