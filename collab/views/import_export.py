@@ -159,8 +159,8 @@ def import_data(request):
                     if "'" in val:
                         feature[key] = val.replace("'", "''")
                 try:
-                    sql = """INSERT INTO {table_name}  SELECT *
-                             FROM json_populate_record(NULL::{table_name}, '{feature}');""".format(
+                    sql = """INSERT INTO "{table_name}" SELECT *
+                             FROM json_populate_record(NULL::"{table_name}", '{feature}');""".format(
                                 table_name=table_name,
                                 feature=json.dumps(feature)
                              )

@@ -358,8 +358,8 @@ def add_feature(data, geom, table_name, project, user_id, feature_id):
         elif "'" in val:
             data[key] = val.replace("'", "''")
     # insert data
-    sql = """INSERT INTO {table_name}  SELECT *
-             FROM json_populate_record(NULL::{table_name}, '{feature}');""".format(
+    sql = """INSERT INTO "{table_name}"  SELECT *
+             FROM json_populate_record(NULL::"{table_name}", '{feature}');""".format(
                 table_name=table_name,
                 feature=json.dumps(data)
            )
