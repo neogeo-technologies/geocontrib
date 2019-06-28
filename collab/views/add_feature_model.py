@@ -8,6 +8,7 @@ from collab.views.views import get_anonymous_rights
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import JSONField
 from django.db import connection
 from django.db.models import Manager as GeoManager
 from django.shortcuts import render
@@ -157,9 +158,13 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
         'user': models.ForeignKey(custom.CustomUser, related_name='models',
                                   on_delete=models.PROTECT,
                                   help_text="Utilisateur abonné"),
+        'feature_link': JSONField('Relation entre signalement',
+                                   blank=True, null=True),
         'project': models.ForeignKey(custom.Project, related_name='models',
                                     on_delete=models.PROTECT,
                                     help_text="Projet"),
+
+
         '__str__': lambda self: '%s %s' (self.title),
         }
 
