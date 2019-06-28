@@ -327,7 +327,7 @@ def edit_feature(data, geom, table_name, feature_id):
     sql = """UPDATE "{table_name}"
              SET ({list_keys})=({feature_keys})
              FROM json_populate_record(null::"{table_name}",'{data}') feature
-             WHERE {table_name}.feature_id='{feature_id}' """.format(
+             WHERE "{table_name}".feature_id='{feature_id}' """.format(
              table_name=table_name,
              list_keys=','.join(list(data.keys())),
              feature_keys=','.join(feature_keys),
