@@ -8,7 +8,7 @@ from collab.views.views import get_anonymous_rights
 
 from collab.views.services.feature_services import add_feature
 from collab.views.services.feature_services import delete_feature
-from collab.views.services.feature_services import edit_feature_sql
+from collab.views.services.feature_services import edit_feature
 from collab.views.services.feature_services import get_feature
 from collab.views.services.feature_services import get_feature_detail
 from collab.views.services.feature_services import get_feature_event
@@ -224,7 +224,7 @@ class ProjectFeatureDetail(View):
         prev_feature = get_feature(APP_NAME, project_slug, feature_type_slug, feature_id)
         # get user right on project
         data = request.POST.dict()
-        modification_date = datetime.datetime.now()
+        # modification_date = datetime.datetime.now()
         # get geom
         data_geom = data.pop('geom', None)
         geom, msg = validate_geom(data_geom, feature_type_slug, project)
@@ -233,23 +233,11 @@ class ProjectFeatureDetail(View):
             return redirect('project_feature_detail', project_slug=project_slug,
                             feature_type_slug=feature_type_slug, feature_id=feature_id)
 
-        # get comment
-        comment = data.pop('comment', None)
+        # remove comment
+        data.pop('comment', None)
         # get sql for additonal field
-        add_sql = edit_feature_sql(data)
-        # create with basic keys
-        sql = """UPDATE "{table}"
-                 SET  modification_date='{modification_date}',
-                      geom='{geom}' {add_sql}
-                 WHERE feature_id='{feature_id}';""".format(
-                 modification_date=modification_date,
-                 table=table_name,
-                 feature_id=feature_id,
-                 add_sql=add_sql,
-                 geom=geom)
-
-        creation = commit_data('default', sql)
-        if creation == True:
+        update = edit_feature(data, geom, table_name, feature_id)
+        if update == True:
             # log de l'event de modification d'un projet
             curr_feature = get_feature(APP_NAME, project_slug, feature_type_slug, feature_id)
             feature_update_events(curr_feature, prev_feature, project, request.user, feature_type_slug, feature_id)
@@ -258,7 +246,7 @@ class ProjectFeatureDetail(View):
         else:
             msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
             logger = logging.getLogger(__name__)
-            logger.exception(creation)
+            logger.exception(update)
             request.session['error'] = msg
             return redirect('project_feature_detail', project_slug=project_slug,
                             feature_type_slug=feature_type_slug, feature_id=feature_id)

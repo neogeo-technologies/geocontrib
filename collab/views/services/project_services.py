@@ -2,8 +2,6 @@ from collab.db_utils import fetch_first_row
 from collab.db_utils import fetch_raw_data
 from collab import models
 from collections import OrderedDict
-from django.core import serializers
-from django.http import HttpResponse
 # import re
 
 

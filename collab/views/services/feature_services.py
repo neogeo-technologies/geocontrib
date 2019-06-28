@@ -296,38 +296,47 @@ def feature_update_events(curr_feature, prev_feature, project, user, feature_typ
             data=data_modify)
 
 
-def edit_feature_sql(data):
+def edit_feature(data, geom, table_name, feature_id):
     """
-        Get sql for the modification of a feature
+         edit feature
     """
-    # remove the csrfmiddlewaretoken key
+    # remove csrfmiddlewaretoken
     data.pop('csrfmiddlewaretoken', None)
-    data.pop('feature', None)
-    add_sql = ""
-    date_pattern = re.compile('^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$')
-    # replace 'on' by 'true'
+    # clé auto généré
+    data['modification_date'] = str(datetime.datetime.now())
+    # geom
+    data['geom'] = str(geom)
+    # A voir si on le mets à jour à chaque fois que le signalement est mise a jour
+    # data['deletion_date'] = None
+    # data['archive_date'] = None
+    # if project.archive_feature:
+    #     archive_date = data['creation_date'] + project.archive_feature
+    #     data['archive_date'] = str(archive_date.date())
+    # if project.delete_feature:
+    #     deletion_date = data['creation_date'] + project.delete_feature
+    #     data['deletion_date'] = str(deletion_date.date())
+    # escape simple quote and empty values
+    feature_keys = []
     for key, val in data.items():
+        feature_keys.append('feature.'+str(key))
         if not val:
-            add_sql += """,{key}=NULL""".format(
-                       key=str(key))
-        elif date_pattern.match(str(val)):
-            format_date = timezone.make_aware(dateutil.parser.parse(val), timezone.get_current_timezone())
-            add_sql += """,{key}='{format_date}'""".format(
-                           key=str(key),
-                           format_date=str(format_date))
-        elif val == "on":
-            add_sql += """,{key}={val}""".format(
-                    key=str(key),
-                    val=True)
-        else:
-            # escape values
-            if "'" in val:
-                val = val.replace("'", "''")
-            add_sql += """,{key}='{val}'""".format(
-                    key=str(key),
-                    val=str(val))
-
-    return add_sql
+            data[key] = None
+        elif "'" in val:
+            data[key] = val.replace("'", "''")
+    # update data
+    sql = """UPDATE "{table_name}"
+             SET ({list_keys})=({feature_keys})
+             FROM json_populate_record(null::"{table_name}",'{data}') feature
+             WHERE {table_name}.feature_id='{feature_id}' """.format(
+             table_name=table_name,
+             list_keys=','.join(list(data.keys())),
+             feature_keys=','.join(feature_keys),
+             data=json.dumps(data),
+             feature_id=feature_id)
+    update = commit_data('default', sql)
+    logger = logging.getLogger(__name__)
+    logger.exception(update)
+    return update
 
 
 def add_feature(data, geom, table_name, project, user_id, feature_id):
@@ -367,35 +376,6 @@ def add_feature(data, geom, table_name, project, user_id, feature_id):
     logger = logging.getLogger(__name__)
     logger.exception(creation)
     return creation
-
-
-def create_feature_sql(data):
-    """
-        Get sql for the creation of a feature
-     """
-
-    # remove the csrfmiddlewaretoken key
-    data.pop('csrfmiddlewaretoken', None)
-    data.pop('feature', None)
-    # replace 'on' by 'true'
-    for key, val in data.items():
-        if val == "on":
-            data[key] = 'True'
-        # escape values
-        if "'" in val:
-            data[key] = val.replace("'", "''")
-    # remove empty keys -> A AMELIORER "'" !!!!!!!!!
-    data = {k: v for k, v in data.items() if v}
-    # escape string
-    data_keys = " "
-    data_values = " "
-
-    if data.keys():
-        data_keys = ',' + ','.join(list(data.keys()))
-    if data.values():
-        data_values = ",'" + "','".join(list(data.values())) + "'"
-
-    return data_keys, data_values
 
 
 def get_feature_event(feature_id, nb_event=3):

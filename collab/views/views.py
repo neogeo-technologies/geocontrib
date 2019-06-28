@@ -604,6 +604,11 @@ def project_list(request):
 
 
 def user_list(request, project_slug):
+    """
+        List of user of a given project
+        @param project_slug project slug
+        @return JSON
+    """
     project = get_object_or_404(models.Project, slug=project_slug)
     members = models.Autorisation.objects.filter(project=project).annotate(
         user_pk=F('user__pk'),

@@ -16,12 +16,13 @@ from collab.views.views import ProjectServiceView
 from collab.views.views import ProjectView
 
 services = [
+    path('api/liste_utilisateur/<slug:project_slug>', views.user_list),
     path('api/liste_projet/', views.project_list),
     path('api/export/', import_export.export_data),
     path('api/import/', import_export.import_data),
     path('api/json_feature_model/', import_export.get_json_feature_model),
     path('api/projet/', ProjectServiceView.as_view()),
-    path('api/liste_utilisateur/<slug:project_slug>', views.user_list),
+
 ]
 
 urlpatterns = services + [
