@@ -2,9 +2,13 @@ import base64
 from collab import models
 from collab.choices import STATUS
 from collab.db_utils import commit_data
+
 from collab.views.services.feature_services import get_feature
+from collab.views.services.feature_services import get_feature_structure
+
 from collab.views.services.project_services import project_feature_type_fields
 from collab.views.services.user_services import authenticate_user
+
 import datetime
 from django.contrib.gis.geos import GEOSGeometry
 from django.conf import settings
@@ -49,28 +53,44 @@ def export_data(request):
 
 def get_json_feature_model(request):
     """
-        Get json mstructure for the import
+        Get json structure for the import
     """
     res = []
-    res_structure = []
+    json_structure = []
     if request.GET.get('project_slug', '') and request.GET.get('feature_type_slug', ''):
         project_slug = request.GET.get('project_slug', '')
         feature_type_slug = request.GET.get('feature_type_slug', '')
-        res = project_feature_type_fields(APP_NAME, project_slug, feature_type_slug)
-        json_structure = {}
-        project = get_object_or_404(models.Project,
-                                    slug=project_slug)
-        for key, val in res.items():
-            if key not in ['feature_id', 'project_id', 'user_id', 'modification_date', 'creation_date']:
-                if key == 'geom':
-                    json_structure[key] = project.get_geom(feature_type_slug) + " format WKT"
-                elif key == 'status':
-                    json_structure[key] = ','.join(dict(STATUS).keys()).replace(',',' ou ')
-                else:
-                    json_structure[key] = str(res[key]['type']) + " / " + str(res[key]['data_type'])
-        res_structure.append(json_structure)
-        res_structure.append(json_structure)
-        return JsonResponse(res_structure, safe=False)
+        project = get_object_or_404(models.Project, slug=project_slug)
+        # Basic structure
+        basic_res = project_feature_type_fields(APP_NAME, project_slug,
+                                                feature_type_slug)
+        basic_res.pop('feature_id', None)
+        basic_res.pop('project_id', None)
+        basic_res.pop('user_id', None)
+        basic_res.pop('modification_date', None)
+        basic_res.pop('creation_date', None)
+        for key, val in basic_res.items():
+            if key == 'geom':
+                basic_res[key] = project.get_geom(feature_type_slug) + " format WKT"
+            elif key == 'status':
+                basic_res[key] = ','.join(dict(STATUS).keys()).replace(',',' ou ')
+            else:
+                basic_res[key] = str(basic_res[key]['type']) + " / " + str(basic_res[key]['data_type'])
+        json_structure.append(basic_res)
+        json_structure.append(basic_res)
+        # get an example of data
+        res = get_feature_structure(APP_NAME, project_slug, feature_type_slug)
+        for elt in res:
+            elt.pop('feature_id', None)
+            elt.pop('project_id', None)
+            elt.pop('user_id', None)
+            elt.pop('modification_date', None)
+            elt.pop('creation_date', None)
+            for key, val in elt.items():
+                if key == 'status':
+                    elt[key] = ','.join(dict(STATUS).keys()).replace(',', ' ou ')
+        json_structure = json_structure + res
+        return JsonResponse(json_structure, safe=False)
     else:
         return JsonResponse({'erreur': 'le project slug et/ou le feature slug sont manquants'},
                             status=400, safe=False)

@@ -391,3 +391,20 @@ def get_feature_event(feature_id, nb_event=3):
         return events[0:nb_event]
     else:
         return events
+
+
+def get_feature_structure(app_name, project_slug, feature_type_slug):
+    """
+        Return two feature to have a exemple of structure
+        @param app_name name of the application
+        @param project_slug project slug
+        @param feature_type_slug type of the feature
+        @return JSON
+    """
+    table_name = get_feature_type_table_name(app_name, project_slug, feature_type_slug)
+    sql = """ SELECT *,  ST_AsText(geom) as geom
+              FROM "{table_name}"
+              LIMIT 2;
+          """.format(table_name=table_name)
+    data = fetch_raw_data('default', sql)
+    return data
