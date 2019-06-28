@@ -3,6 +3,7 @@ from collab.choices import USER_TYPE
 from collab.choices import USER_TYPE_ARCHIVE
 from collab.forms import ProjectForm
 
+from collab.views.services.user_services import authenticate_user
 from collab.views.services.user_services import get_last_user_comments
 from collab.views.services.user_services import get_last_user_events
 from collab.views.services.user_services import get_last_user_feature
@@ -159,12 +160,20 @@ class ProjectServiceView(View):
         @return JSON
     """
     def delete(self, request):
+        user = ""
+        if 'HTTP_AUTHORIZATION' in request.META:
+            auth = request.META['HTTP_AUTHORIZATION'].split()
+            user = authenticate_user(auth)
+
+        if user is None or not user or not user.is_superuser:
+            return JsonResponse({'erreur': "Vous n'êtes pas autorisé à acceder à cette page"},
+                                status=401, safe=False)
 
         if request.GET.get('feature_type_slug', '') and request.GET.get('projet_slug', '') :
             project_slug = request.GET.get('projet_slug', '')
             feature_type_slug = request.GET.get('feature_type_slug', '')
             deletion = delete_feature_table(APP_NAME, project_slug, feature_type_slug)
-            if deletion:
+            if deletion == True:
                 return JsonResponse({'success': 'Le type de signalement a été supprimé'})
             else:
                 return JsonResponse({'error': "Le type de signalement n'a pu être supprimé"},
@@ -180,7 +189,11 @@ class ProjectServiceView(View):
                 deletion = delete_feature_table(APP_NAME, project_slug, feature_type_slug)
             # remove the project
             project.delete()
-            return JsonResponse({'success': 'Le projet a été supprimé'})
+            if deletion == True:
+                return JsonResponse({'success': 'Le projet a été supprimé'})
+            else:
+                return JsonResponse({'error': "Le projet n'a pu être supprimé"},
+                                    status='400')
         else:
             return JsonResponse({'error': 'Veuillez fournir le slug du projet'},
                                 status='400')
