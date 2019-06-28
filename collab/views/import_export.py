@@ -86,9 +86,6 @@ def get_json_feature_model(request):
             elt.pop('user_id', None)
             elt.pop('modification_date', None)
             elt.pop('creation_date', None)
-            for key, val in elt.items():
-                if key == 'status':
-                    elt[key] = ','.join(dict(STATUS).keys()).replace(',', ' ou ')
         json_structure = json_structure + res
         return JsonResponse(json_structure, safe=False)
     else:
