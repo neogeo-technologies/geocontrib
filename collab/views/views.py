@@ -168,7 +168,7 @@ class ProjectServiceView(View):
             user = authenticate_user(auth)
 
         if user is None or not user or not user.is_superuser:
-            return JsonResponse({'erreur': "Vous n'êtes pas autorisé à acceder à cette page"},
+            return JsonResponse({'erreur': "Vous n'êtes pas autorisé à acceder à cette page " + str(user)},
                                 status=401, safe=False)
 
         if request.GET.get('feature_type_slug', '') and request.GET.get('projet_slug', '') :
