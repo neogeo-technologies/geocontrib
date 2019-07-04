@@ -156,7 +156,7 @@ class FeatureLink(models.Model):
 @receiver(models.signals.post_save, sender=FeatureLink)
 def create_symetrical_relation(sender, instance, created, **kwargs):
     if created:
-        if instance.relation_type in ['doublon' or 'depend_de']:
+        if instance.relation_type in ['doublon', 'depend_de']:
             recip = instance.relation_type
         else:
             recip = 'est_remplace_par' if (instance.relation_type == 'remplace') else 'remplace'
@@ -170,7 +170,7 @@ def create_symetrical_relation(sender, instance, created, **kwargs):
 @receiver(models.signals.post_delete, sender=FeatureLink)
 def submission_delete(sender, instance, **kwargs):
     related = []
-    if instance.relation_type in ['doublon' or 'depend_de']:
+    if instance.relation_type in ['doublon', 'depend_de']:
         recip = instance.relation_type
     else:
         recip = 'est_remplace_par' if (instance.relation_type == 'remplace') else 'remplace'
