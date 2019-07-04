@@ -1,77 +1,132 @@
-{% if  edit %}
-  <form id="modify_feature" class='ui equal width form modify_feature' method="POST" >
-    {% csrf_token %}
-    <div class="ui error message"></div>
-    <button id="btn_feature_save" type="submit" class="green ui compact icon button">
-      <i class="white large save icon"></i>
-    </button>
-    {% for key,val in feature.items %}
-        {% if key|display_key%}
-               {% if val.type == 'geometry' %}
-                   <div class="field" class='geomfield'>
-                        <label>Géometrie de type  {{geom_type}}</label><br>
-                        <input type="text"  name="geom" placeholder="Point(0 25)" value="{{val.value}}" />
-                   </div>
-               {% elif val.type == 'varchar' and val.choices %}
-                   <div class="field">
-                       <label>{{labels|get_dict_item:val.column_name}}</label>
-                       <div class="ui selection dropdown status">
-                           <input type="hidden"  name="{{val.column_name}}" placeholder="{{labels|get_dict_item:val.column_name}}" value="{{val.value}}" />
-                           <i class="dropdown icon"></i>
-                           <div class="default text"></div>
-                           <div class="menu">
-                           {% for status in val.choices %}
-                               <div class="item" data-value={{status.0}}>{{status.1}}</div>
-                           {% endfor %}
-                           </div>
-                       </div>
-                   </div>
-                {% elif val.type == 'varchar' %}
-                    <div class="field">
-                        <label>{{labels|get_dict_item:val.column_name}}</label>
-                        <input type="text" maxlength="{{val.char_max_size}}" placeholder="{{labels|get_dict_item:val.column_name}}" name="{{val.column_name}}" value="{{val.value}}" />
-                    </div>
-                {% elif val.type == 'timestamptz' or val.type == 'date'%}
-                     <div class="field">
-                        <label>{{labels|get_dict_item:val.column_name}}</label>
-                        <div class="ui input left icon">
-                            <i class="calendar icon"></i>
-                            <input type="text"  name="{{val.column_name}}" placeholder="10/10/2019" value="{{val.value|date:'d/m/Y'}}" />
-                        </div>
-                     </div>
-                {% elif val.type == 'text' %}
-                     <div class="field">
-                        <label>{{labels|get_dict_item:val.column_name}}</label>
-                        <textarea name="{{val.column_name}}" value="{{val.value}}">{{val.value}}</textarea>
-                    </div>
-                {% elif val.data_type == 'boolean' %}
-                     <div class="inline field">
-                        <div class="ui checkbox boolfield">
-                            {% if val.value %}
-                                <input value='1' type="checkbox" checked='' class="hidden" >
-                                <input type="hidden"  name="{{val.column_name}}" value='1'/>
-                            {% else %}
-                                <input value='0' type="checkbox"  class="hidden" >
-                                  <input type="hidden"  name="{{val.column_name}}" value='0'/>
-                            {% endif %}
+{% if edit %}
+<form id="modify_feature" class='ui equal width form modify_feature' method="POST">
+  {% csrf_token %}
+  <div class="ui error message"></div>
+  <button id="btn_feature_save" type="submit" class="green ui compact icon button">
+    <i class="white large save icon"></i>
+  </button>
+  {% for key,val in feature.items %}
 
-                            <label>{{labels|get_dict_item:val.column_name}}</label>
-                        </div>
-                    </div>
-                {% elif val.data_type == 'integer' %}
-                     <div class="field">
-                        <label>{{labels|get_dict_item:val.column_name}}</label>
-                        <input type="number" placeholder="{{labels|get_dict_item:val.column_name}}" value="{{val.value}}" name="{{val.column_name}}" />
-                    </div>
-                {% elif val.data_type == 'double precision' %}
-                     <div class="field">
-                        <label>{{labels|get_dict_item:val.column_name}}</label>
-                        <input type="number" step="any" placeholder="{{labels|get_dict_item:val.column_name}}" value="{{val.value|stringformat:"f" }}" name="{{val.column_name}}" />
-                    </div>
-                {% endif %}
-        {% endif %}
-    {% endfor %}
-    <!-- <div class="field">
+  {% if key|display_key%}
+  {% if val.type == 'geometry' %}
+  <div class="field" class='geomfield'>
+    <label>Géometrie de type {{geom_type}}</label><br>
+    <input type="text" name="geom" placeholder="Point(0 25)" value="{{val.value}}" />
+  </div>
+  {% elif val.type == 'varchar' and val.choices %}
+  <div class="field">
+    <label>{{labels|get_dict_item:val.column_name}}</label>
+    <div class="ui selection dropdown status">
+      <input type="hidden" name="{{val.column_name}}" placeholder="{{labels|get_dict_item:val.column_name}}" value="{{val.value}}" />
+      <i class="dropdown icon"></i>
+      <div class="default text"></div>
+      <div class="menu">
+        {% for status in val.choices %}
+        <div class="item" data-value={{status.0}}>{{status.1}}</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% elif val.type == 'varchar' %}
+  <div class="field">
+    <label>{{labels|get_dict_item:val.column_name}}</label>
+    <input type="text" maxlength="{{val.char_max_size}}" placeholder="{{labels|get_dict_item:val.column_name}}" name="{{val.column_name}}" value="{{val.value}}" />
+  </div>
+  {% elif val.type == 'timestamptz' or val.type == 'date'%}
+  <div class="field">
+    <label>{{labels|get_dict_item:val.column_name}}</label>
+    <div class="ui input left icon">
+      <i class="calendar icon"></i>
+      <input type="text" name="{{val.column_name}}" placeholder="10/10/2019" value="{{val.value|date:'d/m/Y'}}" />
+    </div>
+  </div>
+  {% elif val.type == 'text' %}
+  <div class="field">
+    <label>{{labels|get_dict_item:val.column_name}}</label>
+    <textarea name="{{val.column_name}}" value="{{val.value}}">{{val.value}}</textarea>
+  </div>
+  {% elif val.data_type == 'boolean' %}
+  <div class="inline field">
+    <div class="ui checkbox boolfield">
+      {% if val.value %}
+      <input value='1' type="checkbox" checked='' class="hidden">
+      <input type="hidden" name="{{val.column_name}}" value='1' />
+      {% else %}
+      <input value='0' type="checkbox" class="hidden">
+      <input type="hidden" name="{{val.column_name}}" value='0' />
+      {% endif %}
+
+      <label>{{labels|get_dict_item:val.column_name}}</label>
+    </div>
+  </div>
+  {% elif val.data_type == 'integer' %}
+  <div class="field">
+    <label>{{labels|get_dict_item:val.column_name}}</label>
+    <input type="number" placeholder="{{labels|get_dict_item:val.column_name}}" value="{{val.value}}" name="{{val.column_name}}" />
+  </div>
+  {% elif val.data_type == 'double precision' %}
+  <div class="field">
+    <label>{{labels|get_dict_item:val.column_name}}</label>
+    <input type="number" step="any" placeholder="{{labels|get_dict_item:val.column_name}}" value="{{val.value|stringformat:"f" }}" name="{{val.column_name}}" />
+  </div>
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+
+  <table class="ui celled padded table">
+    {{ formset_related.management_form }}
+    <div id="form_set">
+      <label> Signalements liés</label>
+      {% for form in formset_related %}
+      {% for hidden in form.hidden_fields %}
+      {{ hidden }}
+      {% endfor %}
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger" role="alert">
+        {% for error in form.non_field_errors %}
+        {{ error }}
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% for field in form.visible_fields %}
+      <tr>
+        <th>{{ field.label_tag }}</th>
+        <td>
+          {{ field }}
+          {{ field.errors }}
+          {{ field.help_text }}
+        </td>
+      </tr>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </table>
+  <input type="button" value="+" id="add_more">
+  <div id="empty_form" style="display:none">
+    <table class='ui celled padded table'>
+      {{ formset_related.empty_form.as_table }}
+    </table>
+  </div>
+  <table class="ui compact celled definition table">
+    <thead>
+      <tr>
+        <th>Identifiant</th>
+        <th>Titre</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for feat in related_features %}
+      <tr>
+        <td>{{ feat|lookup:'feature_id' }}</td>
+        <td>{{ feat|lookup:'title' }}</td>
+        <td>{{ feat|lookup:'description' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- <div class="field">
        <label>Utilisateur</label>
        <input type="text"  value="{{utilisateur}}"  readonly />
    </div> -->
@@ -79,65 +134,66 @@
 
 {% endif %}
 <script>
-    // modify feature
+  $('#add_more').click(function() {
+    var form_idx = $('#id_form-TOTAL_FORMS').val();
+    $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+  });
 
-    $('input[type="checkbox"]').on('change', function(e){
-        if($(this).prop('checked'))
-        {
-            $(this).next().val(1);
-        } else {
-            $(this).next().val(0);
-        }
-     });
 
-    $('.ui.checkbox.boolfield')
-      .checkbox()
-    ;
-    $('.ui.selection.dropdown.status')
-      .dropdown()
+  // modify feature
 
-   function check_form(){
-      $('#modify_feature')
-       .form({
-         fields: {
-           title:  {
-             identifier: 'title',
-             rules: [
-               {
-                 type   : 'empty',
-                 prompt : 'Veuillez entrer un titre pour ce signalement'
-               }
-             ]
-           },
-           geom:  {
-             identifier: 'geom',
-             rules: [
-               {
-                 type   : 'empty',
-                 prompt : 'Veuillez localiser ce signalement'
-               }
-             ]
-           },
-           deletion_date: {
-             identifier: 'deletion_date',
-             optional: true,
-             rules: [{
-               type:  "regExp[/^(0[1-9]|[12][0-9]|3[01])[/.](0[1-9]|1[012])[/.](19|20)\\d\\d$/]",
-               prompt: "Veuiller enter une date valide JJ/MM/AAAA"
-             }]
-           },
-           archive_date: {
-             identifier: 'archive_date',
-             optional: true,
-             rules: [{
-               type:  "regExp[/^(0[1-9]|[12][0-9]|3[01])[/.](0[1-9]|1[012])[/.](19|20)\\d\\d$/]",
-               prompt: "Veuiller enter une date valide JJ/MM/AAAA"
-             }]
-           },
-         }
-       });
+  $('input[type="checkbox"]').on('change', function(e) {
+    if ($(this).prop('checked')) {
+      $(this).next().val(1);
+    } else {
+      $(this).next().val(0);
     }
-    check_form()
+  });
+
+  $('.ui.checkbox.boolfield')
+    .checkbox();
+  $('.ui.selection.dropdown.status')
+    .dropdown()
+
+  function check_form() {
+    $('#modify_feature')
+      .form({
+        fields: {
+          title: {
+            identifier: 'title',
+            rules: [{
+              type: 'empty',
+              prompt: 'Veuillez entrer un titre pour ce signalement'
+            }]
+          },
+          geom: {
+            identifier: 'geom',
+            rules: [{
+              type: 'empty',
+              prompt: 'Veuillez localiser ce signalement'
+            }]
+          },
+          deletion_date: {
+            identifier: 'deletion_date',
+            optional: true,
+            rules: [{
+              type: "regExp[/^(0[1-9]|[12][0-9]|3[01])[/.](0[1-9]|1[012])[/.](19|20)\\d\\d$/]",
+              prompt: "Veuiller enter une date valide JJ/MM/AAAA"
+            }]
+          },
+          archive_date: {
+            identifier: 'archive_date',
+            optional: true,
+            rules: [{
+              type: "regExp[/^(0[1-9]|[12][0-9]|3[01])[/.](0[1-9]|1[012])[/.](19|20)\\d\\d$/]",
+              prompt: "Veuiller enter une date valide JJ/MM/AAAA"
+            }]
+          },
+        }
+      });
+  }
+  check_form()
 
   //   $('#modify_feature').submit(function(e){
   //     if( $('#modify_feature').form('is valid')) {
@@ -160,7 +216,4 @@
   //         });
   //     }
   //  });
-
-
-
 </script>

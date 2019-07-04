@@ -9,7 +9,7 @@ def handle_email(user, context):
     subject = 'Message de notification.'
     try:
         from_email = settings.DEFAULT_FROM_EMAIL
-    except Exception as e:
+    except Exception:
         from_email = "ne-pas-repondre@collab.fr"
 
     # for user in users:

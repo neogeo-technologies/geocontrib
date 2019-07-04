@@ -158,8 +158,6 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
         'user': models.ForeignKey(custom.CustomUser, related_name='models',
                                   on_delete=models.PROTECT,
                                   help_text="Utilisateur abonné"),
-        'feature_link': JSONField('Relation entre signalement',
-                                   blank=True, null=True),
         'project': models.ForeignKey(custom.Project, related_name='models',
                                     on_delete=models.PROTECT,
                                     help_text="Projet"),
@@ -176,7 +174,6 @@ def generate_feature_model(project, feature, geom_type, names, types, labels, us
                    "status": "Statut des signalements",
                    "archive_date": "Date d'archivage automatique",
                    "deletion_date": "Date de suppression automatique"}
-
 
     module = 'config.' + APP_NAME
     field_type = []

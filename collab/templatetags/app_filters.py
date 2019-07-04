@@ -63,7 +63,22 @@ def get_timestamp(timestamp):
             ts = """{nbjours}""".format(
                nbjours=timestamp.days)
             return ts
-        except Exception as e:
-                return "0"
+        except Exception:
+            return "0"
     else:
         return "0"
+
+
+@register.filter
+def lookup(dictionary, key):
+    if isinstance(dictionary, dict):
+        return dictionary.get(key, False)
+    return False
+
+
+@register.filter
+def sortby(list_d, key):
+    newlist = []
+    if isinstance(list_d, list):
+        newlist = sorted(list_d, key=lambda k: k[key])
+    return newlist

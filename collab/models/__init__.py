@@ -1,4 +1,5 @@
 from collab.models.project import FeatureType
+from collab.models.project import FeatureLink
 from collab.models.project import Layer
 from collab.models.project import Project
 from collab.models.subscription import Subscription
@@ -11,6 +12,7 @@ from collab.models.customuser import Autorisation
 
 __all__ = [
     FeatureType,
+    FeatureLink,
     Layer,
     Project,
     Subscription,
@@ -19,4 +21,4 @@ __all__ = [
     Event,
     CustomUser,
     Autorisation,
-    ]
+]

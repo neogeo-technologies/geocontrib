@@ -42,7 +42,7 @@ from django.views.generic.edit import FormView
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
 from collab.forms import AutorisationForm
-from collab.forms import ExtendedBaseFS
+from collab.forms import LocalizedModelBaseFS
 
 
 APP_NAME = __package__.split('.')[0]
@@ -537,7 +537,7 @@ def project_members(request, project_slug):
         models.Autorisation,
         can_delete=True,
         form=AutorisationForm,
-        formset=ExtendedBaseFS,
+        formset=LocalizedModelBaseFS,
         extra=0,
         fields=('first_name', 'last_name', 'username', 'email', 'level'),
     )

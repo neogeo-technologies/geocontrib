@@ -20,24 +20,32 @@
           {% for key,val in feature.items %}
               {% if key|display_key %}
                 <tr>
-                      <td><strong>{{labels|get_dict_item:key}}</strong></td>
-
-                      {% if val %}
-                          {% if val == True %}
-                            <td><i class="green check icon"></td>
-                          {% elif val == False %}
-                            <td><i class="inverted red remove icon"></td>
-                          {% else %}
-                            <td>{{val|feature_val_display}}</td>
-                          {% endif %}
+                  <td><strong>{{labels|get_dict_item:key}}</strong></td>
+                  {% if val %}
+                      {% if val == True %}
+                        <td><i class="green check icon"></td>
+                      {% elif val == False %}
+                        <td><i class="inverted red remove icon"></td>
                       {% else %}
-                          <td><i class="minus icon"></td>
+                        <td>{{val|feature_val_display}}</td>
                       {% endif %}
-                  </tr>
+                  {% else %}
+                      <td><i class="minus icon"></td>
+                  {% endif %}
+                </tr>
               {% endif %}
           {% endfor %}
           <tr><td><strong>Auteur</strong></td>
               <td>{{author.username}}</td>
+          <tr>
+          <tr><td><strong>Signalements liés</strong></td>
+              {%for row in feature_link %}
+                <td>
+                  {{row.get_relation_type_display}}: <a href="{% url 'project_feature_detail' project_slug=project.slug feature_type_slug=feature_type_slug feature_id=row.feature_to  %}" class="header">{{row.feature_to}}</a>
+                </td>
+              {% empty %}
+                <td><i class="minus icon"></td>
+              {% endfor %}
           <tr>
         </tbody>
     </table>

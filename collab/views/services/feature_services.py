@@ -3,20 +3,24 @@ from collab.choices import STATUS
 from collab.views.services.validation_services import diff_data
 from .project_services import get_feature_type_table_name
 from collab.db_utils import commit_data
+from collab.db_utils import column_names
 from collab.db_utils import fetch_first_row
 from collab.db_utils import fetch_raw_data
-from collab import models
+# from collab import models
 from collections import OrderedDict
 import datetime
-import dateutil.parser
+# import dateutil.parser
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from hashlib import md5
 import json
 import logging
-import re
-import uuid
+# import re
+# import uuid
+
+
+logger = logging.getLogger(__name__)
 
 
 def generate_feature_id(app_name, project_slug, feature):
@@ -47,7 +51,6 @@ def delete_feature_table(app_name, project_slug, feature_type_slug):
     sql = """ DROP TABLE "{table_name}";
           """.format(table_name=table_name)
     deletion = commit_data('default', sql)
-    logger = logging.getLogger(__name__)
     logger.exception(deletion)
     # attachment
     models.Attachment.objects.filter(feature_type_slug=feature_type_slug).delete()
@@ -296,16 +299,12 @@ def feature_update_events(curr_feature, prev_feature, project, user, feature_typ
             data=data_modify)
 
 
-def edit_feature(data, geom, table_name, feature_id):
+def edit_feature(raw_data, geom, table_name, feature_id):
     """
          edit feature
     """
     # remove csrfmiddlewaretoken
-    data.pop('csrfmiddlewaretoken', None)
-    # clé auto généré
-    data['modification_date'] = str(datetime.datetime.now())
-    # geom
-    data['geom'] = str(geom)
+    # raw_data.pop('csrfmiddlewaretoken', None)
     # A voir si on le mets à jour à chaque fois que le signalement est mise a jour
     # data['deletion_date'] = None
     # data['archive_date'] = None
@@ -316,9 +315,17 @@ def edit_feature(data, geom, table_name, feature_id):
     #     deletion_date = datetime.datetime.now() + project.delete_feature
     #     data['deletion_date'] = str(deletion_date.date())
     # escape simple quote and empty values
+
+    columns = column_names('default', table_name)
+    # On ne renseigne que les colonnes defini en base
+    # On ne garde dans data que ce qui nous interesse
+    data = {key: value for (key, value) in raw_data.items() if key in columns}
+    data['modification_date'] = str(timezone.now())
+    data['geom'] = str(geom)
+
     feature_keys = []
     for key, val in data.items():
-        feature_keys.append('feature.'+str(key))
+        feature_keys.append('feature.' + str(key))
         if not val:
             data[key] = None
         elif "'" in val:
@@ -328,13 +335,12 @@ def edit_feature(data, geom, table_name, feature_id):
              SET ({list_keys})=({feature_keys})
              FROM json_populate_record(null::"{table_name}",'{data}') feature
              WHERE "{table_name}".feature_id='{feature_id}' """.format(
-             table_name=table_name,
-             list_keys=','.join(list(data.keys())),
-             feature_keys=','.join(feature_keys),
-             data=json.dumps(data),
-             feature_id=feature_id)
+        table_name=table_name,
+        list_keys=','.join(list(data.keys())),
+        feature_keys=','.join(feature_keys),
+        data=json.dumps(data),
+        feature_id=feature_id)
     update = commit_data('default', sql)
-    logger = logging.getLogger(__name__)
     logger.exception(update)
     return update
 
@@ -373,7 +379,6 @@ def add_feature(data, geom, table_name, project, user_id, feature_id):
                 feature=json.dumps(data)
            )
     creation = commit_data('default', sql)
-    logger = logging.getLogger(__name__)
     logger.exception(creation)
     return creation
 

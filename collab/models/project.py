@@ -1,10 +1,10 @@
-import datetime
-from django.db import models
 from collab.choices import USER_TYPE
 from collab.choices import USER_TYPE_ARCHIVE
 from collab.choices import GEOM_TYPE
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.db import models
+from django.dispatch import receiver
 from django.utils.html import format_html
 from django.utils.text import slugify
 APP_NAME = __package__.split('.')[0]
@@ -132,3 +132,53 @@ class FeatureType(models.Model):
     class Meta:
         verbose_name = "Type de signalement"
         verbose_name_plural = "Types de signalements"
+
+
+class FeatureLink(models.Model):
+    REL_TYPES = (
+        ('doublon', 'Doublon'),
+        ('remplace', 'Remplace'),
+        ('est_remplace_par', 'Est remplacé par'),
+        ('depend_de', 'Dépend de'),
+    )
+    relation_type = models.CharField(
+        'Type de liaison', choices=REL_TYPES, max_length=50, default='doublon')
+    feature_from = models.UUIDField(
+        "Identifiant du signalement source", max_length=32, blank=True, null=True)
+    feature_to = models.UUIDField(
+        "Identifiant du signalement lié", max_length=32, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Type de liaison"
+        verbose_name_plural = "Types de liaison"
+
+
+@receiver(models.signals.post_save, sender=FeatureLink)
+def create_symetrical_relation(sender, instance, created, **kwargs):
+    if created:
+        if instance.relation_type in ['doublon' or 'depend_de']:
+            recip = instance.relation_type
+        else:
+            recip = 'est_remplace_par' if (instance.relation_type == 'remplace') else 'remplace'
+        # Creation des réciproques
+        sender.objects.update_or_create(
+            relation_type=recip,
+            feature_from=instance.feature_to,
+            feature_to=instance.feature_from)
+
+
+@receiver(models.signals.post_delete, sender=FeatureLink)
+def submission_delete(sender, instance, **kwargs):
+    related = []
+    if instance.relation_type in ['doublon' or 'depend_de']:
+        recip = instance.relation_type
+    else:
+        recip = 'est_remplace_par' if (instance.relation_type == 'remplace') else 'remplace'
+    related = sender.objects.filter(
+        relation_type=recip,
+        feature_from=instance.feature_to,
+        feature_to=instance.feature_from
+    )
+    # Suppression des réciproques
+    for instance in related:
+        instance.delete()

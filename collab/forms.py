@@ -1,12 +1,11 @@
-from collab.choices import GEOM_TYPE
 from collab.choices import USER_TYPE
 from collab.choices import USER_TYPE_ARCHIVE
 from collab.models import Project
 from collab.models import Autorisation
-from collab.models import CustomUser
 from datetime import timedelta
 from django import forms
 from django.forms.models import BaseModelFormSet
+from django.forms.models import BaseFormSet
 from django.forms.formsets import DELETION_FIELD_NAME
 
 
@@ -49,7 +48,30 @@ class ProjectForm(forms.Form):
         return result
 
 
-class ExtendedBaseFS(BaseModelFormSet):
+class FeatureRelatedForm(forms.Form):
+    relation = forms.ChoiceField(
+        label="lien",
+        choices=(
+            ('', '----'),
+            ('doublon', 'Doublon'),
+            ('remplace', 'Remplace'),
+            ('est_remplace_par', 'Est remplacé par'),
+            ('depend_de', 'Dépend de'),
+        ),
+        widget=forms.Select(),
+        required=False
+    )
+
+    feature_id = forms.CharField(label='Identifiants', max_length=256, required=False)
+
+
+class LocalizedBaseFS(BaseFormSet):
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        form.fields[DELETION_FIELD_NAME].label = 'Supprimer ?'
+
+
+class LocalizedModelBaseFS(BaseModelFormSet):
     def add_fields(self, form, index):
         super().add_fields(form, index)
         form.fields[DELETION_FIELD_NAME].label = 'Supprimer ?'

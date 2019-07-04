@@ -2,10 +2,10 @@ import uuid
 from collab import models
 from collab.choices import STATUS
 from collab.choices import STATUS_MODERE
-from collab.db_utils import commit_data
-from collab.models import CustomUser
+from collab.exif import exif
+from collab.forms import FeatureRelatedForm
+from collab.forms import LocalizedBaseFS
 from collab.views.views import get_anonymous_rights
-
 from collab.views.services.feature_services import add_feature
 from collab.views.services.feature_services import delete_feature
 from collab.views.services.feature_services import edit_feature
@@ -13,30 +13,22 @@ from collab.views.services.feature_services import get_feature
 from collab.views.services.feature_services import get_feature_detail
 from collab.views.services.feature_services import get_feature_event
 from collab.views.services.feature_services import feature_update_events
-
 from collab.views.services.project_services import get_project_features
 from collab.views.services.project_services import project_feature_type_fields
 from collab.views.services.project_services import project_features_types
-
 from collab.views.services.validation_services import validate_geom
-
 from collections import OrderedDict
-import datetime
-
-# from django.db.models import Q
+from django.db.models import F
 from django.conf import settings
-# from django.contrib.auth.decorators import login_required
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.http import JsonResponse
+from django.forms import formset_factory
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.views import View
 
-from collab.exif import exif
-import json
 import logging
 import os
 
@@ -153,10 +145,24 @@ class ProjectFeatureDetail(View):
         # user Subscription
         subscription = False
         if request.user.is_authenticated:
-            if models.Subscription.objects.filter(users=request.user,
-                                     feature_id=feature.get('feature_id', ''),
-                                     project_slug=project.slug):
-                subscription = True
+            subscription = models.Subscription.objects.filter(
+                users=request.user, feature_id=feature.get('feature_id', ''),
+                project_slug=project.slug).exists()
+
+        try:
+            related = get_project_features(APP_NAME, project_slug, feature_type_slug)
+        except:
+            related = {}
+        related_features = [row for row in related if row.get('feature_id') != str(feature_id)]
+
+        RelatedFormset = formset_factory(
+            form=FeatureRelatedForm, formset=LocalizedBaseFS, extra=0, can_delete=True)
+        feature_link = models.FeatureLink.objects.filter(feature_from=feature.get('feature_id'))
+        initials = feature_link.annotate(
+            relation=F('relation_type'),
+            feature_id=F('feature_to')).values('relation', 'feature_id')
+        formset_related = RelatedFormset(initial=initials)
+
         # context
         context = {'rights': rights, 'project': project, 'author': user,
                    'comments': comments, 'attachments': attachments,
@@ -164,7 +170,12 @@ class ProjectFeatureDetail(View):
                    'subscription': subscription,
                    'com_attachment': com_attachment,
                    'file_max_size': settings.FILE_MAX_SIZE,
-                   'labels': labels, 'img_format': settings.IMAGE_FORMAT}
+                   'labels': labels, 'img_format': settings.IMAGE_FORMAT,
+                   'feature_type_slug': feature_type_slug,
+                   'formset_related': formset_related,
+                   'related_features': related_features,
+                   'feature_link': models.FeatureLink.objects.filter(feature_from=feature.get('feature_id')).order_by('relation_type')
+                   }
 
         # A AMELIORER
         if not request.is_ajax() or request.session.get('error', ''):
@@ -186,9 +197,9 @@ class ProjectFeatureDetail(View):
                     data[key]['value'] = feature.get(key, '')
                 # add info for JS display : do not display the same status depending on project configuration
                 if key == 'status':
-                    if rights['feat_modification'] == True or project.moderation == False:
+                    if rights['feat_modification'] is True or project.moderation is False:
                         data[key]['choices'] = STATUS
-                    elif project.moderation == True:
+                    elif project.moderation is True:
                         data[key]['choices'] = STATUS_MODERE
             context['feature'] = data
             context['edit'] = True
@@ -208,7 +219,7 @@ class ProjectFeatureDetail(View):
                         feature_type_slug=feature_type_slug)
         if request.POST.dict().get('_method', '') == 'delete':
             deletion = delete_feature(APP_NAME, project_slug, feature_type_slug, feature_id, request.user)
-            if deletion == True:
+            if deletion is True:
                 return redirect('project_feature_list', project_slug=project_slug)
             else:
                 msg = "Une erreur s'est produite, veuillez renouveller votre demande ultérieurement"
@@ -218,6 +229,25 @@ class ProjectFeatureDetail(View):
                 return redirect('project_feature_detail', project_slug=project_slug,
                                 feature_type_slug=feature_type_slug, feature_id=feature_id)
 
+        RelatedFormset = formset_factory(
+            form=FeatureRelatedForm, formset=LocalizedBaseFS, extra=0, can_delete=True)
+        formset = RelatedFormset(request.POST)
+        if formset.is_valid():
+            for data in formset.cleaned_data:
+                if not data.get('DELETE') and data.get('feature_id'):
+                    models.FeatureLink.objects.get_or_create(
+                        relation_type=data.get('relation'),
+                        feature_from=feature_id,
+                        feature_to=data.get('feature_id')
+                    )
+                if data.get('DELETE') and data.get('feature_id'):
+                    qs = models.FeatureLink.objects.filter(
+                        relation_type=data.get('relation'),
+                        feature_from=feature_id,
+                        feature_to=data.get('feature_id')
+                    )
+                    for instance in qs:
+                        instance.delete()
         project = get_object_or_404(models.Project,
                                     slug=project_slug)
         # get feature before update
@@ -237,7 +267,7 @@ class ProjectFeatureDetail(View):
         data.pop('comment', None)
         # get sql for additonal field
         update = edit_feature(data, geom, table_name, feature_id)
-        if update == True:
+        if update is True:
             # log de l'event de modification d'un projet
             curr_feature = get_feature(APP_NAME, project_slug, feature_type_slug, feature_id)
             feature_update_events(curr_feature, prev_feature, project, request.user, feature_type_slug, feature_id)
@@ -370,7 +400,7 @@ class ProjectFeature(View):
             )
 
         # recuperation des champs descriptifs
-        if creation == True:
+        if creation is True:
             # Ajout d'un evenement de création d'un signalement:
             models.Event.objects.create(
                 user=request.user,

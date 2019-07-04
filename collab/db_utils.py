@@ -1,5 +1,6 @@
 from django.db import connections
 
+
 def commit_data(database, sql):
 
     """
@@ -52,7 +53,6 @@ def fetch_first_row(database, sql):
     """
     idem que fetch_raw_data mais retourne uniquement la premiere ligne
     sous forme d'un dictionnaire.
-
     """
     with connections[database].cursor() as cursor:
         cursor.execute(sql)
@@ -60,3 +60,18 @@ def fetch_first_row(database, sql):
         if not list_dict or not len(list_dict):
             return {}
     return list_dict[0]
+
+
+def column_names(database, table_name):
+    sql = """SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = '{table_name}'
+    """.format(table_name=table_name)
+
+    with connections[database].cursor() as cursor:
+        cursor.execute(sql)
+        fetched = cursor.fetchall()
+        if not fetched or not len(fetched):
+            return []
+    return [x[0] for x in fetched]
