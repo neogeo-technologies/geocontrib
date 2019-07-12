@@ -21,7 +21,7 @@ from collab.views.content_managment import CreateFeatureType
 from collab.views.content_managment import CreateProject
 from collab.views.content_managment import CreateComment
 from collab.views.content_managment import CreateAttachment
-from collab.views.content_managment import project_members
+from collab.views.content_managment import ProjectMembers
 
 # from . import views
 # import collab.views.feature as feature
@@ -52,7 +52,7 @@ urlpatterns = [
 
     path('projet/<slug:slug>/editer/', ProjectExtendedDetail.as_view(), name='admin_project'),
 
-    path('projet/<slug:slug>/membres/', project_members, name='project_members'),
+    path('projet/<slug:slug>/membres/', ProjectMembers.as_view(), name='project_members'),
 
     path('projet/<slug:slug>/type-signalement/ajouter',
          CreateFeatureType.as_view(), name="add_feature_type"),

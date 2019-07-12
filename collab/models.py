@@ -17,13 +17,18 @@ from collab.choices import EVENT_TYPES
 from collab.choices import STATE_CHOICES
 from collab.choices import FREQUENCY_CHOICES
 
+import logging
+logger = logging.getLogger('django')
+
 
 #########################
 # USER'S RELATED MODELS #
 #########################
 
 class User(AbstractUser):
-    pass
+
+    is_administrator = models.BooleanField(
+        verbose_name="Est gestionnaire-métier", default=False)
 
 
 class UserLevelPermission(models.Model):
@@ -83,7 +88,7 @@ class Authorization(models.Model):
 
         user_perms = {
             'can_view_project': False,
-            'can_create_project': False,
+            'can_create_project': False,  # Redondant avec user.is_administartor
             'can_update_project': False,
             'can_view_feature': False,
             'can_create_feature': False,
@@ -362,9 +367,9 @@ class CustomField(models.Model):
         verbose_name_plural = "Champs personnalisés"
         unique_together = (('name', 'feature_type'), )
 
-
     def __str__(self):
         return "{}.{}".format(self.feature_type.slug, self.name)
+
 
 class Layer(models.Model):
     SCHEMAS = (
@@ -372,12 +377,18 @@ class Layer(models.Model):
         ('tms', 'TMS')
     )
     name = models.CharField('Nom', max_length=256, blank=True, null=True)
+
     title = models.CharField('Titre', max_length=256, blank=True, null=True)
+
     style = models.CharField('Style', max_length=256, blank=True, null=True)
+
     service = models.URLField('Service')
+
     order = models.PositiveSmallIntegerField("Numéro d'ordre", default=0)
+
     schema_type = models.CharField(
         "Type de couche", choices=SCHEMAS, max_length=50, default="wms")
+
     project = models.ForeignKey('collab.Project', on_delete=models.CASCADE)
 
     class Meta:
@@ -677,3 +688,18 @@ def update_feature_dates(sender, instance, **kwargs):
             days=instance.project.archive_feature)
         instance.deletion_on = instance.created_on + timezone.timedelta(
             days=instance.project.delete_feature)
+
+
+@receiver(models.signals.post_save, sender=Project)
+def set_author_perms(sender, instance, created, **kwargs):
+    # On ajoute la permission d'admin de projet au créateur
+    Authorization = apps.get_model(app_label='collab', model_name="Authorization")
+    UserLevelPermission = apps.get_model(app_label='collab', model_name="UserLevelPermission")
+    try:
+        Authorization.objects.create(
+            project=instance,
+            user=instance.user,
+            level=UserLevelPermission.objects.get(rank=4)
+        )
+    except Exception as err:
+        logger.error("Error on Authorization create: {}".format(str(err)))

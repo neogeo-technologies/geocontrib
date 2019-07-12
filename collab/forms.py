@@ -1,4 +1,4 @@
-from django.utils import timezone
+# from django.utils import timezone
 # from django import forms
 from django.contrib.gis import forms
 from django.forms.models import BaseModelFormSet
@@ -275,20 +275,3 @@ class FeatureDynamicForm(forms.ModelForm):
             if extra.exists() and self.instance.feature_data:
                 for custom_field in extra:
                     self.fields[custom_field.name].initial = self.instance.feature_data.get(custom_field.name)
-
-
-class DisabeledFeatureDynamicForm(FeatureDynamicForm):
-    class Meta:
-        model = Feature
-        fields = (
-            'title',
-            'description',
-            'status',
-        )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields.pop("geom", None)
-
-        for field in self.fields:
-            self.fields[field].disabled = True

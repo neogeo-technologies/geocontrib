@@ -17,7 +17,7 @@ class UserAdmin(DjangoUserAdmin):
 
     list_display = (
         'email', 'last_name', 'first_name',
-        'is_superuser', 'is_staff', 'is_active'
+        'is_superuser', 'is_administrator', 'is_staff', 'is_active'
     )
     search_fields = ('id', 'email', 'first_name', 'last_name')
 
@@ -40,7 +40,7 @@ class UserAdmin(DjangoUserAdmin):
         }),
         (_('Permissions'), {
             'fields': (
-                'is_active', 'is_staff', 'is_superuser',
+                'is_active', 'is_staff', 'is_superuser', 'is_administrator',
                 'groups', 'user_permissions'),
         }),
         (_('Important dates'), {

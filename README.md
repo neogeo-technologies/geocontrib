@@ -7,11 +7,11 @@ Application de signalement collaboratif
 ```shell
 python3.5 -m venv collab_venv/
 source bin/activate
-git clone git@github.com:neogeo-technologies/ng_collab.git src/
+git clone git@github.com:neogeo-technologies/collab.git src/
 pip install -r src/requirements.txt
 django-admin startproject config .
 
-# Ajout de liens symboliques pour que les source git soient visiblent par Django
+# Ajout de liens symboliques pour que les sources git soient visible par Django
 ln -s src/collab/ .
 ln -s src/api/ .
 ```
@@ -28,9 +28,9 @@ python manage.py loaddata src/collab/data/perm.json
 ```
 
 # Définir une image par défaut.
-Fichier à copier dans dossier de stockage des média, défni dans les settings
+Fichier à copier dans dossier de stockage des média, défini dans les settings
 ```
-cp collab/static/collab/img/default.png media/
+cp src/collab/static/collab/img/default.png media/
 ```
 
 # TODO:
@@ -39,7 +39,7 @@ cp collab/static/collab/img/default.png media/
 - [ ] Telechargement
 - [ ] Abonnement
 - [ ] Projet: Changer niveau d'authenticité
-- [ ] Projet: Administrer les membres
+- [x] Projet: Administrer les membres
 - [ ] Feature: Liaison entre Features
 - [ ] Feature: Affichage et edition carto
 - [ ] Mon Profil: Template à revoir

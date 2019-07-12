@@ -30,13 +30,17 @@ from collab.models import Authorization
 from collab.models import Attachment
 from collab.models import Comment
 from collab.models import CustomField
-from collab.models import Event
+# from collab.models import Event
 from collab.models import Feature
 from collab.models import FeatureType
 from collab.models import FeatureLink
 from collab.models import Project
+from collab.models import UserLevelPermission
 from collab.utils import save_custom_fields
 from collab.utils import retreive_custom_fields
+
+import logging
+logger = logging.getLogger('django')
 
 DECORATORS = [csrf_exempt, login_required(login_url=settings.LOGIN_URL)]
 
@@ -477,10 +481,8 @@ class CreateProject(CreateView):
     template_name = 'collab/project/project_create.html'
 
     def test_func(self):
-        # return self.request.user.is_superuser
         user = self.request.user
-        project = self.get_object()
-        return Authorization.has_permission(user, 'can_create_project', project)
+        return user.is_superuser or user.is_administrator
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -500,14 +502,9 @@ class ProjectMap(SingleObjectMixin, UserPassesTestMixin, View):
         raise NotImplementedError
 
 
-@login_required(login_url=settings.LOGIN_URL)
-def project_members(request, slug):
-
-    project = get_object_or_404(Project, slug=slug)
-    user = request.user
-    permissions = user.all_permissions(project)
-    authorised = Authorization.objects.filter(project=project)
-
+@method_decorator(DECORATORS, name='dispatch')
+class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
+    queryset = Project.objects.all()
     AuthorizationFormSet = modelformset_factory(
         Authorization,
         can_delete=True,
@@ -517,8 +514,33 @@ def project_members(request, slug):
         fields=('first_name', 'last_name', 'username', 'email', 'level'),
     )
 
-    if request.method == 'POST':
-        formset = AuthorizationFormSet(request.POST or None)
+    def test_func(self):
+        user = self.request.user
+        project = self.get_object()
+        return Authorization.has_permission(user, 'is_project_administrator', project)
+
+    def get(self, request, slug):
+        user = self.request.user
+        project = self.get_object()
+        formset = self.AuthorizationFormSet(queryset=Authorization.objects.filter(project=project))
+        authorised = Authorization.objects.filter(project=project)
+        permissions = Authorization.all_permissions(user, project)
+        context = {
+            "title": "Gestion des membres du projet {}".format(project.title),
+            'authorised': authorised,
+            'permissions': permissions,
+            'formset': formset,
+            'feature_types': FeatureType.objects.filter(project=project)
+        }
+
+        return render(request, 'collab/project/admin_members.html', context)
+
+    def post(self, request, slug):
+        user = self.request.user
+        project = self.get_object()
+        formset = self.AuthorizationFormSet(request.POST or None)
+        authorised = Authorization.objects.filter(project=project)
+        permissions = Authorization.all_permissions(user, project)
         if formset.is_valid():
 
             for data in formset.cleaned_data:
@@ -536,36 +558,33 @@ def project_members(request, slug):
                         continue
 
                 elif authorization:
-                    authorization.user.first_name = data.get('first_name')
-                    authorization.user.last_name = data.get('last_name')
-                    authorization.user.email = data.get('email')
-                    authorization.user.save()
-
+                    authorization.level = data.get('level')
+                    authorization.save()
+    
                 elif not authorization and not data.get("DELETE"):
                     # On ne crée pas d'utilisateur: il est choisi parmi ceux existants
+                    try:
+                        user = User.objects.get(
+                            username=data["username"],
+                            email=data["email"],
+                            is_active=True
+                        )
+                    except User.DoesNotExist:
+                        messages.error(request, "Aucun utilisateur ne correspond. ")
+                    else:
+                        Authorization.objects.create(
+                            user=user,
+                            project=project,
+                            level=data.get('level')
+                        )
 
-                    user = User.objects.get(
-                        username=data["username"],
-                        email=data["email"],
-                        is_active=True
-                    )
-                    Authorization.objects.create(
-                        user=user,
-                        project=project,
-                        level=data.get('level')
-                    )
+            return redirect('collab:project_members', slug=slug)
 
-            return redirect('project_members', slug=slug)
-    else:
-        formset = AuthorizationFormSet(
-            queryset=Authorization.objects.filter(project=project))
-
-    context = {
-        "title": "Gestion des membres du projet {}".format(project.title),
-        'authorised': authorised,
-        'permissions': permissions,
-        'formset': formset,
-        'feature_types': FeatureType.objects.filter(project=project)
-    }
-
-    return render(request, 'collab/project/admin_members.html', context)
+        context = {
+            "title": "Gestion des membres du projet {}".format(project.title),
+            'authorised': authorised,
+            'permissions': permissions,
+            'formset': formset,
+            'feature_types': FeatureType.objects.filter(project=project)
+        }
+        return render(request, 'collab/project/admin_members.html', context)

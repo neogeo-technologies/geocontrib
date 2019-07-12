@@ -146,3 +146,30 @@ LOGIN_REDIRECT_URL = 'collab:index'
 LOGOUT_REDIRECT_URL = 'collab:index'
 
 DEFAULT_SENDING_FREQUENCY = 'daily'
+
+# Logging properties
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {pathname}, @{lineno} :\n {message} \n',
+            'style': '{',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',  # On evite de garder des log de debug
+            'propagate': True,
+        },
+    },
+}
