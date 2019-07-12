@@ -139,10 +139,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = "collab.User"
 
-LOGIN_URL = 'login'
+LOGIN_URL = 'collab:login'
 
-LOGIN_REDIRECT_URL = 'index'
+LOGIN_REDIRECT_URL = 'collab:index'
 
-LOGOUT_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'collab:index'
 
 DEFAULT_SENDING_FREQUENCY = 'daily'

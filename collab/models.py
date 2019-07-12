@@ -199,7 +199,7 @@ class Project(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('project', kwargs={'slug': self.slug})
+        return reverse('collab:project', kwargs={'slug': self.slug})
 
 
 class Feature(models.Model):

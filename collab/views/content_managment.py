@@ -297,7 +297,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             # TODO@cbenhabib: a terme mettre dans une methode save du form
             # form.save()
             return HttpResponseRedirect(
-                reverse('feature_detail', kwargs={
+                reverse('collab:feature_detail', kwargs={
                     'slug': project.slug,
                     'feature_type_slug': feature_type.slug,
                     'feature_id': feature_id,
@@ -459,7 +459,7 @@ class ProjectExtendedDetail(SingleObjectMixin, View):
         if form.is_valid() and form.has_changed():
             form.save()
             return HttpResponseRedirect(
-                reverse('project', kwargs={'slug': project.slug}))
+                reverse('collab:project', kwargs={'slug': project.slug}))
         context = {
             'form': form,
             'feature_types': project.featuretype_set.all()

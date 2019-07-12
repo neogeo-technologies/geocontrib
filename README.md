@@ -5,11 +5,15 @@ Application de signalement collaboratif
 # Déploiement pour dev
 
 ```shell
-python3.5 -m venv /collab_venv
+python3.5 -m venv collab_venv/
 source bin/activate
-git clone git@github.com:neogeo-technologies/ng_collab.git .
-pip install -r requirements.txt
+git clone git@github.com:neogeo-technologies/ng_collab.git src/
+pip install -r src/requirements.txt
 django-admin startproject config .
+
+# Ajout de liens symboliques pour que les source git soient visiblent par Django
+ln -s src/collab/ .
+ln -s src/api/ .
 ```
 
 # Conf
@@ -20,13 +24,13 @@ Edit config/settings.py config/urls.py CF config_sample/*
 
 ```shell
 python manage.py migrate
-python manage.py laoddata collab/data/perm.json
+python manage.py loaddata src/collab/data/perm.json
 ```
 
 # Définir une image par défaut.
 Fichier à copier dans dossier de stockage des média, défni dans les settings
 ```
-cp collab/static/collab/img/default.png /media
+cp collab/static/collab/img/default.png media/
 ```
 
 # TODO:

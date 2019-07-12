@@ -4,8 +4,8 @@ from django.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
-    path('', include('collab.urls')),
+    path('api/', include('api.urls', namespace='api')),
+    path('', include('collab.urls', namespace='collab')),
 ]
 
 handler404 = 'collab.views.error.custom_404'
