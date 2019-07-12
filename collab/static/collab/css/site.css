@@ -48,18 +48,19 @@ footer{
   opacity: 0.5;
   text-decoration: none;
 }
+
 #maplist {
     background: #f8f4f0;
     height:400px;
     width:100%;
- }
+}
 
  #mapdetail {
      background: #f8f4f0;
      height:400px;
      width:100%;
      margin: 10px 0px 10px 0px;
-  }
+}
 
  .featuremap{
     margin: 20px 0 100px 0;
@@ -148,7 +149,6 @@ footer{
 #btn_project_save, #btn_project_edit,
 #btn_feature_edit, #btn_feature_save,
 #btn_feature_delete,
-#btn_feature_subscribe,
 #btn_remove_attachment,
 #btn_remove_comment{
   float: right;
@@ -207,4 +207,14 @@ footer{
 /* modal delete feature */
 .delete_actions{
   display: flex;
+}
+
+#add_feature_dropdown{
+  top:0 !important;
+}
+
+
+.disabled {
+  color: white;
+  background: black;
 }

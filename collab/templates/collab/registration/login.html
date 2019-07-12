@@ -16,24 +16,33 @@
   </div>
   <div class="five wide column"></div>
   <div class="six wide column">
-      <form class="ui form" method="post"  role="form" action="/connexion/">
-        {% csrf_token %}
-        <div class="ui stacked secondary  segment">
-          <div class="six field required">
-            <div class="ui left icon input">
-               <i class="user icon"></i>
-               <input type="text" name="username" placeholder="Utilisateur">
-            </div>
+    {% if form.errors %}
+    <div class="ui warning message">
+      <div class="header">
+        Les informations d'identifications sont incorrectes.
+      </div>
+        NB: Seules les comptes actifs peuvent se connecter.
+    </div>
+    {% endif %}
+    <form class="ui form" method="post"  role="form" action="/connexion/">
+      {% csrf_token %}
+
+      <div class="ui stacked secondary  segment">
+        <div class="six field required">
+          <div class="ui left icon input">
+             <i class="user icon"></i>
+             <input type="text" name="username" placeholder="Utilisateur">
           </div>
-          <div class="six field required">
-            <div class="ui left icon input">
-               <i class="lock icon"></i>
-               <input type="password" name="password" placeholder="Mot de passe">
-            </div>
-          </div>
-          <button  class="ui fluid large blue submit button" type="submit">Login</button>
         </div>
-      </form>
+        <div class="six field required">
+          <div class="ui left icon input">
+             <i class="lock icon"></i>
+             <input type="password" name="password" placeholder="Mot de passe">
+          </div>
+        </div>
+        <button  class="ui fluid large blue submit button" type="submit">Login</button>
+      </div>
+  </form>
   </div>
   <div class="five wide column"></div>
 </div>

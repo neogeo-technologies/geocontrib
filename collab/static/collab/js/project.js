@@ -3,6 +3,16 @@ $('.ui.selection.dropdown.feature')
   .dropdown()
 ;
 
+ $(document).ready(function(){
+      $('.ui.dropdown') .dropdown();
+});
+
+$(document).ready(function(){
+  $('.menu .item')
+    .tab()
+  ;
+});
+
 // multiple datefield but need id not class TO DO
 // $('[id^=date-field]').calendar({
 //   type: 'date'

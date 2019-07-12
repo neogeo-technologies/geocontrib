@@ -1,57 +1,194 @@
 {% extends "collab/layout_menu.html" %}
 {% load app_filters %}
-{% block title %}
-{{ title }}
-{% endblock %}
+{% load static %}
+{% load l10n %}
 {% block content %}
 
+{% if permissions|lookup:'can_view_feature' %}
 
-{% if rights.feat_consultation %}
-    <div class="project_header">
-        <h2 class="ui header">Projet {{project.title|title}}</h2>
-        <h3>{{feature.title}}</h3>
+<div class="project_header">
+  <h2 class="ui header">{{project.title}}</h2>
+  <h3>{{feature.title}}</h3>
+</div>
+
+{% if permissions|lookup:'can_update_feature' %}
+  <i id="btn_feature_edit" class="orange big edit icon"></i>
+  <i id="btn_feature_delete" class="trash red big alternate icon"></i>
+{% endif %}
+
+<table class="ui very basic table">
+  <tbody>
+    <tr>
+      <th>Titre</th>
+      <td>{{ feature.title }}</td>
+    </tr>
+    <tr>
+      <th>Description</th>
+      <td>{{ feature.description }}</td>
+    </tr>
+    <tr>
+      <th>Identifiant</th>
+      <td>{{ feature.feature_id }}</td>
+    </tr>
+    <tr>
+      <th>Statut</th>
+      <td>{{ feature.get_status_display }}</td>
+    </tr>
+    <tr>
+      <th>Date de création</th>
+      <td>{{ feature.created_on }}</td>
+    </tr>
+    <tr>
+      <th>Date de derniere modification</th>
+      <td>{{ feature.updated_on }}</td>
+    </tr>
+    <tr>
+      <th>Date de d'archivage</th>
+      <td>{{ feature.archived_on }}</td>
+    </tr>
+    <tr>
+      <th>Date de suppression</th>
+      <td>{{ feature.deletion_on }}</td>
+    </tr>
+    <tr>
+      <th>Auteur</th>
+      <td>{{ feature.user.get_full_name|default:feature.user.username }}</td>
+    </tr>
+    <tr>
+      <th>Localisation</th>
+      <td>{{ feature.geom }}</td>
+    </tr>
+
+    {% for key, data in lib_extra.items %}
+    <tr>
+      <th>{{ data|lookup:'label' }}</th>
+      <td>
+        {% if data|lookup:'value' == True %}
+          <i class="green check icon">
+        {% elif data|lookup:'value' == False %}
+          <i class="inverted red remove icon">
+        {% elif data|lookup:'field_type' == 'date' %}
+          {{ data|lookup:'value'|date }}
+        {% else %}
+          {{ data|lookup:'value' }}
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+
+  </tbody>
+</table>
+
+<!--  carte -->
+<div id='mapdetail'></div>
+
+<div class="ui top attached tabular menu" id="feature_menu">
+  <div class="item active" data-tab="comment">Commentaires</div>
+  <div class="item" data-tab="attachment">Pièces Jointes</div>
+</div>
+
+<!--  comments -->
+<div class="ui bottom attached tab segment active" id="comments" data-tab="comment">
+    {% include 'collab/feature/comments.html' %}
+</div>
+
+<!--  attachment -->
+<div class="ui bottom attached tab segment" id="attachments" data-tab="attachment">
+    {% include 'collab/feature/attachment.html' %}
+</div>
+
+<div class="ui mini modal">
+  <div class="header">Suppression du signalement</div>
+    <div class="content">
+      <p>Etes vous sure de vouloir supprimer ce signalement</p>
     </div>
-    <div id="feature_detail">
-      {% if success or error %}
-          {% if success %}
-              <div class="ui success message">
-                  <div id="success" class="header">{{success}}</div>
-              </div>
-          {% elif error %}
-              <div class="ui error message">
-                  <div class="header">{{error}}</div>
-              </div>
-          {% endif %}
-       {%endif %}
-        {% include 'collab/feature/feature_detail.html' %}
+      <div class="actions delete_actions">
+        <div class="ui negative button">
+          Non
+        </div>
+        <form action="{% url 'collab:feature_delete' slug=project.slug feature_type_slug=feature_type.slug feature_id=feature.feature_id %}" method='POST'>
+          {% csrf_token %}
+          <input type="hidden" name="_method" value="delete">
+          <button type='submit' class="ui positive right labeled icon button">
+            Oui
+            <i class="checkmark icon"></i>
+          </button>
+        </form>
+  </div>
+</div>
+
+<div class="ui longer modal">
+  <div class="header">Edition du signalement</div>
+  <div class="scrolling content">
+    <form id="edit_form" class="ui form" action="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature_type.slug feature_id=feature.feature_id %}" method='POST'>
+     {% csrf_token %}
+     <table class="ui celled table">
+        <tbody>{% localize off %}
+          {% for field in form.visible_fields %}
+          <tr>
+            <th>{{ field.label_tag }}</th>
+            <td>
+            {% if field.field.widget|is_checkbox %}
+                {{ field }}
+            {% elif field.field.widget|is_date %}
+             <div class="field">
+                <div class="ui input left icon">
+                    <i class="calendar icon"></i>
+                    {{ field}}
+                </div>
+            </div>
+            {% else %}
+              {{ field }}
+            {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+          {% endlocalize %}
+        </tbody>
+      </table>
+     </table>
+    </form>
+  </div>
+  <div class="actions edit_actions">
+    <div class="ui negative button">
+      Annuler
     </div>
-    <div id="edit_feature">
-        {% include 'collab/feature/edit_feature.html' %}
-    </div>
-    <!--  carte -->
-    <div id='mapdetail'></div>
-    <div class="ui top attached tabular menu" id="feature_menu">
-      <div class="item active" data-tab="comment">Commentaires</div>
-      <div class="item" data-tab="attachment">Pièces Jointes</div>
-      <div class="item" data-tab="events">Historique</div>
-    </div>
-    <!--  comments -->
-    <div class="ui bottom attached tab segment active" id="comments" data-tab="comment">
-        {% include 'collab/feature/comments.html' %}
-    </div>
-    <!--  attachment -->
-    <div class="ui bottom attached tab segment" id="attachments" data-tab="attachment">
-        {% include 'collab/feature/attachment.html' %}
-    </div>
-    <!--  events -->
-    <div class="ui bottom attached tab segment" id="events" data-tab="events">
-        {% include 'collab/feature/events.html' %}
-    </div>
+    <button type='submit' class="ui positive right labeled icon button" id="btn_submit_edit">
+     Sauvegarder
+     <i class="checkmark icon"></i>
+    </button>
+  </div>
+</div>
 
 {% else %}
-    <i class='icon exclamation triangle'></i>
-    <span>Vous ne disposez pas des droits nécessaires.</span>
+  <i class='icon exclamation triangle'></i>
+  <span>Vous ne disposez pas des droits nécessaires.</span>
 {% endif %}
-{% load staticfiles %}
-<script src="{% static 'collab/js/feature.js' %}"></script>
+
+<script>
+
+$('#btn_feature_delete').click(function(){
+    $('.mini.modal')
+      .modal('show')
+    ;
+});
+
+$('#btn_feature_edit').click(function(){
+    $('.longer.modal')
+      .modal('show')
+    ;
+});
+
+$('#btn_submit_edit').click(function(event){
+    event.preventDefault();
+    $('#edit_form').submit();
+});
+
+var edit_btn = document.getElementById("btn_feature_edit");
+edit_btn.style.cursor = "pointer";
+
+var delete_btn = document.getElementById("btn_feature_delete");
+delete_btn.style.cursor = "pointer";
+
+</script>
 {% endblock %}

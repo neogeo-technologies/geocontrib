@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class SignalementConfig(AppConfig):
+class CollabConfig(AppConfig):
     name = 'collab'

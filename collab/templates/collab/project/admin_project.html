@@ -4,43 +4,20 @@
 {{ title }}
 {% endblock %}
 {% block content %}
-
-{% if project and rights.proj_modification %}
-
-  <div id="detail">
-      {% include 'collab/project/project_detail.html' %}
-  </div>
-
-  <div id="project_form">
-      {% if edit %}
-          {% include 'collab/project/project_form.html' %}
-      {% endif %}
-  </div>
-{% else %}
-    <i class='icon exclamation triangle'></i>
-    <span>Vous ne disposez pas des droits nécessaires.</span>
-{% endif %}
-<script type="text/javascript">
-  // modify type of cursor
-  var element = document.getElementById("modify_project");
-  element.style.cursor = "pointer";
-  // form project editable
-  $("#modify_project").on('click', function(e) {
-
-      url = ''
-      $.ajax({
-        url: url,
-        type: 'GET',
-        success: function (data) {
-            $('#detail').html("");
-            $('#project_form').html(data);
-        },
-        error: function(err) {
-          console.log('Error occured', err);
-        }
-      });
-
-  });
-</script>
-
+<form action="." method="post" enctype="multipart/form-data" class="ui form">
+  {% csrf_token %}
+  {% if errors %}
+  <div class="ui error message">
+    {{ form.non_field_errors }}
+    {% for hidden_field in form.hidden_fields %}
+    {{ hidden_field.errors }}
+    {{ hidden_field }}
+    {% endfor %}
+  </div><i class="close icon"></i>
+  {% endif %}
+  <button id="btn_project_save" type="submit" class="green ui compact icon button">
+    <i class="white large save icon"></i>
+  </button>
+  {{ form.as_p }}
+</form>
 {% endblock %}

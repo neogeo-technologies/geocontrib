@@ -1,5 +1,5 @@
 {% load staticfiles %}
-{% if rights.feat_creation %}
+{% if permissions|lookup:'can_view_feature' %}
     <button id="addattachment" role="button" class="ui basic green tiny button">
       <i class="plus icon"></i>
         Ajouter une piece jointe
@@ -29,7 +29,7 @@
                   le {{attachment.creation_date|date:"d/m/Y"}}
               </div>
               {% if rights.feat_modification %}
-                 <form action="{% url 'project_attachment' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug feature_id=request.resolver_match.kwargs.feature_id %}" method='POST'>
+                 <form action="{% url 'collab:add_attachment' slug=project.slug feature_type_slug=feature_type.slug feature_id=feature.feature_id %}" method='POST'>
                    {% csrf_token %}
                    <input type="hidden" name="_method" value="delete">
                    <input type="hidden" name="attachment_id" value={{attachment.attachment_id}}>
@@ -53,7 +53,7 @@
 
     <div class="content">
 
-        <form id="add_form" action="{% url 'project_attachment' project_slug=project.slug feature_type_slug=request.resolver_match.kwargs.feature_type_slug  feature_id=request.resolver_match.kwargs.feature_id%}" enctype="multipart/form-data" class="ui form attachment_form" method="POST">
+        <form id="add_form" action="{% url 'collab:add_attachment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" enctype="multipart/form-data" class="ui form attachment_form" method="POST">
             {% csrf_token %}
             <div class="ui positive message hidden" id="positive_message">
               <div class="header">

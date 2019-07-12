@@ -1,0 +1,12 @@
+{% extends "collab/layout.html" %}
+
+{% block content %}
+<div class="ui one column stackable center aligned page grid">
+   <div class="column twelve wide">
+      <div class="ui error small message">
+        <div class="header">Aucune ressource ne correspond à votre requête. </div>
+        <a href="{% url 'collab:index' %}" class="ui black button">Retour à l'accueil</a>
+      </div>
+   </div>
+</div>
+{% endblock %}

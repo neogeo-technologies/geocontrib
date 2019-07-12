@@ -1,58 +1,97 @@
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
-from . import views
-from collab.views.attachment import Attachment
-from collab.views.comment import Comment
-import collab.views.feature as feature
-from collab.views.feature import ProjectFeature
-from collab.views.feature import ProjectFeatureDetail
-import collab.views.import_export as import_export
-from collab.views.subscription import Subscription
-from collab.views.views import LoginView
-from collab.views.views import LogoutView
-from collab.views.views import ProjectAdminView
-from collab.views.views import ProjectServiceView
-from collab.views.views import ProjectView
+from django.contrib.auth import views as auth_views
 
-services = [
-    path('api/liste_utilisateur/<slug:project_slug>', views.user_list),
-    path('api/liste_projet/', views.project_list),
-    path('api/export/', import_export.export_data),
-    path('api/import/', import_export.import_data),
-    path('api/json_feature_model/', import_export.get_json_feature_model),
-    path('api/projet/', ProjectServiceView.as_view()),
+from collab.views.accounts import HomePageView
+from collab.views.accounts import MyAccount
+# from collab.views.accounts import LoginView
+# from collab.views.accounts import LogoutView
+from collab.views.accounts import legal
+from collab.views.accounts import site_help
+from collab.views.content_managment import ProjectDetail
+from collab.views.content_managment import FeatureList
+from collab.views.content_managment import FeatureDetail
+# from collab.views.content_managment import FeatureUpdate
+from collab.views.content_managment import FeatureDelete
+from collab.views.content_managment import ProjectExtendedDetail
+from collab.views.content_managment import ProjectMap
+from collab.views.content_managment import CreateFeature
+from collab.views.content_managment import CreateFeatureType
+from collab.views.content_managment import CreateProject
+from collab.views.content_managment import CreateComment
+from collab.views.content_managment import CreateAttachment
+from collab.views.content_managment import project_members
 
-]
+# from . import views
+# import collab.views.feature as feature
+# from collab.views.attachment import ProjectAttachment
+# from collab.views.comment import ProjectComment
+# from collab.views.views import ProjectAdminView
+# from collab.views.feature import ProjectFeature
+# from collab.views.feature import ProjectFeatureDetail
+# from collab.views.views import ProjectView
 
-urlpatterns = services + [
-    path('connexion/', LoginView.as_view(), name='login'),
-    path('deconnexion/', LogoutView.as_view(), name='logout'),
-    path('', views.index, name='index'),
-    path('mon_compte/', views.my_account, name='my_account'),
-    path('mentions/', views.legal, name='legal'),
-    path('aide/', views.site_help, name='help'),
-    path('creer_projet/', ProjectView.as_view(), name='create_project'),
-    path('admin_projet/<slug:project_slug>/', ProjectAdminView.as_view(), name='admin_project'),
-    path('projet/<slug:project_slug>/ajouter_type_signalement/', views.add_feature_model, name="add_feature_model"),
-    path('projet/<slug:project_slug>/', views.project, name='project'),
-    path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),
-    path('projet/<slug:project_slug>/membres/', views.project_members, name='project_members'),
-    path('projet/<slug:project_slug>/ajout/', ProjectFeature.as_view(), name='project_add_feature'),
-    path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/commentaire', Comment.as_view(),
-         name='project_comment'),
-    path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/attachment', Attachment.as_view(),
-         name='project_attachment'),
-    path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/abonnement', Subscription.as_view(),
-          name='project_subscription'),
-    path('projet/<slug:project_slug>/liste/', feature.project_feature_list, name='project_feature_list'),
-    path('projet/<slug:project_slug>/carte/', feature.project_feature_map, name='project_feature_map'),
-    path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>', ProjectFeatureDetail.as_view(),
-         name='project_feature_detail'),
-    path('projet/<slug:project_slug>/import/', views.project_import_issues, name='project_import_issues'),
-    path('projet/<slug:project_slug>/import-geo-image/', views.project_import_geo_image,
-         name='project_import_geo_image'),
-    path('projet/<slug:project_slug>/export/', views.project_download_issues, name='project_download_issues'),
+app_name = 'collab'
+urlpatterns = [
+
+    # Vues générales de navigation
+    path('', HomePageView.as_view(), name='index'),
+    path('connexion/', auth_views.LoginView.as_view(
+        template_name='collab/registration/login.html'), name='login'),
+    path('deconnexion/', auth_views.LogoutView.as_view(
+        template_name='collab/registration/login.html'), name='logout'),
+    path('mon-compte/', MyAccount.as_view(), name='my_account'),
+    path('aide', site_help, name='help'),
+    path('mentions', legal, name='legal'),
+
+    # Vues de gestion et d'édition des données métiers
+    path('creer-projet/', CreateProject.as_view(), name='create_project'),
+
+    path('projet/<slug:slug>/', ProjectDetail.as_view(), name='project'),
+
+    path('projet/<slug:slug>/editer/', ProjectExtendedDetail.as_view(), name='admin_project'),
+
+    path('projet/<slug:slug>/membres/', project_members, name='project_members'),
+
+    path('projet/<slug:slug>/type-signalement/ajouter',
+         CreateFeatureType.as_view(), name="add_feature_type"),
+
+    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/ajouter/',
+         CreateFeature.as_view(), name='add_feature'),
+
+    path('projet/<slug:slug>/signalement/lister/',
+         FeatureList.as_view(), name='feature_list'),
+
+    path('projet/<slug:slug>/carte/', ProjectMap, name='project_map'),
+
+    path(
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>',
+        FeatureDetail.as_view(),
+        name='feature_detail'),
+
+    path(
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/supprimer',
+        FeatureDelete.as_view(),
+        name='feature_delete'),
+
+    path(
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/commentaire/ajouter',
+        CreateComment.as_view(),
+        name='add_comment'),
+
+    path(
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/piece-jointe/ajouter',
+        CreateAttachment.as_view(),
+        name='add_attachment'),
+    # path('mon_compte/activation', views.activation, name='activation'),
+    # path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),
+    # path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/attachment', ProjectAttachment.as_view(),
+    #      name='project_add_attachment'),
+    # path('projet/<slug:project_slug>/import/', views.project_import_issues, name='project_import_issues'),
+    # path('projet/<slug:project_slug>/import-geo-image/', views.project_import_geo_image,
+    #      name='project_import_geo_image'),
+    # path('projet/<slug:project_slug>/export/', views.project_download_issues, name='project_download_issues'),
 ]
 
 if settings.DEBUG:

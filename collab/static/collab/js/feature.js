@@ -3,12 +3,27 @@ $('.menu .item')
   .tab()
 ;
 
-// mouse pointer
-// # feature detail
-$( document ).ready(function() {
-  // var element = document.getElementById("addcomment");
-  // element.style.cursor = "pointer";
+// search
+$('.ui.search')
+  .search({
+    source: content
+  })
+;
 
+$('.ui.checkbox.boolfield')
+  .checkbox()
+;
+
+$('.ui.selection.dropdown.status')
+  .dropdown()
+;
+
+$('.ui.calendar')
+  .calendar()
+;
+
+// feature detail
+$( document ).ready(function() {
   if(document.getElementById("mapdetail")){
     let mapdetail = new mapboxgl.Map({
               container: 'mapdetail', // container id

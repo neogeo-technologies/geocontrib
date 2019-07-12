@@ -44,8 +44,8 @@
                     </tr>
                     <tr>
                         <td>Nom complet</td>
-                        {% if user.name %}
-                            <td>{{user.name}}</td>
+                        {% if user.get_full_name %}
+                            <td>{{user.get_full_name}}</td>
                         {% else %}
                             <td><i class="window minimize icon"></i></td>
                         {% endif %}
@@ -60,7 +60,7 @@
                     </tr>
                     <tr>
                         <td>Administrateur</td>
-                        {% if user.is_admin %}
+                        {% if user.is_superuser %}
                             <td>Oui</td>
                         {% else %}
                             <td>Non</td>
@@ -94,9 +94,8 @@
                 Mes projets
             </h4>
             <div class="ui divided items">
-                {% for project in project_list%}
-                    {% get_nested_item rights project.slug 'proj_consultation' as proj_consultation  %}
-                    {% if proj_consultation %}
+                {% for project in projects %}
+                    {% if permissions|lookup:project.slug %}
                         <div class="item">
                         <div class="ui tiny image">
                             {% if project.illustration %}
@@ -104,28 +103,32 @@
                             {% endif %}
                         </div>
                         <div class="middle aligned content">
-                            <a class="header" href="{% url 'project' project_slug=project.slug %}">{{project.title|title }}</a>
+                            <a class="header" href="{% url 'collab:project' slug=project.slug %}">{{project.title|title }}</a>
                             <div class="description">
                                   <p>{{project.description}}</p>
                             </div>
                             <div class="meta">
                                 <span class="right floated">{% if project.moderation%}Projet modéré {% else %} Projet non modéré {% endif %}</span>
                                 <span>Mon niveau d'autorisation&nbsp;:
-                                    {% get_nested_item project_info project.slug 'level' %}
+                                    {% if user.is_superuser %}
+                                      <p>SuperAdmin</p>
+                                    {% else %}
+                                      <p>Pouet</p>
+                                    {% endif %}
                                 </span>
                             </div>
                             <div class="meta">
-                                <span class="right floated" data-tooltip="Projet créé le {{project.creation_date|date:'d/m/Y'}}">
-                                    <i class="calendar icon"></i>&nbsp;{{project.creation_date|date:'d/m/Y'}}
+                                <span class="right floated" data-tooltip="Projet créé le {{project.created_on|date:'d/m/Y'}}">
+                                    <i class="calendar icon"></i>&nbsp;{{project.created_on|date:'d/m/Y'}}
                                 </span>
                                 <span data-tooltip="Nombre de personnes ont contribué à ce projet">
-                                    {% get_nested_item project_info project.slug 'nb_contributors' %}&nbsp;<i class="user icon"></i>
+                                    {{ project.nb_contributors }}&nbsp;<i class="user icon"></i>
                                 </span>
                                 <span data-tooltip="Nombre de signalements ont été créés pour ce projet">
-                                    &nbsp;{% get_nested_item project_info project.slug 'nb_features' %}&nbsp;<i class="map marker icon"></i>
+                                    &nbsp;{{ project.nb_features }}&nbsp;<i class="map marker icon"></i>
                                 </span>
                                 <span data-tooltip="Nombre de commentaires ont été créés pour ce projet">
-                                    &nbsp;{% get_nested_item project_info project.slug 'nb_comments' %}&nbsp;<i class="comment icon"></i>
+                                    &nbsp;{{ project.nb_comments }}&nbsp;<i class="comment icon"></i>
                                 </span>
                             </div>
                         </div>
@@ -141,27 +144,15 @@
                 Dernières notifications reçues
             </h4>
             <div class="ui list">
-              {% if last_events %}
-                  {% for elt in last_events %}
-                      <div class="item">
-                          <i class="comment icon"></i>
-                          <div class="content">
-                              {% if elt.project_slug and elt.feature_type_slug and elt.feature_id %}
-                                <a  href="{% url 'project_feature_detail' project_slug=elt.project_slug feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" class="header">
-                              {% else %}
-                                <a  href="#" class="header">
-                              {% endif %}
-
-                              {{elt.creation_date}} - {{elt.project_slug}} - {{elt.user.username}} [{{elt.get_event_type_display}} {{elt.get_object_type_display}}]
-
-                              </a>
-                              <div class="description">{{elt.get_event_type_display}}</div>
-                          </div>
-                      </div>
-                  {% endfor %}
-              {% else %}
-                      Pas de notifications
-              {% endif %}
+                <div class="item">
+                    <i class="comment icon"></i>
+                    <div class="content">
+                        <a class="header">
+                            10/03/2019 - 9:25 - Projet - Auteur [Commentaire ajouté]</a>
+                        <div class="description">Titre du signalement</div>
+                        <div class="description">Début du texte du commentaire</div>
+                    </div>
+                </div>
             </div>
 
             <h4 id="mes_derniers_signalements" class="ui horizontal divider header">
@@ -170,24 +161,16 @@
                 Mes derniers signalements
             </h4>
             <div class="ui list">
-                {% if last_features %}
-                    {% for elt in last_features %}
-                        <div class="item">
-                            <i class="map marker icon"></i>
-                            <div class="content">
-                                {% if elt.project and elt.feature_type_slug and elt.feature_id %}
-                                  <a  href="{% url 'project_feature_detail' project_slug=elt.project feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" class="header"> {{elt.modification_date}} - {{elt.project}} - {{elt.title}}</a>
-                                {% else %}
-                                  <a  href="#" class="header">
-                                {% endif %}
-                                <div class="description">{{elt.description|slice:":150"}}</div>
-                                <!-- <div class="description">Date de dernière modification&nbsp;: {{elt.modification_date}}</div> -->
-                            </div>
+                {% for elt in features %}
+                    <div class="item">
+                        <i class="map marker icon"></i>
+                        <div class="content">
+                            <a  href="{% url 'collab:project_feature_detail' project_slug=elt.project feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" class="header">{{elt.project}} - {{elt.title}}</a>
+                            <div class="description">{{elt.description|slice:":150"}}</div>
+                            <div class="description">Date de dernière modification&nbsp;: {{elt.modification_date}}</div>
                         </div>
-                    {% endfor %}
-                {% else %}
-                    Pas de signalement
-                {% endif %}
+                    </div>
+                {% endfor %}
             </div>
             <h4 id="mes_derniers_commentaires" class="ui horizontal divider header">
                 <a name="commentaires"></a>
@@ -195,24 +178,16 @@
                 Mes derniers commentaires
             </h4>
             <div class="ui list">
-                {% if last_comment %}
-                    {% for elt in last_comment %}
-                        <div class="item">
-                            <i class="comment icon"></i>
-                            <div class="content">
-                                {% if elt.project and elt.feature_type_slug and elt.feature_id %}
-                                  <a  href="{% url 'project_feature_detail' project_slug=elt.project.slug feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" class="header">{{elt.creation_date}} - {{elt.project.title}} - {{elt.feature_type_slug}}</a>
-                                {% else %}
-                                  <a  href="#" class="header">
-                                {% endif %}
-                                <div class="description">{{elt.comment|slice:":150"}}</div>
-                                <!-- <div class="description">Date du commentaire&nbsp;: {{elt.creation_date}}</div> -->
-                            </div>
+                {% for elt in last_comment %}
+                    <div class="item">
+                        <i class="comment icon"></i>
+                        <div class="content">
+                            <a   href="{% url 'collab:project_feature_detail' project_slug=elt.project.slug feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" > {{elt.project.title}} - {{elt.feature_slug}}</a>
+                            <div class="description">{{elt.comment|slice:":150"}}</div>
+                            <div class="description">Date du commentaire&nbsp;: {{elt.creation_date}}</div>
                         </div>
-                    {% endfor %}
-                {% else %}
-                    Pas de commentaires
-                {% endif %}
+                    </div>
+                {% endfor %}
             </div>
 
         </div>

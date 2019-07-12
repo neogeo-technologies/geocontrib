@@ -1,83 +1,52 @@
 {% extends "collab/layout_menu.html" %}
+{% load static %}
 {% load app_filters %}
-{% block title %}
-{{ title }}
-{% endblock %}
+
 {% block content %}
-
-{%if rights.feat_consultation%}
-    {%if feature_list %}
-        {% if feature_list|length == 1 %}
-          {% for key,val in feature_list.items %}
-            <h2 class="ui header">
-              {{key|upper}}
-           </h2>
-          {% endfor %}
-        {% elif feature_list %}
-          <div class="ui tabular menu featurelist">
-              {% for key,val in feature_list.items %}
-                  {% if forloop.first %}
-                    <div class="active item"  data-tab={{key}}><strong>{{key|upper}}</strong></div>
-                  {% else %}
-                    <div class="item"  data-tab={{key}}><strong>{{key|upper}}</strong></div>
-                  {% endif %}
-              {% endfor %}
-          </div>
-        {% endif %}
-
-        {% for key,val in feature_list.items %}
-            {% if feature_list|length != 1 %}
-                {% if forloop.first %}
-                  <div class="ui active tab" data-tab="{{key}}" >
-                {% else %}
-                  <div class="ui tab" data-tab="{{key}}" >
-                {% endif %}
-            {% endif %}
-            {% if val %}
-              <table id="" class="display feature_table" style="width:100%">
-                <thead>
-                    <tr>
-                       <th><h2>Signalements</h2></th>
-                     </tr>
-                </thead>
-                <tbody>
-                    {% for feature in val %}
-                        <tr>
-                          <td>
-                            {% if feature.status == 'Archivé'%}
-                              <span  data-tooltip="Archivé" data-position="right center"><i class="red file alternate outline icon"></i></span>
-                            {% elif feature.status == 'En attente de publication'%}
-                              <span  data-tooltip="En attente de publication" data-position="right center"><i  class="orange file alternate outline icon"></i></span>
-                            {% elif feature.status == 'Publié'%}
-                              <span  data-tooltip="Publié" data-position="right center" ><i class="green file alternate outline icon"></i></span>
-                            {% else%}
-                              <span  data-tooltip="Brouillon"  data-position="right center"><i class="file alternate outline icon"></i></span>
-                            {% endif %}
-                            <strong><a href="{% url 'project_feature_detail' project_slug=project.slug feature_type_slug=key feature_id=feature.feature_id  %}">{{feature.title|feature_val_display}}</a></strong>
-                            <span class="sous-titre"><br>Créé par {{feature.author}} le {{feature.creation_date|date:"d/m/Y" }}</span>
-                          </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-              </table>
+<div class="ui middle aligned stackable grid container">
+  <div class="row ">
+    <h2 class="ui header">
+      Liste des signalements pour le projet <a href="{% url 'collab:project' slug=project.slug %}">{{ project.title }}</a>
+    </h2>
+  </div>
+  <div class="row ">
+    <table class="ui compact celled table">
+      <thead>
+        <tr>
+          <th>Statut</th>
+          <th>Titre</th>
+          <th>Crée Par</th>
+          <th>Du type</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for feature in features %}
+        <tr>
+          <td>
+            {% if feature.status == 'archived'%}
+            <span><i class="red file alternate outline icon">Archivé</i></span>
+            {% elif feature.status == 'pending'%}
+            <span><i class="orange file alternate outline icon"></i>En attente</span>
+            {% elif feature.status == 'published'%}
+            <span><i class="green file alternate outline icon"></i>Publié</span>
             {% else %}
-              <h3 class="ui header">
-                  Aucun signalement de ce type n'a été créé pour ce projet.
-              </h3>
+            <span ><i class="file alternate outline icon"></i>Brouillon</span>
             {% endif %}
-            {% if feature_list|length != 1 %}
-              </div>
-            {% endif %}
+          </td>
+          <td>
+            <strong><a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{feature.title|feature_val_display}}</a></strong>
+          </td>
+          <td>
+            <span class="sous-titre">{{feature.user}} le {{feature.created_on }}</span>
+          </td>
+          <td>
+            <span>{{feature.feature_type.title}}</span>
+          </td>
+        </tr>
         {% endfor %}
-    {% else %}
-        <h3 class="ui header">
-            Aucun signalement n'a été créé pour ce projet.
-        </h3>
-    {% endif %}
-{% else %}
-    <i class='icon exclamation triangle'></i>
-    <span>Vous ne disposez pas des droits nécessaires.</span>
-{% endif %}
-{% load staticfiles %}
- <script src="{% static 'collab/js/tables.js' %}"></script>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script src="{% static 'collab/js/feature.js' %}"></script>
 {% endblock %}
