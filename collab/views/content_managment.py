@@ -294,14 +294,6 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         form = self.EditForm(request.POST, instance=feature, feature_type=feature_type, extra=extra)
 
         if form.is_valid():
-
-            # feature.title = form.cleaned_data.get('title')
-            # feature.description = form.cleaned_data.get('description')
-            # feature.status = form.cleaned_data.get('status')
-            # feature.geom = form.cleaned_data.get('geom')
-            # feature.feature_data = save_custom_fields(extra, form.cleaned_data)
-            # feature.save()
-            # TODO@cbenhabib: a terme mettre dans une methode save du form
             form.save()
             return HttpResponseRedirect(
                 reverse('collab:feature_detail', kwargs={
@@ -341,7 +333,7 @@ class CreateFeatureType(SingleObjectMixin, UserPassesTestMixin, View):
     CustomFieldsFormSet = modelformset_factory(
         CustomField,
         can_delete=True,
-        can_order=True,
+        # can_order=True,
         form=CustomFieldModelForm,
         formset=CustomFieldModelBaseFS,
         extra=0,
@@ -382,7 +374,7 @@ class CreateFeatureType(SingleObjectMixin, UserPassesTestMixin, View):
                 if not data.get("DELETE"):
                     CustomField.objects.create(
                         feature_type=feature_type,
-                        position=data.get("ORDER"),
+                        position=data.get("position"),
                         label=data.get("label"),
                         name=data.get("name"),
                         field_type=data.get("field_type"),

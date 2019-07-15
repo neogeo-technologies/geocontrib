@@ -33,7 +33,7 @@ class CustomFieldModelForm(forms.ModelForm):
 
     class Meta:
         model = CustomField
-        fields = ('label', 'name', 'field_type')
+        fields = ('label', 'name', 'field_type', 'position')
 
 
 class FeatureTypeModelForm(forms.ModelForm):
