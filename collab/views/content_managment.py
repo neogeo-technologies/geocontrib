@@ -25,6 +25,7 @@ from collab.forms import CommentForm
 from collab.forms import ExtendedBaseFS
 from collab.forms import FeatureTypeModelForm
 from collab.forms import FeatureDynamicForm
+from collab.forms import FeatureLinkForm
 from collab.forms import ProjectModelForm
 from collab.models import Authorization
 from collab.models import Attachment
@@ -35,7 +36,6 @@ from collab.models import Feature
 from collab.models import FeatureType
 from collab.models import FeatureLink
 from collab.models import Project
-from collab.models import UserLevelPermission
 from collab.utils import save_custom_fields
 from collab.utils import retreive_custom_fields
 
@@ -168,8 +168,7 @@ class CreateFeature(SingleObjectMixin, UserPassesTestMixin, View):
 
         if form.is_valid():
             try:
-
-                Feature.objects.create(
+                feature = Feature.objects.create(
                     title=form.cleaned_data.get('title'),
                     description=form.cleaned_data.get('description'),
                     status=form.cleaned_data.get('status'),
@@ -185,23 +184,25 @@ class CreateFeature(SingleObjectMixin, UserPassesTestMixin, View):
                     "Une erreur s'est produite lors de la création du signalement {title}: {err}".format(
                         title=form.cleaned_data.get('title', 'N/A'),
                         err=str(err)))
+
             else:
                 messages.info(
                     request,
                     "Le signalement {title} a bien été crée. ".format(
                         title=form.cleaned_data.get('title', 'N/A'),
                     ))
-            return redirect('project', slug=project.slug)
+                return redirect(
+                    'collab:feature_detail', slug=project.slug,
+                    feature_type_slug=feature_type.slug, feature_id=feature.feature_id)
 
-        else:
-            context = {
-                'project': project,
-                'feature_type': feature_type,
-                'feature_types': project.featuretype_set.all(),
-                'permissions': Authorization.all_permissions(user, project),
-                'form': form
-            }
-            return render(request, 'collab/feature/add_feature.html', context)
+        context = {
+            'project': project,
+            'feature_type': feature_type,
+            'feature_types': project.featuretype_set.all(),
+            'permissions': Authorization.all_permissions(user, project),
+            'form': form
+        }
+        return render(request, 'collab/feature/add_feature.html', context)
 
 
 @method_decorator(DECORATORS, name='dispatch')
@@ -224,9 +225,6 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_types': feature_types,
             'project': project,
             'permissions': permissions,
-            # 'empty_feature_types': FeatureType.objects.filter(
-            #     project=project
-            # ).exclude(pk__in=[feat.feature_type.pk for feat in features]).values_list('slug', flat=True)
         }
 
         return render(request, 'collab/feature/feature_list.html', context)
@@ -237,6 +235,9 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = Feature.objects.all()
     pk_url_kwarg = 'feature_id'
     EditForm = FeatureDynamicForm
+    LinkedFormset = modelformset_factory(
+        model=FeatureLink,
+        form=FeatureLinkForm)
 
     def test_func(self):
         user = self.request.user
@@ -258,17 +259,15 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
 
         linked_features = FeatureLink.objects.filter(feature_from=feature.feature_id)
 
-        # import pdb; pdb.set_trace()
-
         form = self.EditForm(instance=feature, feature_type=feature_type, extra=extra)
 
         # RelatedFormset = formset_factory(
-        #     form=FeatureRelatedForm, formset=LocalizedBaseFS, extra=0, can_delete=True)
+        #     form=FeatureRelatedForm, extra=0, can_delete=True)
         # feature_link = models.FeatureLink.objects.filter(feature_from=feature.get('feature_id'))
         # initials = feature_link.annotate(
         #     relation=F('relation_type'),
         #     feature_id=F('feature_to')).values('relation', 'feature_id')
-        # formset_related = RelatedFormset(initial=initials)
+        linked_formset = self.LinkedFormset(initial=linked_features)
 
         context = {
             'feature': feature,
@@ -278,7 +277,9 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'permissions': Authorization.all_permissions(user, project),
             'form': form,
             'lib_extra': retreive_custom_fields(extra, feature.feature_data),
-            'availables_features': availables_features
+            'availables_features': availables_features,
+            'linked_formset': linked_formset,
+            'linked_features': linked_features,
         }
 
         return render(request, 'collab/feature/feature.html', context)
@@ -290,16 +291,18 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         feature_type = feature.feature_type
 
         extra = CustomField.objects.filter(feature_type=feature_type)
-        form = self.EditForm(request.POST, feature_type=feature_type, extra=extra)
+        form = self.EditForm(request.POST, instance=feature, feature_type=feature_type, extra=extra)
+
         if form.is_valid():
-            feature.title = form.cleaned_data.get('title')
-            feature.description = form.cleaned_data.get('description')
-            feature.status = form.cleaned_data.get('status')
-            feature.geom = form.cleaned_data.get('geom')
-            feature.feature_data = save_custom_fields(extra, form.cleaned_data)
-            feature.save()
+
+            # feature.title = form.cleaned_data.get('title')
+            # feature.description = form.cleaned_data.get('description')
+            # feature.status = form.cleaned_data.get('status')
+            # feature.geom = form.cleaned_data.get('geom')
+            # feature.feature_data = save_custom_fields(extra, form.cleaned_data)
+            # feature.save()
             # TODO@cbenhabib: a terme mettre dans une methode save du form
-            # form.save()
+            form.save()
             return HttpResponseRedirect(
                 reverse('collab:feature_detail', kwargs={
                     'slug': project.slug,
@@ -384,7 +387,7 @@ class CreateFeatureType(SingleObjectMixin, UserPassesTestMixin, View):
                         name=data.get("name"),
                         field_type=data.get("field_type"),
                     )
-            return redirect('project', slug=project.slug)
+            return redirect('collab:project', slug=project.slug)
         else:
             context = {
                 'form': form,
@@ -560,7 +563,6 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
                 elif authorization:
                     authorization.level = data.get('level')
                     authorization.save()
-    
                 elif not authorization and not data.get("DELETE"):
                     # On ne crée pas d'utilisateur: il est choisi parmi ceux existants
                     try:

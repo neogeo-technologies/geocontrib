@@ -1,5 +1,5 @@
-# from django.utils import timezone
-# from django import forms
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.gis import forms
 from django.forms.models import BaseModelFormSet
 from django.forms.formsets import DELETION_FIELD_NAME
@@ -9,6 +9,7 @@ from collab.models import Attachment
 from collab.models import Comment
 from collab.models import CustomField
 from collab.models import Feature
+from collab.models import FeatureLink
 from collab.models import FeatureType
 from collab.models import Project
 from collab.models import UserLevelPermission
@@ -204,6 +205,16 @@ class AttachmentForm(forms.ModelForm):
         )
 
 
+class FeatureLinkForm(forms.ModelForm):
+    class Meta:
+        model = FeatureLink
+        fields = (
+            'relation_type',
+            # 'feature_from',
+            'feature_to',
+        )
+
+
 class FeatureDynamicForm(forms.ModelForm):
     class Meta:
         model = Feature
@@ -275,3 +286,16 @@ class FeatureDynamicForm(forms.ModelForm):
             if extra.exists() and self.instance.feature_data:
                 for custom_field in extra:
                     self.fields[custom_field.name].initial = self.instance.feature_data.get(custom_field.name)
+
+    def save(self, commit=True, *args, **kwargs):
+        instance = super().save(commit=False)
+
+        extra = CustomField.objects.filter(feature_type=instance.feature_type)
+        newdict = {field_name: self.cleaned_data.get(field_name) for field_name in extra.values_list('name', flat=True)}
+        stringfied = json.dumps(newdict, cls=DjangoJSONEncoder)
+        instance.feature_data = json.loads(stringfied)
+
+        if commit:
+            instance.save()
+
+        return instance

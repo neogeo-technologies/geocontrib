@@ -4,6 +4,9 @@ from rest_framework_gis.serializers import GeometrySerializerMethodField
 from collab.models import Project
 from collab.models import Feature
 
+import logging
+logger = logging.getLogger('django')
+
 
 class ExportFeatureSerializer(serializers.ModelSerializer):
 

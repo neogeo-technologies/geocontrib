@@ -33,6 +33,7 @@ from collab.views.content_managment import ProjectMembers
 # from collab.views.views import ProjectView
 
 app_name = 'collab'
+
 urlpatterns = [
 
     # Vues générales de navigation

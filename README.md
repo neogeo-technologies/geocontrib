@@ -43,4 +43,5 @@ cp src/collab/static/collab/img/default.png media/
 - [ ] Feature: Liaison entre Features
 - [ ] Feature: Affichage et edition carto
 - [ ] Mon Profil: Template à revoir
-- [ ] Permissions: User.is_administrator: Authorization.is_project_administrator/give_adminstration_perms
+- [x] Permissions: User.is_administrator: Authorization.is_project_administrator/give_adminstration_perms
+- [ ] Commentaire

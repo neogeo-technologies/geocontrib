@@ -25,7 +25,7 @@ class ExportFeatureList(APIView):
 
     def get(self, request, slug):
         """
-            Export list of feature
+            Vue de téléchargement des feature lié à un projet
         """
         # project_slug = 'ddddd'
         # feature_type = 'zzz'
@@ -64,7 +64,6 @@ class ProjectView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.Gene
 
     # Pour remplacer le delete ProjectService
     lookup_field = 'slug'
-    lookup_url_kwarg = 'project_slug'
 
 
 class ProjectAuthorization(APIView):

@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
+from django.core.exceptions import ValidationError
 from django.dispatch import receiver
 from django.utils import timezone
 from django.urls import reverse
@@ -256,6 +257,10 @@ class Feature(models.Model):
     class Meta:
         verbose_name = "Signalement"
         verbose_name_plural = "Signalements"
+
+    def clean(self):
+        if not isinstance(self.feature_data, dict):
+            raise ValidationError('Format de donnée invalide')
 
     def save(self, *args, **kwargs):
         if self._state.adding is True:

@@ -22,7 +22,8 @@ def retreive_custom_fields(extras, output_data):
         for row in extras.order_by('position').values('name', 'label', 'field_type'):
 
             if row['field_type'] == 'date':
-                value = datetime.strptime(output_data.get(row['name']), "%Y-%m-%d")
+                # value = datetime.strptime(output_data.get(row['name']), "%Y-%m-%d")
+                value = output_data.get(row['name'])
             else:
                 value = output_data.get(row['name'])
             res[row['name']] = {
