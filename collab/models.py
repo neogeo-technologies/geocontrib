@@ -91,7 +91,11 @@ class Authorization(models.Model):
             'can_view_project': False,
             'can_create_project': False,  # Redondant avec user.is_administartor
             'can_update_project': False,
-            'can_view_feature': False,
+            # 'can_view_feature': False,
+
+            'can_view_published_feature': False,
+            'can_view_archived_feature': False,
+
             'can_create_feature': False,
             'can_update_feature': False,
             'can_archive_feature': False,

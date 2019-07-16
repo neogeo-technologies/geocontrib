@@ -223,6 +223,7 @@ class FeatureLinkForm(forms.ModelForm):
         # import pdb; pdb.set_trace()
         return super().__init__(*args, **kwargs)
 
+
 class FeatureDynamicForm(forms.ModelForm):
     class Meta:
         model = Feature
@@ -237,6 +238,11 @@ class FeatureDynamicForm(forms.ModelForm):
         feature_type = kwargs.pop('feature_type')
         extra = kwargs.pop('extra', None)
         super().__init__(*args, **kwargs)
+        project = feature_type.project
+        if not project.moderation:
+            self.fields["status"] = forms.ChoiceField(
+                choices=tuple(x for x in Feature.STATUS_CHOICES if x[0] != 'pending')
+            )
 
         # TODO: factoriser les attributs de champs geom
         if feature_type.geom_type == "point":
