@@ -13,22 +13,3 @@ def save_custom_fields(extras, input_data):
         newdict = {field_name: jsonified.get(field_name) for field_name in extras.values_list('name', flat=True)}
         return newdict
     return {}
-
-
-def retreive_custom_fields(extras, output_data):
-    res = {}
-    if extras.exists():
-
-        for row in extras.order_by('position').values('name', 'label', 'field_type'):
-
-            if row['field_type'] == 'date':
-                # value = datetime.strptime(output_data.get(row['name']), "%Y-%m-%d")
-                value = output_data.get(row['name'])
-            else:
-                value = output_data.get(row['name'])
-            res[row['name']] = {
-                'label': row['label'],
-                'field_type': row['field_type'],
-                'value': value
-            }
-    return res

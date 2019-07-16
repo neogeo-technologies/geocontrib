@@ -161,13 +161,13 @@
                 Mes derniers signalements
             </h4>
             <div class="ui list">
-                {% for elt in features %}
+                {% for feature in features %}
                     <div class="item">
                         <i class="map marker icon"></i>
                         <div class="content">
-                            <a  href="{% url 'collab:project_feature_detail' project_slug=elt.project feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" class="header">{{elt.project}} - {{elt.title}}</a>
-                            <div class="description">{{elt.description|slice:":150"}}</div>
-                            <div class="description">Date de dernière modification&nbsp;: {{elt.modification_date}}</div>
+                            <a  href="{% url 'collab:feature_detail' slug=feature.project.slug feature_type_slug=feature.feature_type_slug  feature_id=feature.feature_id %}" class="header">{{feature.project}} - {{feature.title}}</a>
+                            <div class="description">{{feature.description|slice:":150"}}</div>
+                            <div class="description">Date de dernière modification&nbsp;: {{feature.updated_on}}</div>
                         </div>
                     </div>
                 {% endfor %}
@@ -182,7 +182,7 @@
                     <div class="item">
                         <i class="comment icon"></i>
                         <div class="content">
-                            <a   href="{% url 'collab:project_feature_detail' project_slug=elt.project.slug feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" > {{elt.project.title}} - {{elt.feature_slug}}</a>
+                            <a   href="{% url 'collab:feature_detail' slug=elt.project.slug feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" > {{elt.project.title}} - {{elt.feature_slug}}</a>
                             <div class="description">{{elt.comment|slice:":150"}}</div>
                             <div class="description">Date du commentaire&nbsp;: {{elt.creation_date}}</div>
                         </div>

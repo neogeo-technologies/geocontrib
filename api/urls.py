@@ -14,7 +14,7 @@ router = routers.DefaultRouter()
 router.register(r'projects', ProjectView, base_name='projects')
 
 urlpatterns = [
-    path('projects/<slug:slug>/users', ProjectAuthorization.as_view(), name='project-authorization'),
+    path('projects/<slug:slug>/utilisateurs', ProjectAuthorization.as_view(), name='project-authorization'),
     path('projects/<slug:slug>/export', ExportFeatureList.as_view(), name='project-export'),
 ]
 

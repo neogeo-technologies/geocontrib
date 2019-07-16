@@ -271,6 +271,20 @@ class Feature(models.Model):
     def __str__(self):
         return str(self.title)
 
+    @property
+    def custom_fields_as_list(self):
+        CustomField = apps.get_model(app_label='collab', model_name="CustomField")
+        custom_fields = CustomField.objects.filter(feature_type=self.feature_type)
+        res = []
+        if custom_fields.exists():
+            for row in custom_fields.order_by('position').values('name', 'label', 'field_type'):
+                res.append({
+                    'label': row['label'],
+                    'field_type': row['field_type'],
+                    'value': self.feature_data.get(row['name'])
+                })
+        return res
+
 
 class FeatureLink(models.Model):
     REL_TYPES = (

@@ -12,7 +12,7 @@ from collab.views.accounts import site_help
 from collab.views.content_managment import ProjectDetail
 from collab.views.content_managment import FeatureList
 from collab.views.content_managment import FeatureDetail
-# from collab.views.content_managment import FeatureUpdate
+from collab.views.content_managment import FeatureUpdate
 from collab.views.content_managment import FeatureDelete
 from collab.views.content_managment import ProjectExtendedDetail
 from collab.views.content_managment import ProjectMap
@@ -64,12 +64,17 @@ urlpatterns = [
     path('projet/<slug:slug>/signalement/lister/',
          FeatureList.as_view(), name='feature_list'),
 
-    path('projet/<slug:slug>/carte/', ProjectMap, name='project_map'),
+    path('projet/<slug:slug>/carte/', ProjectMap.as_view(), name='project_map'),
 
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>',
         FeatureDetail.as_view(),
         name='feature_detail'),
+
+    path(
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/editer',
+        FeatureUpdate.as_view(),
+        name='feature_update'),
 
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/supprimer',

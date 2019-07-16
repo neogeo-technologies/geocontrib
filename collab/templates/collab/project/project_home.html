@@ -80,7 +80,7 @@
         <div class="ui list">
           {% for elt in val %}
           <div class="content">
-            <a href="{% url 'collab:project_feature_detail' project_slug=project.slug feature_type_slug=key feature_id=elt.feature_id  %}" class="header">{{elt.titre|title}}</a>
+            <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=key feature_id=elt.feature_id  %}" class="header">{{elt.titre|title}}</a>
             <div class="description">Créé par {{elt.last_name|title}} {{elt.first_name|title}} le {{elt.creation_date|date:"d/m/Y"}}</div>
           </div>
           <br>

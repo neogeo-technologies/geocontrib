@@ -1,0 +1,136 @@
+{% extends "collab/layout_menu.html" %}
+{% load app_filters %}
+{% load static %}
+{% load l10n %}
+{% block title%}Édition d'un signalement{%endblock%}
+{% block content %}
+
+<div class="project_header">
+  <h2 class="ui header">{{project.title}}</h2>
+  <h3>{{feature.title}}</h3>
+</div>
+
+{% if permissions|lookup:'can_update_feature' %}
+<i id="btn_feature_edit" class="green big save outline icon"></i>
+<i id="btn_feature_delete" class="trash red big alternate icon"></i>
+{% endif %}
+
+
+<div class="header">Détail du signalement</div>
+  <table class="ui celled table">
+    <tbody>
+      <tr>
+        <th>Identifiant </th>
+        <td>{{ feature.feature_id }}</td>
+      </tr>
+      <tr>
+        <th>Date de création</th>
+        <td>{{ feature.created_on }}</td>
+      </tr>
+      <tr>
+        <th>Date de derniere modification</th>
+        <td>{{ feature.updated_on }}</td>
+      </tr>
+      <tr>
+        <th>Date de d'archivage</th>
+        <td>{{ feature.archived_on }}</td>
+      </tr>
+      <tr>
+        <th>Date de suppression</th>
+        <td>{{ feature.deletion_on }}</td>
+      </tr>
+      <tr>
+        <th>Auteur</th>
+        <td>{{ feature.user.get_full_name|default:feature.user.username }}</td>
+      </tr>
+      {% for field in feature_data %}
+      <tr>
+        <th>{{ field|lookup:'label' }}</th>
+        <td>
+          {{ field|lookup:'value' }}
+        </td>
+      </tr>
+      {% endfor %}
+
+      <tr>
+        <th>Signalements liés</th>
+        {%for row in linked_features %}
+        <td>
+          {{row.get_relation_type_display}}: <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=row.feature_to  %}" class="header">{{row.feature_to}}</a>
+        </td>
+        {% empty %}
+          <td><i class="minus icon"></td>
+        {% endfor %}
+      <tr>
+    </tbody>
+
+
+  </table>
+
+
+
+
+<!--  carte -->
+<div id='mapdetail'></div>
+
+<div class="ui top attached tabular menu" id="feature_menu">
+  <div class="item active" data-tab="comment">Commentaires</div>
+  <div class="item" data-tab="attachment">Pièces Jointes</div>
+</div>
+
+<!--  comments -->
+<div class="ui bottom attached tab segment active" id="comments" data-tab="comment">
+  {% include 'collab/feature/comments.html' %}
+</div>
+
+<!--  attachment -->
+<div class="ui bottom attached tab segment" id="attachments" data-tab="attachment">
+  {% include 'collab/feature/attachment.html' %}
+</div>
+
+<div class="ui mini modal">
+  <div class="header">Suppression du signalement</div>
+  <div class="content">
+    <p>Etes vous sure de vouloir supprimer ce signalement</p>
+  </div>
+  <div class="actions delete_actions">
+    <div class="ui negative button">
+      Non
+    </div>
+    <form action="{% url 'collab:feature_delete' slug=project.slug feature_type_slug=feature_type.slug feature_id=feature.feature_id %}" method='POST'>
+      {% csrf_token %}
+      <input type="hidden" name="_method" value="delete">
+      <button type='submit' class="ui positive right labeled icon button">
+        Oui
+        <i class="checkmark icon"></i>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+
+  $('#add_more').click(function() {
+    var form_idx = $('#id_form-TOTAL_FORMS').val();
+    $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+  });
+
+  $('#btn_feature_delete').click(function() {
+    $('.mini.modal')
+      .modal('show');
+  });
+
+  $('#btn_feature_edit').click(function(event) {
+    event.preventDefault();
+    $('#edit_form').submit();;
+  });
+
+
+  var edit_btn = document.getElementById("btn_feature_edit");
+  edit_btn.style.cursor = "pointer";
+
+  var delete_btn = document.getElementById("btn_feature_delete");
+  delete_btn.style.cursor = "pointer";
+</script>
+{% endblock %}

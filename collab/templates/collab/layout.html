@@ -31,8 +31,8 @@
         <div class="ui fixed inverted menu">
             <div class="ui container">
                 <a href="{% url 'collab:index' %}" class="header item">
-                    <img id="menu-logo" class="logo" src="{% static 'collab/img/logo.png' %}">
-                    Collab{% if project %}&nbsp;- {{project.title}}{% endif %}
+                    <img id="menu-logo" class="logo" src="{{ LOGO_PATH }}">
+                    {{ APPLICATION_NAME }}{% if project %}&nbsp;- {{project.title}}{% endif %}
                 </a>
                 <div class="right menu">
                 {% if request.user.is_authenticated %}

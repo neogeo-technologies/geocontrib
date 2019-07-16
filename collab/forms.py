@@ -206,14 +206,22 @@ class AttachmentForm(forms.ModelForm):
 
 
 class FeatureLinkForm(forms.ModelForm):
+
+    # feature_id = forms.ModelChoiceField(
+    #     Feature.objects.all(), label='Identifiant', to_field_name='feature_id'
+    # )
+
     class Meta:
         model = FeatureLink
         fields = (
             'relation_type',
-            # 'feature_from',
             'feature_to',
         )
 
+    def __init__(self, *args, **kwargs):
+
+        # import pdb; pdb.set_trace()
+        return super().__init__(*args, **kwargs)
 
 class FeatureDynamicForm(forms.ModelForm):
     class Meta:

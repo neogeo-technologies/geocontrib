@@ -38,8 +38,8 @@ cp src/collab/static/collab/img/default.png media/
 - [ ] Import de photographie
 - [ ] Telechargement
 - [ ] Abonnement
-- [ ] Projet: Changer niveau d'authenticité
-- [x] Projet: Administrer les membres
+- [ ] Projet: Changer niveau d'autorisation
+- [ ] Projet: Administrer les membres: cf service api GET projects/<slug:slug>/utilisateurs
 - [ ] Feature: Liaison entre Features
 - [ ] Feature: Affichage et edition carto
 - [ ] Mon Profil: Template à revoir

@@ -4,11 +4,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.forms import modelformset_factory
-from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
-from django.urls import reverse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -37,7 +35,6 @@ from collab.models import FeatureType
 from collab.models import FeatureLink
 from collab.models import Project
 from collab.utils import save_custom_fields
-from collab.utils import retreive_custom_fields
 
 import logging
 logger = logging.getLogger('django')
@@ -66,8 +63,10 @@ class CreateAttachment(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         user = request.user
-        permissions = Authorization.all_permissions(user, project)
         form = CommentForm(request.POST or None, request.FILE)
+        linked_features = FeatureLink.objects.filter(
+            feature_from=feature.feature_id
+        )
         if form.is_valide():
             Attachment.objects.create(
                 feature_id=feature.feature_id,
@@ -76,13 +75,17 @@ class CreateAttachment(SingleObjectMixin, UserPassesTestMixin, View):
                 comment=form.cleaned_data.get('comment'),
                 feature_type_slug=feature.feature_type.slug,
             )
+
         context = {
             'feature': feature,
+            'feature_data': feature.custom_fields_as_list,
+            'feature_types': FeatureType.objects.filter(project=project),
             'feature_type': feature.feature_type,
+            'linked_features': linked_features,
             'project': project,
-            'permissions': permissions,
+            'permissions': Authorization.all_permissions(user, project),
         }
-        return render(request, 'collab/feature/feature.html', context)
+        return render(request, 'collab/feature/feature_detail.html', context)
 
 
 #################
@@ -105,8 +108,10 @@ class CreateComment(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         user = request.user
-        permissions = Authorization.all_permissions(user, project)
         form = CommentForm(request.POST or None)
+        linked_features = FeatureLink.objects.filter(
+            feature_from=feature.feature_id
+        )
         if form.is_valide():
             Comment.objects.create(
                 feature_id=feature.feature_id,
@@ -117,11 +122,14 @@ class CreateComment(SingleObjectMixin, UserPassesTestMixin, View):
             )
         context = {
             'feature': feature,
+            'feature_data': feature.custom_fields_as_list,
+            'feature_types': FeatureType.objects.filter(project=project),
             'feature_type': feature.feature_type,
+            'linked_features': linked_features,
             'project': project,
-            'permissions': permissions,
+            'permissions': Authorization.all_permissions(user, project),
         }
-        return render(request, 'collab/feature/feature.html', context)
+        return render(request, 'collab/feature/feature_detail.html', context)
 
 
 #################
@@ -232,12 +240,9 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
 
 @method_decorator(DECORATORS, name='dispatch')
 class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
+
     queryset = Feature.objects.all()
     pk_url_kwarg = 'feature_id'
-    EditForm = FeatureDynamicForm
-    LinkedFormset = modelformset_factory(
-        model=FeatureLink,
-        form=FeatureLinkForm)
 
     def test_func(self):
         user = self.request.user
@@ -249,25 +254,63 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature = self.get_object()
         project = feature.project
+        linked_features = FeatureLink.objects.filter(
+            feature_from=feature.feature_id
+        )
+        context = {
+            'feature': feature,
+            'feature_data': feature.custom_fields_as_list,
+            'feature_types': FeatureType.objects.filter(project=project),
+            'feature_type': feature.feature_type,
+            'linked_features': linked_features,
+            'project': project,
+            'permissions': Authorization.all_permissions(user, project),
+        }
+
+        return render(request, 'collab/feature/feature_detail.html', context)
+
+
+@method_decorator(DECORATORS, name='dispatch')
+class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
+
+    queryset = Feature.objects.all()
+    pk_url_kwarg = 'feature_id'
+    EditForm = FeatureDynamicForm
+    LinkedFormset = modelformset_factory(
+        model=FeatureLink,
+        form=FeatureLinkForm,
+        extra=0,
+        can_delete=True)
+
+    def test_func(self):
+        user = self.request.user
+        feature = self.get_object()
+        project = feature.project
+        return Authorization.has_permission(user, 'can_update_feature', project)
+
+    def get(self, request, slug, feature_type_slug, feature_id):
+
+        user = request.user
+        feature = self.get_object()
+        project = feature.project
         feature_type = feature.feature_type
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         availables_features = Feature.objects.filter(
             project=project,
-            # status='published'
         ).exclude(feature_id=feature.feature_id)
-
-        linked_features = FeatureLink.objects.filter(feature_from=feature.feature_id)
 
         form = self.EditForm(instance=feature, feature_type=feature_type, extra=extra)
 
-        # RelatedFormset = formset_factory(
-        #     form=FeatureRelatedForm, extra=0, can_delete=True)
-        # feature_link = models.FeatureLink.objects.filter(feature_from=feature.get('feature_id'))
-        # initials = feature_link.annotate(
-        #     relation=F('relation_type'),
-        #     feature_id=F('feature_to')).values('relation', 'feature_id')
-        linked_formset = self.LinkedFormset(initial=linked_features)
+        from django.db.models import F
+        linked_features = FeatureLink.objects.filter(
+            feature_from=feature.feature_id
+        ).annotate(
+            feature_id=F('feature_to')).values('relation_type', 'feature_id')
+
+        linked_formset = self.LinkedFormset(
+            initial=linked_features,
+            queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
 
         context = {
             'feature': feature,
@@ -276,50 +319,74 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'project': project,
             'permissions': Authorization.all_permissions(user, project),
             'form': form,
-            'lib_extra': retreive_custom_fields(extra, feature.feature_data),
             'availables_features': availables_features,
             'linked_formset': linked_formset,
-            'linked_features': linked_features,
         }
 
-        return render(request, 'collab/feature/feature.html', context)
+        return render(request, 'collab/feature/feature_update.html', context)
 
     def post(self, request, slug, feature_type_slug, feature_id):
-
+        user = request.user
         feature = self.get_object()
         project = feature.project
         feature_type = feature.feature_type
+        availables_features = Feature.objects.filter(
+            project=project,
+        ).exclude(feature_id=feature.feature_id)
 
         extra = CustomField.objects.filter(feature_type=feature_type)
         form = self.EditForm(request.POST, instance=feature, feature_type=feature_type, extra=extra)
+        linked_formset = self.LinkedFormset(request.POST)
 
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(
-                reverse('collab:feature_detail', kwargs={
-                    'slug': project.slug,
-                    'feature_type_slug': feature_type.slug,
-                    'feature_id': feature_id,
-                }))
+            if linked_formset.is_valid():
 
-        features = Feature.objects.filter(project=project)
+                for data in linked_formset.cleaned_data:
+                    feature_to = data.get('feature_to')
+
+                    if feature_to:
+                        if not data.get('DELETE'):
+                            FeatureLink.objects.get_or_create(
+                                relation_type=data.get('relation_type'),
+                                feature_from=feature_id,
+                                feature_to=feature_to
+                            )
+                        if data.get('DELETE'):
+                            qs = FeatureLink.objects.filter(
+                                relation_type=data.get('relation_type'),
+                                feature_from=feature_id,
+                                feature_to=feature_to
+                            )
+                            for instance in qs:
+                                instance.delete()
+            else:
+                logger.error(linked_formset.errors)
+
+            return redirect(
+                'collab:feature_detail', slug=project.slug,
+                feature_type_slug=feature_type.slug, feature_id=feature.feature_id)
+
+        import pdb; pdb.set_trace()
+
         context = {
-            'features': features,
+            'feature': feature,
             'feature_types': FeatureType.objects.filter(project=project),
+            'feature_type': feature.feature_type,
             'project': project,
-            'permissions': Authorization.all_permissions(request.user, project),
-            'empty_feature_types': FeatureType.objects.filter(
-                project=project
-            ).exclude(pk__in=[feat.feature_type.pk for feat in features]).values_list('slug', flat=True)
+            'permissions': Authorization.all_permissions(user, project),
+            'form': form,
+            'availables_features': availables_features,
+            'linked_formset': linked_formset,
         }
-        # return render(request, 'collab/feature/feature.html', context)
-        return render(request, 'collab/feature/feature_list.html', context)
+
+        return render(request, 'collab/feature/feature_update.html', context)
 
 
 class FeatureDelete(DeleteView):
     model = Feature
     pk_url_kwarg = 'feature_id'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('collab:index')
 
 
 ######################
@@ -457,8 +524,8 @@ class ProjectExtendedDetail(SingleObjectMixin, View):
         form = ProjectModelForm(request.POST, request.FILES, instance=project)
         if form.is_valid() and form.has_changed():
             form.save()
-            return HttpResponseRedirect(
-                reverse('collab:project', kwargs={'slug': project.slug}))
+            return redirect('collab:project', slug=project.slug)
+
         context = {
             'form': form,
             'feature_types': project.featuretype_set.all()
@@ -515,6 +582,9 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
         return Authorization.has_permission(user, 'is_project_administrator', project)
 
     def get(self, request, slug):
+        """
+
+        """
         user = self.request.user
         project = self.get_object()
         formset = self.AuthorizationFormSet(queryset=Authorization.objects.filter(project=project))

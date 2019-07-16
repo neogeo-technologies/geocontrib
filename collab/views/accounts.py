@@ -37,7 +37,9 @@ class HomePageView(TemplateView):
 
 
 class LoginView(TemplateView):
-
+    """
+        Authentification par proxy
+    """
     template_name = 'collab/registration/login.html'
 
 
