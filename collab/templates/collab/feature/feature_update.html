@@ -17,6 +17,15 @@
 
 
 <div class="header">Edition du signalement</div>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 <form id="edit_form" class="ui form" action="" method='POST'>
   {% csrf_token %}
   <table class="ui celled table">

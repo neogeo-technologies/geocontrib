@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.db.models import F
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -302,7 +303,6 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
         form = self.EditForm(instance=feature, feature_type=feature_type, extra=extra)
 
-        from django.db.models import F
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         ).annotate(
@@ -322,7 +322,6 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'availables_features': availables_features,
             'linked_formset': linked_formset,
         }
-
         return render(request, 'collab/feature/feature_update.html', context)
 
     def post(self, request, slug, feature_type_slug, feature_id):
@@ -338,49 +337,45 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         form = self.EditForm(request.POST, instance=feature, feature_type=feature_type, extra=extra)
         linked_formset = self.LinkedFormset(request.POST)
 
-        if form.is_valid():
+        if not form.is_valid() or not linked_formset.is_valid():
+            logger.error(form.errors)
+            logger.error(linked_formset.errors)
+            messages.error(request, "un champs du formulaire est incorrecte. ")
+            context = {
+                'feature': feature,
+                'feature_types': FeatureType.objects.filter(project=project),
+                'feature_type': feature.feature_type,
+                'project': project,
+                'permissions': Authorization.all_permissions(user, project),
+                'form': form,
+                'availables_features': availables_features,
+                'linked_formset': linked_formset,
+            }
+            return render(request, 'collab/feature/feature_update.html', context)
+        else:
             form.save()
-            if linked_formset.is_valid():
+            for data in linked_formset.cleaned_data:
+                feature_to = data.get('feature_to')
 
-                for data in linked_formset.cleaned_data:
-                    feature_to = data.get('feature_to')
+                if feature_to:
+                    if not data.get('DELETE'):
+                        FeatureLink.objects.get_or_create(
+                            relation_type=data.get('relation_type'),
+                            feature_from=feature_id,
+                            feature_to=feature_to
+                        )
+                    if data.get('DELETE'):
+                        qs = FeatureLink.objects.filter(
+                            relation_type=data.get('relation_type'),
+                            feature_from=feature_id,
+                            feature_to=feature_to
+                        )
+                        for instance in qs:
+                            instance.delete()
 
-                    if feature_to:
-                        if not data.get('DELETE'):
-                            FeatureLink.objects.get_or_create(
-                                relation_type=data.get('relation_type'),
-                                feature_from=feature_id,
-                                feature_to=feature_to
-                            )
-                        if data.get('DELETE'):
-                            qs = FeatureLink.objects.filter(
-                                relation_type=data.get('relation_type'),
-                                feature_from=feature_id,
-                                feature_to=feature_to
-                            )
-                            for instance in qs:
-                                instance.delete()
-            else:
-                logger.error(linked_formset.errors)
-
-            return redirect(
-                'collab:feature_detail', slug=project.slug,
-                feature_type_slug=feature_type.slug, feature_id=feature.feature_id)
-
-        import pdb; pdb.set_trace()
-
-        context = {
-            'feature': feature,
-            'feature_types': FeatureType.objects.filter(project=project),
-            'feature_type': feature.feature_type,
-            'project': project,
-            'permissions': Authorization.all_permissions(user, project),
-            'form': form,
-            'availables_features': availables_features,
-            'linked_formset': linked_formset,
-        }
-
-        return render(request, 'collab/feature/feature_update.html', context)
+        return redirect(
+            'collab:feature_detail', slug=project.slug,
+            feature_type_slug=feature_type.slug, feature_id=feature.feature_id)
 
 
 class FeatureDelete(DeleteView):
