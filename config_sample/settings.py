@@ -175,6 +175,10 @@ LOGGING = {
     },
 }
 
+# Custom Contexts: cf 'collab.context_processors.custom_contexts'
+
 APPLICATION_NAME = 'Collab'
+
+APPLICATION_ABSTRACT = 'Describtion du projet'
 
 LOGO_PATH = 'media/logo.png'
