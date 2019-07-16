@@ -68,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'collab.context_processors.custom_contexts',
             ],
         },
     },
@@ -173,3 +174,7 @@ LOGGING = {
         },
     },
 }
+
+APPLICATION_NAME = 'Collab'
+
+LOGO_PATH = 'media/logo.png'
