@@ -1,0 +1,33 @@
+/* ---------------------------------- */
+            /* HEADER */
+/* ---------------------------------- */
+
+header {
+  background: #373636;
+}
+
+main {
+  padding: 1em;
+}
+
+
+/* ---------------------------------- */
+            /* FOOTER */
+/* ---------------------------------- */
+footer {
+  background-color: #464646;
+  text-align: center;
+}
+
+footer .ui.text.menu .item {
+  color: #ffffff;
+  padding: 5px 14px;
+}
+
+footer .ui.text.menu a.item:hover {
+  color: #1ab2b6;
+}
+
+footer .ui.text.menu .item:not(:first-child) {
+    border-left: 1px solid rgba(34,36,38,.15);
+}

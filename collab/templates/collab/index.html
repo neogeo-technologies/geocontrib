@@ -1,61 +1,63 @@
-{% extends "collab/layout.html" %}
+{% extends "collab/base.html" %}
+
 {% load static %}
-{% block title %}
-{{title}}
-{% endblock %}
+{% load app_filters %}
+
+{% block title %}{{ title }}{% endblock %}
+
 {% block content %}
-<div class="ui top aligned centered grid container">
-    <div class="twelve wide column">
-        <img class="ui centered medium image" src="{% static 'collab/img/logo-large.png' %}">
-        <h2 class="ui center aligned icon header">
-            <div class="content">
-                Collab
-                <div class="sub header">L'espace de production et de qualification collaboratif de Géo2France</div>
-            </div>
-        </h2>
-
-        <h4 id="les_projets" class="ui horizontal divider header">
-            <i class="users icon"></i>
-            Les projets
-        </h4>
-        <div class="ui divided items">
-            {% for project in projects %}
-            <div class="item">
-                <div class="ui tiny image">
-                    <img src="{{ project.thumbnail.url }}">
-                </div>
-                <div class="middle aligned content">
-                    <a class="header" href="{% url 'collab:project' slug=project.slug %}">{{project.title|title }}</a>
-                    <div class="description">
-                        <p>{{project.description}}</p>
-                    </div>
-                    <div class="meta">
-                        <span class="right floated">
-                            {% if project.moderation %}<strong>Projet modéré</strong>{% else %}<strong>Projet non modéré</strong>{% endif %}
-                        </span>
-                        <span>Niveau d'autorisation requis&nbsp;: {{project.access_level_pub_feature.get_user_type_id_display}} </span>
-                    </div>
-                    <div class="meta">
-                        <span class="right floated" data-tooltip="">
-                            <i class="calendar icon"></i>&nbsp; {{project.created_on|date:'d/m/Y'}}
-                        </span>
-                        <span data-tooltip="  {{project.nb_contributors}} personnes ont contribué à ce projet">
-                            {{project.nb_contributors}}&nbsp;<i class="user icon"></i>
-                        </span>
-                        <span data-tooltip="{{project.nb_features}} signalements ont été créés pour ce projet">
-                            &nbsp;{{project.nb_features}}&nbsp;<i class="map marker icon"></i>
-                        </span>
-                        <span data-tooltip="{{project.nb_comments}} commentaires ont été créés pour ce projet">
-                            &nbsp;{{project.nb_comments}}&nbsp;<i class="comment icon"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-              <span>Vous n'avez accès à aucun projet.</span>
-            {% endfor %}
-
-        </div>
+<div class="wide column">
+  <img class="ui centered small image" src="{{ LOGO_PATH }}">
+  <h2 class="ui center aligned icon header">
+    <div class="content">
+      {{ APPLICATION_NAME }}
+      <div class="sub header">{{ APPLICATION_ABSTRACT }}</div>
     </div>
+  </h2>
+
+  <h4 id="les_projets" class="ui horizontal divider header">PROJETS</h4>
+  <div class="ui divided items">
+    {% for project in projects %}
+    <div class="item">
+      <div class="ui tiny image">
+        <img src="{{ project.thumbnail.url }}">
+      </div>
+      <div class="middle aligned content">
+        <a class="header" href="{% url 'collab:project' slug=project.slug %}">{{ project.title }}</a>
+        <div class="description">
+          <p>{{project.description}}</p>
+        </div>
+        <div class="meta">
+          <span class="right floated">
+            {% if project.moderation %}<strong>Projet modéré</strong>{% else %}<strong>Projet non modéré</strong>{% endif %}
+          </span>
+          <span>Niveau d'autorisation requis&nbsp;: {{project.access_level_pub_feature.get_user_type_id_display}} </span>
+        </div>
+        <div class="meta">
+          <span class="right floated" data-tooltip="">
+            <i class="calendar icon"></i>&nbsp; {{project.created_on|date:'d/m/Y'}}
+          </span>
+          <span data-tooltip="  {{project.nb_contributors}} personnes ont contribué à ce projet">
+            {{project.nb_contributors}}&nbsp;<i class="user icon"></i>
+          </span>
+          <span data-tooltip="{{project.nb_features}} signalements ont été créés pour ce projet">
+            &nbsp;{{project.nb_features}}&nbsp;<i class="map marker icon"></i>
+          </span>
+          <span data-tooltip="{{project.nb_comments}} commentaires ont été créés pour ce projet">
+            &nbsp;{{project.nb_comments}}&nbsp;<i class="comment icon"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <span>Vous n'avez accès à aucun projet.</span>
+    {% endfor %}
+    <div class="item">
+    </div>
+  </div>
+  <a class="ui green basic button" href="{% url 'collab:create_project' %}">
+    <i class="plus icon"></i> Créer un nouveau projet
+  </a>
+
 </div>
 {% endblock %}
