@@ -33,7 +33,7 @@ class UserAdmin(DjangoUserAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('email', 'password')
+            'fields': ('username', 'email', 'password')
         }),
         (_('Personal info'), {
             'fields': ('first_name', 'last_name',)

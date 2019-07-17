@@ -17,6 +17,7 @@ from collab.choices import EXTENDED_RELATED_MODELS
 from collab.choices import EVENT_TYPES
 from collab.choices import STATE_CHOICES
 from collab.choices import FREQUENCY_CHOICES
+from collab.managers import AvailableFeaturesManager
 
 import logging
 logger = logging.getLogger('django')
@@ -85,19 +86,34 @@ class Authorization(models.Model):
         super().save(*args, **kwargs)
 
     @classmethod
-    def all_permissions(cls, user, projet):
+    def get_rank(cls, user, project):
 
+        # Si pas d'autorisation defini ou utilisateur non connecté
+        try:
+            auth = cls.objects.get(user=user, project=project)
+        except Exception:
+            user_rank = 1 if user.is_authenticated else 0
+        else:
+            user_rank = auth.level.rank
+        return user_rank
+
+    @classmethod
+    def all_permissions(cls, user, project, feature=None):
+        """
+        0    ANONYMOUS = 'anonymous'
+        1    LOGGED_USER = 'logged_user'
+        2    CONTRIBUTOR = 'contributor'
+        3    MODERATOR = 'moderator'
+        4    ADMIN = 'admin'
+        """
         user_perms = {
             'can_view_project': False,
             'can_create_project': False,  # Redondant avec user.is_administartor
             'can_update_project': False,
-            # 'can_view_feature': False,
-
-            'can_view_published_feature': False,
-            'can_view_archived_feature': False,
-
+            'can_view_feature': False,
             'can_create_feature': False,
             'can_update_feature': False,
+            'can_publish_feature': False,
             'can_archive_feature': False,
             'can_create_feature_type': False,
             'is_project_administrator': False,
@@ -109,17 +125,10 @@ class Authorization(models.Model):
             return user_perms
 
         else:
-            project_rank_min = projet.access_level_pub_feature.rank
-            project_arch_rank_min = projet.access_level_arch_feature.rank
+            project_rank_min = project.access_level_pub_feature.rank
+            project_arch_rank_min = project.access_level_arch_feature.rank
 
-            # Si pas d'autorisation defini ou utilisateur non connecté
-            try:
-                # Authorization = apps.get_model(app_label='collab', model_name="Authorization")
-                auth = cls.objects.get(user=user, project=projet)
-            except Exception:
-                user_rank = 1 if user.is_authenticated else 0
-            else:
-                user_rank = auth.level.rank
+            user_rank = cls.get_rank(user, project)
 
             if user_rank >= project_rank_min or project_rank_min < 2:
                 user_perms['can_view_project'] = True
@@ -132,16 +141,22 @@ class Authorization(models.Model):
 
             if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
                 user_perms['can_archive_feature'] = True
-            if user_rank >= 3:
+
+            # on permet aux utilisateur de modifier leur propre feature
+            if user_rank >= 3 or (feature and feature.user == user):
                 user_perms['can_update_feature'] = True
+
+            # seuls les moderateurs peuvent publier
+            if user_rank >= 3:
+                user_perms['can_publish_feature'] = True
             if user_rank >= 2:
                 user_perms['can_create_feature'] = True
 
         return user_perms
 
     @classmethod
-    def has_permission(cls, user, permission, projet):
-        auths = cls.all_permissions(user, projet)
+    def has_permission(cls, user, permission, project, feature=None):
+        auths = cls.all_permissions(user, project, feature)
         if isinstance(auths, dict):
             return auths.get(permission, False)
         return False
@@ -258,12 +273,16 @@ class Feature(models.Model):
 
     feature_data = JSONField(blank=True, null=True)
 
+    objects = models.Manager()
+
+    handy = AvailableFeaturesManager()
+
     class Meta:
         verbose_name = "Signalement"
         verbose_name_plural = "Signalements"
 
     def clean(self):
-        if not isinstance(self.feature_data, dict):
+        if self.feature_data and not isinstance(self.feature_data, dict):
             raise ValidationError('Format de donnée invalide')
 
     def save(self, *args, **kwargs):

@@ -237,12 +237,20 @@ class FeatureDynamicForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         feature_type = kwargs.pop('feature_type')
         extra = kwargs.pop('extra', None)
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         project = feature_type.project
+
+        choices = tuple(x for x in Feature.STATUS_CHOICES)
         if not project.moderation:
-            self.fields["status"] = forms.ChoiceField(
-                choices=tuple(x for x in Feature.STATUS_CHOICES if x[0] != 'pending')
-            )
+            choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] != 'pending')
+
+        if project.moderation and not Authorization.has_permission(user, 'can_publish_feature', project):
+            choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] in ['draft', 'pending'])
+
+        self.fields["status"] = forms.ChoiceField(
+            choices=choices
+        )
 
         # TODO: factoriser les attributs de champs geom
         if feature_type.geom_type == "point":

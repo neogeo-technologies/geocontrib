@@ -58,7 +58,7 @@ class CreateAttachment(SingleObjectMixin, UserPassesTestMixin, View):
         user = self.request.user
         feature = self.get_object()
         project = feature.project
-        return Authorization.has_permission(user, 'can_view_feature', project)
+        return Authorization.has_permission(user, 'can_view_feature', project, feature)
 
     def post(self, request, slug, feature_type_slug, feature_id):
         feature = self.get_object()
@@ -103,7 +103,7 @@ class CreateComment(SingleObjectMixin, UserPassesTestMixin, View):
         user = self.request.user
         feature = self.get_object()
         project = feature.project
-        return Authorization.has_permission(user, 'can_view_feature', project)
+        return Authorization.has_permission(user, 'can_view_feature', project, feature)
 
     def post(self, request, slug, feature_type_slug, feature_id):
         feature = self.get_object()
@@ -142,7 +142,6 @@ class CreateComment(SingleObjectMixin, UserPassesTestMixin, View):
 class CreateFeature(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = FeatureType.objects.all()
     slug_url_kwarg = 'feature_type_slug'
-    CreateForm = FeatureDynamicForm
 
     def test_func(self):
         user = self.request.user
@@ -155,7 +154,7 @@ class CreateFeature(SingleObjectMixin, UserPassesTestMixin, View):
         project = feature_type.project
         extra = CustomField.objects.filter(feature_type=feature_type)
 
-        form = self.CreateForm(feature_type=feature_type, extra=extra)
+        form = FeatureDynamicForm(feature_type=feature_type, extra=extra, user=user)
 
         context = {
             'project': project,
@@ -173,8 +172,8 @@ class CreateFeature(SingleObjectMixin, UserPassesTestMixin, View):
         feature_type = self.get_object()
         project = feature_type.project
         extra = CustomField.objects.filter(feature_type=feature_type)
-        form = self.CreateForm(request.POST, feature_type=feature_type, extra=extra)
-
+        form = FeatureDynamicForm(
+            request.POST, feature_type=feature_type, extra=extra, user=user)
         if form.is_valid():
             try:
                 feature = Feature.objects.create(
@@ -227,10 +226,9 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
         project = self.get_object()
         user = request.user
         permissions = Authorization.all_permissions(user, project)
-        features = Feature.objects.filter(project=project).order_by('-status', 'created_on')
         feature_types = FeatureType.objects.filter(project=project)
         context = {
-            'features': features,
+            'features': Feature.handy.availables(user, project).order_by('-status', 'created_on'),
             'feature_types': feature_types,
             'project': project,
             'permissions': permissions,
@@ -249,7 +247,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         user = self.request.user
         feature = self.get_object()
         project = feature.project
-        return Authorization.has_permission(user, 'can_view_feature', project)
+        return Authorization.has_permission(user, 'can_view_feature', project, feature)
 
     def get(self, request, slug, feature_type_slug, feature_id):
         user = request.user
@@ -265,7 +263,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_type': feature.feature_type,
             'linked_features': linked_features,
             'project': project,
-            'permissions': Authorization.all_permissions(user, project),
+            'permissions': Authorization.all_permissions(user, project, feature),
         }
 
         return render(request, 'collab/feature/feature_detail.html', context)
@@ -276,7 +274,6 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
     queryset = Feature.objects.all()
     pk_url_kwarg = 'feature_id'
-    EditForm = FeatureDynamicForm
     LinkedFormset = modelformset_factory(
         model=FeatureLink,
         form=FeatureLinkForm,
@@ -287,7 +284,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         user = self.request.user
         feature = self.get_object()
         project = feature.project
-        return Authorization.has_permission(user, 'can_update_feature', project)
+        return Authorization.has_permission(user, 'can_update_feature', project, feature)
 
     def get(self, request, slug, feature_type_slug, feature_id):
 
@@ -301,7 +298,8 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             project=project,
         ).exclude(feature_id=feature.feature_id)
 
-        form = self.EditForm(instance=feature, feature_type=feature_type, extra=extra)
+        form = FeatureDynamicForm(
+            instance=feature, feature_type=feature_type, extra=extra, user=user)
 
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
@@ -317,7 +315,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_types': FeatureType.objects.filter(project=project),
             'feature_type': feature.feature_type,
             'project': project,
-            'permissions': Authorization.all_permissions(user, project),
+            'permissions': Authorization.all_permissions(user, project, feature),
             'form': form,
             'availables_features': availables_features,
             'linked_formset': linked_formset,
@@ -334,7 +332,10 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         ).exclude(feature_id=feature.feature_id)
 
         extra = CustomField.objects.filter(feature_type=feature_type)
-        form = self.EditForm(request.POST, instance=feature, feature_type=feature_type, extra=extra)
+        form = FeatureDynamicForm(
+            request.POST, instance=feature, feature_type=feature_type,
+            extra=extra, user=user)
+
         linked_formset = self.LinkedFormset(request.POST)
 
         if not form.is_valid() or not linked_formset.is_valid():

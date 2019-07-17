@@ -13,7 +13,13 @@
   <div class="row">
     <form class='ui equal width form add_feature' method="POST" enctype="multipart/form-data">
       {% csrf_token %}
-      <div class="ui error message"></div>
+      <div class="ui error message">
+      {{ form.non_field_errors }}
+      {% for hidden_field in form.hidden_fields %}
+        {{ hidden_field.errors }}
+        {{ hidden_field }}
+      {% endfor %}
+      </div>
       <table class="ui very basic table">
         <tbody>
           {% for field in form.visible_fields %}
