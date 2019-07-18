@@ -7,7 +7,7 @@ Application de signalement collaboratif
 ## Création projet Django et clone du repo
 ```shell
 python3.5 -m venv collab_venv/
-source bin/activate
+source collab_venv/bin/activate
 git clone git@github.com:neogeo-technologies/collab.git src/
 # Installer les dépendances
 django-admin startproject config .
@@ -19,7 +19,7 @@ ln -s src/api/ .
 
 ## Settings & URL's
 
-Edition des fichiers de configuration et du fichier d'url
+Édition du fichier de configuration et du fichier d'url
 
 ## Migrations et ajout de données initiales
 
@@ -32,6 +32,7 @@ python manage.py loaddata src/collab/data/perm.json
 Fichier à copier dans dossier de stockage des média, défini dans les settings
 ```
 cp src/collab/static/collab/img/default.png media/
+cp src/collab/static/collab/img/logo.png media/
 ```
 
 # TODO:
