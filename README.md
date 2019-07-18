@@ -18,7 +18,8 @@ ln -s src/api/ .
 ```
 
 ## Settings & URL's
-Edit config/settings.py config/urls.py CF config_sample/*
+
+Edition des fichiers de configuration et du fichier d'url
 
 ## Migrations et ajout de données initiales
 
