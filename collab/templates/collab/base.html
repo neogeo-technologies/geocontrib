@@ -38,8 +38,8 @@
     <div class="ui container">
       <div class="ui inverted icon menu">
         <a href="{% url 'collab:index' %}" class="header item">
-            <img class="ui mini right spaced image"  src="{{ LOGO_PATH }}">
-            {{ APPLICATION_NAME }}
+          <img class="ui mini right spaced image" src="{{ LOGO_PATH }}">
+          {{ APPLICATION_NAME }}
         </a>
         {% if project %}
           <div class="ui dropdown item">
@@ -75,7 +75,7 @@
   </header>
 
   <main>
-    <div class="ui container">
+    <div class="ui stackable grid centered container">
       {% block content %}
       {% endblock %}
     </div>

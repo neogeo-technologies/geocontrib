@@ -1,146 +1,190 @@
-{% extends "collab/layout_menu.html" %}
-{% load static %}
-{% block content %}
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% if permissions|lookup:'can_view_project' %}
-<div class="project_header">
-  <h2 class="ui header">{{project.title|title }}</h2>
-</div>
-<div id='detail'>
-  {% if project and permissions|lookup:'can_update_project' %}
-    <i id="btn_project_edit" class="orange big edit icon "></i>
-  {% endif %}
-  <table class="ui very basic table">
-    <tbody>
-      <tr>
-        <td>Date de création du projet</td>
-        <td><strong>{{project.created_on|date:'d/m/Y'}}</strong></td>
-      </tr>
-      <tr>
-        <td>Délai avant archivage (nb jours)</td>
-        <td><strong>{{project.archive_feature}}</strong></td>
-      </tr>
-      <tr>
-        <td>Délai avant suppression (nb jours)</td>
-        <td><strong>{{project.delete_feature}}</strong></td>
-      </tr>
-      <tr>
-        <td>Description</td>
-        <td><strong>{{project.description}}</strong></td>
-      </tr>
-      <tr>
-        <td>Visibilité des signalements publiés</td>
-        <td><strong>{{project.access_level_pub_feature.get_user_type_id_display}}</strong></td>
-      </tr>
-      <tr>
-        <td>Visibilité des signalements archivés</td>
-        <td><strong>{{project.access_level_arch_feature.get_user_type_id_display}}</strong></td>
-      </tr>
-      <tr>
-        <td>Modération activée&nbsp;?</td>
-        <td>{% if project.moderation %}<strong>Oui</strong>{% else %}<strong>Non</strong>{% endif %}</td>
-      </tr>
-      <tr>
-        <td>Nombre de signalements</td>
-        <td><strong>{{features|length}}</strong></td>
-      </tr>
-      <tr>
-        <td>Nombre de commentaires</td>
-        <td><strong>{{comments|length}}</strong></td>
-      </tr>
-    </tbody>
-  </table>
-  <br>
-  <h3 class="ui header">Derniers utilisateurs inscrits</h3>
-  <table class="ui very basic table">
-    {% for auth in authorizations %}
-      <tr>
-        <td> <i class="user icon"></i>{{ auth.user.get_full_name|default:auth.user.username }}</td>
-      </tr>
-    {% empty %}
-      Aucun utilisateur n'est inscrit à ce projet
-    {% endfor %}
-  </table>
-  <br>
-  <h3 class="ui header">Derniers signalements</h3>
-  {% if last_features %}
-  <table class="ui very basic table">
-    {% for key,val in last_features.items %}
-    <tr>
-      <td>
-        <img class="ui avatar image" src="{{project.illustration.url}}"><strong>{{key|title}}</strong></td>
-      <td>
-        {% if val %}
-        <div class="ui list">
-          {% for elt in val %}
-          <div class="content">
-            <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=key feature_id=elt.feature_id  %}" class="header">{{elt.titre|title}}</a>
-            <div class="description">Créé par {{elt.last_name|title}} {{elt.first_name|title}} le {{elt.creation_date|date:"d/m/Y"}}</div>
-          </div>
-          <br>
-          {% endfor %}
-        </div>
-        {% else %}
-        <div class="description"><span>Aucun signalement de ce type n'a été créé</span></div>
-        <br>
-        {% endif %}
-      </td>
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% else%}
-  Aucun signalement n'est disponible
-  {% endif %}
-  <br>
-  <h3 class="ui header">Derniers commentaires</h3>
-  {% if comments %}
-  <div class="ui bulleted list">
-    {% for elt in comments %}
-    <table class="ui celled table">
-      <thead>
-        <tr>
-          <th>
-            <span class="comment_title"> <strong>{{elt.author__first_name|title}}
-                {{elt.author__last_name|title}} <strong>
-                  Le {{elt.creation_date|date:"d M Y"}}</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td data-label="">{{elt.comment}}</td>
-        </tr>
-      </tbody>
-    </table>
-    {% endfor %}
-  </div>
-  {% else %}
-  <span>Aucun commentaire n'a été ajouté</span>
-  {% endif %}
-</div>
-<div id="project_form">
-  {% if edit %}
-  {% include 'collab/project/admin_project.html' %}
-  {% endif %}
-</div>
-{% else %}
-  <i class='icon exclamation triangle'></i>
-  <span>Vous ne disposez pas des droits nécessaires.</span>
-{% endif %}
+{% extends "collab/base.html" %}
 
-<script>
-  var element = document.getElementById("btn_project_edit");
-  element.style.cursor = "pointer";
-  var project_slug = "{{project.slug}}"
-  element.onclick = function () {
-    location.href = "{% url 'collab:project_update' slug=project.slug %}";
-  };
-</script>
+{% load static %}
+
+{% block title %}Projet {{ project.title }}{% endblock %}
+
+{% block content %}
+
+  {% if permissions|lookup:'can_view_project' %}
+
+  <div class="row">
+    <div class="three wide column">
+      <img class="ui small image" src="{{ project.thumbnail.url }}">
+    </div>
+    <div class="eleven wide column">
+      <h1 class="ui header">
+        <div class="content">
+          {{ project.title }}
+          {% if project and permissions|lookup:'can_update_project' %}
+            <div class="ui icon right floated compact buttons">
+              <a href="{% url 'collab:project_update' slug=project.slug %}" class="ui button button-hover-orange">
+                <i class="inverted grey pencil alternate icon"></i>
+              </a>
+            </div>
+          {% endif %}
+          <div class="ui hidden divider"></div>
+          <div class="sub header">
+            {{ project.description }}
+          </div>
+        </div>
+      </h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="three wide column">
+      <div class="ui basic teal label" data-tooltip="Utilisateurs">
+        <i class="user icon"></i>1
+      </div>
+      <div class="ui basic teal label" data-tooltip="Signalements">
+        <i class="map marker icon"></i>{{ features|length }}
+      </div>
+      <div class="ui basic teal label" data-tooltip="Commentaires">
+        <i class="comment icon"></i>{{ comments|length }}
+      </div>
+    </div>
+    <div class="eleven wide column">
+      <h3 class="ui header">Types de signalements</h3>
+      <div class="ui middle aligned divided selection list">
+        {% for type in feature_types %}
+          <a class="item" href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=type.slug %}">
+            {% if type.geom_type == 'point' %}
+              <img class="ui image list-image-type" src="{% static 'collab/img/marker.png' %}">
+            {% elif type.geom_type == 'linestring' %}
+              <img class="ui image list-image-type" src="{% static 'collab/img/line.png' %}">
+            {% elif type.geom_type == 'polygon' %}
+              <img class="ui image list-image-type" src="{% static 'collab/img/polygon.png' %}">
+            {% endif %}
+            <div class="content">
+              {{ type.title }}
+            </div>
+          </a>
+        {% empty %}
+          VIDE
+        {% endfor%}
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="fourteen wide column">
+      <div class="ui three stackable cards">
+        <div class="red card">
+          <div class="content">
+            <div class="center aligned header">Derniers signalements</div>
+            <div class="center aligned description">
+              {% for item in last_features.items %}
+                <p>{{ item.title }}</p>
+              {% empty %}
+                <i>Aucun signalement pour le moment.</i>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="orange card">
+          <div class="content">
+            <div class="center aligned header">Derniers commentaires</div>
+            <div class="center aligned description">
+              <div class="ui relaxed list">
+                {% for elt in comments %}
+                  <div class="item">
+                    <div class="content">
+                      <div>"{{ elt.comment }}"</div>
+                      <div class="description">
+                        <i>Par {{ elt.author__first_name|title }} {{ elt.author__last_name }}, le {{ elt.creation_date|date:"d M Y" }}</i>
+                      </div>
+                    </div>
+                  </div>
+                {% empty %}
+                  <i>Aucun commentaire pour le moment.</i>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="yellow card">
+          <div class="content">
+            <div class="center aligned header">Derniers utilisateurs inscrits au projet</div>
+            <div class="center aligned description">
+              {% for auth in authorizations %}
+                <p>{{ auth.user.get_full_name|default:auth.user.username }}</p>
+              {% empty %}
+                <i>Aucun utilisateur n'est inscrit à ce projet.</i>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="fourteen wide column" >
+      <div class="ui grey segment" style="background:#e8e8e8">
+        <h3 class="ui header">Paramètres du projet</h3>
+        <div class="ui five stackable cards">
+          <div class="card">
+            <div class="center aligned content">
+              <h4 class="ui center aligned icon header">
+                <i class="archive icon"></i>
+                <div class="content">Délai avant archivage</div>
+              </h4>
+            </div>
+            <div class="center aligned extra content">{{ project.archive_feature }} jours</div>
+          </div>
+          <div class="card">
+            <div class="content">
+              <h4 class="ui center aligned icon header">
+                <i class="trash alternate icon"></i>
+                <div class="content">Délai avant suppression</div>
+              </h4>
+            </div>
+            <div class="center aligned extra content">{{ project.delete_feature }} jours</div>
+          </div>
+          <div class="card">
+            <div class="content">
+              <h4 class="ui center aligned icon header">
+                <i class="eye icon"></i>
+                <div class="content">Visibilité des signalements publiés</div>
+              </h4>
+            </div>
+            <div class="center aligned extra content">{{ project.access_level_pub_feature.get_user_type_id_display }}</div>
+          </div>
+          <div class="card">
+            <div class="content">
+              <h4 class="ui center aligned icon header">
+                <i class="eye icon"></i>
+                <div class="content">Visibilité des signalements archivés</div>
+              </h4>
+            </div>
+            <div class="center aligned extra content">{{ project.access_level_arch_feature.get_user_type_id_display }}</div>
+          </div>
+          <div class="card">
+            <div class="content">
+              <h4 class="ui center aligned icon header">
+                <i class="cogs icon"></i>
+                <div class="content">Modération</div>
+              </h4>
+            </div>
+            <div class="center aligned extra content">{% if project.moderation %}Oui{% else %}Non{% endif %}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+    <i class='icon exclamation triangle'></i>
+    <span>Vous ne disposez pas des droits nécessaires.</span>
+  {% endif %}
+
+{% endblock %}
+
+{% block custom_resources %}
+<style>
+  .list-image-type {
+    height: 15px;
+  }
+</style>
 {% endblock %}

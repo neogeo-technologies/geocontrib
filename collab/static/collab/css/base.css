@@ -7,7 +7,16 @@ header {
 }
 
 main {
-  padding: 1em;
+  padding: 2em 0em;
+}
+
+
+/* ---------------------------------- */
+            /* MAIN */
+/* ---------------------------------- */
+
+a.button-hover-orange:hover {
+  background: orange !important;
 }
 
 
