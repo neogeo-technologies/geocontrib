@@ -116,6 +116,7 @@ class Authorization(models.Model):
             'can_publish_feature': False,
             'can_archive_feature': False,
             'can_create_feature_type': False,
+            'can_view_feature_type': False,
             'is_project_administrator': False,
         }
 
@@ -133,6 +134,7 @@ class Authorization(models.Model):
             if user_rank >= project_rank_min or project_rank_min < 2:
                 user_perms['can_view_project'] = True
                 user_perms['can_view_feature'] = True
+                user_perms['can_view_feature_type'] = True
 
             if user_rank >= 4:
                 user_perms['can_update_project'] = True
@@ -472,6 +474,7 @@ class AnnotationAbstract(models.Model):
     def save(self, *args, **kwargs):
         if self._state.adding is True:
             self.created_on = timezone.now()
+        super().save(*args, **kwargs)
 
 
 class Attachment(AnnotationAbstract):
@@ -557,6 +560,7 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.created_on = timezone.now()
+        super().save(*args, **kwargs)
 
 
 class Subscription(models.Model):
@@ -580,6 +584,7 @@ class Subscription(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.created_on = timezone.now()
+        super().save(*args, **kwargs)
 
 
 class StackedEvent(models.Model):
@@ -625,6 +630,7 @@ class StackedEvent(models.Model):
             elif self.sending_frequency == "weekly":
                 self.schedualed_delivery_on = timezone.now() - timezone.timedelta(days=7)
         self.updated_on = timezone.now()
+        super().save(*args, **kwargs)
 
 
 ############

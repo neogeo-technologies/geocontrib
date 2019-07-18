@@ -20,6 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from collab.forms import AuthorizationForm
 from collab.forms import CustomFieldModelForm
 from collab.forms import CustomFieldModelBaseFS
+from collab.forms import AttachmentForm
 from collab.forms import CommentForm
 from collab.forms import ExtendedBaseFS
 from collab.forms import FeatureTypeModelForm
@@ -64,14 +65,14 @@ class AttachmentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         user = request.user
-        form = CommentForm(request.POST or None, request.FILE)
+        form = AttachmentForm(request.POST or None, request.FILES)
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         )
-        if form.is_valide():
+        if form.is_valid():
             Attachment.objects.create(
                 feature_id=feature.feature_id,
-                author=request.user,
+                user=request.user,
                 project=project,
                 comment=form.cleaned_data.get('comment'),
                 feature_type_slug=feature.feature_type.slug,
@@ -85,6 +86,8 @@ class AttachmentCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'linked_features': linked_features,
             'project': project,
             'permissions': Authorization.all_permissions(user, project),
+            'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
+            'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id)
         }
         return render(request, 'collab/feature/feature_detail.html', context)
 
@@ -109,18 +112,27 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         user = request.user
-        form = CommentForm(request.POST or None)
+        form = CommentForm(request.POST)
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         )
-        if form.is_valide():
-            Comment.objects.create(
-                feature_id=feature.feature_id,
-                author=request.user,
-                project=project,
-                comment=form.cleaned_data.get('comment'),
-                feature_type_slug=feature.feature_type.slug,
-            )
+
+        if form.is_valid():
+            try:
+                # La piece jointe est aussi ajoutée coté form.save()
+                form.save(
+                    user=user,
+                    project=project,
+                    feature=feature,
+                    attachment=request.FILES
+                )
+
+            except Exception as err:
+                logger.error(err)
+                messages.error(request, "Erreur à l'ajout du commentaire: {err}".format(err=err))
+            else:
+                messages.info(request, "Ajout du commentaire confirmé")
+
         context = {
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
@@ -129,6 +141,8 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'linked_features': linked_features,
             'project': project,
             'permissions': Authorization.all_permissions(user, project),
+            'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
+            'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id)
         }
         return render(request, 'collab/feature/feature_detail.html', context)
 
@@ -264,6 +278,8 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'linked_features': linked_features,
             'project': project,
             'permissions': Authorization.all_permissions(user, project, feature),
+            'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
+            'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id)
         }
 
         return render(request, 'collab/feature/feature_detail.html', context)
@@ -339,9 +355,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         linked_formset = self.LinkedFormset(request.POST)
 
         if not form.is_valid() or not linked_formset.is_valid():
-            logger.error(form.errors)
-            logger.error(linked_formset.errors)
-            messages.error(request, "un champs du formulaire est incorrecte. ")
+            messages.error(request, "Erreur à la mise à jour du signalement. ")
             context = {
                 'feature': feature,
                 'feature_types': FeatureType.objects.filter(project=project),
@@ -420,7 +434,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_types': project.featuretype_set.all(),
             'project': project,
         }
-        return render(request, 'collab/feature/add_feature_type.html', context)
+        return render(request, 'collab/feature_type/feature_type_create.html', context)
 
     def post(self, request, slug):
         user = request.user
@@ -453,6 +467,30 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
             }
             return render(request, 'collab/feature/add_feature_type.html', context)
 
+
+@method_decorator(DECORATORS, name='dispatch')
+class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
+    queryset = FeatureType.objects.all()
+    slug_url_kwarg = 'feature_type_slug'
+
+    def test_func(self):
+        user = self.request.user
+        feature_type = self.get_object()
+        project = feature_type.project
+        return Authorization.has_permission(user, 'can_view_feature_type', project)
+
+    def get(self, request, slug, feature_type_slug):
+        feature_type = self.get_object()
+        project = feature_type.project
+        user = request.user
+        context = {
+            'feature_type': feature_type,
+            'permissions': Authorization.all_permissions(user, project),
+            'feature_types': project.featuretype_set.all(),
+            'project': project,
+            'structure': {'todo': 'Ajout de structure'}
+        }
+        return render(request, 'collab/feature_type/feature_type_detail.html', context)
 
 #################
 # PROJECT VIEWS #

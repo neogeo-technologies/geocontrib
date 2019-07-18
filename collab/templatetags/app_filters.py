@@ -29,14 +29,6 @@ def get_item(dictionary, key):
         return ''
 
 
-@register.simple_tag
-def get_nested_item(dictionary, key, val=""):
-    if not val:
-        return dictionary.get(key, '')
-    data = dictionary.get(key, '')
-    return data.get(val, '')
-
-
 @register.filter
 def header_display(key):
     return str(key).replace('_', ' ').capitalize()

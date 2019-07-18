@@ -181,4 +181,8 @@ APPLICATION_NAME = 'Collab'
 
 APPLICATION_ABSTRACT = 'Describtion du projet'
 
-LOGO_PATH = 'media/logo.png'
+LOGO_PATH = 'logo.png'
+
+IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
+
+FILE_MAX_SIZE = 10000000

@@ -18,6 +18,7 @@ from collab.views.content_managment import ProjectUpdate
 from collab.views.content_managment import ProjectMap
 from collab.views.content_managment import FeatureCreate
 from collab.views.content_managment import FeatureTypeCreate
+from collab.views.content_managment import FeatureTypeDetail
 from collab.views.content_managment import ProjectCreate
 from collab.views.content_managment import CommentCreate
 from collab.views.content_managment import AttachmentCreate
@@ -57,6 +58,9 @@ urlpatterns = [
 
     path('projet/<slug:slug>/type-signalement/ajouter',
          FeatureTypeCreate.as_view(), name="feature_type_create"),  # add_feature_type
+
+    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/',
+         FeatureTypeDetail.as_view(), name='feature_type_detail'),
 
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/ajouter/',
          FeatureCreate.as_view(), name='feature_create'),  # add_feature

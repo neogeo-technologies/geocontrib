@@ -128,13 +128,13 @@
       // verif size and allowed format
 
       if(current_file_upload){
-        var file_max_size = "{{file_max_size}}";
-        if(parseFloat(current_file_upload.size) > parseFloat("{{file_max_size}}")) {
+        var file_max_size = "{{FILE_MAX_SIZE}}";
+        if(parseFloat(current_file_upload.size) > parseFloat("{{FILE_MAX_SIZE}}")) {
           $('#error_message').html('<span>Le fichier est trop volumineux, la taille maximale est de 10 Mo.</span>');
           $( "#error_message").show();
           return false
         }
-        var img_format = "{{img_format}}";
+        var img_format = "{{IMAGE_FORMAT}}";
         img_format = img_format.split(',');
         if(!img_format.includes(current_file_upload.type )){
           $('#error_message').html('<span>Le document doit être au format '+ img_format +' .</span>');

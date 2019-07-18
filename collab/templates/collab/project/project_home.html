@@ -140,7 +140,7 @@
   element.style.cursor = "pointer";
   var project_slug = "{{project.slug}}"
   element.onclick = function () {
-    location.href = "{% url 'collab:admin_project' slug=project.slug %}";
+    location.href = "{% url 'collab:project_update' slug=project.slug %}";
   };
 </script>
 {% endblock %}

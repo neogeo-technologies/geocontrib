@@ -5,51 +5,16 @@
         Ajouter un commentaire
     </button>
 {% endif %}
+
 {% if comments %}
-   <div class="ui one column grid">
-       {% for val in comments %}
-          <div class="column">
-             <div class="ui fluid card">
-                 <div class="content">
-                    <div class="description">
-                      {{val.comment}}
-                    </div>
-                 </div>
-                 <div class="content">
-                    {% get_nested_item com_attachment val.comment_id  as com_att  %}
-                    {% if com_att.file%}
-                        <i class="green paperclip  fitted icon">
-                           <a href="{{com_att.file.url}}" class="header">{{com_att.title}}</a>
-                        </i>
-                   {% else%}
-                        <i class="grey paperclip  fitted icon">
-                              <a href="#" class="header">Aucune pièce jointe</a>
-                        </i>
-                  {% endif %}
-                 </div>
-                 <div class="extra content">
-                      <div class="left floated">
-                         <i class="user icon"></i>
-                         Ajouter par {{val.author__username|title}} <br>
-                         le {{val.creation_date|date:"d/m/Y"}}
-                      </div>
-                      {% if permissions|lookup:'can_update_feature' %}
-                         <form action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug feature_id=feature.ature_id %}" method='POST'>
-                           {% csrf_token %}
-                           <input type="hidden" name="_method" value="delete">
-                           <input type="hidden" name="comment_id" value={{val.comment_id}}>
-                           <button type='submit' role="button" id="btn_remove_comment" class="ui basic red icon mini button">
-                              <i class="trash alternate icon"></i>
-                           </button>
-                         </form>
-
-                      {% endif %}
-                </div>
-             </div>
-         </div>
-       {% endfor %}
-   </div>
-
+ <div class="ui one column grid">
+    {% for comment in comments %}
+      {{ comment.comment }}
+      {% for att in comment.attachments.all %}
+        {{ att.title }}
+      {% endfor %}
+    {% endfor %}
+ </div>
 {% endif %}
 
 <div class="ui small modal comment">
@@ -60,7 +25,7 @@
 
     <div class="content">
 
-        <form id="commentform" action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" class="ui form comment_form" method="POST">
+        <form id="commentform" action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" class="ui form comment_form" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
             <div class="ui positive message hidden" id="positive_message">
               <div class="header">
@@ -131,21 +96,21 @@
             return false
       }
 
-      if( (isEmpty(current_attach_file) && title) || (isEmpty(current_attach_file) && info)){
-            $('#error_comment').html('<span>Veuillez fournir une piece jointe</span>');
-            $("#error_comment").show();
-            return false
-      }
+      // if( (isEmpty(current_attach_file) && title) || (isEmpty(current_attach_file) && info)){
+      //       $('#error_comment').html('<span>Veuillez fournir une piece jointe</span>');
+      //       $("#error_comment").show();
+      //       return false
+      // }
       // verif size and allowed format
 
       if(current_attach_file){
-        var file_max_size = "{{file_max_size}}";
+        var file_max_size = "{{FILE_MAX_SIZE}}";
         if(parseFloat(current_attach_file.size) > parseFloat(file_max_size)) {
           $('#error_comment').html('<span>Le fichier est trop volumineux, la taille maximale est de 10 Mo.</span>');
           $( "#error_comment").show();
           return false
         }
-        var img_format = "{{img_format}}";
+        var img_format = "{{IMAGE_FORMAT}}";
         img_format = img_format.split(',');
         if(!img_format.includes(current_attach_file.type )){
           $('#error_comment').html('<span>Le document doit être au format '+ img_format +' .</span>');

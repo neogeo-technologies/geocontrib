@@ -188,11 +188,51 @@ class AuthorizationForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
+
+    attachment_title = forms.CharField(
+        label="Information additonelle (pièce jointe)", max_length=128, required=False)
+    attachment_info = forms.CharField(
+        label="Titre de la pièce jointe", required=False, widget=forms.Textarea())
+
     class Meta:
         model = Comment
         fields = (
             'comment',
+            'attachment_title',
+            'attachment_info',
         )
+
+    def save(self, commit=True, *args, **kwargs):
+
+        user = kwargs.pop('user', None)
+        project = kwargs.pop('project', None)
+        feature = kwargs.pop('feature', None)
+        attachment = kwargs.pop('attachment', None)
+
+        instance = super().save(commit=False)
+
+        instance.feature_id = feature.feature_id
+        instance.feature_type_slug = feature.feature_type.slug
+        instance.author = user
+        instance.project = project
+
+        if commit:
+            instance.save()
+            # if attachment:
+            #     Attachment.objects.create(
+            #         feature_id=instance.feature_id,
+            #         author=instance.author,
+            #         project=instance.project,
+            #         title='',
+            #         info='',
+            #         type_objet='comment',
+            #         attachment_file=attachment,
+            #         comment=instance,
+            #     )
+            #     import pdb; pdb.set_trace()
+
+
+        return instance
 
 
 class AttachmentForm(forms.ModelForm):

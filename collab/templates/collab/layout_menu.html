@@ -90,7 +90,7 @@
                 <div class="menu" id="add_feature_dropdown">
                   <div class="header">Pour :</div>
                   {% for feature_type in feature_types %}
-                    <a class="item" href="{% url 'collab:add_feature' slug=project.slug feature_type_slug=feature_type.slug %}">{{feature_type.title}}</a>
+                    <a class="item" href="{% url 'collab:feature_create' slug=project.slug feature_type_slug=feature_type.slug %}">{{feature_type.title}}</a>
                   {% endfor %}
                 </div>
               </div>
@@ -99,7 +99,7 @@
               {% endif %}
 
               {% if project and permissions|lookup:'can_create_feature_type' %}
-              <a class="item" href="{% url 'collab:add_feature_type'  slug=project.slug  %}">
+              <a class="item" href="{% url 'collab:feature_type_create'  slug=project.slug  %}">
               <i class="icon plus"></i>Créer un nouveau type de signalement</a>
               {% endif %}
 
@@ -135,7 +135,7 @@
                   <i class="icon home"></i>Page d'accueil du projet</a>
                 <a class="item"><i class="icon lock open"></i>Changer son niveau d'autorisation</a>
                 {% if permissions|lookup:'can_create_project' %}
-                <a class="item" href="{% url 'collab:create_project'  %}">
+                <a class="item" href="{% url 'collab:project_create'  %}">
                   <i class="icon plus"></i>Créer un nouveau projet</a>
                 {% endif %}
                 {% if permissions|lookup:'is_project_administrator' %}
