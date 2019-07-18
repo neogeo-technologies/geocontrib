@@ -29,8 +29,8 @@ ALL_LEVELS = LOWER_LEVELS + EXTENDED_LEVELS
 
 COMMENT = 'comment'
 FEATURE = 'feature'
-ATTACHMENT = 'feature'
-PROJECT = 'Projet'
+ATTACHMENT = 'attachment'
+PROJECT = 'project'
 
 RELATED_MODELS = (
     (COMMENT, 'Commentaire'),
