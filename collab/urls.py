@@ -14,13 +14,13 @@ from collab.views.content_managment import FeatureList
 from collab.views.content_managment import FeatureDetail
 from collab.views.content_managment import FeatureUpdate
 from collab.views.content_managment import FeatureDelete
-from collab.views.content_managment import ProjectExtendedDetail
+from collab.views.content_managment import ProjectUpdate
 from collab.views.content_managment import ProjectMap
-from collab.views.content_managment import CreateFeature
-from collab.views.content_managment import CreateFeatureType
-from collab.views.content_managment import CreateProject
-from collab.views.content_managment import CreateComment
-from collab.views.content_managment import CreateAttachment
+from collab.views.content_managment import FeatureCreate
+from collab.views.content_managment import FeatureTypeCreate
+from collab.views.content_managment import ProjectCreate
+from collab.views.content_managment import CommentCreate
+from collab.views.content_managment import AttachmentCreate
 from collab.views.content_managment import ProjectMembers
 
 # from . import views
@@ -47,19 +47,19 @@ urlpatterns = [
     path('mentions', legal, name='legal'),
 
     # Vues de gestion et d'édition des données métiers
-    path('creer-projet/', CreateProject.as_view(), name='create_project'),
+    path('creer-projet/', ProjectCreate.as_view(), name='project_create'),  # create_project
 
     path('projet/<slug:slug>/', ProjectDetail.as_view(), name='project'),
 
-    path('projet/<slug:slug>/editer/', ProjectExtendedDetail.as_view(), name='admin_project'),
+    path('projet/<slug:slug>/editer/', ProjectUpdate.as_view(), name='project_update'),  # admin_project
 
     path('projet/<slug:slug>/membres/', ProjectMembers.as_view(), name='project_members'),
 
     path('projet/<slug:slug>/type-signalement/ajouter',
-         CreateFeatureType.as_view(), name="add_feature_type"),
+         FeatureTypeCreate.as_view(), name="feature_type_create"),  # add_feature_type
 
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/ajouter/',
-         CreateFeature.as_view(), name='add_feature'),
+         FeatureCreate.as_view(), name='feature_create'),  # add_feature
 
     path('projet/<slug:slug>/signalement/lister/',
          FeatureList.as_view(), name='feature_list'),
@@ -83,13 +83,14 @@ urlpatterns = [
 
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/commentaire/ajouter',
-        CreateComment.as_view(),
+        CommentCreate.as_view(),
         name='add_comment'),
 
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/piece-jointe/ajouter',
-        CreateAttachment.as_view(),
+        AttachmentCreate.as_view(),
         name='add_attachment'),
+
     # path('mon_compte/activation', views.activation, name='activation'),
     # path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),
     # path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/attachment', ProjectAttachment.as_view(),

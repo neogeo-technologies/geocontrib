@@ -50,7 +50,7 @@ User = get_user_model()
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class CreateAttachment(SingleObjectMixin, UserPassesTestMixin, View):
+class AttachmentCreate(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = Feature.objects.all()
     pk_url_kwarg = 'feature_id'
 
@@ -95,7 +95,7 @@ class CreateAttachment(SingleObjectMixin, UserPassesTestMixin, View):
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class CreateComment(SingleObjectMixin, UserPassesTestMixin, View):
+class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = Feature.objects.all()
     pk_url_kwarg = 'feature_id'
 
@@ -139,7 +139,7 @@ class CreateComment(SingleObjectMixin, UserPassesTestMixin, View):
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class CreateFeature(SingleObjectMixin, UserPassesTestMixin, View):
+class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = FeatureType.objects.all()
     slug_url_kwarg = 'feature_type_slug'
 
@@ -391,7 +391,7 @@ class FeatureDelete(DeleteView):
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class CreateFeatureType(SingleObjectMixin, UserPassesTestMixin, View):
+class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = Project.objects.all()
     CustomFieldsFormSet = modelformset_factory(
         CustomField,
@@ -502,7 +502,7 @@ class ProjectDetail(DetailView):
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class ProjectExtendedDetail(SingleObjectMixin, View):
+class ProjectUpdate(SingleObjectMixin, View):
     queryset = Project.objects.all()
 
     def get(self, request, slug):
@@ -530,7 +530,7 @@ class ProjectExtendedDetail(SingleObjectMixin, View):
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class CreateProject(CreateView):
+class ProjectCreate(CreateView):
 
     model = Project
 

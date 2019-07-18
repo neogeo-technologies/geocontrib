@@ -735,13 +735,14 @@ def update_feature_dates(sender, instance, **kwargs):
 @receiver(models.signals.post_save, sender=Project)
 def set_author_perms(sender, instance, created, **kwargs):
     # On ajoute la permission d'admin de projet au créateur
-    Authorization = apps.get_model(app_label='collab', model_name="Authorization")
-    UserLevelPermission = apps.get_model(app_label='collab', model_name="UserLevelPermission")
-    try:
-        Authorization.objects.create(
-            project=instance,
-            user=instance.user,
-            level=UserLevelPermission.objects.get(rank=4)
-        )
-    except Exception as err:
-        logger.error("Error on Authorization create: {}".format(str(err)))
+    if created:
+        Authorization = apps.get_model(app_label='collab', model_name="Authorization")
+        UserLevelPermission = apps.get_model(app_label='collab', model_name="UserLevelPermission")
+        try:
+            Authorization.objects.create(
+                project=instance,
+                user=instance.user,
+                level=UserLevelPermission.objects.get(rank=4)
+            )
+        except Exception as err:
+            logger.error("Error on Authorization create: {}".format(str(err)))
