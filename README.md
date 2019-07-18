@@ -9,7 +9,7 @@ Application de signalement collaboratif
 python3.5 -m venv collab_venv/
 source bin/activate
 git clone git@github.com:neogeo-technologies/collab.git src/
-pip install -r src/requirements.txt
+# Installer les dépendances
 django-admin startproject config .
 
 # Ajout de liens symboliques pour que les sources git soient visible par Django
