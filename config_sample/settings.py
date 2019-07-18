@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'rest_framework_gis',
     'collab',
     'api',
-    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -130,11 +129,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# Renseigner le path du static/
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Renseigner le path du media/
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Extended properties
 
