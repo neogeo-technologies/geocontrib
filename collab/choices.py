@@ -1,11 +1,11 @@
 """
-Propositions d'usage de listes de choix
-Redondant mais permet de faire des controles de type:
->>>if user1.level == choices.CONTRIBUTOR: [...]
-Ces constantes sont referencées dans __init_.py pour les importer toutes
-On pourrai utiliser des libellée au lieu de symboles, car c'est la valeur stocké
-en base, on pourra ainsi lire les tables plus facilement
+Si modifications sur ce fichier, générer migrations pour que les listes de choix
+soient à jours entre application et base.
 """
+
+######################
+# LEVELS PERMISSIONS #
+######################
 
 ANONYMOUS = 'anonymous'
 LOGGED_USER = 'logged_user'
@@ -26,6 +26,10 @@ EXTENDED_LEVELS = (
 
 ALL_LEVELS = LOWER_LEVELS + EXTENDED_LEVELS
 
+
+##################
+# EVENTS CHOICES #
+##################
 
 COMMENT = 'comment'
 FEATURE = 'feature'

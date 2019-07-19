@@ -19,7 +19,7 @@ ln -s src/api/ .
 
 ## Settings & URL's
 
-Édition du fichier de configuration et du fichier d'url
+Édition du fichier de configuration et du fichier d'url.
 
 ## Migrations et ajout de données initiales
 
@@ -44,7 +44,7 @@ cp src/collab/static/collab/img/logo.png media/
 - [ ] Projet: Administrer les membres: cf service api GET projects/<slug:slug>/utilisateurs
 - [x] Feature: Liaison entre Features
 - [ ] Feature: Affichage et edition carto
-- [ ] Mon Profil: Template à revoir
+- [x] Mon Profil: Template à revoir
 - [x] Permissions: User.is_administrator: Authorization.is_project_administrator/give_adminstration_perms
 - [ ] Commentaire
 - [x] Filtrer les signalements selon autorisation de l'utilisateur

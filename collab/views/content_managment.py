@@ -31,7 +31,6 @@ from collab.models import Authorization
 from collab.models import Attachment
 from collab.models import Comment
 from collab.models import CustomField
-# from collab.models import Event
 from collab.models import Feature
 from collab.models import FeatureType
 from collab.models import FeatureLink
@@ -59,37 +58,34 @@ class AttachmentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = self.request.user
         feature = self.get_object()
         project = feature.project
-        return Authorization.has_permission(user, 'can_view_feature', project, feature)
+        return Authorization.has_permission(user, 'can_update_feature', project, feature)
 
     def post(self, request, slug, feature_type_slug, feature_id):
         feature = self.get_object()
         project = feature.project
         user = request.user
         form = AttachmentForm(request.POST or None, request.FILES)
-        linked_features = FeatureLink.objects.filter(
-            feature_from=feature.feature_id
-        )
         if form.is_valid():
-            Attachment.objects.create(
-                feature_id=feature.feature_id,
-                user=request.user,
-                project=project,
-                comment=form.cleaned_data.get('comment'),
-                feature_type_slug=feature.feature_type.slug,
-            )
+            try:
+                Attachment.objects.create(
+                    feature_id=feature.feature_id,
+                    author=user,
+                    project=project,
+                    type_objet='feature',
+                    attachment_file=form.cleaned_data.get('attachment_file')
+                )
+            except Exception as err:
+                messages.error(
+                    request,
+                    "Erreur à l'ajout de la pièce jointe: {err}".format(err=str(err)))
+            else:
+                messages.info(request, "Ajout de la pièce jointe confirmé")
+        else:
+            messages.error(request, "Erreur à l'ajout de la pièce jointe")
 
-        context = {
-            'feature': feature,
-            'feature_data': feature.custom_fields_as_list,
-            'feature_types': FeatureType.objects.filter(project=project),
-            'feature_type': feature.feature_type,
-            'linked_features': linked_features,
-            'project': project,
-            'permissions': Authorization.all_permissions(user, project),
-            'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
-            'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id)
-        }
-        return render(request, 'collab/feature/feature_detail.html', context)
+        return redirect(
+            'collab:feature_update', slug=slug,
+            feature_type_slug=feature_type_slug, feature_id=feature_id)
 
 
 #################
@@ -112,26 +108,49 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         user = request.user
-        form = CommentForm(request.POST)
+        form = CommentForm(request.POST, request.FILES)
+
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         )
 
         if form.is_valid():
             try:
-                # La piece jointe est aussi ajoutée coté form.save()
-                form.save(
-                    user=user,
+                comment = Comment.objects.create(
+                    feature_id=feature.feature_id,
+                    feature_type_slug=feature.feature_type.slug,
+                    author=user,
                     project=project,
-                    feature=feature,
-                    attachment=request.FILES
+                    comment=form.cleaned_data.get('comment')
                 )
+                up_file = form.cleaned_data.get('attachment_file')
+                title = form.cleaned_data.get('title')
+                info = form.cleaned_data.get('info')
+                if comment and up_file and title:
+                    Attachment.objects.create(
+                        feature_id=feature.feature_id,
+                        author=user,
+                        project=project,
+                        comment=comment,
+                        attachment_file=up_file,
+                        title=title,
+                        info=info,
+                        type_objet='comment'
+                    )
 
             except Exception as err:
                 logger.error(err)
                 messages.error(request, "Erreur à l'ajout du commentaire: {err}".format(err=err))
             else:
                 messages.info(request, "Ajout du commentaire confirmé")
+
+            return redirect(
+                'collab:feature_detail',
+                slug=slug,
+                feature_type_slug=feature_type_slug,
+                feature_id=feature_id)
+        else:
+            logger.error(form.errors)
 
         context = {
             'feature': feature,
@@ -142,7 +161,9 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'project': project,
             'permissions': Authorization.all_permissions(user, project),
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
-            'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id)
+            'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id),
+            'comment_form': form
+
         }
         return render(request, 'collab/feature/feature_detail.html', context)
 
@@ -267,9 +288,19 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature = self.get_object()
         project = feature.project
+
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         )
+
+        comment_form = CommentForm()
+        attachment_form = AttachmentForm()
+
+        comments = Comment.objects.filter(project=project, feature_id=feature.feature_id)
+        for comment in comments:
+            for attachment in comment.attachment_set.all():
+                print(attachment.__dict__)
+
         context = {
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
@@ -279,7 +310,8 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'project': project,
             'permissions': Authorization.all_permissions(user, project, feature),
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
-            'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id)
+            'comment_form': comment_form,
+            'attachment_form': attachment_form,
         }
 
         return render(request, 'collab/feature/feature_detail.html', context)
@@ -335,6 +367,11 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'form': form,
             'availables_features': availables_features,
             'linked_formset': linked_formset,
+            'attachment_form': AttachmentForm(),
+            'comment_form': CommentForm(),
+            'attachments': Attachment.objects.filter(
+                project=project, feature_id=feature.feature_id,
+                type_objet='feature'),
         }
         return render(request, 'collab/feature/feature_update.html', context)
 
@@ -365,6 +402,9 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 'form': form,
                 'availables_features': availables_features,
                 'linked_formset': linked_formset,
+                'attachments': Attachment.objects.filter(
+                    project=project, feature_id=feature.feature_id,
+                    type_objet='feature'),
             }
             return render(request, 'collab/feature/feature_update.html', context)
         else:
@@ -483,6 +523,7 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
         feature_type = self.get_object()
         project = feature_type.project
         user = request.user
+
         context = {
             'feature_type': feature_type,
             'permissions': Authorization.all_permissions(user, project),
@@ -490,6 +531,7 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'project': project,
             'structure': {'todo': 'Ajout de structure'}
         }
+
         return render(request, 'collab/feature_type/feature_type_detail.html', context)
 
 #################
@@ -661,6 +703,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
                     authorization.save()
                 elif not authorization and not data.get("DELETE"):
                     # On ne crée pas d'utilisateur: il est choisi parmi ceux existants
+                    # TODO @cbenhabib: A brancher sur proxy cas
                     try:
                         user = User.objects.get(
                             username=data["username"],

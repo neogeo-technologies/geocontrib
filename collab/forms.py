@@ -191,47 +191,41 @@ class AuthorizationForm(forms.ModelForm):
 
 class CommentForm(forms.ModelForm):
 
-    # title = forms.CharField(label="Titre de la pièce jointe", required=False)
-    #
-    # file_attachement = forms.FileField(label="Choisir un document", required=False)
-    #
-    # info = forms.CharField(
-    #     label="Information additonelle", required=False, widget=forms.Textarea())
+    title = forms.CharField(label="Titre de la pièce jointe", required=False)
+
+    attachment_file = forms.FileField(label="Fichier joint", required=False)
+
+    info = forms.CharField(
+        label="Information additonelle au fichier joint", required=False, widget=forms.Textarea())
 
     class Meta:
         model = Comment
         fields = (
             'comment',
-            # 'title',
-            # 'file_attachement',
-            # 'info',
+            'title',
+            'attachment_file',
+            'info',
         )
 
-    def save(self, commit=True, *args, **kwargs):
-
-        user = kwargs.pop('user', None)
-        project = kwargs.pop('project', None)
-        feature = kwargs.pop('feature', None)
-
-        instance = super().save(commit=False)
-        instance.feature_id = feature.feature_id
-        instance.feature_type_slug = feature.feature_type.slug
-        instance.author = user
-        instance.project = project
-
-        if commit:
-            instance.save()
-        return instance
+    def clean(self):
+        cleaned_data = super().clean()
+        up_file = cleaned_data.get("attachment_file")
+        title = cleaned_data.get("title")
+        if up_file and not title:
+            raise forms.ValidationError(
+                "Veuillez donner un titre à votre pièce jointe. "
+            )
+        return cleaned_data
 
 
 class AttachmentForm(forms.ModelForm):
 
-    title = forms.CharField(label="Titre de la pièce jointe", required=False)
+    # title = forms.CharField(label="Titre de la pièce jointe", required=False)
 
-    attachment_file = forms.FileField(label="Choisir un document", required=False)
+    # attachment_file = forms.FileField(label="Choisir un document", required=False)
 
-    info = forms.CharField(
-        label="Information additonelle", required=False, widget=forms.Textarea())
+    # info = forms.CharField(
+    #     label="Information additonelle", required=False, widget=forms.Textarea())
 
     class Meta:
         model = Attachment
@@ -241,23 +235,32 @@ class AttachmentForm(forms.ModelForm):
             'info',
         )
 
-    def save(self, commit=True, *args, **kwargs):
+    # def save(self, commit=True, *args, **kwargs):
+    #
+    #     user = kwargs.pop('user', None)
+    #     project = kwargs.pop('project', None)
+    #     feature = kwargs.pop('feature', None)
+    #
+    #     instance = super().save(commit=False)
+    #
+    #     instance.feature_id = feature.feature_id
+    #     instance.author = user
+    #     instance.project = project
+    #
+    #     if commit:
+    #         instance.save()
+    #
+    #     return instance
 
-        user = kwargs.pop('user', None)
-        project = kwargs.pop('project', None)
-        feature = kwargs.pop('feature', None)
-
-        instance = super().save(commit=False)
-
-        instance.feature_id = feature.feature_id
-        instance.feature_type_slug = feature.feature_type.slug
-        instance.author = user
-        instance.project = project
-
-        if commit:
-            instance.save()
-
-        return instance
+    def clean(self):
+        cleaned_data = super().clean()
+        up_file = cleaned_data.get("attachment_file")
+        title = cleaned_data.get("title")
+        if up_file and not title:
+            raise forms.ValidationError(
+                "Veuillez donner un titre à votre pièce jointe. "
+            )
+        return cleaned_data
 
 
 class FeatureLinkForm(forms.ModelForm):

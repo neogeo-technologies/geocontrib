@@ -75,17 +75,40 @@
 
 <div class="ui top attached tabular menu" id="feature_menu">
   <div class="item active" data-tab="comment">Commentaires</div>
-  <div class="item" data-tab="attachment">Pièces Jointes</div>
 </div>
 
 <!--  comments -->
 <div class="ui bottom attached tab segment active" id="comments" data-tab="comment">
-  {% include 'collab/feature/comments.html' %}
-</div>
+  {# {% include 'collab/feature/comments.html' %} #}
+  {% for comment in comments %}
+    {{ comment.comment }}
+    {{ comment.author }}
+    {{ comment.created_on }}
+    {% for attachment in  comment.attachment_set.all %}
+      <label>Fichier: </label>
+      {{ attachment.title }}
+      <a href="{{ attachment.attachment_file.url }}" download>Télécharger</a>
+    {% endfor %}
+  <br>
+  {% endfor %}
+  <form id="commentform" action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" class="ui form comment_form" method="POST" enctype="multipart/form-data">
+    {% for hidden in comment_form.hidden_fields %}
+      {{ hidden }}
+    {% endfor %}
+    {% if comment_form.non_field_errors %}
+    <div class="alert alert-danger" role="alert">
+      {% for error in comment_form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+    {% endif %}
 
-<!--  attachment -->
-<div class="ui bottom attached tab segment" id="attachments" data-tab="attachment">
-  {% include 'collab/feature/attachment.html' %}
+    {{ comment_form.as_p }}
+    <div class="actions">
+        <div class="ui cancel button">Annuler</div>
+        <button class="ui button green" type="submit">Ajouter</button>
+    </div>
+  </form>
 </div>
 
 <div class="ui mini modal">
