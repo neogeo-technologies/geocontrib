@@ -205,10 +205,10 @@ class Project(models.Model):
     )
 
     archive_feature = models.PositiveIntegerField(
-        "Délai avant archivage (nb jours)", blank=True, null=True)
+        "Délai avant archivage", blank=True, null=True)
 
     delete_feature = models.PositiveIntegerField(
-        "Délai avant suppression (nb jours)", blank=True, null=True)
+        "Délai avant suppression", blank=True, null=True)
 
     features_info = JSONField(
         "Info sur les types de signalements disponibles", blank=True, null=True)
@@ -648,19 +648,6 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
             os.remove(instance.thumbnail.path)
 
 
-@receiver(models.signals.post_save, sender=Project)
-def create_event_on_project_creation(sender, instance, created, **kwargs):
-    if created:
-        Event = apps.get_model(app_label='collab', model_name="Event")
-        Event.objects.create(
-            user=instance.user,
-            event_type='create',
-            object_type='project',
-            project_slug=instance.slug,
-            data={}
-        )
-
-
 @receiver(models.signals.pre_delete, sender=User)
 def anonymize_comments(sender, instance, **kwargs):
     """
@@ -688,7 +675,7 @@ def stack_event_(sender, instance, created, **kwargs):
     if created and instance.feature_id:
         if settings.DEFAULT_SENDING_FREQUENCY != "instantly":
             StackedEvent = apps.get_model(app_label='collab', model_name="StackedEvent")
-            stack, _ = StackedEvent.get_or_create(
+            stack, _ = StackedEvent.objects.get_or_create(
                 sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending')
             stack.events.add(instance)
             stack.save()
@@ -752,3 +739,34 @@ def set_author_perms(sender, instance, created, **kwargs):
             )
         except Exception as err:
             logger.error("Error on Authorization create: {}".format(str(err)))
+
+
+# EVENT'S TRIGGERS
+
+@receiver(models.signals.post_save, sender=Project)
+def create_event_on_project_creation(sender, instance, created, **kwargs):
+    if created:
+        Event = apps.get_model(app_label='collab', model_name="Event")
+        Event.objects.create(
+            user=instance.user,
+            event_type='create',
+            object_type='project',
+            project_slug=instance.slug,
+            data={}
+        )
+
+
+@receiver(models.signals.post_save, sender=Comment)
+def create_event_on_comment_creation(sender, instance, created, **kwargs):
+    if created:
+        Event = apps.get_model(app_label='collab', model_name="Event")
+        Event.objects.create(
+            feature_id=instance.feature_id,
+            comment_id=instance.id,
+            event_type='create',
+            object_type='comment',
+            user=instance.author,
+            project_slug=instance.project.slug,
+            feature_type_slug=instance.feature_type_slug,
+            data={}
+        )
