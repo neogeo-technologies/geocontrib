@@ -31,7 +31,7 @@ class HomePageView(TemplateView):
             nb_contributors=nb_contributors,
             nb_features=nb_features,
             nb_comments=nb_comments
-        )
+        ).order_by('-created_on')
 
         return context
 
