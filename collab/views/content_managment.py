@@ -587,7 +587,7 @@ class ProjectUpdate(SingleObjectMixin, View):
             'permissions': Authorization.all_permissions(request.user, project),
             'feature_types': project.featuretype_set.all()
         }
-        return render(request, 'collab/project/admin_project.html', context)
+        return render(request, 'collab/project/project_edit.html', context)
 
     def post(self, request, slug):
         project = self.get_object()
@@ -600,7 +600,7 @@ class ProjectUpdate(SingleObjectMixin, View):
             'form': form,
             'feature_types': project.featuretype_set.all()
         }
-        return render(request, 'collab/project/admin_project.html', context)
+        return render(request, 'collab/project/project_edit.html', context)
 
 
 @method_decorator(DECORATORS, name='dispatch')
@@ -610,7 +610,7 @@ class ProjectCreate(CreateView):
 
     form_class = ProjectModelForm
 
-    template_name = 'collab/project/project_create.html'
+    template_name = 'collab/project/project_edit.html'
 
     def test_func(self):
         user = self.request.user
