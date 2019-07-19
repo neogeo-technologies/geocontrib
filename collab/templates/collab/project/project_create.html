@@ -9,7 +9,7 @@
   <div class="row">
     <h2 class="ui header">Créer un nouveau projet</h2>
   </div>
-  <form class='ui form' method="post">{% csrf_token %}
+  <form class='ui form' method="post" enctype="multipart/form-data">{% csrf_token %}
       <div style="margin-top:10px">
         {{ form.as_p }}
         <button class="green ui button" type="submit">
