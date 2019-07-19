@@ -295,14 +295,6 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             feature_from=feature.feature_id
         )
 
-        comment_form = CommentForm()
-        attachment_form = AttachmentForm()
-
-        comments = Comment.objects.filter(project=project, feature_id=feature.feature_id)
-        for comment in comments:
-            for attachment in comment.attachment_set.all():
-                print(attachment.__dict__)
-
         context = {
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
@@ -312,8 +304,8 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'project': project,
             'permissions': Authorization.all_permissions(user, project, feature),
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
-            'comment_form': comment_form,
-            'attachment_form': attachment_form,
+            'comment_form': CommentForm(),
+            'attachment_form': AttachmentForm(),
         }
 
         return render(request, 'collab/feature/feature_detail.html', context)
