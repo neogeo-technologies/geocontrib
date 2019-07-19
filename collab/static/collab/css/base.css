@@ -19,6 +19,15 @@ a.button-hover-orange:hover {
   background: orange !important;
 }
 
+.ui.header .content {
+  width: 100%;
+}
+
+.ui.horizontal.divider {
+  color: #1ab2b6!important;
+  padding-top: 1.5em;
+}
+
 
 /* ---------------------------------- */
             /* FOOTER */

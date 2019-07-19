@@ -8,7 +8,7 @@
 {% block content %}
 <div class="fourteen wide column">
 
-  <form id="form-project-create" action="." method="post" enctype="multipart/form-data" class="ui form">
+  <form id="form-project-edit" action="." method="post" enctype="multipart/form-data" class="ui form">
     {% if errors %}
     <div class="ui error message">
       {{ form.non_field_errors }}
@@ -21,7 +21,13 @@
     <i class="close icon"></i>
     {% endif %}
 
-    <h1>Édition du projet "{{ form.instance.title }}"</h1>
+    <h1>
+      {% if action == 'update' %}
+        Édition du projet "{{ form.instance.title }}"
+      {% elif action == 'create' %}
+        Création d'un projet
+      {% endif %}
+    </h1>
 
     <div class="ui horizontal divider">INFORMATIONS</div>
 
@@ -30,14 +36,14 @@
         <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
         <input type="text" required maxlength="{{ form.title.field.max_length }}"
           name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}"
-          value="{{ form.title.value }}" >
+          value="{% if form.title.value %}{{ form.title.value }}{% endif %}" >
         {{ form.title.errors }}
       </div>
       <div class="required field">
         <label for="{{ form.slug.id_for_label }}">{{ form.slug.label }}</label>
         <input type="text" required maxlength="{{ form.slug.field.max_length }}"
           name="{{ form.slug.html_name }}" id="{{ form.slug.id_for_label }}"
-          value="{{ form.slug.value }}" >
+          value="{% if form.slug.value %}{{ form.slug.value }}{% endif %}" >
         {{ form.slug.errors }}
       </div>
     </div>
@@ -61,7 +67,7 @@
     </div>
     <div class="field">
       <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
-      <textarea name="{{ form.description.html_name }}" rows="5">{{ form.description.value }}</textarea>
+      <textarea name="{{ form.description.html_name }}" rows="5">{% if form.description.value %}{{ form.description.value }}{% endif %}</textarea>
       {{ form.description.errors }}
     </div>
 
@@ -148,11 +154,6 @@
   #form-input-file-logo {
     margin-left: auto;
     margin-right: auto;
-  }
-
-  #form-project-edit .ui.horizontal.divider {
-    color: #1ab2b6!important;
-    padding-top: 1.5em;
   }
 </style>
 

@@ -61,8 +61,13 @@
             </div>
           </a>
         {% empty %}
-          VIDE
-        {% endfor%}
+          <div>
+            <i>
+              Le projet ne contient pas encore de signalements. Vous pouvez commencer par
+              <a href="{% url 'collab:feature_type_create' slug=project.slug %}">créer un type de signalement</a>.
+            </i>
+          </div>
+        {% endfor %}
       </div>
     </div>
   </div>
