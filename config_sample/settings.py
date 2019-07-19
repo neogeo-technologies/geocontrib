@@ -182,7 +182,7 @@ APPLICATION_NAME = 'Collab'
 
 APPLICATION_ABSTRACT = 'Describtion du projet'
 
-LOGO_PATH = 'logo.png'
+LOGO_PATH = '/media/logo.png'
 
 IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
 

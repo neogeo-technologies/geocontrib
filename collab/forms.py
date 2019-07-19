@@ -76,18 +76,20 @@ class ProjectModelForm(forms.ModelForm):
     moderation = forms.BooleanField(label='Modération', required=False)
 
     archive_feature = forms.IntegerField(
-        label='Délai avant archivage (nb jours)', min_value=0, required=False)
+        label='Délai avant archivage', min_value=0, required=False)
 
     delete_feature = forms.IntegerField(
-        label='Délai avant suppression (nb jours)', min_value=0, required=False)
+        label='Délai avant suppression', min_value=0, required=False)
 
     access_level_pub_feature = forms.ModelChoiceField(
         label='Visibilité des signalements publiés',
-        queryset=UserLevelPermission.objects.filter(rank__lte=2).order_by('rank'))
+        queryset=UserLevelPermission.objects.filter(rank__lte=2).order_by('rank'),
+        empty_label=None,)
 
     access_level_arch_feature = forms.ModelChoiceField(
         label='Visibilité des signalements archivés',
-        queryset=UserLevelPermission.objects.filter(rank__gt=2).order_by('rank'))
+        queryset=UserLevelPermission.objects.filter(rank__gt=2).order_by('rank'),
+        empty_label=None,)
 
     class Meta:
         model = Project
@@ -189,17 +191,20 @@ class AuthorizationForm(forms.ModelForm):
 
 class CommentForm(forms.ModelForm):
 
-    attachment_title = forms.CharField(
-        label="Information additonelle (pièce jointe)", max_length=128, required=False)
-    attachment_info = forms.CharField(
-        label="Titre de la pièce jointe", required=False, widget=forms.Textarea())
+    # title = forms.CharField(label="Titre de la pièce jointe", required=False)
+    #
+    # file_attachement = forms.FileField(label="Choisir un document", required=False)
+    #
+    # info = forms.CharField(
+    #     label="Information additonelle", required=False, widget=forms.Textarea())
 
     class Meta:
         model = Comment
         fields = (
             'comment',
-            'attachment_title',
-            'attachment_info',
+            # 'title',
+            # 'file_attachement',
+            # 'info',
         )
 
     def save(self, commit=True, *args, **kwargs):
@@ -207,7 +212,40 @@ class CommentForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         project = kwargs.pop('project', None)
         feature = kwargs.pop('feature', None)
-        attachment = kwargs.pop('attachment', None)
+
+        instance = super().save(commit=False)
+        instance.feature_id = feature.feature_id
+        instance.feature_type_slug = feature.feature_type.slug
+        instance.author = user
+        instance.project = project
+
+        if commit:
+            instance.save()
+        return instance
+
+
+class AttachmentForm(forms.ModelForm):
+
+    title = forms.CharField(label="Titre de la pièce jointe", required=False)
+
+    attachment_file = forms.FileField(label="Choisir un document", required=False)
+
+    info = forms.CharField(
+        label="Information additonelle", required=False, widget=forms.Textarea())
+
+    class Meta:
+        model = Attachment
+        fields = (
+            'title',
+            'attachment_file',
+            'info',
+        )
+
+    def save(self, commit=True, *args, **kwargs):
+
+        user = kwargs.pop('user', None)
+        project = kwargs.pop('project', None)
+        feature = kwargs.pop('feature', None)
 
         instance = super().save(commit=False)
 
@@ -218,38 +256,11 @@ class CommentForm(forms.ModelForm):
 
         if commit:
             instance.save()
-            # if attachment:
-            #     Attachment.objects.create(
-            #         feature_id=instance.feature_id,
-            #         author=instance.author,
-            #         project=instance.project,
-            #         title='',
-            #         info='',
-            #         type_objet='comment',
-            #         attachment_file=attachment,
-            #         comment=instance,
-            #     )
-            #     import pdb; pdb.set_trace()
-
 
         return instance
 
 
-class AttachmentForm(forms.ModelForm):
-    class Meta:
-        model = Attachment
-        fields = (
-            'title',
-            'info',
-            'attachment_file',
-        )
-
-
 class FeatureLinkForm(forms.ModelForm):
-
-    # feature_id = forms.ModelChoiceField(
-    #     Feature.objects.all(), label='Identifiant', to_field_name='feature_id'
-    # )
 
     class Meta:
         model = FeatureLink
@@ -257,11 +268,6 @@ class FeatureLinkForm(forms.ModelForm):
             'relation_type',
             'feature_to',
         )
-
-    def __init__(self, *args, **kwargs):
-
-        # import pdb; pdb.set_trace()
-        return super().__init__(*args, **kwargs)
 
 
 class FeatureDynamicForm(forms.ModelForm):
