@@ -562,16 +562,13 @@ class ProjectDetail(DetailView):
             project=project
         )[0:3]
 
-        context = {
-            "authorizations": authorizations,
-            "project": project,
-            "user": user,
-            "comments": comments,
-            "features": last_features,
-            "permissions": permissions,
-            "feature_types": project.featuretype_set.all()
-        }
-
+        context['authorizations'] = authorizations
+        context['project'] = project
+        context['user'] = user
+        context['comments'] = comments
+        context['features'] = last_features
+        context['permissions'] = permissions
+        context['feature_types'] = project.featuretype_set.all()
         return context
 
 
@@ -585,7 +582,8 @@ class ProjectUpdate(SingleObjectMixin, View):
         context = {
             'form': form,
             'permissions': Authorization.all_permissions(request.user, project),
-            'feature_types': project.featuretype_set.all()
+            'feature_types': project.featuretype_set.all(),
+            'action': 'update'
         }
         return render(request, 'collab/project/project_edit.html', context)
 
@@ -620,6 +618,10 @@ class ProjectCreate(CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = 'create'
+        return context
 
 @method_decorator(DECORATORS, name='dispatch')
 class ProjectMap(SingleObjectMixin, UserPassesTestMixin, View):
