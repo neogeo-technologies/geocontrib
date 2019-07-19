@@ -191,6 +191,8 @@ class AuthorizationForm(forms.ModelForm):
 
 class CommentForm(forms.ModelForm):
 
+    comment = forms.CharField(required=True, widget=forms.Textarea())
+
     title = forms.CharField(label="Titre de la pièce jointe", required=False)
 
     attachment_file = forms.FileField(label="Fichier joint", required=False)
@@ -220,13 +222,6 @@ class CommentForm(forms.ModelForm):
 
 class AttachmentForm(forms.ModelForm):
 
-    # title = forms.CharField(label="Titre de la pièce jointe", required=False)
-
-    # attachment_file = forms.FileField(label="Choisir un document", required=False)
-
-    # info = forms.CharField(
-    #     label="Information additonelle", required=False, widget=forms.Textarea())
-
     class Meta:
         model = Attachment
         fields = (
@@ -234,23 +229,6 @@ class AttachmentForm(forms.ModelForm):
             'attachment_file',
             'info',
         )
-
-    # def save(self, commit=True, *args, **kwargs):
-    #
-    #     user = kwargs.pop('user', None)
-    #     project = kwargs.pop('project', None)
-    #     feature = kwargs.pop('feature', None)
-    #
-    #     instance = super().save(commit=False)
-    #
-    #     instance.feature_id = feature.feature_id
-    #     instance.author = user
-    #     instance.project = project
-    #
-    #     if commit:
-    #         instance.save()
-    #
-    #     return instance
 
     def clean(self):
         cleaned_data = super().clean()

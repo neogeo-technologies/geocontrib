@@ -140,7 +140,9 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
 
             except Exception as err:
                 logger.error(err)
-                messages.error(request, "Erreur à l'ajout du commentaire: {err}".format(err=err))
+                messages.error(
+                    request,
+                    "Erreur à l'ajout du commentaire: {err}".format(err=err))
             else:
                 messages.info(request, "Ajout du commentaire confirmé")
 
