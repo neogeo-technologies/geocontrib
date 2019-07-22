@@ -69,6 +69,9 @@
           </div>
         {% endfor %}
       </div>
+      <a class="ui compact basic button button-hover-green" href="{% url 'collab:feature_type_create' slug=project.slug %}">
+        <i class="ui plus icon"></i>Créer un nouveau type de signalement
+      </a>
     </div>
   </div>
 
