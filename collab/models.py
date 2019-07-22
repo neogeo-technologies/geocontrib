@@ -35,7 +35,7 @@ class User(AbstractUser):
 
 class UserLevelPermission(models.Model):
     """
-    Les niveaux de permissions pourrai etre gerée depuis cette table.
+    Les niveaux des permissions pourraient être gérés depuis cette table.
     """
 
     user_type_id = models.CharField(
@@ -250,7 +250,7 @@ class Feature(models.Model):
     description = models.TextField("Description", blank=True, null=True)
 
     status = models.CharField(
-        "Statut des signalements", choices=STATUS_CHOICES, max_length=50,
+        "Statut", choices=STATUS_CHOICES, max_length=50,
         default="draft", null=True, blank=True)
 
     created_on = models.DateTimeField("Date de création", null=True, blank=True)
@@ -271,7 +271,7 @@ class Feature(models.Model):
 
     feature_type = models.ForeignKey("collab.FeatureType", on_delete=models.CASCADE)
 
-    geom = models.GeometryField("Champs geometrique", srid=4326, blank=True, null=True)
+    geom = models.GeometryField("Géométrie", srid=4326, blank=True, null=True)
 
     feature_data = JSONField(blank=True, null=True)
 
@@ -335,7 +335,7 @@ class FeatureLink(models.Model):
 class FeatureType(models.Model):
 
     GEOM_CHOICES = (
-        ("linestring", "Ligne brisée"),
+        ("linestring", "Ligne"),
         ("point", "Point"),
         ("polygon", "Polygone"),
     )
@@ -345,7 +345,7 @@ class FeatureType(models.Model):
     slug = models.SlugField("Slug", max_length=256, unique=True)
 
     geom_type = models.CharField(
-        "Type de champs géometrique", choices=GEOM_CHOICES, max_length=50,
+        "Type de géométrie", choices=GEOM_CHOICES, max_length=50,
         default="boolean")
 
     project = models.ForeignKey(
@@ -353,7 +353,7 @@ class FeatureType(models.Model):
 
     class Meta:
         verbose_name = "Type de signalement"
-        verbose_name_plural = "Types de Signalements"
+        verbose_name_plural = "Types de signalements"
 
     def save(self, *args, **kwargs):
         if not self.pk and self.title:
@@ -377,7 +377,7 @@ class FeatureType(models.Model):
 #         "collab.CustomField", on_delete=models.CASCADE, blank=True, null=True)
 #
 #     class Meta:
-#         verbose_name = "Valeur de champs personnalisés"
+#         verbose_name = "Valeur de champ personnalisé"
 #         verbose_name_plural = "Valeurs de champs personnalisés"
 
 
@@ -389,7 +389,7 @@ class CustomField(models.Model):
         ("date", "Date"),
         ("integer", "Entier"),
         ("decimal", "Décimale"),
-        ("text", "Champs texte"),
+        ("text", "Champ texte"),
     )
 
     label = models.CharField("Label", max_length=128, null=True, blank=True)
@@ -400,14 +400,14 @@ class CustomField(models.Model):
         "Position", default=0, blank=False, null=False)
 
     field_type = models.CharField(
-        "Type de champs", choices=TYPE_CHOICES, max_length=50,
+        "Type de champ", choices=TYPE_CHOICES, max_length=50,
         default="boolean", null=True, blank=True)
 
     feature_type = models.ForeignKey(
         "collab.FeatureType", on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = "Champs personnalisés"
+        verbose_name = "Champ personnalisé"
         verbose_name_plural = "Champs personnalisés"
         unique_together = (('name', 'feature_type'), )
 
@@ -497,8 +497,8 @@ class Attachment(AnnotationAbstract):
         "collab.Comment", on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        verbose_name = "Pièce Jointe"
-        verbose_name_plural = "Pièces Jointes"
+        verbose_name = "Pièce jointe"
+        verbose_name_plural = "Pièces jointes"
 
     def __str__(self):
         if self.title:
@@ -542,10 +542,10 @@ class Event(models.Model):
     event_type = models.CharField(
         "Type de l'évènement", choices=EVENT_TYPES, max_length=100)
 
-    project_slug = models.SlugField('Slug Projet', max_length=256, blank=True, null=True)
+    project_slug = models.SlugField('Slug du projet', max_length=256, blank=True, null=True)
 
     feature_type_slug = models.SlugField(
-        'Slug Feature', max_length=256, blank=True, null=True)
+        'Slug du type de signalement', max_length=256, blank=True, null=True)
 
     data = JSONField(blank=True, null=True)
 
@@ -571,7 +571,7 @@ class Subscription(models.Model):
     project_slug = models.SlugField('Slug', max_length=128)
 
     created_on = models.DateTimeField(
-        "Date de création de l'Abonnement", blank=True, null=True)
+        "Date de création de l'abonnement", blank=True, null=True)
 
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, verbose_name="Utilisateurs",
@@ -611,13 +611,13 @@ class StackedEvent(models.Model):
         "Date de création du lot", blank=True, null=True)
 
     updated_on = models.DateTimeField(
-        "Date de derniére modification du lot", blank=True, null=True)
+        "Date de dernière modification du lot", blank=True, null=True)
 
     schedualed_delivery_on = models.DateTimeField(
         "Timestamp d'envoi prévu", blank=True, null=True)
 
     class Meta:
-        verbose_name = "Lot de notification"
+        verbose_name = "Lot de notifications"
         verbose_name_plural = "Lots de notifications des abonnées"
 
     def save(self, *args, **kwargs):
@@ -651,7 +651,7 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
 @receiver(models.signals.pre_delete, sender=User)
 def anonymize_comments(sender, instance, **kwargs):
     """
-    On transfere les commentaires sur un utilisateur anonyme
+    On transfère les commentaires sur un utilisateur anonyme
     """
     for comment in instance.comments:
         anonymous, _ = sender.objects.get_or_create(username="anonymous")
