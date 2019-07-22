@@ -7,8 +7,8 @@ from collab.models import Feature
 from collab.models import Project
 from collab.models import FeatureType
 from collab.models import CustomField
-# from collab.models import CustomFieldValue
 from collab.models import UserLevelPermission
+# from collab.models import CustomFieldInterface
 
 User = get_user_model()
 
@@ -77,8 +77,8 @@ class FeatureTypeAdmin(admin.ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(CustomField)
-# admin.site.register(CustomFieldValue)
 admin.site.register(Feature)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(Project)
 admin.site.register(UserLevelPermission)
+# admin.site.register(CustomFieldInterface)

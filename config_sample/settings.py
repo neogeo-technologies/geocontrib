@@ -139,7 +139,7 @@ MEDIA_URL = '/'
 
 # Extended properties
 
-AUTH_USER_MODEL = "collab.User"
+AUTH_USER_MODEL = 'collab.User'
 
 LOGIN_URL = 'collab:login'
 
@@ -182,7 +182,7 @@ APPLICATION_NAME = 'Collab'
 
 APPLICATION_ABSTRACT = 'Describtion du projet'
 
-LOGO_PATH = '/logo.png'
+LOGO_PATH = '/media/logo.png'
 
 IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
 

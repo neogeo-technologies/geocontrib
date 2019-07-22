@@ -623,6 +623,7 @@ class ProjectCreate(CreateView):
         context['action'] = 'create'
         return context
 
+
 @method_decorator(DECORATORS, name='dispatch')
 class ProjectMap(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = Project.objects.all()

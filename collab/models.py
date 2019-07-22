@@ -5,6 +5,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.dispatch import receiver
@@ -364,21 +365,27 @@ class FeatureType(models.Model):
     def __str__(self):
         return self.title
 
+
 # Si besoin de garder les valeurs en base
-# class CustomFieldValue(models.Model):
-#
-#     label = models.CharField("Label", max_length=128, null=True, blank=True)
-#
-#     name = models.CharField("Name", max_length=128, null=True, blank=True)
-#
-#     position = models.PositiveIntegerField("Position", null=True, blank=True)
-#
-#     custom_field = models.ForeignKey(
-#         "collab.CustomField", on_delete=models.CASCADE, blank=True, null=True)
-#
-#     class Meta:
-#         verbose_name = "Valeur de champs personnalisés"
-#         verbose_name_plural = "Valeurs de champs personnalisés"
+class CustomFieldInterface(models.Model):
+
+    TYPE_CHOICES = (
+        ("unique", "Entrée unique"),
+        ("multi_choice", "Choix multiple"),
+        ("radio", "Bouton radio"),
+        ("range", "Curseur"),
+    )
+
+    field_type = models.CharField(
+        "Type de champs", choices=TYPE_CHOICES, max_length=50,
+        default="unique", null=True, blank=True)
+
+    # Permet de stocker les options des differents type d'input
+    options = ArrayField(base_field=models.CharField(max_length=256), blank=True)
+
+    class Meta:
+        verbose_name = "Interface de champs personnalisés"
+        verbose_name_plural = "Interfaces de champs personnalisés"
 
 
 class CustomField(models.Model):
@@ -404,7 +411,11 @@ class CustomField(models.Model):
         default="boolean", null=True, blank=True)
 
     feature_type = models.ForeignKey(
-        "collab.FeatureType", on_delete=models.CASCADE)
+        "collab.FeatureType", on_delete=models.CASCADE
+    )
+
+    interface = models.ForeignKey(
+        "collab.CustomFieldInterface", on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Champs personnalisés"
