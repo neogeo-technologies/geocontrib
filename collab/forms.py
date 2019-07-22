@@ -40,33 +40,18 @@ class FeatureTypeModelForm(forms.ModelForm):
 
     title = forms.CharField(label='Titre', required=True)
 
-    slug = forms.SlugField(label='Slug', required=True)
+    # slug = forms.SlugField(label='Slug', required=True)
 
     class Meta:
         model = FeatureType
-        fields = ('title', 'slug', 'geom_type')
-
-    def clean_slug(self):
-        slug = self.cleaned_data.get('slug')
-        if self.instance.pk:
-            if FeatureType.objects.filter(slug=slug).exclude(pk=self.instance.pk).exists():
-                msg = "Veuillez modifier le slug de ce type de signalement, cette valeur doit etre unique."
-                raise forms.ValidationError(msg)
-        else:
-            if FeatureType.objects.filter(slug=slug).exists():
-                msg = "Veuillez modifier le slug de votre projet, cette valeur doit etre unique."
-                raise forms.ValidationError(msg)
-        return slug
+        fields = ('title', 'geom_type')
 
 
 class ProjectModelForm(forms.ModelForm):
-    # TODO: demander si on ne peux pas avoir un positif integer field pour le
-    # nombre de jours pour archive_feature et delete_feature au lieu d'une durée
-    # on calculerai le timedelat plus facilement si on a pas besoin de gerer des horaire
-    # de durée..
+    # TODO: slug en champs auto non editable
     title = forms.CharField(label='Titre', max_length=100)
 
-    slug = forms.SlugField(label='Slug', max_length=100)
+    # slug = forms.SlugField(label='Slug', max_length=100)
 
     thumbnail = forms.ImageField(label="Illustration du projet", required=False)
 
@@ -95,7 +80,7 @@ class ProjectModelForm(forms.ModelForm):
         model = Project
         fields = [
             'title',
-            'slug',
+            # 'slug',
             # 'created_on'
             'description',
             'moderation',
@@ -104,7 +89,6 @@ class ProjectModelForm(forms.ModelForm):
             'access_level_arch_feature',
             'archive_feature',
             'delete_feature',
-            # 'features_info'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -129,18 +113,6 @@ class ProjectModelForm(forms.ModelForm):
                 msg = "Veuillez modifier le titre de votre projet, un projet avec ce titre existe déjà."
                 raise forms.ValidationError(msg)
         return title
-
-    def clean_slug(self):
-        slug = self.cleaned_data.get('slug')
-        if self.instance.pk:
-            if Project.objects.filter(slug=slug).exclude(pk=self.instance.pk).exists():
-                msg = "Veuillez modifier le slug de votre projet, un projet avec ce slug existe déjà."
-                raise forms.ValidationError(msg)
-        else:
-            if Project.objects.filter(slug=slug).exists():
-                msg = "Veuillez modifier le slug de votre projet, un projet avec ce slug existe déjà."
-                raise forms.ValidationError(msg)
-        return slug
 
 
 class ExtendedBaseFS(BaseModelFormSet):

@@ -187,3 +187,5 @@ LOGO_PATH = '/logo.png'
 IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
 
 FILE_MAX_SIZE = 10000000
+
+DB_SRID = 4326

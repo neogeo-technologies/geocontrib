@@ -9,7 +9,9 @@ from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.text import slugify
 from django.urls import reverse
+
 
 from collab.choices import ALL_LEVELS
 from collab.choices import RELATED_MODELS
@@ -177,8 +179,7 @@ class Project(models.Model):
 
     title = models.CharField("Titre", max_length=128, unique=True)
 
-    # En attendant de déterminer les modalités pour générer le slug
-    slug = models.SlugField("Slug", max_length=256, blank=True, null=True)
+    slug = models.SlugField("Slug", max_length=256, editable=False, null=True)
 
     created_on = models.DateTimeField("Date de création", blank=True, null=True)
 
@@ -188,7 +189,9 @@ class Project(models.Model):
 
     thumbnail = models.ImageField("Illustration", upload_to=thumbnail_dir, default="default.png")
 
-    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        verbose_name="Auteur")
 
     access_level_pub_feature = models.ForeignKey(
         to="collab.UserLevelPermission", limit_choices_to=limit_pub,
@@ -209,9 +212,6 @@ class Project(models.Model):
 
     delete_feature = models.PositiveIntegerField(
         "Délai avant suppression", blank=True, null=True)
-
-    features_info = JSONField(
-        "Info sur les types de signalements disponibles", blank=True, null=True)
 
     class Meta:
         verbose_name = "Projet"
@@ -271,7 +271,7 @@ class Feature(models.Model):
 
     feature_type = models.ForeignKey("collab.FeatureType", on_delete=models.CASCADE)
 
-    geom = models.GeometryField("Géométrie", srid=4326, blank=True, null=True)
+    geom = models.GeometryField("Géométrie", srid=settings.DB_SRID, blank=True, null=True)
 
     feature_data = JSONField(blank=True, null=True)
 
@@ -342,7 +342,7 @@ class FeatureType(models.Model):
 
     title = models.CharField("Titre", max_length=128)
 
-    slug = models.SlugField("Slug", max_length=256, unique=True)
+    slug = models.SlugField("Slug", max_length=256, editable=False, null=True)
 
     geom_type = models.CharField(
         "Type de géométrie", choices=GEOM_CHOICES, max_length=50,
@@ -665,7 +665,7 @@ def submission_delete(sender, instance, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=Event)
-def stack_event_(sender, instance, created, **kwargs):
+def stack_event_notification(sender, instance, created, **kwargs):
     """
         TODO@cbenhabib: ajout d'une commande django branchée a un cron
         qui itere sur la stack en attente de traitement et qui envoi les messages
@@ -723,6 +723,22 @@ def update_feature_dates(sender, instance, **kwargs):
             days=instance.project.archive_feature)
         instance.deletion_on = instance.created_on + timezone.timedelta(
             days=instance.project.delete_feature)
+
+
+@receiver(models.signals.post_save, sender=FeatureType)
+def slugify_feature_type(sender, instance, created, **kwargs):
+
+    if created:
+        instance.slug = slugify("{}-{}".format(instance.pk, instance.title))
+        instance.save()
+
+
+@receiver(models.signals.post_save, sender=Project)
+def slugify_project(sender, instance, created, **kwargs):
+
+    if created:
+        instance.slug = slugify("{}-{}".format(instance.pk, instance.title))
+        instance.save()
 
 
 @receiver(models.signals.post_save, sender=Project)

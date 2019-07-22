@@ -39,13 +39,6 @@
           value="{% if form.title.value %}{{ form.title.value }}{% endif %}" >
         {{ form.title.errors }}
       </div>
-      <div class="required field">
-        <label for="{{ form.slug.id_for_label }}">{{ form.slug.label }}</label>
-        <input type="text" required maxlength="{{ form.slug.field.max_length }}"
-          name="{{ form.slug.html_name }}" id="{{ form.slug.id_for_label }}"
-          value="{% if form.slug.value %}{{ form.slug.value }}{% endif %}" >
-        {{ form.slug.errors }}
-      </div>
     </div>
     <div class="six wide field">
       <label>{{ form.thumbnail.label }}</label>
