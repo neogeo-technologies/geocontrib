@@ -401,7 +401,7 @@ class CustomField(models.Model):
 
     field_type = models.CharField(
         "Type de champ", choices=TYPE_CHOICES, max_length=50,
-        default="boolean", null=True, blank=True)
+        default="boolean", null=False, blank=False)
 
     feature_type = models.ForeignKey(
         "collab.FeatureType", on_delete=models.CASCADE)
@@ -564,6 +564,7 @@ class Event(models.Model):
 
     @property
     def notify_users(self):
+        Event = apps.get_model(app_label='collab', model_name="Event")
         pass
 
 
