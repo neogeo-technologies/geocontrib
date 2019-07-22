@@ -220,10 +220,11 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
                     geom=form.cleaned_data.get('geom'),
                     project=project,
                     feature_type=feature_type,
-                    user=user,
+                    creator=user,
                     feature_data=save_custom_fields(extra, form.cleaned_data)
                 )
             except Exception as err:
+                logger.error(str(err))
                 messages.error(
                     request,
                     "Une erreur s'est produite lors de la création du signalement {title}: {err}".format(
@@ -240,6 +241,8 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
                     'collab:feature_detail', slug=project.slug,
                     feature_type_slug=feature_type.slug, feature_id=feature.feature_id)
 
+        else:
+            logger.error(form.errors)
         context = {
             'project': project,
             'feature_type': feature_type,
@@ -615,7 +618,7 @@ class ProjectCreate(CreateView):
         return user.is_superuser or user.is_administrator
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        form.instance.creator = self.request.user
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):

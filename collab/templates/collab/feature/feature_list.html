@@ -37,7 +37,7 @@
             <strong><a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{feature.title|feature_val_display}}</a></strong>
           </td>
           <td>
-            <span class="sous-titre">{{feature.user}} le {{feature.created_on }}</span>
+            <span class="sous-titre">{{feature.creator}} le {{feature.created_on }}</span>
           </td>
           <td>
             <span>{{feature.feature_type.title}}</span>

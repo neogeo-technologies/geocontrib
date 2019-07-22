@@ -169,7 +169,7 @@ class Authorization(models.Model):
 class Project(models.Model):
 
     def thumbnail_dir(instance, filename):
-        return "user_{0}/{1}".format(instance.user.pk, filename)
+        return "user_{0}/{1}".format(instance.creator.pk, filename)
 
     def limit_pub():
         return {"rank__lte": 2}
@@ -189,9 +189,9 @@ class Project(models.Model):
 
     thumbnail = models.ImageField("Illustration", upload_to=thumbnail_dir, default="default.png")
 
-    user = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-        verbose_name="Auteur")
+    creator = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL, verbose_name="Créateur",
+        on_delete=models.SET_NULL, null=True, blank=True)
 
     access_level_pub_feature = models.ForeignKey(
         to="collab.UserLevelPermission", limit_choices_to=limit_pub,
@@ -263,9 +263,9 @@ class Feature(models.Model):
     deletion_on = models.DateField(
         "Date de suppression automatique", null=True, blank=True)
 
-    user = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        help_text="Utilisateur abonné")
+    creator = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL, verbose_name="Créateur",
+        on_delete=models.SET_NULL, null=True, blank=True)
 
     project = models.ForeignKey("collab.Project", on_delete=models.CASCADE)
 
@@ -750,7 +750,7 @@ def set_author_perms(sender, instance, created, **kwargs):
         try:
             Authorization.objects.create(
                 project=instance,
-                user=instance.user,
+                user=instance.creator,
                 level=UserLevelPermission.objects.get(rank=4)
             )
         except Exception as err:
@@ -764,7 +764,7 @@ def create_event_on_project_creation(sender, instance, created, **kwargs):
     if created:
         Event = apps.get_model(app_label='collab', model_name="Event")
         Event.objects.create(
-            user=instance.user,
+            user=instance.creator,
             event_type='create',
             object_type='project',
             project_slug=instance.slug,

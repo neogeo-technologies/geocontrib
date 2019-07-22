@@ -41,7 +41,7 @@
       </tr>
       <tr>
         <th>Auteur</th>
-        <td>{{ feature.user.get_full_name|default:feature.user.username }}</td>
+        <td>{{ feature.creator.get_full_name|default:feature.creator.username }}</td>
       </tr>
       {% for field in feature_data %}
       <tr>
