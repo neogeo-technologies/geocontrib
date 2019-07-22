@@ -35,6 +35,7 @@ from collab.models import Feature
 from collab.models import FeatureType
 from collab.models import FeatureLink
 from collab.models import Project
+from collab.models import Subscription
 from collab.utils import save_custom_fields
 
 import logging
@@ -154,6 +155,8 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         else:
             logger.error(form.errors)
 
+        is_suscriber = Subscription.objects.filter(feature=feature, users__pk=user.pk).exists()
+
         context = {
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
@@ -164,7 +167,8 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'permissions': Authorization.all_permissions(user, project),
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
             'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id),
-            'comment_form': form
+            'comment_form': form,
+            'is_suscriber': is_suscriber
 
         }
         return render(request, 'collab/feature/feature_detail.html', context)
@@ -298,6 +302,8 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             feature_from=feature.feature_id
         )
 
+        is_suscriber = Subscription.objects.filter(feature=feature, users__pk=user.pk).exists()
+
         context = {
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
@@ -309,6 +315,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
             'comment_form': CommentForm(),
             'attachment_form': AttachmentForm(),
+            'is_suscriber': is_suscriber
         }
 
         return render(request, 'collab/feature/feature_detail.html', context)
@@ -729,3 +736,48 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_types': FeatureType.objects.filter(project=project)
         }
         return render(request, 'collab/project/admin_members.html', context)
+
+
+######################
+# SUBSCRIPTION VIEWS #
+######################
+
+@method_decorator(DECORATORS, name='dispatch')
+class SubscribingView(SingleObjectMixin, UserPassesTestMixin, View):
+
+    queryset = Feature.objects.all()
+    pk_url_kwarg = 'feature_id'
+
+    def test_func(self):
+        user = self.request.user
+        feature = self.get_object()
+        project = feature.project
+        return Authorization.has_permission(user, 'can_view_feature', project, feature)
+
+    def post(self, request, slug, feature_type_slug, feature_id, action):
+        feature = self.get_object()
+        user = request.user
+
+        if action.lower() not in ['ajouter', 'annuler']:
+            logger.error("Erreur de syntaxe dans l'url d'abonnement. ")
+
+        elif action.lower() == 'ajouter':
+            obj, _created = Subscription.objects.get_or_create(
+                feature=feature,
+            )
+            obj.users.add(user)
+            obj.save()
+            messages.info('Vous etes bien abonné aux notiifcations pour ce signalement')
+
+        elif action.lower() == 'annuler':
+            try:
+                obj = Subscription.objects.get(feature)
+                obj.users.remove(user)
+                obj.save()
+                messages.info('Vous ne recevrez plus les notifications liés à ce signalement')
+            except Exception as err:
+                logger.error(str(err))
+
+        return redirect(
+            'feature_detail', slug=slug,
+            feature_type_slug=feature_type_slug, feature_id=feature_id)

@@ -23,6 +23,7 @@ from collab.views.content_managment import ProjectCreate
 from collab.views.content_managment import CommentCreate
 from collab.views.content_managment import AttachmentCreate
 from collab.views.content_managment import ProjectMembers
+from collab.views.content_managment import SubscribingView
 
 # from . import views
 # import collab.views.feature as feature
@@ -94,6 +95,11 @@ urlpatterns = [
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/piece-jointe/ajouter',
         AttachmentCreate.as_view(),
         name='add_attachment'),
+
+    path(
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/abonnement/<str:action>',
+        SubscribingView.as_view(),
+        name='subscription'),
 
     # path('mon_compte/activation', views.activation, name='activation'),
     # path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),

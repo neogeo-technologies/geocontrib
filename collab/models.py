@@ -12,7 +12,6 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.urls import reverse
 
-
 from collab.choices import ALL_LEVELS
 from collab.choices import RELATED_MODELS
 from collab.choices import EXTENDED_RELATED_MODELS
@@ -20,6 +19,7 @@ from collab.choices import EVENT_TYPES
 from collab.choices import STATE_CHOICES
 from collab.choices import FREQUENCY_CHOICES
 from collab.managers import AvailableFeaturesManager
+
 
 import logging
 logger = logging.getLogger('django')
@@ -562,16 +562,19 @@ class Event(models.Model):
             self.created_on = timezone.now()
         super().save(*args, **kwargs)
 
+    @property
+    def notify_users(self):
+        pass
+
 
 class Subscription(models.Model):
 
-    feature_id = models.UUIDField(
-        "Identifiant du signalement", editable=False, max_length=32)
-
-    project_slug = models.SlugField('Slug', max_length=128)
-
     created_on = models.DateTimeField(
         "Date de création de l'abonnement", blank=True, null=True)
+
+    feature = models.ForeignKey(
+        "collab.Feature", on_delete=models.SET_NULL,
+        null=True, blank=True)
 
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, verbose_name="Utilisateurs",
@@ -681,8 +684,7 @@ def stack_event_notification(sender, instance, created, **kwargs):
             stack.save()
 
         else:
-            # TODO: on appel le notify_users()
-            pass
+            instance.notify_users()
 
 
 @receiver(models.signals.post_save, sender=FeatureLink)

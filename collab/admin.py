@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from collab.models import Feature
 from collab.models import Project
+from collab.models import Subscription
 from collab.models import FeatureType
 from collab.models import CustomField
 # from collab.models import CustomFieldValue
@@ -81,4 +82,5 @@ admin.site.register(CustomField)
 admin.site.register(Feature)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(Project)
+admin.site.register(Subscription)
 admin.site.register(UserLevelPermission)
