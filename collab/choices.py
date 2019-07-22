@@ -20,7 +20,7 @@ LOWER_LEVELS = (
 )
 
 EXTENDED_LEVELS = (
-    (MODERATOR, 'Moderateur'),
+    (MODERATOR, 'Modérateur'),
     (ADMIN, 'Admin'),
 )
 
