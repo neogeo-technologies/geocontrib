@@ -530,13 +530,14 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
         feature_type = self.get_object()
         project = feature_type.project
         user = request.user
-
+        features = Feature.objects.filter(feature_type=feature_type)
         structure = FeatureTypeSerializer(feature_type, context={'request': request})
 
         context = {
             'feature_type': feature_type,
             'permissions': Authorization.all_permissions(user, project),
             'feature_types': project.featuretype_set.all(),
+            'features': features,
             'project': project,
             'structure': json.dumps(structure.data)
         }
