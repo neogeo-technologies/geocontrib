@@ -45,9 +45,10 @@ class HomePageView(TemplateView):
             nb_features=Count('feature'),
             nb_comments=Count('comment')
         )
+
         serilized_projects = ProjectDetailedSerializer(
             Project.objects.all(), many=True)
-        context['data'] = json.dumps(serilized_projects.data)
+        context['data'] = serilized_projects.data
 
         return context
 
