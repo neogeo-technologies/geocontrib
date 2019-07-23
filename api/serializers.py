@@ -1,11 +1,26 @@
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeometrySerializerMethodField
-
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from collab.models import Project
 from collab.models import Feature
 
 import logging
 logger = logging.getLogger('django')
+
+
+class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
+
+    class Meta:
+        model = Feature
+        geo_field = "geom"
+        fields = '__all__'
+        # you can also explicitly declare which fields you want to include
+        # as with a ModelSerializer.
+        # fields = ('id', 'address', 'city', 'state')
+
+    def get_properties(self, instance, fields):
+        # This is a PostgreSQL JSON field, which django maps to a dict
+        return instance.feature_data
 
 
 class ExportFeatureSerializer(serializers.ModelSerializer):
