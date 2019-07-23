@@ -110,7 +110,7 @@ class Authorization(models.Model):
         """
         user_perms = {
             'can_view_project': False,
-            'can_create_project': False,  # Redondant avec user.is_administartor
+            'can_create_project': False,  # Redondant avec user.is_administrator
             'can_update_project': False,
             'can_view_feature': False,
             'can_create_feature': False,
@@ -464,7 +464,8 @@ class AnnotationAbstract(models.Model):
         "Identifiant du signalement", max_length=32, blank=True, null=True)
 
     author = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL, verbose_name="Auteur", on_delete=models.CASCADE)
+        to=settings.AUTH_USER_MODEL, verbose_name="Auteur",
+        on_delete=models.SET_NULL, null=True, blank=True)
 
     project = models.ForeignKey("collab.Project", on_delete=models.CASCADE)
 
@@ -524,6 +525,20 @@ class Event(models.Model):
 
     created_on = models.DateTimeField("Date de l'évènement", blank=True, null=True)
 
+    object_type = models.CharField(
+        "Type de l'objet lié", choices=EXTENDED_RELATED_MODELS, max_length=100)
+
+    event_type = models.CharField(
+        "Type de l'évènement", choices=EVENT_TYPES, max_length=100)
+
+    data = JSONField(blank=True, null=True)
+
+    project_slug = models.SlugField(
+        'Slug du projet', max_length=256, blank=True, null=True)
+
+    feature_type_slug = models.SlugField(
+        'Slug du type de signalement', max_length=256, blank=True, null=True)
+
     feature_id = models.UUIDField(
         "Identifiant du signalement", editable=False, max_length=32, blank=True,
         null=True)
@@ -536,22 +551,9 @@ class Event(models.Model):
         "Identifiant de la pièce jointe", editable=False, max_length=32,
         blank=True, null=True)
 
-    object_type = models.CharField(
-        "Type de l'objet lié", choices=EXTENDED_RELATED_MODELS, max_length=100)
-
-    event_type = models.CharField(
-        "Type de l'évènement", choices=EVENT_TYPES, max_length=100)
-
-    project_slug = models.SlugField('Slug du projet', max_length=256, blank=True, null=True)
-
-    feature_type_slug = models.SlugField(
-        'Slug du type de signalement', max_length=256, blank=True, null=True)
-
-    data = JSONField(blank=True, null=True)
-
     user = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, verbose_name="Utilisateur", blank=True,
-        null=True, on_delete=models.CASCADE)
+        null=True, on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = "Évènement"
@@ -563,9 +565,21 @@ class Event(models.Model):
         super().save(*args, **kwargs)
 
     @property
-    def notify_users(self):
-        Event = apps.get_model(app_label='collab', model_name="Event")
+    def get_suscribers(self):
         pass
+        # Subscription = apps.get_model(app_label='collab', model_name="Subscription")
+        # # On notifie les utilisateurs abonnés au signalement.
+        # try:
+        #     feature_subscription = Subscription.objects.get(project__slug=self.project_slug)
+        # except:
+        #     pass
+        # else:
+        #     for user in feature_subscription.set_users.all():
+        #         notify_user(self, user)
+        #
+        # # On notifie les utilisateurs abonnés au projet en excluant
+        # # ceux deja notifiés precedement
+        # for subscriptions in Subscription.objects.filter(project__slug=self.project_slug):
 
 
 class Subscription(models.Model):
@@ -573,9 +587,8 @@ class Subscription(models.Model):
     created_on = models.DateTimeField(
         "Date de création de l'abonnement", blank=True, null=True)
 
-    feature = models.ForeignKey(
-        "collab.Feature", on_delete=models.SET_NULL,
-        null=True, blank=True)
+    project = models.ForeignKey(
+        "collab.Project", on_delete=models.CASCADE, null=True, blank=True)
 
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, verbose_name="Utilisateurs",
@@ -589,6 +602,14 @@ class Subscription(models.Model):
         if not self.pk:
             self.created_on = timezone.now()
         super().save(*args, **kwargs)
+
+    @classmethod
+    def is_suscriber(cls, user, project):
+        if not user.is_authenticated:
+            is_it = False
+        else:
+            is_it = cls.objects.filter(project=project, users=user.pk).exists()
+        return is_it
 
 
 class StackedEvent(models.Model):
@@ -666,26 +687,6 @@ def anonymize_comments(sender, instance, **kwargs):
 @receiver(models.signals.post_delete, sender=Attachment)
 def submission_delete(sender, instance, **kwargs):
     instance.attachment_file.delete()
-
-
-@receiver(models.signals.post_save, sender=Event)
-def stack_event_notification(sender, instance, created, **kwargs):
-    """
-        TODO@cbenhabib: ajout d'une commande django branchée a un cron
-        qui itere sur la stack en attente de traitement et qui envoi les messages
-        aux destinataires abonnés.
-        On ferme ensuite la stack en indiquant l'état d'exécution de la commande.
-    """
-    if created and instance.feature_id:
-        if settings.DEFAULT_SENDING_FREQUENCY != "instantly":
-            StackedEvent = apps.get_model(app_label='collab', model_name="StackedEvent")
-            stack, _ = StackedEvent.objects.get_or_create(
-                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending')
-            stack.events.add(instance)
-            stack.save()
-
-        else:
-            instance.notify_users()
 
 
 @receiver(models.signals.post_save, sender=FeatureLink)
@@ -789,3 +790,42 @@ def create_event_on_comment_creation(sender, instance, created, **kwargs):
             feature_type_slug=instance.feature_type_slug,
             data={}
         )
+
+
+@receiver(models.signals.post_save, sender=Attachment)
+def create_event_on_attachment_creation(sender, instance, created, **kwargs):
+
+    # Si creation d'une piece jointe sans rapport avec un commentaire
+    if created and not instance.comment:
+        Event = apps.get_model(app_label='collab', model_name="Event")
+        Event.objects.create(
+            feature_id=instance.feature_id,
+            comment_id=instance.id,
+            event_type='create',
+            object_type='attachment',
+            user=instance.author,
+            project_slug=instance.project.slug,
+            data={}
+        )
+
+
+@receiver(models.signals.post_save, sender=Event)
+def stack_event_notification(sender, instance, created, **kwargs):
+    """
+        TODO@cbenhabib: ajout d'une commande django branchée a un cron
+        qui itere sur la stack en attente de traitement et qui envoi les messages
+        aux destinataires abonnés.
+        On ferme ensuite la stack en indiquant l'état d'exécution de la commande.
+    """
+    if created and instance.feature_id:
+        if settings.DEFAULT_SENDING_FREQUENCY != "instantly":
+            StackedEvent = apps.get_model(app_label='collab', model_name="StackedEvent")
+            stack, _ = StackedEvent.objects.get_or_create(
+                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending')
+            stack.events.add(instance)
+            stack.save()
+        else:
+            try:
+                instance.get_suscribers()
+            except Exception as err:
+                logger.error(str(err))

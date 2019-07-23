@@ -57,6 +57,10 @@ urlpatterns = [
 
     path('projet/<slug:slug>/membres/', ProjectMembers.as_view(), name='project_members'),
 
+    path(
+        'projet/<slug:slug>/abonnement/<str:action>', SubscribingView.as_view(),
+        name='subscription'),
+
     path('projet/<slug:slug>/type-signalement/ajouter',
          FeatureTypeCreate.as_view(), name="feature_type_create"),  # add_feature_type
 
@@ -95,11 +99,6 @@ urlpatterns = [
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/piece-jointe/ajouter',
         AttachmentCreate.as_view(),
         name='add_attachment'),
-
-    path(
-        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/abonnement/<str:action>',
-        SubscribingView.as_view(),
-        name='subscription'),
 
     # path('mon_compte/activation', views.activation, name='activation'),
     # path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),
