@@ -1,3 +1,4 @@
+import json
 from django.views.generic.base import TemplateView
 from django.db.models import Count
 from django.db.models import Q
@@ -7,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
+
+from api.serializers import ProjectDetailedSerializer
 
 from collab.models import Authorization
 from collab.models import Project
@@ -29,15 +32,22 @@ class HomePageView(TemplateView):
             if user.is_superuser or user.is_administrator:
                 context["can_create_project"] = True
 
-        nb_contributors = Count(
-            'authorization', filter=Q(authorization__level=choices.CONTRIBUTOR))
-        nb_features = Count('feature')
-        nb_comments = Count('comment')
+        # nb_contributors = Count(
+        #     'authorization', filter=Q(authorization__level=choices.CONTRIBUTOR))
+        #
+        # nb_feature = Count('feature')
+        #
+        # nb_comments = Count('comment')
+
         context["projects"] = Project.objects.annotate(
-            nb_contributors=nb_contributors,
-            nb_features=nb_features,
-            nb_comments=nb_comments
-        ).order_by('-created_on')
+            nb_contributors=Count(
+                'authorization', filter=Q(authorization__level=choices.CONTRIBUTOR)),
+            nb_features=Count(F('feature')),
+            nb_comments=Count(F('comment'))
+        )
+        serilized_projects = ProjectDetailedSerializer(
+            Project.objects.all(), many=True)
+        context['data'] = json.dumps(serilized_projects.data)
 
         return context
 

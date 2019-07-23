@@ -158,8 +158,6 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         else:
             logger.error(form.errors)
 
-        is_suscriber = Subscription.objects.filter(feature=feature, users__pk=user.pk).exists()
-
         context = {
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
@@ -171,8 +169,6 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
             'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id),
             'comment_form': form,
-            'is_suscriber': is_suscriber
-
         }
         return render(request, 'collab/feature/feature_detail.html', context)
 
@@ -305,8 +301,6 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             feature_from=feature.feature_id
         )
 
-        is_suscriber = Subscription.objects.filter(feature=feature, users__pk=user.pk).exists()
-
         context = {
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
@@ -318,7 +312,6 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
             'comment_form': CommentForm(),
             'attachment_form': AttachmentForm(),
-            'is_suscriber': is_suscriber
         }
 
         return render(request, 'collab/feature/feature_detail.html', context)
@@ -563,9 +556,6 @@ class ProjectDetail(DetailView):
         user = self.request.user
 
         permissions = Authorization.all_permissions(user, project)
-        # authorizations = Authorization.objects.filter(
-        #     project=project
-        # ).order_by('created_on')
 
         comments = Comment.objects.filter(
             project=project
@@ -574,31 +564,39 @@ class ProjectDetail(DetailView):
             'comment', 'created_on'
         ).order_by('-created_on')[0:3]
 
-        last_features = Feature.objects.filter(
+        features = Feature.objects.filter(
             project=project
-        )[0:3]
+        )
 
-        # context['authorizations'] = authorizations
         context['project'] = project
         context['user'] = user
         context['comments'] = comments
-        context['features'] = last_features
+        context['features'] = features
+        context['last_features'] = features.order_by('-created_on')[0:3]
         context['permissions'] = permissions
         context['feature_types'] = project.featuretype_set.all()
+        context['is_suscriber'] = Subscription.is_suscriber(user, project)
         return context
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class ProjectUpdate(SingleObjectMixin, View):
+class ProjectUpdate(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = Project.objects.all()
+
+    def test_func(self):
+        user = self.request.user
+        project = self.get_object()
+        return Authorization.has_permission(user, 'can_update_project', project)
 
     def get(self, request, slug):
         project = get_object_or_404(Project, slug=slug)
+
         form = ProjectModelForm(instance=project)
         context = {
             'form': form,
             'permissions': Authorization.all_permissions(request.user, project),
             'feature_types': project.featuretype_set.all(),
+            'is_suscriber': Subscription.is_suscriber(request.user, project),
             'action': 'update'
         }
         return render(request, 'collab/project/project_edit.html', context)
