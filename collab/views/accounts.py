@@ -42,8 +42,8 @@ class HomePageView(TemplateView):
         context["projects"] = Project.objects.annotate(
             nb_contributors=Count(
                 'authorization', filter=Q(authorization__level=choices.CONTRIBUTOR)),
-            nb_features=Count(F('feature')),
-            nb_comments=Count(F('comment'))
+            nb_features=Count('feature'),
+            nb_comments=Count('comment')
         )
         serilized_projects = ProjectDetailedSerializer(
             Project.objects.all(), many=True)
