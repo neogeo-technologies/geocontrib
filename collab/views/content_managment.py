@@ -453,7 +453,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = Project.objects.all()
     CustomFieldsFormSet = modelformset_factory(
         CustomField,
-        can_delete=True,
+        # can_delete=True,
         # can_order=True,
         form=CustomFieldModelForm,
         formset=CustomFieldModelBaseFS,
@@ -509,7 +509,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
                 'feature_types': project.featuretype_set.all(),
                 'project': project,
             }
-            return render(request, 'collab/feature/add_feature_type.html', context)
+            return render(request, 'collab/feature_type/add_feature_type.html', context)
 
 
 @method_decorator(DECORATORS, name='dispatch')

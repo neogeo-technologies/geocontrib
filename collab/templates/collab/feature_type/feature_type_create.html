@@ -1,70 +1,133 @@
-{% extends "collab/layout_menu.html" %}
-{% block title %}
-{{ title }}
-{% endblock %}
+{% extends "collab/base.html" %}
+
+
+{% block title %}{{ title }}{% endblock %}
+
 {% block content %}
 
 {% if success %}
-<br>
 <div class="ui success message">
-  <div class="header">{{success}}</div>
+  <div class="header">{{ success }}</div>
 </div>
 {% endif %}
+
 {% if error %}
-<br>
 <div class="ui error message">
   <strong>{{error}}</strong>
 </div>
 {% endif %}
-<div class="ui middle aligned stackable grid container">
 
-  <div class="row ">
-    <h2 class="ui header">Créer un nouveau type de signalement pour le projet <a href="{% url 'collab:project' slug=project.slug %}">{{ project.title }}</a></h2>
+<div class="fourteen wide column">
 
-  </div>
-  <form class='ui equal width addfeaturemodel form' method="POST">
+  <form id="form-type-edit" action="" method="post" enctype="multipart/form-data" class="ui form">
     {% csrf_token %}
-    <div class="ui error message"></div>
-    {{ form.as_p }}
-    <input type="button" value="+" id="add_more">
-    <table class="ui celled padded table">
-      {{ formset.management_form }}
-      <div id="form_set">
-      {{ formset.non_form_errors }}
-      {% for form in formset %}
 
-          {% for hidden in form.hidden_fields %}
-            {{ hidden }}
-          {% endfor %}
-          {% if form.non_field_errors %}
-          <div class="alert alert-danger" role="alert">
-            {% for error in form.non_field_errors %}
-              {{ error }}
+    <h1>Créer un nouveau type de signalement pour le projet "{{ project.title }}"</h1>
+
+    <div class="two fields">
+      <div class="required field">
+        <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+        <input type="text" required maxlength="{{ form.title.field.max_length }}"
+          name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}">
+        {{ form.title.errors }}
+      </div>
+      <div class="required field">
+        <label for="{{ form.geom_type.id_for_label }}">{{ form.geom_type.label }}</label>
+        <div class="ui selection dropdown">
+          <input type="hidden" name="{{ form.geom_type.html_name }}" id="{{ form.geom_type.id_for_label }}">
+          <div class="default text"></div>
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            {% for x,y in form.geom_type.field.choices %}
+              <div class="item" data-value="{{ x }}" {% if form.geom_type.value == x %} selected{% endif %}>{{ y }}</div>
             {% endfor %}
           </div>
-          {% endif %}
-          {{ form.as_table }}
-      {% endfor %}
+        </div>
+        {{ form.geom_type.errors }}
       </div>
-    </table>
-    <div id="empty_form" style="display:none">
-      <table class='ui compact celled definition table'>
-        {{ formset.empty_form.as_table }}
-      </table>
     </div>
-    <div style="margin-top:10px">
-      <button class="green ui button" type="submit">
-        Créer le type de signalement
-      </button>
-    </div>
+
+    {{ formset.management_form }}
+    {{ formset.non_form_errors }}
+    {% for error in form.non_field_errors %}{% endfor %}
+    <div id="formsets"></div>
+
+    <button id="add-field" type="button" class="ui compact basic button button-hover-green">
+      <i class="ui plus icon"></i>Ajouter un champ personnalisé
+    </button>
+
+    <div class="ui divider"></div>
+
+    <button type="submit" class="ui basic teal icon button">
+      <i class="white save icon"></i>Créer le type de signalement
+    </button>
+
   </form>
+
 </div>
 
 <script>
-$('#add_more').click(function() {
-	var form_idx = $('#id_form-TOTAL_FORMS').val();
-	$('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-	$('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-});
+var line = 0
+
+$('#add-field').click(function() {
+  var form_idx = $('#id_form-TOTAL_FORMS').val();
+
+  console.log('add-field', form_idx);
+  $('#formsets').append((`
+    <div class="ui teal segment">
+      <h4>
+        Champ personnalisé
+        <button class="ui small compact right floated icon button remove-field" type="button"><i class="ui times icon"></i></button>
+      </h4>
+      <div class="four fields">
+        <div class="required field">
+          <label for="{{ formset.empty_form.label.id_for_label }}">{{ formset.empty_form.label.label }}</label>
+          <input type="text" required maxlength="{{  formset.empty_form.label.field.max_length }}"
+            name="{{ formset.empty_form.label.html_name }}" id="{{  formset.empty_form.label.id_for_label }}">
+          {{ formset.empty_form.label.errors }}
+        </div>
+        <div class="required field">
+          <label for="{{ formset.empty_form.name.id_for_label }}">{{ formset.empty_form.name.label }}</label>
+          <input type="text" required maxlength="{{  formset.empty_form.name.field.max_length }}"
+            name="{{ formset.empty_form.name.html_name }}" id="{{  formset.empty_form.name.id_for_label }}">
+          {{ formset.empty_form.name.errors }}
+        </div>
+        <div class="required field">
+          <label for="{{ formset.empty_form.field_type.id_for_label }}">{{ formset.empty_form.field_type.label }}</label>
+          <div class="ui selection dropdown">
+            <input type="hidden"
+              name="{{ formset.empty_form.field_type.html_name }}" id="{{ formset.empty_form.field_type.id_for_label }}"
+              value="{{ formset.empty_form.field_type.value }}">
+            <div class="default text"></div>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              {% for x,y in formset.empty_form.field_type.field.choices %}
+                <div class="item" data-value="{{ x }}" {% if formset.empty_form.field_type.value == x %} selected{% endif %}>{{ y }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          {{ formset.empty_form.field_type.errors }}
+        </div>
+        <div class="required field">
+          <label for="{{ formset.empty_form.position.id_for_label }}">{{ formset.empty_form.position.label }}</label>
+          <div class="ui input">
+            <input type="number" min="{{ formset.empty_form.position.field.min_value }}"
+            name="{{ formset.empty_form.position.html_name }}" id="{{ formset.empty_form.position.id_for_label }}"
+            value="${form_idx}">
+          </div>
+          {{ formset.empty_form.position.errors }}
+        </div>
+      </div>
+    </div>
+  `).replace(/__prefix__/g, form_idx))
+  $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+
+  $('.ui.dropdown').dropdown()
+  $('.remove-field').click(function(){
+    console.log('remove-field');
+    $(this).parent().parent('.segment').remove()
+  })
+})
+
 </script>
 {% endblock %}
