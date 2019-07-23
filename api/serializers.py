@@ -86,8 +86,13 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProjectDetailedSerializer(serializers.ModelSerializer):
+
+    created_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
+
     nb_features = serializers.SerializerMethodField()
+
     nb_comments = serializers.SerializerMethodField()
+
     nb_contributors = serializers.SerializerMethodField()
 
     def get_nb_features(self, obj):
