@@ -23,6 +23,12 @@ class HomePageView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Collab"
 
+        context["can_create_project"] = False
+        user = self.request.user
+        if user.is_authenticated:
+            if user.is_superuser or user.is_administrator:
+                context["can_create_project"] = True
+
         nb_contributors = Count(
             'authorization', filter=Q(authorization__level=choices.CONTRIBUTOR))
         nb_features = Count('feature')
