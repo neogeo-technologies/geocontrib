@@ -70,7 +70,7 @@ class CustomFieldTabular(admin.TabularInline):
 
 
 class FeatureTypeAdmin(admin.ModelAdmin):
-
+    readonly_fields = ('geom_type', )
     inlines = (
         CustomFieldTabular,
     )

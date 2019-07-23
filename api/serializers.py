@@ -1,26 +1,14 @@
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeometrySerializerMethodField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
-from collab.models import Project
+
+from collab.models import CustomField
 from collab.models import Feature
+from collab.models import FeatureType
+from collab.models import Project
 
 import logging
 logger = logging.getLogger('django')
-
-
-class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
-
-    class Meta:
-        model = Feature
-        geo_field = "geom"
-        fields = '__all__'
-        # you can also explicitly declare which fields you want to include
-        # as with a ModelSerializer.
-        # fields = ('id', 'address', 'city', 'state')
-
-    def get_properties(self, instance, fields):
-        # This is a PostgreSQL JSON field, which django maps to a dict
-        return instance.feature_data
 
 
 class ExportFeatureSerializer(serializers.ModelSerializer):
@@ -46,21 +34,47 @@ class ExportFeatureSerializer(serializers.ModelSerializer):
             'feature_data',
         )
 
-    # def to_representation(self, obj):
-    #     url = reverse(
-    #         'collab:feature-detail',
-    #         kwargs={
-    #             'slug': obj.project.slug,
-    #             'feature_type_slug': obj.feature_type.slug,
-    #             'feature_id': obj.feature_id
-    #         })
-    #
-    #     return OrderedDict([
-    #         ('geom', obj.geom),
-    #         ('status', obj.status),
-    #         ('user', obj.user.username),
-    #         ('url', url),
-    #     ])
+
+class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
+
+    class Meta:
+        model = Feature
+        geo_field = "geom"
+        fields = '__all__'
+        # you can also explicitly declare which fields you want to include
+        # as with a ModelSerializer.
+        # fields = ('id', 'address', 'city', 'state')
+
+    def get_properties(self, instance, fields):
+        # This is a PostgreSQL JSON field, which django maps to a dict
+        return instance.feature_data
+
+
+class CustomFieldSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomField
+        fields = (
+            'position',
+            'label',
+            'name',
+            'field_type',
+        )
+
+
+class FeatureTypeSerializer(serializers.ModelSerializer):
+
+    customfield_set = CustomFieldSerializer(
+        many=True, read_only=True)
+
+    class Meta:
+        model = FeatureType
+        fields = (
+            'title',
+            'slug',
+            'geom_type',
+            'customfield_set',
+        )
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):

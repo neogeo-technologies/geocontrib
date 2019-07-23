@@ -1,3 +1,4 @@
+import json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -16,6 +17,8 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.decorators.csrf import csrf_exempt
+
+from api.serializers import FeatureTypeSerializer
 
 from collab.forms import AuthorizationForm
 from collab.forms import CustomFieldModelForm
@@ -528,12 +531,14 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
         project = feature_type.project
         user = request.user
 
+        structure = FeatureTypeSerializer(feature_type, context={'request': request})
+
         context = {
             'feature_type': feature_type,
             'permissions': Authorization.all_permissions(user, project),
             'feature_types': project.featuretype_set.all(),
             'project': project,
-            'structure': {'todo': 'Ajout de structure'}
+            'structure': json.dumps(structure.data)
         }
 
         return render(request, 'collab/feature_type/feature_type_detail.html', context)
@@ -557,9 +562,9 @@ class ProjectDetail(DetailView):
         user = self.request.user
 
         permissions = Authorization.all_permissions(user, project)
-        authorizations = Authorization.objects.filter(
-            project=project
-        ).order_by('created_on')
+        # authorizations = Authorization.objects.filter(
+        #     project=project
+        # ).order_by('created_on')
 
         comments = Comment.objects.filter(
             project=project
@@ -572,7 +577,7 @@ class ProjectDetail(DetailView):
             project=project
         )[0:3]
 
-        context['authorizations'] = authorizations
+        # context['authorizations'] = authorizations
         context['project'] = project
         context['user'] = user
         context['comments'] = comments
