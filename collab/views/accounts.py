@@ -32,23 +32,10 @@ class HomePageView(TemplateView):
             if user.is_superuser or user.is_administrator:
                 context["can_create_project"] = True
 
-        # nb_contributors = Count(
-        #     'authorization', filter=Q(authorization__level=choices.CONTRIBUTOR))
-        #
-        # nb_feature = Count('feature')
-        #
-        # nb_comments = Count('comment')
-
-        context["projects"] = Project.objects.annotate(
-            nb_contributors=Count(
-                'authorization', filter=Q(authorization__level=choices.CONTRIBUTOR)),
-            nb_features=Count('feature'),
-            nb_comments=Count('comment')
-        )
-
         serilized_projects = ProjectDetailedSerializer(
-            Project.objects.all(), many=True)
-        context['data'] = serilized_projects.data
+            Project.objects.all().order_by('-created_on'), many=True)
+
+        context['projects'] = serilized_projects.data
 
         return context
 
