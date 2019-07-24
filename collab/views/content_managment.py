@@ -4,6 +4,9 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.error import GEOSException
+from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404
@@ -536,6 +539,101 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
         }
 
         return render(request, 'collab/feature_type/feature_type_detail.html', context)
+
+
+@method_decorator([csrf_exempt, ], name='dispatch')
+# @method_decorator(DECORATORS, name='dispatch')
+class ImportFeatures(SingleObjectMixin, UserPassesTestMixin, View):
+    queryset = FeatureType.objects.all()
+    slug_url_kwarg = 'feature_type_slug'
+
+    def test_func(self):
+        return True
+        user = self.request.user
+        feature_type = self.get_object()
+        project = feature_type.project
+        return Authorization.has_permission(user, 'can_create_feature', project)
+
+    def get_geom(self, geom):
+
+        # Si geoJSON
+        if isinstance(geom, dict):
+            geom = str(geom)
+        try:
+            geom = GEOSGeometry(geom, srid=4326)
+        except (GEOSException, ValueError):
+            geom = None
+        return geom
+
+    def create_features(self, request, creator, data, feature_type):
+        new_features = data.get('features')
+        nb_features = len(new_features)
+        for feature in new_features:
+            properties = feature.get('properties')
+
+            current = Feature.objects.create(
+                title=properties.get('title'),
+                description=properties.get('description'),
+                status='draft',
+                creator=creator,
+                project=feature_type.project,
+                feature_type=feature_type,
+                geom=self.get_geom(feature.get('geometry')),
+                feature_data=properties.get('feature_data'),
+            )
+
+            simili_features = Feature.objects.filter(
+                title=current.title, description=current.description
+            ).exclude(feature_id=current.feature_id)
+
+            if simili_features.count() > 0:
+                for row in simili_features:
+                    FeatureLink.objects.get_or_create(
+                        relation_type='doublon',
+                        feature_from=current.feature_id,
+                        feature_to=row.feature_id
+                    )
+        if nb_features > 0:
+            msg = "{nb} signalement(s) importé(s). ".format(nb=nb_features)
+            messages.info(request, msg)
+
+    @transaction.atomic
+    def post(self, request, slug, feature_type_slug):
+        """
+        Import d'un fichier GeoJSON
+
+        Disponibilité de la fonction :
+            Fonction disponible pour chaque type de signalement de chaque projet (dans la page descriptive du type de signalements)
+            Uniquement pour les utilisateurs qui peuvent créer des signalements (contributeurs et niveaux de droits supérieurs du projet)
+        Action de la fonction :
+            Créer de nouveaux signalements
+            La fonction n'est pas capable de mettre à jour des signalements existants ni de supprimer des signalements existants
+            Les enregistrements soupçonnés de former des doublons sont marqués automatiquement à l'aide du mécanisme de relation entre signalements. Les doublons sont identifiés par l'égalité de leur titre et de leur description)
+            Les enregistrements importés sont enregistrés avec le statut "brouillon"
+        Structuration des données importées :
+            Le modèle de données supporté par la fonction d'import doit être décrit dans la page descriptive du type de signalements
+            Seuls les champs portant les mêmes noms que la table des signalements en base seront exploités
+            Pour les champs correspondant à des listes de choix : seules les valeurs seront exploitées (pas les libellés en langage naturel)
+            Géométries supportées pour Excel : colonne geom en WKT dans le système de coordonnées attendu (pas de reprojection - cf. DB_SRID dans settings.py)
+
+        En cas d'erreur lors de l'exécution de l'import un compte rendu des erreurs rencontrées doit être présenté à l'utilisateur.
+        Si des signalements ont été créés, le nombre de signalements créés doit être indiqué à l'utilisateur.
+        """
+        feature_type = self.get_object()
+        try:
+            up_file = request.FILES['json_file'].read()
+            data = json.loads(up_file.decode('utf-8'))
+        except Exception as err:
+            logger.error(str(err))
+            messages.error(request, "Erreur à l'import du fichier. ")
+        else:
+            try:
+                with transaction.atomic():
+                    self.create_features(request, request.user, data, feature_type)
+            except IntegrityError:
+                messages.error(request, "Erreur à lors de l'ajout des signalements. ")
+
+        return redirect('collab:feature_type_detail', slug=slug, feature_type_slug=feature_type_slug)
 
 #################
 # PROJECT VIEWS #

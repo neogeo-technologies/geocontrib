@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeometrySerializerMethodField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
@@ -42,14 +43,31 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Feature
         geo_field = "geom"
-        fields = '__all__'
-        # you can also explicitly declare which fields you want to include
-        # as with a ModelSerializer.
-        # fields = ('id', 'address', 'city', 'state')
+        fields = (
+            'feature_id',
+            'title',
+            'description',
+            'status',
+            'created_on',
+            'updated_on',
+            'archived_on',
+            'deletion_on',
+            'feature_type',
+            'feature_data',
+        )
 
-    def get_properties(self, instance, fields):
-        # This is a PostgreSQL JSON field, which django maps to a dict
-        return instance.feature_data
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['geometry'].update({
+            'crs': {
+                "type": "name",
+                "properties": {"name": "EPSG:{}".format(settings.DB_SRID)}}}
+        )
+        return ret
+
+    # def get_properties(self, instance, fields):
+    #     # This is a PostgreSQL JSON field, which django maps to a dict
+    #     return instance.feature_data
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
@@ -99,7 +117,7 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
 
     access_level_pub_feature = serializers.ReadOnlyField(
         source='access_level_pub_feature.get_user_type_id_display')
-        
+
     access_level_arch_feature = serializers.ReadOnlyField(
         source='access_level_arch_feature.get_user_type_id_display')
 

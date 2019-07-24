@@ -40,29 +40,11 @@ cp src/collab/static/collab/img/logo.png media/
 - [ ] Import de photographie
 - [ ] Téléchargement
 - [ ] Abonnement
-- [ ] Projet: Changer niveau d'autorisation
-- [ ] Projet: Administrer les membres: cf service api GET projects/<slug:slug>/utilisateurs
+- [x] Projet: Changer niveau d'autorisation
+- [x] Projet: Administrer les membres: cf service api GET projects/<slug:slug>/utilisateurs
 - [x] Feature: Liaison entre Features
 - [ ] Feature: Affichage et edition carto
 - [x] Mon Profil: Template à revoir
-- [x] Permissions: User.is_administrator: Authorization.is_project_administrator/give_adminstration_perms
-- [ ] Commentaire
+- [x] Permissions: Administrateur de projet ajout et màj
+- [x] Commentaire
 - [x] Filtrer les signalements selon autorisation de l'utilisateur
-
-
-# Informations permissions utilisateur
-
-Qui peut créer un projet?
-  - user.is_administrator == True
-
-Qui peut créer une feature ?
-  - Authorization.has_permission(user, 'can_create_feature', project)
-    - équivalent à user_rank >= CONTRIBUTOR
-
-Qui peut modifier une feature ?
-  - Authorization.has_permission(user, 'can_update_feature', project, feature)
-    - équivalent à user_rank >= MODERATOR OR user == feature.user
-
-Qui peut publier une feature si projet modéré?
-  - Authorization.has_permission(user, 'can_publish_feature', project, feature)
-    - équivalent à user_rank >= MODERATOR

@@ -306,10 +306,13 @@ class Feature(models.Model):
         res = []
         if custom_fields.exists():
             for row in custom_fields.order_by('position').values('name', 'label', 'field_type'):
+                value = ''
+                if isinstance(self.feature_data, dict):
+                    value = self.feature_data.get(row['name'])
                 res.append({
                     'label': row['label'],
                     'field_type': row['field_type'],
-                    'value': self.feature_data.get(row['name'])
+                    'value': value
                 })
         return res
 
