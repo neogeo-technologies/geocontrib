@@ -20,9 +20,10 @@ a.button-hover-orange:hover {
 }
 a.button-hover-green:hover {
   background: #21ba45 !important;
-  color: #21ba45 !important;
 }
-
+a.button-hover-red:hover {
+  background: #ee2e24 !important;
+}
 
 .ui.header .content {
   width: 100%;
