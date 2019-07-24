@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
   // INITIALISATION SEMANTIC UI COMPONENTS
+  $('.ui.accordion').accordion()
   // $('main .selection.dropdown').dropdown()
   // $('main .ui.checkbox').checkbox()
   // $('.message .close').on('click', function() {

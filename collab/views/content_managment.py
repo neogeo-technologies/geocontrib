@@ -535,7 +535,7 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_types': project.featuretype_set.all(),
             'features': features,
             'project': project,
-            'structure': json.dumps(structure.data)
+            'structure': structure.data
         }
 
         return render(request, 'collab/feature_type/feature_type_detail.html', context)
