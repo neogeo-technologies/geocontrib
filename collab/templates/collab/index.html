@@ -6,6 +6,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
+
 <div class="fourteen wide column">
   <img class="ui centered small image" src="{{ LOGO_PATH }}">
   <h2 class="ui center aligned icon header">
@@ -17,7 +18,7 @@
 
   <h4 id="les_projets" class="ui horizontal divider header">PROJETS</h4>
   <div class="ui divided items">
-    {% for project in projects %}
+    {% for project in data %}
     <div class="item">
       <div class="ui tiny image">
         <img src="{{ project.thumbnail }}">
@@ -34,10 +35,10 @@
           <span>Niveau d'autorisation requis&nbsp;: {{ project.access_level_pub_feature }} </span>
         </div>
         <div class="meta">
-          <span class="right floated" data-tooltip="">
+          <span class="right floated">
             <i class="calendar icon"></i>&nbsp; {{ project.created_on }}
           </span>
-          <span data-tooltip="{{ project.nb_contributors }} personnes ont contribué à ce projet">
+          <span data-tooltip="  {{ project.nb_contributors}} personnes ont contribué à ce projet">
             {{ project.nb_contributors }}&nbsp;<i class="user icon"></i>
           </span>
           <span data-tooltip="{{ project.nb_features }} signalements ont été créés pour ce projet">
@@ -55,9 +56,12 @@
     <div class="item">
     </div>
   </div>
+
+  {% if can_create_project %}
   <a class="ui green basic button" href="{% url 'collab:project_create' %}">
     <i class="plus icon"></i> Créer un nouveau projet
   </a>
+  {% endif %}
 
 </div>
 {% endblock %}
