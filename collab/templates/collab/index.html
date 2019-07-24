@@ -20,7 +20,7 @@
     {% for project in projects %}
     <div class="item">
       <div class="ui tiny image">
-        <img src="{{ project.thumbnail.url }}">
+        <img src="{{ project.thumbnail }}">
       </div>
       <div class="middle aligned content">
         <a class="header" href="{% url 'collab:project' slug=project.slug %}">{{ project.title }}</a>
@@ -31,19 +31,19 @@
           <span class="right floated">
             {% if project.moderation %}<strong>Projet modéré</strong>{% else %}<strong>Projet non modéré</strong>{% endif %}
           </span>
-          <span>Niveau d'autorisation requis&nbsp;: {{ project.access_level_pub_feature.get_user_type_id_display }} </span>
+          <span>Niveau d'autorisation requis&nbsp;: {{ project.access_level_pub_feature }} </span>
         </div>
         <div class="meta">
           <span class="right floated" data-tooltip="">
-            <i class="calendar icon"></i>&nbsp; {{ project.created_on|date:'d/m/Y' }}
+            <i class="calendar icon"></i>&nbsp; {{ project.created_on }}
           </span>
-          <span data-tooltip="  {{project.nb_contributors}} personnes ont contribué à ce projet">
+          <span data-tooltip="{{ project.nb_contributors }} personnes ont contribué à ce projet">
             {{ project.nb_contributors }}&nbsp;<i class="user icon"></i>
           </span>
-          <span data-tooltip="{{project.nb_features}} signalements ont été créés pour ce projet">
+          <span data-tooltip="{{ project.nb_features }} signalements ont été créés pour ce projet">
             &nbsp;{{ project.nb_features }}&nbsp;<i class="map marker icon"></i>
           </span>
-          <span data-tooltip="{{project.nb_comments}} commentaires ont été créés pour ce projet">
+          <span data-tooltip="{{ project.nb_comments }} commentaires ont été créés pour ce projet">
             &nbsp;{{ project.nb_comments }}&nbsp;<i class="comment icon"></i>
           </span>
         </div>

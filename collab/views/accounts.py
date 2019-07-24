@@ -1,7 +1,4 @@
-import json
 from django.views.generic.base import TemplateView
-from django.db.models import Count
-from django.db.models import Q
 from django.shortcuts import render
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -13,6 +10,7 @@ from api.serializers import ProjectDetailedSerializer
 
 from collab.models import Authorization
 from collab.models import Project
+from collab.models import UserLevelPermission
 from collab import choices
 
 DECORATORS = [csrf_exempt, login_required(login_url=settings.LOGIN_URL)]
@@ -58,24 +56,29 @@ class MyAccount(View):
     def get(self, request):
         context = {}
         user = request.user
-
-        context['user'] = user
-
-        nb_contributors = Count(
-            'authorization', filter=Q(authorization__level=choices.CONTRIBUTOR))
-        nb_features = Count('feature')
-        nb_comments = Count('comment')
+        # context['user'] = user
 
         # on liste les droits de l'utilisateur pour chaque projet
-        context["permissions"] = {}
-        for projet in Project.objects.all():
-            context["permissions"][projet.slug] = Authorization.has_permission(user, 'can_view_project', projet)
+        context['permissions'] = {}
+        context['rank'] = {}
+        for project in Project.objects.all():
+            context['permissions'][project.slug] = Authorization.has_permission(user, 'can_view_project', project)
 
-        context["projects"] = Project.objects.annotate(
-            nb_contributors=nb_contributors,
-            nb_features=nb_features,
-            nb_comments=nb_comments,
-        )
+            try:
+                rank = Authorization.objects.get(project=project, user=user).level
+            except Exception:
+                if user.is_superuser:
+                    usertype = choices.ADMIN
+                else:
+                    usertype = choices.LOGGED_USER
+                rank = UserLevelPermission.objects.get(user_type_id=usertype)
+
+            context['rank'][project.slug] = rank
+
+        serilized_projects = ProjectDetailedSerializer(
+            Project.objects.filter(creator=user).order_by('-created_on'), many=True)
+
+        context['projects'] = serilized_projects.data
 
         return render(request, 'collab/my_account.html', context)
 

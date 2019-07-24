@@ -183,6 +183,8 @@ class Project(models.Model):
 
     created_on = models.DateTimeField("Date de création", blank=True, null=True)
 
+    updated_on = models.DateTimeField("Date de modification", blank=True, null=True)
+
     description = models.TextField("Description", blank=True, null=True)
 
     moderation = models.BooleanField("Modération", default=False)
@@ -223,6 +225,7 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.created_on = timezone.now()
+        self.updated_on = timezone.now()
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -346,7 +349,11 @@ class FeatureType(models.Model):
 
     geom_type = models.CharField(
         "Type de géométrie", choices=GEOM_CHOICES, max_length=50,
-        default="boolean")
+        default="point")
+
+    color = models.CharField(
+        verbose_name='Couleur', max_length=7, blank=True, null=True
+    )
 
     project = models.ForeignKey(
         "collab.Project", on_delete=models.CASCADE)

@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.gis import admin
 from django.utils.translation import ugettext_lazy as _
+from django import forms
 
 from collab.models import Feature
 from collab.models import Project
@@ -69,7 +70,17 @@ class CustomFieldTabular(admin.TabularInline):
     view_on_site = False
 
 
+class FeatureTypeForm(forms.ModelForm):
+    class Meta:
+        model = FeatureType
+        fields = '__all__'
+        widgets = {
+            'color': forms.widgets.TextInput(attrs={'type': 'color'}),
+        }
+
+
 class FeatureTypeAdmin(admin.ModelAdmin):
+    form = FeatureTypeForm
     readonly_fields = ('geom_type', )
     inlines = (
         CustomFieldTabular,

@@ -92,14 +92,15 @@
                 <a name="projets"></a>
                 <i class="users icon"></i>
                 Mes projets
+                {{ user|get_identity:user }}
             </h4>
             <div class="ui divided items">
                 {% for project in projects %}
                     {% if permissions|lookup:project.slug %}
                         <div class="item">
                         <div class="ui tiny image">
-                            {% if project.illustration %}
-                              <img  class="ui small image" src="{{project.illustration.url}}" height="200">
+                            {% if project.thumbnail %}
+                              <img  class="ui small image" src="{{ project.thumbnail }}" height="200">
                             {% endif %}
                         </div>
                         <div class="middle aligned content">
@@ -110,16 +111,12 @@
                             <div class="meta">
                                 <span class="right floated">{% if project.moderation%}Projet modéré {% else %} Projet non modéré {% endif %}</span>
                                 <span>Mon niveau d'autorisation&nbsp;:
-                                    {% if user.is_superuser %}
-                                      <p>SuperAdmin</p>
-                                    {% else %}
-                                      <p>Pouet</p>
-                                    {% endif %}
+                                  <p>{{ rank|lookup:project.slug }}</p>
                                 </span>
                             </div>
                             <div class="meta">
-                                <span class="right floated" data-tooltip="Projet créé le {{project.created_on|date:'d/m/Y'}}">
-                                    <i class="calendar icon"></i>&nbsp;{{project.created_on|date:'d/m/Y'}}
+                                <span class="right floated" data-tooltip="Projet créé le {{ project.created_on }}">
+                                    <i class="calendar icon"></i>&nbsp;{{ project.created_on }}
                                 </span>
                                 <span data-tooltip="Nombre de personnes ont contribué à ce projet">
                                     {{ project.nb_contributors }}&nbsp;<i class="user icon"></i>
@@ -162,14 +159,14 @@
             </h4>
             <div class="ui list">
                 {% for feature in features %}
-                    <div class="item">
-                        <i class="map marker icon"></i>
-                        <div class="content">
-                            <a  href="{% url 'collab:feature_detail' slug=feature.project.slug feature_type_slug=feature.feature_type_slug  feature_id=feature.feature_id %}" class="header">{{feature.project}} - {{feature.title}}</a>
-                            <div class="description">{{feature.description|slice:":150"}}</div>
-                            <div class="description">Date de dernière modification&nbsp;: {{feature.updated_on}}</div>
-                        </div>
-                    </div>
+                  <div class="item">
+                      <i class="map marker icon"></i>
+                      <div class="content">
+                          <a  href="{% url 'collab:feature_detail' slug=feature.project.slug feature_type_slug=feature.feature_type_slug  feature_id=feature.feature_id %}" class="header">{{feature.project}} - {{feature.title}}</a>
+                          <div class="description">{{ feature.description|slice:":150" }}</div>
+                          <div class="description">Date de dernière modification&nbsp;: {{ feature.updated_on }}</div>
+                      </div>
+                  </div>
                 {% endfor %}
             </div>
             <h4 id="mes_derniers_commentaires" class="ui horizontal divider header">

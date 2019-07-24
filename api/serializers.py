@@ -89,11 +89,19 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
 
+    updated_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
+
     nb_features = serializers.SerializerMethodField()
 
     nb_comments = serializers.SerializerMethodField()
 
     nb_contributors = serializers.SerializerMethodField()
+
+    access_level_pub_feature = serializers.ReadOnlyField(
+        source='access_level_pub_feature.get_user_type_id_display')
+        
+    access_level_arch_feature = serializers.ReadOnlyField(
+        source='access_level_arch_feature.get_user_type_id_display')
 
     def get_nb_features(self, obj):
         return Feature.objects.filter(project=obj).count()
@@ -110,6 +118,7 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'title',
             'slug',
             'created_on',
+            'updated_on',
             'description',
             'moderation',
             'thumbnail',
