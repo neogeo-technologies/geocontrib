@@ -54,7 +54,7 @@
           Importer des signalements
         </div>
         <div class="content">
-          <form id="form-import-features" action="./import-features" method="post" enctype="multipart/form-data" class="ui form">
+          <form id="form-import-features" action="{% url 'collab:import_features' slug=project.slug feature_type_slug=feature_type.slug %}" method="post" enctype="multipart/form-data" class="ui form">
             {% csrf_token %}
             <div class="field">
               <label class="ui icon button" for="json_file">
