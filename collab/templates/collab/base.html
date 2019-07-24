@@ -46,11 +46,11 @@
             {{ project.title }}
             <i class="dropdown icon"></i>
             <div class="menu">
-              <a class="item" href="{% url 'collab:feature_list' slug=project.slug %}">
-                <i class="icon list"></i>Liste
+              <a class="item" href="{% url 'collab:project' slug=project.slug %}">
+                <i class="home icon"></i>Fiche projet
               </a>
-              <a class="item" href="{% url 'collab:project_map' slug=project.slug %}">
-                <i class="icon map"></i>Carte
+              <a class="item" href="{% url 'collab:feature_list' slug=project.slug %}">
+                <i class="icon list"></i>Liste & Carte
               </a>
               <!-- <a class="item" href="{% url 'collab:feature_type_create' slug=project.slug %}">Créer un nouveau type de signalement</a> -->
               <!-- <a class="item">Ajout d'un signalement</a> -->
@@ -63,7 +63,7 @@
           </a>
           {% if user.is_authenticated %}
             <a class="item" href="{% url 'collab:my_account' %}">
-              {{ user.username }}
+              {{ user.get_full_name|default:user.username }}
             </a>
             <a class="item" href="{% url 'collab:logout' %}"><i class="ui logout icon"></i></a>
           {% else %}
@@ -73,7 +73,6 @@
       </div>
     </div>
   </header>
-
   <main>
     <div class="ui stackable grid centered container">
       {% block content %}
@@ -84,9 +83,8 @@
   <footer>
     <div class="ui compact text menu">
       <div class="item">® 2019 Geo2France</div>
-      <a class="item" href="{% url 'collab:help' %}">Aide</a>
-      <a class="item">Contact</a>
       <a class="item" href="{% url 'collab:legal' %}">Mentions légales</a>
+      <a class="item" href="{% url 'collab:help' %}">Aide</a>
     </div>
   </footer>
 
