@@ -648,7 +648,8 @@ class ProjectMap(SingleObjectMixin, UserPassesTestMixin, View):
         return Authorization.has_permission(user, 'can_update_feature', project)
 
     def get(self, request, slug):
-        raise NotImplementedError
+        # raise NotImplementedError
+        return render(request, 'collab/project/project_map.html', {})
 
 
 @method_decorator(DECORATORS, name='dispatch')

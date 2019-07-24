@@ -1,4 +1,5 @@
-{% extends "collab/layout_menu.html" %}
+{% extends "collab/base.html" %}
+
 {% load static %}
 {% load app_filters %}
 
@@ -47,6 +48,29 @@
       </tbody>
     </table>
   </div>
+  <div class="row">
+    <div class="sixteen wide column">
+      <div id="map"></div>
+    </div>
+  </div>
 </div>
 <script src="{% static 'collab/js/feature.js' %}"></script>
+{% endblock %}
+
+
+{% block custom_resources %}
+<style>
+  #map {
+    width: 100%;
+    height: 500px;
+  }
+</style>
+<script>
+  $(document).ready(function() {
+    var map = L.map('map').setView([43.604462, 1.444247], 13)
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map)
+  })
+</script>
 {% endblock %}

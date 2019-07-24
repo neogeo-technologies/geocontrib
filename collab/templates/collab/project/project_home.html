@@ -7,10 +7,18 @@
 {% block content %}
 
   {% if permissions|lookup:'can_view_project' %}
-
   <div class="row">
     <div class="three wide column">
       <img class="ui small image" src="{{ project.thumbnail.url }}">
+      <div class="ui basic teal label" data-tooltip="Utilisateurs">
+        <i class="user icon"></i>{{ nb_contributors }}
+      </div>
+      <div class="ui basic teal label" data-tooltip="Signalements">
+        <i class="map marker icon"></i>{{ features|length }}
+      </div>
+      <div class="ui basic teal label" data-tooltip="Commentaires">
+        <i class="comment icon"></i>{{ comments|length }}
+      </div>
     </div>
     <div class="eleven wide column">
       <h1 class="ui header">
@@ -33,38 +41,32 @@
   </div>
 
   <div class="row">
-    <div class="three wide column">
-      <div class="ui basic teal label" data-tooltip="Utilisateurs">
-        <i class="user icon"></i>1
-      </div>
-      <div class="ui basic teal label" data-tooltip="Signalements">
-        <i class="map marker icon"></i>{{ features|length }}
-      </div>
-      <div class="ui basic teal label" data-tooltip="Commentaires">
-        <i class="comment icon"></i>{{ comments|length }}
-      </div>
-    </div>
-    <div class="eleven wide column">
+    <div class="seven wide column">
       <h3 class="ui header">Types de signalements</h3>
       <div class="ui middle aligned divided selection list">
         {% for type in feature_types %}
-          <a class="item" href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=type.slug %}">
-            {% if type.geom_type == 'point' %}
-              <img class="ui image list-image-type" src="{% static 'collab/img/marker.png' %}">
-            {% elif type.geom_type == 'linestring' %}
-              <img class="ui image list-image-type" src="{% static 'collab/img/line.png' %}">
-            {% elif type.geom_type == 'polygon' %}
-              <img class="ui image list-image-type" src="{% static 'collab/img/polygon.png' %}">
-            {% endif %}
-            <div class="content">
-              {{ type.title }}
+          <div class="item">
+            <div class="middle aligned content">
+              {% if type.geom_type == 'point' %}
+                <img class="list-image-type" src="{% static 'collab/img/marker.png' %}">
+              {% elif type.geom_type == 'linestring' %}
+                <img class="list-image-type" src="{% static 'collab/img/line.png' %}">
+              {% elif type.geom_type == 'polygon' %}
+                <img class="list-image-type" src="{% static 'collab/img/polygon.png' %}">
+              {% endif %}
+              <a href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=type.slug %}">{{ type.title }}</a>
+              {% if project and feature_types and permissions|lookup:'can_create_feature' %}
+              <a class="ui compact small icon right floated button" data-tooltip="Ajouter un signalement" data-position="left center" data-variation="mini"
+                 href="{% url 'collab:feature_create' slug=project.slug feature_type_slug=type.slug %}">
+                <i class="ui plus icon"></i>
+              </a>
+              {% endif %}
             </div>
-          </a>
+          </div>
         {% empty %}
           <div>
             <i>
-              Le projet ne contient pas encore de signalement. Vous pouvez commencer par
-              <a href="{% url 'collab:feature_type_create' slug=project.slug %}">créer un type de signalements</a>.
+              Le projet ne contient pas encore de signalement.
             </i>
           </div>
         {% endfor %}
@@ -73,16 +75,21 @@
         <i class="ui plus icon"></i>Créer un nouveau type de signalement
       </a>
     </div>
+    <div class="seven wide column">
+      <a href="{% url 'collab:feature_list' slug=project.slug %}">
+        <div id="map"></div>
+      </a>
+    </div>
   </div>
 
   <div class="row">
     <div class="fourteen wide column">
-      <div class="ui three stackable cards">
+      <div class="ui two stackable cards">
         <div class="red card">
           <div class="content">
             <div class="center aligned header">Derniers signalements</div>
             <div class="center aligned description">
-              {% for item in last_features.items %}
+              {% for item in last_features %}
                 <p>{{ item.title }}</p>
               {% empty %}
                 <i>Aucun signalement pour le moment.</i>
@@ -108,18 +115,6 @@
                   <i>Aucun commentaire pour le moment.</i>
                 {% endfor %}
               </div>
-            </div>
-          </div>
-        </div>
-        <div class="yellow card">
-          <div class="content">
-            <div class="center aligned header">Derniers utilisateurs inscrits au projet</div>
-            <div class="center aligned description">
-              {% for auth in authorizations %}
-                <p>{{ auth.user.get_full_name|default:auth.user.username }}</p>
-              {% empty %}
-                <i>Aucun utilisateur n'est inscrit à ce projet.</i>
-              {% endfor %}
             </div>
           </div>
         </div>
@@ -181,18 +176,36 @@
       </div>
     </div>
   </div>
-
   {% else %}
-    <i class='icon exclamation triangle'></i>
-    <span>Vous ne disposez pas des droits nécessaires.</span>
+  <i class='icon exclamation triangle'></i>
+  <span>Vous ne disposez pas des droits nécessaires.</span>
   {% endif %}
 
 {% endblock %}
 
 {% block custom_resources %}
 <style>
+  #map {
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+  }
   .list-image-type {
     height: 15px;
+    vertical-align: bottom;
   }
 </style>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    var map = L.map('map', {zoomControl: false}).setView([43.604462, 1.444247], 13)
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map)
+
+    map.dragging.disable()
+    map.doubleClickZoom.disable()
+    map.scrollWheelZoom.disable()
+  })
+</script>
 {% endblock %}
