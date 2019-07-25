@@ -206,10 +206,11 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_type': feature_type,
             'feature_types': project.featuretype_set.all(),
             'permissions': Authorization.all_permissions(user, project),
-            'form': form
+            'form': form,
+            'action': 'create'
         }
 
-        return render(request, 'collab/feature/add_feature.html', context)
+        return render(request, 'collab/feature/feature_edit.html', context)
 
     def post(self, request, slug, feature_type_slug):
 
@@ -256,9 +257,10 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_type': feature_type,
             'feature_types': project.featuretype_set.all(),
             'permissions': Authorization.all_permissions(user, project),
-            'form': form
+            'form': form,
+            'action': 'create'
         }
-        return render(request, 'collab/feature/add_feature.html', context)
+        return render(request, 'collab/feature/feature_edit.html', context)
 
 
 @method_decorator(DECORATORS, name='dispatch')
@@ -377,6 +379,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'attachments': Attachment.objects.filter(
                 project=project, feature_id=feature.feature_id,
                 type_objet='feature'),
+            'action': 'update'
         }
         return render(request, 'collab/feature/feature_update.html', context)
 
@@ -410,8 +413,9 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 'attachments': Attachment.objects.filter(
                     project=project, feature_id=feature.feature_id,
                     type_objet='feature'),
+                'action': 'update'
             }
-            return render(request, 'collab/feature/feature_update.html', context)
+            return render(request, 'collab/feature/feature_edit.html', context)
         else:
             form.save()
             for data in linked_formset.cleaned_data:
@@ -649,19 +653,50 @@ class ImportFromImage(SingleObjectMixin, UserPassesTestMixin, View):
         project = feature_type.project
         return Authorization.has_permission(user, 'can_create_feature', project)
 
-    @transaction.atomic
-    def post(self, request, slug, feature_type_slug):
+    def get_geom(self, geom):
 
-        feature_type = self.get_object()
+        # Si geoJSON
+        if isinstance(geom, dict):
+            geom = str(geom)
         try:
-            up_file = request.FILES['image_file'].read()
-            data_geom_wkt = exif.get_image_geoloc_as_wkt(up_file, with_alt=False, ewkt=False)
-            # up_file2 = request.FILES['geo_file'].read()
+            geom = GEOSGeometry(geom, srid=4326)
+        except (GEOSException, ValueError):
+            geom = None
+        return geom
+
+    def post(self, request, slug, feature_type_slug):
+        user = request.user
+        feature_type = self.get_object()
+        project = feature_type.project
+        context = {}
+        try:
+            up_file = request.FILES['image_file']
         except Exception as err:
             logger.error(str(err))
             messages.error(request, "Erreur à l'import du fichier. ")
 
-        return redirect('collab:feature_type_detail', slug=slug, feature_type_slug=feature_type_slug)
+        try:
+            data_geom_wkt = exif.get_image_geoloc_as_wkt(up_file, with_alt=False, ewkt=False)
+        except Exception as err:
+            logger.error(str(err))
+            messages.error(request, "Erreur à lors de la lecture des données GPS. ")
+        else:
+            context['up_geom'] = self.get_geom(data_geom_wkt, )
+            context['up_file'] = up_file
+
+        extra = CustomField.objects.filter(feature_type=feature_type)
+
+        form = FeatureDynamicForm(feature_type=feature_type, extra=extra, user=user)
+
+        context.update({
+            'project': project,
+            'feature_type': feature_type,
+            'feature_types': project.featuretype_set.all(),
+            'permissions': Authorization.all_permissions(user, project),
+            'form': form,
+        })
+
+        return render(request, 'collab/feature/feature_edit.html', context)
 
 
 #################
