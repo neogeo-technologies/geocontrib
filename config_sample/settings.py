@@ -132,7 +132,7 @@ STATIC_URL = '/static/'
 # Renseigner le path du static/
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-MEDIA_URL = '/'
+MEDIA_URL = '/media/'
 
 # Renseigner le path du media/
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -182,7 +182,7 @@ APPLICATION_NAME = 'Collab'
 
 APPLICATION_ABSTRACT = 'Describtion du projet'
 
-LOGO_PATH = '/logo.png'
+LOGO_PATH = '/media/logo.png'
 
 IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
 
