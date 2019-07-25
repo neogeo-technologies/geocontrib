@@ -22,7 +22,9 @@ from django.views.generic.edit import DeleteView
 from django.views.decorators.csrf import csrf_exempt
 
 from api.serializers import FeatureTypeSerializer
+from api.serializers import ProjectDetailedSerializer
 
+from collab.exif import exif
 from collab.forms import AuthorizationForm
 from collab.forms import CustomFieldModelForm
 from collab.forms import CustomFieldModelBaseFS
@@ -541,9 +543,8 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
         return render(request, 'collab/feature_type/feature_type_detail.html', context)
 
 
-@method_decorator([csrf_exempt, ], name='dispatch')
-# @method_decorator(DECORATORS, name='dispatch')
-class ImportFeatures(SingleObjectMixin, UserPassesTestMixin, View):
+@method_decorator(DECORATORS, name='dispatch')
+class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = FeatureType.objects.all()
     slug_url_kwarg = 'feature_type_slug'
 
@@ -635,6 +636,34 @@ class ImportFeatures(SingleObjectMixin, UserPassesTestMixin, View):
 
         return redirect('collab:feature_type_detail', slug=slug, feature_type_slug=feature_type_slug)
 
+
+@method_decorator(DECORATORS, name='dispatch')
+class ImportFromImage(SingleObjectMixin, UserPassesTestMixin, View):
+    queryset = FeatureType.objects.all()
+    slug_url_kwarg = 'feature_type_slug'
+
+    def test_func(self):
+        return True
+        user = self.request.user
+        feature_type = self.get_object()
+        project = feature_type.project
+        return Authorization.has_permission(user, 'can_create_feature', project)
+
+    @transaction.atomic
+    def post(self, request, slug, feature_type_slug):
+
+        feature_type = self.get_object()
+        try:
+            up_file = request.FILES['image_file'].read()
+            data_geom_wkt = exif.get_image_geoloc_as_wkt(up_file, with_alt=False, ewkt=False)
+            # up_file2 = request.FILES['geo_file'].read()
+        except Exception as err:
+            logger.error(str(err))
+            messages.error(request, "Erreur à l'import du fichier. ")
+
+        return redirect('collab:feature_type_detail', slug=slug, feature_type_slug=feature_type_slug)
+
+
 #################
 # PROJECT VIEWS #
 #################
@@ -666,7 +695,9 @@ class ProjectDetail(DetailView):
             project=project
         )
 
-        context['project'] = project
+        serilized_projects = ProjectDetailedSerializer(project)
+
+        context['project'] = serilized_projects.data
         context['user'] = user
         context['comments'] = comments
         context['features'] = features

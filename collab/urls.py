@@ -19,7 +19,8 @@ from collab.views.content_managment import ProjectMap
 from collab.views.content_managment import FeatureCreate
 from collab.views.content_managment import FeatureTypeCreate
 from collab.views.content_managment import FeatureTypeDetail
-from collab.views.content_managment import ImportFeatures
+from collab.views.content_managment import ImportFromGeoJSON
+from collab.views.content_managment import ImportFromImage
 from collab.views.content_managment import ProjectCreate
 from collab.views.content_managment import CommentCreate
 from collab.views.content_managment import AttachmentCreate
@@ -68,8 +69,11 @@ urlpatterns = [
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/',
          FeatureTypeDetail.as_view(), name='feature_type_detail'),
 
-    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/importer/',
-         ImportFeatures.as_view(), name='import_features'),
+    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/importer-geojson/',
+         ImportFromGeoJSON.as_view(), name='import_from_geojson'),
+
+    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/importer-image/',
+         ImportFromImage.as_view(), name='import_from_image'),
 
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/ajouter/',
          FeatureCreate.as_view(), name='feature_create'),  # add_feature
