@@ -754,8 +754,6 @@ def update_feature_dates(sender, instance, **kwargs):
             days=instance.project.delete_feature)
 
 
-
-
 @receiver(models.signals.post_save, sender=FeatureType)
 def slugify_feature_type(sender, instance, created, **kwargs):
 
@@ -804,19 +802,18 @@ def create_event_on_project_creation(sender, instance, created, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=Feature)
-def create_event_on_feature_creation(sender, instance, created, **kwargs):
-    if created:
-        Event = apps.get_model(app_label='collab', model_name="Event")
-        Event.objects.create(
-            feature_id=instance.feature_id,
-            comment_id=instance.id,
-            event_type='create',
-            object_type='feature',
-            user=instance.creator,
-            project_slug=instance.project.slug,
-            feature_type_slug=instance.feature_type_slug,
-            data=instance.feature_data
-        )
+def create_event_on_feature_save(sender, instance, created, **kwargs):
+
+    Event = apps.get_model(app_label='collab', model_name="Event")
+    Event.objects.create(
+        feature_id=instance.feature_id,
+        event_type='create' if created else 'update',
+        object_type='feature',
+        user=instance.creator,
+        project_slug=instance.project.slug,
+        feature_type_slug=instance.feature_type.slug,
+        data=instance.feature_data
+    )
 
 
 @receiver(models.signals.post_save, sender=Comment)
