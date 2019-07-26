@@ -16,7 +16,7 @@ class AvailableFeaturesManager(models.Manager):
         # 1 - si is_project_administrator on liste toutes les features
         queryset = self.get_queryset().filter(project=project)
         if not Authorization.has_permission(user, 'is_project_administrator', project):
-
+            # Sont exclus les signalement Brouillon des autres utilisateurs
             queryset = queryset.exclude(
                 ~Q(user=user), status='draft',
             )

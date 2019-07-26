@@ -7,28 +7,11 @@ from collab.models import Comment
 from collab.models import Feature
 from collab.models import FeatureType
 from collab.models import Project
+from collab.models import Event
+
 
 import logging
 logger = logging.getLogger('django')
-
-
-class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
-
-    class Meta:
-        model = Feature
-        geo_field = 'geom'
-        fields = (
-            'feature_id',
-            'title',
-            'description',
-            'status',
-            'created_on',
-            'updated_on',
-            'archived_on',
-            'deletion_on',
-            'feature_type',
-            'feature_data',
-        )
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
@@ -55,6 +38,27 @@ class FeatureTypeSerializer(serializers.ModelSerializer):
             'slug',
             'geom_type',
             'customfield_set',
+        )
+
+
+class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
+
+    feature_type = FeatureTypeSerializer(read_only=True)
+
+    class Meta:
+        model = Feature
+        geo_field = 'geom'
+        fields = (
+            'feature_id',
+            'title',
+            'description',
+            'status',
+            'created_on',
+            'updated_on',
+            'archived_on',
+            'deletion_on',
+            'feature_type',
+            'feature_data',
         )
 
 
@@ -110,3 +114,9 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'nb_comments',
             'nb_contributors'
         )
+
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = '__all__'

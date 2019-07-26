@@ -310,16 +310,27 @@ class FeatureBaseForm(forms.ModelForm):
             )
 
     def save(self, commit=True, *args, **kwargs):
+
         extra = kwargs.pop('extra', None)
+        feature_type = kwargs.pop('feature_type', None)
+        project = kwargs.pop('project', None)
+        creator = kwargs.pop('creator', None)
         instance = super().save(commit=False)
 
-        if extra:
-            custom_fields = CustomField.objects.filter(feature_type=instance.feature_type)
-            newdict = {field_name: extra.get(field_name) for field_name in custom_fields.values_list('name', flat=True)}
+        if extra and feature_type:
+            custom_fields = CustomField.objects.filter(feature_type=feature_type)
+            newdict = {
+                field_name: extra.get(field_name) for field_name in custom_fields.values_list('name', flat=True)
+            }
             stringfied = json.dumps(newdict, cls=DjangoJSONEncoder)
             instance.feature_data = json.loads(stringfied)
 
+        if creator:
+            instance.creator = creator
+
         if commit:
+            instance.feature_type = feature_type
+            instance.project = project
             instance.save()
 
         return instance

@@ -21,6 +21,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.decorators.csrf import csrf_exempt
 
+from api.serializers import EventSerializer
 from api.serializers import FeatureTypeSerializer
 from api.serializers import ProjectDetailedSerializer
 
@@ -40,6 +41,7 @@ from collab.models import Authorization
 from collab.models import Attachment
 from collab.models import Comment
 from collab.models import CustomField
+from collab.models import Event
 from collab.models import Feature
 from collab.models import FeatureType
 from collab.models import FeatureLink
@@ -199,7 +201,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         project = feature_type.project
         extra = CustomField.objects.filter(feature_type=feature_type)
 
-        feature_form = FeatureBaseForm(feature_type=feature_type, extra=extra, user=user)
+        feature_form = FeatureBaseForm(feature_type=feature_type, user=user)
         extra_form = FeatureExtraForm(extra=extra)
 
         context = {
@@ -219,30 +221,26 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
-        extra = CustomField.objects.filter(feature_type=feature_type)
+
         feature_form = FeatureBaseForm(
             request.POST, feature_type=feature_type, user=user)
+        extra = CustomField.objects.filter(feature_type=feature_type)
         extra_form = FeatureExtraForm(request.POST, extra=extra)
+
         if feature_form.is_valid() and extra_form.is_valid():
             try:
-                feature = Feature.objects.create(
-                    title=feature_form.cleaned_data.get('title'),
-                    description=feature_form.cleaned_data.get('description'),
-                    status=feature_form.cleaned_data.get('status'),
-                    geom=feature_form.cleaned_data.get('geom'),
+                feature = feature_form.save(
                     project=project,
                     feature_type=feature_type,
                     creator=user,
-                    feature_data=extra_form.cleaned_data
+                    extra=extra_form.cleaned_data
                 )
             except Exception as err:
-                logger.error(str(err))
                 messages.error(
                     request,
                     "Une erreur s'est produite lors de la création du signalement {title}: {err}".format(
                         title=feature_form.cleaned_data.get('title', 'N/A'),
                         err=str(err)))
-
             else:
                 messages.info(
                     request,
@@ -311,6 +309,8 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         )
+        events = Event.objects.filter(feature_id=feature.feature_id).order_by('-created_on')
+        serialized_events = EventSerializer(events, many=True)
 
         context = {
             'feature': feature,
@@ -321,6 +321,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'project': project,
             'permissions': Authorization.all_permissions(user, project, feature),
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
+            'events': serialized_events.data,
             'comment_form': CommentForm(),
             'attachment_form': AttachmentForm(),
         }
@@ -428,7 +429,11 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             }
             return render(request, 'collab/feature/feature_edit.html', context)
         else:
-            feature_form.save(extra=extra_form.cleaned_data)
+            feature_form.save(
+                project=project,
+                feature_type=feature_type,
+                extra=extra_form.cleaned_data
+            )
 
             # traitement des siganlement liés
             for data in linked_formset.cleaned_data:
@@ -699,14 +704,16 @@ class ImportFromImage(SingleObjectMixin, UserPassesTestMixin, View):
 
         extra = CustomField.objects.filter(feature_type=feature_type)
 
-        form = FeatureBaseForm(feature_type=feature_type, extra=extra, user=user)
+        feature_form = FeatureBaseForm(feature_type=feature_type, user=user)
+        extra_form = FeatureExtraForm(extra=extra)
 
         context.update({
             'project': project,
             'feature_type': feature_type,
             'feature_types': project.featuretype_set.all(),
             'permissions': Authorization.all_permissions(user, project),
-            'form': form,
+            'feature_form': feature_form,
+            'extra_form': extra_form,
         })
 
         return render(request, 'collab/feature/feature_edit.html', context)

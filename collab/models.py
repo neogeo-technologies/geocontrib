@@ -536,7 +536,7 @@ class Event(models.Model):
     data = JSONField(blank=True, null=True)
 
     project_slug = models.SlugField(
-        'Slug du projet', max_length=256, blank=True, null=True)
+        'Slug du projet', max_length=256)
 
     feature_type_slug = models.SlugField(
         'Slug du type de signalement', max_length=256, blank=True, null=True)
@@ -567,21 +567,44 @@ class Event(models.Model):
         super().save(*args, **kwargs)
 
     @property
-    def get_suscribers(self):
-        pass
-        # Subscription = apps.get_model(app_label='collab', model_name="Subscription")
-        # # On notifie les utilisateurs abonnés au signalement.
-        # try:
-        #     feature_subscription = Subscription.objects.get(project__slug=self.project_slug)
-        # except:
-        #     pass
-        # else:
-        #     for user in feature_subscription.set_users.all():
-        #         notify_user(self, user)
-        #
-        # # On notifie les utilisateurs abonnés au projet en excluant
-        # # ceux deja notifiés precedement
-        # for subscriptions in Subscription.objects.filter(project__slug=self.project_slug):
+    def ping_users(self):
+        """
+        Les différents cas d'envoi de notifications sont :
+            - Les modérateurs d’un projet sont notifiés des signalements dont le statut
+            devient "pending" (en attente de publication).
+            Cela n'a de sens que pour les projets qui sont modérés.
+
+            - L'auteur d'un signalement est notifié des changements de statut du signalement,
+            des modifications du signalement et de l’ajout de commentaires
+            (si l'auteur n'est pas lui-même à l'origine de ces évènements).
+
+            - Un utilisateur abonné à un projet est notifié de tout évènement
+            (dont il n'est pas à l'origine) sur ce projet.
+        """
+        event_initiator = self.user
+        Project = apps.get_model(app_label='collab', model_name='Project')
+        Subscription = apps.get_model(app_label='collab', model_name='Subscription')
+        # On notifie les modérateurs du projet si l'evenement concerne le changement de status
+        project = Project.object.get(slug=self.project_slug)
+        if project.moderation:
+            Authorization = apps.get_model(app_label='collab', model_name='Authorization')
+            moderators__emails = Authorization.objects.filter(
+                project=project, level__rank__gte=3
+            ).exclude(user=event_initiator).values_list('user__email', flat=True)
+            for email in moderators__emails:
+                pass
+        # On notifie les utilisateurs abonnés au projet.
+        try:
+            subscription = Subscription.objects.get(project__slug=self.project_slug)
+        except:
+            logger.error('No suscription for {}'.format(self.project_slug))
+        else:
+            # Les utilisateur sont notifié des evenements dont ils ne sont pas
+            # à l'origine.
+            for user in subscription.set_users.exclude(pk=self.user.pk):
+                pass
+                # TODO EMAIL notifier
+                # user.event_notification(self)
 
 
 class Subscription(models.Model):
@@ -731,6 +754,8 @@ def update_feature_dates(sender, instance, **kwargs):
             days=instance.project.delete_feature)
 
 
+
+
 @receiver(models.signals.post_save, sender=FeatureType)
 def slugify_feature_type(sender, instance, created, **kwargs):
 
@@ -778,6 +803,22 @@ def create_event_on_project_creation(sender, instance, created, **kwargs):
         )
 
 
+@receiver(models.signals.post_save, sender=Feature)
+def create_event_on_feature_creation(sender, instance, created, **kwargs):
+    if created:
+        Event = apps.get_model(app_label='collab', model_name="Event")
+        Event.objects.create(
+            feature_id=instance.feature_id,
+            comment_id=instance.id,
+            event_type='create',
+            object_type='feature',
+            user=instance.creator,
+            project_slug=instance.project.slug,
+            feature_type_slug=instance.feature_type_slug,
+            data=instance.feature_data
+        )
+
+
 @receiver(models.signals.post_save, sender=Comment)
 def create_event_on_comment_creation(sender, instance, created, **kwargs):
     if created:
@@ -812,22 +853,19 @@ def create_event_on_attachment_creation(sender, instance, created, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=Event)
-def stack_event_notification(sender, instance, created, **kwargs):
-    """
-        TODO@cbenhabib: ajout d'une commande django branchée a un cron
-        qui itere sur la stack en attente de traitement et qui envoi les messages
-        aux destinataires abonnés.
-        On ferme ensuite la stack en indiquant l'état d'exécution de la commande.
-    """
-    if created and instance.feature_id:
-        if settings.DEFAULT_SENDING_FREQUENCY != "instantly":
+def notify_or_stack_events(sender, instance, created, **kwargs):
+
+    if created and instance.project_slug:
+        # Stack dépilé par tache cron
+        if settings.DEFAULT_SENDING_FREQUENCY != 'instantly':
             StackedEvent = apps.get_model(app_label='collab', model_name="StackedEvent")
             stack, _ = StackedEvent.objects.get_or_create(
                 sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending')
             stack.events.add(instance)
             stack.save()
+        # Sinon notification instantané
         else:
             try:
-                instance.get_suscribers()
+                instance.ping_users()
             except Exception as err:
                 logger.error(str(err))
