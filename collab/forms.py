@@ -1,3 +1,5 @@
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.gis import forms
 from django.forms.models import BaseModelFormSet
 from django.forms.formsets import DELETION_FIELD_NAME
@@ -252,7 +254,6 @@ class FeatureExtraForm(forms.Form):
                 self.fields[custom_field.name] = forms.CharField(
                     label=custom_field.label, required=False, widget=forms.Textarea())
 
-            # {{ field.field.widget.attrs|lookup:'field_type' }}
             self.fields[custom_field.name].widget.attrs.update({
                 'field_type': custom_field.field_type
             })
@@ -311,8 +312,12 @@ class FeatureBaseForm(forms.ModelForm):
     def save(self, commit=True, *args, **kwargs):
         extra = kwargs.pop('extra', None)
         instance = super().save(commit=False)
+
         if extra:
-            instance.feature_data = extra
+            custom_fields = CustomField.objects.filter(feature_type=instance.feature_type)
+            newdict = {field_name: extra.get(field_name) for field_name in custom_fields.values_list('name', flat=True)}
+            stringfied = json.dumps(newdict, cls=DjangoJSONEncoder)
+            instance.feature_data = json.loads(stringfied)
 
         if commit:
             instance.save()

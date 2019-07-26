@@ -147,7 +147,7 @@ LOGIN_REDIRECT_URL = 'collab:index'
 
 LOGOUT_REDIRECT_URL = 'collab:index'
 
-DEFAULT_SENDING_FREQUENCY = 'daily'
+DEFAULT_SENDING_FREQUENCY = 'daily'  # A choisir parmi: 'instantly', 'daily', 'weekly'
 
 # Logging properties
 
