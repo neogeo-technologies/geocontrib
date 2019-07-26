@@ -231,7 +231,8 @@ class FeatureExtraForm(forms.Form):
         for custom_field in extra.order_by('position'):
             if custom_field.field_type == 'boolean':
                 self.fields[custom_field.name] = forms.BooleanField(
-                    label=custom_field.label, initial=False, required=False)
+                    label=custom_field.label, initial=False, required=False,
+                )
 
             if custom_field.field_type == 'char':
                 self.fields[custom_field.name] = forms.CharField(
@@ -240,10 +241,7 @@ class FeatureExtraForm(forms.Form):
             if custom_field.field_type == 'date':
                 self.fields[custom_field.name] = forms.DateField(
                     label=custom_field.label, required=False,
-                    widget=forms.DateInput(attrs={
-                        'class': 'ui calendar',
-                        'type': 'date'
-                    }))
+                )
 
             if custom_field.field_type == 'integer':
                 self.fields[custom_field.name] = forms.IntegerField(
@@ -259,6 +257,10 @@ class FeatureExtraForm(forms.Form):
             if custom_field.field_type == 'text':
                 self.fields[custom_field.name] = forms.CharField(
                     label=custom_field.label, required=False, widget=forms.Textarea())
+
+            self.fields[custom_field.name].widget.attrs.update({
+                'field_type': custom_field.field_type
+            })
 
         if feature and isinstance(feature.feature_data, dict):
             for custom_field in extra:
