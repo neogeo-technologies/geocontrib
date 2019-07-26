@@ -8,9 +8,15 @@
 
 {% block content %}
 <div class="fourteen wide column">
-  <h1>{{ action }} signalement "{{ feature.title }}"</h1>
+  {% if action == 'update' %}
+    <h1>Mise à jour du signalement "{{ feature.title }}"</h1>
+  {% elif action == 'create' %}
+    <h1>Création d'un signalement</h1>
+  {% endif %}
 
-  <form id="form-feature-edit" action="." method="post" enctype="multipart/form-data" class="ui form">
+
+  <form id="form-feature-edit" action="" method="post" enctype="multipart/form-data" class="ui form">
+    {% csrf_token %}
 
     <!-- Feature Fields -->
     <div class="two fields">
@@ -45,27 +51,105 @@
     </div>
 
     <!-- Extra Fields -->
+    <div class="ui horizontal divider">DONNÉES MÉTIER</div>
     {% for field in extra_form %}
-    <hr>
-    {{ field.field.widget.input_type }}
-    {{ field.label }}
-    {{ field.name }}
-    <div class="field">
-      {% if field.field.widget.input_type == 'text' %}
-
-      {% elif field.field.widget.input_type == 'number' %}
-
-      {% elif field.field.widget.input_type == 'checkbox' %}
-      {% elif field.field.widget.input_type == 'date' %}
-      {% elif field.field.widget.input_type == 'number' %}
-      {% elif field.field.widget.input_type == 'text' %}
-      {% endif %}
-      <label for="{{ field.name }}">{{ field.label }}</label>
-      <input type="text" name="{{ field.name }}" id="{{ field.name }}"
-        value="{% if field.value %}{{ field.value }}{% endif %}" >
-      {{ field.errors }}
-    </div>
+      <div class="field">
+        {% if field.field.widget.attrs|lookup:'field_type' == 'char' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <input type="text" name="{{ field.name }}" id="{{ field.name }}"
+            value="{% if field.value %}{{ field.value }}{% endif %}" >
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'integer' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <div class="ui input">
+            <input type="number" name="{{ field.name }}" id="{{ field.name }}"
+              value="{{ field.value }}">
+          </div>
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'boolean' %}
+          <div class="ui checkbox">
+            <input type="checkbox" {% if field.value %}checked{% endif %}
+              name="{{ field.name }}" id="{{ field.name }}">
+            <label for="{{ field.name }}">{{ field.label }}</label>
+          </div>
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'date' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <input type="date" name="{{ field.name }}" id="{{ field.name }}"
+            value="{% if field.value %}{{ field.value }}{% endif %}" >
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'decimal' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <div class="ui input">
+            <input type="number" step=".01" name="{{ field.name }}" id="{{ field.name }}"
+              value="{{ field.value }}">
+          </div>
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'text' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <textarea name="{{ field.name }}" rows="3">{% if field.value %}{{ field.value }}{% endif %}</textarea>
+        {% endif %}
+        {{ field.errors }}
+      </div>
     {% endfor %}
+
+
+    <div class="header">Edition des signalements liés</div>
+    <table class="ui celled padded table">
+      {{ linked_formset.management_form }}
+      <div id="form_set">
+        {% for formset in linked_formset %}
+        {% for hidden in formset.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        {% if formset.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+          {% for error in formset.non_field_errors %}
+          {{ error }}
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% for field in formset.visible_fields %}
+        <tr>
+          <th>{{ field.label_tag }}</th>
+          <td>
+            {{ field }}
+            {{ field.errors }}
+            {{ field.help_text }}
+          </td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+      </div>
+    </table>
+    <input type="button" value="+" id="add_more">
+    <div id="empty_form" style="display:none">
+      <table class='ui celled padded table'>
+        {{ linked_formset.empty_form.as_table }}
+      </table>
+    </div>
+    <table class="ui compact celled definition table">
+      <thead>
+        <tr>
+          <th>Identifiant</th>
+          <th>Titre</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for feat in availables_features %}
+        <tr>
+          <td>{{ feat.feature_id }}</td>
+          <td>{{ feat.title }}</td>
+          <td>{{ feat.description }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+
+
+    <div class="ui divider"></div>
+
+    <button type="submit" class="ui basic teal icon button">
+      <i class="white save icon"></i> Enregistrer les changements
+    </button>
 
   </form>
 </div>

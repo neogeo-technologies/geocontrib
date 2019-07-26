@@ -84,7 +84,7 @@ urlpatterns = [
     path('projet/<slug:slug>/carte/', ProjectMap.as_view(), name='project_map'),
 
     path(
-        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>',
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/',
         FeatureDetail.as_view(),
         name='feature_detail'),
 

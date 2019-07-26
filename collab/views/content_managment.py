@@ -426,7 +426,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                     type_objet='feature'),
                 'action': 'update'
             }
-            return render(request, 'collab/feature/feature_update.html', context)
+            return render(request, 'collab/feature/feature_edit.html', context)
         else:
             feature_form.save(extra=extra_form.cleaned_data)
 

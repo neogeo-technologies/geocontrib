@@ -7,7 +7,7 @@
 {% block content %}
   {% if permissions|lookup:'can_view_project' %}
   <div class="row">
-    <div class="three wide middle aligned column">
+    <div class="four wide middle aligned column">
       <img class="ui small spaced image" src="{{ project.thumbnail }}">
       <div class="ui hidden divider"></div>
       <div class="ui basic teal label" data-tooltip="Utilisateurs">
@@ -20,7 +20,7 @@
         <i class="comment icon"></i>{{ comments|length }}
       </div>
     </div>
-    <div class="eleven wide column">
+    <div class="ten wide column">
       <h1 class="ui header">
         <div class="content">
           {{ project.title }}
@@ -56,7 +56,7 @@
               {% endif %}
               <a href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=type.slug %}"> {{ type.title }} </a>
               {% if project and feature_types and permissions|lookup:'can_create_feature' %}
-              <a class="ui compact small icon right floated button" data-tooltip="Ajouter un signalement" data-position="left center" data-variation="mini"
+              <a class="ui compact small icon right floated button button-hover-green" data-tooltip="Ajouter un signalement" data-position="left center" data-variation="mini"
                  href="{% url 'collab:feature_create' slug=project.slug feature_type_slug=type.slug %}">
                 <i class="ui plus icon"></i>
               </a>
@@ -126,7 +126,7 @@
 
   <div class="row">
     <div class="fourteen wide column" >
-      <div class="ui grey segment" style="background:#e8e8e8">
+      <div class="ui grey segment">
         <h3 class="ui header">Paramètres du projet</h3>
         <div class="ui five stackable cards">
           <div class="card">
@@ -141,7 +141,7 @@
           <div class="card">
             <div class="content">
               <h4 class="ui center aligned icon header">
-                <i class="trash alternate icon"></i>
+                <i class="disabled grey trash alternate icon"></i>
                 <div class="content">Délai avant suppression automatique</div>
               </h4>
             </div>
@@ -193,7 +193,8 @@
     min-height: 250px;
   }
   .list-image-type {
-    height: 15px;
+    margin-right: 5px;
+    height: 25px;
     vertical-align: bottom;
   }
 </style>
