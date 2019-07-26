@@ -18,6 +18,7 @@ from collab.choices import EXTENDED_RELATED_MODELS
 from collab.choices import EVENT_TYPES
 from collab.choices import STATE_CHOICES
 from collab.choices import FREQUENCY_CHOICES
+from collab.choices import TYPE_CHOICES
 from collab.managers import AvailableFeaturesManager
 
 
@@ -392,15 +393,6 @@ class FeatureType(models.Model):
 
 
 class CustomField(models.Model):
-
-    TYPE_CHOICES = (
-        ("boolean", "Booléen"),
-        ("char", "Chaîne de caractères"),
-        ("date", "Date"),
-        ("integer", "Entier"),
-        ("decimal", "Décimale"),
-        ("text", "Champ texte"),
-    )
 
     label = models.CharField("Label", max_length=128, null=True, blank=True)
 

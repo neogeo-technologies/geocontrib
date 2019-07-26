@@ -38,18 +38,14 @@ class FeatureTypeModelForm(forms.ModelForm):
 
     title = forms.CharField(label='Titre', required=True)
 
-    # slug = forms.SlugField(label='Slug', required=True)
-
     class Meta:
         model = FeatureType
         fields = ('title', 'geom_type')
 
 
 class ProjectModelForm(forms.ModelForm):
-    # TODO: slug en champs auto non editable
-    title = forms.CharField(label='Titre', max_length=100)
 
-    # slug = forms.SlugField(label='Slug', max_length=100)
+    title = forms.CharField(label='Titre', max_length=100)
 
     thumbnail = forms.ImageField(label="Illustration du projet", required=False)
 
@@ -78,8 +74,6 @@ class ProjectModelForm(forms.ModelForm):
         model = Project
         fields = [
             'title',
-            # 'slug',
-            # 'created_on'
             'description',
             'moderation',
             'thumbnail',
@@ -258,6 +252,7 @@ class FeatureExtraForm(forms.Form):
                 self.fields[custom_field.name] = forms.CharField(
                     label=custom_field.label, required=False, widget=forms.Textarea())
 
+            # {{ field.field.widget.attrs|lookup:'field_type' }}
             self.fields[custom_field.name].widget.attrs.update({
                 'field_type': custom_field.field_type
             })

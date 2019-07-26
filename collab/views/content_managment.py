@@ -847,9 +847,6 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
         return Authorization.has_permission(user, 'is_project_administrator', project)
 
     def get(self, request, slug):
-        """
-
-        """
         user = self.request.user
         project = self.get_object()
         formset = self.AuthorizationFormSet(queryset=Authorization.objects.filter(project=project))
@@ -927,17 +924,15 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
 @method_decorator(DECORATORS, name='dispatch')
 class SubscribingView(SingleObjectMixin, UserPassesTestMixin, View):
 
-    queryset = Feature.objects.all()
-    pk_url_kwarg = 'feature_id'
+    queryset = Project.objects.all()
 
     def test_func(self):
         user = self.request.user
-        feature = self.get_object()
-        project = feature.project
-        return Authorization.has_permission(user, 'can_view_feature', project, feature)
+        project = self.get_object()
+        return Authorization.has_permission(user, 'can_view_feature', project)
 
-    def post(self, request, slug, feature_type_slug, feature_id, action):
-        feature = self.get_object()
+    def post(self, request, slug, action):
+        project = self.get_object()
         user = request.user
 
         if action.lower() not in ['ajouter', 'annuler']:
@@ -945,21 +940,19 @@ class SubscribingView(SingleObjectMixin, UserPassesTestMixin, View):
 
         elif action.lower() == 'ajouter':
             obj, _created = Subscription.objects.get_or_create(
-                feature=feature,
+                project=project,
             )
             obj.users.add(user)
             obj.save()
-            messages.info('Vous etes bien abonné aux notiifcations pour ce signalement')
+            messages.info('Vous etes bien abonné aux notifcations pour ce projet. ')
 
         elif action.lower() == 'annuler':
             try:
-                obj = Subscription.objects.get(feature)
+                obj = Subscription.objects.get(project=project)
                 obj.users.remove(user)
                 obj.save()
-                messages.info('Vous ne recevrez plus les notifications liés à ce signalement')
+                messages.info('Vous ne recevrez plus les notifications liés à ce projet. ')
             except Exception as err:
                 logger.error(str(err))
 
-        return redirect(
-            'feature_detail', slug=slug,
-            feature_type_slug=feature_type_slug, feature_id=feature_id)
+        return redirect('project_detail', slug=slug)

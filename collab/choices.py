@@ -4,6 +4,19 @@ soient à jours entre application et base.
 """
 
 ######################
+# CUSTOM FIELD TYPES #
+######################
+
+TYPE_CHOICES = (
+    ("boolean", "Booléen"),
+    ("char", "Chaîne de caractères"),
+    ("date", "Date"),
+    ("integer", "Entier"),
+    ("decimal", "Décimale"),
+    ("text", "Champ texte"),
+)
+
+######################
 # LEVELS PERMISSIONS #
 ######################
 
