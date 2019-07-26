@@ -14,10 +14,10 @@
         {{ feature.title }}
         {% if permissions|lookup:'can_update_feature' %}
           <div class="ui icon right floated compact buttons">
-            <a class="ui button button-hover-orange">
+            <a href="{% url 'collab:feature_update' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id %}" class="ui button button-hover-orange">
               <i class="inverted grey pencil alternate icon"></i>
             </a>
-            <a class="ui button button-hover-red">
+            <a id="feature-delete" class="ui button button-hover-red">
               <i class="inverted grey trash alternate icon"></i>
             </a>
           </div>
@@ -238,7 +238,7 @@
 <div class="ui mini modal">
   <div class="header">Suppression du signalement</div>
   <div class="content">
-    <p>Etes vous sure de vouloir supprimer ce signalement</p>
+    <p>Êtes-vous sûr de vouloir supprimer ce signalement ?</p>
   </div>
   <div class="actions delete_actions">
     <div class="ui negative button">
@@ -262,23 +262,6 @@
     $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
     $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
   });
-
-  $('#btn_feature_delete').click(function() {
-    $('.mini.modal')
-      .modal('show');
-  });
-
-  $('#btn_feature_edit').click(function(event) {
-    event.preventDefault();
-    $('#edit_form').submit();;
-  });
-
-
-  var edit_btn = document.getElementById("btn_feature_edit");
-  edit_btn.style.cursor = "pointer";
-
-  var delete_btn = document.getElementById("btn_feature_delete");
-  delete_btn.style.cursor = "pointer";
 </script>
 {% endblock %}
 
@@ -295,6 +278,11 @@
 
 <script type="text/javascript">
   $(document).ready(function() {
+
+    $('#feature-delete').click(function() {
+      $('.mini.modal').modal('show')
+    })
+
     var map = L.map('map', {zoomControl: false}).setView([43.604462, 1.444247], 13)
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -303,6 +291,22 @@
     map.dragging.disable()
     map.doubleClickZoom.disable()
     map.scrollWheelZoom.disable()
+
+    console.log("{{ feature.geom.wkt }}");
+    var featureGroup = new L.FeatureGroup()
+    var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
+    console.log('geomFeatureJSON', geomFeatureJSON);
+    var geomJSON = turf.flip(geomFeatureJSON)
+    console.log('geomJSON', geomJSON);
+    if (geomJSON.type === 'Point') {
+      L.circleMarker(geomJSON.coordinates, {color: 'green'}).addTo(featureGroup)
+    } else if (geomJSON.type === 'LineString') {
+      L.polyline(geomJSON.coordinates, {color: 'red'}).addTo(featureGroup)
+    } else if (geomJSON.type === 'Polygon') {
+      L.polygon(geomJSON.coordinates, {color: 'blue'}).addTo(featureGroup)
+    }
+    map.addLayer(featureGroup);
+    map.fitBounds(featureGroup.getBounds())
   })
 </script>
 {% endblock %}

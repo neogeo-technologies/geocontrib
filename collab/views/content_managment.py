@@ -390,7 +390,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 type_objet='feature'),
             'action': 'update'
         }
-        return render(request, 'collab/feature/feature_update.html', context)
+        return render(request, 'collab/feature/feature_edit.html', context)
 
     def post(self, request, slug, feature_type_slug, feature_id):
         user = request.user
