@@ -1,10 +1,12 @@
-{% extends "collab/layout_menu.html" %}
+{% extends "collab/base.html" %}
+
 {% load app_filters %}
 {% load static %}
 {% load l10n %}
-{% block title%}Édition d'un signalement{%endblock%}
-{% block content %}
 
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
 <div class="project_header">
   <h2 class="ui header">{{project.title}}</h2>
   <h3>{{feature.title}}</h3>

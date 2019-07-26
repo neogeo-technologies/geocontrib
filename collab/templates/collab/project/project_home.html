@@ -5,11 +5,11 @@
 {% block title %}Projet {{ project.title }}{% endblock %}
 
 {% block content %}
-
   {% if permissions|lookup:'can_view_project' %}
   <div class="row">
-    <div class="three wide column">
-      <img class="ui small image" src="{{ project.thumbnail.url }}">
+    <div class="three wide middle aligned column">
+      <img class="ui small spaced image" src="{{ project.thumbnail }}">
+      <div class="ui hidden divider"></div>
       <div class="ui basic teal label" data-tooltip="Utilisateurs">
         <i class="user icon"></i>{{ project.nb_contributors }}
       </div>
@@ -54,7 +54,7 @@
               {% elif type.geom_type == 'polygon' %}
                 <img class="list-image-type" src="{% static 'collab/img/polygon.png' %}">
               {% endif %}
-              <a href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=type.slug %}">{{ type.title }}</a>
+              <a href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=type.slug %}"> {{ type.title }} </a>
               {% if project and feature_types and permissions|lookup:'can_create_feature' %}
               <a class="ui compact small icon right floated button" data-tooltip="Ajouter un signalement" data-position="left center" data-variation="mini"
                  href="{% url 'collab:feature_create' slug=project.slug feature_type_slug=type.slug %}">
@@ -90,7 +90,9 @@
             <div class="center aligned header">Derniers signalements</div>
             <div class="center aligned description">
               {% for item in last_features %}
-                <p>{{ item.title }}</p>
+                <p>
+                  <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=item.feature_type.slug feature_id=item.feature_id  %}">{{ item.title }}</a>
+                </p>
               {% empty %}
                 <i>Aucun signalement pour le moment.</i>
               {% endfor %}
@@ -206,6 +208,24 @@
     map.dragging.disable()
     map.doubleClickZoom.disable()
     map.scrollWheelZoom.disable()
+
+
+    var featureGroup = new L.FeatureGroup()
+    {% for feature in features %}
+      var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
+      var geomJSON = turf.flip(geomFeatureJSON)
+      if (geomJSON.type === 'Point') {
+        L.circleMarker(geomJSON.coordinates, {color: 'green'}).addTo(featureGroup)
+      } else if (geomJSON.type === 'LineString') {
+        L.polyline(geomJSON.coordinates, {color: 'red'}).addTo(featureGroup)
+      } else if (geomJSON.type === 'Polygon') {
+        L.polygon(geomJSON.coordinates, {color: 'blue'}).addTo(featureGroup)
+      }
+    {% endfor %}
+    map.addLayer(featureGroup);
+    map.fitBounds(featureGroup.getBounds())
+
+
   })
 </script>
 {% endblock %}

@@ -1,0 +1,79 @@
+{% extends "collab/base.html" %}
+
+{% load app_filters %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+
+{% block content %}
+<div class="fourteen wide column">
+  <h1>{{ action }} signalement "{{ feature.title }}"</h1>
+
+  <form id="form-feature-edit" action="." method="post" enctype="multipart/form-data" class="ui form">
+
+    <!-- Feature Fields -->
+    <div class="two fields">
+      <div class="required field">
+        <label for="{{ feature_form.title.id_for_label }}">{{ feature_form.title.label }}</label>
+        <input type="text" required maxlength="{{ feature_form.title.field.max_length }}"
+          name="{{ feature_form.title.html_name }}" id="{{ feature_form.title.id_for_label }}"
+          value="{% if feature_form.title.value %}{{ feature_form.title.value }}{% endif %}" >
+        {{ feature_form.title.errors }}
+      </div>
+      <div class="required field">
+        <label for="{{ feature_form.status.id_for_label }}">{{ feature_form.status.label }}</label>
+        <div class="ui selection dropdown">
+          <input type="hidden"
+            name="{{ feature_form.status.html_name }}" id="{{ feature_form.status.id_for_label }}"
+            value="{{ feature_form.status.value }}">
+          <div class="default text"></div>
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            {% for x,y in feature_form.status.field.choices %}
+              <div class="item" data-value="{{ x }}" {% if feature_form.status.value == x %} selected{% endif %}>{{ y }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        {{ feature_form.status.errors }}
+      </div>
+    </div>
+    <div class="field">
+      <label for="{{ feature_form.description.id_for_label }}">{{ feature_form.description.label }}</label>
+      <textarea name="{{ feature_form.description.html_name }}" rows="5">{% if feature_form.description.value %}{{ feature_form.description.value }}{% endif %}</textarea>
+      {{ feature_form.description.errors }}
+    </div>
+
+    <!-- Extra Fields -->
+    {% for field in extra_form %}
+    <hr>
+    {{ field.field.widget.input_type }}
+    {{ field.label }}
+    {{ field.name }}
+    <div class="field">
+      {% if field.field.widget.input_type == 'text' %}
+
+      {% elif field.field.widget.input_type == 'number' %}
+
+      {% elif field.field.widget.input_type == 'checkbox' %}
+      {% elif field.field.widget.input_type == 'date' %}
+      {% elif field.field.widget.input_type == 'number' %}
+      {% elif field.field.widget.input_type == 'text' %}
+      {% endif %}
+      <label for="{{ field.name }}">{{ field.label }}</label>
+      <input type="text" name="{{ field.name }}" id="{{ field.name }}"
+        value="{% if field.value %}{{ field.value }}{% endif %}" >
+      {{ field.errors }}
+    </div>
+    {% endfor %}
+
+  </form>
+</div>
+{% endblock %}
+
+
+{% block custom_resources %}
+<script type="text/javascript">
+
+</script>
+{% endblock %}
