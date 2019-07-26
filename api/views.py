@@ -11,7 +11,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from api.serializers import FeatureGeoJSONSerializer
-# from api.serializers import ExportFeatureSerializer
 from api.serializers import ProjectSerializer
 from collab.models import Authorization
 from collab.models import Feature
@@ -30,7 +29,6 @@ class ExportFeatureList(APIView):
         """
         features = Feature.objects.filter(status="published", project__slug=slug)
         serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
-        # serializer = ExportFeatureSerializer(features, many=True, context={'request': request})
         response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
         response['Content-Disposition'] = 'attachment; filename=export_projet.json'
         return response

@@ -45,7 +45,6 @@ from collab.models import FeatureType
 from collab.models import FeatureLink
 from collab.models import Project
 from collab.models import Subscription
-from collab.utils import save_custom_fields
 
 import logging
 logger = logging.getLogger('django')

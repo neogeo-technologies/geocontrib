@@ -1,5 +1,3 @@
-import json
-from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.gis import forms
 from django.forms.models import BaseModelFormSet
 from django.forms.formsets import DELETION_FIELD_NAME

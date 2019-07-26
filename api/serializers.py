@@ -1,6 +1,4 @@
-from django.conf import settings
 from rest_framework import serializers
-from rest_framework_gis.serializers import GeometrySerializerMethodField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from collab.models import Authorization
@@ -14,35 +12,11 @@ import logging
 logger = logging.getLogger('django')
 
 
-class ExportFeatureSerializer(serializers.ModelSerializer):
-
-    geometrie = GeometrySerializerMethodField(
-        read_only=True,
-        source="geom",
-    )
-
-    class Meta:
-        model = Feature
-        fields = (
-            'feature_id',
-            'title',
-            'geometrie',
-            'description',
-            'status',
-            'created_on',
-            'updated_on',
-            'archived_on',
-            'deletion_on',
-            'feature_type',
-            'feature_data',
-        )
-
-
 class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = Feature
-        geo_field = "geom"
+        geo_field = 'geom'
         fields = (
             'feature_id',
             'title',
@@ -55,19 +29,6 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             'feature_type',
             'feature_data',
         )
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret['geometry'].update({
-            'crs': {
-                "type": "name",
-                "properties": {"name": "EPSG:{}".format(settings.DB_SRID)}}}
-        )
-        return ret
-
-    # def get_properties(self, instance, fields):
-    #     # This is a PostgreSQL JSON field, which django maps to a dict
-    #     return instance.feature_data
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
