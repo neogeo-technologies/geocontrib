@@ -274,7 +274,7 @@ class Feature(models.Model):
 
     feature_type = models.ForeignKey("collab.FeatureType", on_delete=models.CASCADE)
 
-    geom = models.GeometryField("Géométrie", srid=settings.DB_SRID, blank=True, null=True)
+    geom = models.GeometryField("Géométrie", srid=4326, blank=True, null=True)
 
     feature_data = JSONField(blank=True, null=True)
 

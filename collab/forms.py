@@ -223,7 +223,51 @@ class FeatureLinkForm(forms.ModelForm):
         )
 
 
-class FeatureDynamicForm(forms.ModelForm):
+class FeatureExtraForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        extra = kwargs.pop('extra', None)
+        feature = kwargs.pop('feature', None)
+        super().__init__(*args, **kwargs)
+
+        for custom_field in extra.order_by('position'):
+            if custom_field.field_type == 'boolean':
+                self.fields[custom_field.name] = forms.BooleanField(
+                    label=custom_field.label, initial=False, required=False)
+
+            if custom_field.field_type == 'char':
+                self.fields[custom_field.name] = forms.CharField(
+                    label=custom_field.label, max_length=256, required=False)
+
+            if custom_field.field_type == 'date':
+                self.fields[custom_field.name] = forms.DateField(
+                    label=custom_field.label, required=False,
+                    widget=forms.DateInput(attrs={
+                        'class': 'ui calendar',
+                        'type': 'date'
+                    }))
+
+            if custom_field.field_type == 'integer':
+                self.fields[custom_field.name] = forms.IntegerField(
+                    label=custom_field.label, required=False)
+
+            if custom_field.field_type == 'decimal':
+                self.fields[custom_field.name] = forms.DecimalField(
+                    label=custom_field.label, required=False,
+                    widget=forms.TextInput(attrs={
+                        'localization': False
+                    }))
+
+            if custom_field.field_type == 'text':
+                self.fields[custom_field.name] = forms.CharField(
+                    label=custom_field.label, required=False, widget=forms.Textarea())
+
+        if feature and isinstance(feature.feature_data, dict):
+            for custom_field in extra:
+                self.fields[custom_field.name].initial = feature.feature_data.get(custom_field.name)
+
+
+class FeatureBaseForm(forms.ModelForm):
     class Meta:
         model = Feature
         fields = (
@@ -235,7 +279,6 @@ class FeatureDynamicForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         feature_type = kwargs.pop('feature_type')
-        extra = kwargs.pop('extra', None)
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         project = feature_type.project
@@ -270,51 +313,11 @@ class FeatureDynamicForm(forms.ModelForm):
                 required=False,
             )
 
-        if extra.exists():
-            for custom_field in extra.order_by('position'):
-                if custom_field.field_type == 'boolean':
-                    self.fields[custom_field.name] = forms.BooleanField(
-                        label=custom_field.label, initial=False, required=False)
-
-                if custom_field.field_type == 'char':
-                    self.fields[custom_field.name] = forms.CharField(
-                        label=custom_field.label, max_length=256, required=False)
-
-                if custom_field.field_type == 'date':
-                    self.fields[custom_field.name] = forms.DateField(
-                        label=custom_field.label, required=False,
-                        widget=forms.DateInput(attrs={
-                            'class': 'ui calendar',
-                            'type': 'date'
-                        }))
-
-                if custom_field.field_type == 'integer':
-                    self.fields[custom_field.name] = forms.IntegerField(
-                        label=custom_field.label, required=False)
-
-                if custom_field.field_type == 'decimal':
-                    self.fields[custom_field.name] = forms.DecimalField(
-                        label=custom_field.label, required=False,
-                        widget=forms.TextInput(attrs={
-                            'localization': False
-                        }))
-
-                if custom_field.field_type == 'text':
-                    self.fields[custom_field.name] = forms.CharField(
-                        label=custom_field.label, required=False, widget=forms.Textarea())
-
-        if isinstance(self.instance.feature_data, dict):
-            if extra.exists() and self.instance.feature_data:
-                for custom_field in extra:
-                    self.fields[custom_field.name].initial = self.instance.feature_data.get(custom_field.name)
-
     def save(self, commit=True, *args, **kwargs):
+        extra = kwargs.pop('extra', None)
         instance = super().save(commit=False)
-
-        extra = CustomField.objects.filter(feature_type=instance.feature_type)
-        newdict = {field_name: self.cleaned_data.get(field_name) for field_name in extra.values_list('name', flat=True)}
-        stringfied = json.dumps(newdict, cls=DjangoJSONEncoder)
-        instance.feature_data = json.loads(stringfied)
+        if extra:
+            instance.feature_data = extra
 
         if commit:
             instance.save()

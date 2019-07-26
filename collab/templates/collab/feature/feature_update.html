@@ -68,8 +68,27 @@
         <th>Auteur</th>
         <td>{{ feature.creator.get_full_name|default:feature.creator.username }}</td>
       </tr>
+      {% for field in feature_form.visible_fields %}
+      <tr>
+        <th>{{ field.label_tag }}</th>
+        <td>
+          {% if field.field.widget|is_checkbox %}
+          {{ field }}
+          {% elif field.field.widget|is_date %}
+          <div class="field">
+            <div class="ui input left icon">
+              <i class="calendar icon"></i>
+              {{ field}}
+            </div>
+          </div>
+          {% else %}
+          {{ field }}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
 
-      {% for field in form.visible_fields %}
+      {% for field in extra_form.visible_fields %}
       <tr>
         <th>{{ field.label_tag }}</th>
         <td>

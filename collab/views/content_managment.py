@@ -32,7 +32,8 @@ from collab.forms import AttachmentForm
 from collab.forms import CommentForm
 from collab.forms import ExtendedBaseFS
 from collab.forms import FeatureTypeModelForm
-from collab.forms import FeatureDynamicForm
+from collab.forms import FeatureBaseForm
+from collab.forms import FeatureExtraForm
 from collab.forms import FeatureLinkForm
 from collab.forms import ProjectModelForm
 from collab.models import Authorization
@@ -199,14 +200,16 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         project = feature_type.project
         extra = CustomField.objects.filter(feature_type=feature_type)
 
-        form = FeatureDynamicForm(feature_type=feature_type, extra=extra, user=user)
+        feature_form = FeatureBaseForm(feature_type=feature_type, extra=extra, user=user)
+        extra_form = FeatureExtraForm(extra=extra)
 
         context = {
             'project': project,
             'feature_type': feature_type,
             'feature_types': project.featuretype_set.all(),
             'permissions': Authorization.all_permissions(user, project),
-            'form': form,
+            'feature_form': feature_form,
+            'extra_form': extra_form,
             'action': 'create'
         }
 
@@ -218,46 +221,48 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         feature_type = self.get_object()
         project = feature_type.project
         extra = CustomField.objects.filter(feature_type=feature_type)
-        form = FeatureDynamicForm(
-            request.POST, feature_type=feature_type, extra=extra, user=user)
-        if form.is_valid():
+        feature_form = FeatureBaseForm(
+            request.POST, feature_type=feature_type, user=user)
+        extra_form = FeatureExtraForm(request.POST, extra=extra)
+        if feature_form.is_valid() and extra_form.is_valid():
             try:
                 feature = Feature.objects.create(
-                    title=form.cleaned_data.get('title'),
-                    description=form.cleaned_data.get('description'),
-                    status=form.cleaned_data.get('status'),
-                    geom=form.cleaned_data.get('geom'),
+                    title=feature_form.cleaned_data.get('title'),
+                    description=feature_form.cleaned_data.get('description'),
+                    status=feature_form.cleaned_data.get('status'),
+                    geom=feature_form.cleaned_data.get('geom'),
                     project=project,
                     feature_type=feature_type,
                     creator=user,
-                    feature_data=save_custom_fields(extra, form.cleaned_data)
+                    feature_data=extra_form.cleaned_data
                 )
             except Exception as err:
                 logger.error(str(err))
                 messages.error(
                     request,
                     "Une erreur s'est produite lors de la création du signalement {title}: {err}".format(
-                        title=form.cleaned_data.get('title', 'N/A'),
+                        title=feature_form.cleaned_data.get('title', 'N/A'),
                         err=str(err)))
 
             else:
                 messages.info(
                     request,
                     "Le signalement {title} a bien été crée. ".format(
-                        title=form.cleaned_data.get('title', 'N/A'),
+                        title=feature_form.cleaned_data.get('title', 'N/A'),
                     ))
                 return redirect(
                     'collab:feature_detail', slug=project.slug,
                     feature_type_slug=feature_type.slug, feature_id=feature.feature_id)
 
         else:
-            logger.error(form.errors)
+            logger.error(feature_form.errors)
         context = {
             'project': project,
             'feature_type': feature_type,
             'feature_types': project.featuretype_set.all(),
             'permissions': Authorization.all_permissions(user, project),
-            'form': form,
+            'feature_form': feature_form,
+            'extra_form': extra_form,
             'action': 'create'
         }
         return render(request, 'collab/feature/feature_edit.html', context)
@@ -347,14 +352,17 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         feature_type = feature.feature_type
+
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         availables_features = Feature.objects.filter(
             project=project,
         ).exclude(feature_id=feature.feature_id)
 
-        form = FeatureDynamicForm(
-            instance=feature, feature_type=feature_type, extra=extra, user=user)
+        feature_form = FeatureBaseForm(
+            instance=feature, feature_type=feature_type, user=user)
+
+        extra_form = FeatureExtraForm(feature=feature, extra=extra)
 
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
@@ -367,11 +375,13 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
         context = {
             'feature': feature,
+            'feature_data': feature.custom_fields_as_list,
             'feature_types': FeatureType.objects.filter(project=project),
             'feature_type': feature.feature_type,
             'project': project,
             'permissions': Authorization.all_permissions(user, project, feature),
-            'form': form,
+            'feature_form': feature_form,
+            'extra_form': extra_form,
             'availables_features': availables_features,
             'linked_formset': linked_formset,
             'attachment_form': AttachmentForm(),
@@ -393,13 +403,14 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         ).exclude(feature_id=feature.feature_id)
 
         extra = CustomField.objects.filter(feature_type=feature_type)
-        form = FeatureDynamicForm(
-            request.POST, instance=feature, feature_type=feature_type,
-            extra=extra, user=user)
+        feature_form = FeatureBaseForm(
+            request.POST, instance=feature, feature_type=feature_type, user=user)
+
+        extra_form = FeatureExtraForm(request.POST, feature=feature, extra=extra)
 
         linked_formset = self.LinkedFormset(request.POST)
 
-        if not form.is_valid() or not linked_formset.is_valid():
+        if not feature_form.is_valid() or not extra_form.is_valid() or not linked_formset.is_valid():
             messages.error(request, "Erreur à la mise à jour du signalement. ")
             context = {
                 'feature': feature,
@@ -407,7 +418,8 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 'feature_type': feature.feature_type,
                 'project': project,
                 'permissions': Authorization.all_permissions(user, project),
-                'form': form,
+                'feature_form': feature_form,
+                'extra_form': extra_form,
                 'availables_features': availables_features,
                 'linked_formset': linked_formset,
                 'attachments': Attachment.objects.filter(
@@ -415,9 +427,11 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                     type_objet='feature'),
                 'action': 'update'
             }
-            return render(request, 'collab/feature/feature_edit.html', context)
+            return render(request, 'collab/feature/feature_update.html', context)
         else:
-            form.save()
+            feature_form.save(extra=extra_form.cleaned_data)
+
+            # traitement des siganlement liés
             for data in linked_formset.cleaned_data:
                 feature_to = data.get('feature_to')
 
@@ -686,7 +700,7 @@ class ImportFromImage(SingleObjectMixin, UserPassesTestMixin, View):
 
         extra = CustomField.objects.filter(feature_type=feature_type)
 
-        form = FeatureDynamicForm(feature_type=feature_type, extra=extra, user=user)
+        form = FeatureBaseForm(feature_type=feature_type, extra=extra, user=user)
 
         context.update({
             'project': project,
