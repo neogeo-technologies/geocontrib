@@ -9,6 +9,7 @@ from django.contrib.gis.geos.error import GEOSException
 from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.forms import modelformset_factory
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -20,7 +21,6 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.decorators.csrf import csrf_exempt
-
 from api.serializers import EventSerializer
 from api.serializers import FeatureTypeSerializer
 from api.serializers import ProjectDetailedSerializer
@@ -340,6 +340,12 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         extra=0,
         can_delete=True)
 
+    AttachmentFormset = modelformset_factory(
+        model=Attachment,
+        form=AttachmentForm,
+        extra=0,
+        can_delete=True)
+
     def test_func(self):
         user = self.request.user
         feature = self.get_object()
@@ -373,6 +379,15 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             initial=linked_features,
             queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
 
+        attachements = Attachment.objects.filter(
+            project=project, feature_id=feature.feature_id,
+            type_objet='feature'
+        )
+        attachment_formset = self.AttachmentFormset(
+            initial=attachements,
+            queryset=attachements
+        )
+
         context = {
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
@@ -384,11 +399,10 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'extra_form': extra_form,
             'availables_features': availables_features,
             'linked_formset': linked_formset,
+            'attachment_formset': attachment_formset,
             'attachment_form': AttachmentForm(),
             'comment_form': CommentForm(),
-            'attachments': Attachment.objects.filter(
-                project=project, feature_id=feature.feature_id,
-                type_objet='feature'),
+            'attachments': attachements,
             'action': 'update'
         }
         return render(request, 'collab/feature/feature_edit.html', context)
@@ -410,10 +424,17 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
         linked_formset = self.LinkedFormset(request.POST)
 
+        attachment_formset = self.AttachmentFormset(request.POST)
+
         old_status = feature.status
         old_geom = feature.geom.wkt if feature.geom else ''
 
-        if not feature_form.is_valid() or not extra_form.is_valid() or not linked_formset.is_valid():
+        forms_are_valid = feature_form.is_valid() and \
+            extra_form.is_valid() and \
+            linked_formset.is_valid() and \
+            attachment_formset.is_valid()
+
+        if not forms_are_valid:
             messages.error(request, "Erreur à la mise à jour du signalement. ")
             context = {
                 'feature': feature,
@@ -425,6 +446,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 'extra_form': extra_form,
                 'availables_features': availables_features,
                 'linked_formset': linked_formset,
+                'attachment_formset': attachment_formset,
                 'attachments': Attachment.objects.filter(
                     project=project, feature_id=feature.feature_id,
                     type_objet='feature'),
@@ -432,11 +454,13 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             }
             return render(request, 'collab/feature/feature_edit.html', context)
         else:
+
             updated_feature = feature_form.save(
                 project=project,
                 feature_type=feature_type,
                 extra=extra_form.cleaned_data
             )
+
             # On contextualise l'evenement en fonction des modifications apportés
             data = {} if not updated_feature.feature_data else updated_feature.feature_data
 
@@ -461,7 +485,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 data=data
             )
 
-            # traitement des siganlement liés
+            # Traitement des signalements liés
             for data in linked_formset.cleaned_data:
                 feature_to = data.get('feature_to')
 
@@ -480,6 +504,24 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                         )
                         for instance in qs:
                             instance.delete()
+
+            # Traitement des piéces jointes
+            for data in attachment_formset.cleaned_data:
+                attachment = data.get('attachment_file')
+
+                if attachment:
+                    if not data.get('DELETE'):
+                        Attachment.objects.get_or_create(
+                            feature_id=feature_id,
+                            project=project,
+                            author=user,
+                            title=data.get('relation_type'),
+                            info=data.get('info'),
+                            type_objet='feature',
+                            attachment_file=data.get('attachment_file'),
+                        )
+                    if data.get('DELETE'):
+                        logger.error('TO BE CONTINUED')
 
         return redirect(
             'collab:feature_detail', slug=project.slug,
@@ -709,40 +751,30 @@ class ImportFromImage(SingleObjectMixin, UserPassesTestMixin, View):
         return geom
 
     def post(self, request, slug, feature_type_slug):
-        user = request.user
-        feature_type = self.get_object()
-        project = feature_type.project
+
         context = {}
         try:
             up_file = request.FILES['image_file']
         except Exception as err:
             logger.error(str(err))
-            messages.error(request, "Erreur à l'import du fichier. ")
+            context['status'] = "error"
+            context['message'] = "Erreur à l'import du fichier. "
+            status = 400
 
         try:
             data_geom_wkt = exif.get_image_geoloc_as_wkt(up_file, with_alt=False, ewkt=False)
         except Exception as err:
             logger.error(str(err))
-            messages.error(request, "Erreur à lors de la lecture des données GPS. ")
+            context['status'] = "error"
+            context['message'] = "Erreur à lors de la lecture des données GPS. "
+            status = 400
         else:
-            context['up_geom'] = self.get_geom(data_geom_wkt, )
-            context['up_file'] = up_file
+            geom = self.get_geom(data_geom_wkt)
+            context['geom'] = geom.ewkt
+            context['status'] = "success"
+            status = 200
 
-        extra = CustomField.objects.filter(feature_type=feature_type)
-
-        feature_form = FeatureBaseForm(feature_type=feature_type, user=user)
-        extra_form = FeatureExtraForm(extra=extra)
-
-        context.update({
-            'project': project,
-            'feature_type': feature_type,
-            'feature_types': project.featuretype_set.all(),
-            'permissions': Authorization.all_permissions(user, project),
-            'feature_form': feature_form,
-            'extra_form': extra_form,
-        })
-
-        return render(request, 'collab/feature/feature_edit.html', context)
+        return JsonResponse(context, status=status)
 
 
 #################

@@ -264,6 +264,7 @@ class FeatureExtraForm(forms.Form):
 
 
 class FeatureBaseForm(forms.ModelForm):
+
     class Meta:
         model = Feature
         fields = (
@@ -278,16 +279,18 @@ class FeatureBaseForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         project = feature_type.project
-
         choices = tuple(x for x in Feature.STATUS_CHOICES)
         if not project.moderation:
             choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] != 'pending')
+            initial = 'published' if not self.instance else self.instance.status
 
         if project.moderation and not Authorization.has_permission(user, 'can_publish_feature', project):
             choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] in ['draft', 'pending'])
+            initial = 'pending'
 
         self.fields["status"] = forms.ChoiceField(
-            choices=choices
+            choices=choices,
+            # initial=initial
         )
 
         # TODO: factoriser les attributs de champs geom
@@ -295,18 +298,21 @@ class FeatureBaseForm(forms.ModelForm):
             self.fields["geom"] = forms.PointField(
                 label="Localisation",
                 required=False,
+                srid=4326
             )
 
         if feature_type.geom_type == "linestring":
             self.fields["geom"] = forms.LineStringField(
                 label="Localisation",
                 required=False,
+                srid=4326
             )
 
         if feature_type.geom_type == "polygon":
             self.fields["geom"] = forms.PolygonField(
                 label="Localisation",
                 required=False,
+                srid=4326
             )
 
     def save(self, commit=True, *args, **kwargs):

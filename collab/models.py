@@ -237,10 +237,6 @@ class Project(models.Model):
 
 
 class Feature(models.Model):
-    """
-    On reprend ici les champs standards augmentés de champs optionnels
-    multiples génériques.
-    """
 
     STATUS_CHOICES = (
         ("draft", "Brouillon"),
@@ -258,7 +254,7 @@ class Feature(models.Model):
 
     status = models.CharField(
         "Statut", choices=STATUS_CHOICES, max_length=50,
-        default="draft", null=True, blank=True)
+        default="draft")
 
     created_on = models.DateTimeField("Date de création", null=True, blank=True)
 
@@ -278,7 +274,7 @@ class Feature(models.Model):
 
     feature_type = models.ForeignKey("collab.FeatureType", on_delete=models.CASCADE)
 
-    geom = models.GeometryField("Géométrie", srid=4326, blank=True, null=True)
+    geom = models.GeometryField("Géométrie", srid=4326)
 
     feature_data = JSONField(blank=True, null=True)
 
@@ -608,7 +604,6 @@ class Event(models.Model):
 
         if self.object_type == 'feature':
 
-            Subscription = apps.get_model(app_label='collab', model_name='Subscription')
             feature = Feature.objects.get(feature_id=self.feature_id)
             project = feature.project
             if project.moderation:
@@ -655,6 +650,7 @@ class Event(models.Model):
         # TODO @cbenhabib: demander si on ne limite pas qd meme aux seules evenements visibles?
 
         try:
+            Subscription = apps.get_model(app_label='collab', model_name='Subscription')
             subscription = Subscription.objects.get(project__slug=self.project_slug)
         except Subscription.DoesNotExist:
             logger.error('No suscription for {}'.format(self.project_slug))

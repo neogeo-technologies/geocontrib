@@ -68,6 +68,14 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
+# NON-API SERIALIZERS: cf collab app
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = '__all__'
+
+
 class ProjectDetailedSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
@@ -114,9 +122,3 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'nb_comments',
             'nb_contributors'
         )
-
-
-class EventSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Event
-        fields = '__all__'

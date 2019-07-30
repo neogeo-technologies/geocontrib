@@ -63,7 +63,7 @@ def notif_creator_published_feature(emails, context):
     plain_message = strip_tags(html_message)
 
     email = EmailMultiAlternatives(
-        subject, plain_message, from_email=settings.DEFAULT_FROM_EMAIL, bcc=to_emails
+        subject, plain_message, from_email=settings.DEFAULT_FROM_EMAIL, to=to_emails
     )
 
     email.attach_alternative(html_message, "text/html")
