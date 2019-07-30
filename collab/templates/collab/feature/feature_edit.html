@@ -32,7 +32,7 @@
         <div class="ui selection dropdown">
           <input type="hidden"
             name="{{ feature_form.status.html_name }}" id="{{ feature_form.status.id_for_label }}"
-            value="{{ feature_form.status.value }}">
+            value="{% if feature_form.status.value %}{{ feature_form.status.value }}{% endif %}">
           <div class="default text"></div>
           <i class="dropdown icon"></i>
           <div class="menu">
@@ -50,6 +50,14 @@
       {{ feature_form.description.errors }}
     </div>
 
+    <!-- Geom Field -->
+    <div class="field">
+      <label for="{{ feature_form.geom.id_for_label }}">{{ feature_form.geom.label }}</label>
+      <input type="hidden" name="{{ feature_form.geom.html_name }}" id="{{ feature_form.geom.id_for_label }}"
+        value="{% if feature_form.geom.value.wkt %}{{ feature_form.geom.value.wkt }}{% endif %}" />
+      <div id="map"></div>
+    </div>
+
     <!-- Extra Fields -->
     <div class="ui horizontal divider">DONNÉES MÉTIER</div>
     {% for field in extra_form %}
@@ -62,7 +70,7 @@
           <label for="{{ field.name }}">{{ field.label }}</label>
           <div class="ui input">
             <input type="number" name="{{ field.name }}" id="{{ field.name }}"
-              value="{{ field.value }}">
+              value="{% if field.value %}{{ field.value }}{% endif %}">
           </div>
         {% elif field.field.widget.attrs|lookup:'field_type' == 'boolean' %}
           <div class="ui checkbox">
@@ -78,7 +86,7 @@
           <label for="{{ field.name }}">{{ field.label }}</label>
           <div class="ui input">
             <input type="number" step=".01" name="{{ field.name }}" id="{{ field.name }}"
-              value="{{ field.value }}">
+              value="{% if field.value %}{{ field.value }}{% endif %}">
           </div>
         {% elif field.field.widget.attrs|lookup:'field_type' == 'text' %}
           <label for="{{ field.name }}">{{ field.label }}</label>
@@ -88,8 +96,12 @@
       </div>
     {% endfor %}
 
+    <!-- Pièces jointes -->
+    <div class="ui horizontal divider">PIÈCES JOINTES</div>
+    FORMSETS
 
-    <div class="header">Edition des signalements liés</div>
+    <!-- Signalements liés -->
+    <div class="ui horizontal divider">SIGNALEMENTS LIÉS</div>
     <table class="ui celled padded table">
       {{ linked_formset.management_form }}
       <div id="form_set">
@@ -157,7 +169,122 @@
 
 
 {% block custom_resources %}
+<style>
+#map {
+  height:300px;
+  width:100%;
+}
+</style>
+
 <script type="text/javascript">
 
+function updateGeomField(event) {
+  console.log('event', event)
+  console.log('next geom', event.layer.toGeoJSON())
+  console.log('next geom wkt', wellknown.stringify(event.layer.toGeoJSON()))
+  var geomWKT = wellknown.stringify(event.layer.toGeoJSON())
+  $('#{{ feature_form.geom.id_for_label }}').val(geomWKT);
+}
+
+$(document).ready(function() {
+  var map = L.map('map').setView([43.604462, 1.444247], 13);
+  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map)
+
+  // Geom type + init Leaflet Draw Control
+  var geomType = "{{ feature_type.geom_type }}"
+  var drawConfig = {
+    polygon: false,
+    marker: false,
+    polyline: false,
+    rectangle: false,
+    circle: false,
+    circlemarker: false
+  }
+  drawConfig[geomLeaflet[geomType]] = true
+
+
+  // var featureGroup = new L.FeatureGroup().addTo(map)
+  var drawnItems = new L.FeatureGroup()
+  map.addLayer(drawnItems)
+  var geomFeatureJSON = wellknown.parse("{{ feature_form.geom.value.wkt }}")
+  if (geomFeatureJSON) {
+    var geomJSON = turf.flip(geomFeatureJSON)
+    if (geomType === 'point') {
+      L.circleMarker(geomJSON.coordinates, {color: 'green'}).addTo(drawnItems)
+    } else if (geomType === 'linestring') {
+      L.polyline(geomJSON.coordinates, {color: 'red'}).addTo(drawnItems)
+    } else if (geomType === 'polygon') {
+      L.polygon(geomJSON.coordinates, {color: 'blue'}).addTo(drawnItems)
+    }
+    map.fitBounds(drawnItems.getBounds())
+  }
+
+  var drawControlFull = new L.Control.Draw({
+    edit: {
+      featureGroup: drawnItems
+    },
+    draw: drawConfig,
+  })
+
+  var drawControlEditOnly = new L.Control.Draw({
+    edit: {
+      featureGroup: drawnItems
+    },
+    draw: false
+  })
+
+  // var drawControl = new L.Control.Draw({
+  //   draw: drawConfig,
+  //   edit: {
+  //     featureGroup: drawnItems
+  //   }
+  // })
+  // map.addControl(drawControl)
+  map.addControl(drawControlFull);
+
+  map.on("draw:created", function (e) {
+    console.log('draw:created')
+    var layer = e.layer
+    layer.addTo(drawnItems)
+    drawControlFull.remove(map)
+    drawControlEditOnly.addTo(map)
+    updateGeomField(e)
+  })
+
+  map.on("draw:edited", function(e) {
+    console.log('draw:edited')
+    updateGeomField(e)
+  })
+
+  map.on("draw:deleted", function(e) {
+    console.log('draw:deleted')
+    drawControlEditOnly.remove(map)
+    drawControlFull.addTo(map)
+    updateGeomField(e)
+  })
+
+
+  // map.on('draw:created', function (event) {
+  //   var layer = event.layer
+  //   console.log('draw:created', layer)
+  //   drawnItems.addLayer(layer)
+  //   updateGeomField(layer)
+  // })
+  //
+  // map.on('draw:edited', function (event) {
+  //   console.log('draw:edited', event)
+  //   updateGeomField(event)
+  // })
+  //
+  // map.on('draw:deleted', function (event) {
+  //   console.log('draw:deleted', event)
+  //   // updateGeomField(event)
+  // })
+
+
+
+})
 </script>
 {% endblock %}

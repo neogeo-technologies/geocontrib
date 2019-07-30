@@ -1,5 +1,11 @@
-$(document).ready(function() {
+// Geom types
+var geomLeaflet = {
+  'point': 'circlemarker',
+  'linestring': 'polyline',
+  'polygon': 'polygon'
+}
 
+$(document).ready(function() {
   // INITIALISATION SEMANTIC UI COMPONENTS
   $('.ui.accordion').accordion()
   // $('main .selection.dropdown').dropdown()
