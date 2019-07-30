@@ -1,0 +1,16 @@
+<span style="color:rgb(64, 64, 64)">
+  Bonjour,<br><br>
+  <br>
+  <p>Vous recevez ce message automatique en tant que modérateur du projet {{ feature.project.title|title }}.</p>
+  <p>Nous vous signalons que le signalement suivant est mis attente de publication par {{ event_initiator.get_full_name|default:event_initiator.username }},</p>
+  <p>Vous pouvez confirmer sa publication en editant son statut.</p>
+  <br>
+  <a
+    href="{% url 'collab:feature_detail' slug=feature.project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id %}">
+      {{ feature.title }}
+  </a>
+  <br>
+  <span style="font-family:verdana,geneva,sans-serif; font-size:11px">
+    -- Ce message a été automatiquement envoyé par le site Collab.
+  </span>
+</span>

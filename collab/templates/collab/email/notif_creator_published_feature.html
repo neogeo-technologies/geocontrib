@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=UTF-8">
+</head>
+<body>
+  La publication du signalement {{ feature.title|title }} a été confirmée par un modérateur du projet {{ feature.project.title|title }} le {{ event.created_on }}
+  <hr style="width:100%;height:1px;background:#ccc;border:0;margin:1.2em">
+  <span class="footer" style="font-size:0.8em;font-style:italic">
+    <p>Vous avez reçu ce message car vous etes le créateur du signalement {{ feature.title|title }}</p>
+  </span>
+</body>
+</html>

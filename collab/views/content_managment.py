@@ -410,6 +410,9 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
         linked_formset = self.LinkedFormset(request.POST)
 
+        old_status = feature.status
+        old_geom = feature.geom.wkt if feature.geom else ''
+
         if not feature_form.is_valid() or not extra_form.is_valid() or not linked_formset.is_valid():
             messages.error(request, "Erreur à la mise à jour du signalement. ")
             context = {
@@ -429,10 +432,33 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             }
             return render(request, 'collab/feature/feature_edit.html', context)
         else:
-            feature_form.save(
+            updated_feature = feature_form.save(
                 project=project,
                 feature_type=feature_type,
                 extra=extra_form.cleaned_data
+            )
+            # On contextualise l'evenement en fonction des modifications apportés
+            data = {} if not updated_feature.feature_data else updated_feature.feature_data
+
+            data['feature_status'] = {
+                'has_changed': (old_status != updated_feature.status),
+                'old_status': old_status,
+                'new_status': updated_feature.status,
+            }
+            data['feature_geom'] = {
+                'has_changed': (old_geom != updated_feature.geom),
+                'old_geom': old_geom,
+                'new_geom': updated_feature.geom.wkt if updated_feature.geom else '',
+            }
+
+            Event.objects.create(
+                feature_id=updated_feature.feature_id,
+                event_type='update',
+                object_type='feature',
+                user=user,
+                project_slug=updated_feature.project.slug,
+                feature_type_slug=updated_feature.feature_type.slug,
+                data=data
             )
 
             # traitement des siganlement liés
@@ -938,7 +964,7 @@ class SubscribingView(SingleObjectMixin, UserPassesTestMixin, View):
         project = self.get_object()
         return Authorization.has_permission(user, 'can_view_feature', project)
 
-    def post(self, request, slug, action):
+    def get(self, request, slug, action):
         project = self.get_object()
         user = request.user
 
@@ -951,15 +977,15 @@ class SubscribingView(SingleObjectMixin, UserPassesTestMixin, View):
             )
             obj.users.add(user)
             obj.save()
-            messages.info('Vous etes bien abonné aux notifcations pour ce projet. ')
+            messages.info(request, 'Vous etes bien abonné aux notifcations pour ce projet. ')
 
         elif action.lower() == 'annuler':
             try:
                 obj = Subscription.objects.get(project=project)
                 obj.users.remove(user)
                 obj.save()
-                messages.info('Vous ne recevrez plus les notifications liés à ce projet. ')
+                messages.info(request, 'Vous ne recevrez plus les notifications liés à ce projet. ')
             except Exception as err:
                 logger.error(str(err))
 
-        return redirect('project_detail', slug=slug)
+        return redirect('collab:project', slug=slug)

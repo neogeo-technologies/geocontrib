@@ -60,7 +60,7 @@ urlpatterns = [
     path('projet/<slug:slug>/membres/', ProjectMembers.as_view(), name='project_members'),
 
     path(
-        'projet/<slug:slug>/abonnement/<str:action>', SubscribingView.as_view(),
+        'projet/<slug:slug>/abonnement/<str:action>/', SubscribingView.as_view(),
         name='subscription'),
 
     path('projet/<slug:slug>/type-signalement/ajouter/',
