@@ -53,6 +53,16 @@
     <!-- Geom Field -->
     <div class="field">
       <label for="{{ feature_form.geom.id_for_label }}">{{ feature_form.geom.label }}</label>
+
+      <!-- Import GeoImage -->
+      <p>
+        <button id="add-geo-image" type="button" class="ui compact basic button">
+          <i class="file image icon"></i>Importer une image géoréférencée
+        </button>
+        Vous pouvez utiliser une image géoréférencée pour localiser le signalement.
+      </p>
+
+      <!-- Map -->
       <input type="hidden" name="{{ feature_form.geom.html_name }}" id="{{ feature_form.geom.id_for_label }}"
         value="{% if feature_form.geom.value.wkt %}{{ feature_form.geom.value.wkt }}{% endif %}" />
       <div id="map"></div>
@@ -184,12 +194,8 @@ var geomLeaflet = {
   'polygon': 'polygon'
 }
 
-function updateGeomField(event) {
-  console.log('event', event)
-  console.log('next geom', event.layer.toGeoJSON())
-  console.log('next geom wkt', wellknown.stringify(event.layer.toGeoJSON()))
-  var geomWKT = wellknown.stringify(event.layer.toGeoJSON())
-  $('#{{ feature_form.geom.id_for_label }}').val(geomWKT);
+function updateGeomField(newGeom) {
+  $('#{{ feature_form.geom.id_for_label }}').val(`SRID=4326;${newGeom}`);
 }
 
 $(document).ready(function() {
@@ -199,6 +205,7 @@ $(document).ready(function() {
   }).addTo(map)
 
   // Geom type + init Leaflet Draw Control
+  console.log('geomType', "{{ feature_type.color }}");
   var geomType = "{{ feature_type.geom_type }}"
   var drawConfig = {
     polygon: false,
@@ -211,18 +218,17 @@ $(document).ready(function() {
   drawConfig[geomLeaflet[geomType]] = true
 
 
-  // var featureGroup = new L.FeatureGroup().addTo(map)
   var drawnItems = new L.FeatureGroup()
   map.addLayer(drawnItems)
   var geomFeatureJSON = wellknown.parse("{{ feature_form.geom.value.wkt }}")
   if (geomFeatureJSON) {
     var geomJSON = turf.flip(geomFeatureJSON)
     if (geomType === 'point') {
-      L.circleMarker(geomJSON.coordinates, {color: 'green'}).addTo(drawnItems)
+      L.circleMarker(geomJSON.coordinates).addTo(drawnItems)
     } else if (geomType === 'linestring') {
-      L.polyline(geomJSON.coordinates, {color: 'red'}).addTo(drawnItems)
+      L.polyline(geomJSON.coordinates).addTo(drawnItems)
     } else if (geomType === 'polygon') {
-      L.polygon(geomJSON.coordinates, {color: 'blue'}).addTo(drawnItems)
+      L.polygon(geomJSON.coordinates).addTo(drawnItems)
     }
     map.fitBounds(drawnItems.getBounds())
   }
@@ -241,14 +247,11 @@ $(document).ready(function() {
     draw: false
   })
 
-  // var drawControl = new L.Control.Draw({
-  //   draw: drawConfig,
-  //   edit: {
-  //     featureGroup: drawnItems
-  //   }
-  // })
-  // map.addControl(drawControl)
-  map.addControl(drawControlFull);
+  {% if feature_form.geom.value.wkt %}
+    map.addControl(drawControlEditOnly);
+  {% else %}
+    map.addControl(drawControlFull);
+  {% endif %}
 
   map.on("draw:created", function (e) {
     console.log('draw:created')
@@ -256,40 +259,23 @@ $(document).ready(function() {
     layer.addTo(drawnItems)
     drawControlFull.remove(map)
     drawControlEditOnly.addTo(map)
-    updateGeomField(e)
+    updateGeomField(wellknown.stringify(turf.flip(layer.toGeoJSON())))
   })
 
   map.on("draw:edited", function(e) {
     console.log('draw:edited')
-    updateGeomField(e)
+    var layers = e.layers
+    layers.eachLayer(function (layer) {
+      updateGeomField(wellknown.stringify(turf.flip(layer.toGeoJSON())))
+    })
   })
 
   map.on("draw:deleted", function(e) {
     console.log('draw:deleted')
     drawControlEditOnly.remove(map)
     drawControlFull.addTo(map)
-    updateGeomField(e)
+    updateGeomField('')
   })
-
-
-  // map.on('draw:created', function (event) {
-  //   var layer = event.layer
-  //   console.log('draw:created', layer)
-  //   drawnItems.addLayer(layer)
-  //   updateGeomField(layer)
-  // })
-  //
-  // map.on('draw:edited', function (event) {
-  //   console.log('draw:edited', event)
-  //   updateGeomField(event)
-  // })
-  //
-  // map.on('draw:deleted', function (event) {
-  //   console.log('draw:deleted', event)
-  //   // updateGeomField(event)
-  // })
-
-
 
 })
 </script>
