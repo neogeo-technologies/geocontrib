@@ -771,11 +771,11 @@ class ImportFromImage(SingleObjectMixin, UserPassesTestMixin, View):
         except Exception:
             logger.exception('ImportFromImage.post')
             context['status'] = "error"
-            context['message'] = "Erreur à lors de la lecture des données GPS. "
+            context['message'] = "Erreur lors de la lecture des données GPS. "
             status = 400
         else:
             geom = self.get_geom(data_geom_wkt)
-            context['geom'] = geom.ewkt
+            context['geom'] = geom.wkt
             context['status'] = "success"
             status = 200
 
