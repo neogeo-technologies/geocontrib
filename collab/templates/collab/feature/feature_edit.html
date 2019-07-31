@@ -64,6 +64,8 @@
       </p>
       {% endif %}
 
+      {{ feature_form.geom.errors }}
+
       <!-- Map -->
       <input type="hidden" name="{{ feature_form.geom.html_name }}" id="{{ feature_form.geom.id_for_label }}"
         value="{% if feature_form.geom.value.wkt %}{{ feature_form.geom.value.wkt }}{% endif %}" />
@@ -110,51 +112,28 @@
 
     <!-- Pièces jointes -->
     <div class="ui horizontal divider">PIÈCES JOINTES</div>
-    FORMSETS
+
+    {{ attachment_formset.management_form }}
+    {{ attachment_formset.non_form_errors }}
+
+    <!-- <p>{{ attachment_formset.empty_form.as_table }}</p> -->
+
+    <div id="formsets-attachment"></div>
+    <button id="add-attachment" type="button" class="ui compact basic button button-hover-green">
+      <i class="ui plus icon"></i>Ajouter une pièce jointe
+    </button>
 
     <!-- Signalements liés -->
     <div class="ui horizontal divider">SIGNALEMENTS LIÉS</div>
-    <table class="ui celled padded table">
-      {{ linked_formset.management_form }}
-      <div id="form_set">
-        {% for formset in linked_formset %}
-        {% for hidden in formset.hidden_fields %}
-        {{ hidden }}
-        {% endfor %}
-        {% if formset.non_field_errors %}
-        <div class="alert alert-danger" role="alert">
-          {% for error in formset.non_field_errors %}
-          {{ error }}
-          {% endfor %}
-        </div>
-        {% endif %}
-        {% for field in formset.visible_fields %}
-        <tr>
-          <th>{{ field.label_tag }}</th>
-          <td>
-            {{ field }}
-            {{ field.errors }}
-            {{ field.help_text }}
-          </td>
-        </tr>
-        {% endfor %}
-        {% endfor %}
-      </div>
-    </table>
-    <input type="button" value="+" id="add_more">
-    <div id="empty_form" style="display:none">
-      <table class='ui celled padded table'>
-        {{ linked_formset.empty_form.as_table }}
-      </table>
-    </div>
+
+    <!-- {{ linked_formset.management_form }} -->
+    {{ linked_formset.non_form_errors }}
+    <div id="formsets-link"></div>
+    <button id="add-link" type="button" class="ui compact basic button button-hover-green">
+      <i class="ui plus icon"></i>Ajouter une liaison
+    </button>
+
     <table class="ui compact celled definition table">
-      <thead>
-        <tr>
-          <th>Identifiant</th>
-          <th>Titre</th>
-          <th>Description</th>
-        </tr>
-      </thead>
       <tbody>
         {% for feat in availables_features %}
         <tr>
@@ -165,7 +144,6 @@
         {% endfor %}
       </tbody>
     </table>
-
 
     <div class="ui divider"></div>
 
@@ -179,8 +157,7 @@
 <div class="ui mini modal">
   <div class="content">
     <h3>Importer une image géoréférencée</h3>
-    <form class="ui form" enctype="multipart/form-data" method="POST"
-      action="{% url 'collab:import_from_image' slug=project.slug feature_type_slug=feature_type.slug %}">
+    <form id="form-geo-image" class="ui form" enctype="multipart/form-data">
       {% csrf_token %}
       <p>Attention, si vous avez déjà saisi une géométrie, celle issue de l'image importée l'écrasera.</p>
 
@@ -191,11 +168,11 @@
           <span class="label">Sélectionner une image ...</span>
         </label>
         <input type="file" accept="image/jpeg, image/png" style="display:none;"
-          name="image_file" id="image_file" >
-        {{ form.errors }}
+          name="image_file" class="image_file" id="image_file" >
+        <p class="error-message" style="color:red;"></p>
       </div>
 
-      <button type='submit' class="ui positive right labeled icon button">
+      <button id="get-geom-from-image-file" type='button' class="ui positive right labeled icon button">
         Importer
         <i class="checkmark icon"></i>
       </button>
@@ -215,15 +192,47 @@
 </style>
 
 <script type="text/javascript">
-// Geom types
+console.log("{{ feature_form.geom.value.wkt }}")
+
+// Geom type + init Leaflet Draw Control
 var geomLeaflet = {
   'point': 'circlemarker',
   'linestring': 'polyline',
   'polygon': 'polygon'
 }
+var geomType = "{{ feature_type.geom_type }}"
+var drawConfig = {
+  polygon: false,
+  marker: false,
+  polyline: false,
+  rectangle: false,
+  circle: false,
+  circlemarker: false
+}
+drawConfig[geomLeaflet[geomType]] = true
+
+
+var drawnItems = new L.FeatureGroup()
 
 function updateGeomField(newGeom) {
   $('#{{ feature_form.geom.id_for_label }}').val(`SRID=4326;${newGeom}`);
+}
+
+function updateMap(map, geomFeatureJSON) {
+  drawnItems.clearLayers()
+  if (geomFeatureJSON) {
+    var geomJSON = turf.flip(geomFeatureJSON)
+    if (geomType === 'point') {
+      L.circleMarker(geomJSON.coordinates).addTo(drawnItems)
+    } else if (geomType === 'linestring') {
+      L.polyline(geomJSON.coordinates).addTo(drawnItems)
+    } else if (geomType === 'polygon') {
+      L.polygon(geomJSON.coordinates).addTo(drawnItems)
+    }
+    map.fitBounds(drawnItems.getBounds())
+  } else {
+    console.log('ZOOM FRANCE ENTIERE');
+  }
 }
 
 function truncate(n, len) {
@@ -237,7 +246,7 @@ function truncate(n, len) {
 }
 
 $(document).ready(function() {
-  $(document).on('change', '#image_file', function () {
+  $(document).on('change', '.image_file', function () {
     var logoFile = $(this).prop('files')[0]
     $(this).parent().children('label').children('.label').html(truncate(logoFile.name, 30))
     var reader = new FileReader();
@@ -251,39 +260,140 @@ $(document).ready(function() {
     $('.mini.modal').modal('show')
   })
 
+  $('#add-attachment').click(function() {
+    var form_idx = $('#id_form-TOTAL_FORMS').val();
+
+    console.log('add-attachment', form_idx)
+    $('#formsets-attachment').append((`
+      <div class="ui teal segment">
+        <h4>
+          Pièce jointe
+          <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+        </h4>
+        <div class="two fields">
+          <div class="required field">
+            <label for="{{ attachment_formset.empty_form.title.id_for_label }}">{{ attachment_formset.empty_form.title.label }}</label>
+            <input type="text" required maxlength="{{ attachment_formset.empty_form.title.field.max_length }}"
+              name="{{ attachment_formset.empty_form.title.html_name }}" id="{{  attachment_formset.empty_form.title.id_for_label }}">
+            {{ attachment_formset.title.errors }}
+          </div>
+          <div class="required field">
+            <label>Fichier (PDF, PNG, JPEG)</label>
+            <label class="ui icon button" for="{{ attachment_formset.empty_form.attachment_file.id_for_label }}">
+              <i class="file icon"></i>
+              <span class="label">Sélectionner un fichier ...</span>
+            </label>
+            <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;"
+              name="{{ attachment_formset.empty_form.attachment_file.html_name }}" class="image_file" id="{{ attachment_formset.empty_form.attachment_file.id_for_label }}" >
+            {{ form.errors }}
+          </div>
+        </div>
+        <div class="required field">
+          <label for="{{ attachment_formset.empty_form.info.id_for_label }}">{{ attachment_formset.empty_form.info.label }}</label>
+          <textarea name="{{ attachment_formset.empty_form.info.html_name }}" rows="5">
+            {% if attachment_formset.empty_form.info.value %}{{ attachment_formset.empty_form.info.value }}{% endif %}
+          </textarea>
+          {{ attachment_formset.info.errors }}
+        </div>
+      </div>
+    `).replace(/__prefix__/g, form_idx))
+    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+
+    $('.ui.dropdown').dropdown()
+    $('.remove-formset').click(function(){
+      console.log('remove-formset');
+      $(this).parent().parent('.segment').remove()
+    })
+  })
+
+  $('#add-link').click(function() {
+    var form_idx = $('#id_form-TOTAL_FORMS').val();
+
+    console.log('add-link', form_idx)
+    $('#formsets-link').append((`
+      <div class="ui teal segment">
+        <h4>
+          Liaison
+          <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+        </h4>
+        <div class="two fields">
+          <div class="required field">
+            <label for="{{ linked_formset.empty_form.relation_type.id_for_label }}">{{ linked_formset.empty_form.relation_type.label }}</label>
+            <div class="ui selection dropdown">
+              <input type="hidden"
+                name="{{ linked_formset.empty_form.relation_type.html_name }}" id="{{ linked_formset.empty_form.relation_type.id_for_label }}"
+                value="{{ linked_formset.empty_form.relation_type.value }}">
+              <div class="default text"></div>
+              <i class="dropdown icon"></i>
+              <div class="menu">
+                {% for x,y in linked_formset.empty_form.relation_type.field.choices %}
+                  <div class="item" data-value="{{ x }}" {% if linked_formset.empty_form.relation_type.value == x %} selected{% endif %}>{{ y }}</div>
+                {% endfor %}
+              </div>
+            </div>
+            {{ linked_formset.relation_type.errors }}
+          </div>
+          <div class="required field">
+            <label for="{{ linked_formset.empty_form.feature_to.id_for_label }}">{{ linked_formset.empty_form.feature_to.label }}</label>
+            <input type="text" required maxlength="{{ linked_formset.empty_form.feature_to.field.max_length }}"
+              name="{{ linked_formset.empty_form.feature_to.html_name }}" id="{{  linked_formset.empty_form.feature_to.id_for_label }}">
+            {{ linked_formset.feature_to.errors }}
+          </div>
+        </div>
+      </div>
+    `).replace(/__prefix__/g, form_idx))
+    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+
+    $('.ui.dropdown').dropdown()
+    $('.remove-formset').click(function(){
+      console.log('remove-formset');
+      $(this).parent().parent('.segment').remove()
+    })
+  })
+
+  $('#get-geom-from-image-file').click(function() {
+    var formGeoImage = new FormData()
+    var imageFile = $('#form-geo-image .image_file').prop('files')[0]
+    formGeoImage.append("image_file", imageFile)
+
+    console.log(formGeoImage)
+
+    var request = new XMLHttpRequest()
+    // request.onload = function(e) {
+    request.onreadystatechange = function(e) {
+      if (this.readyState === XMLHttpRequest.DONE) {
+        var responseJSON = JSON.parse(this.response);
+        if (this.status === 200) {
+          console.log('SUCCESS REQUEST', responseJSON)
+          let responseGeomJSON = turf.flip(wellknown.parse(responseJSON.geom))
+          updateMap(map, responseGeomJSON)
+          updateGeomField(wellknown.stringify(responseGeomJSON))
+          $('.mini.modal').modal('hide')
+        } else {
+          console.log('ERROR REQUEST', responseJSON)
+          $('#form-geo-image .error-message').html(responseJSON.message)
+        }
+      }
+    }
+    request.open("POST", "{% url 'collab:import_from_image' slug=project.slug feature_type_slug=feature_type.slug %}")
+    request.send(formGeoImage)
+  })
+
+
+  // **************************** //
+  //              MAP             //
+  // **************************** //
   var map = L.map('map').setView([43.604462, 1.444247], 13);
   L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map)
 
-  // Geom type + init Leaflet Draw Control
-  console.log('geomType', "{{ feature_form.geom.value.wkt }}");
-  var geomType = "{{ feature_type.geom_type }}"
-  var drawConfig = {
-    polygon: false,
-    marker: false,
-    polyline: false,
-    rectangle: false,
-    circle: false,
-    circlemarker: false
-  }
-  drawConfig[geomLeaflet[geomType]] = true
-
-
-  var drawnItems = new L.FeatureGroup()
   map.addLayer(drawnItems)
-  var geomFeatureJSON = wellknown.parse("{{ feature_form.geom.value.wkt }}")
-  if (geomFeatureJSON) {
-    var geomJSON = turf.flip(geomFeatureJSON)
-    if (geomType === 'point') {
-      L.circleMarker(geomJSON.coordinates).addTo(drawnItems)
-    } else if (geomType === 'linestring') {
-      L.polyline(geomJSON.coordinates).addTo(drawnItems)
-    } else if (geomType === 'polygon') {
-      L.polygon(geomJSON.coordinates).addTo(drawnItems)
-    }
-    map.fitBounds(drawnItems.getBounds())
-  }
+
+  {% if feature_form.geom.value.wkt %}
+    updateMap(map, wellknown.parse("{{ feature_form.geom.value.wkt }}"))
+  {% endif %}
+
 
   var drawControlFull = new L.Control.Draw({
     edit: {
@@ -306,7 +416,6 @@ $(document).ready(function() {
   {% endif %}
 
   map.on("draw:created", function (e) {
-    console.log('draw:created')
     var layer = e.layer
     layer.addTo(drawnItems)
     drawControlFull.remove(map)
@@ -315,7 +424,6 @@ $(document).ready(function() {
   })
 
   map.on("draw:edited", function(e) {
-    console.log('draw:edited')
     var layers = e.layers
     layers.eachLayer(function (layer) {
       updateGeomField(wellknown.stringify(layer.toGeoJSON()))
@@ -323,7 +431,6 @@ $(document).ready(function() {
   })
 
   map.on("draw:deleted", function(e) {
-    console.log('draw:deleted')
     drawControlEditOnly.remove(map)
     drawControlFull.addTo(map)
     updateGeomField('')
