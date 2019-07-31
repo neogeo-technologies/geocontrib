@@ -1006,7 +1006,9 @@ class SubscribingView(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
 
         if action.lower() not in ['ajouter', 'annuler']:
-            logger.error("Erreur de syntaxe dans l'url d'abonnement. ")
+            msg = "Erreur de syntaxe dans l'url d'abonnement. "
+            logger.error(msg)
+            messages.error(request, "Cette action est incorrecte")
 
         elif action.lower() == 'ajouter':
             obj, _created = Subscription.objects.get_or_create(
@@ -1022,7 +1024,7 @@ class SubscribingView(SingleObjectMixin, UserPassesTestMixin, View):
                 obj.users.remove(user)
                 obj.save()
                 messages.info(request, 'Vous ne recevrez plus les notifications liés à ce projet. ')
-            except Exception as err:
-                logger.error(str(err))
+            except Exception:
+                logger.exception('SubscribingView.get')
 
         return redirect('collab:project', slug=slug)

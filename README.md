@@ -35,15 +35,21 @@ cp src/collab/static/collab/img/default.png media/
 cp src/collab/static/collab/img/logo.png media/
 ```
 
+## Définir le domaine et le nom du site.
+
+Ces données sont à définir depuis l'admin Django dans la section Site et
+permettent notamment d'afficher les url dans les gabarit d'e-mail
+
 # TODO:
-- [ ] Import en masse
-- [ ] Import de photographie
-- [ ] Téléchargement
+
+- [x] Import en masse
+- [x] Import de photographie
+- [x] Téléchargement
 - [ ] Abonnement
 - [x] Projet: Changer niveau d'autorisation
 - [x] Projet: Administrer les membres: cf service api GET projects/<slug:slug>/utilisateurs
-- [x] Feature: Liaison entre Features
-- [ ] Feature: Affichage et edition carto
+- [ ] Feature: Liaison entre Features
+- [x] Feature: Affichage et edition carto
 - [x] Mon Profil: Template à revoir
 - [x] Permissions: Administrateur de projet ajout et màj
 - [x] Commentaire

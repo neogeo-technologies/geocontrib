@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django.contrib.gis',
     'rest_framework',
     'rest_framework_gis',
@@ -187,6 +188,8 @@ LOGO_PATH = '/media/logo.png'
 IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
 
 FILE_MAX_SIZE = 10000000
+
+SITE_ID = 1
 
 # SMTP dev confs
 

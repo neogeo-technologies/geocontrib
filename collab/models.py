@@ -94,10 +94,10 @@ class Authorization(models.Model):
     @classmethod
     def get_rank(cls, user, project):
 
-        # Si pas d'autorisation defini ou utilisateur non connecté
         try:
             auth = cls.objects.get(user=user, project=project)
         except Exception:
+            # Si pas d'autorisation defini ou utilisateur non connecté
             user_rank = 1 if user.is_authenticated else 0
         else:
             user_rank = auth.level.rank
@@ -150,11 +150,11 @@ class Authorization(models.Model):
             if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
                 user_perms['can_archive_feature'] = True
 
-            # on permet aux utilisateur de modifier leur propre feature
-            if user_rank >= 3 or (feature and feature.creator == user):
+            # On permet aux contributeurs et aux auteurs de modifier les features
+            if user_rank >= 2 or (feature and feature.creator == user):
                 user_perms['can_update_feature'] = True
 
-            # seuls les moderateurs peuvent publier
+            # Seuls les moderateurs peuvent publier
             if user_rank >= 3:
                 user_perms['can_publish_feature'] = True
             if user_rank >= 2:
@@ -298,6 +298,18 @@ class Feature(models.Model):
 
     def __str__(self):
         return str(self.title)
+
+    def get_absolute_url(self):
+
+        return reverse('collab:feature_update', kwargs={
+            'slug': self.project.slug, 'feature_type_slug': self.feature_type.slug,
+            'feature_id': self.feature_id})
+
+    def get_view_url(self):
+
+        return reverse('collab:feature_detail', kwargs={
+            'slug': self.project.slug, 'feature_type_slug': self.feature_type.slug,
+            'feature_id': self.feature_id})
 
     @property
     def custom_fields_as_list(self):
@@ -630,6 +642,7 @@ class Event(models.Model):
                             emails=moderators__emails, context=context)
                     except Exception:
                         logger.exception('Event.ping_users')
+
                 # On notifie l'auteur du signalement si l'evenement concerne
                 # la publication de son signalement
                 if status_has_changed and new_status == 'published':
@@ -666,7 +679,7 @@ class Event(models.Model):
             try:
                 notif_suscribers_project_event(emails=suscribers_emails, context=context)
             except Exception:
-                logger.error('Event.ping_users.notif_suscribers_project_event')
+                logger.exception('Event.ping_users.notif_suscribers_project_event')
 
 
 class Subscription(models.Model):

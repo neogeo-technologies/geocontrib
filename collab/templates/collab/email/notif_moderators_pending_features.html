@@ -6,7 +6,7 @@
   <p>Vous pouvez confirmer sa publication en editant son statut.</p>
   <br>
   <a
-    href="{% url 'collab:feature_detail' slug=feature.project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id %}">
+    href="{{ url_feature }}">
       {{ feature.title }}
   </a>
   <br>
