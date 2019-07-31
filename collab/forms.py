@@ -279,6 +279,9 @@ class FeatureBaseForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         project = feature_type.project
+
+        # Status choices
+        initial = 'draft'
         choices = tuple(x for x in Feature.STATUS_CHOICES)
         if not project.moderation:
             choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] != 'pending')
@@ -290,7 +293,7 @@ class FeatureBaseForm(forms.ModelForm):
 
         self.fields["status"] = forms.ChoiceField(
             choices=choices,
-            # initial=initial
+            initial=initial
         )
 
         # TODO: factoriser les attributs de champs geom

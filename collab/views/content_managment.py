@@ -600,7 +600,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
                 'feature_types': project.featuretype_set.all(),
                 'project': project,
             }
-            return render(request, 'collab/feature_type/add_feature_type.html', context)
+            return render(request, 'collab/feature_type/feature_type_create.html', context)
 
 
 @method_decorator(DECORATORS, name='dispatch')

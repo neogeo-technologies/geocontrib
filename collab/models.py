@@ -653,7 +653,7 @@ class Event(models.Model):
             Subscription = apps.get_model(app_label='collab', model_name='Subscription')
             subscription = Subscription.objects.get(project__slug=self.project_slug)
         except Subscription.DoesNotExist:
-            logger.error('No suscription for {}'.format(self.project_slug))
+            logger.info('No suscription for {}'.format(self.project_slug))
         else:
             context = {
                 'project': subscription.project,
@@ -927,7 +927,7 @@ def notify_or_stack_events(sender, instance, created, **kwargs):
             stack.save()
         # Sinon notification instantané
         else:
-            # try:
-            instance.ping_users()
-            # except Exception as e:
-            #     logger.exception('ping_users@notify_or_stack_events')
+            try:
+                instance.ping_users()
+            except Exception as e:
+                logger.exception('ping_users@notify_or_stack_events')
