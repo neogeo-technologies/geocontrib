@@ -150,7 +150,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
                     )
 
             except Exception as err:
-                logger.error(err)
+                logger.exception('CommentCreate.post')
                 messages.error(
                     request,
                     "Erreur à l'ajout du commentaire: {err}".format(err=err))
@@ -236,6 +236,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
                     extra=extra_form.cleaned_data
                 )
             except Exception as err:
+                logger.exception('FeatureCreate.post')
                 messages.error(
                     request,
                     "Une erreur s'est produite lors de la création du signalement {title}: {err}".format(
@@ -253,6 +254,10 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
 
         else:
             logger.error(feature_form.errors)
+            logger.error(extra_form.errors)
+
+        import pdb; pdb.set_trace()
+
         context = {
             'project': project,
             'feature_type': feature_type,
@@ -714,8 +719,8 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
         try:
             up_file = request.FILES['json_file'].read()
             data = json.loads(up_file.decode('utf-8'))
-        except Exception as err:
-            logger.error(str(err))
+        except Exception:
+            logger.exception('ImportFromGeoJSON.post')
             messages.error(request, "Erreur à l'import du fichier. ")
         else:
             try:
@@ -755,16 +760,16 @@ class ImportFromImage(SingleObjectMixin, UserPassesTestMixin, View):
         context = {}
         try:
             up_file = request.FILES['image_file']
-        except Exception as err:
-            logger.error(str(err))
+        except Exception:
+            logger.exception('ImportFromImage.post')
             context['status'] = "error"
             context['message'] = "Erreur à l'import du fichier. "
             status = 400
 
         try:
             data_geom_wkt = exif.get_image_geoloc_as_wkt(up_file, with_alt=False, ewkt=False)
-        except Exception as err:
-            logger.error(str(err))
+        except Exception:
+            logger.exception('ImportFromImage.post')
             context['status'] = "error"
             context['message'] = "Erreur à lors de la lecture des données GPS. "
             status = 400

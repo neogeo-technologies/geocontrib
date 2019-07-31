@@ -187,3 +187,19 @@ LOGO_PATH = '/media/logo.png'
 IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
 
 FILE_MAX_SIZE = 10000000
+
+# SMTP dev confs
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = 'CHANGEME'
+
+# EMAIL_PORT = 587
+
+# EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'CHANGEME'
+
+EMAIL_HOST_PASSWORD = 'CHANGEME'
+
+DEFAULT_FROM_EMAIL = 'no-reply@collab.fr'

@@ -603,7 +603,6 @@ class Event(models.Model):
         event_initiator = self.user
 
         if self.object_type == 'feature':
-
             feature = Feature.objects.get(feature_id=self.feature_id)
             project = feature.project
             if project.moderation:
@@ -629,8 +628,8 @@ class Event(models.Model):
                     try:
                         notif_moderators_pending_features(
                             emails=moderators__emails, context=context)
-                    except Exception as err:
-                        logger.error(str(err))
+                    except Exception:
+                        logger.exception('Event.ping_users')
                 # On notifie l'auteur du signalement si l'evenement concerne
                 # la publication de son signalement
                 if status_has_changed and new_status == 'published':
@@ -642,8 +641,8 @@ class Event(models.Model):
                         try:
                             notif_creator_published_feature(
                                 emails=[feature.creator.email, ], context=context)
-                        except Exception as err:
-                            logger.error(str(err))
+                        except Exception:
+                            logger.exception('Event.ping_users.notif_creator_published_feature')
 
         # On notifie les utilisateurs abonnés au projet de tout evenement,
         # dont il ne sont pas à l'origine.
@@ -666,8 +665,8 @@ class Event(models.Model):
             ).values_list('email', flat=True)
             try:
                 notif_suscribers_project_event(emails=suscribers_emails, context=context)
-            except Exception as err:
-                logger.error(str(err))
+            except Exception:
+                logger.error('Event.ping_users.notif_suscribers_project_event')
 
 
 class Subscription(models.Model):
@@ -845,8 +844,8 @@ def set_author_perms(sender, instance, created, **kwargs):
                 user=instance.creator,
                 level=UserLevelPermission.objects.get(rank=4)
             )
-        except Exception as err:
-            logger.error("Error on Authorization create: {}".format(str(err)))
+        except Exception:
+            logger.exception('Trigger.set_author_perms')
 
 
 # EVENT'S TRIGGERS
@@ -929,5 +928,5 @@ def notify_or_stack_events(sender, instance, created, **kwargs):
         else:
             try:
                 instance.ping_users()
-            except Exception as e:
+            except Exception:
                 logger.exception('ping_users@notify_or_stack_events')

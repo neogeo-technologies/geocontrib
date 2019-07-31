@@ -291,30 +291,34 @@ class FeatureBaseForm(forms.ModelForm):
             choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] in ['draft', 'pending'])
             initial = 'pending'
 
-        self.fields["status"] = forms.ChoiceField(
+        if project.moderation and Authorization.has_permission(user, 'can_publish_feature', project):
+            choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] in ['draft', 'published', 'archived'])
+            initial = 'pending'
+
+        self.fields['status'] = forms.ChoiceField(
             choices=choices,
             initial=initial
         )
 
         # TODO: factoriser les attributs de champs geom
         if feature_type.geom_type == "point":
-            self.fields["geom"] = forms.PointField(
+            self.fields['geom'] = forms.PointField(
                 label="Localisation",
-                required=False,
+                required=True,
                 srid=4326
             )
 
         if feature_type.geom_type == "linestring":
-            self.fields["geom"] = forms.LineStringField(
+            self.fields['geom'] = forms.LineStringField(
                 label="Localisation",
-                required=False,
+                required=True,
                 srid=4326
             )
 
         if feature_type.geom_type == "polygon":
-            self.fields["geom"] = forms.PolygonField(
+            self.fields['geom'] = forms.PolygonField(
                 label="Localisation",
-                required=False,
+                required=True,
                 srid=4326
             )
 
