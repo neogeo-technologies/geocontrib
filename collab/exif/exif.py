@@ -40,10 +40,10 @@ get_float = lambda x: float(x[0]) / float(x[1])
 
 class Exif():
 
-    WKT_POINT_TEMPLATE = "POINT({lat} {lon})"
-    WKT_POINT_Z_TEMPLATE = "POINT({lat} {lon} {alt})"
-    EWKT_POINT_TEMPLATE = "SRID=4326;POINT({lat} {lon})"
-    EWKT_POINT_Z_TEMPLATE = "SRID=4326;POINT({lat} {lon} {alt})"
+    WKT_POINT_TEMPLATE = "POINT({lon} {lat})"
+    WKT_POINT_Z_TEMPLATE = "POINT({lon} {lon} {alt})"
+    EWKT_POINT_TEMPLATE = "SRID=4326;POINT({lon} {lat})"
+    EWKT_POINT_Z_TEMPLATE = "SRID=4326;POINT({lon} {lat} {alt})"
 
     def __init__(self, image_file_path):
         self.exif = None
@@ -159,4 +159,3 @@ def get_image_tag_by_name(image_file_path, tag_name):
 def get_image_tag_by_id(image_file_path, tag_id):
     exif = Exif(image_file_path)
     return exif.get_tag_by_id(tag_id)
-
