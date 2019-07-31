@@ -186,7 +186,7 @@
 {% block custom_resources %}
 <style>
 #map {
-  height:300px;
+  height:350px;
   width:100%;
 }
 </style>
@@ -231,7 +231,8 @@ function updateMap(map, geomFeatureJSON) {
     }
     map.fitBounds(drawnItems.getBounds())
   } else {
-    console.log('ZOOM FRANCE ENTIERE');
+    console.log('ZOOM FRANCE ENTIERE')
+    map.setView([46.52863469527167, 2.43896484375], 5)
   }
 }
 
@@ -356,19 +357,18 @@ $(document).ready(function() {
     var imageFile = $('#form-geo-image .image_file').prop('files')[0]
     formGeoImage.append("image_file", imageFile)
 
-    console.log(formGeoImage)
-
     var request = new XMLHttpRequest()
-    // request.onload = function(e) {
     request.onreadystatechange = function(e) {
       if (this.readyState === XMLHttpRequest.DONE) {
         var responseJSON = JSON.parse(this.response);
         if (this.status === 200) {
           console.log('SUCCESS REQUEST', responseJSON)
-          let responseGeomJSON = turf.flip(wellknown.parse(responseJSON.geom))
+          // Set Geom
+          let responseGeomJSON = wellknown.parse(responseJSON.geom)
           updateMap(map, responseGeomJSON)
           updateGeomField(wellknown.stringify(responseGeomJSON))
           $('.mini.modal').modal('hide')
+          // Set Attachment
         } else {
           console.log('ERROR REQUEST', responseJSON)
           $('#form-geo-image .error-message').html(responseJSON.message)
@@ -383,17 +383,12 @@ $(document).ready(function() {
   // **************************** //
   //              MAP             //
   // **************************** //
-  var map = L.map('map').setView([43.604462, 1.444247], 13);
+  var map = L.map('map').setView([46.52863469527167, 2.43896484375], 5)
   L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map)
 
   map.addLayer(drawnItems)
-
-  {% if feature_form.geom.value.wkt %}
-    updateMap(map, wellknown.parse("{{ feature_form.geom.value.wkt }}"))
-  {% endif %}
-
 
   var drawControlFull = new L.Control.Draw({
     edit: {
@@ -410,6 +405,7 @@ $(document).ready(function() {
   })
 
   {% if feature_form.geom.value.wkt %}
+    updateMap(map, wellknown.parse("{{ feature_form.geom.value.wkt }}"))
     map.addControl(drawControlEditOnly);
   {% else %}
     map.addControl(drawControlFull);
