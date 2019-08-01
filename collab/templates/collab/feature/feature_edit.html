@@ -126,6 +126,7 @@
             Pièce jointe
             <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
           </h4>
+          {{ form.errors }}
           <div class="visible-fields">
             <div class="two fields">
               <div class="required field">
@@ -142,14 +143,12 @@
                 </label>
                 <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;"
                   name="{{ form.attachment_file.html_name }}" class="image_file" id="{{ form.attachment_file.id_for_label }}" >
-                {{ form.errors }}
+                {{ form.attachment_file.errors }}
               </div>
             </div>
             <div class="required field">
               <label for="{{ form.info.id_for_label }}">{{ form.info.label }}</label>
-              <textarea name="{{ form.info.html_name }}" rows="5">
-                {% if form.info.value %}{{ form.info.value }}{% endif %}
-              </textarea>
+              <textarea name="{{ form.info.html_name }}" rows="5">{% if form.info.value %}{{ form.info.value }}{% endif %}</textarea>
               {{ form.info.errors }}
             </div>
           </div>
@@ -181,6 +180,7 @@
               Liaison
               <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
             </h4>
+            {{ form.errors }}
             <div class="visible-fields">
               <div class="two fields">
                 <div class="required field">
@@ -385,9 +385,7 @@ $(document).ready(function() {
           </div>
           <div class="required field">
             <label for="{{ attachment_formset.empty_form.info.id_for_label }}">{{ attachment_formset.empty_form.info.label }}</label>
-            <textarea name="{{ attachment_formset.empty_form.info.html_name }}" rows="5">
-              {% if attachment_formset.empty_form.info.value %}{{ attachment_formset.empty_form.info.value }}{% endif %}
-            </textarea>
+            <textarea name="{{ attachment_formset.empty_form.info.html_name }}" rows="5">{% if attachment_formset.empty_form.info.value %}{{ attachment_formset.empty_form.info.value }}{% endif %}</textarea>
             {{ attachment_formset.info.errors }}
           </div>
         </div>
