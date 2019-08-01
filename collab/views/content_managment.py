@@ -336,7 +336,9 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
 class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
     queryset = Feature.objects.all()
+
     pk_url_kwarg = 'feature_id'
+
     LinkedFormset = modelformset_factory(
         model=FeatureLink,
         form=FeatureLinkForm,
@@ -379,14 +381,10 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             feature_id=F('feature_to')).values('relation_type', 'feature_id')
 
         linked_formset = self.LinkedFormset(
+            form_kwargs={'feature_type': feature_type},
             prefix='linked',
             initial=linked_features,
             queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
-
-        for form in linked_formset:
-            form.fields['feature_to'].choices = tuple(
-                (feat.feature_id, "{} ({} - {})".format(feat.title, feat.creator.username, feat.created_on)) for feat in Feature.objects.filter(feature_type=feature_type)
-            )
 
         attachments = Attachment.objects.filter(
             project=project, feature_id=feature.feature_id,

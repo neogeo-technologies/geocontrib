@@ -14,6 +14,9 @@ from collab.models import FeatureType
 from collab.models import Project
 from collab.models import UserLevelPermission
 
+import logging
+logger = logging.getLogger('django')
+
 
 class CustomFieldModelBaseFS(BaseModelFormSet):
     def clean(self):
@@ -218,6 +221,17 @@ class FeatureLinkForm(forms.ModelForm):
             'relation_type',
             'feature_to',
         )
+
+    def __init__(self, *args, **kwargs):
+        feature_type = kwargs.pop('feature_type', None)
+        super().__init__(*args, **kwargs)
+
+        try:
+            self.fields['feature_to'].choices = tuple(
+                (feat.feature_id, "{} ({} - {})".format(feat.title, feat.creator.username, feat.created_on)) for feat in Feature.objects.filter(feature_type=feature_type)
+            )
+        except Exception:
+            logger.exception('No feature_type found')
 
 
 class FeatureExtraForm(forms.Form):
