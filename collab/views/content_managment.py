@@ -379,16 +379,19 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             feature_id=F('feature_to')).values('relation_type', 'feature_id')
 
         linked_formset = self.LinkedFormset(
+            prefix='linked',
             initial=linked_features,
             queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
 
-        attachements = Attachment.objects.filter(
+        attachments = Attachment.objects.filter(
             project=project, feature_id=feature.feature_id,
             type_objet='feature'
         )
+
         attachment_formset = self.AttachmentFormset(
-            initial=attachements,
-            queryset=attachements
+            prefix='attachment',
+            initial=attachments.values(),
+            queryset=attachments
         )
 
         context = {
@@ -403,9 +406,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'availables_features': availables_features,
             'linked_formset': linked_formset,
             'attachment_formset': attachment_formset,
-            'attachment_form': AttachmentForm(),
-            'comment_form': CommentForm(),
-            'attachments': attachements,
+            'attachments': attachments,
             'action': 'update'
         }
         return render(request, 'collab/feature/feature_edit.html', context)
@@ -420,26 +421,52 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         ).exclude(feature_id=feature.feature_id)
 
         extra = CustomField.objects.filter(feature_type=feature_type)
+
         feature_form = FeatureBaseForm(
             request.POST, instance=feature, feature_type=feature_type, user=user)
 
         extra_form = FeatureExtraForm(request.POST, feature=feature, extra=extra)
 
-        linked_formset = self.LinkedFormset(request.POST)
+        linked_formset = self.LinkedFormset(request.POST or None)
 
-        attachment_formset = self.AttachmentFormset(request.POST)
+        attachment_formset = self.AttachmentFormset(request.POST or None)
 
         old_status = feature.status
+
         old_geom = feature.geom.wkt if feature.geom else ''
 
-        forms_are_valid = feature_form.is_valid() and \
-            extra_form.is_valid() and \
-            linked_formset.is_valid() and \
-            attachment_formset.is_valid()
-
+        all_forms = [
+            feature_form,
+            extra_form,
+            attachment_formset,
+            linked_formset,
+        ]
+        forms_are_valid = all([ff.is_valid() for ff in all_forms])
+        logger.error(request.POST)
         if not forms_are_valid:
 
+            logger.error([ff.errors for ff in all_forms])
             messages.error(request, "Erreur à la mise à jour du signalement. ")
+
+            feature_form = FeatureBaseForm(instance=feature, feature_type=feature_type, user=user)
+            extra_form = FeatureExtraForm(feature=feature, extra=extra)
+            linked_features = FeatureLink.objects.filter(
+                feature_from=feature.feature_id
+            ).annotate(
+                feature_id=F('feature_to')).values('relation_type', 'feature_id')
+            linked_formset = self.LinkedFormset(
+                initial=linked_features,
+                queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
+
+            attachments = Attachment.objects.filter(
+                project=project, feature_id=feature.feature_id,
+                type_objet='feature'
+            )
+            attachment_formset = self.AttachmentFormset(
+                initial=attachments.values(),
+                queryset=attachments
+            )
+
             context = {
                 'feature': feature,
                 'feature_types': FeatureType.objects.filter(project=project),
@@ -451,9 +478,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 'availables_features': availables_features,
                 'linked_formset': linked_formset,
                 'attachment_formset': attachment_formset,
-                'attachments': Attachment.objects.filter(
-                    project=project, feature_id=feature.feature_id,
-                    type_objet='feature'),
+                'attachments': attachments,
                 'action': 'update'
             }
             return render(request, 'collab/feature/feature_edit.html', context)
@@ -490,7 +515,6 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             )
 
             # Traitement des signalements liés
-            logger.error(linked_formset.cleaned_data)
             for data in linked_formset.cleaned_data:
 
                 feature_link = data.pop('id', None)
@@ -505,12 +529,12 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                         feature_link.delete()
 
                 if not feature_link and not data.get('DELETE'):
-
                     FeatureLink.objects.create(
                         relation_type=data.get('relation_type'),
                         feature_from=feature_id,
                         feature_to=data.get('feature_to')
                     )
+
             # Traitement des piéces jointes
             for data in attachment_formset.cleaned_data:
 
