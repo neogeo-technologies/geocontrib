@@ -70,6 +70,7 @@
 $(document).on('click', '.remove-field', function () {
   var $segment = $(this).parent().parent('.segment')
   $segment.hide()
+  $segment.children('.visible-fields').remove()
   $segment.children('.delete-hidden-field').prop('checked', true)
 })
 
@@ -83,7 +84,7 @@ $('#add-field').click(function() {
         Champ personnalisé
         <button class="ui small compact right floated icon button remove-field" type="button"><i class="ui times icon"></i></button>
       </h4>
-      <div class="four fields">
+      <div class="four fields visible-fields">
         <div class="required field">
           <label for="{{ formset.empty_form.label.id_for_label }}">{{ formset.empty_form.label.label }}</label>
           <input type="text" required maxlength="{{  formset.empty_form.label.field.max_length }}"
