@@ -210,6 +210,8 @@ class AttachmentForm(forms.ModelForm):
 
 class FeatureLinkForm(forms.ModelForm):
 
+    feature_to = forms.ChoiceField(label='Signalement lié')
+
     class Meta:
         model = FeatureLink
         fields = (

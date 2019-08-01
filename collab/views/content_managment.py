@@ -383,6 +383,11 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             initial=linked_features,
             queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
 
+        for form in linked_formset:
+            form.fields['feature_to'].choices = tuple(
+                (feat.feature_id, "{} ({} - {})".format(feat.title, feat.creator.username, feat.created_on)) for feat in Feature.objects.filter(feature_type=feature_type)
+            )
+
         attachments = Attachment.objects.filter(
             project=project, feature_id=feature.feature_id,
             type_objet='feature'
