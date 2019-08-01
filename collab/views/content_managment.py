@@ -429,7 +429,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
         linked_formset = self.LinkedFormset(request.POST or None, prefix='linked')
 
-        attachment_formset = self.AttachmentFormset(request.POST or None, prefix='attachment')
+        attachment_formset = self.AttachmentFormset(request.POST or None, request.FILES, prefix='attachment')
 
         old_status = feature.status
 
@@ -450,11 +450,14 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
             feature_form = FeatureBaseForm(instance=feature, feature_type=feature_type, user=user)
             extra_form = FeatureExtraForm(feature=feature, extra=extra)
+
             linked_features = FeatureLink.objects.filter(
                 feature_from=feature.feature_id
             ).annotate(
                 feature_id=F('feature_to')).values('relation_type', 'feature_id')
+
             linked_formset = self.LinkedFormset(
+                prefix='linked',
                 initial=linked_features,
                 queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
 
@@ -463,6 +466,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 type_objet='feature'
             )
             attachment_formset = self.AttachmentFormset(
+                prefix='attachment',
                 initial=attachments.values(),
                 queryset=attachments
             )
@@ -552,10 +556,10 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
                 if not attachment and not data.get('DELETE'):
                     Attachment.objects.create(
-                        attachment_file=data.get('attachement_file'),
+                        attachment_file=data.get('attachment_file'),
                         title=data.get('title'),
                         info=data.get('info'),
-                        type_objet=feature,
+                        type_objet='feature',
                         project=project,
                         feature_id=feature_id,
                         author=user,
