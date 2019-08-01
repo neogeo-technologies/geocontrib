@@ -59,22 +59,10 @@
             <div class="field">
               <label class="ui icon button" for="json_file">
                 <i class="file icon"></i>
-                <span class="label">Sélectionner un fichier JSON ...</span>
+                <span class="label">Sélectionner un fichier GeoJSON ...</span>
               </label>
               <input type="file" accept="application/json, .json" style="display:none;"
                 name="json_file" id="json_file">
-            </div>
-            <button type="submit" class="ui basic teal icon button"><i class="upload icon"></i> Lancer l'import</button>
-          </form>
-          <form id="form-import-features" action="{% url 'collab:import_from_image' slug=project.slug feature_type_slug=feature_type.slug %}" method="post" enctype="multipart/form-data" class="ui form">
-            {% csrf_token %}
-            <div class="field">
-              <label class="ui icon button" for="image_file">
-                <i class="file icon"></i>
-                <span class="label">Sélectionner un fichier Image ...</span>
-              </label>
-              <input type="file" accept="{{ IMAGE_FORMAT }}" style="display:none;"
-                name="image_file" id="image_file">
             </div>
             <button type="submit" class="ui basic teal icon button"><i class="upload icon"></i> Lancer l'import</button>
           </form>
@@ -87,7 +75,6 @@
     <h3 class="ui header">
       Derniers signalements
     </h3>
-    <div class="ui divider"></div>
     {% for feature in features %}
       <div class="ui small header">
         <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">
@@ -95,7 +82,6 @@
         </a>
         <div class="sub header">{{ feature.description}}</div>
       </div>
-      <div class="ui divider"></div>
     {% endfor %}
     <a class="ui right labeled icon button" href="{% url 'collab:feature_list' slug=project.slug %}">
       <i class="right arrow icon"></i>

@@ -24,7 +24,7 @@
         {% endif %}
         <div class="ui hidden divider"></div>
         <div class="sub header">
-          {{ feature.description }}
+          {{ feature.description|linebreaks }}
         </div>
       </div>
     </h1>
@@ -44,11 +44,11 @@
           <td>{{ feature.created_on }}</td>
         </tr>
         <tr>
-          <td>Date de derniere modification</td>
+          <td>Date de dernière modification</td>
           <td>{{ feature.updated_on }}</td>
         </tr>
         <tr>
-          <td>Date de d'archivage</td>
+          <td>Date d'archivage</td>
           <td>{{ feature.archived_on }}</td>
         </tr>
         <tr>
@@ -75,9 +75,10 @@
           {% endfor %}
         <tr> -->
       </tbody>
-
-
     </table>
+    {% for link in linked_features %}
+      <p>{{ link.relation_type }} {{ link.feature_to }}</p>
+    {% endfor %}
   </div>
   <div class="seven wide column">
     <a href="{% url 'collab:feature_list' slug=project.slug %}">
@@ -107,32 +108,58 @@
 
   <div class="seven wide column">
     <h3 class="ui header">Activités et commentaires</h3>
+
+
+    <!-- {% for event in events %}
+      <hr>
+      <h4>{{ event.event_type }}</h4>
+      {{ event }}
+    {% endfor %} -->
     <div class="ui feed">
+
+      {% for event in events %}
       <div class="event">
+        {% if event.event_type == 'create' %}
+          {% if event.object_type == 'feature' %}
+          <div class="content">
+            <div class="summary">
+              Création du signalement
+              {% if user.is_authenticated %} par {{ user.get_full_name|default:user.username }}{% endif %}
+              <div class="date">
+                {{ event.created_on }}
+              </div>
+            </div>
+          </div>
+          {% elif event.object_type == 'comment' %}
+          <div class="content">
+            <div class="summary">
+              Commentaire
+              {% if user.is_authenticated %} par {{ user.get_full_name|default:user.username }}{% endif %}
+              <div class="date">
+                {{ event.created_on }}
+              </div>
+            </div>
+            <div class="extra text">
+              Hey c'est un commentaire !
+            </div>
+          </div>
+          {% endif %}
+        {% elif event.event_type == 'update' %}
         <div class="content">
           <div class="summary">
-              Chouette a mis à jour le signalement
+            Signalement mis à jour
+            {% if user.is_authenticated %} par {{ user.get_full_name|default:user.username }}{% endif %}
             <div class="date">
-              25/06/2020
+              {{ event.created_on }}
             </div>
           </div>
         </div>
+        {% endif %}
       </div>
-      <div class="ui hidden divider"></div>
-      <div class="event">
-        <div class="content">
-          <div class="summary">
-            Machin a ajouté un commentaire
-            <div class="date">
-              01/01/2000
-            </div>
-          </div>
-          <div class="extra text">
-            Hey c'est un commentaire !
-          </div>
-        </div>
-      </div>
+      {% endfor %}
+
     </div>
+
     <a class="ui compact basic button button-hover-green">
       <i class="ui plus icon"></i>Ajouter un commentaire
     </a>

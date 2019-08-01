@@ -68,7 +68,7 @@
 
       <!-- Map -->
       <input type="hidden" name="{{ feature_form.geom.html_name }}" id="{{ feature_form.geom.id_for_label }}"
-        value="{% if feature_form.geom.value.wkt %}{{ feature_form.geom.value.wkt }}{% endif %}" />
+        value="{% if feature_form.geom.value.ewkt %}{{ feature_form.geom.value.ewkt }}{% endif %}" />
       <div id="map"></div>
     </div>
 
@@ -112,7 +112,6 @@
 
     <!-- Pièces jointes -->
     <div class="ui horizontal divider">PIÈCES JOINTES</div>
-
     {{ attachment_formset.non_form_errors }}
     <div id="formsets-attachment">
       {{ attachment_formset.management_form }}
@@ -171,7 +170,6 @@
 
     <!-- Signalements liés -->
     <div class="ui horizontal divider">SIGNALEMENTS LIÉS</div>
-
     {{ linked_formset.non_form_errors }}
     <div id="formsets-link">
       {{ linked_formset.management_form }}
@@ -207,9 +205,18 @@
                 </div>
                 <div class="required field">
                   <label for="{{ form.feature_to.id_for_label }}">{{ form.feature_to.label }}</label>
-                  <input type="text" required maxlength="{{ form.feature_to.field.max_length }}"
-                    name="{{ form.feature_to.html_name }}" id="{{  form.feature_to.id_for_label }}"
-                    value="{{ form.feature_to.value }}">
+                  <div class="ui selection search dropdown">
+                    <input type="hidden"
+                      name="{{ form.feature_to.html_name }}" id="{{ form.feature_to.id_for_label }}"
+                      value="{% if form.feature_to.value %}{{ form.feature_to.value }}{% endif %}">
+                    <div class="default text"></div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                      {% for x,y in form.feature_to.field.choices %}
+                        <div class="item" data-value="{{ x }}" {% if form.feature_to.value == x %} selected{% endif %}>{{ y }}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
                   {{ form.feature_to.errors }}
                 </div>
               </div>
@@ -418,6 +425,8 @@ $(document).ready(function() {
         <div class="visible-fields">
           <div class="two fields">
             <div class="required field">
+            {% for choice in linked_formset.empty_form.relation_type.field.choices %} {{ choice }} {% endfor %}
+
               <label for="{{ linked_formset.empty_form.relation_type.id_for_label }}">{{ linked_formset.empty_form.relation_type.label }}</label>
               <div class="ui selection dropdown">
                 <input type="hidden"
@@ -434,9 +443,21 @@ $(document).ready(function() {
               {{ linked_formset.relation_type.errors }}
             </div>
             <div class="required field">
+            {% for choice in linked_formset.empty_form.feature_to.field.choices %} {{ choice }} {% endfor %}
+              {{ linked_formset.empty_form.feature_to.field.choices }}
               <label for="{{ linked_formset.empty_form.feature_to.id_for_label }}">{{ linked_formset.empty_form.feature_to.label }}</label>
-              <input type="text" required maxlength="{{ linked_formset.empty_form.feature_to.field.max_length }}"
-                name="{{ linked_formset.empty_form.feature_to.html_name }}" id="{{  linked_formset.empty_form.feature_to.id_for_label }}">
+              <div class="ui selection search dropdown">
+                <input type="hidden"
+                  name="{{ linked_formset.empty_form.feature_to.html_name }}" id="{{ linked_formset.empty_form.feature_to.id_for_label }}"
+                  value="{% if linked_formset.empty_form.feature_to.value %}{{ linked_formset.empty_form.feature_to.value }}{% endif %}">
+                <div class="default text"></div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  {% for x,y in linked_formset.empty_form.feature_to.field.choices %}
+                    <div class="item" data-value="{{ x }}" {% if linked_formset.empty_form.feature_to.value == x %} selected{% endif %}>{{ y }}</div>
+                  {% endfor %}
+                </div>
+              </div>
               {{ linked_formset.feature_to.errors }}
             </div>
           </div>
