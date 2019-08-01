@@ -544,15 +544,14 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
                 attachment = data.pop('id', None)
 
-                if attachment:
-                    if not data.get('DELETE'):
-                        attachment.attachment_file = data.get('attachement_file')
-                        attachment.title = data.get('title')
-                        attachment.info = data.get('info')
-                        attachment.save()
+                if attachment and data.get('DELETE'):
+                    attachment.delete()
 
-                    if data.get('DELETE'):
-                        attachment.delete()
+                if attachment and not data.get('DELETE'):
+                    attachment.attachment_file = data.get('attachment_file')
+                    attachment.title = data.get('title')
+                    attachment.info = data.get('info')
+                    attachment.save()
 
                 if not attachment and not data.get('DELETE'):
                     Attachment.objects.create(
