@@ -197,6 +197,7 @@ class AttachmentForm(forms.ModelForm):
         )
 
     def clean(self):
+
         cleaned_data = super().clean()
         up_file = cleaned_data.get("attachment_file")
         title = cleaned_data.get("title")

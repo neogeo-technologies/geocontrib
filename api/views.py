@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from api.serializers import FeatureGeoJSONSerializer
+from api.serializers import FeatureLinkSerializer
 from api.serializers import ProjectSerializer
 from collab.models import Authorization
 from collab.models import Feature
@@ -32,6 +33,21 @@ class ExportFeatureList(APIView):
         response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
         response['Content-Disposition'] = 'attachment; filename=export_projet.json'
         return response
+
+
+class AvailablesFeatureLinkList(APIView):
+
+    http_method_names = ['get', ]
+
+    def get(self, request, slug, feature_type_slug):
+        """
+            Vue retournant un abstract des signalements d'un type donnée,
+            permettant de rechercher les signalements liés
+        """
+        features = Feature.objects.filter(
+            status="published", project__slug=slug, feature_type__slug=feature_type_slug)
+        serializer = FeatureLinkSerializer(features, many=True, context={'request': request})
+        return Response(serializer.data)
 
 
 class ProjectView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):

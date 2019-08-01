@@ -122,3 +122,24 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'nb_comments',
             'nb_contributors'
         )
+
+
+class FeatureLinkSerializer(serializers.ModelSerializer):
+    user_full_name = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+
+    def get_user_full_name(self, obj):
+        return obj.creator.get_full_name()
+
+    def get_username(self, obj):
+        return obj.creator.username
+
+    class Meta:
+        model = Feature
+        fields = (
+            'feature_id',
+            'title',
+            'created_on',
+            'user_full_name',
+            'username'
+        )

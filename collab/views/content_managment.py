@@ -427,9 +427,9 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
         extra_form = FeatureExtraForm(request.POST, feature=feature, extra=extra)
 
-        linked_formset = self.LinkedFormset(request.POST or None)
+        linked_formset = self.LinkedFormset(request.POST or None, prefix='linked')
 
-        attachment_formset = self.AttachmentFormset(request.POST or None)
+        attachment_formset = self.AttachmentFormset(request.POST or None, prefix='attachment')
 
         old_status = feature.status
 
@@ -442,7 +442,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             linked_formset,
         ]
         forms_are_valid = all([ff.is_valid() for ff in all_forms])
-        logger.error(request.POST)
+
         if not forms_are_valid:
 
             logger.error([ff.errors for ff in all_forms])
