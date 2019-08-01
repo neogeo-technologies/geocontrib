@@ -113,12 +113,66 @@
     <!-- Pièces jointes -->
     <div class="ui horizontal divider">PIÈCES JOINTES</div>
 
-    {{ attachment_formset.management_form }}
     {{ attachment_formset.non_form_errors }}
+    <div id="formsets-attachment">
+      {{ attachment_formset.management_form }}
+      {% for form in attachment_formset %}
+        {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+        {% endfor %}
+<!--
 
-    <!-- <p>{{ attachment_formset.empty_form.as_table }}</p> -->
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+          {% for error in form.non_field_errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% for field in form.visible_fields %}
+        <tr>
+          <th>{{ field.label_tag }}</th>
+          <td>
+            {{ field }}
+            {{ field.errors }}
+            {{ field.help_text }}
+          </td>
+        </tr>
+        {% endfor %} -->
 
-    <div id="formsets-attachment"></div>
+        <div class="ui teal segment">
+          <h4>
+            Pièce jointe
+            <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+          </h4>
+          <div class="two fields">
+            <div class="required field">
+              <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+              <input type="text" required maxlength="{{ form.title.field.max_length }}"
+                name="{{ form.title.html_name }}" id="{{  form.title.id_for_label }}">
+              {{ form.title.errors }}
+            </div>
+            <div class="required field">
+              <label>Fichier (PDF, PNG, JPEG)</label>
+              <label class="ui icon button" for="{{ form.attachment_file.id_for_label }}">
+                <i class="file icon"></i>
+                <span class="label">Sélectionner un fichier ...</span>
+              </label>
+              <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;"
+                name="{{ form.attachment_file.html_name }}" class="image_file" id="{{ form.attachment_file.id_for_label }}" >
+              {{ form.errors }}
+            </div>
+          </div>
+          <div class="required field">
+            <label for="{{ form.info.id_for_label }}">{{ form.info.label }}</label>
+            <textarea name="{{ form.info.html_name }}" rows="5">
+              {% if form.info.value %}{{ form.info.value }}{% endif %}
+            </textarea>
+            {{ form.info.errors }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
     <button id="add-attachment" type="button" class="ui compact basic button button-hover-green">
       <i class="ui plus icon"></i>Ajouter une pièce jointe
     </button>
@@ -128,62 +182,51 @@
 
     {{ linked_formset.non_form_errors }}
     <div id="formsets-link">
-      <!-- {{ linked_formset.management_form }} -->
+      {{ linked_formset.management_form }}
       {% for form in linked_formset %}
-
-          <!-- {% for hidden in form.hidden_fields %}
-            {{ hidden }}
-          {% endfor %}
-
+        {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+        {% endfor %}
+          <!--
           {% if form.non_field_errors %}
           <div class="alert alert-danger" role="alert">
             {% for error in form.non_field_errors %}
               {{ error }}
             {% endfor %}
           </div>
-          {% endif %}
-          {% for field in form.visible_fields %}
-          <tr>
-            <th>{{ field.label_tag }}</th>
-            <td>
-              {{ field }}
-              {{ field.errors }}
-              {{ field.help_text }}
-            </td>
-          </tr>
-          {% endfor %} -->
+          {% endif %} -->
 
-          <div class="ui teal segment">
-            <h4>
-              Liaison
-              <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
-            </h4>
-            <div class="two fields">
-              <div class="required field">
-                <label for="{{ form.relation_type.id_for_label }}">{{ form.relation_type.label }}</label>
-                <div class="ui selection dropdown">
-                  <input type="hidden"
-                    name="{{ form.relation_type.html_name }}" id="{{ form.relation_type.id_for_label }}"
-                    value="{{ form.relation_type.value }}">
-                  <div class="default text"></div>
-                  <i class="dropdown icon"></i>
-                  <div class="menu">
-                    {% for x,y in form.relation_type.field.choices %}
-                      <div class="item" data-value="{{ x }}" {% if form.relation_type.value == x %} selected{% endif %}>{{ y }}</div>
-                    {% endfor %}
-                  </div>
+        <div class="ui teal segment">
+          <h4>
+            Liaison
+            <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+          </h4>
+          <div class="two fields">
+            <div class="required field">
+              <label for="{{ form.relation_type.id_for_label }}">{{ form.relation_type.label }}</label>
+              <div class="ui selection dropdown">
+                <input type="hidden"
+                  name="{{ form.relation_type.html_name }}" id="{{ form.relation_type.id_for_label }}"
+                  value="{{ form.relation_type.value }}">
+                <div class="default text"></div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  {% for x,y in form.relation_type.field.choices %}
+                    <div class="item" data-value="{{ x }}" {% if form.relation_type.value == x %} selected{% endif %}>{{ y }}</div>
+                  {% endfor %}
                 </div>
-                {{ form.relation_type.errors }}
               </div>
-              <div class="required field">
-                <label for="{{ form.feature_to.id_for_label }}">{{ form.feature_to.label }}</label>
-                <input type="text" required maxlength="{{ form.feature_to.field.max_length }}"
-                  name="{{ form.feature_to.html_name }}" id="{{  form.feature_to.id_for_label }}"
-                  value="{{ form.feature_to.value }}">
-                {{ form.feature_to.errors }}
-              </div>
+              {{ form.relation_type.errors }}
+            </div>
+            <div class="required field">
+              <label for="{{ form.feature_to.id_for_label }}">{{ form.feature_to.label }}</label>
+              <input type="text" required maxlength="{{ form.feature_to.field.max_length }}"
+                name="{{ form.feature_to.html_name }}" id="{{  form.feature_to.id_for_label }}"
+                value="{{ form.feature_to.value }}">
+              {{ form.feature_to.errors }}
             </div>
           </div>
+        </div>
       {% endfor %}
     </div>
     <button id="add-link" type="button" class="ui compact basic button button-hover-green">
@@ -323,7 +366,7 @@ $(document).ready(function() {
   })
 
   $('#add-attachment').click(function() {
-    var form_idx = $('#id_form-TOTAL_FORMS').val();
+    var form_idx = $('#formsets-attachment [name=form-TOTAL_FORMS]').val();
 
     console.log('add-attachment', form_idx)
     $('#formsets-attachment').append((`
@@ -369,7 +412,7 @@ $(document).ready(function() {
   })
 
   $('#add-link').click(function() {
-    var form_idx = $('#id_form-TOTAL_FORMS').val();
+    var form_idx = $('#formsets-link [name=form-TOTAL_FORMS]').val();
 
     console.log('add-link', form_idx)
     $('#formsets-link').append((`
