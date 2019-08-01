@@ -126,9 +126,66 @@
     <!-- Signalements liés -->
     <div class="ui horizontal divider">SIGNALEMENTS LIÉS</div>
 
-    <!-- {{ linked_formset.management_form }} -->
     {{ linked_formset.non_form_errors }}
-    <div id="formsets-link"></div>
+    <div id="formsets-link">
+      <!-- {{ linked_formset.management_form }} -->
+      {% for form in linked_formset %}
+
+          <!-- {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
+
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">
+            {% for error in form.non_field_errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+          {% endif %}
+          {% for field in form.visible_fields %}
+          <tr>
+            <th>{{ field.label_tag }}</th>
+            <td>
+              {{ field }}
+              {{ field.errors }}
+              {{ field.help_text }}
+            </td>
+          </tr>
+          {% endfor %} -->
+
+          <div class="ui teal segment">
+            <h4>
+              Liaison
+              <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+            </h4>
+            <div class="two fields">
+              <div class="required field">
+                <label for="{{ form.relation_type.id_for_label }}">{{ form.relation_type.label }}</label>
+                <div class="ui selection dropdown">
+                  <input type="hidden"
+                    name="{{ form.relation_type.html_name }}" id="{{ form.relation_type.id_for_label }}"
+                    value="{{ form.relation_type.value }}">
+                  <div class="default text"></div>
+                  <i class="dropdown icon"></i>
+                  <div class="menu">
+                    {% for x,y in form.relation_type.field.choices %}
+                      <div class="item" data-value="{{ x }}" {% if form.relation_type.value == x %} selected{% endif %}>{{ y }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+                {{ form.relation_type.errors }}
+              </div>
+              <div class="required field">
+                <label for="{{ form.feature_to.id_for_label }}">{{ form.feature_to.label }}</label>
+                <input type="text" required maxlength="{{ form.feature_to.field.max_length }}"
+                  name="{{ form.feature_to.html_name }}" id="{{  form.feature_to.id_for_label }}"
+                  value="{{ form.feature_to.value }}">
+                {{ form.feature_to.errors }}
+              </div>
+            </div>
+          </div>
+      {% endfor %}
+    </div>
     <button id="add-link" type="button" class="ui compact basic button button-hover-green">
       <i class="ui plus icon"></i>Ajouter une liaison
     </button>
@@ -147,7 +204,7 @@
 
     <div class="ui divider"></div>
 
-    <button type="submit" class="ui basic teal icon button">
+    <button type="submit" class="ui teal icon button">
       <i class="white save icon"></i> Enregistrer les changements
     </button>
 
@@ -247,6 +304,10 @@ function truncate(n, len) {
 }
 
 $(document).ready(function() {
+  $(document).on('click', '.remove-formset', function () {
+    $(this).parent().parent('.segment').remove()
+  })
+
   $(document).on('change', '.image_file', function () {
     var logoFile = $(this).prop('files')[0]
     $(this).parent().children('label').children('.label').html(truncate(logoFile.name, 30))
@@ -346,10 +407,6 @@ $(document).ready(function() {
     $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
     $('.ui.dropdown').dropdown()
-    $('.remove-formset').click(function(){
-      console.log('remove-formset');
-      $(this).parent().parent('.segment').remove()
-    })
   })
 
   $('#get-geom-from-image-file').click(function() {
@@ -369,6 +426,7 @@ $(document).ready(function() {
           updateGeomField(wellknown.stringify(responseGeomJSON))
           $('.mini.modal').modal('hide')
           // Set Attachment
+          // TODO:
         } else {
           console.log('ERROR REQUEST', responseJSON)
           $('#form-geo-image .error-message').html(responseJSON.message)
