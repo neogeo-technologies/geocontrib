@@ -132,17 +132,23 @@
               <div class="required field">
                 <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
                 <input type="text" required maxlength="{{ form.title.field.max_length }}"
-                  name="{{ form.title.html_name }}" id="{{  form.title.id_for_label }}">
+                  name="{{ form.title.html_name }}" id="{{  form.title.id_for_label }}"
+                  value="{% if form.title.value %}{{ form.title.value }}{% endif %}">
                 {{ form.title.errors }}
               </div>
               <div class="required field">
                 <label>Fichier (PDF, PNG, JPEG)</label>
                 <label class="ui icon button" for="{{ form.attachment_file.id_for_label }}">
                   <i class="file icon"></i>
-                  <span class="label">Sélectionner un fichier ...</span>
+                  {% if form.attachment_file.value %}
+                    <span class="label">{{ form.attachment_file.value }}</span>
+                  {% else %}
+                    <span class="label">Sélectionner un fichier ...</span>
+                  {% endif %}
                 </label>
                 <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;"
-                  name="{{ form.attachment_file.html_name }}" class="image_file" id="{{ form.attachment_file.id_for_label }}" >
+                  name="{{ form.attachment_file.html_name }}" class="image_file" id="{{ form.attachment_file.id_for_label }}"
+                  value="{% if form.attachment_file.value %}{{ form.attachment_file.value }}{% endif %}" >
                 {{ form.attachment_file.errors }}
               </div>
             </div>
