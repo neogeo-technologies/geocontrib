@@ -256,8 +256,6 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
             logger.error(feature_form.errors)
             logger.error(extra_form.errors)
 
-        import pdb; pdb.set_trace()
-
         context = {
             'project': project,
             'feature_type': feature_type,
@@ -440,6 +438,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             attachment_formset.is_valid()
 
         if not forms_are_valid:
+
             messages.error(request, "Erreur à la mise à jour du signalement. ")
             context = {
                 'feature': feature,
@@ -491,25 +490,27 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             )
 
             # Traitement des signalements liés
+            logger.error(linked_formset.cleaned_data)
             for data in linked_formset.cleaned_data:
-                feature_to = data.get('feature_to')
 
-                if feature_to:
+                feature_link = data.pop('id', None)
+
+                if feature_link:
                     if not data.get('DELETE'):
-                        FeatureLink.objects.get_or_create(
-                            relation_type=data.get('relation_type'),
-                            feature_from=feature_id,
-                            feature_to=feature_to
-                        )
-                    if data.get('DELETE'):
-                        qs = FeatureLink.objects.filter(
-                            relation_type=data.get('relation_type'),
-                            feature_from=feature_id,
-                            feature_to=feature_to
-                        )
-                        for instance in qs:
-                            instance.delete()
+                        feature_link.relation_type = data.get('relation_type')
+                        feature_link.feature_to = data.get('feature_to')
+                        feature_link.save()
 
+                    if data.get('DELETE'):
+                        feature_link.delete()
+
+                if not feature_link and not data.get('DELETE'):
+
+                    FeatureLink.objects.create(
+                        relation_type=data.get('relation_type'),
+                        feature_from=feature_id,
+                        feature_to=data.get('feature_to')
+                    )
             # Traitement des piéces jointes
             for data in attachment_formset.cleaned_data:
 
@@ -517,16 +518,24 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
                 if attachment:
                     if not data.get('DELETE'):
+                        attachment.attachment_file = data.get('attachement_file')
+                        attachment.title = data.get('title')
+                        attachment.info = data.get('info')
+                        attachment.save()
 
-                        att, created = Attachment.objects.update_or_create(
-                            id=attachment.id,
-                            feature_id=feature_id,
-                            project=project,
-                            type_objet='feature',
-                            defaults=data
-                        )
                     if data.get('DELETE'):
                         attachment.delete()
+
+                if not attachment and not data.get('DELETE'):
+                    Attachment.objects.create(
+                        attachment_file=data.get('attachement_file'),
+                        title=data.get('title'),
+                        info=data.get('info'),
+                        type_objet=feature,
+                        project=project,
+                        feature_id=feature_id,
+                        author=user,
+                    )
 
         return redirect(
             'collab:feature_detail', slug=project.slug,
@@ -549,7 +558,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = Project.objects.all()
     CustomFieldsFormSet = modelformset_factory(
         CustomField,
-        # can_delete=True,
+        can_delete=True,
         # can_order=True,
         form=CustomFieldModelForm,
         formset=CustomFieldModelBaseFS,
