@@ -355,7 +355,7 @@ $(document).ready(function() {
   })
 
   $('#add-attachment').click(function() {
-    var form_idx = $('#formsets-attachment [name=form-TOTAL_FORMS]').val();
+    var form_idx = $('#formsets-attachment [name=attachment-TOTAL_FORMS]').val();
 
     console.log('add-attachment', form_idx)
     $('#formsets-attachment').append((`
@@ -394,13 +394,13 @@ $(document).ready(function() {
           id="{{ attachment_formset.empty_form.DELETE.id_for_label }}">
       </div>
     `).replace(/__prefix__/g, form_idx))
-    $('#formsets-attachment [name=form-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
+    $('#formsets-attachment [name=attachment-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
 
     $('.ui.dropdown').dropdown()
   })
 
   $('#add-link').click(function() {
-    var form_idx = $('#formsets-link [name=form-TOTAL_FORMS]').val();
+    var form_idx = $('#formsets-link [name=linked-TOTAL_FORMS]').val();
 
     console.log('add-link', form_idx)
     $('#formsets-link').append((`
@@ -440,7 +440,7 @@ $(document).ready(function() {
           id="{{ linked_formset.empty_form.DELETE.id_for_label }}">
       </div>
     `).replace(/__prefix__/g, form_idx))
-    $('#formsets-link [name=form-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
+    $('#formsets-link [name=linked-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
 
     $('.ui.dropdown').dropdown()
   })
