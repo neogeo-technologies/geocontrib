@@ -117,9 +117,8 @@
     <div id="formsets-attachment">
       {{ attachment_formset.management_form }}
       {% for form in attachment_formset %}
-      {% if form.DELETE.value == False %}
+      {% if not form.DELETE.value %}
         <div class="ui teal segment">
-          {{ form.DELETE.value }}
           {% for hidden in form.hidden_fields %}
             {{ hidden }}
           {% endfor %}
@@ -172,7 +171,7 @@
     <div id="formsets-link">
       {{ linked_formset.management_form }}
       {% for form in linked_formset %}
-        {% if form.DELETE.value == False %}
+        {% if not form.DELETE.value %}
           {% for hidden in form.hidden_fields %}
             {{ hidden }}
           {% endfor %}
