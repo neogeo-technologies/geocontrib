@@ -67,7 +67,11 @@
 </div>
 
 <script>
-var line = 0
+$(document).on('click', '.remove-field', function () {
+  var $segment = $(this).parent().parent('.segment')
+  $segment.hide()
+  $segment.children('.delete-hidden-field').prop('checked', true)
+})
 
 $('#add-field').click(function() {
   var form_idx = $('#id_form-TOTAL_FORMS').val();
@@ -118,15 +122,15 @@ $('#add-field').click(function() {
           {{ formset.empty_form.position.errors }}
         </div>
       </div>
+      <input class="delete-hidden-field" type="checkbox"
+        name="{{ formset.empty_form.DELETE.html_name }}"
+        id="{{ formset.empty_form.DELETE.id_for_label }}">
+      </div>
     </div>
   `).replace(/__prefix__/g, form_idx))
   $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
   $('.ui.dropdown').dropdown()
-  $('.remove-field').click(function(){
-    console.log('remove-field');
-    $(this).parent().parent('.segment').remove()
-  })
 })
 
 </script>

@@ -34,6 +34,10 @@ a.button-hover-red:hover {
   padding-top: 1.5em;
 }
 
+.delete-hidden-field {
+  display: none;
+}
+
 
 /* ---------------------------------- */
             /* FOOTER */
