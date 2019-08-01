@@ -297,7 +297,8 @@ class FeatureBaseForm(forms.ModelForm):
 
         self.fields['status'] = forms.ChoiceField(
             choices=choices,
-            initial=initial
+            initial=initial,
+            label='Statut'
         )
 
         # TODO: factoriser les attributs de champs geom

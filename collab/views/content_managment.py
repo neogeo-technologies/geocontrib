@@ -512,21 +512,21 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
             # Traitement des piéces jointes
             for data in attachment_formset.cleaned_data:
-                attachment = data.get('attachment_file')
+
+                attachment = data.pop('id', None)
 
                 if attachment:
                     if not data.get('DELETE'):
-                        Attachment.objects.get_or_create(
+
+                        att, created = Attachment.objects.update_or_create(
+                            id=attachment.id,
                             feature_id=feature_id,
                             project=project,
-                            author=user,
-                            title=data.get('relation_type'),
-                            info=data.get('info'),
                             type_objet='feature',
-                            attachment_file=data.get('attachment_file'),
+                            defaults=data
                         )
                     if data.get('DELETE'):
-                        logger.error('TO BE CONTINUED')
+                        attachment.delete()
 
         return redirect(
             'collab:feature_detail', slug=project.slug,
