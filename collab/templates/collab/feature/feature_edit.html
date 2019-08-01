@@ -117,60 +117,48 @@
     <div id="formsets-attachment">
       {{ attachment_formset.management_form }}
       {% for form in attachment_formset %}
-        {% for hidden in form.hidden_fields %}
-          {{ hidden }}
-        {% endfor %}
-<!--
-
-        {% if form.non_field_errors %}
-        <div class="alert alert-danger" role="alert">
-          {% for error in form.non_field_errors %}
-            {{ error }}
-          {% endfor %}
-        </div>
-        {% endif %}
-        {% for field in form.visible_fields %}
-        <tr>
-          <th>{{ field.label_tag }}</th>
-          <td>
-            {{ field }}
-            {{ field.errors }}
-            {{ field.help_text }}
-          </td>
-        </tr>
-        {% endfor %} -->
-
+      {% if form.DELETE.value == False %}
         <div class="ui teal segment">
+          {{ form.DELETE.value }}
+          {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
           <h4>
             Pièce jointe
             <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
           </h4>
-          <div class="two fields">
-            <div class="required field">
-              <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
-              <input type="text" required maxlength="{{ form.title.field.max_length }}"
-                name="{{ form.title.html_name }}" id="{{  form.title.id_for_label }}">
-              {{ form.title.errors }}
+          <div class="visible-fields">
+            <div class="two fields">
+              <div class="required field">
+                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                <input type="text" required maxlength="{{ form.title.field.max_length }}"
+                  name="{{ form.title.html_name }}" id="{{  form.title.id_for_label }}">
+                {{ form.title.errors }}
+              </div>
+              <div class="required field">
+                <label>Fichier (PDF, PNG, JPEG)</label>
+                <label class="ui icon button" for="{{ form.attachment_file.id_for_label }}">
+                  <i class="file icon"></i>
+                  <span class="label">Sélectionner un fichier ...</span>
+                </label>
+                <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;"
+                  name="{{ form.attachment_file.html_name }}" class="image_file" id="{{ form.attachment_file.id_for_label }}" >
+                {{ form.errors }}
+              </div>
             </div>
             <div class="required field">
-              <label>Fichier (PDF, PNG, JPEG)</label>
-              <label class="ui icon button" for="{{ form.attachment_file.id_for_label }}">
-                <i class="file icon"></i>
-                <span class="label">Sélectionner un fichier ...</span>
-              </label>
-              <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;"
-                name="{{ form.attachment_file.html_name }}" class="image_file" id="{{ form.attachment_file.id_for_label }}" >
-              {{ form.errors }}
+              <label for="{{ form.info.id_for_label }}">{{ form.info.label }}</label>
+              <textarea name="{{ form.info.html_name }}" rows="5">
+                {% if form.info.value %}{{ form.info.value }}{% endif %}
+              </textarea>
+              {{ form.info.errors }}
             </div>
           </div>
-          <div class="required field">
-            <label for="{{ form.info.id_for_label }}">{{ form.info.label }}</label>
-            <textarea name="{{ form.info.html_name }}" rows="5">
-              {% if form.info.value %}{{ form.info.value }}{% endif %}
-            </textarea>
-            {{ form.info.errors }}
-          </div>
+          <input class="delete-hidden-field" type="checkbox"
+            name="{{ form.DELETE.html_name }}"
+            id="{{ form.DELETE.id_for_label }}">
         </div>
+        {% endif %}
       {% endfor %}
     </div>
     <button id="add-attachment" type="button" class="ui compact basic button button-hover-green">
@@ -184,49 +172,48 @@
     <div id="formsets-link">
       {{ linked_formset.management_form }}
       {% for form in linked_formset %}
-        {% for hidden in form.hidden_fields %}
-          {{ hidden }}
-        {% endfor %}
-          <!--
-          {% if form.non_field_errors %}
-          <div class="alert alert-danger" role="alert">
-            {% for error in form.non_field_errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-          {% endif %} -->
+        {% if form.DELETE.value == False %}
+          {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
 
-        <div class="ui teal segment">
-          <h4>
-            Liaison
-            <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
-          </h4>
-          <div class="two fields">
-            <div class="required field">
-              <label for="{{ form.relation_type.id_for_label }}">{{ form.relation_type.label }}</label>
-              <div class="ui selection dropdown">
-                <input type="hidden"
-                  name="{{ form.relation_type.html_name }}" id="{{ form.relation_type.id_for_label }}"
-                  value="{{ form.relation_type.value }}">
-                <div class="default text"></div>
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                  {% for x,y in form.relation_type.field.choices %}
-                    <div class="item" data-value="{{ x }}" {% if form.relation_type.value == x %} selected{% endif %}>{{ y }}</div>
-                  {% endfor %}
+          <div class="ui teal segment">
+            <h4>
+              Liaison
+              <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+            </h4>
+            <div class="visible-fields">
+              <div class="two fields">
+                <div class="required field">
+                  <label for="{{ form.relation_type.id_for_label }}">{{ form.relation_type.label }}</label>
+                  <div class="ui selection dropdown">
+                    <input type="hidden"
+                      name="{{ form.relation_type.html_name }}" id="{{ form.relation_type.id_for_label }}"
+                      value="{{ form.relation_type.value }}">
+                    <div class="default text"></div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                      {% for x,y in form.relation_type.field.choices %}
+                        <div class="item" data-value="{{ x }}" {% if form.relation_type.value == x %} selected{% endif %}>{{ y }}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {{ form.relation_type.errors }}
+                </div>
+                <div class="required field">
+                  <label for="{{ form.feature_to.id_for_label }}">{{ form.feature_to.label }}</label>
+                  <input type="text" required maxlength="{{ form.feature_to.field.max_length }}"
+                    name="{{ form.feature_to.html_name }}" id="{{  form.feature_to.id_for_label }}"
+                    value="{{ form.feature_to.value }}">
+                  {{ form.feature_to.errors }}
                 </div>
               </div>
-              {{ form.relation_type.errors }}
             </div>
-            <div class="required field">
-              <label for="{{ form.feature_to.id_for_label }}">{{ form.feature_to.label }}</label>
-              <input type="text" required maxlength="{{ form.feature_to.field.max_length }}"
-                name="{{ form.feature_to.html_name }}" id="{{  form.feature_to.id_for_label }}"
-                value="{{ form.feature_to.value }}">
-              {{ form.feature_to.errors }}
-            </div>
+            <input class="delete-hidden-field" type="checkbox"
+              name="{{ form.DELETE.html_name }}"
+              id="{{ form.DELETE.id_for_label }}">
           </div>
-        </div>
+        {% endif %}
       {% endfor %}
     </div>
     <button id="add-link" type="button" class="ui compact basic button button-hover-green">
@@ -348,7 +335,10 @@ function truncate(n, len) {
 
 $(document).ready(function() {
   $(document).on('click', '.remove-formset', function () {
-    $(this).parent().parent('.segment').remove()
+    var $segment = $(this).parent().parent('.segment')
+    $segment.hide()
+    $segment.children('.visible-fields').remove()
+    $segment.children('.delete-hidden-field').prop('checked', true)
   })
 
   $(document).on('change', '.image_file', function () {
@@ -375,40 +365,41 @@ $(document).ready(function() {
           Pièce jointe
           <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
         </h4>
-        <div class="two fields">
-          <div class="required field">
-            <label for="{{ attachment_formset.empty_form.title.id_for_label }}">{{ attachment_formset.empty_form.title.label }}</label>
-            <input type="text" required maxlength="{{ attachment_formset.empty_form.title.field.max_length }}"
-              name="{{ attachment_formset.empty_form.title.html_name }}" id="{{  attachment_formset.empty_form.title.id_for_label }}">
-            {{ attachment_formset.title.errors }}
+        <div class="visible-fields">
+          <div class="two fields">
+            <div class="required field">
+              <label for="{{ attachment_formset.empty_form.title.id_for_label }}">{{ attachment_formset.empty_form.title.label }}</label>
+              <input type="text" required maxlength="{{ attachment_formset.empty_form.title.field.max_length }}"
+                name="{{ attachment_formset.empty_form.title.html_name }}" id="{{  attachment_formset.empty_form.title.id_for_label }}">
+              {{ attachment_formset.title.errors }}
+            </div>
+            <div class="required field">
+              <label>Fichier (PDF, PNG, JPEG)</label>
+              <label class="ui icon button" for="{{ attachment_formset.empty_form.attachment_file.id_for_label }}">
+                <i class="file icon"></i>
+                <span class="label">Sélectionner un fichier ...</span>
+              </label>
+              <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;"
+                name="{{ attachment_formset.empty_form.attachment_file.html_name }}" class="image_file" id="{{ attachment_formset.empty_form.attachment_file.id_for_label }}" >
+              {{ form.errors }}
+            </div>
           </div>
           <div class="required field">
-            <label>Fichier (PDF, PNG, JPEG)</label>
-            <label class="ui icon button" for="{{ attachment_formset.empty_form.attachment_file.id_for_label }}">
-              <i class="file icon"></i>
-              <span class="label">Sélectionner un fichier ...</span>
-            </label>
-            <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;"
-              name="{{ attachment_formset.empty_form.attachment_file.html_name }}" class="image_file" id="{{ attachment_formset.empty_form.attachment_file.id_for_label }}" >
-            {{ form.errors }}
+            <label for="{{ attachment_formset.empty_form.info.id_for_label }}">{{ attachment_formset.empty_form.info.label }}</label>
+            <textarea name="{{ attachment_formset.empty_form.info.html_name }}" rows="5">
+              {% if attachment_formset.empty_form.info.value %}{{ attachment_formset.empty_form.info.value }}{% endif %}
+            </textarea>
+            {{ attachment_formset.info.errors }}
           </div>
         </div>
-        <div class="required field">
-          <label for="{{ attachment_formset.empty_form.info.id_for_label }}">{{ attachment_formset.empty_form.info.label }}</label>
-          <textarea name="{{ attachment_formset.empty_form.info.html_name }}" rows="5">
-            {% if attachment_formset.empty_form.info.value %}{{ attachment_formset.empty_form.info.value }}{% endif %}
-          </textarea>
-          {{ attachment_formset.info.errors }}
-        </div>
+        <input class="delete-hidden-field" type="checkbox"
+          name="{{ attachment_formset.empty_form.DELETE.html_name }}"
+          id="{{ attachment_formset.empty_form.DELETE.id_for_label }}">
       </div>
     `).replace(/__prefix__/g, form_idx))
-    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    $('#formsets-attachment [name=form-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
 
     $('.ui.dropdown').dropdown()
-    $('.remove-formset').click(function(){
-      console.log('remove-formset');
-      $(this).parent().parent('.segment').remove()
-    })
   })
 
   $('#add-link').click(function() {
@@ -421,33 +412,38 @@ $(document).ready(function() {
           Liaison
           <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
         </h4>
-        <div class="two fields">
-          <div class="required field">
-            <label for="{{ linked_formset.empty_form.relation_type.id_for_label }}">{{ linked_formset.empty_form.relation_type.label }}</label>
-            <div class="ui selection dropdown">
-              <input type="hidden"
-                name="{{ linked_formset.empty_form.relation_type.html_name }}" id="{{ linked_formset.empty_form.relation_type.id_for_label }}"
-                value="{{ linked_formset.empty_form.relation_type.value }}">
-              <div class="default text"></div>
-              <i class="dropdown icon"></i>
-              <div class="menu">
-                {% for x,y in linked_formset.empty_form.relation_type.field.choices %}
-                  <div class="item" data-value="{{ x }}" {% if linked_formset.empty_form.relation_type.value == x %} selected{% endif %}>{{ y }}</div>
-                {% endfor %}
+        <div class="visible-fields">
+          <div class="two fields">
+            <div class="required field">
+              <label for="{{ linked_formset.empty_form.relation_type.id_for_label }}">{{ linked_formset.empty_form.relation_type.label }}</label>
+              <div class="ui selection dropdown">
+                <input type="hidden"
+                  name="{{ linked_formset.empty_form.relation_type.html_name }}" id="{{ linked_formset.empty_form.relation_type.id_for_label }}"
+                  value="{{ linked_formset.empty_form.relation_type.value }}">
+                <div class="default text"></div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  {% for x,y in linked_formset.empty_form.relation_type.field.choices %}
+                    <div class="item" data-value="{{ x }}" {% if linked_formset.empty_form.relation_type.value == x %} selected{% endif %}>{{ y }}</div>
+                  {% endfor %}
+                </div>
               </div>
+              {{ linked_formset.relation_type.errors }}
             </div>
-            {{ linked_formset.relation_type.errors }}
-          </div>
-          <div class="required field">
-            <label for="{{ linked_formset.empty_form.feature_to.id_for_label }}">{{ linked_formset.empty_form.feature_to.label }}</label>
-            <input type="text" required maxlength="{{ linked_formset.empty_form.feature_to.field.max_length }}"
-              name="{{ linked_formset.empty_form.feature_to.html_name }}" id="{{  linked_formset.empty_form.feature_to.id_for_label }}">
-            {{ linked_formset.feature_to.errors }}
+            <div class="required field">
+              <label for="{{ linked_formset.empty_form.feature_to.id_for_label }}">{{ linked_formset.empty_form.feature_to.label }}</label>
+              <input type="text" required maxlength="{{ linked_formset.empty_form.feature_to.field.max_length }}"
+                name="{{ linked_formset.empty_form.feature_to.html_name }}" id="{{  linked_formset.empty_form.feature_to.id_for_label }}">
+              {{ linked_formset.feature_to.errors }}
+            </div>
           </div>
         </div>
+        <input class="delete-hidden-field" type="checkbox"
+          name="{{ linked_formset.empty_form.DELETE.html_name }}"
+          id="{{ linked_formset.empty_form.DELETE.id_for_label }}">
       </div>
     `).replace(/__prefix__/g, form_idx))
-    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    $('#formsets-link [name=form-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
 
     $('.ui.dropdown').dropdown()
   })
