@@ -58,10 +58,13 @@
                 <i class="home icon"></i>Accueil du projet
               </a>
               <a class="item" href="{% url 'collab:feature_list' slug=project.slug %}">
-                <i class="icon list"></i>Liste & Carte
+                <i class="list icon"></i>Liste & Carte
               </a>
-              <a class="item" href="{% url 'api:project-export' slug=project.slug%}">
-                <i class="icon download"></i>Exporter les signalements
+              <a class="item" href="{% url 'api:project-export' slug=project.slug %}">
+                <i class="download icon"></i>Exporter les signalements
+              </a>
+              <a class="item" href="{% url 'collab:project_members' slug=project.slug %}">
+                <i class="users icon"></i>Gérer les membres
               </a>
             </div>
           </div>

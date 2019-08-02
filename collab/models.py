@@ -529,6 +529,11 @@ class Attachment(AnnotationAbstract):
         if self.title:
             return self.title
 
+    @property
+    def extension(self):
+        name, extension = os.path.splitext(self.attachment_file.name)
+        return extension
+
 
 class Comment(AnnotationAbstract):
 
