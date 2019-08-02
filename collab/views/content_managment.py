@@ -201,21 +201,34 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
+
         extra = CustomField.objects.filter(feature_type=feature_type)
 
-        feature_form = FeatureBaseForm(feature_type=feature_type, user=user)
+        feature_form = FeatureBaseForm(
+            feature_type=feature_type, user=user)
+
         extra_form = FeatureExtraForm(extra=extra)
 
+        linked_formset = self.LinkedFormset(
+            form_kwargs={'feature_type': feature_type, 'feature': feature},
+            prefix='linked',
+            queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
+
+        attachment_formset = self.AttachmentFormset(
+            prefix='attachment',
+            queryset=Attachment.objects.none()
+        )
+
         context = {
-            'project': project,
             'feature_type': feature_type,
-            'feature_types': project.featuretype_set.all(),
-            'permissions': Authorization.all_permissions(user, project),
+            'project': project,
+            # 'permissions': Authorization.all_permissions(user, project),
             'feature_form': feature_form,
             'extra_form': extra_form,
+            'linked_formset': linked_formset,
+            'attachment_formset': attachment_formset,
             'action': 'create'
         }
-
         return render(request, 'collab/feature/feature_edit.html', context)
 
     def post(self, request, slug, feature_type_slug):
