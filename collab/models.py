@@ -415,7 +415,7 @@ class CustomField(models.Model):
     )
 
     interface = models.ForeignKey(
-        "collab.CustomFieldInterface", on_delete=models.CASCADE)
+        "collab.CustomFieldInterface", on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name = "Champs personnalisés"
