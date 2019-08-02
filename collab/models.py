@@ -500,7 +500,7 @@ class Attachment(AnnotationAbstract):
 
     info = models.TextField('Info', blank=True, null=True)
 
-    type_objet = models.CharField(
+    object_type = models.CharField(
         "Type d'objet concerné", choices=RELATED_MODELS, max_length=50)
 
     # TODO@cbenhabib: valider L'extension + Taille du fichier?
@@ -905,7 +905,12 @@ def create_event_on_comment_creation(sender, instance, created, **kwargs):
             user=instance.author,
             project_slug=instance.project.slug,
             feature_type_slug=instance.feature_type_slug,
-            data={}
+            data={
+                'author': instance.author.get_full_name(),
+                'username': instance.author.username,
+                'project_slug': instance.project.slug,
+                'comment': instance.comment
+            }
         )
 
 

@@ -82,7 +82,7 @@ class AttachmentCreate(SingleObjectMixin, UserPassesTestMixin, View):
                     feature_id=feature.feature_id,
                     author=user,
                     project=project,
-                    type_objet='feature',
+                    object_type='feature',
                     attachment_file=form.cleaned_data.get('attachment_file')
                 )
             except Exception as err:
@@ -146,7 +146,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
                         attachment_file=up_file,
                         title=title,
                         info=info,
-                        type_objet='comment'
+                        object_type='comment'
                     )
 
             except Exception as err:
@@ -155,6 +155,8 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
                     request,
                     "Erreur à l'ajout du commentaire: {err}".format(err=err))
             else:
+                # Un evenement est ajouter lors de la creation d'un commentaire
+                # au niveau des trigger.
                 messages.info(request, "Ajout du commentaire confirmé")
 
             return redirect(
@@ -174,7 +176,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'project': project,
             'permissions': Authorization.all_permissions(user, project),
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
-            'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id),
+            'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id, object_type='feature'),
             'comment_form': form,
         }
         return render(request, 'collab/feature/feature_detail.html', context)
@@ -389,7 +391,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
         attachments = Attachment.objects.filter(
             project=project, feature_id=feature.feature_id,
-            type_objet='feature'
+            object_type='feature'
         )
 
         attachment_formset = self.AttachmentFormset(
@@ -473,7 +475,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
             attachments = Attachment.objects.filter(
                 project=project, feature_id=feature.feature_id,
-                type_objet='feature'
+                object_type='feature'
             )
             attachment_formset = self.AttachmentFormset(
                 prefix='attachment',
@@ -568,7 +570,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                         attachment_file=data.get('attachment_file'),
                         title=data.get('title'),
                         info=data.get('info'),
-                        type_objet='feature',
+                        object_type='feature',
                         project=project,
                         feature_id=feature_id,
                         author=user,
