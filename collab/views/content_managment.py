@@ -192,6 +192,18 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = FeatureType.objects.all()
     slug_url_kwarg = 'feature_type_slug'
 
+    LinkedFormset = modelformset_factory(
+        model=FeatureLink,
+        form=FeatureLinkForm,
+        extra=0,
+        can_delete=True)
+
+    AttachmentFormset = modelformset_factory(
+        model=Attachment,
+        form=AttachmentForm,
+        extra=0,
+        can_delete=True)
+
     def test_func(self):
         user = self.request.user
         feature_type = self.get_object()
@@ -210,9 +222,10 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         extra_form = FeatureExtraForm(extra=extra)
 
         linked_formset = self.LinkedFormset(
-            form_kwargs={'feature_type': feature_type, 'feature': feature},
+            form_kwargs={'feature_type': feature_type},
             prefix='linked',
-            queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
+            queryset=FeatureLink.objects.none()
+        )
 
         attachment_formset = self.AttachmentFormset(
             prefix='attachment',
@@ -242,7 +255,25 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         extra = CustomField.objects.filter(feature_type=feature_type)
         extra_form = FeatureExtraForm(request.POST, extra=extra)
 
-        if feature_form.is_valid() and extra_form.is_valid():
+        linked_formset = self.LinkedFormset(
+            request.POST or None,
+            prefix='linked',
+            form_kwargs={'feature_type': feature_type},
+        )
+
+        attachment_formset = self.AttachmentFormset(
+            request.POST or None, request.FILES, prefix='attachment')
+
+        all_forms = [
+            feature_form,
+            extra_form,
+            attachment_formset,
+            linked_formset,
+        ]
+
+        forms_are_valid = all([ff.is_valid() for ff in all_forms])
+
+        if forms_are_valid:
             try:
                 feature = feature_form.save(
                     project=project,
@@ -268,16 +299,25 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
                     feature_type_slug=feature_type.slug, feature_id=feature.feature_id)
 
         else:
-            logger.error(feature_form.errors)
-            logger.error(extra_form.errors)
+            logger.error([ff.errors for ff in all_forms])
+
+        linked_formset = self.LinkedFormset(
+            request.POST or None,
+            prefix='linked',
+            form_kwargs={'feature_type': feature_type},
+        )
+
+        attachment_formset = self.AttachmentFormset(
+            request.POST or None, request.FILES, prefix='attachment')
 
         context = {
-            'project': project,
             'feature_type': feature_type,
-            'feature_types': project.featuretype_set.all(),
-            'permissions': Authorization.all_permissions(user, project),
+            'project': project,
+            # 'permissions': Authorization.all_permissions(user, project),
             'feature_form': feature_form,
             'extra_form': extra_form,
+            'linked_formset': linked_formset,
+            'attachment_formset': attachment_formset,
             'action': 'create'
         }
         return render(request, 'collab/feature/feature_edit.html', context)
@@ -452,7 +492,8 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             form_kwargs={'feature_type': feature_type, 'feature': feature},
             queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
 
-        attachment_formset = self.AttachmentFormset(request.POST or None, request.FILES, prefix='attachment')
+        attachment_formset = self.AttachmentFormset(
+            request.POST or None, request.FILES, prefix='attachment')
 
         old_status = feature.status
 
