@@ -430,7 +430,11 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
         extra_form = FeatureExtraForm(request.POST, feature=feature, extra=extra)
 
-        linked_formset = self.LinkedFormset(request.POST or None, prefix='linked')
+        linked_formset = self.LinkedFormset(
+            request.POST or None,
+            prefix='linked',
+            form_kwargs={'feature_type': feature_type, 'feature': feature},
+            queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
 
         attachment_formset = self.AttachmentFormset(request.POST or None, request.FILES, prefix='attachment')
 
@@ -525,7 +529,6 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
             # Traitement des signalements liés
             for data in linked_formset.cleaned_data:
-                import pdb; pdb.set_trace()
 
                 feature_link = data.pop('id', None)
 

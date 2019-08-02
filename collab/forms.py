@@ -231,12 +231,12 @@ class FeatureLinkForm(forms.ModelForm):
             qs = Feature.objects.filter(feature_type=feature_type)
             if feature:
                 qs = qs.exclude(feature_id=feature.feature_id)
+
             self.fields['feature_to'].choices = tuple(
                 (feat.feature_id, "{} ({} - {})".format(
                     feat.title, feat.creator.username, feat.created_on)) for feat in qs
             )
-            if self.instance.feature_to:
-                self.fields['feature_to'].initial = self.instance.feature_to
+
         except Exception:
             logger.exception('No feature_type found')
 
