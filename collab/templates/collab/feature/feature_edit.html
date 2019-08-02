@@ -306,7 +306,7 @@ var drawConfig = {
   polyline: false,
   rectangle: false,
   circle: false,
-  circlemarker: false
+  circlemarker: false,
 }
 drawConfig[geomLeaflet[geomType]] = true
 
@@ -425,8 +425,6 @@ $(document).ready(function() {
         <div class="visible-fields">
           <div class="two fields">
             <div class="required field">
-            {% for choice in linked_formset.empty_form.relation_type.field.choices %} {{ choice }} {% endfor %}
-
               <label for="{{ linked_formset.empty_form.relation_type.id_for_label }}">{{ linked_formset.empty_form.relation_type.label }}</label>
               <div class="ui selection dropdown">
                 <input type="hidden"
@@ -436,25 +434,23 @@ $(document).ready(function() {
                 <i class="dropdown icon"></i>
                 <div class="menu">
                   {% for x,y in linked_formset.empty_form.relation_type.field.choices %}
-                    <div class="item" data-value="{{ x }}" {% if linked_formset.empty_form.relation_type.value == x %} selected{% endif %}>{{ y }}</div>
+                    <div class="item" data-value="{{ x }}">{{ y }}</div>
                   {% endfor %}
                 </div>
               </div>
               {{ linked_formset.relation_type.errors }}
             </div>
             <div class="required field">
-            {% for choice in linked_formset.empty_form.feature_to.field.choices %} {{ choice }} {% endfor %}
-              {{ linked_formset.empty_form.feature_to.field.choices }}
               <label for="{{ linked_formset.empty_form.feature_to.id_for_label }}">{{ linked_formset.empty_form.feature_to.label }}</label>
               <div class="ui selection search dropdown">
                 <input type="hidden"
                   name="{{ linked_formset.empty_form.feature_to.html_name }}" id="{{ linked_formset.empty_form.feature_to.id_for_label }}"
-                  value="{% if linked_formset.empty_form.feature_to.value %}{{ linked_formset.empty_form.feature_to.value }}{% endif %}">
+                  value="{{ linked_formset.empty_form.feature_to.value }}">
                 <div class="default text"></div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
                   {% for x,y in linked_formset.empty_form.feature_to.field.choices %}
-                    <div class="item" data-value="{{ x }}" {% if linked_formset.empty_form.feature_to.value == x %} selected{% endif %}>{{ y }}</div>
+                    <div class="item" data-value="{{ x }}">{{ y }}</div>
                   {% endfor %}
                 </div>
               </div>
@@ -504,7 +500,7 @@ $(document).ready(function() {
   // **************************** //
   //              MAP             //
   // **************************** //
-  var map = L.map('map').setView([46.52863469527167, 2.43896484375], 5)
+  var map = L.map('map').setView([50.00976, 2.8657699], 7)
   L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map)
