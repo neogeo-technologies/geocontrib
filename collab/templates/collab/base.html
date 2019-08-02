@@ -60,8 +60,9 @@
               <a class="item" href="{% url 'collab:feature_list' slug=project.slug %}">
                 <i class="icon list"></i>Liste & Carte
               </a>
-              <!-- <a class="item" href="{% url 'collab:feature_type_create' slug=project.slug %}">Créer un nouveau type de signalement</a> -->
-              <!-- <a class="item">Ajout d'un signalement</a> -->
+              <a class="item" href="{% url 'api:project-export' slug=project.slug%}">
+                <i class="icon download"></i>Exporter les signalements
+              </a>
             </div>
           </div>
         {% endif %}
