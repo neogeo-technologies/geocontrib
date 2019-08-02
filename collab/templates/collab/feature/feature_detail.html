@@ -112,12 +112,6 @@
 
   <div class="seven wide column">
     <h3 class="ui header">Activités et commentaires</h3>
-
-    {% for comm in comments %}
-      <hr>
-      <h4>{{ comm.title }}</h4>
-      {{ comm }}
-    {% endfor %}
     <div class="ui feed">
 
       {% for event in events %}
@@ -143,7 +137,9 @@
               </div>
             </div>
             <div class="extra text">
-              {{ event }}
+              {{ event.data.username }}
+              {{ event.data.comment }}
+              {{ event.data.author }}
             </div>
           </div>
           {% endif %}

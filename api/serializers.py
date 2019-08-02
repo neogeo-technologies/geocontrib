@@ -1,6 +1,6 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
-
 from collab.models import Authorization
 from collab.models import CustomField
 from collab.models import Comment
@@ -12,6 +12,8 @@ from collab.models import Event
 
 import logging
 logger = logging.getLogger('django')
+
+User = get_user_model()
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
@@ -70,18 +72,31 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
 # NON-API SERIALIZERS: cf collab app
 
+class UserSerializer(serializers.ModelSerializer):
+
+    full_name = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
+
+    class Meta:
+        model = User
+        fields = (
+            'full_name',
+            'username'
+        )
+
+
 class EventSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
 
-    user_full_name = serializers.SerializerMethodField()
-
-    username = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True)
 
     def get_user_full_name(self, obj):
         return obj.user.get_full_name()
 
-    def get_username(self, obj):
+    def get_user_username(self, obj):
         return obj.user.username
 
     class Meta:
@@ -96,8 +111,7 @@ class EventSerializer(serializers.ModelSerializer):
             'feature_id',
             'comment_id',
             'attachment_id',
-            'user_full_name',
-            'username',
+            'user'
         )
 
 
@@ -153,9 +167,7 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
 
-    user_full_name = serializers.SerializerMethodField()
-
-    username = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True)
 
     def get_user_full_name(self, obj):
         return obj.creator.get_full_name()
@@ -169,6 +181,5 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
             'feature_id',
             'title',
             'created_on',
-            'user_full_name',
-            'username'
+            'user',
         )
