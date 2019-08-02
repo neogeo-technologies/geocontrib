@@ -74,9 +74,31 @@ class EventSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
 
+    user_full_name = serializers.SerializerMethodField()
+
+    username = serializers.SerializerMethodField()
+
+    def get_user_full_name(self, obj):
+        return obj.user.get_full_name()
+
+    def get_username(self, obj):
+        return obj.user.username
+
     class Meta:
         model = Event
-        fields = '__all__'
+        fields = (
+            'created_on',
+            'object_type',
+            'event_type',
+            'data',
+            'project_slug',
+            'feature_type_slug',
+            'feature_id',
+            'comment_id',
+            'attachment_id',
+            'user_full_name',
+            'username',
+        )
 
 
 class ProjectDetailedSerializer(serializers.ModelSerializer):
