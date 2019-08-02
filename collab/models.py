@@ -10,6 +10,7 @@ from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.text import slugify
 from django.urls import reverse
 
 from collab.choices import ALL_LEVELS
@@ -18,7 +19,12 @@ from collab.choices import EXTENDED_RELATED_MODELS
 from collab.choices import EVENT_TYPES
 from collab.choices import STATE_CHOICES
 from collab.choices import FREQUENCY_CHOICES
+from collab.choices import TYPE_CHOICES
+from collab.emails import notif_moderators_pending_features
+from collab.emails import notif_suscribers_project_event
+from collab.emails import notif_creator_published_feature
 from collab.managers import AvailableFeaturesManager
+
 
 import logging
 logger = logging.getLogger('django')
@@ -36,7 +42,7 @@ class User(AbstractUser):
 
 class UserLevelPermission(models.Model):
     """
-    Les niveaux de permissions pourrai etre gerée depuis cette table.
+    Les niveaux des permissions pourraient être gérés depuis cette table.
     """
 
     user_type_id = models.CharField(
@@ -89,10 +95,10 @@ class Authorization(models.Model):
     @classmethod
     def get_rank(cls, user, project):
 
-        # Si pas d'autorisation defini ou utilisateur non connecté
         try:
             auth = cls.objects.get(user=user, project=project)
         except Exception:
+            # Si pas d'autorisation defini ou utilisateur non connecté
             user_rank = 1 if user.is_authenticated else 0
         else:
             user_rank = auth.level.rank
@@ -109,7 +115,7 @@ class Authorization(models.Model):
         """
         user_perms = {
             'can_view_project': False,
-            'can_create_project': False,  # Redondant avec user.is_administartor
+            'can_create_project': False,  # Redondant avec user.is_administrator
             'can_update_project': False,
             'can_view_feature': False,
             'can_create_feature': False,
@@ -145,11 +151,11 @@ class Authorization(models.Model):
             if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
                 user_perms['can_archive_feature'] = True
 
-            # on permet aux utilisateur de modifier leur propre feature
-            if user_rank >= 3 or (feature and feature.user == user):
+            # On permet aux contributeurs et aux auteurs de modifier les features
+            if user_rank >= 2 or (feature and feature.creator == user):
                 user_perms['can_update_feature'] = True
 
-            # seuls les moderateurs peuvent publier
+            # Seuls les moderateurs peuvent publier
             if user_rank >= 3:
                 user_perms['can_publish_feature'] = True
             if user_rank >= 2:
@@ -168,7 +174,7 @@ class Authorization(models.Model):
 class Project(models.Model):
 
     def thumbnail_dir(instance, filename):
-        return "user_{0}/{1}".format(instance.user.pk, filename)
+        return "user_{0}/{1}".format(instance.creator.pk, filename)
 
     def limit_pub():
         return {"rank__lte": 2}
@@ -178,10 +184,11 @@ class Project(models.Model):
 
     title = models.CharField("Titre", max_length=128, unique=True)
 
-    # En attendant de déterminer les modalités pour générer le slug
-    slug = models.SlugField("Slug", max_length=256, blank=True, null=True)
+    slug = models.SlugField("Slug", max_length=256, editable=False, null=True)
 
     created_on = models.DateTimeField("Date de création", blank=True, null=True)
+
+    updated_on = models.DateTimeField("Date de modification", blank=True, null=True)
 
     description = models.TextField("Description", blank=True, null=True)
 
@@ -189,7 +196,9 @@ class Project(models.Model):
 
     thumbnail = models.ImageField("Illustration", upload_to=thumbnail_dir, default="default.png")
 
-    user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    creator = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL, verbose_name="Créateur",
+        on_delete=models.SET_NULL, null=True, blank=True)
 
     access_level_pub_feature = models.ForeignKey(
         to="collab.UserLevelPermission", limit_choices_to=limit_pub,
@@ -211,9 +220,6 @@ class Project(models.Model):
     delete_feature = models.PositiveIntegerField(
         "Délai avant suppression", blank=True, null=True)
 
-    features_info = JSONField(
-        "Info sur les types de signalements disponibles", blank=True, null=True)
-
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"
@@ -224,6 +230,7 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.created_on = timezone.now()
+        self.updated_on = timezone.now()
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -231,10 +238,6 @@ class Project(models.Model):
 
 
 class Feature(models.Model):
-    """
-    On reprend ici les champs standards augmentés de champs optionnels
-    multiples génériques.
-    """
 
     STATUS_CHOICES = (
         ("draft", "Brouillon"),
@@ -251,8 +254,8 @@ class Feature(models.Model):
     description = models.TextField("Description", blank=True, null=True)
 
     status = models.CharField(
-        "Statut des signalements", choices=STATUS_CHOICES, max_length=50,
-        default="draft", null=True, blank=True)
+        "Statut", choices=STATUS_CHOICES, max_length=50,
+        default="draft")
 
     created_on = models.DateTimeField("Date de création", null=True, blank=True)
 
@@ -264,15 +267,15 @@ class Feature(models.Model):
     deletion_on = models.DateField(
         "Date de suppression automatique", null=True, blank=True)
 
-    user = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        help_text="Utilisateur abonné")
+    creator = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL, verbose_name="Créateur",
+        on_delete=models.SET_NULL, null=True, blank=True)
 
     project = models.ForeignKey("collab.Project", on_delete=models.CASCADE)
 
     feature_type = models.ForeignKey("collab.FeatureType", on_delete=models.CASCADE)
 
-    geom = models.GeometryField("Champs geometrique", srid=4326, blank=True, null=True)
+    geom = models.GeometryField("Géométrie", srid=4326)
 
     feature_data = JSONField(blank=True, null=True)
 
@@ -297,6 +300,18 @@ class Feature(models.Model):
     def __str__(self):
         return str(self.title)
 
+    def get_absolute_url(self):
+
+        return reverse('collab:feature_update', kwargs={
+            'slug': self.project.slug, 'feature_type_slug': self.feature_type.slug,
+            'feature_id': self.feature_id})
+
+    def get_view_url(self):
+
+        return reverse('collab:feature_detail', kwargs={
+            'slug': self.project.slug, 'feature_type_slug': self.feature_type.slug,
+            'feature_id': self.feature_id})
+
     @property
     def custom_fields_as_list(self):
         CustomField = apps.get_model(app_label='collab', model_name="CustomField")
@@ -304,10 +319,13 @@ class Feature(models.Model):
         res = []
         if custom_fields.exists():
             for row in custom_fields.order_by('position').values('name', 'label', 'field_type'):
+                value = ''
+                if isinstance(self.feature_data, dict):
+                    value = self.feature_data.get(row['name'])
                 res.append({
                     'label': row['label'],
                     'field_type': row['field_type'],
-                    'value': self.feature_data.get(row['name'])
+                    'value': value
                 })
         return res
 
@@ -336,25 +354,29 @@ class FeatureLink(models.Model):
 class FeatureType(models.Model):
 
     GEOM_CHOICES = (
-        ("linestring", "Ligne brisée"),
+        ("linestring", "Ligne"),
         ("point", "Point"),
         ("polygon", "Polygone"),
     )
 
     title = models.CharField("Titre", max_length=128)
 
-    slug = models.SlugField("Slug", max_length=256, unique=True)
+    slug = models.SlugField("Slug", max_length=256, editable=False, null=True)
 
     geom_type = models.CharField(
-        "Type de champs géometrique", choices=GEOM_CHOICES, max_length=50,
-        default="boolean")
+        "Type de géométrie", choices=GEOM_CHOICES, max_length=50,
+        default="point")
+
+    color = models.CharField(
+        verbose_name='Couleur', max_length=7, blank=True, null=True
+    )
 
     project = models.ForeignKey(
         "collab.Project", on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Type de signalement"
-        verbose_name_plural = "Types de Signalements"
+        verbose_name_plural = "Types de signalements"
 
     def save(self, *args, **kwargs):
         if not self.pk and self.title:
@@ -390,15 +412,6 @@ class CustomFieldInterface(models.Model):
 
 class CustomField(models.Model):
 
-    TYPE_CHOICES = (
-        ("boolean", "Booléen"),
-        ("char", "Chaîne de caractères"),
-        ("date", "Date"),
-        ("integer", "Entier"),
-        ("decimal", "Décimale"),
-        ("text", "Champs texte"),
-    )
-
     label = models.CharField("Label", max_length=128, null=True, blank=True)
 
     name = models.CharField("Nom", max_length=128, null=True, blank=True)
@@ -407,8 +420,8 @@ class CustomField(models.Model):
         "Position", default=0, blank=False, null=False)
 
     field_type = models.CharField(
-        "Type de champs", choices=TYPE_CHOICES, max_length=50,
-        default="boolean", null=True, blank=True)
+        "Type de champ", choices=TYPE_CHOICES, max_length=50,
+        default="boolean", null=False, blank=False)
 
     feature_type = models.ForeignKey(
         "collab.FeatureType", on_delete=models.CASCADE
@@ -418,7 +431,7 @@ class CustomField(models.Model):
         "collab.CustomFieldInterface", on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        verbose_name = "Champs personnalisés"
+        verbose_name = "Champ personnalisé"
         verbose_name_plural = "Champs personnalisés"
         unique_together = (('name', 'feature_type'), )
 
@@ -475,7 +488,8 @@ class AnnotationAbstract(models.Model):
         "Identifiant du signalement", max_length=32, blank=True, null=True)
 
     author = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL, verbose_name="Auteur", on_delete=models.CASCADE)
+        to=settings.AUTH_USER_MODEL, verbose_name="Auteur",
+        on_delete=models.SET_NULL, null=True, blank=True)
 
     project = models.ForeignKey("collab.Project", on_delete=models.CASCADE)
 
@@ -497,7 +511,7 @@ class Attachment(AnnotationAbstract):
 
     info = models.TextField('Info', blank=True, null=True)
 
-    type_objet = models.CharField(
+    object_type = models.CharField(
         "Type d'objet concerné", choices=RELATED_MODELS, max_length=50)
 
     # TODO@cbenhabib: valider L'extension + Taille du fichier?
@@ -508,8 +522,8 @@ class Attachment(AnnotationAbstract):
         "collab.Comment", on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        verbose_name = "Pièce Jointe"
-        verbose_name_plural = "Pièces Jointes"
+        verbose_name = "Pièce jointe"
+        verbose_name_plural = "Pièces jointes"
 
     def __str__(self):
         if self.title:
@@ -535,6 +549,20 @@ class Event(models.Model):
 
     created_on = models.DateTimeField("Date de l'évènement", blank=True, null=True)
 
+    object_type = models.CharField(
+        "Type de l'objet lié", choices=EXTENDED_RELATED_MODELS, max_length=100)
+
+    event_type = models.CharField(
+        "Type de l'évènement", choices=EVENT_TYPES, max_length=100)
+
+    data = JSONField(blank=True, null=True)
+
+    project_slug = models.SlugField(
+        'Slug du projet', max_length=256)
+
+    feature_type_slug = models.SlugField(
+        'Slug du type de signalement', max_length=256, blank=True, null=True)
+
     feature_id = models.UUIDField(
         "Identifiant du signalement", editable=False, max_length=32, blank=True,
         null=True)
@@ -547,22 +575,9 @@ class Event(models.Model):
         "Identifiant de la pièce jointe", editable=False, max_length=32,
         blank=True, null=True)
 
-    object_type = models.CharField(
-        "Type de l'objet lié", choices=EXTENDED_RELATED_MODELS, max_length=100)
-
-    event_type = models.CharField(
-        "Type de l'évènement", choices=EVENT_TYPES, max_length=100)
-
-    project_slug = models.SlugField('Slug Projet', max_length=256, blank=True, null=True)
-
-    feature_type_slug = models.SlugField(
-        'Slug Feature', max_length=256, blank=True, null=True)
-
-    data = JSONField(blank=True, null=True)
-
     user = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, verbose_name="Utilisateur", blank=True,
-        null=True, on_delete=models.CASCADE)
+        null=True, on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = "Évènement"
@@ -573,16 +588,118 @@ class Event(models.Model):
             self.created_on = timezone.now()
         super().save(*args, **kwargs)
 
+    @property
+    def contextualize_action(self):
+        evt = 'Aucun evenement'
+        obj = 'defini'
+        if self.event_type == 'create':
+            evt = "Ajout"
+        if self.event_type == 'update':
+            evt = "Modification"
+        if self.event_type == 'delete':
+            evt = "Suppression"
+
+        if self.object_type == 'feature':
+            obj = "d'un signalement"
+        if self.object_type == 'comment':
+            obj = "d'un commentaire"
+        if self.object_type == 'attachment':
+            obj = "d'une piece jointe"
+
+        action = "{} {}".format(evt, obj)
+        return action
+
+    def ping_users(self, *args, **kwargs):
+        """
+        Les différents cas d'envoi de notifications sont :
+            - Les modérateurs d’un projet sont notifiés des signalements dont le statut
+            devient "pending" (en attente de publication).
+            Cela n'a de sens que pour les projets qui sont modérés.
+
+            - L'auteur d'un signalement est notifié des changements de statut du signalement,
+            des modifications du signalement et de l’ajout de commentaires
+            (si l'auteur n'est pas lui-même à l'origine de ces évènements).
+
+            - Un utilisateur abonné à un projet est notifié de tout évènement
+            (dont il n'est pas à l'origine) sur ce projet.
+        """
+        event_initiator = self.user
+
+        if self.object_type == 'feature':
+            feature = Feature.objects.get(feature_id=self.feature_id)
+            project = feature.project
+            if project.moderation:
+
+                # On notifie les modérateurs du projet si l'evenement concerne
+                # Un demande de publication d'un signalement
+                feature_status = self.data.get('feature_status', {})
+                status_has_changed = feature_status.get('has_changed', False)
+                new_status = feature_status.get('new_status', 'draft')
+
+                if status_has_changed and new_status == 'pending':
+                    Authorization = apps.get_model(app_label='collab', model_name='Authorization')
+                    moderators__emails = Authorization.objects.filter(
+                        project=project, level__rank__gte=3
+                    ).exclude(
+                        user=event_initiator  # On exclue l'initiateur de l'evenement.
+                    ).values_list('user__email', flat=True)
+
+                    context = {
+                        'feature': feature,
+                        'event_initiator': event_initiator,
+                    }
+                    try:
+                        notif_moderators_pending_features(
+                            emails=moderators__emails, context=context)
+                    except Exception:
+                        logger.exception('Event.ping_users')
+
+                # On notifie l'auteur du signalement si l'evenement concerne
+                # la publication de son signalement
+                if status_has_changed and new_status == 'published':
+                    if event_initiator != feature.creator:
+                        context = {
+                            'feature': feature,
+                            'event': self
+                        }
+                        try:
+                            notif_creator_published_feature(
+                                emails=[feature.creator.email, ], context=context)
+                        except Exception:
+                            logger.exception('Event.ping_users.notif_creator_published_feature')
+
+        # On notifie les utilisateurs abonnés au projet de tout evenement,
+        # dont il ne sont pas à l'origine.
+        # TODO @cbenhabib: demander si on ne limite pas qd meme aux seules evenements visibles?
+
+        try:
+            Subscription = apps.get_model(app_label='collab', model_name='Subscription')
+            subscription = Subscription.objects.get(project__slug=self.project_slug)
+        except Subscription.DoesNotExist:
+            logger.info('No suscription for {}'.format(self.project_slug))
+        else:
+            context = {
+                'project': subscription.project,
+                'event_initiator': event_initiator,
+                'created_on': self.created_on,
+                'action': self.contextualize_action
+            }
+            suscribers_emails = subscription.users.exclude(
+                pk=self.user.pk
+            ).values_list('email', flat=True)
+            try:
+                notif_suscribers_project_event(emails=suscribers_emails, context=context)
+            except Exception:
+                logger.exception('Event.ping_users.notif_suscribers_project_event')
+
 
 class Subscription(models.Model):
 
-    feature_id = models.UUIDField(
-        "Identifiant du signalement", editable=False, max_length=32)
-
-    project_slug = models.SlugField('Slug', max_length=128)
-
     created_on = models.DateTimeField(
-        "Date de création de l'Abonnement", blank=True, null=True)
+        "Date de création de l'abonnement", blank=True, null=True)
+
+    project = models.ForeignKey(
+        "collab.Project", on_delete=models.CASCADE, null=True, blank=True)
 
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, verbose_name="Utilisateurs",
@@ -596,6 +713,14 @@ class Subscription(models.Model):
         if not self.pk:
             self.created_on = timezone.now()
         super().save(*args, **kwargs)
+
+    @classmethod
+    def is_suscriber(cls, user, project):
+        if not user.is_authenticated:
+            is_it = False
+        else:
+            is_it = cls.objects.filter(project=project, users=user.pk).exists()
+        return is_it
 
 
 class StackedEvent(models.Model):
@@ -622,13 +747,13 @@ class StackedEvent(models.Model):
         "Date de création du lot", blank=True, null=True)
 
     updated_on = models.DateTimeField(
-        "Date de derniére modification du lot", blank=True, null=True)
+        "Date de dernière modification du lot", blank=True, null=True)
 
     schedualed_delivery_on = models.DateTimeField(
         "Timestamp d'envoi prévu", blank=True, null=True)
 
     class Meta:
-        verbose_name = "Lot de notification"
+        verbose_name = "Lot de notifications"
         verbose_name_plural = "Lots de notifications des abonnées"
 
     def save(self, *args, **kwargs):
@@ -662,7 +787,7 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
 @receiver(models.signals.pre_delete, sender=User)
 def anonymize_comments(sender, instance, **kwargs):
     """
-    On transfere les commentaires sur un utilisateur anonyme
+    On transfère les commentaires sur un utilisateur anonyme
     """
     for comment in instance.comments:
         anonymous, _ = sender.objects.get_or_create(username="anonymous")
@@ -673,27 +798,6 @@ def anonymize_comments(sender, instance, **kwargs):
 @receiver(models.signals.post_delete, sender=Attachment)
 def submission_delete(sender, instance, **kwargs):
     instance.attachment_file.delete()
-
-
-@receiver(models.signals.post_save, sender=Event)
-def stack_event_(sender, instance, created, **kwargs):
-    """
-        TODO@cbenhabib: ajout d'une commande django branchée a un cron
-        qui itere sur la stack en attente de traitement et qui envoi les messages
-        aux destinataires abonnés.
-        On ferme ensuite la stack en indiquant l'état d'exécution de la commande.
-    """
-    if created and instance.feature_id:
-        if settings.DEFAULT_SENDING_FREQUENCY != "instantly":
-            StackedEvent = apps.get_model(app_label='collab', model_name="StackedEvent")
-            stack, _ = StackedEvent.objects.get_or_create(
-                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending')
-            stack.events.add(instance)
-            stack.save()
-
-        else:
-            # TODO: on appel le notify_users()
-            pass
 
 
 @receiver(models.signals.post_save, sender=FeatureLink)
@@ -736,6 +840,22 @@ def update_feature_dates(sender, instance, **kwargs):
             days=instance.project.delete_feature)
 
 
+@receiver(models.signals.post_save, sender=FeatureType)
+def slugify_feature_type(sender, instance, created, **kwargs):
+
+    if created:
+        instance.slug = slugify("{}-{}".format(instance.pk, instance.title))
+        instance.save()
+
+
+@receiver(models.signals.post_save, sender=Project)
+def slugify_project(sender, instance, created, **kwargs):
+
+    if created:
+        instance.slug = slugify("{}-{}".format(instance.pk, instance.title))
+        instance.save()
+
+
 @receiver(models.signals.post_save, sender=Project)
 def set_author_perms(sender, instance, created, **kwargs):
     # On ajoute la permission d'admin de projet au créateur
@@ -745,11 +865,11 @@ def set_author_perms(sender, instance, created, **kwargs):
         try:
             Authorization.objects.create(
                 project=instance,
-                user=instance.user,
+                user=instance.creator,
                 level=UserLevelPermission.objects.get(rank=4)
             )
-        except Exception as err:
-            logger.error("Error on Authorization create: {}".format(str(err)))
+        except Exception:
+            logger.exception('Trigger.set_author_perms')
 
 
 # EVENT'S TRIGGERS
@@ -759,11 +879,28 @@ def create_event_on_project_creation(sender, instance, created, **kwargs):
     if created:
         Event = apps.get_model(app_label='collab', model_name="Event")
         Event.objects.create(
-            user=instance.user,
+            user=instance.creator,
             event_type='create',
             object_type='project',
             project_slug=instance.slug,
             data={}
+        )
+
+
+@receiver(models.signals.post_save, sender=Feature)
+def create_event_on_feature_create(sender, instance, created, **kwargs):
+    # Pour la modification d'un signalement l'évènement est generé parallelement
+    # à l'update() afin de recupere l'utilisateur courant.
+    if created:
+        Event = apps.get_model(app_label='collab', model_name="Event")
+        Event.objects.create(
+            feature_id=instance.feature_id,
+            event_type='create',
+            object_type='feature',
+            user=instance.creator,
+            project_slug=instance.project.slug,
+            feature_type_slug=instance.feature_type.slug,
+            data=instance.feature_data
         )
 
 
@@ -779,5 +916,46 @@ def create_event_on_comment_creation(sender, instance, created, **kwargs):
             user=instance.author,
             project_slug=instance.project.slug,
             feature_type_slug=instance.feature_type_slug,
+            data={
+                'author': instance.author.get_full_name(),
+                'username': instance.author.username,
+                'project_slug': instance.project.slug,
+                'comment': instance.comment
+            }
+        )
+
+
+@receiver(models.signals.post_save, sender=Attachment)
+def create_event_on_attachment_creation(sender, instance, created, **kwargs):
+
+    # Si creation d'une piece jointe sans rapport avec un commentaire
+    if created and not instance.comment:
+        Event = apps.get_model(app_label='collab', model_name="Event")
+        Event.objects.create(
+            feature_id=instance.feature_id,
+            comment_id=instance.id,
+            event_type='create',
+            object_type='attachment',
+            user=instance.author,
+            project_slug=instance.project.slug,
             data={}
         )
+
+
+@receiver(models.signals.post_save, sender=Event)
+def notify_or_stack_events(sender, instance, created, **kwargs):
+
+    if created and instance.project_slug and settings.DEFAULT_SENDING_FREQUENCY != 'never':
+        # Stack dépilé par tache cron
+        if settings.DEFAULT_SENDING_FREQUENCY != 'instantly':
+            StackedEvent = apps.get_model(app_label='collab', model_name="StackedEvent")
+            stack, _ = StackedEvent.objects.get_or_create(
+                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending')
+            stack.events.add(instance)
+            stack.save()
+        # Sinon notification instantané
+        else:
+            try:
+                instance.ping_users()
+            except Exception:
+                logger.exception('ping_users@notify_or_stack_events')

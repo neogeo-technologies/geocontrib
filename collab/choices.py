@@ -4,6 +4,19 @@ soient à jours entre application et base.
 """
 
 ######################
+# CUSTOM FIELD TYPES #
+######################
+
+TYPE_CHOICES = (
+    ("boolean", "Booléen"),
+    ("char", "Chaîne de caractères"),
+    ("date", "Date"),
+    ("integer", "Entier"),
+    ("decimal", "Décimale"),
+    ("text", "Champ texte"),
+)
+
+######################
 # LEVELS PERMISSIONS #
 ######################
 
@@ -20,7 +33,7 @@ LOWER_LEVELS = (
 )
 
 EXTENDED_LEVELS = (
-    (MODERATOR, 'Moderateur'),
+    (MODERATOR, 'Modérateur'),
     (ADMIN, 'Admin'),
 )
 
@@ -50,11 +63,8 @@ EXTENDED_RELATED_MODELS = RELATED_MODELS + OTHERS_MODELS
 
 EVENT_TYPES = (
     ('create', "Création"),
-    ('update_attachment', "Modification d'une pièce jointe"),
-    ('update_loc', 'Modification de la localisation'),
-    ('update_attrs', "Modification d’un attribut"),
-    ('update_status', "Changement de statut"),
-    ('delete', 'Suppression'),
+    ('update', "Modification"),
+    ('delete', "Suppression"),
 )
 
 
@@ -65,6 +75,7 @@ STATE_CHOICES = (
 )
 
 FREQUENCY_CHOICES = (
+    ('never', 'Jamais'),
     ('instantly', 'Instantanément'),
     ('daily', 'Quotidienne'),
     ('weekly', 'Hebdomadaire'),

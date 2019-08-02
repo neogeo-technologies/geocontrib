@@ -24,6 +24,14 @@
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
+  <!-- Leaflet Draw -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" integrity="sha256-XzD3RpaHPv7lzX9qt+2n1j5cWj48O24KsgaGYpKN8x8=" crossorigin="anonymous" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha256-siofc4Uwjlra3YWkwthOn8Uj69cNN4aMug/iOHNiRgs=" crossorigin="anonymous"></script>
+
+  <!-- WellKnown JS -->
+  <script src="https://cdn.rawgit.com/mapbox/wellknown/master/wellknown.js"></script>
+  <!-- Turf.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script>
 
   <!-- Custom -->
   <link rel="stylesheet" href="{% static 'collab/css/base.css' %}"/>
@@ -46,24 +54,22 @@
             {{ project.title }}
             <i class="dropdown icon"></i>
             <div class="menu">
+              <a class="item" href="{% url 'collab:project' slug=project.slug %}">
+                <i class="home icon"></i>Accueil du projet
+              </a>
               <a class="item" href="{% url 'collab:feature_list' slug=project.slug %}">
-                <i class="icon list"></i>Liste
+                <i class="icon list"></i>Liste & Carte
               </a>
-              <a class="item" href="{% url 'collab:project_map' slug=project.slug %}">
-                <i class="icon map"></i>Carte
+              <a class="item" href="{% url 'api:project-export' slug=project.slug%}">
+                <i class="icon download"></i>Exporter les signalements
               </a>
-              <a class="item" href="{% url 'collab:feature_type_create' slug=project.slug %}">Créer un nouveau type de signalement</a>
-              <a class="item">Ajout d'un signalement</a>
             </div>
           </div>
         {% endif %}
         <div class="right menu">
-          <a class="item" href="{% url 'collab:help' %}">
-            Aide
-          </a>
-          {% if request.user.is_authenticated %}
+          {% if user.is_authenticated %}
             <a class="item" href="{% url 'collab:my_account' %}">
-              {{ user.username }}
+              {{ user.get_full_name|default:user.username }}
             </a>
             <a class="item" href="{% url 'collab:logout' %}"><i class="ui logout icon"></i></a>
           {% else %}
@@ -73,7 +79,6 @@
       </div>
     </div>
   </header>
-
   <main>
     <div class="ui stackable grid centered container">
       {% block content %}
@@ -83,10 +88,8 @@
 
   <footer>
     <div class="ui compact text menu">
-      <div class="item">® 2019 Geo2France</div>
-      <a class="item" href="{% url 'collab:help' %}">Aide</a>
-      <a class="item">Contact</a>
       <a class="item" href="{% url 'collab:legal' %}">Mentions légales</a>
+      <a class="item" href="{% url 'collab:help' %}">Aide</a>
     </div>
   </footer>
 

@@ -1,6 +1,5 @@
 import json
 from django.core.serializers.json import DjangoJSONEncoder
-from datetime import datetime
 
 
 # TODO@cbenhabib: tester une solution avec l'utilisation de DRF pour

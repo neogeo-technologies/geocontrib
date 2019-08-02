@@ -14,6 +14,9 @@ from collab.models import FeatureType
 from collab.models import Project
 from collab.models import UserLevelPermission
 
+import logging
+logger = logging.getLogger('django')
+
 
 class CustomFieldModelBaseFS(BaseModelFormSet):
     def clean(self):
@@ -40,33 +43,14 @@ class FeatureTypeModelForm(forms.ModelForm):
 
     title = forms.CharField(label='Titre', required=True)
 
-    slug = forms.SlugField(label='Slug', required=True)
-
     class Meta:
         model = FeatureType
-        fields = ('title', 'slug', 'geom_type')
-
-    def clean_slug(self):
-        slug = self.cleaned_data.get('slug')
-        if self.instance.pk:
-            if FeatureType.objects.filter(slug=slug).exclude(pk=self.instance.pk).exists():
-                msg = "Veuillez modifier le slug de ce type de signalement, cette valeur doit etre unique."
-                raise forms.ValidationError(msg)
-        else:
-            if FeatureType.objects.filter(slug=slug).exists():
-                msg = "Veuillez modifier le slug de votre projet, cette valeur doit etre unique."
-                raise forms.ValidationError(msg)
-        return slug
+        fields = ('title', 'geom_type')
 
 
 class ProjectModelForm(forms.ModelForm):
-    # TODO: demander si on ne peux pas avoir un positif integer field pour le
-    # nombre de jours pour archive_feature et delete_feature au lieu d'une durée
-    # on calculerai le timedelat plus facilement si on a pas besoin de gerer des horaire
-    # de durée..
-    title = forms.CharField(label='Titre', max_length=100)
 
-    slug = forms.SlugField(label='Slug', max_length=100)
+    title = forms.CharField(label='Titre', max_length=100)
 
     thumbnail = forms.ImageField(label="Illustration du projet", required=False)
 
@@ -95,8 +79,6 @@ class ProjectModelForm(forms.ModelForm):
         model = Project
         fields = [
             'title',
-            'slug',
-            # 'created_on'
             'description',
             'moderation',
             'thumbnail',
@@ -104,7 +86,6 @@ class ProjectModelForm(forms.ModelForm):
             'access_level_arch_feature',
             'archive_feature',
             'delete_feature',
-            # 'features_info'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -129,18 +110,6 @@ class ProjectModelForm(forms.ModelForm):
                 msg = "Veuillez modifier le titre de votre projet, un projet avec ce titre existe déjà."
                 raise forms.ValidationError(msg)
         return title
-
-    def clean_slug(self):
-        slug = self.cleaned_data.get('slug')
-        if self.instance.pk:
-            if Project.objects.filter(slug=slug).exclude(pk=self.instance.pk).exists():
-                msg = "Veuillez modifier le slug de votre projet, un projet avec ce slug existe déjà."
-                raise forms.ValidationError(msg)
-        else:
-            if Project.objects.filter(slug=slug).exists():
-                msg = "Veuillez modifier le slug de votre projet, un projet avec ce slug existe déjà."
-                raise forms.ValidationError(msg)
-        return slug
 
 
 class ExtendedBaseFS(BaseModelFormSet):
@@ -231,6 +200,7 @@ class AttachmentForm(forms.ModelForm):
         )
 
     def clean(self):
+
         cleaned_data = super().clean()
         up_file = cleaned_data.get("attachment_file")
         title = cleaned_data.get("title")
@@ -243,6 +213,8 @@ class AttachmentForm(forms.ModelForm):
 
 class FeatureLinkForm(forms.ModelForm):
 
+    feature_to = forms.ChoiceField(label='Signalement lié')
+
     class Meta:
         model = FeatureLink
         fields = (
@@ -250,8 +222,73 @@ class FeatureLinkForm(forms.ModelForm):
             'feature_to',
         )
 
+    def __init__(self, *args, **kwargs):
+        feature_type = kwargs.pop('feature_type', None)
+        feature = kwargs.pop('feature', None)
+        super().__init__(*args, **kwargs)
 
-class FeatureDynamicForm(forms.ModelForm):
+        try:
+            qs = Feature.objects.filter(feature_type=feature_type)
+            if feature:
+                qs = qs.exclude(feature_id=feature.feature_id)
+
+            self.fields['feature_to'].choices = tuple(
+                (feat.feature_id, "{} ({} - {})".format(
+                    feat.title, feat.creator.username, feat.created_on)) for feat in qs
+            )
+
+        except Exception:
+            logger.exception('No feature_type found')
+
+
+class FeatureExtraForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        extra = kwargs.pop('extra', None)
+        feature = kwargs.pop('feature', None)
+        super().__init__(*args, **kwargs)
+
+        for custom_field in extra.order_by('position'):
+            if custom_field.field_type == 'boolean':
+                self.fields[custom_field.name] = forms.BooleanField(
+                    label=custom_field.label, initial=False, required=False,
+                )
+
+            if custom_field.field_type == 'char':
+                self.fields[custom_field.name] = forms.CharField(
+                    label=custom_field.label, max_length=256, required=False)
+
+            if custom_field.field_type == 'date':
+                self.fields[custom_field.name] = forms.DateField(
+                    label=custom_field.label, required=False,
+                )
+
+            if custom_field.field_type == 'integer':
+                self.fields[custom_field.name] = forms.IntegerField(
+                    label=custom_field.label, required=False)
+
+            if custom_field.field_type == 'decimal':
+                self.fields[custom_field.name] = forms.DecimalField(
+                    label=custom_field.label, required=False,
+                    widget=forms.TextInput(attrs={
+                        'localization': False
+                    }))
+
+            if custom_field.field_type == 'text':
+                self.fields[custom_field.name] = forms.CharField(
+                    label=custom_field.label, required=False, widget=forms.Textarea())
+
+            self.fields[custom_field.name].widget.attrs.update({
+                'field_type': custom_field.field_type
+            })
+
+        if feature and isinstance(feature.feature_data, dict):
+            for custom_field in extra:
+                self.fields[custom_field.name].initial = feature.feature_data.get(custom_field.name)
+
+
+class FeatureBaseForm(forms.ModelForm):
+
     class Meta:
         model = Feature
         fields = (
@@ -263,88 +300,75 @@ class FeatureDynamicForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         feature_type = kwargs.pop('feature_type')
-        extra = kwargs.pop('extra', None)
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         project = feature_type.project
 
+        # Status choices
+        initial = 'draft'
         choices = tuple(x for x in Feature.STATUS_CHOICES)
         if not project.moderation:
             choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] != 'pending')
+            initial = 'published' if not self.instance else self.instance.status
 
         if project.moderation and not Authorization.has_permission(user, 'can_publish_feature', project):
             choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] in ['draft', 'pending'])
+            initial = 'pending'
 
-        self.fields["status"] = forms.ChoiceField(
-            choices=choices
+        if project.moderation and Authorization.has_permission(user, 'can_publish_feature', project):
+            choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] in ['draft', 'published', 'archived'])
+            initial = 'draft'
+
+        self.fields['status'] = forms.ChoiceField(
+            choices=choices,
+            initial=initial,
+            label='Statut'
         )
 
         # TODO: factoriser les attributs de champs geom
         if feature_type.geom_type == "point":
-            self.fields["geom"] = forms.PointField(
+            self.fields['geom'] = forms.PointField(
                 label="Localisation",
-                required=False,
+                required=True,
+                srid=4326
             )
 
         if feature_type.geom_type == "linestring":
-            self.fields["geom"] = forms.LineStringField(
+            self.fields['geom'] = forms.LineStringField(
                 label="Localisation",
-                required=False,
+                required=True,
+                srid=4326
             )
 
         if feature_type.geom_type == "polygon":
-            self.fields["geom"] = forms.PolygonField(
+            self.fields['geom'] = forms.PolygonField(
                 label="Localisation",
-                required=False,
+                required=True,
+                srid=4326
             )
 
-        if extra.exists():
-            for custom_field in extra.order_by('position'):
-                if custom_field.field_type == 'boolean':
-                    self.fields[custom_field.name] = forms.BooleanField(
-                        label=custom_field.label, initial=False, required=False)
-
-                if custom_field.field_type == 'char':
-                    self.fields[custom_field.name] = forms.CharField(
-                        label=custom_field.label, max_length=256, required=False)
-
-                if custom_field.field_type == 'date':
-                    self.fields[custom_field.name] = forms.DateField(
-                        label=custom_field.label, required=False,
-                        widget=forms.DateInput(attrs={
-                            'class': 'ui calendar',
-                            'type': 'date'
-                        }))
-
-                if custom_field.field_type == 'integer':
-                    self.fields[custom_field.name] = forms.IntegerField(
-                        label=custom_field.label, required=False)
-
-                if custom_field.field_type == 'decimal':
-                    self.fields[custom_field.name] = forms.DecimalField(
-                        label=custom_field.label, required=False,
-                        widget=forms.TextInput(attrs={
-                            'localization': False
-                        }))
-
-                if custom_field.field_type == 'text':
-                    self.fields[custom_field.name] = forms.CharField(
-                        label=custom_field.label, required=False, widget=forms.Textarea())
-
-        if isinstance(self.instance.feature_data, dict):
-            if extra.exists() and self.instance.feature_data:
-                for custom_field in extra:
-                    self.fields[custom_field.name].initial = self.instance.feature_data.get(custom_field.name)
-
     def save(self, commit=True, *args, **kwargs):
+
+        extra = kwargs.pop('extra', None)
+        feature_type = kwargs.pop('feature_type', None)
+        project = kwargs.pop('project', None)
+        creator = kwargs.pop('creator', None)
         instance = super().save(commit=False)
 
-        extra = CustomField.objects.filter(feature_type=instance.feature_type)
-        newdict = {field_name: self.cleaned_data.get(field_name) for field_name in extra.values_list('name', flat=True)}
-        stringfied = json.dumps(newdict, cls=DjangoJSONEncoder)
-        instance.feature_data = json.loads(stringfied)
+        if extra and feature_type:
+            custom_fields = CustomField.objects.filter(feature_type=feature_type)
+            newdict = {
+                field_name: extra.get(field_name) for field_name in custom_fields.values_list('name', flat=True)
+            }
+            stringfied = json.dumps(newdict, cls=DjangoJSONEncoder)
+            instance.feature_data = json.loads(stringfied)
+
+        if creator:
+            instance.creator = creator
 
         if commit:
+            instance.feature_type = feature_type
+            instance.project = project
             instance.save()
 
         return instance

@@ -39,31 +39,24 @@
           value="{% if form.title.value %}{{ form.title.value }}{% endif %}" >
         {{ form.title.errors }}
       </div>
-      <div class="required field">
-        <label for="{{ form.slug.id_for_label }}">{{ form.slug.label }}</label>
-        <input type="text" required maxlength="{{ form.slug.field.max_length }}"
-          name="{{ form.slug.html_name }}" id="{{ form.slug.id_for_label }}"
-          value="{% if form.slug.value %}{{ form.slug.value }}{% endif %}" >
-        {{ form.slug.errors }}
-      </div>
-    </div>
-    <div class="six wide field">
-      <label>{{ form.thumbnail.label }}</label>
-      {% if form.thumbnail.value %}
-        <img class="ui small image" id="form-input-file-logo" src="/media/{{ form.thumbnail.value }}">
-      {% endif %}
-      <label class="ui icon button" for="{{ form.thumbnail.id_for_label }}">
-        <i class="file icon"></i>
-        {% if form.thumbnail.value %}
-          <span class="label">{{ form.thumbnail.value }}</span>
-        {% else %}
-          <span class="label">Sélectionner une image ...</span>
+      <div class="field">
+        <label>{{ form.thumbnail.label }}</label>
+        {% if form.instance.thumbnail.url %}
+          <img class="ui small image" id="form-input-file-logo" src="{{ form.instance.thumbnail.url }}">
         {% endif %}
-      </label>
-      <input type="file" accept="image/jpeg, image/png" style="display:none;"
-        name="{{ form.thumbnail.html_name }}" id="{{ form.thumbnail.id_for_label }}"
-        value="{{ form.thumbnail.value }}" >
-      {{ form.thumbnail.errors }}
+        <label class="ui icon button" for="{{ form.thumbnail.id_for_label }}">
+          <i class="file icon"></i>
+          {% if form.thumbnail.value %}
+            <span class="label">{{ form.thumbnail.value }}</span>
+          {% else %}
+            <span class="label">Sélectionner une image ...</span>
+          {% endif %}
+        </label>
+        <input type="file" accept="image/jpeg, image/png" style="display:none;"
+          name="{{ form.thumbnail.html_name }}" id="{{ form.thumbnail.id_for_label }}"
+          value="{{ form.thumbnail.value }}" >
+        {{ form.thumbnail.errors }}
+      </div>
     </div>
     <div class="field">
       <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
@@ -139,7 +132,7 @@
 
     <div class="ui divider"></div>
 
-    <button id="btn_project_save" type="submit" class="ui basic teal icon button">
+    <button type="submit" class="ui basic teal icon button">
       <i class="white save icon"></i> Enregistrer les changements
     </button>
 

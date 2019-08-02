@@ -16,7 +16,13 @@ main {
 /* ---------------------------------- */
 
 a.button-hover-orange:hover {
-  background: orange !important;
+  background: #fbbd08 !important;
+}
+a.button-hover-green:hover {
+  background: #21ba45 !important;
+}
+a.button-hover-red:hover {
+  background: #ee2e24 !important;
 }
 
 .ui.header .content {
@@ -26,6 +32,10 @@ a.button-hover-orange:hover {
 .ui.horizontal.divider {
   color: #1ab2b6!important;
   padding-top: 1.5em;
+}
+
+.delete-hidden-field {
+  display: none;
 }
 
 

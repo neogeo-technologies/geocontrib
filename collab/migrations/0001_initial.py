@@ -84,7 +84,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='UserLevelPermission',
             fields=[
-                ('user_type_id', models.CharField(choices=[('anonymous', 'Utilisateur anonyme'), ('logged_user', 'Utilisateur connecté'), ('contributor', 'Contributeur'), ('moderator', 'Moderateur'), ('admin', 'Admin')], max_length=100, primary_key=True, serialize=False, verbose_name='Identifiant')),
+                ('user_type_id', models.CharField(choices=[('anonymous', 'Utilisateur anonyme'), ('logged_user', 'Utilisateur connecté'), ('contributor', 'Contributeur'), ('moderator', 'Modérateur'), ('admin', 'Admin')], max_length=100, primary_key=True, serialize=False, verbose_name='Identifiant')),
                 ('rank', models.PositiveSmallIntegerField(unique=True, verbose_name='Rang')),
             ],
             options={

@@ -5,14 +5,22 @@
 {% block title %}Projet {{ project.title }}{% endblock %}
 
 {% block content %}
-
   {% if permissions|lookup:'can_view_project' %}
-
   <div class="row">
-    <div class="three wide column">
-      <img class="ui small image" src="{{ project.thumbnail.url }}">
+    <div class="four wide middle aligned column">
+      <img class="ui small spaced image" src="{{ project.thumbnail }}">
+      <div class="ui hidden divider"></div>
+      <div class="ui basic teal label" data-tooltip="Utilisateurs">
+        <i class="user icon"></i>{{ project.nb_contributors }}
+      </div>
+      <div class="ui basic teal label" data-tooltip="Signalements">
+        <i class="map marker icon"></i>{{ features|length }}
+      </div>
+      <div class="ui basic teal label" data-tooltip="Commentaires">
+        <i class="comment icon"></i>{{ comments|length }}
+      </div>
     </div>
-    <div class="eleven wide column">
+    <div class="ten wide column">
       <h1 class="ui header">
         <div class="content">
           {{ project.title }}
@@ -25,7 +33,7 @@
           {% endif %}
           <div class="ui hidden divider"></div>
           <div class="sub header">
-            {{ project.description }}
+            {{ project.description|linebreaks }}
           </div>
         </div>
       </h1>
@@ -33,54 +41,58 @@
   </div>
 
   <div class="row">
-    <div class="three wide column">
-      <div class="ui basic teal label" data-tooltip="Utilisateurs">
-        <i class="user icon"></i>1
-      </div>
-      <div class="ui basic teal label" data-tooltip="Signalements">
-        <i class="map marker icon"></i>{{ features|length }}
-      </div>
-      <div class="ui basic teal label" data-tooltip="Commentaires">
-        <i class="comment icon"></i>{{ comments|length }}
-      </div>
-    </div>
-    <div class="eleven wide column">
+    <div class="seven wide column">
       <h3 class="ui header">Types de signalements</h3>
       <div class="ui middle aligned divided selection list">
         {% for type in feature_types %}
-          <a class="item" href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=type.slug %}">
-            {% if type.geom_type == 'point' %}
-              <img class="ui image list-image-type" src="{% static 'collab/img/marker.png' %}">
-            {% elif type.geom_type == 'linestring' %}
-              <img class="ui image list-image-type" src="{% static 'collab/img/line.png' %}">
-            {% elif type.geom_type == 'polygon' %}
-              <img class="ui image list-image-type" src="{% static 'collab/img/polygon.png' %}">
-            {% endif %}
-            <div class="content">
-              {{ type.title }}
+          <div class="item">
+            <div class="middle aligned content">
+              {% if type.geom_type == 'point' %}
+                <img class="list-image-type" src="{% static 'collab/img/marker.png' %}">
+              {% elif type.geom_type == 'linestring' %}
+                <img class="list-image-type" src="{% static 'collab/img/line.png' %}">
+              {% elif type.geom_type == 'polygon' %}
+                <img class="list-image-type" src="{% static 'collab/img/polygon.png' %}">
+              {% endif %}
+              <a href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=type.slug %}"> {{ type.title }} </a>
+              {% if project and feature_types and permissions|lookup:'can_create_feature' %}
+              <a class="ui compact small icon right floated button button-hover-green" data-tooltip="Ajouter un signalement" data-position="left center" data-variation="mini"
+                 href="{% url 'collab:feature_create' slug=project.slug feature_type_slug=type.slug %}">
+                <i class="ui plus icon"></i>
+              </a>
+              {% endif %}
             </div>
-          </a>
+          </div>
         {% empty %}
           <div>
             <i>
-              Le projet ne contient pas encore de signalements. Vous pouvez commencer par
-              <a href="{% url 'collab:feature_type_create' slug=project.slug %}">créer un type de signalement</a>.
+              Le projet ne contient pas encore de signalement.
             </i>
           </div>
         {% endfor %}
       </div>
+      <a class="ui compact basic button button-hover-green" href="{% url 'collab:feature_type_create' slug=project.slug %}">
+        <i class="ui plus icon"></i>Créer un nouveau type de signalement
+      </a>
+    </div>
+    <div class="seven wide column">
+      <a href="{% url 'collab:feature_list' slug=project.slug %}">
+        <div id="map"></div>
+      </a>
     </div>
   </div>
 
   <div class="row">
     <div class="fourteen wide column">
-      <div class="ui three stackable cards">
+      <div class="ui two stackable cards">
         <div class="red card">
           <div class="content">
             <div class="center aligned header">Derniers signalements</div>
             <div class="center aligned description">
-              {% for item in last_features.items %}
-                <p>{{ item.title }}</p>
+              {% for item in last_features %}
+                <p>
+                  <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=item.feature_type.slug feature_id=item.feature_id  %}">{{ item.title }}</a>
+                </p>
               {% empty %}
                 <i>Aucun signalement pour le moment.</i>
               {% endfor %}
@@ -108,32 +120,20 @@
             </div>
           </div>
         </div>
-        <div class="yellow card">
-          <div class="content">
-            <div class="center aligned header">Derniers utilisateurs inscrits au projet</div>
-            <div class="center aligned description">
-              {% for auth in authorizations %}
-                <p>{{ auth.user.get_full_name|default:auth.user.username }}</p>
-              {% empty %}
-                <i>Aucun utilisateur n'est inscrit à ce projet.</i>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 
   <div class="row">
     <div class="fourteen wide column" >
-      <div class="ui grey segment" style="background:#e8e8e8">
+      <div class="ui grey segment">
         <h3 class="ui header">Paramètres du projet</h3>
         <div class="ui five stackable cards">
           <div class="card">
             <div class="center aligned content">
               <h4 class="ui center aligned icon header">
                 <i class="archive icon"></i>
-                <div class="content">Délai avant archivage</div>
+                <div class="content">Délai avant archivage automatique</div>
               </h4>
             </div>
             <div class="center aligned extra content">{{ project.archive_feature }} jours</div>
@@ -141,8 +141,8 @@
           <div class="card">
             <div class="content">
               <h4 class="ui center aligned icon header">
-                <i class="trash alternate icon"></i>
-                <div class="content">Délai avant suppression</div>
+                <i class="disabled grey trash alternate icon"></i>
+                <div class="content">Délai avant suppression automatique</div>
               </h4>
             </div>
             <div class="center aligned extra content">{{ project.delete_feature }} jours</div>
@@ -178,18 +178,55 @@
       </div>
     </div>
   </div>
-
   {% else %}
-    <i class='icon exclamation triangle'></i>
-    <span>Vous ne disposez pas des droits nécessaires.</span>
+  <i class='icon exclamation triangle'></i>
+  <span>Vous ne disposez pas des droits nécessaires.</span>
   {% endif %}
 
 {% endblock %}
 
 {% block custom_resources %}
 <style>
+  #map {
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+  }
   .list-image-type {
-    height: 15px;
+    margin-right: 5px;
+    height: 25px;
+    vertical-align: bottom;
   }
 </style>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    var map = L.map('map', {zoomControl: false}).setView([43.604462, 1.444247], 13)
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map)
+
+    map.dragging.disable()
+    map.doubleClickZoom.disable()
+    map.scrollWheelZoom.disable()
+
+
+    var featureGroup = new L.FeatureGroup()
+    {% for feature in features %}
+      var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
+      var geomJSON = turf.flip(geomFeatureJSON)
+      if (geomJSON.type === 'Point') {
+        L.circleMarker(geomJSON.coordinates, {color: 'green'}).addTo(featureGroup)
+      } else if (geomJSON.type === 'LineString') {
+        L.polyline(geomJSON.coordinates, {color: 'red'}).addTo(featureGroup)
+      } else if (geomJSON.type === 'Polygon') {
+        L.polygon(geomJSON.coordinates, {color: 'blue'}).addTo(featureGroup)
+      }
+    {% endfor %}
+    map.addLayer(featureGroup);
+    map.fitBounds(featureGroup.getBounds())
+
+
+  })
+</script>
 {% endblock %}

@@ -2,9 +2,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.gis import admin
 from django.utils.translation import ugettext_lazy as _
+from django import forms
 
 from collab.models import Feature
 from collab.models import Project
+from collab.models import Subscription
 from collab.models import FeatureType
 from collab.models import CustomField
 from collab.models import UserLevelPermission
@@ -68,8 +70,18 @@ class CustomFieldTabular(admin.TabularInline):
     view_on_site = False
 
 
-class FeatureTypeAdmin(admin.ModelAdmin):
+class FeatureTypeForm(forms.ModelForm):
+    class Meta:
+        model = FeatureType
+        fields = '__all__'
+        widgets = {
+            'color': forms.widgets.TextInput(attrs={'type': 'color'}),
+        }
 
+
+class FeatureTypeAdmin(admin.ModelAdmin):
+    form = FeatureTypeForm
+    readonly_fields = ('geom_type', )
     inlines = (
         CustomFieldTabular,
     )
@@ -80,5 +92,6 @@ admin.site.register(CustomField)
 admin.site.register(Feature)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(Project)
+admin.site.register(Subscription)
 admin.site.register(UserLevelPermission)
 # admin.site.register(CustomFieldInterface)

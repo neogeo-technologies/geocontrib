@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django.contrib.gis',
     'rest_framework',
     'rest_framework_gis',
@@ -132,7 +133,7 @@ STATIC_URL = '/static/'
 # Renseigner le path du static/
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-MEDIA_URL = '/'
+MEDIA_URL = '/media/'
 
 # Renseigner le path du media/
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -147,7 +148,7 @@ LOGIN_REDIRECT_URL = 'collab:index'
 
 LOGOUT_REDIRECT_URL = 'collab:index'
 
-DEFAULT_SENDING_FREQUENCY = 'daily'
+DEFAULT_SENDING_FREQUENCY = 'daily'  # A choisir parmi: 'never', 'instantly', 'daily', 'weekly'
 
 # Logging properties
 
@@ -187,3 +188,21 @@ LOGO_PATH = '/media/logo.png'
 IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
 
 FILE_MAX_SIZE = 10000000
+
+SITE_ID = 1
+
+# SMTP dev confs
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = 'CHANGEME'
+
+# EMAIL_PORT = 587
+
+# EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'CHANGEME'
+
+EMAIL_HOST_PASSWORD = 'CHANGEME'
+
+DEFAULT_FROM_EMAIL = 'no-reply@collab.fr'

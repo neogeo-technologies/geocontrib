@@ -19,10 +19,13 @@ from collab.views.content_managment import ProjectMap
 from collab.views.content_managment import FeatureCreate
 from collab.views.content_managment import FeatureTypeCreate
 from collab.views.content_managment import FeatureTypeDetail
+from collab.views.content_managment import ImportFromGeoJSON
+from collab.views.content_managment import ImportFromImage
 from collab.views.content_managment import ProjectCreate
 from collab.views.content_managment import CommentCreate
 from collab.views.content_managment import AttachmentCreate
 from collab.views.content_managment import ProjectMembers
+from collab.views.content_managment import SubscribingView
 
 # from . import views
 # import collab.views.feature as feature
@@ -56,11 +59,21 @@ urlpatterns = [
 
     path('projet/<slug:slug>/membres/', ProjectMembers.as_view(), name='project_members'),
 
-    path('projet/<slug:slug>/type-signalement/ajouter',
+    path(
+        'projet/<slug:slug>/abonnement/<str:action>/', SubscribingView.as_view(),
+        name='subscription'),
+
+    path('projet/<slug:slug>/type-signalement/ajouter/',
          FeatureTypeCreate.as_view(), name="feature_type_create"),  # add_feature_type
 
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/',
          FeatureTypeDetail.as_view(), name='feature_type_detail'),
+
+    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/importer-geojson/',
+         ImportFromGeoJSON.as_view(), name='import_from_geojson'),
+
+    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/importer-image/',
+         ImportFromImage.as_view(), name='import_from_image'),
 
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/ajouter/',
          FeatureCreate.as_view(), name='feature_create'),  # add_feature
@@ -71,27 +84,27 @@ urlpatterns = [
     path('projet/<slug:slug>/carte/', ProjectMap.as_view(), name='project_map'),
 
     path(
-        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>',
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/',
         FeatureDetail.as_view(),
         name='feature_detail'),
 
     path(
-        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/editer',
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/editer/',
         FeatureUpdate.as_view(),
         name='feature_update'),
 
     path(
-        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/supprimer',
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/supprimer/',
         FeatureDelete.as_view(),
         name='feature_delete'),
 
     path(
-        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/commentaire/ajouter',
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/commentaire/ajouter/',
         CommentCreate.as_view(),
         name='add_comment'),
 
     path(
-        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/piece-jointe/ajouter',
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/piece-jointe/ajouter/',
         AttachmentCreate.as_view(),
         name='add_attachment'),
 

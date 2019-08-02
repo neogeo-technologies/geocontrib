@@ -1,10 +1,12 @@
-{% extends "collab/layout_menu.html" %}
+{% extends "collab/base.html" %}
+
 {% load app_filters %}
 {% load static %}
 {% load l10n %}
-{% block title%}Édition d'un signalement{%endblock%}
-{% block content %}
 
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
 <div class="project_header">
   <h2 class="ui header">{{project.title}}</h2>
   <h3>{{feature.title}}</h3>
@@ -66,10 +68,29 @@
       </tr>
       <tr>
         <th>Auteur</th>
-        <td>{{ feature.user.get_full_name|default:feature.user.username }}</td>
+        <td>{{ feature.creator.get_full_name|default:feature.creator.username }}</td>
       </tr>
+      {% for field in feature_form.visible_fields %}
+      <tr>
+        <th>{{ field.label_tag }}</th>
+        <td>
+          {% if field.field.widget|is_checkbox %}
+          {{ field }}
+          {% elif field.field.widget|is_date %}
+          <div class="field">
+            <div class="ui input left icon">
+              <i class="calendar icon"></i>
+              {{ field}}
+            </div>
+          </div>
+          {% else %}
+          {{ field }}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
 
-      {% for field in form.visible_fields %}
+      {% for field in extra_form.visible_fields %}
       <tr>
         <th>{{ field.label_tag }}</th>
         <td>
