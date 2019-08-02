@@ -1,3 +1,4 @@
+from functools import wraps
 import os
 import uuid
 
@@ -5,7 +6,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.gis.db import models
-from django.contrib.postgres.fields import ArrayField
+# from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.dispatch import receiver
@@ -388,26 +389,25 @@ class FeatureType(models.Model):
         return self.title
 
 
-# Si besoin de garder les valeurs en base
-class CustomFieldInterface(models.Model):
-
-    TYPE_CHOICES = (
-        ("unique", "Entrée unique"),
-        ("multi_choice", "Choix multiple"),
-        ("radio", "Bouton radio"),
-        ("range", "Curseur"),
-    )
-
-    field_type = models.CharField(
-        "Type de champs", choices=TYPE_CHOICES, max_length=50,
-        default="unique", null=True, blank=True)
-
-    # Permet de stocker les options des differents type d'input
-    options = ArrayField(base_field=models.CharField(max_length=256), blank=True)
-
-    class Meta:
-        verbose_name = "Interface de champs personnalisés"
-        verbose_name_plural = "Interfaces de champs personnalisés"
+# class CustomFieldInterface(models.Model):
+#
+#     INTERFACE_CHOICES = (
+#         ("unique", "Entrée unique"),
+#         ("multi_choice", "Choix multiple"),
+#         ("radio", "Bouton radio"),
+#         ("range", "Curseur"),
+#     )
+#
+#     interface_type = models.CharField(
+#         "Type d'interface", choices=INTERFACE_CHOICES, max_length=50,
+#         default="unique", null=True, blank=True)
+#
+#     # Permet de stocker les options des differents type d'input
+#     options = ArrayField(base_field=models.CharField(max_length=256), blank=True)
+#
+#     class Meta:
+#         verbose_name = "Interface de champs personnalisés"
+#         verbose_name_plural = "Interfaces de champs personnalisés"
 
 
 class CustomField(models.Model):
@@ -420,15 +420,15 @@ class CustomField(models.Model):
         "Position", default=0, blank=False, null=False)
 
     field_type = models.CharField(
-        "Type de champ", choices=TYPE_CHOICES, max_length=50,
+        "Type de champs", choices=TYPE_CHOICES, max_length=50,
         default="boolean", null=False, blank=False)
 
     feature_type = models.ForeignKey(
         "collab.FeatureType", on_delete=models.CASCADE
     )
 
-    interface = models.ForeignKey(
-        "collab.CustomFieldInterface", on_delete=models.CASCADE, null=True, blank=True)
+    # interface = models.ForeignKey(
+    #     "collab.CustomFieldInterface", on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name = "Champ personnalisé"
@@ -778,8 +778,21 @@ class StackedEvent(models.Model):
 # TRIGGERS #
 ############
 
+def disable_for_loaddata(signal_handler):
+    """
+    On desactive les trigger pour les loaddata, car ils créent des instances
+    redondantes.
+    """
+    @wraps(signal_handler)
+    def wrapper(*args, **kwargs):
+        if kwargs['raw']:
+            return
+        signal_handler(*args, **kwargs)
+    return wrapper
+
 
 @receiver(models.signals.post_delete, sender=Project)
+@disable_for_loaddata
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
     Supprime les fichiers image lors de la suppression d'une instance projet.
@@ -790,6 +803,7 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
 
 
 @receiver(models.signals.pre_delete, sender=User)
+@disable_for_loaddata
 def anonymize_comments(sender, instance, **kwargs):
     """
     On transfère les commentaires sur un utilisateur anonyme
@@ -801,11 +815,13 @@ def anonymize_comments(sender, instance, **kwargs):
 
 
 @receiver(models.signals.post_delete, sender=Attachment)
+@disable_for_loaddata
 def submission_delete(sender, instance, **kwargs):
     instance.attachment_file.delete()
 
 
 @receiver(models.signals.post_save, sender=FeatureLink)
+@disable_for_loaddata
 def create_symetrical_relation(sender, instance, created, **kwargs):
     if created:
         if instance.relation_type in ['doublon', 'depend_de']:
@@ -820,6 +836,7 @@ def create_symetrical_relation(sender, instance, created, **kwargs):
 
 
 @receiver(models.signals.post_delete, sender=FeatureLink)
+@disable_for_loaddata
 def delete_symetrical_relation(sender, instance, **kwargs):
     related = []
     if instance.relation_type in ['doublon', 'depend_de']:
@@ -837,6 +854,7 @@ def delete_symetrical_relation(sender, instance, **kwargs):
 
 
 @receiver(models.signals.pre_save, sender=Feature)
+@disable_for_loaddata
 def update_feature_dates(sender, instance, **kwargs):
     if instance.project:
         instance.archived_on = instance.created_on + timezone.timedelta(
@@ -846,6 +864,7 @@ def update_feature_dates(sender, instance, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=FeatureType)
+@disable_for_loaddata
 def slugify_feature_type(sender, instance, created, **kwargs):
 
     if created:
@@ -854,6 +873,7 @@ def slugify_feature_type(sender, instance, created, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=Project)
+@disable_for_loaddata
 def slugify_project(sender, instance, created, **kwargs):
 
     if created:
@@ -862,6 +882,7 @@ def slugify_project(sender, instance, created, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=Project)
+@disable_for_loaddata
 def set_author_perms(sender, instance, created, **kwargs):
     # On ajoute la permission d'admin de projet au créateur
     if created:
@@ -880,6 +901,7 @@ def set_author_perms(sender, instance, created, **kwargs):
 # EVENT'S TRIGGERS
 
 @receiver(models.signals.post_save, sender=Project)
+@disable_for_loaddata
 def create_event_on_project_creation(sender, instance, created, **kwargs):
     if created:
         Event = apps.get_model(app_label='collab', model_name="Event")
@@ -893,6 +915,7 @@ def create_event_on_project_creation(sender, instance, created, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=Feature)
+@disable_for_loaddata
 def create_event_on_feature_create(sender, instance, created, **kwargs):
     # Pour la modification d'un signalement l'évènement est generé parallelement
     # à l'update() afin de recupere l'utilisateur courant.
@@ -910,6 +933,7 @@ def create_event_on_feature_create(sender, instance, created, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=Comment)
+@disable_for_loaddata
 def create_event_on_comment_creation(sender, instance, created, **kwargs):
     if created:
         Event = apps.get_model(app_label='collab', model_name="Event")
@@ -931,6 +955,7 @@ def create_event_on_comment_creation(sender, instance, created, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=Attachment)
+@disable_for_loaddata
 def create_event_on_attachment_creation(sender, instance, created, **kwargs):
 
     # Si creation d'une piece jointe sans rapport avec un commentaire
@@ -948,6 +973,7 @@ def create_event_on_attachment_creation(sender, instance, created, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=Event)
+@disable_for_loaddata
 def notify_or_stack_events(sender, instance, created, **kwargs):
 
     if created and instance.project_slug and settings.DEFAULT_SENDING_FREQUENCY != 'never':

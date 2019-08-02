@@ -40,6 +40,12 @@ cp src/collab/static/collab/img/logo.png media/
 Ces données sont à définir depuis l'admin Django dans la section Site et
 permettent notamment d'afficher les url dans les gabarit d'e-mail
 
+## Dump et load de la base de recette sans conflits.
+
+```
+python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > dump.json
+```
+
 # TODO:
 
 - [x] Import en masse

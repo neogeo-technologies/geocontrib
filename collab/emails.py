@@ -8,7 +8,11 @@ from django.contrib.sites.models import Site
 import logging
 logger = logging.getLogger('django')
 
-CURRENT_SITE_DOMAIN = Site.objects.get_current().domain
+try:
+    CURRENT_SITE_DOMAIN = Site.objects.get_current().domain
+except Exception:
+    CURRENT_SITE_DOMAIN = 'http://SETUP-URL-IN-ADMIN'
+    logger.error('Sites not migrated yet. Please make sure you have Sites setup on Django Admin')
 
 
 class EmailBaseBuilder(object):
