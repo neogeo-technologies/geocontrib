@@ -189,6 +189,9 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
 
 @method_decorator(DECORATORS, name='dispatch')
 class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
+    """
+        TODO @cbenhabib: les vues FeatureCreate et FeatureUpdate doivent etre mergées.
+    """
     queryset = FeatureType.objects.all()
     slug_url_kwarg = 'feature_type_slug'
 
@@ -289,11 +292,59 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
                         title=feature_form.cleaned_data.get('title', 'N/A'),
                         err=str(err)))
             else:
+
+                # Traitement des signalements liés
+                for data in linked_formset.cleaned_data:
+
+                    feature_link = data.pop('id', None)
+
+                    if feature_link:
+                        if not data.get('DELETE'):
+                            feature_link.relation_type = data.get('relation_type')
+                            feature_link.feature_to = data.get('feature_to')
+                            feature_link.save()
+
+                        if data.get('DELETE'):
+                            feature_link.delete()
+
+                    if not feature_link and not data.get('DELETE'):
+                        FeatureLink.objects.create(
+                            relation_type=data.get('relation_type'),
+                            feature_from=feature.feature_id,
+                            feature_to=data.get('feature_to')
+                        )
+
+                # Traitement des piéces jointes
+                for data in attachment_formset.cleaned_data:
+
+                    attachment = data.pop('id', None)
+
+                    if attachment and data.get('DELETE'):
+                        attachment.delete()
+
+                    if attachment and not data.get('DELETE'):
+                        attachment.attachment_file = data.get('attachment_file')
+                        attachment.title = data.get('title')
+                        attachment.info = data.get('info')
+                        attachment.save()
+
+                    if not attachment and not data.get('DELETE'):
+                        Attachment.objects.create(
+                            attachment_file=data.get('attachment_file'),
+                            title=data.get('title'),
+                            info=data.get('info'),
+                            object_type='feature',
+                            project=project,
+                            feature_id=feature.feature_id,
+                            author=user,
+                        )
+
                 messages.info(
                     request,
                     "Le signalement {title} a bien été crée. ".format(
-                        title=feature_form.cleaned_data.get('title', 'N/A'),
+                        title=feature.title,
                     ))
+
                 return redirect(
                     'collab:feature_detail', slug=project.slug,
                     feature_type_slug=feature_type.slug, feature_id=feature.feature_id)
