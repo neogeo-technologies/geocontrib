@@ -324,9 +324,10 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'project': project,
             'permissions': Authorization.all_permissions(user, project, feature),
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
+            'attachments': Attachment.objects.filter(
+                project=project, feature_id=feature.feature_id, object_type='feature'),
             'events': serialized_events.data,
             'comment_form': CommentForm(),
-            'attachment_form': AttachmentForm(),
         }
 
         return render(request, 'collab/feature/feature_detail.html', context)
