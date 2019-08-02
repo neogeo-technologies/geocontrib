@@ -90,7 +90,11 @@
 <div class="row">
   <div class="seven wide column">
     <h3 class="ui header">Pièces jointes</h3>
-    <div class="ui tiny images">
+    {% for pj in attachments %}
+    {{ pj }}
+    <hr>
+    {% endfor %}
+    <!-- <div class="ui tiny images">
       <a href="" class="ui medium bordered image">
         <img src="{% static 'collab/img/polygon.png' %}">
       </a>
@@ -103,18 +107,17 @@
       <a href="" class="ui medium bordered image">
         <img src="{% static 'collab/img/polygon.png' %}">
       </a>
-    </div>
+    </div> -->
   </div>
 
   <div class="seven wide column">
     <h3 class="ui header">Activités et commentaires</h3>
 
-
-    <!-- {% for event in events %}
+    {% for comm in comments %}
       <hr>
-      <h4>{{ event.event_type }}</h4>
-      {{ event }}
-    {% endfor %} -->
+      <h4>{{ comm.title }}</h4>
+      {{ comm }}
+    {% endfor %}
     <div class="ui feed">
 
       {% for event in events %}
@@ -140,7 +143,7 @@
               </div>
             </div>
             <div class="extra text">
-              Hey c'est un commentaire !
+              {{ event }}
             </div>
           </div>
           {% endif %}
@@ -163,6 +166,25 @@
     <a class="ui compact basic button button-hover-green">
       <i class="ui plus icon"></i>Ajouter un commentaire
     </a>
+
+    <form id="commentform" action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" class="ui form comment_form" method="POST" enctype="multipart/form-data">
+      {% for hidden in comment_form.hidden_fields %}
+        {{ hidden }}
+      {% endfor %}
+      {% if comment_form.non_field_errors %}
+      <div class="alert alert-danger" role="alert">
+        {% for error in comment_form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {{ comment_form.as_p }}
+      <div class="actions">
+          <div class="ui cancel button">Annuler</div>
+          <button class="ui button green" type="submit">Ajouter</button>
+      </div>
+    </form>
   </div>
 </div>
 
