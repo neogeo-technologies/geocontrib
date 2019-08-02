@@ -381,7 +381,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             feature_id=F('feature_to')).values('relation_type', 'feature_id')
 
         linked_formset = self.LinkedFormset(
-            form_kwargs={'feature_type': feature_type},
+            form_kwargs={'feature_type': feature_type, 'feature': feature},
             prefix='linked',
             initial=linked_features,
             queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
@@ -444,6 +444,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             attachment_formset,
             linked_formset,
         ]
+
         forms_are_valid = all([ff.is_valid() for ff in all_forms])
 
         if not forms_are_valid:
@@ -460,6 +461,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 feature_id=F('feature_to')).values('relation_type', 'feature_id')
 
             linked_formset = self.LinkedFormset(
+                form_kwargs={'feature_type': feature_type, 'feature': feature},
                 prefix='linked',
                 initial=linked_features,
                 queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
@@ -523,6 +525,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
             # Traitement des signalements liés
             for data in linked_formset.cleaned_data:
+                import pdb; pdb.set_trace()
 
                 feature_link = data.pop('id', None)
 
