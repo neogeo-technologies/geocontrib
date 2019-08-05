@@ -190,7 +190,9 @@ class Project(models.Model):
         return {"rank__lte": 2}
 
     def limit_arch():
-        return {"rank__gt": 2}
+        # TODO: n'a plus lieu d'etre, les signalements archivés pouvant
+        # potentiellement etre visible par tous.
+        return {"rank__lte": 4}
 
     title = models.CharField("Titre", max_length=128, unique=True)
 

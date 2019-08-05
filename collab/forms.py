@@ -72,7 +72,7 @@ class ProjectModelForm(forms.ModelForm):
 
     access_level_arch_feature = forms.ModelChoiceField(
         label='Visibilité des signalements archivés',
-        queryset=UserLevelPermission.objects.filter(rank__gt=2).order_by('rank'),
+        queryset=UserLevelPermission.objects.filter(rank__lte=4).order_by('rank'),
         empty_label=None,)
 
     class Meta:
