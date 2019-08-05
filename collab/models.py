@@ -108,10 +108,11 @@ class Authorization(models.Model):
     def get_user_level_projects(cls, user):
         Project = apps.get_model(app_label='collab', model_name="Project")
         UserLevelPermission = apps.get_model(app_label='collab', model_name="UserLevelPermission")
-        return [{
-            'project_slug': project.slug,
-            'user_level': UserLevelPermission.objects.get(rank=cls.get_rank(user, project)).get_user_type_id_display()
-        } for project in Project.objects.all()]
+        levels = {}
+        for project in Project.objects.all():
+            levels[project.slug] = UserLevelPermission.objects.get(
+                rank=cls.get_rank(user, project)).get_user_type_id_display()
+        return levels
 
     @classmethod
     def all_permissions(cls, user, project, feature=None):

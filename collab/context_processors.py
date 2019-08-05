@@ -10,7 +10,7 @@ def custom_contexts(request):
     try:
         user_level_projects = Authorization.get_user_level_projects(request.user)
     except Exception:
-        user_level_projects = []
+        user_level_projects = {}
         logger.exception('Cannot retrieve user level project')
 
     return {
