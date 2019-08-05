@@ -48,11 +48,11 @@
           <td>{{ feature.updated_on }}</td>
         </tr>
         <tr>
-          <td>Date d'archivage</td>
+          <td>Date d'archivage automatique</td>
           <td>{{ feature.archived_on }}</td>
         </tr>
         <tr>
-          <td>Date de suppression</td>
+          <td>Date de suppression automatique</td>
           <td>{{ feature.deletion_on }}</td>
         </tr>
         {% for field in feature_data %}
@@ -90,30 +90,32 @@
 <div class="row">
   <div class="seven wide column">
     <h3 class="ui header">Pièces jointes</h3>
-    {% for pj in attachments %}
-    {{ pj }}
-    <hr>
-    {% endfor %}
-    <!-- <div class="ui tiny images">
-      <a href="" class="ui medium bordered image">
-        <img src="{% static 'collab/img/polygon.png' %}">
-      </a>
-      <a href="" class="ui medium bordered image">
-        <img src="{% static 'collab/img/polygon.png' %}">
-      </a>
-      <a href="" class="ui medium bordered image">
-        <img src="{% static 'collab/img/polygon.png' %}">
-      </a>
-      <a href="" class="ui medium bordered image">
-        <img src="{% static 'collab/img/polygon.png' %}">
-      </a>
-    </div> -->
+
+    <div class="ui divided items">
+      {% for pj in attachments %}
+      <div class="item">
+        <a class="ui tiny image" target="_blank" href="{{ pj.attachment_file.url }}">
+          {% if pj.extension == '.pdf' %}
+            <img src="{% static 'collab/img/pdf.png' %}">
+          {% else %}
+            <img src="{{ pj.attachment_file.url }}">
+          {% endif %}
+        </a>
+        <div class="middle aligned content">
+          <a class="header" target="_blank" href="{{ pj.attachment_file.url }}">{{ pj.title }}</a>
+          <div class="description">
+            {{ pj.info }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
 
   <div class="seven wide column">
     <h3 class="ui header">Activités et commentaires</h3>
-    <div class="ui feed">
 
+    <div class="ui feed">
       {% for event in events %}
       <div class="event">
         {% if event.event_type == 'create' %}
@@ -121,7 +123,7 @@
           <div class="content">
             <div class="summary">
               Création du signalement
-              {% if user.is_authenticated %} par {{ user.get_full_name|default:user.username }}{% endif %}
+              {% if user.is_authenticated %} par {{ event.user.full_name }}{% endif %}
               <div class="date">
                 {{ event.created_on }}
               </div>
@@ -131,15 +133,17 @@
           <div class="content">
             <div class="summary">
               Commentaire
-              {% if user.is_authenticated %} par {{ user.get_full_name|default:user.username }}{% endif %}
+              {% if user.is_authenticated %} par {{ event.user.full_name }}{% endif %}
               <div class="date">
                 {{ event.created_on }}
               </div>
             </div>
             <div class="extra text">
-              {{ event.data.username }}
-              {{ event.data.comment }}
-              {{ event.data.author }}
+              {{ event.related_comment.comment }}
+              {% for att in event.related_comment.attachments %}
+                  {{ att.title }}
+                  {{ att.url }}
+              {% endfor %}
             </div>
           </div>
           {% endif %}
@@ -147,7 +151,7 @@
         <div class="content">
           <div class="summary">
             Signalement mis à jour
-            {% if user.is_authenticated %} par {{ user.get_full_name|default:user.username }}{% endif %}
+            {% if user.is_authenticated %} par {{ event.user.full_name }}{% endif %}
             <div class="date">
               {{ event.created_on }}
             </div>
@@ -156,129 +160,62 @@
         {% endif %}
       </div>
       {% endfor %}
-
     </div>
 
-    <a class="ui compact basic button button-hover-green">
+    <!-- <a class="ui compact basic button button-hover-green">
       <i class="ui plus icon"></i>Ajouter un commentaire
-    </a>
+    </a> -->
 
-    <form id="commentform" action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" class="ui form comment_form" method="POST" enctype="multipart/form-data">
-      {% for hidden in comment_form.hidden_fields %}
-        {{ hidden }}
-      {% endfor %}
-      {% if comment_form.non_field_errors %}
-      <div class="alert alert-danger" role="alert">
-        {% for error in comment_form.non_field_errors %}
-          {{ error }}
-        {% endfor %}
+    <div class="ui accordion">
+      <div class="title">
+        <i class="dropdown icon"></i>
+        Ajouter un commentaire
       </div>
-      {% endif %}
-
-      {{ comment_form.as_p }}
-      <div class="actions">
-          <div class="ui cancel button">Annuler</div>
-          <button class="ui button green" type="submit">Ajouter</button>
+      <div class="content">
+        <div class="ui segment">
+          <form id="form-comment" action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" class="ui form" method="POST" enctype="multipart/form-data">
+            {% for hidden in comment_form.hidden_fields %}
+              {{ hidden }}
+            {% endfor %}
+            {% if comment_form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              {% for error in comment_form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="required field">
+              <label for="{{ comment_form.comment.id_for_label }}">Commentaire</label>
+              <textarea name="{{ comment_form.comment.html_name }}" rows="5">{% if comment_form.comment.value %}{{ comment_form.comment.value }}{% endif %}</textarea>
+              {{ form.comment.errors }}
+            </div>
+            <label>Pièce jointe (facultative)</label>
+            <div class="two fields">
+              <div class="field">
+                <input type="text" name="{{ comment_form.title.html_name }}" id="{{ comment_form.title.id_for_label }}"
+                  value="{% if comment_form.title.value %}{{ comment_form.title.value }}{% endif %}" >
+                {{ comment_form.title.errors }}
+              </div>
+              <div class="field">
+                <label class="ui icon button" for="attachment_file">
+                  <i class="paperclip icon"></i>
+                  <span class="label">Sélectionner un fichier ...</span>
+                </label>
+                <input type="file" accept="application/pdf, image/jpeg, image/png" style="display:none;"
+                  name="attachment_file" id="attachment_file">
+                {{ comment_form.attachment_file.errors }}
+              </div>
+            </div>
+            <button type="submit" class="ui compact green icon button">
+              <i class="plus icon"></i> Poster le commentaire
+            </button>
+          </form>
+        </div>
       </div>
-    </form>
+    </div>
   </div>
 </div>
 
-
-  <!-- <div class="header">Détail du signalement</div>
-    <table class="ui celled table">
-      <tbody>
-        <tr>
-          <th>Identifiant </th>
-          <td>{{ feature.feature_id }}</td>
-        </tr>
-        <tr>
-          <th>Date de création</th>
-          <td>{{ feature.created_on }}</td>
-        </tr>
-        <tr>
-          <th>Date de derniere modification</th>
-          <td>{{ feature.updated_on }}</td>
-        </tr>
-        <tr>
-          <th>Date de d'archivage</th>
-          <td>{{ feature.archived_on }}</td>
-        </tr>
-        <tr>
-          <th>Date de suppression</th>
-          <td>{{ feature.deletion_on }}</td>
-        </tr>
-        <tr>
-          <th>Auteur</th>
-          <td>{{ feature.creator.get_full_name|default:feature.creator.username }}</td>
-        </tr>
-        {% for field in feature_data %}
-        <tr>
-          <th>{{ field|lookup:'label' }}</th>
-          <td>
-            {{ field|lookup:'value' }}
-          </td>
-        </tr>
-        {% endfor %}
-
-        <tr>
-          <th>Signalements liés</th>
-          {%for row in linked_features %}
-          <td>
-            {{row.get_relation_type_display}}: <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=row.feature_to  %}" class="header">{{row.feature_to}}</a>
-          </td>
-          {% empty %}
-            <td><i class="minus icon"></td>
-          {% endfor %}
-        <tr>
-      </tbody>
-
-
-    </table> -->
-
-
-
-
-  <!--  carte -->
-  <!-- <div id='mapdetail'></div>
-
-  <div class="ui top attached tabular menu" id="feature_menu">
-    <div class="item active" data-tab="comment">Commentaires</div>
-  </div> -->
-
-  <!--  comments -->
-  <!-- <div class="ui bottom attached tab segment active" id="comments" data-tab="comment">
-    {# {% include 'collab/feature/comments.html' %} #}
-    {% for comment in comments %}
-      {{ comment.comment }}
-      {{ comment.author }}
-      {{ comment.created_on }}
-      {% for attachment in  comment.attachment_set.all %}
-        <label>Fichier: </label>
-        {{ attachment.title }}
-        <a href="{{ attachment.attachment_file.url }}" download>Télécharger</a>
-      {% endfor %}
-    <br>
-    {% endfor %}
-    <form id="commentform" action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" class="ui form comment_form" method="POST" enctype="multipart/form-data">
-      {% for hidden in comment_form.hidden_fields %}
-        {{ hidden }}
-      {% endfor %}
-      {% if comment_form.non_field_errors %}
-      <div class="alert alert-danger" role="alert">
-        {% for error in comment_form.non_field_errors %}
-          {{ error }}
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      {{ comment_form.as_p }}
-      <div class="actions">
-          <div class="ui cancel button">Annuler</div>
-          <button class="ui button green" type="submit">Ajouter</button>
-      </div>
-    </form>
-  </div> -->
 
 <div class="ui mini modal">
   <div class="header">Suppression du signalement</div>
@@ -300,17 +237,7 @@
   </div>
 </div>
 
-<script>
-
-  $('#add_more').click(function() {
-    var form_idx = $('#id_form-TOTAL_FORMS').val();
-    $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-  });
-</script>
 {% endblock %}
-
-
 
 {% block custom_resources %}
 <style>
@@ -322,6 +249,21 @@
 </style>
 
 <script type="text/javascript">
+  function truncate(n, len) {
+    var ext = n.substring(n.lastIndexOf(".") + 1, n.length).toLowerCase()
+    var filename = n.replace('.' + ext, '')
+    if (filename.length <= len) {
+      return n
+    }
+    filename = filename.substr(0, len) + (n.length > len ? '[...]' : '')
+    return filename + '.' + ext
+  }
+
+  $(document).on('change', '#form-comment #attachment_file', function () {
+    var logoFile = $(this).prop('files')[0]
+    $(this).parent().children('label').children('.label').html(truncate(logoFile.name, 10))
+  })
+
   $(document).ready(function() {
 
     $('#feature-delete').click(function() {

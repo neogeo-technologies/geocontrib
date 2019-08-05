@@ -57,7 +57,7 @@
       <!-- Import GeoImage -->
       {% if feature_type.geom_type == 'point' %}
       <p>
-        <button id="add-geo-image" type="button" class="ui compact basic button">
+        <button id="add-geo-image" type="button" class="ui compact button">
           <i class="file image icon"></i>Importer une image géoréférencée
         </button>
         Vous pouvez utiliser une image géoréférencée pour localiser le signalement.
@@ -117,10 +117,10 @@
       {{ attachment_formset.management_form }}
       {% for form in attachment_formset %}
       {% if not form.DELETE.value %}
+        {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+        {% endfor %}
         <div class="ui teal segment">
-          {% for hidden in form.hidden_fields %}
-            {{ hidden }}
-          {% endfor %}
           <h4>
             Pièce jointe
             <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
@@ -151,7 +151,7 @@
                 {{ form.attachment_file.errors }}
               </div>
             </div>
-            <div class="required field">
+            <div class="field">
               <label for="{{ form.info.id_for_label }}">{{ form.info.label }}</label>
               <textarea name="{{ form.info.html_name }}" rows="5">{% if form.info.value %}{{ form.info.value }}{% endif %}</textarea>
               {{ form.info.errors }}
@@ -231,18 +231,6 @@
     <button id="add-link" type="button" class="ui compact basic button button-hover-green">
       <i class="ui plus icon"></i>Ajouter une liaison
     </button>
-
-    <!-- <table class="ui compact celled definition table">
-      <tbody>
-        {% for feat in availables_features %}
-        <tr>
-          <td>{{ feat.feature_id }}</td>
-          <td>{{ feat.title }}</td>
-          <td>{{ feat.description }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table> -->
 
     <div class="ui divider"></div>
 
@@ -345,6 +333,56 @@ function truncate(n, len) {
   return filename + '.' + ext
 }
 
+function addAttachment(geoAttachment) {
+  console.log('geoAttachment', geoAttachment);
+  let title = geoAttachment ? 'Localisation' : ''
+
+  let label = geoAttachment ? geoAttachment.name : 'Sélectionner un fichier ...'
+  let file = geoAttachment ? geoAttachment : ''
+  var form_idx = $('#formsets-attachment [name=attachment-TOTAL_FORMS]').val()
+  $('#formsets-attachment').append((`
+    <div class="ui teal segment">
+      <h4>
+        Pièce jointe
+        <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+      </h4>
+      <div class="visible-fields">
+        <div class="two fields">
+          <div class="required field">
+            <label for="{{ attachment_formset.empty_form.title.id_for_label }}">{{ attachment_formset.empty_form.title.label }}</label>
+            <input type="text" required maxlength="{{ attachment_formset.empty_form.title.field.max_length }}"
+              name="{{ attachment_formset.empty_form.title.html_name }}" id="{{  attachment_formset.empty_form.title.id_for_label }}"
+              value="${title}">
+            {{ attachment_formset.title.errors }}
+          </div>
+          <div class="required field">
+            <label>Fichier (PDF, PNG, JPEG)</label>
+            <label class="ui icon button" for="{{ attachment_formset.empty_form.attachment_file.id_for_label }}">
+              <i class="file icon"></i>
+              <span class="label">${label}</span>
+            </label>
+            <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;" class="image_file"
+              name="{{ attachment_formset.empty_form.attachment_file.html_name }}" id="{{ attachment_formset.empty_form.attachment_file.id_for_label }}"
+              value="${file.name}">
+            {{ form.errors }}
+          </div>
+        </div>
+        <div class="field">
+          <label for="{{ attachment_formset.empty_form.info.id_for_label }}">{{ attachment_formset.empty_form.info.label }}</label>
+          <textarea name="{{ attachment_formset.empty_form.info.html_name }}" rows="5">{% if attachment_formset.empty_form.info.value %}{{ attachment_formset.empty_form.info.value }}{% endif %}</textarea>
+          {{ attachment_formset.info.errors }}
+        </div>
+      </div>
+      <input class="delete-hidden-field" type="checkbox"
+        name="{{ attachment_formset.empty_form.DELETE.html_name }}"
+        id="{{ attachment_formset.empty_form.DELETE.id_for_label }}">
+    </div>
+  `).replace(/__prefix__/g, form_idx))
+  $('#formsets-attachment [name=attachment-TOTAL_FORMS]').val(parseInt(form_idx) + 1)
+
+  $('.ui.dropdown').dropdown()
+}
+
 $(document).ready(function() {
   $(document).on('click', '.remove-formset', function () {
     var $segment = $(this).parent().parent('.segment')
@@ -368,54 +406,11 @@ $(document).ready(function() {
   })
 
   $('#add-attachment').click(function() {
-    var form_idx = $('#formsets-attachment [name=attachment-TOTAL_FORMS]').val();
-
-    console.log('add-attachment', form_idx)
-    $('#formsets-attachment').append((`
-      <div class="ui teal segment">
-        <h4>
-          Pièce jointe
-          <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
-        </h4>
-        <div class="visible-fields">
-          <div class="two fields">
-            <div class="required field">
-              <label for="{{ attachment_formset.empty_form.title.id_for_label }}">{{ attachment_formset.empty_form.title.label }}</label>
-              <input type="text" required maxlength="{{ attachment_formset.empty_form.title.field.max_length }}"
-                name="{{ attachment_formset.empty_form.title.html_name }}" id="{{  attachment_formset.empty_form.title.id_for_label }}">
-              {{ attachment_formset.title.errors }}
-            </div>
-            <div class="required field">
-              <label>Fichier (PDF, PNG, JPEG)</label>
-              <label class="ui icon button" for="{{ attachment_formset.empty_form.attachment_file.id_for_label }}">
-                <i class="file icon"></i>
-                <span class="label">Sélectionner un fichier ...</span>
-              </label>
-              <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;"
-                name="{{ attachment_formset.empty_form.attachment_file.html_name }}" class="image_file" id="{{ attachment_formset.empty_form.attachment_file.id_for_label }}" >
-              {{ form.errors }}
-            </div>
-          </div>
-          <div class="required field">
-            <label for="{{ attachment_formset.empty_form.info.id_for_label }}">{{ attachment_formset.empty_form.info.label }}</label>
-            <textarea name="{{ attachment_formset.empty_form.info.html_name }}" rows="5">{% if attachment_formset.empty_form.info.value %}{{ attachment_formset.empty_form.info.value }}{% endif %}</textarea>
-            {{ attachment_formset.info.errors }}
-          </div>
-        </div>
-        <input class="delete-hidden-field" type="checkbox"
-          name="{{ attachment_formset.empty_form.DELETE.html_name }}"
-          id="{{ attachment_formset.empty_form.DELETE.id_for_label }}">
-      </div>
-    `).replace(/__prefix__/g, form_idx))
-    $('#formsets-attachment [name=attachment-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
-
-    $('.ui.dropdown').dropdown()
+    addAttachment()
   })
 
   $('#add-link').click(function() {
     var form_idx = $('#formsets-link [name=linked-TOTAL_FORMS]').val();
-
-    console.log('add-link', form_idx)
     $('#formsets-link').append((`
       <div class="ui teal segment">
         <h4>
@@ -464,7 +459,6 @@ $(document).ready(function() {
       </div>
     `).replace(/__prefix__/g, form_idx))
     $('#formsets-link [name=linked-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
-
     $('.ui.dropdown').dropdown()
   })
 
@@ -485,7 +479,7 @@ $(document).ready(function() {
           updateGeomField(wellknown.stringify(responseGeomJSON))
           $('.mini.modal').modal('hide')
           // Set Attachment
-          // TODO:
+          addAttachment(imageFile)
         } else {
           console.log('ERROR REQUEST', responseJSON)
           $('#form-geo-image .error-message').html(responseJSON.message)
