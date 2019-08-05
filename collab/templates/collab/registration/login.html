@@ -1,21 +1,24 @@
-{% extends "collab/layout.html" %}
+{% extends "collab/base.html" %}
+
 {% load static %}
 
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="ui middle aligned center aligned grid">
-  <div class="sixteen wide column">
-    <img class="ui centered small image" src="{% static 'collab/img/logo-large.png' %}">
+<div class="row">
+  <div class="fourteen wide column">
+    <img class="ui centered small image" src="{{ LOGO_PATH }}">
     <h2 class="ui center aligned icon header">
-        <div class="content">
-            Collab
-            <div class="sub header">L'espace de production et de qualification collaboratif de Géo2France</div>
-        </div>
+      <div class="content">
+        {{ APPLICATION_NAME }}
+        <div class="sub header">{{ APPLICATION_ABSTRACT }}</div>
+      </div>
     </h2>
   </div>
-  <div class="five wide column"></div>
+</div>
+<div class="row">
   <div class="six wide column">
+    <h3 class="ui horizontal divider header">CONNEXION</h3>
     {% if form.errors %}
     <div class="ui warning message">
       <div class="header">
@@ -26,7 +29,6 @@
     {% endif %}
     <form class="ui form" method="post"  role="form" action="/connexion/">
       {% csrf_token %}
-
       <div class="ui stacked secondary  segment">
         <div class="six field required">
           <div class="ui left icon input">
@@ -40,11 +42,10 @@
              <input type="password" name="password" placeholder="Mot de passe">
           </div>
         </div>
-        <button  class="ui fluid large blue submit button" type="submit">Login</button>
+        <button  class="ui fluid large teal submit button" type="submit">Login</button>
       </div>
-  </form>
+    </form>
   </div>
-  <div class="five wide column"></div>
 </div>
 
 {% endblock %}

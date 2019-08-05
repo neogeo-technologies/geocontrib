@@ -5,6 +5,7 @@
 {% block title %}Projet {{ project.title }}{% endblock %}
 
 {% block content %}
+
   {% if permissions|lookup:'can_view_project' %}
   <div class="row">
     <div class="four wide middle aligned column">
@@ -17,7 +18,7 @@
         <i class="map marker icon"></i>{{ features|length }}
       </div>
       <div class="ui basic teal label" data-tooltip="Commentaires">
-        <i class="comment icon"></i>{{ comments|length }}
+        <i class="comment icon"></i>{{ project.nb_comments }}
       </div>
     </div>
     <div class="ten wide column">
@@ -71,9 +72,11 @@
           </div>
         {% endfor %}
       </div>
-      <a class="ui compact basic button button-hover-green" href="{% url 'collab:feature_type_create' slug=project.slug %}">
-        <i class="ui plus icon"></i>Créer un nouveau type de signalement
-      </a>
+      {% if project and permissions|lookup:'can_update_project' %}
+        <a class="ui compact basic button button-hover-green" href="{% url 'collab:feature_type_create' slug=project.slug %}">
+          <i class="ui plus icon"></i>Créer un nouveau type de signalement
+        </a>
+      {% endif %}
     </div>
     <div class="seven wide column">
       <a href="{% url 'collab:feature_list' slug=project.slug %}">
@@ -109,7 +112,12 @@
                     <div class="content">
                       <div>"{{ elt.comment }}"</div>
                       <div class="description">
-                        <i>Par {{ elt.author__first_name|title }} {{ elt.author__last_name }}, le {{ elt.creation_date|date:"d M Y" }}</i>
+                        <i>[
+                          {{ elt.created_on|date:"d/m/Y" }}
+                        {% if user.is_authenticated %}
+                          , par {{ elt.author__first_name|title }} {{ elt.author__last_name }}
+                        {% endif %}
+                        ]</i>
                       </div>
                     </div>
                   </div>
@@ -132,7 +140,7 @@
           <div class="card">
             <div class="center aligned content">
               <h4 class="ui center aligned icon header">
-                <i class="archive icon"></i>
+                <i class="disabled grey archive icon"></i>
                 <div class="content">Délai avant archivage automatique</div>
               </h4>
             </div>
@@ -150,25 +158,25 @@
           <div class="card">
             <div class="content">
               <h4 class="ui center aligned icon header">
-                <i class="eye icon"></i>
+                <i class="disabled grey eye icon"></i>
                 <div class="content">Visibilité des signalements publiés</div>
               </h4>
             </div>
-            <div class="center aligned extra content">{{ project.access_level_pub_feature.get_user_type_id_display }}</div>
+            <div class="center aligned extra content">{{ project.access_level_pub_feature }}</div>
           </div>
           <div class="card">
             <div class="content">
               <h4 class="ui center aligned icon header">
-                <i class="eye icon"></i>
+                <i class="disabled grey eye icon"></i>
                 <div class="content">Visibilité des signalements archivés</div>
               </h4>
             </div>
-            <div class="center aligned extra content">{{ project.access_level_arch_feature.get_user_type_id_display }}</div>
+            <div class="center aligned extra content">{{ project.access_level_arch_feature }}</div>
           </div>
           <div class="card">
             <div class="content">
               <h4 class="ui center aligned icon header">
-                <i class="cogs icon"></i>
+                <i class="disabled grey cogs icon"></i>
                 <div class="content">Modération</div>
               </h4>
             </div>
@@ -216,11 +224,11 @@
       var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
       var geomJSON = turf.flip(geomFeatureJSON)
       if (geomJSON.type === 'Point') {
-        L.circleMarker(geomJSON.coordinates, {color: 'green'}).addTo(featureGroup)
+        L.circleMarker(geomJSON.coordinates, {color: '{{ feature.feature_type.color }}'}).addTo(featureGroup)
       } else if (geomJSON.type === 'LineString') {
-        L.polyline(geomJSON.coordinates, {color: 'red'}).addTo(featureGroup)
+        L.polyline(geomJSON.coordinates, {color: '{{ feature.feature_type.color }}'}).addTo(featureGroup)
       } else if (geomJSON.type === 'Polygon') {
-        L.polygon(geomJSON.coordinates, {color: 'blue'}).addTo(featureGroup)
+        L.polygon(geomJSON.coordinates, {color: '{{ feature.feature_type.color }}'}).addTo(featureGroup)
       }
     {% endfor %}
     map.addLayer(featureGroup);

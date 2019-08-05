@@ -142,7 +142,7 @@
               {{ event.related_comment.comment }}
               {% if event.related_comment.attachments %}
                 {% for att in event.related_comment.attachments %}
-                  <a href="{{ att.url }}"><i class="paperclip icon"></i> {{ att.title }}</a>
+                  <a href="{{ att.url }}" target="_blank"><i class="paperclip icon"></i> {{ att.title }}</a>
                 {% endfor %}
               {% endif %}
             </div>

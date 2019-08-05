@@ -145,7 +145,7 @@
                     <span class="label">Sélectionner un fichier ...</span>
                   {% endif %}
                 </label>
-                <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;"
+                <input type="file" accept="{{ IMAGE_FORMAT }}" style="display:none;"
                   name="{{ form.attachment_file.html_name }}" class="image_file" id="{{ form.attachment_file.id_for_label }}"
                   value="{% if form.attachment_file.value %}{{ form.attachment_file.value }}{% endif %}" >
                 {{ form.attachment_file.errors }}
@@ -360,7 +360,7 @@ function addAttachment(geoAttachment) {
               <i class="file icon"></i>
               <span class="label">${label}</span>
             </label>
-            <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;" class="image_file"
+            <input type="file" accept="{{ IMAGE_FORMAT }}" style="display:none;" class="image_file"
               name="{{ attachment_formset.empty_form.attachment_file.html_name }}" id="{{ attachment_formset.empty_form.attachment_file.id_for_label }}"
               value="${geoAttachment.name}">
             {{ form.errors }}

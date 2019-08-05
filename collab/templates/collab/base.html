@@ -51,7 +51,7 @@
         </a>
         {% if project %}
           <div class="ui dropdown item">
-            {{ project.title }}
+            {{ project.title }}<br><div class="ui teal horizontal label">{{ USER_LEVEL_PROJECTS|lookup:project.slug }}</div>
             <i class="dropdown icon"></i>
             <div class="menu">
               <a class="item" href="{% url 'collab:project' slug=project.slug %}">
@@ -62,6 +62,9 @@
               </a>
               <a class="item" href="{% url 'api:project-export' slug=project.slug %}">
                 <i class="download icon"></i>Exporter les signalements
+              </a>
+              <a class="item" href="{% url 'collab:project_members' slug=project.slug %}">
+                <i class="map icon"></i>Administration carto
               </a>
               <a class="item" href="{% url 'collab:project_members' slug=project.slug %}">
                 <i class="users icon"></i>Gérer les membres

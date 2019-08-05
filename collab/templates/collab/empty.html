@@ -1,9 +1,9 @@
-{% extends "collab/layout.html" %}
-{% block title %}
-{{ title }}
-{% endblock %}
+{% extends "collab/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
 {% block content %}
 <div class="ui middle aligned stackable grid container">
-    {{ content }}
+  {{ content }}
 </div>
 {% endblock %}
