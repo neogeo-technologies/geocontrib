@@ -398,7 +398,7 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
         return render(request, 'collab/feature/feature_list.html', context)
 
 
-@method_decorator(DECORATORS, name='dispatch')
+@method_decorator(DECORATORS[0], name='dispatch')
 class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
 
     queryset = Feature.objects.all()
@@ -465,7 +465,6 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         return Authorization.has_permission(user, 'can_update_feature', project, feature)
 
     def get(self, request, slug, feature_type_slug, feature_id):
-
         user = request.user
         feature = self.get_object()
         project = feature.project
@@ -744,7 +743,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
             return render(request, 'collab/feature_type/feature_type_create.html', context)
 
 
-@method_decorator(DECORATORS, name='dispatch')
+@method_decorator(DECORATORS[0], name='dispatch')
 class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = FeatureType.objects.all()
     slug_url_kwarg = 'feature_type_slug'
