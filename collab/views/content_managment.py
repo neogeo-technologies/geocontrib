@@ -543,6 +543,11 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             form_kwargs={'feature_type': feature_type, 'feature': feature},
             queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
 
+        attachments = Attachment.objects.filter(
+            project=project, feature_id=feature.feature_id,
+            object_type='feature'
+        )
+
         attachment_formset = self.AttachmentFormset(
             request.POST or None, request.FILES, prefix='attachment')
 
@@ -562,31 +567,9 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         if not forms_are_valid:
 
             logger.error([ff.errors for ff in all_forms])
+            logger.error(request.POST)
+            logger.error(request.FILES)
             messages.error(request, "Erreur à la mise à jour du signalement. ")
-
-            feature_form = FeatureBaseForm(instance=feature, feature_type=feature_type, user=user)
-            extra_form = FeatureExtraForm(feature=feature, extra=extra)
-
-            linked_features = FeatureLink.objects.filter(
-                feature_from=feature.feature_id
-            ).annotate(
-                feature_id=F('feature_to')).values('relation_type', 'feature_id')
-
-            linked_formset = self.LinkedFormset(
-                form_kwargs={'feature_type': feature_type, 'feature': feature},
-                prefix='linked',
-                initial=linked_features,
-                queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
-
-            attachments = Attachment.objects.filter(
-                project=project, feature_id=feature.feature_id,
-                object_type='feature'
-            )
-            attachment_formset = self.AttachmentFormset(
-                prefix='attachment',
-                initial=attachments.values(),
-                queryset=attachments
-            )
 
             context = {
                 'feature': feature,

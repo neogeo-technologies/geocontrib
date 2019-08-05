@@ -98,14 +98,16 @@ class EventSerializer(serializers.ModelSerializer):
     def get_related_comment(self, obj):
         res = {}
         if obj.object_type == 'comment':
-
-            comment = Comment.objects.get(id=obj.comment_id)
-            res = {
-                'comment': comment.comment,
-                'attachments': [
-                    {'url': att.attachment_file.url, 'title': att.title} for att in comment.attachment_set.all()
-                ]
-            }
+            try:
+                comment = Comment.objects.get(id=obj.comment_id)
+                res = {
+                    'comment': comment.comment,
+                    'attachments': [
+                        {'url': att.attachment_file.url, 'title': att.title} for att in comment.attachment_set.all()
+                    ]
+                }
+            except Exception:
+                logger.exception('No related comment found')
         return res
 
     class Meta:
