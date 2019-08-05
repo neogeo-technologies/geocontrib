@@ -337,8 +337,7 @@ function addAttachment(geoAttachment) {
   console.log('geoAttachment', geoAttachment);
   let title = geoAttachment ? 'Localisation' : ''
 
-  let label = geoAttachment ? geoAttachment.name : 'Sélectionner un fichier ...'
-  let file = geoAttachment ? geoAttachment : ''
+  let label = geoAttachment ? geoAttachment[0].name : 'Sélectionner un fichier ...'
   var form_idx = $('#formsets-attachment [name=attachment-TOTAL_FORMS]').val()
   $('#formsets-attachment').append((`
     <div class="ui teal segment">
@@ -363,7 +362,7 @@ function addAttachment(geoAttachment) {
             </label>
             <input type="file" accept="image/jpeg, image/png, application/pdf" style="display:none;" class="image_file"
               name="{{ attachment_formset.empty_form.attachment_file.html_name }}" id="{{ attachment_formset.empty_form.attachment_file.id_for_label }}"
-              value="${file.name}">
+              value="${geoAttachment.name}">
             {{ form.errors }}
           </div>
         </div>
@@ -379,6 +378,11 @@ function addAttachment(geoAttachment) {
     </div>
   `).replace(/__prefix__/g, form_idx))
   $('#formsets-attachment [name=attachment-TOTAL_FORMS]').val(parseInt(form_idx) + 1)
+
+  if (geoAttachment) {
+    var inputFileLocalisation = $("#formsets-attachment .image_file").last()[0]
+    inputFileLocalisation.files = geoAttachment
+  }
 
   $('.ui.dropdown').dropdown()
 }
@@ -464,8 +468,8 @@ $(document).ready(function() {
 
   $('#get-geom-from-image-file').click(function() {
     var formGeoImage = new FormData()
-    var imageFile = $('#form-geo-image .image_file').prop('files')[0]
-    formGeoImage.append("image_file", imageFile)
+    var imageFile = $('#form-geo-image .image_file').prop('files')
+    formGeoImage.append("image_file", imageFile[0])
 
     var request = new XMLHttpRequest()
     request.onreadystatechange = function(e) {
