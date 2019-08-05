@@ -40,13 +40,15 @@
                 <div class="description">{{ field.field_type }}</div>
               </div>
               <div class="content">
-                {{ field.label }}
+                {{ field.label }} ({{ field.name }})
               </div>
             </div>
           {% endfor %}
         </div>
       </div>
     </div>
+
+    {% if permissions|lookup:'can_create_feature' %}
     <div class="ui bottom attached secondary segment">
       <div class="ui accordion">
         <div class="title">
@@ -69,6 +71,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
   </div>
   <div class="nine wide column">
@@ -87,6 +90,12 @@
       <i class="right arrow icon"></i>
       Voir tous les signalements
     </a>
+    {% if permissions|lookup:'can_create_feature' %}
+    <a class="ui icon button button-hover-green"
+       href="{% url 'collab:feature_create' slug=project.slug feature_type_slug=structure.slug %}">
+      Ajouter un signalement
+    </a>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
