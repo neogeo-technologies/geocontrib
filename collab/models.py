@@ -406,7 +406,7 @@ class FeatureType(models.Model):
 #     options = ArrayField(base_field=models.CharField(max_length=256), blank=True)
 #
 #     class Meta:
-#         verbose_name = "Interface de champs personnalisés"
+#         verbose_name = "Interface de champ personnalisé"
 #         verbose_name_plural = "Interfaces de champs personnalisés"
 
 
@@ -420,7 +420,7 @@ class CustomField(models.Model):
         "Position", default=0, blank=False, null=False)
 
     field_type = models.CharField(
-        "Type de champs", choices=TYPE_CHOICES, max_length=50,
+        "Type de champ", choices=TYPE_CHOICES, max_length=50,
         default="boolean", null=False, blank=False)
 
     feature_type = models.ForeignKey(
@@ -958,12 +958,12 @@ def create_event_on_comment_creation(sender, instance, created, **kwargs):
 @disable_for_loaddata
 def create_event_on_attachment_creation(sender, instance, created, **kwargs):
 
+    Event = apps.get_model(app_label='collab', model_name="Event")
     # Si creation d'une piece jointe sans rapport avec un commentaire
     if created and not instance.comment:
-        Event = apps.get_model(app_label='collab', model_name="Event")
         Event.objects.create(
             feature_id=instance.feature_id,
-            comment_id=instance.id,
+            attachment_id=instance.id,
             event_type='create',
             object_type='attachment',
             user=instance.author,

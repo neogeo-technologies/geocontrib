@@ -93,11 +93,20 @@ class EventSerializer(serializers.ModelSerializer):
 
     user = UserSerializer(read_only=True)
 
-    def get_user_full_name(self, obj):
-        return obj.user.get_full_name()
+    related_comment = serializers.SerializerMethodField()
 
-    def get_user_username(self, obj):
-        return obj.user.username
+    def get_related_comment(self, obj):
+        res = {}
+        if obj.object_type == 'comment':
+
+            comment = Comment.objects.get(id=obj.comment_id)
+            res = {
+                'comment': comment.comment,
+                'attachments': [
+                    {'url': att.attachment_file.url, 'title': att.title} for att in comment.attachment_set.all()
+                ]
+            }
+        return res
 
     class Meta:
         model = Event
@@ -111,7 +120,8 @@ class EventSerializer(serializers.ModelSerializer):
             'feature_id',
             'comment_id',
             'attachment_id',
-            'user'
+            'user',
+            'related_comment'
         )
 
 
