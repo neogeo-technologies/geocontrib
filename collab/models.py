@@ -22,7 +22,6 @@ from collab.choices import STATE_CHOICES
 from collab.choices import FREQUENCY_CHOICES
 from collab.choices import TYPE_CHOICES
 from collab.emails import notif_moderators_pending_features
-from collab.emails import notif_suscribers_project_event
 from collab.emails import notif_creator_published_feature
 from collab.managers import AvailableFeaturesManager
 
@@ -104,6 +103,15 @@ class Authorization(models.Model):
         else:
             user_rank = auth.level.rank
         return user_rank
+
+    @classmethod
+    def get_user_level_projects(cls, user):
+        Project = apps.get_model(app_label='collab', model_name="Project")
+        UserLevelPermission = apps.get_model(app_label='collab', model_name="UserLevelPermission")
+        return [{
+            'project_slug': project.slug,
+            'user_level': UserLevelPermission.objects.get(rank=cls.get_rank(user, project)).get_user_type_id_display()
+        } for project in Project.objects.all()]
 
     @classmethod
     def all_permissions(cls, user, project, feature=None):
@@ -673,30 +681,6 @@ class Event(models.Model):
                         except Exception:
                             logger.exception('Event.ping_users.notif_creator_published_feature')
 
-        # On notifie les utilisateurs abonnés au projet de tout evenement,
-        # dont il ne sont pas à l'origine.
-        # TODO @cbenhabib: demander si on ne limite pas qd meme aux seules evenements visibles?
-
-        try:
-            Subscription = apps.get_model(app_label='collab', model_name='Subscription')
-            subscription = Subscription.objects.get(project__slug=self.project_slug)
-        except Subscription.DoesNotExist:
-            logger.info('No suscription for {}'.format(self.project_slug))
-        else:
-            context = {
-                'project': subscription.project,
-                'event_initiator': event_initiator,
-                'created_on': self.created_on,
-                'action': self.contextualize_action
-            }
-            suscribers_emails = subscription.users.exclude(
-                pk=self.user.pk
-            ).values_list('email', flat=True)
-            try:
-                notif_suscribers_project_event(emails=suscribers_emails, context=context)
-            except Exception:
-                logger.exception('Event.ping_users.notif_suscribers_project_event')
-
 
 class Subscription(models.Model):
 
@@ -977,16 +961,15 @@ def create_event_on_attachment_creation(sender, instance, created, **kwargs):
 def notify_or_stack_events(sender, instance, created, **kwargs):
 
     if created and instance.project_slug and settings.DEFAULT_SENDING_FREQUENCY != 'never':
-        # Stack dépilé par tache cron
-        if settings.DEFAULT_SENDING_FREQUENCY != 'instantly':
-            StackedEvent = apps.get_model(app_label='collab', model_name="StackedEvent")
-            stack, _ = StackedEvent.objects.get_or_create(
-                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending')
-            stack.events.add(instance)
-            stack.save()
-        # Sinon notification instantané
-        else:
-            try:
-                instance.ping_users()
-            except Exception:
-                logger.exception('ping_users@notify_or_stack_events')
+        # On empile les evenements pour notifier les abonnés, en focntion de la fréquence d'envoi
+        StackedEvent = apps.get_model(app_label='collab', model_name="StackedEvent")
+        stack, _ = StackedEvent.objects.get_or_create(
+            sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending')
+        stack.events.add(instance)
+        stack.save()
+
+        # On notifie les collaborateurs des messages nécessitant une action immédiate
+        try:
+            instance.ping_users()
+        except Exception:
+            logger.exception('ping_users@notify_or_stack_events')
