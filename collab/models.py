@@ -6,7 +6,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.gis.db import models
-# from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.dispatch import receiver
@@ -437,6 +437,9 @@ class CustomField(models.Model):
     feature_type = models.ForeignKey(
         "collab.FeatureType", on_delete=models.CASCADE
     )
+
+    options = ArrayField(
+        base_field=models.CharField(max_length=256), null=True, blank=True)
 
     # interface = models.ForeignKey(
     #     "collab.CustomFieldInterface", on_delete=models.CASCADE, null=True, blank=True)
@@ -963,7 +966,7 @@ def create_event_on_attachment_creation(sender, instance, created, **kwargs):
 def notify_or_stack_events(sender, instance, created, **kwargs):
 
     if created and instance.project_slug and settings.DEFAULT_SENDING_FREQUENCY != 'never':
-        # On empile les evenements pour notifier les abonnés, en focntion de la fréquence d'envoi
+        # On empile les evenements pour notifier les abonnés, en fonction de la fréquence d'envoi
         StackedEvent = apps.get_model(app_label='collab', model_name="StackedEvent")
         stack, _ = StackedEvent.objects.get_or_create(
             sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending',

@@ -32,6 +32,7 @@ class Command(BaseCommand):
             return
 
         processed_stacks = []
+        failed_stacks = []
 
         users = User.objects.filter(is_active=True)
         for user in users:
@@ -51,6 +52,7 @@ class Command(BaseCommand):
 
                 if pending_stack.exists():
                     serialized_project = ProjectDetailedSerializer(Project.objects.get(slug=slug))
+                    # On ne peut avoir qu'une pile en attente pour un projet donnée
                     serialized_stack = StackedEventSerializer(pending_stack.first())
 
                     stacked_events.append(
@@ -60,14 +62,14 @@ class Command(BaseCommand):
                         }
                     )
 
-                context['stack_events'] = stacked_events
-
-            try:
-                notif_suscriber_grouped_events(emails=[user.email, ], context=context)
-            except Exception:
-                logger.exception('Error on notif_suscriber_grouped_events: {0}'.format(user.email))
-            else:
-                logger.info('Batch sent to {0}'.format(user.email))
+            context['stacked_events'] = stacked_events
+            if len(context['stacked_events']) > 0:
+                try:
+                    notif_suscriber_grouped_events(emails=[user.email, ], context=context)
+                except Exception:
+                    logger.exception('Error on notif_suscriber_grouped_events: {0}'.format(user.email))
+                else:
+                    logger.info('Batch sent to {0}'.format(user.email))
 
 
         # for row in StackedEvent.objects.filter(pk__in=[elm for elm in processed_stacks]):

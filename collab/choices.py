@@ -14,6 +14,7 @@ TYPE_CHOICES = (
     ("integer", "Entier"),
     ("decimal", "Décimale"),
     ("text", "Champ texte"),
+    ("list", "Liste"),
 )
 
 ######################
