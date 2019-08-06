@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=UTF-8">
+</head>
+<body>
+  Bonjour,
+  {{ stacked_events }}
+  {% for stacked_event in stacked_events %}
+    {{ stacked_event.project_data.title }}<br>
+    {% for event in stacked_event.stack_data %}
+      {{ event }}
+    {% endfor %}
+    <br><br>
+  {% endfor %}
+  <hr style="width:100%;height:1px;background:#ccc;border:0;margin:1.2em">
+  <span class="footer" style="font-size:0.8em;font-style:italic">
+    <p>Vous avez reçu ce message car vous étes associé au projet {{ project.title|title }}</p>
+  </span>
+</body>
+</html>

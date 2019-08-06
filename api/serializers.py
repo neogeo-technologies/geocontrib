@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
+
+from collab.models import Attachment
 from collab.models import Authorization
 from collab.models import CustomField
 from collab.models import Comment
@@ -8,6 +10,7 @@ from collab.models import Feature
 from collab.models import FeatureType
 from collab.models import Project
 from collab.models import Event
+from collab.models import StackedEvent
 
 
 import logging
@@ -70,7 +73,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-# NON-API SERIALIZERS: cf collab app
+# NON-API SERIALIZERS: TODO @cbenhabib: à déplacé dans collab
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -125,6 +128,43 @@ class EventSerializer(serializers.ModelSerializer):
             'user',
             'related_comment'
         )
+
+
+class AttachmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Attachment
+        fields = '__all__'
+
+
+class EventEnhencedSerializer(EventSerializer):
+    related_attachments = AttachmentSerializer(source='attachment_id', many=True)
+
+    class Meta:
+        model = Event
+        fields = (
+            'created_on',
+            'object_type',
+            'event_type',
+            'data',
+            'project_slug',
+            'feature_type_slug',
+            'feature_id',
+            'comment_id',
+            'attachment_id',
+            'user',
+            'related_comment',
+            'related_attachments'
+        )
+
+
+class StackedEventSerializer(serializers.ModelSerializer):
+
+    events = EventSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = StackedEvent
+        fields = '__all__'
 
 
 class ProjectDetailedSerializer(serializers.ModelSerializer):

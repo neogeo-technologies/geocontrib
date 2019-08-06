@@ -45,4 +45,4 @@ class Command(BaseCommand):
             self.delete_feature()
             self.archive_feature()
 
-        logger.info('Tasks successed! ')
+        logger.info('Tasks succeessed! ')

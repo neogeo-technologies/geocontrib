@@ -85,3 +85,14 @@ def notif_creator_published_feature(emails, context):
         template='collab/email/notif_creator_published_feature.html')
 
     email.send()
+
+
+def notif_suscriber_grouped_events(emails, context):
+
+    subject = "[Collab] Activité des projets suivies. "
+
+    email = EmailBaseBuilder(
+        context=context, to=emails, subject=subject,
+        template='collab/email/notif_suscriber_grouped_events.html')
+
+    email.send()
