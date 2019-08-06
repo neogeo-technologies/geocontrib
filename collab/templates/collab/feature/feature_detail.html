@@ -163,53 +163,47 @@
       {% endfor %}
     </div>
 
-    <!-- <div class="ui accordion">
-      <div class="title">
-        <i class="dropdown icon"></i>
-        Ajouter un commentaire
-      </div>
-      <div class="content"> -->
-        <div class="ui segment">
-          <form id="form-comment" action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" class="ui form" method="POST" enctype="multipart/form-data">
-            {% for hidden in comment_form.hidden_fields %}
-              {{ hidden }}
+    {% if user.is_authenticated %}
+      <div class="ui segment">
+        <form id="form-comment" action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" class="ui form" method="POST" enctype="multipart/form-data">
+          {% for hidden in comment_form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
+          {% if comment_form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">
+            {% for error in comment_form.non_field_errors %}
+              {{ error }}
             {% endfor %}
-            {% if comment_form.non_field_errors %}
-            <div class="alert alert-danger" role="alert">
-              {% for error in comment_form.non_field_errors %}
-                {{ error }}
-              {% endfor %}
+          </div>
+          {% endif %}
+          <div class="required field">
+            <label for="{{ comment_form.comment.id_for_label }}">Ajouter un commentaire</label>
+            <textarea name="{{ comment_form.comment.html_name }}" rows="2">{% if comment_form.comment.value %}{{ comment_form.comment.value }}{% endif %}</textarea>
+            {{ comment_form.comment.errors }}
+          </div>
+          <label>Pièce jointe (facultative)</label>
+          <div class="two fields">
+            <div class="field">
+              <input type="text" name="{{ comment_form.title.html_name }}" id="{{ comment_form.title.id_for_label }}"
+                value="{% if comment_form.title.value %}{{ comment_form.title.value }}{% endif %}" >
+              {{ comment_form.title.errors }}
             </div>
-            {% endif %}
-            <div class="required field">
-              <label for="{{ comment_form.comment.id_for_label }}">Ajouter un commentaire</label>
-              <textarea name="{{ comment_form.comment.html_name }}" rows="2">{% if comment_form.comment.value %}{{ comment_form.comment.value }}{% endif %}</textarea>
-              {{ comment_form.comment.errors }}
+            <div class="field">
+              <label class="ui icon button" for="attachment_file">
+                <i class="paperclip icon"></i>
+                <span class="label">Sélectionner un fichier ...</span>
+              </label>
+              <input type="file" accept="application/pdf, image/jpeg, image/png" style="display:none;"
+                name="attachment_file" id="attachment_file">
+              {{ comment_form.attachment_file.errors }}
             </div>
-            <label>Pièce jointe (facultative)</label>
-            <div class="two fields">
-              <div class="field">
-                <input type="text" name="{{ comment_form.title.html_name }}" id="{{ comment_form.title.id_for_label }}"
-                  value="{% if comment_form.title.value %}{{ comment_form.title.value }}{% endif %}" >
-                {{ comment_form.title.errors }}
-              </div>
-              <div class="field">
-                <label class="ui icon button" for="attachment_file">
-                  <i class="paperclip icon"></i>
-                  <span class="label">Sélectionner un fichier ...</span>
-                </label>
-                <input type="file" accept="application/pdf, image/jpeg, image/png" style="display:none;"
-                  name="attachment_file" id="attachment_file">
-                {{ comment_form.attachment_file.errors }}
-              </div>
-            </div>
-            <button type="submit" class="ui compact green icon button">
-              <i class="plus icon"></i> Poster le commentaire
-            </button>
-          </form>
-        </div>
-      <!-- </div>
-    </div> -->
+          </div>
+          <button type="submit" class="ui compact green icon button">
+            <i class="plus icon"></i> Poster le commentaire
+          </button>
+        </form>
+      </div>
+    {% endif %}
   </div>
 </div>
 
@@ -259,6 +253,7 @@
   $(document).on('change', '#form-comment #attachment_file', function () {
     var logoFile = $(this).prop('files')[0]
     $(this).parent().children('label').children('.label').html(truncate(logoFile.name, 10))
+    $('#{{ comment_form.title.id_for_label }}').val(truncate(logoFile.name, 10))
   })
 
   $(document).ready(function() {
@@ -268,8 +263,8 @@
     })
 
     var map = L.map('map', {zoomControl: false}).setView([43.604462, 1.444247], 13)
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map)
 
     map.dragging.disable()
