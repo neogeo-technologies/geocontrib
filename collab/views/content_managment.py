@@ -169,6 +169,9 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         else:
             logger.error(form.errors)
 
+        events = Event.objects.filter(feature_id=feature.feature_id).order_by('-created_on')
+        serialized_events = EventSerializer(events, many=True)
+
         context = {
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
@@ -176,11 +179,14 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_type': feature.feature_type,
             'linked_features': linked_features,
             'project': project,
-            'permissions': Authorization.all_permissions(user, project),
+            'permissions': Authorization.all_permissions(user, project, feature),
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
-            'attachments': Attachment.objects.filter(project=project, feature_id=feature.feature_id, object_type='feature'),
-            'comment_form': form,
+            'attachments': Attachment.objects.filter(
+                project=project, feature_id=feature.feature_id, object_type='feature'),
+            'events': serialized_events.data,
+            'comment_form': CommentForm(),
         }
+
         return render(request, 'collab/feature/feature_detail.html', context)
 
 
@@ -978,6 +984,7 @@ class ProjectUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         form = ProjectModelForm(instance=project)
         context = {
             'form': form,
+            'project': project,
             'permissions': Authorization.all_permissions(request.user, project),
             'feature_types': project.featuretype_set.all(),
             'is_suscriber': Subscription.is_suscriber(request.user, project),
@@ -994,7 +1001,11 @@ class ProjectUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
         context = {
             'form': form,
-            'feature_types': project.featuretype_set.all()
+            'project': project,
+            'permissions': Authorization.all_permissions(request.user, project),
+            'feature_types': project.featuretype_set.all(),
+            'is_suscriber': Subscription.is_suscriber(request.user, project),
+            'action': 'update'
         }
         return render(request, 'collab/project/project_edit.html', context)
 
@@ -1110,6 +1121,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
             "title": "Gestion des membres du projet {}".format(project.title),
             'authorised': authorised,
             'permissions': permissions,
+            'project': project,
             'formset': formset,
             'feature_types': FeatureType.objects.filter(project=project)
         }
@@ -1165,6 +1177,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
             "title": "Gestion des membres du projet {}".format(project.title),
             'authorised': authorised,
             'permissions': permissions,
+            'project': project,
             'formset': formset,
             'feature_types': FeatureType.objects.filter(project=project)
         }

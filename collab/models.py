@@ -476,10 +476,7 @@ class Layer(models.Model):
         unique_together = ('project', 'order')
 
     def __str__(self):
-        if self.title:
-            return " ".format(self.pk, self.title)
-        else:
-            return "{}- {}".format(self.pk, self.service[0:25])
+        return str(self.service)
 
 
 ###############################
