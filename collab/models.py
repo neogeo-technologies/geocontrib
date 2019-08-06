@@ -458,18 +458,22 @@ class Layer(models.Model):
         ('wms', 'WMS'),
         ('tms', 'TMS')
     )
+
     name = models.CharField('Nom', max_length=256, blank=True, null=True)
 
     title = models.CharField('Titre', max_length=256, blank=True, null=True)
 
     style = models.CharField('Style', max_length=256, blank=True, null=True)
 
-    service = models.URLField('Service')
+    service = models.CharField('Service', max_length=256)
 
     order = models.PositiveSmallIntegerField("Numéro d'ordre", default=0)
 
     schema_type = models.CharField(
         "Type de couche", choices=SCHEMAS, max_length=50, default="wms")
+
+    attribution = models.CharField(
+        "Attribution", max_length=256, blank=True, null=True)
 
     project = models.ForeignKey('collab.Project', on_delete=models.CASCADE)
 
