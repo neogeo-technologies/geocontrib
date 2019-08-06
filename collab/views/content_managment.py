@@ -169,7 +169,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         else:
             logger.error(form.errors)
 
-        events = Event.objects.filter(feature_id=feature.feature_id).order_by('-created_on')
+        events = Event.objects.filter(feature_id=feature.feature_id).order_by('created_on')
         serialized_events = EventSerializer(events, many=True)
 
         context = {
@@ -429,7 +429,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         )
-        events = Event.objects.filter(feature_id=feature.feature_id).order_by('-created_on')
+        events = Event.objects.filter(feature_id=feature.feature_id).order_by('created_on')
         serialized_events = EventSerializer(events, many=True)
 
         context = {
