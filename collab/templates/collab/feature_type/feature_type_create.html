@@ -80,6 +80,17 @@ $(document).on('click', '.remove-field', function () {
   $segment.children('.delete-hidden-field').prop('checked', true)
 })
 
+$(document).on('change', '.field-type', function () {
+  var $options = $(this).parent().parent('.field').parent('.fields').children('.field-list-options')
+  if ($(this).val() === "list") {
+    $options.show()
+  } else {
+    $options.hide()
+  }
+})
+
+
+
 $('#add-field').click(function() {
   var form_idx = $('#id_form-TOTAL_FORMS').val();
 
@@ -90,43 +101,53 @@ $('#add-field').click(function() {
         Champ personnalisé
         <button class="ui small compact right floated icon button remove-field" type="button"><i class="ui times icon"></i></button>
       </h4>
-      <div class="four fields visible-fields">
-        <div class="required field">
-          <label for="{{ formset.empty_form.label.id_for_label }}">{{ formset.empty_form.label.label }}</label>
-          <input type="text" required maxlength="{{  formset.empty_form.label.field.max_length }}"
-            name="{{ formset.empty_form.label.html_name }}" id="{{  formset.empty_form.label.id_for_label }}">
-          {{ formset.empty_form.label.errors }}
+      <div class="visible-fields">
+        <div class="two fields">
+          <div class="required field">
+            <label for="{{ formset.empty_form.label.id_for_label }}">{{ formset.empty_form.label.label }}</label>
+            <input type="text" required maxlength="{{  formset.empty_form.label.field.max_length }}"
+              name="{{ formset.empty_form.label.html_name }}" id="{{  formset.empty_form.label.id_for_label }}">
+            {{ formset.label.errors }}
+          </div>
+          <div class="required field">
+            <label for="{{ formset.empty_form.name.id_for_label }}">{{ formset.empty_form.name.label }}</label>
+            <input type="text" required maxlength="{{  formset.empty_form.name.field.max_length }}"
+              name="{{ formset.empty_form.name.html_name }}" id="{{  formset.empty_form.name.id_for_label }}">
+            {{ formset.name.errors }}
+          </div>
         </div>
-        <div class="required field">
-          <label for="{{ formset.empty_form.name.id_for_label }}">{{ formset.empty_form.name.label }}</label>
-          <input type="text" required maxlength="{{  formset.empty_form.name.field.max_length }}"
-            name="{{ formset.empty_form.name.html_name }}" id="{{  formset.empty_form.name.id_for_label }}">
-          {{ formset.empty_form.name.errors }}
-        </div>
-        <div class="required field">
-          <label for="{{ formset.empty_form.field_type.id_for_label }}">{{ formset.empty_form.field_type.label }}</label>
-          <div class="ui selection dropdown">
-            <input type="hidden"
-              name="{{ formset.empty_form.field_type.html_name }}" id="{{ formset.empty_form.field_type.id_for_label }}"
-              value="{{ formset.empty_form.field_type.value }}">
-            <div class="default text"></div>
-            <i class="dropdown icon"></i>
-            <div class="menu">
-              {% for x,y in formset.empty_form.field_type.field.choices %}
-                <div class="item" data-value="{{ x }}" {% if formset.empty_form.field_type.value == x %} selected{% endif %}>{{ y }}</div>
-              {% endfor %}
+        <div class="three fields">
+          <div class="required field">
+            <label for="{{ formset.empty_form.position.id_for_label }}">{{ formset.empty_form.position.label }}</label>
+            <div class="ui input">
+              <input type="number" min="{{ formset.empty_form.position.field.min_value }}"
+              name="{{ formset.empty_form.position.html_name }}" id="{{ formset.empty_form.position.id_for_label }}"
+              value="${form_idx}">
             </div>
+            {{ formset.position.errors }}
           </div>
-          {{ formset.empty_form.field_type.errors }}
-        </div>
-        <div class="required field">
-          <label for="{{ formset.empty_form.position.id_for_label }}">{{ formset.empty_form.position.label }}</label>
-          <div class="ui input">
-            <input type="number" min="{{ formset.empty_form.position.field.min_value }}"
-            name="{{ formset.empty_form.position.html_name }}" id="{{ formset.empty_form.position.id_for_label }}"
-            value="${form_idx}">
+          <div class="required field">
+            <label for="{{ formset.empty_form.field_type.id_for_label }}">{{ formset.empty_form.field_type.label }}</label>
+            <div class="ui selection dropdown">
+              <input type="hidden" class="field-type"
+                name="{{ formset.empty_form.field_type.html_name }}" id="{{ formset.empty_form.field_type.id_for_label }}"
+                value="{{ formset.empty_form.field_type.value }}">
+              <div class="default text"></div>
+              <i class="dropdown icon"></i>
+              <div class="menu">
+                {% for x,y in formset.empty_form.field_type.field.choices %}
+                  <div class="item" data-value="{{ x }}" {% if formset.empty_form.field_type.value == x %} selected{% endif %}>{{ y }}</div>
+                {% endfor %}
+              </div>
+            </div>
+            {{ formset.empty_form.field_type.errors }}
           </div>
-          {{ formset.empty_form.position.errors }}
+          <div class="field field-list-options" style="display:none;">
+            <label for="{{ formset.empty_form.options.id_for_label }}">{{ formset.empty_form.options.label }}</label>
+            <input type="text" maxlength="{{  formset.empty_form.options.field.max_length }}"
+              name="{{ formset.empty_form.options.html_name }}" id="{{  formset.empty_form.options.id_for_label }}">
+            {{ formset.options.errors }}
+          </div>
         </div>
       </div>
       <input class="delete-hidden-field" type="checkbox"
