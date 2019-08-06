@@ -46,7 +46,7 @@ class FeatureTypeModelForm(forms.ModelForm):
 
     class Meta:
         model = FeatureType
-        fields = ('title', 'geom_type')
+        fields = ('title', 'geom_type', 'color')
 
 
 class ProjectModelForm(forms.ModelForm):
