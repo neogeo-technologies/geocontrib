@@ -224,7 +224,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
-
+        layers = Layer.objects.filter(project=project)
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         feature_form = FeatureBaseForm(
@@ -246,12 +246,12 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         context = {
             'feature_type': feature_type,
             'project': project,
-            # 'permissions': Authorization.all_permissions(user, project),
             'feature_form': feature_form,
             'extra_form': extra_form,
             'linked_formset': linked_formset,
             'attachment_formset': attachment_formset,
-            'action': 'create'
+            'action': 'create',
+            'layers': layers
         }
         return render(request, 'collab/feature/feature_edit.html', context)
 
@@ -260,7 +260,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
-
+        layers = Layer.objects.filter(project=project)
         feature_form = FeatureBaseForm(
             request.POST, feature_type=feature_type, user=user)
         extra = CustomField.objects.filter(feature_type=feature_type)
@@ -377,7 +377,8 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'extra_form': extra_form,
             'linked_formset': linked_formset,
             'attachment_formset': attachment_formset,
-            'action': 'create'
+            'action': 'create',
+            'layers': layers
         }
         return render(request, 'collab/feature/feature_edit.html', context)
 
@@ -394,11 +395,13 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
     def get(self, request, slug):
         project = self.get_object()
         user = request.user
+        layers = Layer.objects.filter(project=project)
         permissions = Authorization.all_permissions(user, project)
         feature_types = FeatureType.objects.filter(project=project)
         context = {
             'features': Feature.handy.availables(user, project).order_by('-status', 'created_on'),
             'feature_types': feature_types,
+            'layers': layers,
             'project': project,
             'permissions': permissions,
         }
@@ -422,7 +425,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature = self.get_object()
         project = feature.project
-
+        layers = Layer.objects.filter(project=project)
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         )
@@ -442,6 +445,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
                 project=project, feature_id=feature.feature_id, object_type='feature'),
             'events': serialized_events.data,
             'comment_form': CommentForm(),
+            'layers': layers,
         }
 
         return render(request, 'collab/feature/feature_detail.html', context)
@@ -477,7 +481,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         feature_type = feature.feature_type
-
+        layers = Layer.objects.filter(project=project)
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         availables_features = Feature.objects.filter(
@@ -524,7 +528,8 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'linked_formset': linked_formset,
             'attachment_formset': attachment_formset,
             'attachments': attachments,
-            'action': 'update'
+            'action': 'update',
+            'layers': layers
         }
         return render(request, 'collab/feature/feature_edit.html', context)
 
@@ -536,7 +541,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         availables_features = Feature.objects.filter(
             project=project,
         ).exclude(feature_id=feature.feature_id)
-
+        layers = Layer.objects.filter(project=project)
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         feature_form = FeatureBaseForm(
@@ -590,7 +595,8 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 'linked_formset': linked_formset,
                 'attachment_formset': attachment_formset,
                 'attachments': attachments,
-                'action': 'update'
+                'action': 'update',
+                'layers': layers,
             }
             return render(request, 'collab/feature/feature_edit.html', context)
         else:
@@ -966,6 +972,7 @@ class ProjectDetail(DetailView):
         context['permissions'] = permissions
         context['feature_types'] = project.featuretype_set.all()
         context['is_suscriber'] = Subscription.is_suscriber(user, project)
+        context['layers'] = Layer.objects.filter(project=project)
         return context
 
 
