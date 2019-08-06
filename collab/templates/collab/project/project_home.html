@@ -25,13 +25,18 @@
       <h1 class="ui header">
         <div class="content">
           {{ project.title }}
-          {% if project and permissions|lookup:'can_update_project' %}
-            <div class="ui icon right floated compact buttons">
+          <div class="ui icon right floated compact buttons">
+            {% if permissions|lookup:'can_view_project' %}
+              <a id="subscribe-button" class="ui button button-hover-green">
+                <i class="inverted grey envelope icon"></i>
+              </a>
+            {% endif %}
+            {% if project and permissions|lookup:'can_update_project' %}
               <a href="{% url 'collab:project_update' slug=project.slug %}" class="ui button button-hover-orange">
                 <i class="inverted grey pencil alternate icon"></i>
               </a>
-            </div>
-          {% endif %}
+            {% endif %}
+          </div>
           <div class="ui hidden divider"></div>
           <div class="sub header">
             {{ project.description|linebreaks }}
@@ -191,6 +196,31 @@
   <span>Vous ne disposez pas des droits nécessaires.</span>
   {% endif %}
 
+  <div class="ui mini modal subscription">
+    <i class="close icon"></i>
+    <div class="ui icon header">
+      <i class="envelope icon"></i>
+      Notifications du projet
+    </div>
+    <div class="content">
+      {% if is_suscriber %}
+        <form action="{% url 'collab:subscription' slug=project.slug action='annuler' %}" method="GET">
+          <button type="submit" class="ui red compact fluid button">
+            Se désabonner de ce projet
+          </button>
+        </form>
+      {% else %}
+      <form action="{% url 'collab:subscription' slug=project.slug action='ajouter' %}" method="GET">
+        <button type="submit" class="ui green compact fluid button">
+          S'abonner à ce projet
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
 {% endblock %}
 
 {% block custom_resources %}
@@ -209,6 +239,11 @@
 
 <script type="text/javascript">
   $(document).ready(function() {
+    $('#subscribe-button').click(function(){
+      $('.mini.modal.subscription').modal('show')
+    })
+
+
     var map = L.map('map', {zoomControl: false}).setView([43.604462, 1.444247], 13)
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -233,7 +268,6 @@
     {% endfor %}
     map.addLayer(featureGroup);
     map.fitBounds(featureGroup.getBounds())
-
 
   })
 </script>
