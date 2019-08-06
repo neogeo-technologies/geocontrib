@@ -845,7 +845,7 @@ def delete_symetrical_relation(sender, instance, **kwargs):
 @receiver(models.signals.pre_save, sender=Feature)
 @disable_for_loaddata
 def update_feature_dates(sender, instance, **kwargs):
-    if instance.project:
+    if instance._state.adding and instance.project:
         instance.archived_on = instance.created_on + timezone.timedelta(
             days=instance.project.archive_feature)
         instance.deletion_on = instance.created_on + timezone.timedelta(

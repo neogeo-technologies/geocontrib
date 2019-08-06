@@ -27,6 +27,7 @@ class Command(BaseCommand):
         logger.info('NB deleted features: {}'.format(nb_features))
 
     def archive_feature(self):
+
         features = Feature.objects.filter(archived_on__lte=timezone.now())
         nb_features = features.count()
         for feature in features:
