@@ -15,7 +15,7 @@ from collab.views.content_managment import FeatureDetail
 from collab.views.content_managment import FeatureUpdate
 from collab.views.content_managment import FeatureDelete
 from collab.views.content_managment import ProjectUpdate
-from collab.views.content_managment import ProjectMap
+from collab.views.content_managment import ProjectMapping
 from collab.views.content_managment import FeatureCreate
 from collab.views.content_managment import FeatureTypeCreate
 from collab.views.content_managment import FeatureTypeDetail
@@ -59,6 +59,8 @@ urlpatterns = [
 
     path('projet/<slug:slug>/membres/', ProjectMembers.as_view(), name='project_members'),
 
+    path('projet/<slug:slug>/administration-carte/', ProjectMapping.as_view(), name='project_mapping'),
+
     path(
         'projet/<slug:slug>/abonnement/<str:action>/', SubscribingView.as_view(),
         name='subscription'),
@@ -80,8 +82,6 @@ urlpatterns = [
 
     path('projet/<slug:slug>/signalement/lister/',
          FeatureList.as_view(), name='feature_list'),
-
-    path('projet/<slug:slug>/carte/', ProjectMap.as_view(), name='project_map'),
 
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/',

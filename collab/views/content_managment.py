@@ -36,6 +36,7 @@ from collab.forms import FeatureTypeModelForm
 from collab.forms import FeatureBaseForm
 from collab.forms import FeatureExtraForm
 from collab.forms import FeatureLinkForm
+from collab.forms import LayerForm
 from collab.forms import ProjectModelForm
 from collab.models import Authorization
 from collab.models import Attachment
@@ -45,6 +46,7 @@ from collab.models import Event
 from collab.models import Feature
 from collab.models import FeatureType
 from collab.models import FeatureLink
+from collab.models import Layer
 from collab.models import Project
 from collab.models import Subscription
 
@@ -1021,17 +1023,64 @@ class ProjectCreate(CreateView):
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class ProjectMap(SingleObjectMixin, UserPassesTestMixin, View):
+class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = Project.objects.all()
+
+    LayerFormSet = modelformset_factory(
+        Layer,
+        can_delete=True,
+        form=LayerForm,
+        extra=0,
+        fields=('name', 'title', 'style', 'service', 'order', 'schema_type')
+    )
 
     def test_func(self):
         user = self.request.user
         project = self.get_object()
-        return Authorization.has_permission(user, 'can_update_feature', project)
+        return Authorization.has_permission(user, 'can_update_project', project)
 
     def get(self, request, slug):
-        # raise NotImplementedError
-        return render(request, 'collab/project/project_map.html', {})
+
+        project = self.get_object()
+        layers = Layer.objects.filter(project=project)
+        layer_formset = self.LayerFormSet(queryset=layers)
+
+        context = {
+            'layers': layers,
+            'layer_formset': layer_formset
+        }
+        return render(request, 'collab/project/project_mapping.html', context)
+
+    def post(self, request, slug):
+        project = self.get_object()
+        layers = Layer.objects.filter(project=project)
+        layer_formset = self.LayerFormSet(request.POST or None)
+        if layer_formset.is_valid():
+
+            for data in layer_formset.cleaned_data:
+                # id contient l'instance si existante
+                layer = data.pop("id", None)
+                is_deleted = data.pop("DELETE", False)
+                if layer:
+                    if is_deleted:
+                        layer.delete()
+                    else:
+                        for attr, value in data.items():
+                            setattr(layer, attr, value)
+                        layer.save()
+
+                elif not layer and not is_deleted:
+                    data['project'] = project
+                    Layer.objects.create(**data)
+            return redirect('collab:project', slug=slug)
+
+        messages.error(request, "L'édition des couches cartographiques a échouée. ")
+        logger.error(layer_formset.errors)
+        context = {
+            'layers': layers,
+            'layer_formset': layer_formset
+        }
+        return render(request, 'collab/project/project_mapping.html', context)
 
 
 @method_decorator(DECORATORS, name='dispatch')

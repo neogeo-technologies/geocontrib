@@ -11,6 +11,7 @@ from collab.models import CustomField
 from collab.models import Feature
 from collab.models import FeatureLink
 from collab.models import FeatureType
+from collab.models import Layer
 from collab.models import Project
 from collab.models import UserLevelPermission
 
@@ -372,3 +373,10 @@ class FeatureBaseForm(forms.ModelForm):
             instance.save()
 
         return instance
+
+
+class LayerForm(forms.ModelForm):
+
+    class Meta:
+        model = Layer
+        fields = ('name', 'title', 'style', 'service', 'order', 'schema_type')

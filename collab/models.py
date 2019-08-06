@@ -732,6 +732,8 @@ class StackedEvent(models.Model):
         choices=STATE_CHOICES,
         default='pending',
     )
+    project_slug = models.SlugField(
+        'Slug du projet', max_length=256, blank=True, null=True)
 
     events = models.ManyToManyField('collab.Event')
 
@@ -967,7 +969,8 @@ def notify_or_stack_events(sender, instance, created, **kwargs):
         # On empile les evenements pour notifier les abonnés, en focntion de la fréquence d'envoi
         StackedEvent = apps.get_model(app_label='collab', model_name="StackedEvent")
         stack, _ = StackedEvent.objects.get_or_create(
-            sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending')
+            sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending',
+            project_slug=instance.project_slug)
         stack.events.add(instance)
         stack.save()
 
