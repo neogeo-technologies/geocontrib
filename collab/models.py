@@ -128,10 +128,10 @@ class Authorization(models.Model):
             'can_create_project': False,  # Redondant avec user.is_administrator
             'can_update_project': False,
             'can_view_feature': False,
+            'can_view_archived_feature': False,
             'can_create_feature': False,
             'can_update_feature': False,
             'can_publish_feature': False,
-            'can_archive_feature': False,
             'can_create_feature_type': False,
             'can_view_feature_type': False,
             'is_project_administrator': False,
@@ -159,7 +159,7 @@ class Authorization(models.Model):
                 user_perms['is_project_administrator'] = True
 
             if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
-                user_perms['can_archive_feature'] = True
+                user_perms['can_view_archived_feature'] = True
 
             # On permet aux contributeurs et aux auteurs de modifier les features
             if user_rank >= 2 or (feature and feature.creator == user):

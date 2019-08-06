@@ -15,7 +15,13 @@ class AvailableFeaturesManager(models.Manager):
 
         # 0 - si utlisateur anonyme
         if not user.is_authenticated:
-            queryset = self.get_queryset().filter(project=project, status='published')
+            if Authorization.has_permission(user, 'can_view_archived_feature', project):
+                queryset = self.get_queryset().filter(
+                    project=project
+                ).filter(Q(status='published') | Q(status='archived'))
+            else:
+                queryset = self.get_queryset().filter(
+                    project=project, status='published')
         else:
             # 1 - si is_project_administrator on liste toutes les features
             queryset = self.get_queryset().filter(project=project)
