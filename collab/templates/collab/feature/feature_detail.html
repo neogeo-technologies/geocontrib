@@ -283,11 +283,11 @@
     var geomJSON = turf.flip(geomFeatureJSON)
     console.log('geomJSON', geomJSON);
     if (geomJSON.type === 'Point') {
-      L.circleMarker(geomJSON.coordinates, {color: 'green'}).addTo(featureGroup)
+      L.circleMarker(geomJSON.coordinates, {color: '{{ feature.feature_type.color }}'}).addTo(featureGroup)
     } else if (geomJSON.type === 'LineString') {
-      L.polyline(geomJSON.coordinates, {color: 'red'}).addTo(featureGroup)
+      L.polyline(geomJSON.coordinates, {color: '{{ feature.feature_type.color }}'}).addTo(featureGroup)
     } else if (geomJSON.type === 'Polygon') {
-      L.polygon(geomJSON.coordinates, {color: 'blue'}).addTo(featureGroup)
+      L.polygon(geomJSON.coordinates, {color: '{{ feature.feature_type.color }}'}).addTo(featureGroup)
     }
     map.addLayer(featureGroup);
     map.fitBounds(featureGroup.getBounds())

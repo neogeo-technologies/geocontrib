@@ -45,6 +45,12 @@
         </div>
         {{ form.geom_type.errors }}
       </div>
+      <div class="required field">
+        <label for="{{ form.color.id_for_label }}">{{ form.color.label }}</label>
+        <input type="color" required style="width:100%;height:38px;"
+          name="{{ form.color.html_name }}" id="{{ form.color.id_for_label }}">
+        {{ form.color.errors }}
+      </div>
     </div>
 
     {{ formset.management_form }}
