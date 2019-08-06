@@ -279,8 +279,6 @@
 </style>
 
 <script type="text/javascript">
-console.log("{{ feature_form.geom.value.wkt }}")
-
 // Geom type + init Leaflet Draw Control
 var geomLeaflet = {
   'point': 'circlemarker',
@@ -334,7 +332,6 @@ function truncate(n, len) {
 }
 
 function addAttachment(geoAttachment) {
-  console.log('geoAttachment', geoAttachment);
   let title = geoAttachment ? 'Localisation' : ''
 
   let label = geoAttachment ? geoAttachment[0].name : 'Sélectionner un fichier ...'
@@ -362,7 +359,7 @@ function addAttachment(geoAttachment) {
             </label>
             <input type="file" accept="{{ IMAGE_FORMAT }}" style="display:none;" class="image_file"
               name="{{ attachment_formset.empty_form.attachment_file.html_name }}" id="{{ attachment_formset.empty_form.attachment_file.id_for_label }}"
-              value="${geoAttachment.name}">
+              value="${label}">
             {{ form.errors }}
           </div>
         </div>

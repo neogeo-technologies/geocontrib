@@ -15,13 +15,13 @@ main {
             /* MAIN */
 /* ---------------------------------- */
 
-a.button-hover-orange:hover {
+.button-hover-orange:hover {
   background: #fbbd08 !important;
 }
-a.button-hover-green:hover {
-  background: #21ba45 !important;
+.button-hover-green:hover {
+  background: #5bba21 !important;
 }
-a.button-hover-red:hover {
+.button-hover-red:hover {
   background: #ee2e24 !important;
 }
 
