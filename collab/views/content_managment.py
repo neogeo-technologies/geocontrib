@@ -382,7 +382,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         return render(request, 'collab/feature/feature_edit.html', context)
 
 
-@method_decorator(DECORATORS, name='dispatch')
+@method_decorator(DECORATORS[0], name='dispatch')
 class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = Project.objects.all()
 
@@ -766,7 +766,7 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
         feature_type = self.get_object()
         project = feature_type.project
         user = request.user
-        features = Feature.objects.filter(feature_type=feature_type)
+        features = Feature.objects.filter(feature_type=feature_type).order_by('-updated_on')[:5]
         structure = FeatureTypeSerializer(feature_type, context={'request': request})
 
         context = {
