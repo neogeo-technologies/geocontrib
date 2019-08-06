@@ -80,6 +80,12 @@
           <label for="{{ field.name }}">{{ field.label }}</label>
           <input type="text" name="{{ field.name }}" id="{{ field.name }}"
             value="{% if field.value %}{{ field.value }}{% endif %}" >
+
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'list' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          {{ field }}
+
+
         {% elif field.field.widget.attrs|lookup:'field_type' == 'integer' %}
           <label for="{{ field.name }}">{{ field.label }}</label>
           <div class="ui input">

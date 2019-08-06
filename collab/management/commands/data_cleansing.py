@@ -32,6 +32,7 @@ class Command(BaseCommand):
         for feature in features:
             feature.status = 'archived'
             feature.save()
+            logger.info('Feature {0} archived'.format(feature.feature_id))
         logger.info('NB archived features: {}'.format(nb_features))
 
     def handle(self, *args, **options):

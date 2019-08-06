@@ -245,7 +245,7 @@ class FeatureLinkForm(forms.ModelForm):
 
             self.fields['feature_to'].choices = tuple(
                 (feat.feature_id, "{} ({} - {})".format(
-                    feat.title, feat.creator.username, feat.created_on.strftime("%d/%m/%Y %H:%M"))) for feat in qs
+                    feat.title, feat.creator.get_full_name(), feat.created_on.strftime("%d/%m/%Y %H:%M"))) for feat in qs
             )
 
         except Exception:
@@ -288,6 +288,12 @@ class FeatureExtraForm(forms.Form):
             if custom_field.field_type == 'text':
                 self.fields[custom_field.name] = forms.CharField(
                     label=custom_field.label, required=False, widget=forms.Textarea())
+
+            if custom_field.field_type == 'list':
+                self.fields[custom_field.name] = forms.ChoiceField(
+                    label=custom_field.label,
+                    choices=[(str(xx), str(xx)) for xx in custom_field.options],
+                    required=False)
 
             self.fields[custom_field.name].widget.attrs.update({
                 'field_type': custom_field.field_type

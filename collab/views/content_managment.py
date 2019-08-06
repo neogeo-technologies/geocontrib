@@ -744,6 +744,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
                         label=data.get("label"),
                         name=data.get("name"),
                         field_type=data.get("field_type"),
+                        options=data.get("options"),
                     )
             return redirect('collab:project', slug=project.slug)
         else:
