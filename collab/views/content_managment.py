@@ -1050,7 +1050,7 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
         can_delete=True,
         form=LayerForm,
         extra=0,
-        fields=('name', 'title', 'style', 'service', 'order', 'schema_type')
+        fields=('title', 'service', 'order', 'schema_type', 'options')
     )
 
     def test_func(self):

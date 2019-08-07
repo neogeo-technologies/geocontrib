@@ -395,4 +395,4 @@ class LayerForm(forms.ModelForm):
 
     class Meta:
         model = Layer
-        fields = ('name', 'title', 'style', 'service', 'order', 'schema_type')
+        fields = ('title', 'service', 'order', 'schema_type', 'options')

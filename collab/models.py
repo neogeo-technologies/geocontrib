@@ -464,11 +464,7 @@ class Layer(models.Model):
         ('tms', 'TMS')
     )
 
-    name = models.CharField('Nom', max_length=256, blank=True, null=True)
-
     title = models.CharField('Titre', max_length=256, blank=True, null=True)
-
-    style = models.CharField('Style', max_length=256, blank=True, null=True)
 
     service = models.CharField('Service', max_length=256)
 
@@ -477,8 +473,7 @@ class Layer(models.Model):
     schema_type = models.CharField(
         "Type de couche", choices=SCHEMAS, max_length=50, default="wms")
 
-    attribution = models.CharField(
-        "Attribution", max_length=256, blank=True, null=True)
+    options = JSONField("Options", blank=True, null=True)
 
     project = models.ForeignKey('collab.Project', on_delete=models.CASCADE)
 
@@ -488,7 +483,7 @@ class Layer(models.Model):
         unique_together = ('project', 'order')
 
     def __str__(self):
-        return str(self.service)
+        return "{} - {}".format(self.pk, self.service)
 
 
 ###############################
