@@ -289,7 +289,7 @@ class FeatureExtraForm(forms.Form):
                 self.fields[custom_field.name] = forms.CharField(
                     label=custom_field.label, required=False, widget=forms.Textarea())
 
-            if custom_field.field_type == 'list':
+            if custom_field.field_type == 'list' and custom_field.options:
                 self.fields[custom_field.name] = forms.ChoiceField(
                     label=custom_field.label,
                     choices=[(str(xx), str(xx)) for xx in custom_field.options],
