@@ -396,7 +396,7 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
     def get(self, request, slug):
         project = self.get_object()
         user = request.user
-        layers = Layer.objects.filter(project=project)
+        layers = Layer.objects.filter(project=project).order_by('order')
         serialized_layers = LayerSerializer(layers, many=True)
         permissions = Authorization.all_permissions(user, project)
         feature_types = FeatureType.objects.filter(project=project)
