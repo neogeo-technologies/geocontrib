@@ -23,6 +23,7 @@ from django.views.generic.edit import DeleteView
 from django.views.decorators.csrf import csrf_exempt
 from api.serializers import EventSerializer
 from api.serializers import FeatureTypeSerializer
+from api.serializers import LayerSerializer
 from api.serializers import ProjectDetailedSerializer
 
 from collab.exif import exif
@@ -396,12 +397,13 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
         project = self.get_object()
         user = request.user
         layers = Layer.objects.filter(project=project)
+        serialized_layers = LayerSerializer(layers, many=True)
         permissions = Authorization.all_permissions(user, project)
         feature_types = FeatureType.objects.filter(project=project)
         context = {
             'features': Feature.handy.availables(user, project).order_by('-status', 'created_on'),
             'feature_types': feature_types,
-            'layers': layers,
+            'layers': serialized_layers.data,
             'project': project,
             'permissions': permissions,
         }

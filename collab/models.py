@@ -485,12 +485,6 @@ class Layer(models.Model):
     def __str__(self):
         return "{} - {}".format(self.pk, self.service)
 
-    @property
-    def options_dumps(self):
-        import json
-        if self.options:
-            return json.dumps(self.options)
-        return {}
 
 ###############################
 # FEATURE'S CONTEXTUAL MODELS #

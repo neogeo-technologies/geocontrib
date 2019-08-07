@@ -11,6 +11,7 @@ from collab.models import FeatureType
 from collab.models import Project
 from collab.models import Event
 from collab.models import StackedEvent
+from collab.models import Layer
 
 
 import logging
@@ -134,6 +135,19 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Attachment
+        fields = '__all__'
+
+
+class LayerSerializer(serializers.ModelSerializer):
+
+    options = serializers.SerializerMethodField(read_only=True)
+
+    def get_options(self, obj):
+        import json
+        return json.dumps(obj.options)
+
+    class Meta:
+        model = Layer
         fields = '__all__'
 
 
