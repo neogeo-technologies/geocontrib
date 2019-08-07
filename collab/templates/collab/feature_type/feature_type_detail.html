@@ -5,6 +5,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
+
 <div class="row">
   <div class="five wide column">
     <div class="ui attached secondary segment">
@@ -48,9 +49,10 @@
       </div>
     </div>
 
-    {% if permissions|lookup:'can_create_feature' %}
+
     <div class="ui bottom attached secondary segment">
-      <div class="ui accordion">
+      <div class="ui styled accordion">
+        {% if permissions|lookup:'can_create_feature' %}
         <div class="title">
           <i class="dropdown icon"></i>
           Importer des signalements
@@ -66,12 +68,23 @@
               <input type="file" accept="application/json, .json" style="display:none;"
                 name="json_file" id="json_file">
             </div>
-            <button type="submit" class="ui basic teal icon button"><i class="upload icon"></i> Lancer l'import</button>
+            <button type="submit" class="ui fluid teal icon button"><i class="upload icon"></i> Lancer l'import</button>
           </form>
+        </div>
+        {% endif %}
+        <div class="active title">
+          <i class="dropdown icon"></i>
+          Exporter les signalements
+        </div>
+        <div class="active content">
+          <p>
+            Vous pouvez télécharger l'ensemble des signalements de ce type.
+          </p>
+          <a class="ui fluid teal icon button"><i class="download icon"></i> Exporter</a>
         </div>
       </div>
     </div>
-    {% endif %}
+
 
   </div>
   <div class="nine wide column">
