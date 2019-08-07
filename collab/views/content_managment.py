@@ -1134,7 +1134,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_types': FeatureType.objects.filter(project=project)
         }
 
-        return render(request, 'collab/project/admin_members.html', context)
+        return render(request, 'collab/project/project_members.html', context)
 
     def post(self, request, slug):
         user = self.request.user
@@ -1189,7 +1189,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
             'formset': formset,
             'feature_types': FeatureType.objects.filter(project=project)
         }
-        return render(request, 'collab/project/admin_members.html', context)
+        return render(request, 'collab/project/project_members.html', context)
 
 
 ######################

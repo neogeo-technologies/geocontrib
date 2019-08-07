@@ -80,12 +80,20 @@
           <label for="{{ field.name }}">{{ field.label }}</label>
           <input type="text" name="{{ field.name }}" id="{{ field.name }}"
             value="{% if field.value %}{{ field.value }}{% endif %}" >
-
         {% elif field.field.widget.attrs|lookup:'field_type' == 'list' %}
           <label for="{{ field.name }}">{{ field.label }}</label>
-          {{ field }}
-
-
+          <div class="ui selection dropdown">
+            <input type="hidden"
+              name="{{ field.name }}" id="{{ field.name }}"
+              value="{% if field.value %}{{ field.value }}{% endif %}">
+            <div class="default text"></div>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              {% for x,y in field.field.choices %}
+                <div class="item" data-value="{{ x }}" {% if field.value == x %} selected{% endif %}>{{ y }}</div>
+              {% endfor %}
+            </div>
+          </div>
         {% elif field.field.widget.attrs|lookup:'field_type' == 'integer' %}
           <label for="{{ field.name }}">{{ field.label }}</label>
           <div class="ui input">
