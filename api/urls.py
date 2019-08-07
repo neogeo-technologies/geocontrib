@@ -16,7 +16,7 @@ router.register(r'projects', ProjectView, base_name='projects')
 
 urlpatterns = [
     path('projet/<slug:slug>/utilisateurs', ProjectAuthorization.as_view(), name='project-authorization'),
-    path('projet/<slug:slug>/export', ExportFeatureList.as_view(), name='project-export'),
+    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/export', ExportFeatureList.as_view(), name='project-export'),
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/recherche',
         AvailablesFeatureLinkList.as_view(), name='feature-search'

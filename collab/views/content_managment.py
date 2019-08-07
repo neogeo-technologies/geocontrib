@@ -1124,7 +1124,9 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
     def get(self, request, slug):
         user = self.request.user
         project = self.get_object()
-        formset = self.AuthorizationFormSet(queryset=Authorization.objects.filter(project=project))
+        formset = self.AuthorizationFormSet(
+            queryset=Authorization.objects.filter(
+                project=project, user__is_active=True))
         authorised = Authorization.objects.filter(project=project)
         permissions = Authorization.all_permissions(user, project)
         context = {
@@ -1163,23 +1165,6 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
                 elif authorization:
                     authorization.level = data.get('level')
                     authorization.save()
-                elif not authorization and not data.get("DELETE"):
-                    # On ne crée pas d'utilisateur: il est choisi parmi ceux existants
-                    # TODO @cbenhabib: A brancher sur proxy cas
-                    try:
-                        user = User.objects.get(
-                            username=data["username"],
-                            email=data["email"],
-                            is_active=True
-                        )
-                    except User.DoesNotExist:
-                        messages.error(request, "Aucun utilisateur ne correspond. ")
-                    else:
-                        Authorization.objects.create(
-                            user=user,
-                            project=project,
-                            level=data.get('level')
-                        )
 
             return redirect('collab:project_members', slug=slug)
 

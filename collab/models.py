@@ -806,10 +806,11 @@ def anonymize_comments(sender, instance, **kwargs):
     """
     On transfère les commentaires sur un utilisateur anonyme
     """
-    for comment in instance.comments:
-        anonymous, _ = sender.objects.get_or_create(username="anonymous")
-        comment.author = anonymous
-        comment.save()
+    if hasattr(instance, 'comments'):
+        for comment in instance.comments:
+            anonymous, _ = sender.objects.get_or_create(username="anonymous")
+            comment.author = anonymous
+            comment.save()
 
 
 @receiver(models.signals.post_delete, sender=Attachment)
@@ -895,6 +896,44 @@ def set_author_perms(sender, instance, created, **kwargs):
             )
         except Exception:
             logger.exception('Trigger.set_author_perms')
+
+
+@receiver(models.signals.post_save, sender=User)
+@disable_for_loaddata
+def set_auth_member(sender, instance, created, **kwargs):
+    Authorization = apps.get_model(app_label='collab', model_name="Authorization")
+    UserLevelPermission = apps.get_model(app_label='collab', model_name="UserLevelPermission")
+    Project = apps.get_model(app_label='collab', model_name="Project")
+    if created:
+        try:
+            for project in Project.objects.all():
+                Authorization.objects.create(
+                    project=project,
+                    user=instance,
+                    level=UserLevelPermission.objects.get(rank=1)
+                )
+        except Exception:
+            logger.exception('Trigger.set_auth_member')
+    elif not instance.is_active:
+        try:
+            for project in Project.objects.all():
+                Authorization.objects.update_or_create(
+                    project=project,
+                    user=instance,
+                    defaults={'level': UserLevelPermission.objects.get(rank=0)}
+                )
+        except Exception:
+            logger.exception('Trigger.set_auth_member')
+    elif instance.is_active:
+        try:
+            for project in Project.objects.all():
+                Authorization.objects.update_or_create(
+                    project=project,
+                    user=instance,
+                    defaults={'level': UserLevelPermission.objects.get(rank=1)}
+                )
+        except Exception:
+            logger.exception('Trigger.set_auth_member')
 
 
 # EVENT'S TRIGGERS

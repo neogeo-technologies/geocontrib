@@ -24,11 +24,12 @@ class ExportFeatureList(APIView):
 
     http_method_names = ['get', ]
 
-    def get(self, request, slug):
+    def get(self, request, slug, feature_type_slug):
         """
             Vue de téléchargement des signalements lié à un projet.
         """
-        features = Feature.objects.filter(status="published", project__slug=slug)
+        features = Feature.objects.filter(
+            status="published", project__slug=slug, feature_type__slug=feature_type_slug)
         serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
         response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
         response['Content-Disposition'] = 'attachment; filename=export_projet.json'
