@@ -12,82 +12,46 @@
     {% csrf_token %}
 
     {{ formset.non_form_errors }}
-    <div id="formsets-members">
-      {{ formset.management_form }}
-      {% for form in formset %}
-        {% if not form.DELETE.value %}
-          {% for hidden in form.hidden_fields %}
-            {{ hidden }}
-          {% endfor %}
-
-          <div class="ui teal segment">
-            <h4>
-              Membre
-              {% if not form.level.value == 'admin' %}
-              <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
-              {% endif %}
-            </h4>
-            {% if form.non_field_errors %}
-              {% for error in form.non_field_errors %}
-                {{ error }}
+    <table class="ui red table">
+      <tbody>
+        <thead>
+          <tr>
+            <th>Membre</th>
+            <th>{{ formset.empty_form.level.label }}</th>
+          </tr>
+        </thead>
+        <div id="formsets-members">
+          {{ formset.management_form }}
+          {% for form in formset %}
+            {% if not form.DELETE.value %}
+              {% for hidden in form.hidden_fields %}
+                {{ hidden }}
               {% endfor %}
-            {% endif %}
-            {{ form.errors }}
-            <div class="visible-fields">
-              <div class="two fields">
-                <div class="field">
-                  <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
-                  {{ form.first_name }}
-                  {{ form.first_name.errors }}
-                </div>
-                <div class="field">
-                  <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
-                  {{ form.last_name }}
-                  {{ form.last_name.errors }}
-                </div>
-              </div>
-              <div class="two fields">
-                <div class="required field">
-                  <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
-                  {{ form.username }}
-                  {{ form.username.errors }}
-                </div>
-                <div class="required field">
-                  <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-                  {{ form.email }}
-                  {{ form.email.errors }}
-                </div>
-              </div>
-              <div class="two fields">
-                <div class="required field">
-                  <label for="{{ form.level.id_for_label }}">{{ form.level.label }}</label>
-                  <div class="ui selection search dropdown">
-                    <input type="hidden"
-                      name="{{ form.level.html_name }}" id="{{ form.level.id_for_label }}"
-                      value="{% if form.level.value %}{{ form.level.value }}{% endif %}">
-                    <div class="default text"></div>
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                      {% for x,y in form.level.field.choices %}
-                        <div class="item" data-value="{{ x }}" {% if form.level.value == x %} selected{% endif %}>{{ y }}</div>
-                      {% endfor %}
+              <tr>
+                <td>{{ form.first_name.value }} {{ form.last_name.value }}<br><i>{{ form.username.value }}</i></td>
+                <td>
+                  <div class="required field">
+                    <div class="ui selection search dropdown">
+                      <input type="hidden"
+                        name="{{ form.level.html_name }}" id="{{ form.level.id_for_label }}"
+                        value="{% if form.level.value %}{{ form.level.value }}{% endif %}">
+                      <div class="default text"></div>
+                      <i class="dropdown icon"></i>
+                      <div class="menu">
+                        {% for x,y in form.level.field.choices %}
+                          <div class="item" data-value="{{ x }}" {% if form.level.value == x %} selected{% endif %}>{{ y }}</div>
+                        {% endfor %}
+                      </div>
                     </div>
+                    {{ form.level.errors }}
                   </div>
-                  {{ form.level.errors }}
-                </div>
-              </div>
-            </div>
-            <input class="delete-hidden-field" type="checkbox"
-              name="{{ form.DELETE.html_name }}"
-              id="{{ form.DELETE.id_for_label }}">
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-
-    <button id="add-member" type="button" class="ui compact button button-hover-green">
-      <i class="ui plus icon"></i>Ajouter un membre
-    </button>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </tbody>
+    </table>
 
     <div class="ui divider"></div>
 
@@ -100,88 +64,8 @@
 </div>
 
 <script>
-  $('#add_more').click(function() {
-  	var form_idx = $('#id_form-TOTAL_FORMS').val();
-  	$('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-  	$('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-  });
-
-
   $(document).ready(function() {
-    $(document).on('click', '.remove-formset', function () {
-      var $segment = $(this).parent().parent('.segment')
-      $segment.hide()
-      $segment.children('.visible-fields').remove()
-      $segment.children('.delete-hidden-field').prop('checked', true)
-    })
 
-    $('#add-member').click(function() {
-      var form_idx = $('#formsets-members [name=form-TOTAL_FORMS]').val();
-      $('#formsets-members').append((`
-        <div class="ui teal segment">
-          <h4>
-            Membre
-            <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
-          </h4>
-          {% if formset.non_field_errors %}
-            {% for error in formset.non_field_errors %}
-              {{ error }}
-            {% endfor %}
-          {% endif %}
-          {% if formset.errors %}{{ formset.errors }}{% endif %}
-          <div class="visible-fields">
-            <div class="two fields">
-              <div class="field">
-                <label for="{{ formset.empty_form.first_name.id_for_label }}">{{ formset.empty_form.first_name.label }}</label>
-                {{ formset.empty_form.first_name }}
-                {{ formset.first_name.errors }}
-              </div>
-              <div class="field">
-                <label for="{{ formset.empty_form.last_name.id_for_label }}">{{ formset.empty_form.last_name.label }}</label>
-                {{ formset.empty_form.last_name }}
-                {{ formset.last_name.errors }}
-              </div>
-            </div>
-            <div class="two fields">
-              <div class="required field">
-                <label for="{{ formset.empty_form.username.id_for_label }}">{{ formset.empty_form.username.label }}</label>
-                {{ formset.empty_form.username }}
-                {{ formset.username.errors }}
-              </div>
-              <div class="required field">
-                <label for="{{ formset.empty_form.email.id_for_label }}">{{ formset.empty_form.email.label }}</label>
-                {{ formset.empty_form.email }}
-                {{ formset.email.errors }}
-              </div>
-            </div>
-            <div class="two fields">
-              <div class="required field">
-                <label for="{{ formset.empty_form.level.id_for_label }}">{{ formset.empty_form.level.label }}</label>
-                <div class="ui selection search dropdown">
-                  <input type="hidden"
-                    name="{{ formset.empty_form.level.html_name }}" id="{{ formset.empty_form.level.id_for_label }}"
-                    value="{% if formset.empty_form.level.value %}{{ formset.empty_form.level.value }}{% endif %}">
-                  <div class="default text"></div>
-                  <i class="dropdown icon"></i>
-                  <div class="menu">
-                    {% for x,y in formset.empty_form.level.field.choices %}
-                      <div class="item" data-value="{{ x }}" {% if formset.empty_form.level.value == x %} selected{% endif %}>{{ y }}</div>
-                    {% endfor %}
-                  </div>
-                </div>
-                {{ formset.level.errors }}
-              </div>
-            </div>
-          </div>
-          <input class="delete-hidden-field" type="checkbox"
-            name="{{ formset.DELETE.html_name }}"
-            id="{{ formset.DELETE.id_for_label }}">
-        </div>
-      `).replace(/__prefix__/g, form_idx))
-      $('#formsets-members [name=form-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
-      $('.ui.dropdown').dropdown()
-    })
   })
-
 </script>
 {% endblock %}
