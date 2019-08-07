@@ -452,6 +452,11 @@ class CustomField(models.Model):
     def __str__(self):
         return "{}.{}".format(self.feature_type.slug, self.name)
 
+    def clean(self):
+
+        if self.field_type == 'list' and len(self.options) == 0:
+            raise ValidationError("La liste d'options ne peut être vide. ")
+
 
 class Layer(models.Model):
     SCHEMAS = (
