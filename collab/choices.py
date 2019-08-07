@@ -35,7 +35,7 @@ LOWER_LEVELS = (
 
 EXTENDED_LEVELS = (
     (MODERATOR, 'Modérateur'),
-    (ADMIN, 'Admin'),
+    (ADMIN, 'Administrateur projet'),
 )
 
 ALL_LEVELS = LOWER_LEVELS + EXTENDED_LEVELS
@@ -65,6 +65,7 @@ EXTENDED_RELATED_MODELS = RELATED_MODELS + OTHERS_MODELS
 EVENT_TYPES = (
     ('create', "Création"),
     ('update', "Modification"),
+    ('archive', "Archivage"),
     ('delete', "Suppression"),
 )
 

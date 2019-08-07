@@ -61,10 +61,10 @@ class ProjectModelForm(forms.ModelForm):
     moderation = forms.BooleanField(label='Modération', required=False)
 
     archive_feature = forms.IntegerField(
-        label='Délai avant archivage', min_value=0, required=False)
+        label='Délai avant archivage', required=False)
 
     delete_feature = forms.IntegerField(
-        label='Délai avant suppression', min_value=0, required=False)
+        label='Délai avant suppression', required=False)
 
     access_level_pub_feature = forms.ModelChoiceField(
         label='Visibilité des signalements publiés',
@@ -114,9 +114,9 @@ class ProjectModelForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        archive_feature = cleaned_data.get('archive_feature')
-        delete_feature = cleaned_data.get('delete_feature')
-        if archive_feature > delete_feature:
+        archive_feature = cleaned_data.get('archive_feature', None)
+        delete_feature = cleaned_data.get('delete_feature', None)
+        if archive_feature and delete_feature and archive_feature > delete_feature:
             raise forms.ValidationError(
                 "Le délai d'archivage doit être inférieur au délai de suppression. "
             )
