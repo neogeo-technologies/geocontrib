@@ -1065,6 +1065,7 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
         layer_formset = self.LayerFormSet(queryset=layers)
 
         context = {
+            'project': project,
             'layers': layers,
             'layer_formset': layer_formset
         }
@@ -1096,6 +1097,7 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
         messages.error(request, "L'édition des couches cartographiques a échouée. ")
         logger.error(layer_formset.errors)
         context = {
+            'project': project,
             'layers': layers,
             'layer_formset': layer_formset
         }
