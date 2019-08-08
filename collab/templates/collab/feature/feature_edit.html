@@ -322,29 +322,17 @@ function updateMap(map, geomFeatureJSON) {
   drawnItems.clearLayers()
   if (geomFeatureJSON) {
     var geomJSON = turf.flip(geomFeatureJSON)
-    if (geomJSON.type === 'Point') {
-      L.circleMarker(geomJSON.coordinates, {
-        color: '{{ feature.feature_type.color }}',
-        radius: 4,
-        fillOpacity: 0.3,
-        weight: 1
-      }).addTo(drawnItems)
-    } else if (geomJSON.type === 'LineString') {
-      L.polyline(geomJSON.coordinates, {
-        color: '{{ feature.feature_type.color }}',
-        weight: 1.5
-      }).addTo(drawnItems)
-    } else if (geomJSON.type === 'Polygon') {
-      L.polygon(geomJSON.coordinates, {
-        color: '{{ feature.feature_type.color }}',
-        weight: 1.5,
-        fillOpacity: 0.3
-      }).addTo(drawnItems)
+    if (geomType === 'point') {
+      L.circleMarker(geomJSON.coordinates).addTo(drawnItems)
+    } else if (geomType === 'linestring') {
+      L.polyline(geomJSON.coordinates).addTo(drawnItems)
+    } else if (geomType === 'polygon') {
+      L.polygon(geomJSON.coordinates).addTo(drawnItems)
     }
     map.fitBounds(drawnItems.getBounds())
   } else {
     console.log('ZOOM FRANCE ENTIERE')
-    map.setView([46.52863469527167, 2.43896484375], 5)
+    map.setView([50.00976, 2.8657699], 7)
   }
 }
 
@@ -537,6 +525,35 @@ $(document).ready(function() {
       attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map)
   {% endif %}
+
+  var featureGroup = new L.FeatureGroup()
+  {% for feat in features %}
+    {% if not feat.feature_id == feature.feature_id %}
+      var geomFeatureJSON = wellknown.parse("{{ feat.geom.wkt }}")
+      var geomJSON = turf.flip(geomFeatureJSON)
+      var popupContent = `{{ feat.title }}`
+      if (geomJSON.type === 'Point') {
+        L.circleMarker(geomJSON.coordinates, {
+          color: '{{ feat.feature_type.color }}',
+          radius: 4,
+          fillOpacity: 0.3,
+          weight: 1
+        }).bindPopup(popupContent).addTo(featureGroup)
+      } else if (geomJSON.type === 'LineString') {
+        L.polyline(geomJSON.coordinates, {
+          color: '{{ feat.feature_type.color }}',
+          weight: 1.5
+        }).bindPopup(popupContent).addTo(featureGroup)
+      } else if (geomJSON.type === 'Polygon') {
+        L.polygon(geomJSON.coordinates, {
+          color: '{{ feat.feature_type.color }}',
+          weight: 1.5,
+          fillOpacity: 0.3
+        }).bindPopup(popupContent).addTo(featureGroup)
+      }
+    {% endif %}
+  {% endfor %}
+  map.addLayer(featureGroup);
 
   map.addLayer(drawnItems)
 

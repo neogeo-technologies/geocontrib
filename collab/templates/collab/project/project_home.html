@@ -243,7 +243,7 @@
       $('.mini.modal.subscription').modal('show')
     })
 
-    var map = L.map('map', {zoomControl: false}).setView([43.604462, 1.444247], 13)
+    var map = L.map('map', {zoomControl: false}).setView([50.00976, 2.8657699], 7)
     {% if layers %}
       {% for layer in layers %}
         var options = {{ layer.options|safe }}

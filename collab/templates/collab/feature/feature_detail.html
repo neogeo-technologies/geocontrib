@@ -92,28 +92,32 @@
     <h2 class="ui header">Pièces jointes</h2>
 
     <div class="ui divided items">
-      {% for pj in attachments %}
-      <div class="item">
-        <a class="ui tiny image" target="_blank" href="{{ pj.attachment_file.url }}">
-          {% if pj.extension == '.pdf' %}
-            <img src="{% static 'collab/img/pdf.png' %}">
-          {% else %}
-            <img src="{{ pj.attachment_file.url }}">
-          {% endif %}
-        </a>
-        <div class="middle aligned content">
-          <a class="header" target="_blank" href="{{ pj.attachment_file.url }}">{{ pj.title }}</a>
-          <div class="description">
-            {{ pj.info }}
+      {% if attachments %}
+        {% for pj in attachments %}
+        <div class="item">
+          <a class="ui tiny image" target="_blank" href="{{ pj.attachment_file.url }}">
+            {% if pj.extension == '.pdf' %}
+              <img src="{% static 'collab/img/pdf.png' %}">
+            {% else %}
+              <img src="{{ pj.attachment_file.url }}">
+            {% endif %}
+          </a>
+          <div class="middle aligned content">
+            <a class="header" target="_blank" href="{{ pj.attachment_file.url }}">{{ pj.title }}</a>
+            <div class="description">
+              {{ pj.info }}
+            </div>
           </div>
         </div>
-      </div>
-      {% endfor %}
+        {% endfor %}
+      {% else %}
+        <i>Aucune pièce jointe associée au signalement.</i>
+      {% endif %}
     </div>
   </div>
 
   <div class="seven wide column">
-    <h2 class="ui header">Activités et commentaires</h2>
+    <h2 class="ui header">Activité et commentaires</h2>
 
     <div id="feed-event" class="ui feed">
       {% for event in events %}
@@ -272,7 +276,7 @@
       $('.mini.modal').modal('show')
     })
 
-    var map = L.map('map', {zoomControl: false}).setView([43.604462, 1.444247], 13)
+    var map = L.map('map', {zoomControl: false}).setView([50.00976, 2.8657699], 7)
     {% if layers %}
       {% for layer in layers %}
         var options = {{ layer.options|safe }}
