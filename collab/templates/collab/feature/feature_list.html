@@ -5,13 +5,10 @@
 
 {% block content %}
 <div class="fourteen wide column">
-  <h2 class="ui header">
-    Liste des signalements pour le projet
-  </h2>
-
-  <div class="ui two item pointing menu">
-    <a class="item active" data-tab="map">CARTE</a>
-    <a class="item" data-tab="list">LISTE</a>
+  <div class="ui secondary menu">
+    <div class="item"><h1>Signalements</h1></div>
+    <a class="item active" data-tab="map" data-tooltip="Carte"><i class="map fitted icon"></i></a>
+    <a class="item" data-tab="list" data-tooltip="Liste"><i class="list fitted icon"></i></a>
   </div>
 
   <div class="ui tab active" data-tab="map">
