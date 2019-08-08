@@ -246,6 +246,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         )
 
         context = {
+            'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_type': feature_type,
             'project': project,
             'feature_form': feature_form,
@@ -373,6 +374,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
             request.POST or None, request.FILES, prefix='attachment')
 
         context = {
+            'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_type': feature_type,
             'project': project,
             # 'permissions': Authorization.all_permissions(user, project),
@@ -523,6 +525,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
         context = {
             'feature': feature,
+            'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_data': feature.custom_fields_as_list,
             'feature_types': FeatureType.objects.filter(project=project),
             'feature_type': feature.feature_type,
@@ -592,6 +595,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 
             context = {
                 'feature': feature,
+                'features': Feature.handy.availables(user, project).order_by('updated_on'),
                 'feature_types': FeatureType.objects.filter(project=project),
                 'feature_type': feature.feature_type,
                 'project': project,
