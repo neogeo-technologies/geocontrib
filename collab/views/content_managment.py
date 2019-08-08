@@ -403,7 +403,7 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
         permissions = Authorization.all_permissions(user, project)
         feature_types = FeatureType.objects.filter(project=project)
         context = {
-            'features': Feature.handy.availables(user, project).order_by('-status', 'created_on'),
+            'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_types': feature_types,
             'layers': serialized_layers.data,
             'project': project,
