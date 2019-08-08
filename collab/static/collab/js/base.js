@@ -1,11 +1,9 @@
 $(document).ready(function() {
   // INITIALISATION SEMANTIC UI COMPONENTS
   $('.ui.accordion').accordion()
-  // $('main .selection.dropdown').dropdown()
-  // $('main .ui.checkbox').checkbox()
-  // $('.message .close').on('click', function() {
-    // $(this).closest('.message').hide()
-  // })
+  $('.ui.dropdown').dropdown()
+  $('.menu .item').tab()
+
   updateCSSMinHeight()
 
   $(window).resize(function(){
@@ -19,10 +17,4 @@ $(document).ready(function() {
     var main = (body) - (header+footer)
     $("main").css("min-height",main);
   }
-
-  // $('.ui.sidebar').sidebar({
-  //     context: $('.ui.pushable.segment'),
-  //     transition: 'overlay'
-  // }).sidebar('attach events', '#mobile_item');
-
 })

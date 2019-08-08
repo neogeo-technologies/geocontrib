@@ -322,12 +322,24 @@ function updateMap(map, geomFeatureJSON) {
   drawnItems.clearLayers()
   if (geomFeatureJSON) {
     var geomJSON = turf.flip(geomFeatureJSON)
-    if (geomType === 'point') {
-      L.circleMarker(geomJSON.coordinates).addTo(drawnItems)
-    } else if (geomType === 'linestring') {
-      L.polyline(geomJSON.coordinates).addTo(drawnItems)
-    } else if (geomType === 'polygon') {
-      L.polygon(geomJSON.coordinates).addTo(drawnItems)
+    if (geomJSON.type === 'Point') {
+      L.circleMarker(geomJSON.coordinates, {
+        color: '{{ feature.feature_type.color }}',
+        radius: 4,
+        fillOpacity: 0.3,
+        weight: 1
+      }).addTo(drawnItems)
+    } else if (geomJSON.type === 'LineString') {
+      L.polyline(geomJSON.coordinates, {
+        color: '{{ feature.feature_type.color }}',
+        weight: 1.5
+      }).addTo(drawnItems)
+    } else if (geomJSON.type === 'Polygon') {
+      L.polygon(geomJSON.coordinates, {
+        color: '{{ feature.feature_type.color }}',
+        weight: 1.5,
+        fillOpacity: 0.3
+      }).addTo(drawnItems)
     }
     map.fitBounds(drawnItems.getBounds())
   } else {
@@ -511,9 +523,20 @@ $(document).ready(function() {
   //              MAP             //
   // **************************** //
   var map = L.map('map').setView([50.00976, 2.8657699], 7)
-  L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map)
+  {% if layers %}
+    {% for layer in layers %}
+      var options = {{ layer.options|safe }}
+      {% if layer.schema_type == "wms" %}
+        L.tileLayer.wms('{{ layer.service }}', options).addTo(map)
+      {% elif layer.schema_type == "tms" %}
+        L.tileLayer('{{ layer.service }}', options).addTo(map)
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map)
+  {% endif %}
 
   map.addLayer(drawnItems)
 

@@ -4,57 +4,75 @@
 {% load app_filters %}
 
 {% block content %}
-<div class="ui middle aligned stackable grid container">
-  <div class="row ">
-    <h2 class="ui header">
-      Liste des signalements pour le projet <a href="{% url 'collab:project' slug=project.slug %}">{{ project.title }}</a>
-    </h2>
+<div class="fourteen wide column">
+  <h2 class="ui header">
+    Liste des signalements pour le projet
+  </h2>
+
+  <div class="ui two item pointing menu">
+    <a class="item active" data-tab="map">CARTE</a>
+    <a class="item" data-tab="list">LISTE</a>
   </div>
-  <div class="row ">
-    <table class="ui compact celled table">
+
+  <div class="ui tab active" data-tab="map">
+    <div id="map"></div>
+  </div>
+
+  <div class="ui tab" data-tab="list">
+    <table id="table-features" class="ui compact table">
       <thead>
         <tr>
           <th>Statut</th>
+          <th>Type</th>
           <th>Titre</th>
-          <th>Crée Par</th>
-          <th>Du type</th>
+          <th>Dernière modification</th>
+          {% if user.is_authenticated %}
+            <th>Auteur</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
         {% for feature in features %}
         <tr>
           <td>
-            {% if feature.status == 'archived'%}
-            <span><i class="red file alternate outline icon">Archivé</i></span>
-            {% elif feature.status == 'pending'%}
-            <span><i class="orange file alternate outline icon"></i>En attente</span>
-            {% elif feature.status == 'published'%}
-            <span><i class="green file alternate outline icon"></i>Publié</span>
-            {% else %}
-            <span ><i class="file alternate outline icon"></i>Brouillon</span>
+            {% if feature.status == 'archived' %}
+            <div data-tooltip="Archivé">
+              <i class="grey archive icon"></i>
+            </div>
+            {% elif feature.status == 'pending' %}
+              <div data-tooltip="En attente de publication">
+                <i class="teal hourglass outline icon"></i>
+              </div>
+            {% elif feature.status == 'published' %}
+              <div data-tooltip="Publié">
+                <i class="olive check icon"></i>
+              </div>
+            {% elif feature.status == 'draft' %}
+              <div data-tooltip="Brouillon">
+                <i class="orange pencil alternate icon"></i>
+              </div>
             {% endif %}
           </td>
           <td>
-            <strong><a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a></strong>
+            <a href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=feature.feature_type.slug %}"> {{ feature.feature_type.title }} </a>
           </td>
           <td>
-            <span class="sous-titre">{{feature.creator}} le {{feature.created_on }}</span>
+            <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
           </td>
           <td>
-            <span>{{feature.feature_type.title}}</span>
+            {{feature.updated_on|date:'d/m/Y H:i' }}
           </td>
+          {% if user.is_authenticated %}
+            <td>
+              {{ feature.creator.first_name }} {{ feature.creator.last_name }}
+            </td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-  <div class="row">
-    <div class="sixteen wide column">
-      <div id="map"></div>
-    </div>
-  </div>
 </div>
-<script src="{% static 'collab/js/feature.js' %}"></script>
 {% endblock %}
 
 
@@ -62,15 +80,97 @@
 <style>
   #map {
     width: 100%;
-    height: 500px;
+    min-height: 500px;
+  }
+  #table-features_filter {
+    width: 100%;
+    float: none;
+  }
+  #table-features_filter label {
+    width: 40%;
   }
 </style>
 <script>
   $(document).ready(function() {
-    var map = L.map('map').setView([43.604462, 1.444247], 13)
-    L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map)
+
+    $('#table-features').DataTable({
+      "language": {
+          "sProcessing":     "Traitement en cours...",
+          "sSearch":         "",
+          "sLengthMenu":     "Afficher _MENU_ &eacute;l&eacute;ments",
+          "sInfo":           "Affichage de l'&eacute;l&eacute;ment _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments",
+          "sInfoEmpty":      "Affichage de l'&eacute;l&eacute;ment 0 &agrave; 0 sur 0 &eacute;l&eacute;ment",
+          "sInfoFiltered":   "(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)",
+          "sInfoPostFix":    "",
+          "sLoadingRecords": "Chargement en cours...",
+          "sZeroRecords":    "Aucun &eacute;l&eacute;ment &agrave; afficher",
+          "sEmptyTable":     "Aucune donn&eacute;e disponible",
+          "oPaginate": {
+              "sFirst":      "Premier",
+              "sPrevious":   "Pr&eacute;c&eacute;dent",
+              "sNext":       "Suivant",
+              "sLast":       "Dernier"
+          },
+          "oAria": {
+              "sSortAscending":  ": activer pour trier la colonne par ordre croissant",
+              "sSortDescending": ": activer pour trier la colonne par ordre d&eacute;croissant"
+          }
+      },
+      "lengthChange" : false,
+      "pageLength": 15,
+      "columnDefs": [{ className: "dt-center", targets: "_all" }]
+    })
+
+    $('#table-features_filter label').addClass('ui icon input').prepend('<i class="search icon"></i>')
+    $('#table-features_filter label input').attr('placeholder', 'Rechercher ...')
+
+    var map = L.map('map').setView([50.00976, 2.8657699], 7)
+
+    {% if layers %}
+      {% for layer in layers %}
+        var options = {{ layer.options|safe }}
+        console.log(`{{ layer.service }}`, options);
+        {% if layer.schema_type == "wms" %}
+          L.tileLayer.wms('{{ layer.service }}', options).addTo(map)
+        {% elif layer.schema_type == "tms" %}
+          L.tileLayer('{{ layer.service }}', options).addTo(map)
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map)
+    {% endif %}
+
+      var featureGroup = new L.FeatureGroup()
+      {% for feature in features %}
+        var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
+        var geomJSON = turf.flip(geomFeatureJSON)
+        var popupContent = `
+          <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
+        `
+        if (geomJSON.type === 'Point') {
+          L.circleMarker(geomJSON.coordinates, {
+            color: '{{ feature.feature_type.color }}',
+            radius: 4,
+            fillOpacity: 0.3,
+            weight: 1
+          }).bindPopup(popupContent).addTo(featureGroup)
+        } else if (geomJSON.type === 'LineString') {
+          L.polyline(geomJSON.coordinates, {
+            color: '{{ feature.feature_type.color }}',
+            weight: 1.5
+          }).bindPopup(popupContent).addTo(featureGroup)
+        } else if (geomJSON.type === 'Polygon') {
+          L.polygon(geomJSON.coordinates, {
+            color: '{{ feature.feature_type.color }}',
+            weight: 1.5,
+            fillOpacity: 0.3
+          }).bindPopup(popupContent).addTo(featureGroup)
+        }
+      {% endfor %}
+      map.addLayer(featureGroup);
+      map.fitBounds(featureGroup.getBounds())
   })
 </script>
 {% endblock %}

@@ -15,15 +15,14 @@
   <!-- Semantic UI -->
   <link rel="stylesheet" href="{% static 'collab/resources/semantic-ui-2.4.2/semantic.min.css' %}" />
   <script src="{% static 'collab/resources/semantic-ui-2.4.2/semantic.min.js' %}"></script>
-  <script src="{% static 'collab/js/project.js' %}"></script>
 
   <!-- DataTables -->
   <link rel="stylesheet" href="{% static 'collab/resources/DataTables-1.10.18/datatables.min.css' %}" />
   <script src="{% static 'collab/resources/DataTables-1.10.18/datatables.min.js' %}"></script>
 
   <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
+  <link rel="stylesheet" href="{% static 'collab/resources/leaflet-1.5.1/leaflet.css' %}" />
+  <script src="{% static 'collab/resources/leaflet-1.5.1/leaflet.js' %}"></script>
   <!-- Leaflet Draw -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" integrity="sha256-XzD3RpaHPv7lzX9qt+2n1j5cWj48O24KsgaGYpKN8x8=" crossorigin="anonymous" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha256-siofc4Uwjlra3YWkwthOn8Uj69cNN4aMug/iOHNiRgs=" crossorigin="anonymous"></script>
@@ -53,7 +52,7 @@
           <div class="ui dropdown item">
             {{ project.title }}<br><div class="ui teal horizontal label">{{ USER_LEVEL_PROJECTS|lookup:project.slug }}</div>
             <i class="dropdown icon"></i>
-            <div class="menu">
+            <div class="menu" style="z-index:401;">
               <a class="item" href="{% url 'collab:project' slug=project.slug %}">
                 <i class="home icon"></i>Accueil du projet
               </a>
