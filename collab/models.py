@@ -85,6 +85,11 @@ class Authorization(models.Model):
         unique_together = (
             ('user', 'project'),
         )
+        verbose_name = 'Autorisation'
+
+    def __str__(self):
+        return "{} - {} ({})".format(
+            self.user.email, self.project.title, self.level.get_user_type_id_display())
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -481,6 +486,7 @@ class Layer(models.Model):
         verbose_name = 'Couche'
         verbose_name_plural = 'Couches'
         unique_together = ('project', 'order')
+        ordering = ['project', 'order']
 
     def __str__(self):
         return "{} - {}".format(self.pk, self.service)

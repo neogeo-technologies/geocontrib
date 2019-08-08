@@ -226,6 +226,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         feature_type = self.get_object()
         project = feature_type.project
         layers = Layer.objects.filter(project=project)
+        serialized_layers = LayerSerializer(layers, many=True)
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         feature_form = FeatureBaseForm(
@@ -252,7 +253,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'linked_formset': linked_formset,
             'attachment_formset': attachment_formset,
             'action': 'create',
-            'layers': layers
+            'layers': serialized_layers.data
         }
         return render(request, 'collab/feature/feature_edit.html', context)
 
@@ -262,6 +263,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         feature_type = self.get_object()
         project = feature_type.project
         layers = Layer.objects.filter(project=project)
+        serialized_layers = LayerSerializer(layers, many=True)
         feature_form = FeatureBaseForm(
             request.POST, feature_type=feature_type, user=user)
         extra = CustomField.objects.filter(feature_type=feature_type)
@@ -379,7 +381,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'linked_formset': linked_formset,
             'attachment_formset': attachment_formset,
             'action': 'create',
-            'layers': layers
+            'layers': serialized_layers.data
         }
         return render(request, 'collab/feature/feature_edit.html', context)
 
@@ -428,6 +430,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         layers = Layer.objects.filter(project=project)
+        serialized_layers = LayerSerializer(layers, many=True)
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         )
@@ -447,7 +450,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
                 project=project, feature_id=feature.feature_id, object_type='feature'),
             'events': serialized_events.data,
             'comment_form': CommentForm(),
-            'layers': layers,
+            'layers': serialized_layers.data,
         }
 
         return render(request, 'collab/feature/feature_detail.html', context)
@@ -484,6 +487,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         project = feature.project
         feature_type = feature.feature_type
         layers = Layer.objects.filter(project=project)
+        serialized_layers = LayerSerializer(layers, many=True)
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         availables_features = Feature.objects.filter(
@@ -531,7 +535,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'attachment_formset': attachment_formset,
             'attachments': attachments,
             'action': 'update',
-            'layers': layers
+            'layers': serialized_layers.data
         }
         return render(request, 'collab/feature/feature_edit.html', context)
 
@@ -544,6 +548,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             project=project,
         ).exclude(feature_id=feature.feature_id)
         layers = Layer.objects.filter(project=project)
+        serialized_layers = LayerSerializer(layers, many=True)
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         feature_form = FeatureBaseForm(
@@ -598,7 +603,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 'attachment_formset': attachment_formset,
                 'attachments': attachments,
                 'action': 'update',
-                'layers': layers,
+                'layers': serialized_layers.data,
             }
             return render(request, 'collab/feature/feature_edit.html', context)
         else:
@@ -1064,11 +1069,12 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
 
         project = self.get_object()
         layers = Layer.objects.filter(project=project)
+        serialized_layers = LayerSerializer(layers, many=True)
         layer_formset = self.LayerFormSet(queryset=layers)
 
         context = {
             'project': project,
-            'layers': layers,
+            'layers': serialized_layers.data,
             'layer_formset': layer_formset
         }
         return render(request, 'collab/project/project_mapping.html', context)
@@ -1076,6 +1082,7 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
     def post(self, request, slug):
         project = self.get_object()
         layers = Layer.objects.filter(project=project)
+        serialized_layers = LayerSerializer(layers, many=True)
         layer_formset = self.LayerFormSet(request.POST or None)
         if layer_formset.is_valid():
 
@@ -1094,7 +1101,13 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
                 elif not layer and not is_deleted:
                     data['project'] = project
                     Layer.objects.create(**data)
-            return redirect('collab:project', slug=slug)
+
+        context = {
+            'project': project,
+            'layers': serialized_layers.data,
+            'layer_formset': layer_formset
+        }
+        return render(request, 'collab/project/project_mapping.html', context)
 
         messages.error(request, "L'édition des couches cartographiques a échouée. ")
         logger.error(layer_formset.errors)

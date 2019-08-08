@@ -20,6 +20,17 @@ logger = logging.getLogger('django')
 User = get_user_model()
 
 
+######################
+# SHARED SERIALIZERS #
+######################
+
+class AttachmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Attachment
+        fields = '__all__'
+
+
 class CustomFieldSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -47,6 +58,26 @@ class FeatureTypeSerializer(serializers.ModelSerializer):
         )
 
 
+class UserSerializer(serializers.ModelSerializer):
+
+    full_name = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
+
+    class Meta:
+        model = User
+        fields = (
+            'full_name',
+            'username'
+        )
+
+
+######################
+# HOOKED SERIALIZERS #
+######################
+
+
 class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
     feature_type = FeatureTypeSerializer(read_only=True)
@@ -68,26 +99,25 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
         )
 
 
-class ProjectSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Project
-        fields = '__all__'
+class FeatureLinkSerializer(serializers.ModelSerializer):
 
+    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
 
-# NON-API SERIALIZERS: TODO @cbenhabib: à déplacé dans collab
+    user = UserSerializer(read_only=True)
 
-class UserSerializer(serializers.ModelSerializer):
+    def get_user_full_name(self, obj):
+        return obj.creator.get_full_name()
 
-    full_name = serializers.SerializerMethodField()
-
-    def get_full_name(self, obj):
-        return obj.get_full_name()
+    def get_username(self, obj):
+        return obj.creator.username
 
     class Meta:
-        model = User
+        model = Feature
         fields = (
-            'full_name',
-            'username'
+            'feature_id',
+            'title',
+            'created_on',
+            'user',
         )
 
 
@@ -131,13 +161,6 @@ class EventSerializer(serializers.ModelSerializer):
         )
 
 
-class AttachmentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Attachment
-        fields = '__all__'
-
-
 class LayerSerializer(serializers.ModelSerializer):
 
     options = serializers.SerializerMethodField(read_only=True)
@@ -151,33 +174,9 @@ class LayerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class EventEnhencedSerializer(EventSerializer):
-    related_attachments = AttachmentSerializer(source='attachment_id', many=True)
-
+class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Event
-        fields = (
-            'created_on',
-            'object_type',
-            'event_type',
-            'data',
-            'project_slug',
-            'feature_type_slug',
-            'feature_id',
-            'comment_id',
-            'attachment_id',
-            'user',
-            'related_comment',
-            'related_attachments'
-        )
-
-
-class StackedEventSerializer(serializers.ModelSerializer):
-
-    events = EventSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = StackedEvent
+        model = Project
         fields = '__all__'
 
 
@@ -229,23 +228,10 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
         )
 
 
-class FeatureLinkSerializer(serializers.ModelSerializer):
+class StackedEventSerializer(serializers.ModelSerializer):
 
-    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
-
-    user = UserSerializer(read_only=True)
-
-    def get_user_full_name(self, obj):
-        return obj.creator.get_full_name()
-
-    def get_username(self, obj):
-        return obj.creator.username
+    events = EventSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Feature
-        fields = (
-            'feature_id',
-            'title',
-            'created_on',
-            'user',
-        )
+        model = StackedEvent
+        fields = '__all__'

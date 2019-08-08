@@ -4,6 +4,7 @@ from django.contrib.gis import admin
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 
+from collab.models import Authorization
 from collab.models import Feature
 from collab.models import Project
 from collab.models import Subscription
@@ -91,6 +92,7 @@ class FeatureTypeAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(CustomField)
 admin.site.register(Layer)
+admin.site.register(Authorization)
 admin.site.register(Feature)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(Project)

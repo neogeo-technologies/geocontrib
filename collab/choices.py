@@ -11,10 +11,10 @@ TYPE_CHOICES = (
     ("boolean", "Booléen"),
     ("char", "Chaîne de caractères"),
     ("date", "Date"),
-    ("integer", "Entier"),
-    ("decimal", "Décimale"),
-    ("text", "Champ texte"),
-    ("list", "Liste"),
+    ("list", "Liste de valeurs"),
+    ("integer", "Nombre entier"),
+    ("decimal", "Nombre décimal"),
+    ("text", "Texte multiligne"),
 )
 
 ######################
