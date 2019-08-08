@@ -980,7 +980,12 @@ class ProjectDetail(DetailView):
         context['permissions'] = permissions
         context['feature_types'] = project.featuretype_set.all()
         context['is_suscriber'] = Subscription.is_suscriber(user, project)
-        context['layers'] = Layer.objects.filter(project=project)
+
+        # EDC
+        layers = Layer.objects.filter(project=project)
+        serialized_layers = LayerSerializer(layers, many=True)
+        context['layers'] = serialized_layers.data
+
         return context
 
 
