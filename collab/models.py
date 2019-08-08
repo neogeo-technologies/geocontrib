@@ -967,7 +967,10 @@ def create_event_on_feature_create(sender, instance, created, **kwargs):
             user=instance.creator,
             project_slug=instance.project.slug,
             feature_type_slug=instance.feature_type.slug,
-            data=instance.feature_data
+            data={
+                'extra': instance.feature_data,
+                'feature_title': instance.title
+            }
         )
 
 
@@ -1029,3 +1032,12 @@ def notify_or_stack_events(sender, instance, created, **kwargs):
             instance.ping_users()
         except Exception:
             logger.exception('ping_users@notify_or_stack_events')
+
+
+# @receiver(models.signals.pre_save, sender=Layer)
+# @disable_for_loaddata
+# def update_order_layer(sender, instance, **kwargs):
+#     order = instance.order
+#     while sender.objects.filter(order=order, project=instance.project).exists():
+#         order = order + 1
+#     instance.order = order
