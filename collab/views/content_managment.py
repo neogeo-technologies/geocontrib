@@ -619,7 +619,9 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             )
 
             # On contextualise l'evenement en fonction des modifications apportés
-            data = {} if not updated_feature.feature_data else updated_feature.feature_data
+            data = {}
+            data['extra'] = updated_feature.feature_data
+            data['feature_title'] = updated_feature.title
 
             data['feature_status'] = {
                 'has_changed': (old_status != updated_feature.status),

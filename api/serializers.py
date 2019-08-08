@@ -80,7 +80,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
-    feature_type = FeatureTypeSerializer(read_only=True)
+    # feature_type = FeatureTypeSerializer(read_only=True)
 
     class Meta:
         model = Feature
@@ -94,9 +94,16 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             'updated_on',
             'archived_on',
             'deletion_on',
-            'feature_type',
-            'feature_data',
+            # 'feature_type',
         )
+
+    def get_properties(self, instance, fields):
+        # Ici on retourne les champs extra d'une feature au meme niveau
+        # que les champs de bases
+        properties = super().get_properties(instance, fields)
+        for key, value in instance.feature_data.items():
+            properties[key] = value
+        return properties
 
 
 class FeatureLinkSerializer(serializers.ModelSerializer):

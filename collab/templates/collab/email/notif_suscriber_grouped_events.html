@@ -30,7 +30,11 @@
                   Ajout d'une Pièce-jointe par {{ event.user.full_name }} le {{ event.created_on }}
                 {% endif %}
               {% elif event.event_type == 'update' %}
-                Signalement mis à jour par {{ event.user.full_name }} le {{ event.created_on }}
+                {% if event.object_type == 'feature' %}
+                  Signalement <strong>{{ event.data.feature_title }}<strong> mis à jour par {{ event.user.full_name }} le {{ event.created_on }}
+                {% elif event.object_type == 'attachment' %}
+                  Pièce-jointe mise à jour par {{ event.user.full_name }} le {{ event.created_on }}
+                {% endif %}
               {% endif %}
             </li>
             {% endfor %}

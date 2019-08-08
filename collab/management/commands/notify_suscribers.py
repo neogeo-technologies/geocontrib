@@ -1,15 +1,13 @@
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from django.utils.timezone import timedelta, now
+from django.utils.timezone import now
 
 from api.serializers import ProjectDetailedSerializer
 from api.serializers import StackedEventSerializer
 
 from collab.emails import notif_suscriber_grouped_events
-from collab.models import Event
 from collab.models import Project
 from collab.models import StackedEvent
 from collab.models import Subscription
@@ -30,9 +28,6 @@ class Command(BaseCommand):
         if frequency_setted not in ['instantly', 'daily', 'weekly']:
             logger.error('The default frequency setting is incorrect')
             return
-
-        processed_stacks = []
-        failed_stacks = []
 
         users = User.objects.filter(is_active=True)
         for user in users:
@@ -71,9 +66,9 @@ class Command(BaseCommand):
                 else:
                     logger.info('Batch sent to {0}'.format(user.email))
 
-
-        # for row in StackedEvent.objects.filter(pk__in=[elm for elm in processed_stacks]):
-        #     row.state = 'succesful'
-        #     row.save()
+        # TODO @cbenhabib: revoir la gestion des stack en erreur
+        for row in StackedEvent.objects.filter(state='pending', schedualed_delivery_on__lte=now()):
+            row.state = 'succesful'
+            row.save()
 
         logger.info('Command succeeded! ')
