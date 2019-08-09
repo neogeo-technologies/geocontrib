@@ -88,13 +88,16 @@ class MyAccount(View):
         ).filter(
             level__rank__lte=2
         ).values_list('project__pk', flat=True)
-
         serilized_projects = ProjectDetailedSerializer(
             Project.objects.filter(
                 Q(pk__in=project_authorized) | Q(creator=user)
             ).order_by('-created_on'), many=True)
 
+        events = Event.objects.filter(user=user).order_by('-created_on')
+        serialized_events = EventSerializer(events, many=True)
+
         context['projects'] = serilized_projects.data
+        context['events'] = serialized_events.data
 
         return render(request, 'collab/my_account.html', context)
 
