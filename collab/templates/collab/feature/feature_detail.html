@@ -43,10 +43,12 @@
           </b></td>
         </tr>
         {% endfor %}
-        <tr>
-          <td>Auteur</td>
-          <td>{{ feature.creator.get_full_name|default:feature.creator.username }}</td>
-        </tr>
+        {% if user.is_authenticated %}
+          <tr>
+            <td>Auteur</td>
+            <td>{{ feature.creator.get_full_name|default:feature.creator.username }}</td>
+          </tr>
+        {% endif %}
         <tr>
           <td>Date de création</td>
           <td>{{ feature.created_on }}</td>
@@ -148,7 +150,7 @@
                 {{ event.related_comment.comment }}
                 {% if event.related_comment.attachments %}
                   {% for att in event.related_comment.attachments %}
-                    <a href="{{ att.url }}" target="_blank"><i class="paperclip icon"></i> {{ att.title }}</a>
+                    <br><a href="{{ att.url }}" target="_blank"><i class="paperclip fitted icon"></i> {{ att.title }}</a>
                   {% endfor %}
                 {% endif %}
               </div>
@@ -192,11 +194,6 @@
           <label>Pièce jointe (facultative)</label>
           <div class="two fields">
             <div class="field">
-              <input type="text" name="{{ comment_form.title.html_name }}" id="{{ comment_form.title.id_for_label }}"
-                value="{% if comment_form.title.value %}{{ comment_form.title.value }}{% endif %}" >
-              {{ comment_form.title.errors }}
-            </div>
-            <div class="field">
               <label class="ui icon button" for="attachment_file">
                 <i class="paperclip icon"></i>
                 <span class="label">Sélectionner un fichier ...</span>
@@ -204,6 +201,11 @@
               <input type="file" accept="application/pdf, image/jpeg, image/png" style="display:none;"
                 name="attachment_file" id="attachment_file">
               {{ comment_form.attachment_file.errors }}
+            </div>
+            <div class="field">
+              <input type="text" name="{{ comment_form.title.html_name }}" id="{{ comment_form.title.id_for_label }}"
+                value="{% if comment_form.title.value %}{{ comment_form.title.value }}{% endif %}" >
+              {{ comment_form.title.errors }}
             </div>
           </div>
           <button type="submit" class="ui compact green icon button">

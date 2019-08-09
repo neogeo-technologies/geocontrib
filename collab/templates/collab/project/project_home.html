@@ -97,13 +97,24 @@
           <div class="content">
             <div class="center aligned header">Derniers signalements</div>
             <div class="center aligned description">
-              {% for item in last_features %}
-                <p>
-                  <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=item.feature_type.slug feature_id=item.feature_id  %}">{{ item.title }}</a>
-                </p>
-              {% empty %}
-                <i>Aucun signalement pour le moment.</i>
-              {% endfor %}
+              <div class="ui relaxed list">
+                {% for item in last_features %}
+                  <div class="item">
+                    <div class="content">
+                      <div>
+                        <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=item.feature_type.slug feature_id=item.feature_id  %}">{{ item.title }}</a>
+                      </div>
+                      <div class="description">
+                        <i>[ {{ item.created_on|date:"d/m/Y" }}{% if user.is_authenticated %}, par {{ item.creator.first_name }} {{ item.creator.last_name }}{% endif %} ]</i>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                  </div>
+                {% empty %}
+                  <i>Aucun signalement pour le moment.</i>
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>
@@ -112,17 +123,12 @@
             <div class="center aligned header">Derniers commentaires</div>
             <div class="center aligned description">
               <div class="ui relaxed list">
-                {% for elt in comments %}
+                {% for item in comments %}
                   <div class="item">
                     <div class="content">
-                      <div>"{{ elt.comment }}"</div>
+                      <div><a href="{{ item.url }}">"{{ item.comment }}"</a></div>
                       <div class="description">
-                        <i>[
-                          {{ elt.created_on|date:"d/m/Y" }}
-                        {% if user.is_authenticated %}
-                          , par {{ elt.author__first_name|title }} {{ elt.author__last_name }}
-                        {% endif %}
-                        ]</i>
+                        <i>[ {{ item.created_on|date:"d/m/Y" }}{% if user.is_authenticated %}, par {{ item.author__first_name|title }} {{ item.author__last_name }}{% endif %} ]</i>
                       </div>
                     </div>
                   </div>
