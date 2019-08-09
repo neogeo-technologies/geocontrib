@@ -397,19 +397,31 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
         project = self.get_object()
         return Authorization.has_permission(user, 'can_view_feature', project)
 
-    def get(self, request, slug):
+    def get(self, request, slug, *args, **kwargs):
+
         project = self.get_object()
         user = request.user
         layers = Layer.objects.filter(project=project).order_by('order')
         serialized_layers = LayerSerializer(layers, many=True)
         permissions = Authorization.all_permissions(user, project)
         feature_types = FeatureType.objects.filter(project=project)
+        features = Feature.handy.availables(user, project).order_by('updated_on')
+
+        filters = {}
+        filters['status'] = request.GET.get('status', None)
+        filters['feature_type__slug'] = request.GET.get('feature_type', None)
+        filters['title__icontains'] = request.GET.get('title', None)
+        if filters:
+            filters = {k: v for k, v in filters.items() if v is not None}
+            features = features.filter(**filters)
+
         context = {
-            'features': Feature.handy.availables(user, project).order_by('updated_on'),
+            'features': features,
             'feature_types': feature_types,
             'layers': serialized_layers.data,
             'project': project,
             'permissions': permissions,
+            'status_choices': Feature.STATUS_CHOICES,
         }
 
         return render(request, 'collab/feature/feature_list.html', context)
