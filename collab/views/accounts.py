@@ -93,11 +93,19 @@ class MyAccount(View):
                 Q(pk__in=project_authorized) | Q(creator=user)
             ).order_by('-created_on'), many=True)
 
-        events = Event.objects.filter(user=user).order_by('-created_on')
-        serialized_events = EventSerializer(events, many=True)
+        all_events = Event.objects.filter(user=user).order_by('-created_on')
+        serialized_events = EventSerializer(all_events[0:5], many=True)
+
+        feature_events = Event.objects.filter(user=user, object_type='feature').order_by('-created_on')
+        serialized_feature_events = EventSerializer(feature_events[0:5], many=True)
+
+        comment_events = Event.objects.filter(user=user, object_type='comment').order_by('-created_on')
+        serialized_comment_events = EventSerializer(comment_events[0:5], many=True)
 
         context['projects'] = serilized_projects.data
         context['events'] = serialized_events.data
+        context['features'] = serialized_feature_events.data
+        context['comments'] = serialized_comment_events.data
 
         return render(request, 'collab/my_account.html', context)
 
