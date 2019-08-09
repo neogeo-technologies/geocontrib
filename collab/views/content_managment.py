@@ -21,6 +21,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.decorators.csrf import csrf_exempt
+
 from api.serializers import EventSerializer
 from api.serializers import FeatureTypeSerializer
 from api.serializers import LayerSerializer
@@ -405,7 +406,7 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
         serialized_layers = LayerSerializer(layers, many=True)
         permissions = Authorization.all_permissions(user, project)
         feature_types = FeatureType.objects.filter(project=project)
-        features = Feature.handy.availables(user, project).order_by('updated_on')
+        features = Feature.handy.availables(user, project).order_by('-updated_on')
 
         filters = {}
         filters['status'] = request.GET.get('status', None)

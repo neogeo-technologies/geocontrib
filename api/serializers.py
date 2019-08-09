@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from collab.models import Attachment
@@ -130,11 +132,13 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
 
-    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+    created_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
 
     user = UserSerializer(read_only=True)
 
     related_comment = serializers.SerializerMethodField()
+
+    related_feature = serializers.SerializerMethodField()
 
     def get_related_comment(self, obj):
         res = {}
@@ -146,6 +150,19 @@ class EventSerializer(serializers.ModelSerializer):
                     'attachments': [
                         {'url': att.attachment_file.url, 'title': att.title} for att in comment.attachment_set.all()
                     ]
+                }
+            except Exception:
+                logger.exception('No related comment found')
+        return res
+
+    def get_related_feature(self, obj):
+        res = {}
+        if obj.feature_id:
+            try:
+                feature = Feature.objects.get(feature_id=obj.feature_id)
+                res = {
+                    'feature_id': str(feature.feature_id),
+                    'fearture_url': feature.get_view_url()
                 }
             except Exception:
                 logger.exception('No related comment found')
@@ -164,7 +181,8 @@ class EventSerializer(serializers.ModelSerializer):
             'comment_id',
             'attachment_id',
             'user',
-            'related_comment'
+            'related_comment',
+            'related_feature',
         )
 
 

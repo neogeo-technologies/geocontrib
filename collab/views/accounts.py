@@ -2,13 +2,16 @@ from django.views.generic.base import TemplateView
 from django.shortcuts import render
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 
 from api.serializers import ProjectDetailedSerializer
+from api.serializers import EventSerializer
 
 from collab.models import Authorization
+from collab.models import Event
 from collab.models import Project
 from collab.models import UserLevelPermission
 from collab import choices
@@ -34,6 +37,11 @@ class HomePageView(TemplateView):
             Project.objects.all().order_by('-created_on'), many=True)
 
         context['projects'] = serilized_projects.data
+
+        events = Event.objects.filter(user=user).order_by('-created_on')
+        serialized_events = EventSerializer(events, many=True)
+
+        context['events'] = serialized_events.data
 
         return context
 
@@ -75,8 +83,16 @@ class MyAccount(View):
 
             context['rank'][project.slug] = rank
 
+        project_authorized = Authorization.objects.filter(
+            user=user
+        ).filter(
+            level__rank__lte=2
+        ).values_list('project__pk', flat=True)
+
         serilized_projects = ProjectDetailedSerializer(
-            Project.objects.filter(creator=user).order_by('-created_on'), many=True)
+            Project.objects.filter(
+                Q(pk__in=project_authorized) | Q(creator=user)
+            ).order_by('-created_on'), many=True)
 
         context['projects'] = serilized_projects.data
 

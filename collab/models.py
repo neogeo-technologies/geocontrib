@@ -25,7 +25,6 @@ from collab.emails import notif_moderators_pending_features
 from collab.emails import notif_creator_published_feature
 from collab.managers import AvailableFeaturesManager
 
-
 import logging
 logger = logging.getLogger('django')
 
@@ -991,7 +990,7 @@ def create_event_on_comment_creation(sender, instance, created, **kwargs):
                 'author': instance.author.get_full_name(),
                 'username': instance.author.username,
                 'project_slug': instance.project.slug,
-                'comment': instance.comment
+                'comment': instance.comment,
             }
         )
 
