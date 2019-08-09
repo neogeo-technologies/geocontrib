@@ -145,11 +145,6 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
 
     user = UserSerializer(read_only=True)
 
-    def get_user_full_name(self, obj):
-        return obj.creator.get_full_name()
-
-    def get_username(self, obj):
-        return obj.creator.username
 
     class Meta:
         model = Feature
@@ -170,6 +165,8 @@ class EventSerializer(serializers.ModelSerializer):
     related_comment = serializers.SerializerMethodField()
 
     related_feature = serializers.SerializerMethodField()
+
+    project_url = serializers.SerializerMethodField()
 
     def get_related_comment(self, obj):
         res = {}
@@ -200,6 +197,16 @@ class EventSerializer(serializers.ModelSerializer):
                 logger.exception('No related feature found')
         return res
 
+    def get_project_url(self, obj):
+        url = ''
+        if obj.project_slug:
+            try:
+                project = Feature.objects.get(slug=obj.project_slug)
+                url = project.get_absolute_url()
+            except Exception:
+                logger.exception('No related project found')
+        return url
+
     class Meta:
         model = Event
         fields = (
@@ -215,6 +222,7 @@ class EventSerializer(serializers.ModelSerializer):
             'user',
             'related_comment',
             'related_feature',
+            'project_url',
         )
 
 
