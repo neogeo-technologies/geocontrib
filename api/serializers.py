@@ -201,7 +201,7 @@ class EventSerializer(serializers.ModelSerializer):
         url = ''
         if obj.project_slug:
             try:
-                project = Feature.objects.get(slug=obj.project_slug)
+                project = Project.objects.get(slug=obj.project_slug)
                 url = project.get_absolute_url()
             except Exception:
                 logger.exception('No related project found')
