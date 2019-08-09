@@ -95,10 +95,39 @@
     </h3>
     {% for feature in features %}
       <div class="ui small header">
+        {% if feature.status == 'archived' %}
+        <span data-tooltip="Archivé">
+          <i class="grey archive icon"></i>
+        </span>
+        {% elif feature.status == 'pending' %}
+          <span data-tooltip="En attente de publication">
+            <i class="teal hourglass outline icon"></i>
+          </span>
+        {% elif feature.status == 'published' %}
+          <span data-tooltip="Publié">
+            <i class="olive check icon"></i>
+          </span>
+        {% elif feature.status == 'draft' %}
+          <span data-tooltip="Brouillon">
+            <i class="orange pencil alternate icon"></i>
+          </span>
+        {% endif %}
         <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">
           {{ feature.title }}
         </a>
-        <div class="sub header">{{ feature.description}}</div>
+        <div class="sub header">
+          <div>
+            {{ feature.description|truncatechars:200 }}
+          </div>
+          <div>
+            [
+            Créé le {{ feature.created_on }}
+            {% if user.is_authenticated %}
+              par {{ feature.creator.get_full_name|default:feature.creator.username }}
+            {% endif %}
+            ]
+          </div>
+        </div>
       </div>
     {% endfor %}
     <a class="ui right labeled icon button" href="{% url 'collab:feature_list' slug=project.slug %}">
