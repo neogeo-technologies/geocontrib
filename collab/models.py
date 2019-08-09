@@ -485,7 +485,7 @@ class Layer(models.Model):
     class Meta:
         verbose_name = 'Couche'
         verbose_name_plural = 'Couches'
-        unique_together = ('project', 'order')
+        # unique_together = ('project', 'order')
         ordering = ['project', 'order']
 
     def __str__(self):
@@ -1032,12 +1032,3 @@ def notify_or_stack_events(sender, instance, created, **kwargs):
             instance.ping_users()
         except Exception:
             logger.exception('ping_users@notify_or_stack_events')
-
-
-# @receiver(models.signals.pre_save, sender=Layer)
-# @disable_for_loaddata
-# def update_order_layer(sender, instance, **kwargs):
-#     order = instance.order
-#     while sender.objects.filter(order=order, project=instance.project).exists():
-#         order = order + 1
-#     instance.order = order

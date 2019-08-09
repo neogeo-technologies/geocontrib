@@ -824,11 +824,20 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
             geom = None
         return geom
 
+    def get_feature_data(self, feature_type, properties):
+
+        feature_data = {}
+        if hasattr(feature_type, 'customfield_set'):
+            for field in feature_type.customfield_set.all():
+                feature_data[field.name] = properties.get(field.name)
+        return feature_data
+
     def create_features(self, request, creator, data, feature_type):
         new_features = data.get('features')
         nb_features = len(new_features)
         for feature in new_features:
             properties = feature.get('properties')
+            feature_data = self.get_feature_data(feature_type, properties)
 
             current = Feature.objects.create(
                 title=properties.get('title'),
@@ -838,7 +847,7 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
                 project=feature_type.project,
                 feature_type=feature_type,
                 geom=self.get_geom(feature.get('geometry')),
-                feature_data=properties.get('feature_data'),
+                feature_data=feature_data,
             )
 
             simili_features = Feature.objects.filter(
@@ -949,7 +958,7 @@ class ImportFromImage(SingleObjectMixin, UserPassesTestMixin, View):
 # PROJECT VIEWS #
 #################
 
-
+@method_decorator(DECORATORS[0], name='dispatch')
 class ProjectDetail(DetailView):
 
     model = Project
@@ -1112,6 +1121,15 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
                 elif not layer and not is_deleted:
                     data['project'] = project
                     Layer.objects.create(**data)
+
+                # TODO @cbenhabib: afin d'avoir une valeur unique d'ordre.
+                layers = Layer.objects.filter(project=project).order_by('order')
+                for idx, layer in enumerate(layers):
+                    layer.order = idx
+                    layer.save(update_fields=['order'])
+                layer_formset = self.LayerFormSet(queryset=layers)
+        else:
+            logger.error(layer_formset.errors)
 
         context = {
             'project': project,
