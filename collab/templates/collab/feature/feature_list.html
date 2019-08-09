@@ -4,18 +4,75 @@
 {% load app_filters %}
 
 {% block content %}
-<div class="fourteen wide column">
-  <div class="ui secondary menu">
-    <div class="item"><h1>Signalements</h1></div>
-    <a class="item active" data-tab="map" data-tooltip="Carte"><i class="map fitted icon"></i></a>
-    <a class="item" data-tab="list" data-tooltip="Liste"><i class="list fitted icon"></i></a>
+<div class="row">
+  <div class="four wide column">
+    <h1>Signalements</h1>
+  </div>
+  <div class="ten wide column">
+    <div class="ui secondary menu">
+      <a class="item active" data-tab="map" data-tooltip="Carte"><i class="map fitted icon"></i></a>
+      <a class="item" data-tab="list" data-tooltip="Liste"><i class="list fitted icon"></i></a>
+      <div class="item">
+        <h4>{{ features|length }} signalement{% if features|length > 1 %}s{% endif %}</h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="four wide column">
+
+    <div>
+      <h4 class="ui horizontal divider header">FILTRES</h4>
+
+      <form id="form-filters" class="ui form" action="" method="get">
+        <div class="field">
+          <label>Type</label>
+          <div class="ui fluid search selection dropdown">
+            <input type="hidden" class="filter" name="feature_type" value="{% if request.GET.feature_type %}{{ request.GET.feature_type }}{% endif %}">
+            <div class="default text"></div>
+            <i class="dropdown icon"></i>
+            <div class="menu" style="z-index:9999">
+              {% for type in feature_types %}
+                <div class="item" data-value="{{ type.slug }}" {% if request.GET.type == type.slug %} selected{% endif %}>{{ type.title }}</div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Statut</label>
+          <div class="ui fluid search selection dropdown">
+            <input type="hidden" class="filter" name="status" value="{% if request.GET.status %}{{ request.GET.status }}{% endif %}">
+            <div class="default text"></div>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              {% for x,y in status_choices %}
+                <div class="item" data-value="{{ x }}" {% if request.GET.status == x %} selected{% endif %}>{{ y }}</div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Titre</label>
+          <div class="ui icon input">
+            <i class="search icon"></i>
+            <input type="text" name="title" value="{% if request.GET.title %}{{ request.GET.title }}{% endif %}">
+          </div>
+        </div>
+        <button id="submit-search" type="button" class="ui teal compact fluid button">
+          Lancer la recherche
+        </button>
+      </form>
+    </div>
   </div>
 
-  <div class="ui tab active" data-tab="map">
-    <div id="map"></div>
-  </div>
+  <div class="ten wide column">
+    <div class="ui hidden divider"></div>
+    <div class="ui tab active" data-tab="map">
+      <div id="map"></div>
+    </div>
 
-  <div class="ui tab" data-tab="list">
+    <div class="ui tab" data-tab="list">
     <table id="table-features" class="ui compact table">
       <thead>
         <tr>
@@ -69,6 +126,7 @@
       </tbody>
     </table>
   </div>
+  </div>
 </div>
 {% endblock %}
 
@@ -79,16 +137,35 @@
     width: 100%;
     min-height: 500px;
   }
-  #table-features_filter {
-    width: 100%;
-    float: none;
-  }
-  #table-features_filter label {
-    width: 40%;
-  }
 </style>
 <script>
+  function getDataFilters() {
+    var $form = $("#form-filters").serializeArray()
+    var requestURL = `{% url 'collab:feature_list' slug=project.slug %}`
+    for (var field of $form) {
+      if (field.value) {
+        if (requestURL.includes('?')) {
+          requestURL = `${requestURL}&${field.name}=${field.value}`
+        } else {
+          requestURL = `${requestURL}?${field.name}=${field.value}`
+        }
+      }
+    }
+    document.location = requestURL
+  }
+
   $(document).ready(function() {
+
+    $('#form-filters .ui.selection.dropdown').dropdown({
+      clearable: true
+    })
+
+    $(document).on('click', '#submit-search', function () {
+      getDataFilters()
+    })
+    $(document).on('change', '#form-filters .filter', function () {
+      getDataFilters()
+    })
 
     $('#table-features').DataTable({
       "language": {
@@ -113,16 +190,13 @@
               "sSortDescending": ": activer pour trier la colonne par ordre d&eacute;croissant"
           }
       },
+      "searching" : false,
       "lengthChange" : false,
       "pageLength": 15,
       "columnDefs": [{ className: "dt-center", targets: "_all" }]
     })
 
-    $('#table-features_filter label').addClass('ui icon input').prepend('<i class="search icon"></i>')
-    $('#table-features_filter label input').attr('placeholder', 'Rechercher ...')
-
     var map = L.map('map').setView([50.00976, 2.8657699], 7)
-
     {% if layers %}
       {% for layer in layers %}
         var options = {{ layer.options|safe }}
@@ -139,35 +213,35 @@
       }).addTo(map)
     {% endif %}
 
-      var featureGroup = new L.FeatureGroup()
-      {% for feature in features %}
-        var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
-        var geomJSON = turf.flip(geomFeatureJSON)
-        var popupContent = `
-          <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
-        `
-        if (geomJSON.type === 'Point') {
-          L.circleMarker(geomJSON.coordinates, {
-            color: '{{ feature.feature_type.color }}',
-            radius: 4,
-            fillOpacity: 0.3,
-            weight: 1
-          }).bindPopup(popupContent).addTo(featureGroup)
-        } else if (geomJSON.type === 'LineString') {
-          L.polyline(geomJSON.coordinates, {
-            color: '{{ feature.feature_type.color }}',
-            weight: 1.5
-          }).bindPopup(popupContent).addTo(featureGroup)
-        } else if (geomJSON.type === 'Polygon') {
-          L.polygon(geomJSON.coordinates, {
-            color: '{{ feature.feature_type.color }}',
-            weight: 1.5,
-            fillOpacity: 0.3
-          }).bindPopup(popupContent).addTo(featureGroup)
-        }
-      {% endfor %}
-      map.addLayer(featureGroup);
-      map.fitBounds(featureGroup.getBounds())
+    var featureGroup = new L.FeatureGroup()
+    {% for feature in features %}
+      var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
+      var geomJSON = turf.flip(geomFeatureJSON)
+      var popupContent = `
+        <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
+      `
+      if (geomJSON.type === 'Point') {
+        L.circleMarker(geomJSON.coordinates, {
+          color: '{{ feature.feature_type.color }}',
+          radius: 4,
+          fillOpacity: 0.3,
+          weight: 1
+        }).bindPopup(popupContent).addTo(featureGroup)
+      } else if (geomJSON.type === 'LineString') {
+        L.polyline(geomJSON.coordinates, {
+          color: '{{ feature.feature_type.color }}',
+          weight: 1.5
+        }).bindPopup(popupContent).addTo(featureGroup)
+      } else if (geomJSON.type === 'Polygon') {
+        L.polygon(geomJSON.coordinates, {
+          color: '{{ feature.feature_type.color }}',
+          weight: 1.5,
+          fillOpacity: 0.3
+        }).bindPopup(popupContent).addTo(featureGroup)
+      }
+    {% endfor %}
+    map.addLayer(featureGroup);
+    map.fitBounds(featureGroup.getBounds())
   })
 </script>
 {% endblock %}
