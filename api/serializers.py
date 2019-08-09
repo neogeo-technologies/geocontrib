@@ -161,6 +161,8 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
 
     feature_to = serializers.SerializerMethodField()
 
+    relation_type = serializers.ReadOnlyField(source='get_relation_type_display')
+
     def get_feature_to(self, obj):
         res = {}
         if obj.feature_to:
