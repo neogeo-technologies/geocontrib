@@ -50,6 +50,21 @@
           </tr>
         {% endif %}
         <tr>
+          <td>Statut</td>
+          <td>
+            {% if feature.status == 'archived' %}
+              <i class="grey archive icon"></i>
+            {% elif feature.status == 'pending' %}
+              <i class="teal hourglass outline icon"></i>
+            {% elif feature.status == 'published' %}
+              <i class="olive check icon"></i>
+            {% elif feature.status == 'draft' %}
+              <i class="orange pencil alternate icon"></i>
+            {% endif %}
+            {{ feature.get_status_display }}
+          </td>
+        </tr>
+        <tr>
           <td>Date de création</td>
           <td>{{ feature.created_on }}</td>
         </tr>
@@ -65,23 +80,24 @@
           <td>Date de suppression automatique</td>
           <td>{{ feature.deletion_on }}</td>
         </tr>
-
-        <!-- <tr>
-          <th>Signalements liés</th>
-          {%for row in linked_features %}
-          <td>
-            {{row.get_relation_type_display}}: <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=row.feature_to  %}" class="header">{{row.feature_to}}</a>
-          </td>
-          {% empty %}
-            <td><i class="minus icon"></td>
-          {% endfor %}
-        <tr> -->
       </tbody>
     </table>
+    <small>{% for link in linked_features %}
+    {% endfor %}</small>
+
+
+    <h3>Liaison entre signalements</h3>
     {% for link in linked_features %}
-      <p>{{ link.relation_type }} {{ link.feature_to }}</p>
+      <p>
+        {{ link.relation_type }} <a href="{{ link.feature_to.feature_url }}">{{ link.feature_to.title }}</a>
+        ({{ link.feature_to.creator }} - {{ link.feature_to.created_on }})
+      </p>
+      <div class="ui divider"></div>
     {% endfor %}
+
+
   </div>
+
   <div class="seven wide column">
     <a href="{% url 'collab:feature_list' slug=project.slug %}">
       <div id="map"></div>
