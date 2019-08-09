@@ -193,6 +193,7 @@ class EventSerializer(serializers.ModelSerializer):
                 feature = Feature.objects.get(feature_id=obj.feature_id)
                 res = {
                     'feature_id': str(feature.feature_id),
+                    'title': str(feature.title),
                     'fearture_url': feature.get_view_url()
                 }
             except Exception:
