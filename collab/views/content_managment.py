@@ -712,7 +712,12 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
 class FeatureDelete(DeleteView):
     model = Feature
     pk_url_kwarg = 'feature_id'
-    success_url = reverse_lazy('collab:index')
+
+    def get_success_url(self):
+        feature = self.object
+        return reverse_lazy(
+            'collab:project', kwargs={'slug': feature.project.slug}
+        )
 
 
 ######################
