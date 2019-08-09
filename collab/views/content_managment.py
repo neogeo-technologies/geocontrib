@@ -22,6 +22,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.decorators.csrf import csrf_exempt
 
+from api.serializers import CommentSerializer
 from api.serializers import EventSerializer
 from api.serializers import FeatureTypeSerializer
 from api.serializers import LayerSerializer
@@ -989,22 +990,21 @@ class ProjectDetail(DetailView):
 
         comments = Comment.objects.filter(
             project=project
-        ).values(
-            'author__first_name', 'author__last_name',
-            'comment', 'created_on'
-        ).order_by('-created_on')[0:3]
+        ).order_by('-created_on')[0:5]
+
+        serialized_comments = CommentSerializer(comments, many=True)
 
         features = Feature.objects.filter(
             project=project
-        )
+        ).order_by('-created_on')[0:5]
 
         serilized_projects = ProjectDetailedSerializer(project)
 
         context['project'] = serilized_projects.data
         context['user'] = user
-        context['comments'] = comments
+        context['comments'] = serialized_comments.data
         context['features'] = features
-        context['last_features'] = features.order_by('-created_on')[0:3]
+        context['last_features'] = features
         context['permissions'] = permissions
         context['feature_types'] = project.featuretype_set.all()
         context['is_suscriber'] = Subscription.is_suscriber(user, project)

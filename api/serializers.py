@@ -80,6 +80,37 @@ class UserSerializer(serializers.ModelSerializer):
 ######################
 
 
+class CommentSerializer(serializers.ModelSerializer):
+
+    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+
+    author = UserSerializer(read_only=True)
+
+    related_feature = serializers.SerializerMethodField()
+
+    def get_related_feature(self, obj):
+        res = {}
+        if obj.feature_id:
+            try:
+                feature = Feature.objects.get(feature_id=obj.feature_id)
+                res = {
+                    'feature_id': str(feature.feature_id),
+                    'fearture_url': feature.get_view_url()
+                }
+            except Exception:
+                logger.exception('No related feature found')
+        return res
+
+    class Meta:
+        model = Comment
+        fields = (
+            'created_on',
+            'comment',
+            'author',
+            'related_feature',
+        )
+
+
 class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
     # feature_type = FeatureTypeSerializer(read_only=True)
@@ -132,7 +163,7 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
 
-    created_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
+    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
 
     user = UserSerializer(read_only=True)
 
@@ -165,7 +196,7 @@ class EventSerializer(serializers.ModelSerializer):
                     'fearture_url': feature.get_view_url()
                 }
             except Exception:
-                logger.exception('No related comment found')
+                logger.exception('No related feature found')
         return res
 
     class Meta:
