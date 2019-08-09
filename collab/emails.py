@@ -89,7 +89,7 @@ def notif_creator_published_feature(emails, context):
 
 def notif_suscriber_grouped_events(emails, context):
 
-    subject = "[Collab] Activité des projets suivies. "
+    subject = "[{}] Activité des projets que vous suivez".format(settings.APPLICATION_NAME)
     context['APPLICATION_NAME'] = settings.APPLICATION_NAME
 
     email = EmailBaseBuilder(

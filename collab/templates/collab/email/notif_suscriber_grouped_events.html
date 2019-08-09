@@ -5,10 +5,8 @@
 <meta content="text/html; charset=UTF-8">
 </head>
 <body>
-  Bonjour,
-
-  Voici un compte rendu des dernières actualités de vos projets suivies:
-
+  Bonjour,<br>
+  Derniers évènements des projets que vous suivez&nbsp;:<br>
   <ul>
     {% for stacked_event in stacked_events %}
       <li>{{ stacked_event.project_data.title }} :
@@ -20,7 +18,7 @@
                   Création du signalement par {{ event.user.full_name }} le {{ event.created_on }}
                 {% elif event.object_type == 'comment' %}
                   Ajout d'un commentaire par {{ event.user.full_name }} le {{ event.created_on }}:
-                  <strong>{{ event.related_comment.comment }}<strong>
+                  <strong>{{ event.related_comment.comment }}</strong>
                   {% if event.related_comment.attachments %}
                     {% for att in event.related_comment.attachments %}
                       <a href="{{ att.url|absurl }}" target="_blank">{{ att.title }}</a>
@@ -31,7 +29,7 @@
                 {% endif %}
               {% elif event.event_type == 'update' %}
                 {% if event.object_type == 'feature' %}
-                  Signalement <strong>{{ event.data.feature_title }}<strong> mis à jour par {{ event.user.full_name }} le {{ event.created_on }}
+                  Signalement <strong>{{ event.data.feature_title }}</strong> mis à jour par {{ event.user.full_name }} le {{ event.created_on }}
                 {% elif event.object_type == 'attachment' %}
                   Pièce-jointe mise à jour par {{ event.user.full_name }} le {{ event.created_on }}
                 {% endif %}
@@ -44,7 +42,7 @@
   </ul>
   <hr style="width:100%;height:1px;background:#ccc;border:0;margin:1.2em">
   <span class="footer" style="font-size:0.8em;font-style:italic">
-    <p>Vous avez reçu ce message car vous êtes abonné(e) à la plateform {{ APPLICATION_NAME }}</p>
+    <p>Vous avez reçu ce message car vous êtes abonné(e) à l'outil {{ APPLICATION_NAME }}</p>
   </span>
 </body>
 </html>
