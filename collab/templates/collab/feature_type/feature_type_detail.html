@@ -78,9 +78,11 @@
         </div>
         <div class="active content">
           <p>
-            Vous pouvez télécharger l'ensemble des signalements de ce type.
+            Vous pouvez télécharger l'ensemble des signalements ayant le statut publiés pour ce type.
           </p>
-          <a class="ui fluid teal icon button"><i class="download icon"></i> Exporter</a>
+          <a class="ui fluid teal icon button" href="{% url 'api:project-export' slug=project.slug feature_type_slug=feature_type.slug %}">
+            <i class="download icon"></i> Exporter
+          </a>
         </div>
       </div>
     </div>
