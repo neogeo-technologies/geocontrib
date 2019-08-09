@@ -1,192 +1,146 @@
 {% extends "collab/base.html" %}
+
 {% load app_filters %}
-{% block title %}
-{{ title }}
-{% endblock %}
+
+{% block title %}{{ title }}{% endblock %}
+
 {% block content %}
-<div class="ui top aligned stackable grid container">
-    <div class="top aligned row">
-        <div class="four wide column">
-            <div class="ui secondary vertical pointing menu">
-                <a href="#profil" class="item">
-                    Mon profil
-                </a>
-                <a  href="#projets" class="item">
-                    Mes projets
-                </a>
-                <a href="#notifications"  class="item">
-                    Notifications reçues
-                </a>
-                <a href="#signalements" class="item">
-                    Mes signalements
-                </a>
-                <a href="#commentaires" class="item">
-                    Mes commentaires
-                </a>
-            </div>
+<div class="fourteen wide column">
+  <h1>Mon compte</h1>
+</div>
+
+<div class="row">
+  <div class="five wide column">
+    <h4 class="ui horizontal divider header">PROFIL</h4>
+    <div class="ui divided list">
+      <div class="item">
+        <div class="right floated content">
+          <div class="description">{% if user.username %}{{user.username}}{% endif %}</div>
         </div>
-
-        <div class="twelve wide column">
-            <h4 id="profil_utilisateur" class="ui horizontal divider header">
-                <a name="profil"></a>
-                <i class="user icon"></i>
-                Mon profil
-            </h4>
-            <table class="ui definition table">
-                <tbody>
-                    <tr>
-                        <td class="five wide column">Nom d'utilisateur</td>
-                        {% if user.username %}
-                            <td>{{user.username}}</td>
-                        {% else %}
-                            <td><i class="window minimize icon"></i></td>
-                        {% endif %}
-                    </tr>
-                    <tr>
-                        <td>Nom complet</td>
-                        {% if user.get_full_name %}
-                            <td>{{user.get_full_name}}</td>
-                        {% else %}
-                            <td><i class="window minimize icon"></i></td>
-                        {% endif %}
-                    </tr>
-                    <tr>
-                        <td>Adresse e-mail</td>
-                        {% if user.email %}
-                            <td>{{user.email}}</td>
-                        {% else %}
-                            <td><i class="window minimize icon"></i></td>
-                        {% endif %}
-                    </tr>
-                    <tr>
-                        <td>Administrateur</td>
-                        {% if user.is_superuser %}
-                            <td>Oui</td>
-                        {% else %}
-                            <td>Non</td>
-                        {% endif %}
-                    </tr>
-                </tbody>
-            </table>
-            <!--div class="ui grid">
-                <div class="right floated right aligned four wide column">
-                    <div class="ui primary button"><i class="icon edit"></i>Modifier</div>
-                </div>
-            </div-->
-            <!--h4 class="ui horizontal divider header">
-                <i class="power off icon"></i>
-                Delete your account
-            </h4>
-            <div class="ui grid">
-                <div class="left floated twelve wide column">
-                    <p>Clicking this button will launch the process for your account deletion.
-                        <br>An e-mail asking for confirmation will be sent to you.</p>
-                </div>
-                <div class="right floated right aligned four wide column">
-                    <div class="ui negative button"><i class="power off icon"></i>Delete my account</div>
-                </div>
-            </div-->
-
-
-            <h4 id="mes_projets" class="ui horizontal divider header">
-                <a name="projets"></a>
-                <i class="users icon"></i>
-                Mes projets
-            </h4>
-            <div class="ui divided items">
-                {% for project in projects %}
-                    {% if permissions|lookup:project.slug %}
-                        <div class="item">
-                        <div class="ui tiny image">
-                            {% if project.thumbnail %}
-                              <img  class="ui small image" src="{{ project.thumbnail }}" height="200">
-                            {% endif %}
-                        </div>
-                        <div class="middle aligned content">
-                            <a class="header" href="{% url 'collab:project' slug=project.slug %}">{{project.title|title }}</a>
-                            <div class="description">
-                                  <p>{{project.description}}</p>
-                            </div>
-                            <div class="meta">
-                                <span class="right floated">{% if project.moderation%}Projet modéré {% else %} Projet non modéré {% endif %}</span>
-                                <span>Mon niveau d'autorisation&nbsp;:
-                                  <p>{{ rank|lookup:project.slug }}</p>
-                                </span>
-                            </div>
-                            <div class="meta">
-                                <span class="right floated" data-tooltip="Projet créé le {{ project.created_on }}">
-                                    <i class="calendar icon"></i>&nbsp;{{ project.created_on }}
-                                </span>
-                                <span data-tooltip="Nombre de personnes ont contribué à ce projet">
-                                    {{ project.nb_contributors }}&nbsp;<i class="user icon"></i>
-                                </span>
-                                <span data-tooltip="Nombre de signalements ont été créés pour ce projet">
-                                    &nbsp;{{ project.nb_features }}&nbsp;<i class="map marker icon"></i>
-                                </span>
-                                <span data-tooltip="Nombre de commentaires ont été créés pour ce projet">
-                                    &nbsp;{{ project.nb_comments }}&nbsp;<i class="comment icon"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                {% endfor %}
-            </div>
-
-            <h4 id="dernieres_notifications" class="ui horizontal divider header">
-                <a name="notifications"></a>
-                <i class="bullhorn icon"></i>
-                Dernières notifications reçues
-            </h4>
-            <div class="ui list">
-                <div class="item">
-                    <i class="comment icon"></i>
-                    <div class="content">
-                        <a class="header">
-                            10/03/2019 - 9:25 - Projet - Auteur [Commentaire ajouté]</a>
-                        <div class="description">Titre du signalement</div>
-                        <div class="description">Début du texte du commentaire</div>
-                    </div>
-                </div>
-            </div>
-
-            <h4 id="mes_derniers_signalements" class="ui horizontal divider header">
-                <a name="signalements"></a>
-                <i class="map marker alternate icon"></i>
-                Mes derniers signalements
-            </h4>
-            <div class="ui list">
-                {% for feature in features %}
-                  <div class="item">
-                      <i class="map marker icon"></i>
-                      <div class="content">
-                          <a  href="{% url 'collab:feature_detail' slug=feature.project.slug feature_type_slug=feature.feature_type_slug  feature_id=feature.feature_id %}" class="header">{{feature.project}} - {{feature.title}}</a>
-                          <div class="description">{{ feature.description|slice:":150" }}</div>
-                          <div class="description">Date de dernière modification&nbsp;: {{ feature.updated_on }}</div>
-                      </div>
-                  </div>
-                {% endfor %}
-            </div>
-            <h4 id="mes_derniers_commentaires" class="ui horizontal divider header">
-                <a name="commentaires"></a>
-                <i class="comments icon"></i>
-                Mes derniers commentaires
-            </h4>
-            <div class="ui list">
-                {% for elt in last_comment %}
-                    <div class="item">
-                        <i class="comment icon"></i>
-                        <div class="content">
-                            <a   href="{% url 'collab:feature_detail' slug=elt.project.slug feature_type_slug=elt.feature_type_slug  feature_id=elt.feature_id %}" > {{elt.project.title}} - {{elt.feature_slug}}</a>
-                            <div class="description">{{elt.comment|slice:":150"}}</div>
-                            <div class="description">Date du commentaire&nbsp;: {{elt.creation_date}}</div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-
+        <div class="content">Nom d'utilisateur</div>
+      </div>
+      <div class="item">
+        <div class="right floated content">
+          <div class="description">{% if user.get_full_name %}{{user.get_full_name}}{% endif %}</div>
         </div>
+        <div class="content">Nom complet</div>
+      </div>
+      <div class="item">
+        <div class="right floated content">
+          <div class="description">{% if user.email %}{{user.email}}{% endif %}</div>
+        </div>
+        <div class="content">Adresse e-mail</div>
+      </div>
+      <div class="item">
+        <div class="right floated content">
+          <div class="description">{% if user.is_superuser %}Oui{% else %}Non{% endif %}</div>
+        </div>
+        <div class="content">Administrateur</div>
+      </div>
     </div>
+  </div>
+
+  <div class="nine wide column">
+    <h4 class="ui horizontal divider header">MES PROJETS</h4>
+
+    <div class="ui divided items">
+      {% for project in projects %}
+        {% if permissions|lookup:project.slug %}
+          <div class="item">
+          <div class="ui tiny image">
+            {% if project.thumbnail %}
+              <img class="ui small image" src="{{ project.thumbnail }}" height="200">
+            {% endif %}
+          </div>
+          <div class="middle aligned content">
+            <a class="header" href="{% url 'collab:project' slug=project.slug %}">{{ project.title|title }}</a>
+            <div class="description">
+              <p>{{ project.description }}</p>
+            </div>
+            <div class="meta">
+              <span class="right floated">{% if project.moderation%}Projet modéré {% else %} Projet non modéré {% endif %}</span>
+              <span>Mon niveau d'autorisation : {{ rank|lookup:project.slug }}</span>
+            </div>
+            <div class="meta">
+              <span class="right floated" data-tooltip="Projet créé le {{ project.created_on }}">
+                <i class="calendar icon"></i>&nbsp;{{ project.created_on }}
+              </span>
+              <span data-tooltip="Nombre de personnes ont contribué à ce projet">
+                {{ project.nb_contributors }}&nbsp;<i class="user icon"></i>
+              </span>
+              <span data-tooltip="Nombre de signalements ont été créés pour ce projet">
+                &nbsp;{{ project.nb_features }}&nbsp;<i class="map marker icon"></i>
+              </span>
+              <span data-tooltip="Nombre de commentaires ont été créés pour ce projet">
+                &nbsp;{{ project.nb_comments }}&nbsp;<i class="comment icon"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="fourteen wide column">
+    <div class="ui three stackable cards">
+      <div class="red card">
+        <div class="content">
+          <div class="center aligned header">Mes dernières notifications reçues</div>
+          <div class="center aligned description">
+            {% for item in last_notifs %}
+              <p>
+                <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=item.feature_type.slug feature_id=item.feature_id  %}">{{ item.title }}</a>
+              </p>
+            {% empty %}
+              <i>Aucune notification pour le moment.</i>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="orange card">
+        <div class="content">
+          <div class="center aligned header">Mes derniers signalements</div>
+          <div class="center aligned description">
+            {% for item in last_features %}
+              <p>
+                <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=item.feature_type.slug feature_id=item.feature_id  %}">{{ item.title }}</a>
+              </p>
+            {% empty %}
+              <i>Aucun signalement pour le moment.</i>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="yellow card">
+        <div class="content">
+          <div class="center aligned header">Mes derniers commentaires</div>
+          <div class="center aligned description">
+            <div class="ui relaxed list">
+              {% for comm in last_comments %}
+                <div class="item">
+                  <div class="content">
+                    <div>"{{ elt.comment }}"</div>
+                    <div class="description">
+                      <i>[
+                        {{ elt.created_on|date:"d/m/Y" }}
+                      {% if user.is_authenticated %}
+                        , par {{ elt.author__first_name|title }} {{ elt.author__last_name }}
+                      {% endif %}
+                      ]</i>
+                    </div>
+                  </div>
+                </div>
+              {% empty %}
+                <i>Aucun commentaire pour le moment.</i>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
