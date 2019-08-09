@@ -38,14 +38,14 @@
           <span class="right floated">
             <i class="calendar icon"></i>&nbsp; {{ project.created_on }}
           </span>
-          <span data-tooltip="  {{ project.nb_contributors}} personnes ont contribué à ce projet">
+          <span data-tooltip="{{ project.nb_contributors}} personnes ont contribué à ce projet">
             {{ project.nb_contributors }}&nbsp;<i class="user icon"></i>
           </span>
           <span data-tooltip="{{ project.nb_features }} signalements ont été créés pour ce projet">
-            &nbsp;{{ project.nb_features }}&nbsp;<i class="map marker icon"></i>
+            {{ project.nb_features }}&nbsp;<i class="map marker icon"></i>
           </span>
           <span data-tooltip="{{ project.nb_comments }} commentaires ont été créés pour ce projet">
-            &nbsp;{{ project.nb_comments }}&nbsp;<i class="comment icon"></i>
+            {{ project.nb_comments }}&nbsp;<i class="comment icon"></i>
           </span>
         </div>
       </div>
