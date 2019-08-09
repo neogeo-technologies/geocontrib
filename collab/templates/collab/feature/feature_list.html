@@ -56,17 +56,20 @@
           <label>Titre</label>
           <div class="ui icon input">
             <i class="search icon"></i>
-            <input type="text" name="title" value="{% if request.GET.title %}{{ request.GET.title }}{% endif %}">
+            <div class="ui action input">
+              <input type="text" name="title" value="{% if request.GET.title %}{{ request.GET.title }}{% endif %}">
+              <button type="button" class="ui teal icon button" id="submit-search">
+                <i class="search icon"></i>
+              </button>
+            </div>
           </div>
         </div>
-        <button id="submit-search" type="button" class="ui teal compact fluid button">
-          Lancer la recherche
-        </button>
       </form>
     </div>
   </div>
 
   <div class="ten wide column">
+
     <div class="ui hidden divider"></div>
     <div class="ui tab active" data-tab="map">
       <div id="map"></div>
@@ -114,7 +117,7 @@
             <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
           </td>
           <td>
-            {{feature.updated_on|date:'d/m/Y H:i' }}
+            {{feature.updated_on|date:'d/m/Y' }}
           </td>
           {% if user.is_authenticated %}
             <td>
@@ -135,7 +138,7 @@
 <style>
   #map {
     width: 100%;
-    min-height: 500px;
+    min-height: 300px;
   }
 </style>
 <script>
@@ -191,12 +194,17 @@
           }
       },
       "searching" : false,
+      "sorting" : false,
       "lengthChange" : false,
       "pageLength": 15,
       "columnDefs": [{ className: "dt-center", targets: "_all" }]
     })
 
+    var main = parseInt($("main").css("height"),10)
+    $("#map").css("height", main - 150)
+
     var map = L.map('map').setView([50.00976, 2.8657699], 7)
+
     {% if layers %}
       {% for layer in layers %}
         var options = {{ layer.options|safe }}
@@ -218,8 +226,34 @@
       var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
       var geomJSON = turf.flip(geomFeatureJSON)
       var popupContent = `
-        <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
+        <h4>
+          <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
+        </h4>
+        <div>
+          Statut :
+          {% if feature.status == 'archived' %}
+            Archivé
+          {% elif feature.status == 'pending' %}
+            En attente de publication
+          {% elif feature.status == 'published' %}
+            Publié
+          {% elif feature.status == 'draft' %}
+            Brouillon
+          {% endif %}
+        </div>
+        <div>
+          Type : <a href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=feature.feature_type.slug %}"> {{ feature.feature_type.title }} </a>
+        </div>
+        <div>
+          Dernière mise à jour : {{feature.updated_on|date:'d/m/Y' }}
+        </div>
+        {% if user.is_authenticated %}
+          <div>
+            Auteur : {{ feature.creator.first_name }} {{ feature.creator.last_name }}
+          </div>
+        {% endif %}
       `
+
       if (geomJSON.type === 'Point') {
         L.circleMarker(geomJSON.coordinates, {
           color: '{{ feature.feature_type.color }}',

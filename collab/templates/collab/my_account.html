@@ -90,13 +90,46 @@
         <div class="content">
           <div class="center aligned header">Mes dernières notifications reçues</div>
           <div class="center aligned description">
-            {% for item in last_notifs %}
-              <p>
-                <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=item.feature_type.slug feature_id=item.feature_id  %}">{{ item.title }}</a>
-              </p>
-            {% empty %}
-              <i>Aucune notification pour le moment.</i>
-            {% endfor %}
+            <div class="ui relaxed list">
+              {% for item in events %}
+                <div class="item">
+                  <div class="content">
+                    <div>
+                      {% if item.event_type == 'create' %}
+                        {% if item.object_type == 'feature' %}
+                          <a href="{{ item.related_feature.feature_url }}">
+                            Signalement créé
+                          </a>
+                        {% elif item.object_type == 'comment' %}
+                          <a href="{{ item.related_feature.feature_url }}">
+                            Commentaire créé
+                          </a>
+                        {% elif item.object_type == 'project' %}
+                          <a href="{{ item.project_url }}">
+                            Projet créé
+                          </a>
+                        {% endif %}
+                      {% elif item.event_type == 'update' %}
+                        {% if item.object_type == 'feature' %}
+                          <a href="{{ item.related_feature.project_url }}">
+                            Signalement mis à jour
+                          </a>
+                        {% elif item.object_type == 'project' %}
+                          <a href="{{ item.project_url }}">
+                            Projet mis à jour
+                          </a>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                    <div class="description">
+                      <i>[ {{ item.created_on }}{% if user.is_authenticated %}, par {{ item.user.full_name }}{% endif %} ]</i>
+                    </div>
+                  </div>
+                </div>
+              {% empty %}
+                <i>Aucune notification pour le moment.</i>
+              {% endfor %}
+            </div>
           </div>
         </div>
       </div>
@@ -104,13 +137,22 @@
         <div class="content">
           <div class="center aligned header">Mes derniers signalements</div>
           <div class="center aligned description">
-            {% for item in last_features %}
-              <p>
-                <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=item.feature_type.slug feature_id=item.feature_id  %}">{{ item.title }}</a>
-              </p>
-            {% empty %}
-              <i>Aucun signalement pour le moment.</i>
-            {% endfor %}
+            <div class="ui relaxed list">
+              {% for item in features %}
+                <div class="item">
+                  <div class="content">
+                    <div>
+                      <a href="{{ item.related_feature.feature_url }}">{{ item.related_feature.title }}</a>
+                    </div>
+                    <div class="description">
+                      <i>[ {{ item.created_on }}{% if user.is_authenticated %}, par {{ item.user.full_name }}{% endif %} ]</i>
+                    </div>
+                  </div>
+                </div>
+              {% empty %}
+                <i>Aucun signalement pour le moment.</i>
+              {% endfor %}
+            </div>
           </div>
         </div>
       </div>
@@ -119,17 +161,14 @@
           <div class="center aligned header">Mes derniers commentaires</div>
           <div class="center aligned description">
             <div class="ui relaxed list">
-              {% for comm in last_comments %}
+              {% for item in comments %}
                 <div class="item">
                   <div class="content">
-                    <div>"{{ elt.comment }}"</div>
+                    <div>
+                      <a href="{{ item.related_feature.feature_url }}">"{{ item.related_comment.comment }}"</a>
+                    </div>
                     <div class="description">
-                      <i>[
-                        {{ elt.created_on|date:"d/m/Y" }}
-                      {% if user.is_authenticated %}
-                        , par {{ elt.author__first_name|title }} {{ elt.author__last_name }}
-                      {% endif %}
-                      ]</i>
+                      <i>[ {{ item.created_on }}{% if user.is_authenticated %}, par {{ item.user.full_name }}{% endif %} ]</i>
                     </div>
                   </div>
                 </div>
