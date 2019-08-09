@@ -24,6 +24,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from api.serializers import CommentSerializer
 from api.serializers import EventSerializer
+from api.serializers import FeatureLinkSerializer
 from api.serializers import FeatureTypeSerializer
 from api.serializers import LayerSerializer
 from api.serializers import ProjectDetailedSerializer
@@ -129,6 +130,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         )
+        serialized_link = FeatureLinkSerializer(linked_features, many=True)
 
         if form.is_valid():
             try:
@@ -180,7 +182,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_data': feature.custom_fields_as_list,
             'feature_types': FeatureType.objects.filter(project=project),
             'feature_type': feature.feature_type,
-            'linked_features': linked_features,
+            'linked_features': serialized_link.data,
             'project': project,
             'permissions': Authorization.all_permissions(user, project, feature),
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
@@ -447,9 +449,12 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         project = feature.project
         layers = Layer.objects.filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
+
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
         )
+        serialized_link = FeatureLinkSerializer(linked_features, many=True)
+
         events = Event.objects.filter(feature_id=feature.feature_id).order_by('created_on')
         serialized_events = EventSerializer(events, many=True)
 
@@ -458,7 +463,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_data': feature.custom_fields_as_list,
             'feature_types': FeatureType.objects.filter(project=project),
             'feature_type': feature.feature_type,
-            'linked_features': linked_features,
+            'linked_features': serialized_link.data,
             'project': project,
             'permissions': Authorization.all_permissions(user, project, feature),
             'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),

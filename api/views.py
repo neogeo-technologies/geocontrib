@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from api.serializers import FeatureGeoJSONSerializer
-from api.serializers import FeatureLinkSerializer
+from api.serializers import FeatureSerializer
 from api.serializers import ProjectSerializer
 from collab.models import Authorization
 from collab.models import Feature
@@ -47,7 +47,7 @@ class AvailablesFeatureLinkList(APIView):
         """
         features = Feature.objects.filter(
             status="published", project__slug=slug, feature_type__slug=feature_type_slug)
-        serializer = FeatureLinkSerializer(features, many=True, context={'request': request})
+        serializer = FeatureSerializer(features, many=True, context={'request': request})
         return Response(serializer.data)
 
 

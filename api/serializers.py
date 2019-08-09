@@ -9,6 +9,7 @@ from collab.models import Authorization
 from collab.models import CustomField
 from collab.models import Comment
 from collab.models import Feature
+from collab.models import FeatureLink
 from collab.models import FeatureType
 from collab.models import Project
 from collab.models import Event
@@ -95,6 +96,7 @@ class CommentSerializer(serializers.ModelSerializer):
                 feature = Feature.objects.get(feature_id=obj.feature_id)
                 res = {
                     'feature_id': str(feature.feature_id),
+                    'title': str(feature.title),
                     'feature_url': feature.get_view_url()
                 }
             except Exception:
@@ -139,12 +141,11 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
         return properties
 
 
-class FeatureLinkSerializer(serializers.ModelSerializer):
+class FeatureSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
 
     user = UserSerializer(read_only=True)
-
 
     class Meta:
         model = Feature
@@ -153,6 +154,34 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
             'title',
             'created_on',
             'user',
+        )
+
+
+class FeatureLinkSerializer(serializers.ModelSerializer):
+
+    feature_to = serializers.SerializerMethodField()
+
+    def get_feature_to(self, obj):
+        res = {}
+        if obj.feature_to:
+            try:
+                feature = Feature.objects.get(feature_id=obj.feature_to)
+                res = {
+                    'feature_id': str(feature.feature_id),
+                    'title': str(feature.title),
+                    'feature_url': feature.get_view_url(),
+                    'created_on': feature.created_on.strftime("%d/%m/%Y %H:%M"),
+                    'creator': feature.creator.get_full_name(),
+                }
+            except Exception:
+                logger.exception('No related feature found')
+        return res
+
+    class Meta:
+        model = FeatureLink
+        fields = (
+            'relation_type',
+            'feature_to',
         )
 
 
