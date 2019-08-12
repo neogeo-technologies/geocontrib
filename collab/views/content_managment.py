@@ -822,7 +822,12 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
         feature_type = self.get_object()
         project = feature_type.project
         user = request.user
-        features = Feature.objects.filter(feature_type=feature_type).order_by('-updated_on')[:5]
+        features = Feature.handy.availables(
+            user, project
+        ).filter(
+            feature_type=feature_type
+        ).order_by('-updated_on')[:5]
+
         structure = FeatureTypeSerializer(feature_type, context={'request': request})
 
         context = {
