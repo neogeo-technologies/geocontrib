@@ -720,6 +720,18 @@ class FeatureDelete(DeleteView):
 
     def get_success_url(self):
         feature = self.object
+        Event.objects.create(
+            feature_id=feature.feature_id,
+            event_type='delete',
+            object_type='feature',
+            user=self.request.user,
+            project_slug=feature.project.slug,
+            feature_type_slug=feature.feature_type.slug,
+            data={
+                'extra': feature.feature_data,
+                'feature_title': feature.title
+            }
+        )
         return reverse_lazy(
             'collab:project', kwargs={'slug': feature.project.slug}
         )
