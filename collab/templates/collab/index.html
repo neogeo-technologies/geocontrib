@@ -32,7 +32,16 @@
           <span class="right floated">
             {% if project.moderation %}<strong>Projet modéré</strong>{% else %}<strong>Projet non modéré</strong>{% endif %}
           </span>
-          <span>Niveau d'autorisation requis&nbsp;: {{ project.access_level_pub_feature }} </span>
+          <span>Niveau d'autorisation requis : {{ project.access_level_pub_feature }}</span><br>
+          <span>
+            Mon niveau d'autorisation :
+            {% if user.is_administrator == True %}
+              Administateur métier (super-utilisateur)
+            {% else %}
+              {{ USER_LEVEL_PROJECTS|lookup:project.slug }}
+            {% endif %}
+          </span>
+
         </div>
         <div class="meta">
           <span class="right floated">

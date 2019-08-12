@@ -36,12 +36,20 @@
     <table class="ui very basic table">
       <tbody>
         {% for field in feature_data %}
-        <tr>
-          <td><b>{{ field|lookup:'label' }}</b></td>
-          <td><b>
-            {{ field|lookup:'value' }}
-          </b></td>
-        </tr>
+          <tr>
+            <td><b>{{ field|lookup:'label' }}</b></td>
+            <td>
+              <b>
+                {% if field.field_type == 'boolean' and field.value == True %}
+                  <i class="olive check icon"></i>
+                {% elif field.field_type == 'boolean' and field.value == False %}
+                  <i class="red times icon"></i>
+                {% else %}
+                  {{ field|lookup:'value' }}
+                {% endif %}
+              </b>
+            </td>
+          </tr>
         {% endfor %}
         {% if user.is_authenticated %}
           <tr>
@@ -66,36 +74,40 @@
         </tr>
         <tr>
           <td>Date de création</td>
-          <td>{{ feature.created_on }}</td>
+          <td>{% if feature.created_on %}{{ feature.created_on }}{% endif %}</td>
         </tr>
         <tr>
           <td>Date de dernière modification</td>
-          <td>{{ feature.updated_on }}</td>
+          <td>{% if feature.updated_on %}{{ feature.updated_on }}{% endif %}</td>
         </tr>
         <tr>
           <td>Date d'archivage automatique</td>
-          <td>{{ feature.archived_on }}</td>
+          <td>{% if feature.archived_on %}{{ feature.archived_on }}{% endif %}</td>
         </tr>
         <tr>
           <td>Date de suppression automatique</td>
-          <td>{{ feature.deletion_on }}</td>
+          <td>{% if feature.deletion_on %}{{ feature.deletion_on }}{% endif %}</td>
         </tr>
       </tbody>
     </table>
     <small>{% for link in linked_features %}
     {% endfor %}</small>
 
-
     <h3>Liaison entre signalements</h3>
-    {% for link in linked_features %}
-      <p>
-        {{ link.relation_type }} <a href="{{ link.feature_to.feature_url }}">{{ link.feature_to.title }}</a>
-        ({{ link.feature_to.creator }} - {{ link.feature_to.created_on }})
-      </p>
-      <div class="ui divider"></div>
-    {% endfor %}
-
-
+    <table class="ui very basic table">
+      <tbody>
+        {% for link in linked_features %}
+          {% if link.feature_to %}
+            <tr>
+              <td>
+                {{ link.relation_type }} <a href="{{ link.feature_to.feature_url }}">{{ link.feature_to.title }}</a>
+                ({{ link.feature_to.creator }} - {{ link.feature_to.created_on }})
+              </td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 
   <div class="seven wide column">

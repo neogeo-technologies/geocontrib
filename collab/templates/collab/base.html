@@ -83,6 +83,23 @@
   </header>
   <main>
     <div class="ui stackable grid centered container">
+      {% if messages %}
+        <div class="row">
+          <div class="fourteen wide column">
+            <div class="ui info message">
+              <div class="header">
+                <i class="info circle icon"></i> Informations
+              </div>
+              <ul class="list">
+                {% for message in messages %}
+                  {{ message }}
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
       {% block content %}
       {% endblock %}
     </div>

@@ -53,13 +53,23 @@
             {% endif %}
           </div>
           <div class="middle aligned content">
-            <a class="header" href="{% url 'collab:project' slug=project.slug %}">{{ project.title|title }}</a>
+            <a class="header" href="{% url 'collab:project' slug=project.slug %}">
+              {{ project.title|title }}
+            </a>
             <div class="description">
               <p>{{ project.description }}</p>
             </div>
             <div class="meta">
               <span class="right floated">{% if project.moderation%}Projet modéré {% else %} Projet non modéré {% endif %}</span>
-              <span>Mon niveau d'autorisation : {{ rank|lookup:project.slug }}</span>
+              <span>Niveau d'autorisation requis : {{ project.access_level_pub_feature }}</span><br>
+              <span>
+                Mon niveau d'autorisation :
+                {% if user.is_administrator == True %}
+                  Administateur métier (super-utilisateur)
+                {% else %}
+                  {{ USER_LEVEL_PROJECTS|lookup:project.slug }}
+                {% endif %}
+              </span>
             </div>
             <div class="meta">
               <span class="right floated" data-tooltip="Projet créé le {{ project.created_on }}">
@@ -104,6 +114,10 @@
                           <a href="{{ item.related_feature.feature_url }}">
                             Commentaire créé
                           </a>
+                        {% elif item.object_type == 'attachment' %}
+                          <a href="{{ item.related_feature.feature_url }}">
+                            Pièce jointe ajoutée
+                          </a>
                         {% elif item.object_type == 'project' %}
                           <a href="{{ item.project_url }}">
                             Projet créé
@@ -119,6 +133,12 @@
                             Projet mis à jour
                           </a>
                         {% endif %}
+                      {% elif item.event_type == 'delete' %}
+                        {% if item.object_type == 'feature' %}
+                            Signalement supprimé ({{ item.data.feature_title }})
+                        {% endif %}
+                      {% else %}
+                        <i>Événement inconnu</i>
                       {% endif %}
                     </div>
                     <div class="description">
@@ -142,7 +162,11 @@
                 <div class="item">
                   <div class="content">
                     <div>
-                      <a href="{{ item.related_feature.feature_url }}">{{ item.related_feature.title }}</a>
+                      {% if item.related_feature %}
+                        <a href="{{ item.related_feature.feature_url }}">{{ item.related_feature.title }}</a>
+                      {% else %}
+                        {{ item.data.feature_title }} (supprimé)
+                      {% endif %}
                     </div>
                     <div class="description">
                       <i>[ {{ item.created_on }}{% if user.is_authenticated %}, par {{ item.user.full_name }}{% endif %} ]</i>
