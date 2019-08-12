@@ -566,9 +566,12 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         feature_type = feature.feature_type
-        availables_features = Feature.objects.filter(
+        availables_features = Feature.handy.availables(
+            user=user,
             project=project,
-        ).exclude(feature_id=feature.feature_id)
+        ).exclude(
+            feature_id=feature.feature_id
+        )
         layers = Layer.objects.filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
         extra = CustomField.objects.filter(feature_type=feature_type)
@@ -606,7 +609,6 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         forms_are_valid = all([ff.is_valid() for ff in all_forms])
 
         if not forms_are_valid:
-
             logger.error([ff.errors for ff in all_forms])
             logger.error(request.POST)
             logger.error(request.FILES)

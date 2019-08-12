@@ -13,25 +13,46 @@
           <ul>
             {% for event in stacked_event.stack_data.events %}
             <li>
-              {% if event.event_type == 'create' %}
+              {% if event.event_type == 'delete' %}
                 {% if event.object_type == 'feature' %}
-                  Création du signalement par {{ event.user.full_name }} le {{ event.created_on }}
-                {% elif event.object_type == 'comment' %}
-                  Ajout d'un commentaire par {{ event.user.full_name }} le {{ event.created_on }}:
-                  <strong>{{ event.related_comment.comment }}</strong>
-                  {% if event.related_comment.attachments %}
-                    {% for att in event.related_comment.attachments %}
-                      <a href="{{ att.url|absurl }}" target="_blank">{{ att.title }}</a>
-                    {% endfor %}
-                  {% endif %}
-                {% elif event.object_type == 'attachment' %}
-                  Ajout d'une Pièce-jointe par {{ event.user.full_name }} le {{ event.created_on }}
+                {{ event.created_on }} - "{{ event.data.feature_title }}"
+                  Signalement supprimé par {{ event.user.full_name }}
                 {% endif %}
-              {% elif event.event_type == 'update' %}
-                {% if event.object_type == 'feature' %}
-                  Signalement <strong>{{ event.data.feature_title }}</strong> mis à jour par {{ event.user.full_name }} le {{ event.created_on }}
-                {% elif event.object_type == 'attachment' %}
-                  Pièce-jointe mise à jour par {{ event.user.full_name }} le {{ event.created_on }}
+              {% else %}
+
+                {% if event.related_feature %}
+                  {{ event.created_on }} - <a href="{{ event.related_feature.feature_url|absurl }}">"{{ event.related_feature.title }}"</a>
+                {% else %}
+                  {{ event.created_on }} - <s>"{{ event.data.feature_title }}"</s> <i>(Ressource supprimée depuis)</i> -
+                {% endif%}
+
+                {% if event.event_type == 'create' %}
+
+                  {% if event.object_type == 'feature' %}
+                    Signalement crée par {{ event.user.full_name }}
+
+                  {% elif event.object_type == 'comment' %}
+                    - Commentaire crée par {{ event.user.full_name }}
+                    <strong>{{ event.related_comment.comment }}</strong>
+                    {% if event.related_comment.attachments %}
+                      {% for att in event.related_comment.attachments %}
+                        <a href="{{ att.url|absurl }}" target="_blank">{{ att.title }}</a>
+                      {% endfor %}
+                    {% endif %}
+
+                  {% elif event.object_type == 'attachment' %}
+                    {{ event.created_on }} - Pièce-jointe ajoutée par {{ event.user.full_name }}
+                  {% endif %}
+
+                {% elif event.event_type == 'update' %}
+
+                  {% if event.object_type == 'feature' %}
+                    Signalement mis à jour par {{ event.user.full_name }}
+
+                  {% elif event.object_type == 'attachment' %}
+                    Pièce-jointe mise à jour par {{ event.user.full_name }}
+                  {% endif %}
+
                 {% endif %}
               {% endif %}
             </li>
