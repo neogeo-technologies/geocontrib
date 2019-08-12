@@ -38,11 +38,6 @@ class HomePageView(TemplateView):
 
         context['projects'] = serilized_projects.data
 
-        events = Event.objects.filter(user=user).order_by('-created_on')
-        serialized_events = EventSerializer(events, many=True)
-
-        context['events'] = serialized_events.data
-
         return context
 
 
