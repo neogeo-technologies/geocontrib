@@ -883,11 +883,12 @@ def slugify_project(sender, instance, created, **kwargs):
 
 @receiver(models.signals.post_save, sender=Project)
 @disable_for_loaddata
-def set_author_perms(sender, instance, created, **kwargs):
+def set_users_perms(sender, instance, created, **kwargs):
     # On ajoute la permission d'admin de projet au créateur
     if created:
         Authorization = apps.get_model(app_label='collab', model_name="Authorization")
         UserLevelPermission = apps.get_model(app_label='collab', model_name="UserLevelPermission")
+        User = apps.get_model(app_label='collab', model_name="User")
         try:
             Authorization.objects.create(
                 project=instance,
@@ -895,7 +896,16 @@ def set_author_perms(sender, instance, created, **kwargs):
                 level=UserLevelPermission.objects.get(rank=4)
             )
         except Exception:
-            logger.exception('Trigger.set_author_perms')
+            logger.exception('Trigger.set_users_perms')
+        try:
+            for user in User.objects.filter(is_active=True).exclude(pk=instance.creator.pk):
+                Authorization.objects.update_or_create(
+                    project=instance,
+                    user=user,
+                    defaults={'level': UserLevelPermission.objects.get(rank=1)}
+                )
+        except Exception:
+            logger.exception('Trigger.set_users_perms')
 
 
 @receiver(models.signals.post_save, sender=User)
@@ -921,16 +931,6 @@ def set_auth_member(sender, instance, created, **kwargs):
                     project=project,
                     user=instance,
                     defaults={'level': UserLevelPermission.objects.get(rank=0)}
-                )
-        except Exception:
-            logger.exception('Trigger.set_auth_member')
-    elif instance.is_active:
-        try:
-            for project in Project.objects.all():
-                Authorization.objects.update_or_create(
-                    project=project,
-                    user=instance,
-                    defaults={'level': UserLevelPermission.objects.get(rank=1)}
                 )
         except Exception:
             logger.exception('Trigger.set_auth_member')
