@@ -357,7 +357,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
 
                 messages.info(
                     request,
-                    "Le signalement {title} a bien été crée. ".format(
+                    "Le signalement {title} a bien été créé. ".format(
                         title=feature.title,
                     ))
 
