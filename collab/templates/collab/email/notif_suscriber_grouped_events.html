@@ -29,10 +29,10 @@
                 {% if event.event_type == 'create' %}
 
                   {% if event.object_type == 'feature' %}
-                    Signalement crée par {{ event.user.full_name }}
+                    Signalement créé par {{ event.user.full_name }}
 
                   {% elif event.object_type == 'comment' %}
-                    - Commentaire crée par {{ event.user.full_name }}
+                    - Commentaire créé par {{ event.user.full_name }}
                     <strong>{{ event.related_comment.comment }}</strong>
                     {% if event.related_comment.attachments %}
                       {% for att in event.related_comment.attachments %}
