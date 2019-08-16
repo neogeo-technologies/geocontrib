@@ -1294,14 +1294,14 @@ class SubscribingView(SingleObjectMixin, UserPassesTestMixin, View):
             )
             obj.users.add(user)
             obj.save()
-            messages.info(request, 'Vous etes bien abonné aux notifcations pour ce projet. ')
+            messages.info(request, 'Vous êtes maintenant abonné aux notifications de ce projet. ')
 
         elif action.lower() == 'annuler':
             try:
                 obj = Subscription.objects.get(project=project)
                 obj.users.remove(user)
                 obj.save()
-                messages.info(request, 'Vous ne recevrez plus les notifications liés à ce projet. ')
+                messages.info(request, 'Vous ne recevrez plus les notifications de ce projet. ')
             except Exception:
                 logger.exception('SubscribingView.get')
 
