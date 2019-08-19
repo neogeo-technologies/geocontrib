@@ -73,7 +73,7 @@ EVENT_TYPES = (
 STATE_CHOICES = (
     ('pending', "Tâche en attente d'exécution"),
     ('failed', "Echec de la tâche"),
-    ('succesful', "Tâche terminée avec succés"),
+    ('successful', "Tâche terminée avec succès"),
 )
 
 FREQUENCY_CHOICES = (

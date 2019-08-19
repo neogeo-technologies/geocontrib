@@ -67,8 +67,8 @@ class Command(BaseCommand):
                     logger.info('Batch sent to {0}'.format(user.email))
 
         # TODO @cbenhabib: revoir la gestion des stack en erreur
-        # for row in StackedEvent.objects.filter(state='pending', schedualed_delivery_on__lte=now()):
-        #     row.state = 'succesful'
-        #     row.save()
+        for row in StackedEvent.objects.filter(state='pending', schedualed_delivery_on__lte=now()):
+            row.state = 'successful'
+            row.save()
 
         logger.info('Command succeeded! ')
