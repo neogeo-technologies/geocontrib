@@ -27,12 +27,14 @@
           {{ project.title }}
           <div class="ui icon right floated compact buttons">
             {% if permissions|lookup:'can_view_project' %}
-              <a id="subscribe-button" class="ui button button-hover-green">
+              <a id="subscribe-button" class="ui button button-hover-green"
+                data-tooltip="S'abonner au projet" data-position="top center" data-variation="mini">
                 <i class="inverted grey envelope icon"></i>
               </a>
             {% endif %}
             {% if project and permissions|lookup:'can_update_project' %}
-              <a href="{% url 'collab:project_update' slug=project.slug %}" class="ui button button-hover-orange">
+              <a href="{% url 'collab:project_update' slug=project.slug %}" class="ui button button-hover-orange"
+                data-tooltip="Modifier le projet" data-position="top center" data-variation="mini">
                 <i class="inverted grey pencil alternate icon"></i>
               </a>
             {% endif %}
