@@ -152,7 +152,7 @@ class Authorization(models.Model):
 
             user_rank = cls.get_rank(user, project)
 
-            if user_rank >= project_rank_min or project_rank_min < 2:
+            if user_rank >= project_rank_min or project_rank_min < 1:
                 user_perms['can_view_project'] = True
                 user_perms['can_view_feature'] = True
                 user_perms['can_view_feature_type'] = True
@@ -162,7 +162,7 @@ class Authorization(models.Model):
                 user_perms['can_create_model'] = True
                 user_perms['is_project_administrator'] = True
 
-            if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
+            if user_rank >= project_arch_rank_min or project_arch_rank_min < 1:
                 user_perms['can_view_archived_feature'] = True
 
             # On permet aux contributeurs et aux auteurs de modifier les features
