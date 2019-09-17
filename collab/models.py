@@ -795,7 +795,7 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
     Supprime les fichiers image lors de la suppression d'une instance projet.
     """
-    if instance.thumbnail:
+    if instance.thumbnail and instance.thumbnail.name != 'default.png':
         if os.path.isfile(instance.thumbnail.path):
             os.remove(instance.thumbnail.path)
 
@@ -813,7 +813,7 @@ def anonymize_comments(sender, instance, **kwargs):
             comment.save()
 
 
-@receiver(models.signals.post_delete, sender=Attachment)
+@receiver(models.signals.pre_delete, sender=Attachment)
 @disable_for_loaddata
 def submission_delete(sender, instance, **kwargs):
     instance.attachment_file.delete()
