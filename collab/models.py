@@ -152,7 +152,7 @@ class Authorization(models.Model):
 
             user_rank = cls.get_rank(user, project)
 
-            if user_rank >= project_rank_min or project_rank_min < 1:
+            if user_rank >= project_rank_min or project_rank_min < 2:
                 user_perms['can_view_project'] = True
                 user_perms['can_view_feature'] = True
                 user_perms['can_view_feature_type'] = True
@@ -162,7 +162,7 @@ class Authorization(models.Model):
                 user_perms['can_create_model'] = True
                 user_perms['is_project_administrator'] = True
 
-            if user_rank >= project_arch_rank_min or project_arch_rank_min < 1:
+            if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
                 user_perms['can_view_archived_feature'] = True
 
             # On permet aux contributeurs et aux auteurs de modifier les features
@@ -539,7 +539,7 @@ class Attachment(AnnotationAbstract):
 
     # TODO@cbenhabib: si suppression d'un commentaire?
     comment = models.ForeignKey(
-        "collab.Comment", on_delete=models.CASCADE, null=True, blank=True)
+        "collab.Comment", on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         verbose_name = "Pièce jointe"
@@ -700,7 +700,7 @@ class Subscription(models.Model):
         "Date de création de l'abonnement", blank=True, null=True)
 
     project = models.ForeignKey(
-        "collab.Project", on_delete=models.CASCADE, null=True, blank=True)
+        "collab.Project", on_delete=models.SET_NULL, blank=True, null=True)
 
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, verbose_name="Utilisateurs",
