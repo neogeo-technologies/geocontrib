@@ -161,6 +161,7 @@ class Authorization(models.Model):
                 user_perms['can_update_project'] = True
                 user_perms['can_create_model'] = True
                 user_perms['is_project_administrator'] = True
+                user_perms['can_create_feature_type'] = True
 
             if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
                 user_perms['can_view_archived_feature'] = True
