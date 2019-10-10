@@ -521,8 +521,9 @@ $(document).ready(function() {
       {% endif %}
     {% endfor %}
   {% else %}
-    L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+      attribution: '&copy; contributeurs d\'<a href="https://osm.org/copyright">OpenStreetMap</a>',
+      maxZoom: 20
     }).addTo(map)
   {% endif %}
 
