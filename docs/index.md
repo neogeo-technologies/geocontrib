@@ -180,7 +180,7 @@ GeoJSON. Seuls les signalements dont le statut est "publié" sont exportés.
 
 ### Page de consultation des signalements
 
-La page de consultation des signalement d'un projet propose 2 vues (par l'intermédiaire des pictogrammes en haut de la 
+La page de consultation des signalements d'un projet propose 2 vues (par l'intermédiaire des pictogrammes en haut de la 
 page) :
 * une vue cartographique :
   * présentation de l'ensemble des signalement visibles de l'utilisateur (dépend de ses autorisations par rapport au 
@@ -205,36 +205,43 @@ qu'il recherche :
 
 ### Page de consultation d'un signalement
 
+La page de consultation d'un signalement présente les informations suivantes :
+* L'ensemble des attributs du signalement ;
+* Les dates d'archivage et de suppression automatiques (si de tels délais ont été configurés au niveau du projet) ;
+* la localisation sur une carte ;
+* Les liaisons avec d'autres signalements (les liaisons sont de quatre types : doublon, remplace, est remplacé par, 
+dépend de) ;
+* Les pièces jointes du signalement ;
+* Le fil d'activité et les commentaires du signalement.
+
+Cette page propose également des actions activées en fonction des autorisations de l'utilisateur :
+* Modifier le signalement via un pictogramme en haut à droite de la page (uniquement pour son auteur) ;
+* Supprimer le signalement via un pictogramme en haut à droite de la page (uniquement pour son auteur) ;
+* Ajouter un commentaire (uniquement pour les contributeurs).
+
 ### Page d'administration des fonds cartographiques
+
+La page d'administration des fonds cartographiques est un formulaire permettant aux adminitrateurs du projet de :
+* Déclarer l'ensemble des couches de données qui seront utilisées dans les différentes interfaces cartographiques du 
+projet. Ces couches servent uniquement de fonds de carte afin d'aider à la localisation des signalements créés dans 
+l'application.
+* Ces couches peuvent être de deux types : WMS ou TMS ;
+* Elles peuvent être réordonnées à l'aide du champ `Position` ;
+* Si aucune couche n'est configurée, une couche configurée par défaut au niveau de l'application est alors affichée 
+dans les interfaces cartographiques.
+
+cf. [Fonds cartographiques](basemaps.md) pour des informations détaillées sur la configuration d'une couche.
 
 ### Page d'administration des droits des utilisateurs
 
+La page d'administration des droits des utilisateurs est un formulaire permettant de modifier le niveau 
+d'autorisation de chaque utilisateur de l'application pour le projet courant.
 
-## Consulter un projet
+4 niveaux d'autorisation sont gérés au niveau du projet :
+* Utilisateur connecté : aucun privilège particulier n'est accordé à l'utilisateur ;
+* Contributeur ;
+* Modérateur ;
+* Administrateur du projet.
 
-
-### Consulter les signalements
-### Télécharger les signalements
-### Être notifié des changements
-
-## Contribuer à un projet
-
-### Créer un signalement
-### Commenter un signalement
-### Créer un lien entre deux signalements
-
-## Administrer un projet
-
-### Créer un nouveau projet
-### Ajouter un nouveau type de signalements
-### Gérer les autorisations des utilisateurs
-### Créer un type de signalements
-### Importer des données
-
-## Réexploiter une couche de signalements
-
-## Administrer l'outil
-
-### Créer un utilisateur
-
-### Paramétrer l'outil
+cf. [Utilisateurs et autorisations](users.md) pour des informations détaillées sur ces différents niveaux 
+d'autorisation.

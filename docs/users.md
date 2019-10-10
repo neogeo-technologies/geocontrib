@@ -33,13 +33,13 @@ Le créateur d'un nouveau projet en devient automatiquement administrateur proje
 
 Un utilisateur connecté qui peut avoir accès à un projet peut :
 * S'abonner aux notifications du projet
+* Ajouter des commentaires
 
 
 ## Contributeur
 
 Un contributeur peut :
-* Créer des signalements dans les projets dont il est contributeur
-* Créer des commentaires dans les projets dont il est contributeur
+* Créer et supprimer des signalements dans les projets dont il est contributeur
 * Changer le statut des signalements dont il est l'auteur
 * Modifier les attributs des signalements dont il est l'auteur
 * Ajouter et supprimer des pièces jointes pour les signalements dont il est l'auteur
