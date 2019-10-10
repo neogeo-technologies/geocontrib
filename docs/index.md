@@ -36,17 +36,18 @@ contributeur ou aucun rôle particulier ;
 ### Signalement
 
 Un signalement est une information géolocalisée décrivant un objet géographique porté à la connaissance des usagers 
-d’un projet. Chaque signalement est attaché à un projet et un type de signalement particulier.
+d’un projet. Chaque signalement est attaché à un projet et un type de signalements particulier.
 
-### Type de signalement
+### Type de signalements
 
-Un type de signalement correspond à une modélisation particulière (pour un contexte métier particulier) des 
+Un type de signalements correspond à une modélisation particulière (pour un contexte métier particulier) des 
 signalements :
 * un type de géométrie donné : point, ligne ou polygone
-* des champs spécifiques déclarés par le créateur du type de signalement (ces champs s'ajoutent aux champs obligatoires)
-que l'on retrouve pour tous les types de signalement, à savoir le titre, la description et le statut du signalement.
+* des champs spécifiques déclarés par le créateur du type de signalements (ces champs s'ajoutent aux champs 
+obligatoires) que l'on retrouve pour tous les types de signalements, à savoir le titre, la description et le statut du 
+signalement.
 
-Chaque type de signalement est également caractérisé par une couleur qui est utilisé pour la présentation des 
+Chaque type de signalements est également caractérisé par une couleur qui est utilisé pour la présentation des 
 signalements sur les cartes.
 
 ### Statut d'un signalement
@@ -87,7 +88,130 @@ utilisateurs qui se sont abonnés au projet.
 
 ## Architecture
 
+L'application est développée en Python à l'aide de la bibliothèque Django.
+Elle alimente une base de données PostgreSQL/PostGIS.
+
+
+## Interface homme-machine de l'application
+
+### Page d'accueil de l'application
+
+La page d'accueil de l'application contient :
+* un bandeau horizontal qui contient :
+  * le logo et le nom de l'application (cliquable pour revenir à la page d'accueil de l'application depuis n'importe 
+  quelle autre page),
+  * si aucun utilisateur n'est connecté : un bouton "Se connecter" permettant à l'utilisateur de 
+  s'authentifier,
+  * si un utilisateur est connecté : le nom de l'utilisateur courant et un bouton de déconnexion. Un clic sur le nom de 
+  l'utilisateur renvoie vers sa page "Mon compte"
+* la liste des projets existants avec une courte description et quelques indicateurs. Un clic sur un projet renvoie 
+vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un 
+message d'erreur lui est présenté ;
+* un bouton de création d'un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire 
+métier).
+
+### Menu d'un projet
+
+Lorsque l'utilisateur courant est entré dans un projet un menu supplémentaire apparaît dans le bandeau horizontal 
+d'en-tête. Il donne accès aux principales sous-pages du projet :
+* Page d'accueil du projet ;
+* Page de consultation des signalements sous forme d'une carte ou d'une liste ;
+* Page d'administration des fonds cartographiques (uniquement pour les administrateurs du projet et les utilisateurs 
+ayant des droits supérieurs) ;
+* Page d'administration des droits des utilisateurs pour ce projet (uniquement pour les administrateurs du projet et 
+les utilisateurs ayant des droits supérieurs).
+
+Ce menu identifie également le niveau d'autorisation de l'utilisateur courant par rapport au projet courant :
+* Utilisateur anonyme : indique que l'utilisateur courant n'est pas connecté ;
+* Utilisateur connecté : indique que l'utilisateur est connecté mais n'a pas d'autorisation spécifique sur ce projet ;
+* Contributeur : indique que l'utilisateur peut saisir des signalements et écrire des commentaires ;
+* Modérateur : indique que l'utilisateur peut publier des signalements ;
+* Administrateur projet : indique que l'utilisateur peut créer des nouveaux types de signalements, paramétrer les fonds 
+cartographiques et administrer les niveaux d'autorisation des autres utilisateurs sur ce projet.
+
+### Page d'accueil d'un projet
+
+La page d'accueil d'un projet contient les éléments suivants :
+* Un rappel des informations descriptives du projet dans la partie haute :
+  * Titre,
+  * Description,
+  * Illustration,
+* La liste des types de signalements du projet. Un pictogramme indique le type de géométrie de chaque type de 
+signalement. Un clic sur un type de signalements renvoie vers sa page de description ;
+* Une cartographie des signalements existants (uniquement ceux que l'utilisateur courant est habilité à consulter). Un 
+clic sur cette carte renvoie vers la page de consultation des signalements sous forme de carte ou de liste ;
+* Les derniers signalements et commentaires du projet. Un clic sur un signalement ou un commentaire renvoie vers la 
+page de consultation du signalement associé ;
+* Les caractéristiques techniques du projet dans la partie basse :
+  * Délais d'archivage et de suppression automatiques des signalements,
+  * Visibilité des signalements publiés et archivés en fonction des autorisations des utilisateurs,
+  * Modération du projet.
+
+Au-delà de ces informations, cette page propose également des actions activées en fonction du rôle de l'utilisateur 
+courant par rapport au projet :
+* un bouton d'édition des caractéristiques du projet en haut à droite (pour les 
+administrateurs du projet) ;
+* un bouton d'abonnement aux évènement du projet en haut à droite (pour les utilisateurs connectés membres du projet) ;
+* un bouton de création d'un nouveau type de signalements sous la liste des types de signalements (pour les 
+administrateurs du projet) ;
+* un bouton de création d'un nouveau signalement en face de chaque type de signalements (pour les contributeurs du 
+projet).
+
+### Page d'un type de signalements
+
+La page de description d'un type de signalement (accessible via la page d'accueil de son projet) présente les 
+informations suivantes :
+* Les caractéristiques du type de signalements :
+  * Son titre,
+  * Son type de géométrie,
+  * Les champs personnalisés.
+* Les derniers signalements créés pour ce type. Un clic sur un signalement renvoie vers la  page de consultation du 
+signalement associé.
+
+Au-delà de ces informations, cette page propose également des actions spécifiques :
+* Voir tous les signalements : renvoie vers la page de consultation des signalements du projet ;
+* Ajouter un signalement : création d'un signalement de ce type. Cette fonction n'est active que pour les contributeurs 
+et les utilisateurs avec un niveau d'autorisation supérieur ;
+* Import de signalement : création de signalements par l'import d'un fichier GeoJSON conforme au modèle de données
+spécifique du type de signalements. Cette fonction n'est active que pour les contributeurs et les utilisateurs avec un
+ niveau d'autorisation supérieur ;
+* Export des signalements : enregistrement des signalements du type de signalements courant sous la forme d'un fichier 
+GeoJSON. Seuls les signalements dont le statut est "publié" sont exportés.
+
+### Page de consultation des signalements
+
+La page de consultation des signalement d'un projet propose 2 vues (par l'intermédiaire des pictogrammes en haut de la 
+page) :
+* une vue cartographique :
+  * présentation de l'ensemble des signalement visibles de l'utilisateur (dépend de ses autorisations par rapport au 
+  projet). L'administrateur du projet peut consulter les signalements archivés alors que ce n'est pas systématiquement 
+  le cas pour les autres types d'utilisateurs,
+  * possibilité de zoomer et de se déplacer dans la carte,
+  * consultation des caractéristiques principales d'un signalement dans une petite infobulle à l'aide d'un simple clic,
+  * dans cette info-bulle, le clic sur le titre renvoie vers la fiche détaillée du signalement,
+  * toujours dans cette info-bulle, le clic sur le type de signalements renvoie vers la fiche détaillée du signalement.
+* une vue tabulaire paginée :
+  * tri par ordre chronologique inverse (les signalements les plus récents sont affichés en premier),
+  * présentation des caractéristiques principales : statut (représenté par un pictogramme), type de signalements, titre, 
+  et date de dernière modification,
+  * le clic sur le titre renvoie vers la fiche détaillée du signalement,
+  * le clic sur le type de signalements renvoie vers la fiche détaillée du signalement.
+
+Chacune d'entre elles propose un bloc "Filtres" permettant à l'utilisateur de réduire le nombre de signalements à ceux 
+qu'il recherche :
+* filtre sur le type de signalements ;
+* filtre sur le statut des signalements ;
+* filtre textuel recherchant la chaîne de caractères saisie par l'utilisateur dans le titre des signalements
+
+### Page de consultation d'un signalement
+
+### Page d'administration des fonds cartographiques
+
+### Page d'administration des droits des utilisateurs
+
+
 ## Consulter un projet
+
 
 ### Consulter les signalements
 ### Télécharger les signalements
@@ -102,12 +226,12 @@ utilisateurs qui se sont abonnés au projet.
 ## Administrer un projet
 
 ### Créer un nouveau projet
-### Ajouter un nouveau type de signalement
+### Ajouter un nouveau type de signalements
 ### Gérer les autorisations des utilisateurs
-### Créer un type de signalement
+### Créer un type de signalements
 ### Importer des données
 
-## Réexploiter une couche de signalement
+## Réexploiter une couche de signalements
 
 ## Administrer l'outil
 
