@@ -119,7 +119,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = self.request.user
         feature = self.get_object()
         project = feature.project
-        return Authorization.has_permission(user, 'can_view_feature', project, feature)
+        return Authorization.has_permission(user, 'can_create_feature', project)
 
     def post(self, request, slug, feature_type_slug, feature_id):
         feature = self.get_object()

@@ -135,6 +135,7 @@ class Authorization(models.Model):
             'can_view_archived_feature': False,
             'can_create_feature': False,
             'can_update_feature': False,
+            'can_delete_feature': False,
             'can_publish_feature': False,
             'can_create_feature_type': False,
             'can_view_feature_type': False,
@@ -163,16 +164,25 @@ class Authorization(models.Model):
                 user_perms['is_project_administrator'] = True
                 user_perms['can_create_feature_type'] = True
 
+            # Visibilité des features archivés
             if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
                 user_perms['can_view_archived_feature'] = True
 
-            # On permet aux contributeurs et aux auteurs de modifier les features
-            if user_rank >= 2 or (feature and feature.creator == user):
+            # On permet à son auteur de modifier un feature s'il est encore contributeur
+            # et aux utilisateurs de rangs supérieurs (pour pouvoir modifier le statut
+            if (user_rank >= 2 and (feature and feature.creator == user)) or user_rank >= 3:
                 user_perms['can_update_feature'] = True
+
+            # On permet à son auteur de modifier un feature s'il est encore contributeur
+            # et aux utilisateurs de rangs supérieurs (pour pouvoir modifier le statut
+            if (user_rank >= 2 and (feature and feature.creator == user)):
+                user_perms['can_delete_feature'] = True
 
             # Seuls les moderateurs peuvent publier
             if user_rank >= 3:
                 user_perms['can_publish_feature'] = True
+
+            # Les contributeurs et utilisateurs de droits supérieurs peuvent créer des features
             if user_rank >= 2:
                 user_perms['can_create_feature'] = True
 
