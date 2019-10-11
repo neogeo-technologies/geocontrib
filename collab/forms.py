@@ -37,7 +37,19 @@ class CustomFieldModelBaseFS(BaseModelFormSet):
             names.append(name)
 
 
-class ExtendedBaseFS(BaseModelFormSet):
+class AuthorizationBaseFS(BaseModelFormSet):
+    def clean(self):
+        from collab.choices import ADMIN
+        if any(self.errors):
+            return
+        try:
+            has_administrator = any([form.cleaned_data.get('level').user_type_id == ADMIN for form in self.forms])
+        except Exception:
+            raise forms.ValidationError("Erreur critique dans la sauvegarde des membres. ")
+        else:
+            if not has_administrator:
+                raise forms.ValidationError("Vous devez désigner au moins un adminstrateur par projet. ")
+
     def add_fields(self, form, index):
         super().add_fields(form, index)
         form.fields[DELETION_FIELD_NAME].label = 'Supprimer ?'

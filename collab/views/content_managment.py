@@ -31,11 +31,11 @@ from api.serializers import ProjectDetailedSerializer
 
 from collab.exif import exif
 from collab.forms import AuthorizationForm
+from collab.forms import AuthorizationBaseFS
 from collab.forms import CustomFieldModelForm
 from collab.forms import CustomFieldModelBaseFS
 from collab.forms import AttachmentForm
 from collab.forms import CommentForm
-from collab.forms import ExtendedBaseFS
 from collab.forms import FeatureTypeModelForm
 from collab.forms import FeatureBaseForm
 from collab.forms import FeatureExtraForm
@@ -1197,7 +1197,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
         Authorization,
         can_delete=True,
         form=AuthorizationForm,
-        formset=ExtendedBaseFS,
+        formset=AuthorizationBaseFS,
         extra=0,
         fields=('first_name', 'last_name', 'username', 'email', 'level'),
     )
