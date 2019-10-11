@@ -64,11 +64,8 @@
               <span>Niveau d'autorisation requis : {{ project.access_level_pub_feature }}</span><br>
               <span>
                 Mon niveau d'autorisation :
-                {% if user.is_administrator == True %}
-                  Administateur métier (super-utilisateur)
-                {% else %}
-                  {{ USER_LEVEL_PROJECTS|lookup:project.slug }}
-                {% endif %}
+                {{ USER_LEVEL_PROJECTS|lookup:project.slug }}
+                {% if user.is_administrator == True %} + Gestionnaire métier{% endif %}
               </span>
             </div>
             <div class="meta">
