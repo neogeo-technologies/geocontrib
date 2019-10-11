@@ -17,9 +17,11 @@
             <a href="{% url 'collab:feature_update' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id %}" class="ui button button-hover-orange">
               <i class="inverted grey pencil alternate icon"></i>
             </a>
+          {% if permissions|lookup:'can_delete_feature' %}
             <a id="feature-delete" class="ui button button-hover-red">
               <i class="inverted grey trash alternate icon"></i>
             </a>
+          {% endif %}
           </div>
         {% endif %}
         <div class="ui hidden divider"></div>
@@ -201,7 +203,7 @@
       {% endfor %}
     </div>
 
-    {% if user.is_authenticated %}
+    {% if permissions|lookup:'can_create_feature' %}
       <div class="ui segment">
         <form id="form-comment" action="{% url 'collab:add_comment' slug=project.slug feature_type_slug=feature_type.slug  feature_id=feature.feature_id%}" class="ui form" method="POST" enctype="multipart/form-data">
           {% for hidden in comment_form.hidden_fields %}
