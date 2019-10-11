@@ -908,6 +908,17 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
             msg = "{nb} signalement(s) importé(s). ".format(nb=nb_features)
             messages.info(request, msg)
 
+    def check_feature_type_slug(self, request, data, feature_type_slug):
+        for feat in data.get('features'):
+            if feat.get('properties').get('feature_type', 'N/A') != feature_type_slug:
+                messages.error(
+                    request,
+                    "Le type de signalement {source} ne correspond pas à celui en cours d'import: {dest}. ".format(
+                        source=feat.get('properties').get('feature_type'),
+                        dest=feature_type_slug
+                    ))
+                raise IntegrityError
+
     @transaction.atomic
     def post(self, request, slug, feature_type_slug):
         """
@@ -940,6 +951,7 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
         else:
             try:
                 with transaction.atomic():
+                    self.check_feature_type_slug(request, data, feature_type_slug)
                     self.create_features(request, request.user, data, feature_type)
             except IntegrityError:
                 messages.error(request, "Erreur à lors de l'ajout des signalements. ")

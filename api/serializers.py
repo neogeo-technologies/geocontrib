@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
-from rest_framework.reverse import reverse
+# from rest_framework.reverse import reverse
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from collab.models import Attachment
@@ -48,16 +48,16 @@ class CustomFieldSerializer(serializers.ModelSerializer):
 
 class FeatureTypeSerializer(serializers.ModelSerializer):
 
-    customfield_set = CustomFieldSerializer(
-        many=True, read_only=True)
+    # customfield_set = CustomFieldSerializer(
+    #     many=True, read_only=True)
 
     class Meta:
         model = FeatureType
         fields = (
-            'title',
+            # 'title',
             'slug',
-            'geom_type',
-            'customfield_set',
+            # 'geom_type',
+            # 'customfield_set',
         )
 
 
@@ -115,7 +115,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
-    # feature_type = FeatureTypeSerializer(read_only=True)
+    feature_type = serializers.SlugRelatedField(slug_field='slug', read_only=True)
 
     class Meta:
         model = Feature
@@ -129,7 +129,7 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             'updated_on',
             'archived_on',
             'deletion_on',
-            # 'feature_type',
+            'feature_type',
         )
 
     def get_properties(self, instance, fields):
