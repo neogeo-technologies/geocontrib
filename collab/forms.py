@@ -48,7 +48,7 @@ class AuthorizationBaseFS(BaseModelFormSet):
             raise forms.ValidationError("Erreur critique dans la sauvegarde des membres. ")
         else:
             if not has_administrator:
-                raise forms.ValidationError("Vous devez désigner au moins un adminstrateur par projet. ")
+                raise forms.ValidationError("Vous devez désigner au moins un administrateur par projet.")
 
     def add_fields(self, form, index):
         super().add_fields(form, index)
