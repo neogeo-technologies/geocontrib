@@ -190,6 +190,23 @@ FILE_MAX_SIZE = 10000000
 
 SITE_ID = 1
 
+DEFAULT_BASE_MAP = {
+    'SERVICE': 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+    'OPTIONS': {
+        'attribution': '&copy; contributeurs d\'<a href="https://osm.org/copyright">OpenStreetMap</a>',
+        'maxZoom': 20
+    }
+}
+
+# DEFAULT_BASE_MAP = {
+#     'SERVICE': 'https://osm.geo2france.fr/mapproxy/tms/1.0.0/faded/webmercator/{z}/{x}/{y}.png',
+#     'OPTIONS': {
+#         "tms": True,
+#         "zoomOffset": -1,
+#         "attribution": "\u00a9 les contributeurs d\u2019OpenStreetMap - G\u00e9o2France",
+#         "maxZoom": 19}
+# }
+
 # SMTP dev confs
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

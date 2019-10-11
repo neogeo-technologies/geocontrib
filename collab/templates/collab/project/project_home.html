@@ -262,10 +262,7 @@
         {% endif %}
       {% endfor %}
     {% else %}
-      L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
-        attribution: '&copy; contributeurs d\'<a href="https://osm.org/copyright">OpenStreetMap</a>',
-        maxZoom: 20
-      }).addTo(map)
+      L.tileLayer('{{ SERVICE }}',  JSON.parse('{{ OPTIONS | escapejs }}')).addTo(map)
     {% endif %}
 
     map.dragging.disable()

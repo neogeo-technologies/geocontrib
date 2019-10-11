@@ -1,6 +1,6 @@
 from django.conf import settings
 from collab.models import Authorization
-
+import json
 import logging
 
 logger = logging.getLogger('django')
@@ -19,5 +19,7 @@ def custom_contexts(request):
         'APPLICATION_ABSTRACT': settings.APPLICATION_ABSTRACT,
         'IMAGE_FORMAT': settings.IMAGE_FORMAT,
         'FILE_MAX_SIZE': settings.FILE_MAX_SIZE,
-        'USER_LEVEL_PROJECTS': user_level_projects
+        'USER_LEVEL_PROJECTS': user_level_projects,
+        'SERVICE': settings.DEFAULT_BASE_MAP.get('SERVICE'),
+        'OPTIONS': json.dumps(settings.DEFAULT_BASE_MAP.get('OPTIONS'))
     }
