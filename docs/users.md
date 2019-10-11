@@ -1,47 +1,30 @@
-Utilisateurs et autorisations
+# Utilisateurs et autorisations
 
-Rôles / Profils attribuables par projet :
+Autorisations attribuables par projet :
+* Utilisateur connecté (utilisateur authentifié)
 * Contributeur
 * Modérateur
 * Administrateur projet 
 
-Autres profils non spécifiquement associés à un projet :
+Autorisations indépendantes des projets :
 * Super utilisateur
 * Gestionnaire métier
-* Utilisateur connecté (utilisateur authentifié)
-* Utilisateur anonyme (utilisateur sans compte ou non authentifié)
 
 
-## Super utilisateur
+## Autorisations liées aux projets
 
-Un super-utilisateur peut :
-* Se connecter à l'interface d'admin de Django ;
-* Donner les rôles suivants n'importe quel utilisateur :
-  * Super utilisateur,
-  * Gestionnaire métier.
-
-
-## Gestionnaire métier
-
-Un gestionnaire métier peut :
-* Créer de nouveaux projets
-
-Le créateur d'un nouveau projet en devient automatiquement administrateur projet du projet en question. 
-
-
-## Utilisateur connecté
+### Utilisateur connecté
 
 Un utilisateur connecté qui peut avoir accès à un projet peut :
 * S'abonner aux notifications du projet
-* Ajouter des commentaires
 
-
-## Contributeur
+### Contributeur
 
 Un contributeur peut :
 * Créer et supprimer des signalements dans les projets dont il est contributeur
 * Changer le statut des signalements dont il est l'auteur
 * Modifier les attributs des signalements dont il est l'auteur
+* Ajouter des commentaires
 * Ajouter et supprimer des pièces jointes pour les signalements dont il est l'auteur
 * Supprimer des signalements dont il est l'auteur
 
@@ -58,8 +41,7 @@ auteur)
 * archivé -> en attente de publication (automatique si le projet est modéré et que le signalement a été édité par son 
 auteur)
 
-
-## Modérateur
+### Modérateur
 
 Un modérateur a les droits d'un contributeur ainsi que des droits supplémentaires.
 Un utilisateur peut devenir modérateur d'un projet uniquement si le projet est modéré.
@@ -78,8 +60,7 @@ Changements de statuts réalisables par un modérateur :
 * archivé -> brouillon
 * archivé -> en attente de publication
 
-
-## Administrateur projet
+### Administrateur projet
 
 Un administrateur projet a les droits d'un modérateur ainsi que des droits supplémentaires.
 
@@ -88,3 +69,23 @@ Il peut :
 * Ajouter un nouveau type de signalements au projet
 * Modifier les autorisations des utilisateurs du projet
 * Configurer les fonds cartographiques utilisés dans les cartes du projet
+
+
+## Autorisations indépendantes des projets
+
+### Super utilisateur
+
+Un super-utilisateur peut :
+* Se connecter à l'interface d'admin de Django ;
+* Donner les rôles suivants n'importe quel utilisateur :
+  * Super utilisateur,
+  * Gestionnaire métier.
+
+
+### Gestionnaire métier
+
+Un gestionnaire métier peut :
+* Créer de nouveaux projets
+
+Le créateur d'un nouveau projet en devient automatiquement administrateur projet du projet en question. 
+
