@@ -48,16 +48,16 @@ class CustomFieldSerializer(serializers.ModelSerializer):
 
 class FeatureTypeSerializer(serializers.ModelSerializer):
 
-    # customfield_set = CustomFieldSerializer(
-    #     many=True, read_only=True)
+    customfield_set = CustomFieldSerializer(
+        many=True, read_only=True)
 
     class Meta:
         model = FeatureType
         fields = (
-            # 'title',
+            'title',
             'slug',
-            # 'geom_type',
-            # 'customfield_set',
+            'geom_type',
+            'customfield_set',
         )
 
 
