@@ -136,8 +136,9 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
         # Ici on retourne les champs extra d'une feature au meme niveau
         # que les champs de bases
         properties = super().get_properties(instance, fields)
-        for key, value in instance.feature_data.items():
-            properties[key] = value
+        if instance.feature_data:
+            for key, value in instance.feature_data.items():
+                properties[key] = value
         return properties
 
 
