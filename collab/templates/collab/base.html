@@ -50,21 +50,23 @@
         </a>
         {% if project %}
           <div class="ui dropdown item">
-            {{ project.title }}<br><div class="ui teal horizontal label">{{ USER_LEVEL_PROJECTS|lookup:project.slug }}</div>
+            Projet&nbsp;: {{ project.title }}
             <i class="dropdown icon"></i>
             <div class="menu" style="z-index:401;">
               <a class="item" href="{% url 'collab:project' slug=project.slug %}">
-                <i class="home icon"></i>Accueil du projet
+                <i class="home icon"></i>Accueil
               </a>
               <a class="item" href="{% url 'collab:feature_list' slug=project.slug %}">
                 <i class="list icon"></i>Liste & Carte
               </a>
+            {% if project and permissions|lookup:'is_project_administrator' %}
               <a class="item" href="{% url 'collab:project_mapping' slug=project.slug %}">
-                <i class="map icon"></i>Administration des fonds cartographiques
+                <i class="map icon"></i>Fonds cartographiques
               </a>
               <a class="item" href="{% url 'collab:project_members' slug=project.slug %}">
-                <i class="users icon"></i>Gérer les membres
+                <i class="users icon"></i>Membres
               </a>
+            {% endif %}
             </div>
           </div>
         {% endif %}
@@ -73,6 +75,10 @@
             <a class="item" href="{% url 'collab:my_account' %}">
               {{ user.get_full_name|default:user.username }}
             </a>
+            <div class="item ui label">
+              {% if project %}{{ USER_LEVEL_PROJECTS|lookup:project.slug }}<br>{% endif %}
+              {% if user.is_administrator == True %}Gestionnaire métier{% endif %}
+            </div>
             <a class="item" href="{% url 'collab:logout' %}"><i class="ui logout icon"></i></a>
           {% else %}
             <a class="item" href="{% url 'collab:login' %}">Se Connecter</a>
