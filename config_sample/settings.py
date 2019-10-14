@@ -180,7 +180,7 @@ LOGGING = {
 
 APPLICATION_NAME = 'Collab'
 
-APPLICATION_ABSTRACT = 'Describtion du projet'
+APPLICATION_ABSTRACT = "Description de l'application"
 
 LOGO_PATH = '/media/logo.png'
 
