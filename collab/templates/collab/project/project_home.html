@@ -51,10 +51,11 @@
   <div class="row">
     <div class="seven wide column">
       <h3 class="ui header">Types de signalements</h3>
-      <div class="ui middle aligned divided selection list">
+      <div class="ui middle aligned divided list">
         {% for type in feature_types %}
           <div class="item">
             <div class="middle aligned content">
+              <a href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=type.slug %}">
               {% if type.geom_type == 'point' %}
                 <img class="list-image-type" src="{% static 'collab/img/marker.png' %}">
               {% elif type.geom_type == 'linestring' %}
@@ -62,7 +63,8 @@
               {% elif type.geom_type == 'polygon' %}
                 <img class="list-image-type" src="{% static 'collab/img/polygon.png' %}">
               {% endif %}
-              <a href="{% url 'collab:feature_type_detail' slug=project.slug feature_type_slug=type.slug %}"> {{ type.title }} </a>
+                {{ type.title }}
+              </a>
               {% if project and feature_types and permissions|lookup:'can_create_feature' %}
               <a class="ui compact small icon right floated button button-hover-green" data-tooltip="Ajouter un signalement" data-position="left center" data-variation="mini"
                  href="{% url 'collab:feature_create' slug=project.slug feature_type_slug=type.slug %}">
