@@ -311,6 +311,113 @@ var drawConfig = {
 }
 drawConfig[geomLeaflet[geomType]] = true
 
+L.drawLocal = {
+	draw: {
+		toolbar: {
+			actions: {
+				title: 'Annuler le dessin',
+				text: 'Annuler'
+			},
+			finish: {
+				title: 'Terminer le dessin',
+				text: 'Terminer'
+			},
+			undo: {
+				title: 'Supprimer le dernier point dessiné',
+				text: 'Supprimer le dernier point'
+			},
+			buttons: {
+				polyline: 'Dessiner une polyline',
+				polygon: 'Dessiner un polygone',
+				rectangle: 'Dessiner un rectangle',
+				circle: 'Dessiner un cercle',
+				marker: 'Dessiner une balise',
+				circlemarker: 'Dessiner un point'
+			}
+		},
+		handlers: {
+			circle: {
+				tooltip: {
+					start: 'Cliquer et glisser pour dessiner le cercle.'
+				},
+				radius: 'Rayon'
+			},
+			circlemarker: {
+				tooltip: {
+					start: 'Cliquer sur la carte pour placer le point.'
+				}
+			},
+			marker: {
+				tooltip: {
+					start: 'Cliquer sur la carte pour placer la balise.'
+				}
+			},
+			polygon: {
+				tooltip: {
+					start: 'Cliquer pour commencer à dessiner.',
+					cont: 'Cliquer pour continuer à dessiner.',
+					end: 'Cliquer sur le premier point pour terminer le dessin.'
+				}
+			},
+			polyline: {
+				error: '<strong>Error:</strong> shape edges cannot cross!',
+				tooltip: {
+					start: 'Cliquer pour commencer à dessiner.',
+					cont: 'Cliquer pour continuer à dessiner.',
+					end: 'Cliquer sur le dernier point pour terminer le dessin.'
+				}
+			},
+			rectangle: {
+				tooltip: {
+					start: 'Cliquer et glisser pour dessiner le rectangle.'
+				}
+			},
+			simpleshape: {
+				tooltip: {
+					end: 'Relâcher la souris pour terminer de dessiner.'
+				}
+			}
+		}
+	},
+	edit: {
+		toolbar: {
+			actions: {
+				save: {
+					title: 'Sauver les modifications',
+					text: 'Sauver'
+				},
+				cancel: {
+					title: 'Annuler la modification, annule toutes les modifications',
+					text: 'Annuler'
+				},
+				clearAll: {
+					title: 'Effacer toutes les couches',
+					text: 'Tout effacer'
+				}
+			},
+			buttons: {
+				edit: 'Modifier la couche',
+				editDisabled: 'Aucune couche à éditer',
+				remove: 'Supprimer les couches',
+				removeDisabled: 'Aucun couche à supprimer'
+			}
+		},
+		handlers: {
+			edit: {
+				tooltip: {
+					text: 'Faites glisser les marqueurs ou les balises pour modifier l\'élément.',
+					subtext: 'Cliquez sur Annuler pour annuler les modifications..'
+				}
+			},
+			remove: {
+				tooltip: {
+					text: 'Cliquez sur un élément pour le supprimer.'
+				}
+			}
+		}
+	}
+};
+
 
 var drawnItems = new L.FeatureGroup()
 
@@ -510,7 +617,10 @@ $(document).ready(function() {
   // **************************** //
   //              MAP             //
   // **************************** //
-  var map = L.map('map').setView([50.00976, 2.8657699], 7)
+  var map = L.map('map', {
+    zoomControl: false
+  }).setView([50.00976, 2.8657699], 7)
+  L.control.zoom({zoomInTitle:'zoomer', zoomOutTitle:'dézoomer'}).addTo(map)
   {% if layers %}
     {% for layer in layers %}
       var options = {{ layer.options|safe }}
