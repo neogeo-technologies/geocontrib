@@ -34,6 +34,10 @@ main {
   padding-top: 1.5em;
 }
 
+.description-button{
+  color: darkgrey;
+}
+
 .delete-hidden-field {
   display: none;
 }
