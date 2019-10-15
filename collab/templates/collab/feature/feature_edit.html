@@ -327,7 +327,7 @@ L.drawLocal = {
 				text: 'Supprimer le dernier point'
 			},
 			buttons: {
-				polyline: 'Dessiner une polyline',
+				polyline: 'Dessiner une polyligne',
 				polygon: 'Dessiner un polygone',
 				rectangle: 'Dessiner un rectangle',
 				circle: 'Dessiner un cercle',
@@ -620,7 +620,7 @@ $(document).ready(function() {
   var map = L.map('map', {
     zoomControl: false
   }).setView([50.00976, 2.8657699], 7)
-  L.control.zoom({zoomInTitle:'zoomer', zoomOutTitle:'dézoomer'}).addTo(map)
+  L.control.zoom({zoomInTitle:'Zoomer', zoomOutTitle:'Dézoomer'}).addTo(map)
   {% if layers %}
     {% for layer in layers %}
       var options = {{ layer.options|safe }}
