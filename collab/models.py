@@ -438,15 +438,12 @@ class FeatureType(models.Model):
 
 
 class CustomField(models.Model):
-    label = models.CharField("Label", max_length=128, null=True, blank=True,
-                             help_text="Nom en language naturel du champ")
+    label = models.CharField("Label", max_length=128, null=True, blank=True)
 
-    name = models.CharField("Nom", max_length=128, null=True, blank=True,
-                            help_text="Nom technique du champ tel qu'il apparaît dans la base de données ou dans l'export GeoJSON (sans accents, sans espaces, ni caractères exotiques)")
+    name = models.CharField("Nom", max_length=128, null=True, blank=True)
 
     position = models.PositiveSmallIntegerField(
-        "Position", default=0, blank=False, null=False,
-        help_text="Numéro d'ordre du champ dans le formulaire de saisie du signalement")
+        "Position", default=0, blank=False, null=False)
 
     field_type = models.CharField(
         "Type de champ", choices=TYPE_CHOICES, max_length=50,
