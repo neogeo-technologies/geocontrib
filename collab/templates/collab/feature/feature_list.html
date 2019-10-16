@@ -203,7 +203,8 @@
     var main = parseInt($("main").css("height"),10)
     $("#map").css("height", main - 150)
 
-    var map = L.map('map').setView([50.00976, 2.8657699], 7)
+    var map = L.map('map', {zoomControl: false}).setView([50.00976, 2.8657699], 7)
+    L.control.zoom({zoomInTitle:'Zoomer', zoomOutTitle:'Dézoomer'}).addTo(map)
 
     {% if layers %}
       {% for layer in layers %}
