@@ -84,8 +84,10 @@
   $(document).on('change', '.field-type', function () {
     var $options = $(this).parent().parent('.field').parent('.fields').children('.field-list-options')
     if ($(this).val() === "list") {
+      $options.find('input').prop('required', true)
       $options.show()
     } else {
+      $options.find('input').prop('required',false)
       $options.hide()
     }
   })
@@ -141,7 +143,7 @@
               </div>
               {{ formset.empty_form.field_type.errors }}
             </div>
-            <div class="field field-list-options" style="display:none;">
+            <div class="field field-list-options required field" style="display:none;">
               <label for="{{ formset.empty_form.options.id_for_label }}">{{ formset.empty_form.options.label }}</label>
               <input type="text" maxlength="{{  formset.empty_form.options.field.max_length }}"
                 name="{{ formset.empty_form.options.html_name }}" id="{{  formset.empty_form.options.id_for_label }}">
