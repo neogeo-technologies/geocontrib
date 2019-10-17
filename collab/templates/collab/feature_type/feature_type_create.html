@@ -107,13 +107,16 @@
             <div class="required field">
               <label for="{{ formset.empty_form.label.id_for_label }}">{{ formset.empty_form.label.label }}</label>
               <input type="text" required maxlength="{{  formset.empty_form.label.field.max_length }}"
-                name="{{ formset.empty_form.label.html_name }}" id="{{  formset.empty_form.label.id_for_label }}">
+              name="{{ formset.empty_form.label.html_name }}" id="{{  formset.empty_form.label.id_for_label }}">
+              <small>{{ formset.empty_form.label.help_text }}</small>
               {{ formset.label.errors }}
             </div>
             <div class="required field">
               <label for="{{ formset.empty_form.name.id_for_label }}">{{ formset.empty_form.name.label }}</label>
-              <input type="text" required maxlength="{{  formset.empty_form.name.field.max_length }}"
-                name="{{ formset.empty_form.name.html_name }}" id="{{  formset.empty_form.name.id_for_label }}">
+              <input type="text" required
+              maxlength="{{  formset.empty_form.name.field.max_length }}" name="{{ formset.empty_form.name.html_name }}"
+              id="{{  formset.empty_form.name.id_for_label }}">
+              <small>{{ formset.empty_form.name.help_text }}</small>
               {{ formset.name.errors }}
             </div>
           </div>
@@ -125,6 +128,7 @@
                 name="{{ formset.empty_form.position.html_name }}" id="{{ formset.empty_form.position.id_for_label }}"
                 value="${form_idx}">
               </div>
+              <small>{{ formset.empty_form.position.help_text }}</small>
               {{ formset.position.errors }}
             </div>
             <div class="required field">
