@@ -40,6 +40,17 @@ main {
 
 
 /* ---------------------------------- */
+      /* LEAFLET DRAW TOOLBAR */
+/* ---------------------------------- */
+
+.leaflet-draw-toolbar a.leaflet-draw-draw-circlemarker,
+.leaflet-draw-toolbar a.leaflet-draw-draw-polyline,
+.leaflet-draw-toolbar a.leaflet-draw-draw-polygon {
+    background-color: #FFA19E;
+}
+
+
+/* ---------------------------------- */
             /* FOOTER */
 /* ---------------------------------- */
 footer {
