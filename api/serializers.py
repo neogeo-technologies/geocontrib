@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 from rest_framework import serializers
 # from rest_framework.reverse import reverse
@@ -285,7 +286,11 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
 
     nb_features = serializers.SerializerMethodField()
 
+    nb_published_features = serializers.SerializerMethodField()
+
     nb_comments = serializers.SerializerMethodField()
+
+    nb_published_features_comments = serializers.SerializerMethodField()
 
     nb_contributors = serializers.SerializerMethodField()
 
@@ -298,11 +303,21 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
     def get_nb_features(self, obj):
         return Feature.objects.filter(project=obj).count()
 
+    def get_published_features(self, obj):
+        return Feature.objects.filter(project=obj, status="published")
+
+    def get_nb_published_features(self, obj):
+        return self.get_published_features(obj).count()
+
     def get_nb_comments(self, obj):
         return Comment.objects.filter(project=obj).count()
 
+    def get_nb_published_features_comments(self, obj):
+        return Comment.objects.filter(project=obj, feature_id__in=self.get_published_features(obj)).count()
+
     def get_nb_contributors(self, obj):
-        return Authorization.objects.filter(project=obj).count()
+        return Authorization.objects.filter(project=obj).filter(
+            Q(level_id="admin") | Q(level_id="moderator") | Q(level_id="contributor")).count()
 
     class Meta:
         model = Project
@@ -320,7 +335,9 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'archive_feature',
             'delete_feature',
             'nb_features',
+            'nb_published_features',
             'nb_comments',
+            'nb_published_features_comments',
             'nb_contributors'
         )
 
