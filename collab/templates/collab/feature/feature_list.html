@@ -91,7 +91,7 @@
       <tbody>
         {% for feature in features %}
         <tr>
-          <td><span>{{feature.status}}</span>
+          <td data-order="{{ feature.get_status_display }}">
             {% if feature.status == 'archived' %}
             <div data-tooltip="Archivé">
               <i class="grey archive icon"></i>
@@ -116,7 +116,7 @@
           <td>
             <a href="{% url 'collab:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
           </td>
-          <td><span>{{feature.updated_on|date:'Ymd' }}</span>
+          <td data-order="{{ feature.updated_on|date:'Ymd' }}">
             {{feature.updated_on|date:'d/m/Y' }}
           </td>
           {% if user.is_authenticated %}
@@ -198,6 +198,7 @@
       },
       "searching" : false,
       "ordering" : true,
+      "order": [],
       "lengthChange" : false,
       "pageLength": 15,
       "columnDefs": [{ className: "dt-center", targets: "_all" }]
