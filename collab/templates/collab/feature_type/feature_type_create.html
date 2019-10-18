@@ -151,7 +151,7 @@
               <label for="{{ formset.empty_form.options.id_for_label }}">{{ formset.empty_form.options.label }}</label>
               <input type="text" maxlength="{{  formset.empty_form.options.field.max_length }}"
                 name="{{ formset.empty_form.options.html_name }}" id="{{  formset.empty_form.options.id_for_label }}">
-              <p>Veuillez saisir les valeurs possibles de ce champ, séparées par un virgule.</p>
+              <small>{{ formset.empty_form.options.help_text }}</small>
               {{ formset.options.errors }}
             </div>
           </div>

@@ -164,7 +164,8 @@ class CustomFieldModelForm(forms.ModelForm):
         help_texts = {
             'label': "Nom en language naturel du champ",
             'name': "Nom technique du champ tel qu'il apparaît dans la base de données ou dans l'export GeoJSON (sans accents, sans espaces, ni caractères exotiques)",
-            'position': "Numéro d'ordre du champ dans le formulaire de saisie du signalement"
+            'position': "Numéro d'ordre du champ dans le formulaire de saisie du signalement",
+            'options': "Valeurs possibles de ce champ, séparées par des virgules"
         }
 
 
