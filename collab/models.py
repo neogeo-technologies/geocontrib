@@ -26,6 +26,7 @@ from collab.emails import notif_creator_published_feature
 from collab.managers import AvailableFeaturesManager
 
 import logging
+
 logger = logging.getLogger('django')
 
 
@@ -437,7 +438,6 @@ class FeatureType(models.Model):
 
 
 class CustomField(models.Model):
-
     label = models.CharField("Label", max_length=128, null=True, blank=True)
 
     name = models.CharField("Nom", max_length=128, null=True, blank=True)
@@ -462,7 +462,7 @@ class CustomField(models.Model):
     class Meta:
         verbose_name = "Champ personnalisé"
         verbose_name_plural = "Champs personnalisés"
-        unique_together = (('name', 'feature_type'), )
+        unique_together = (('name', 'feature_type'),)
 
     def __str__(self):
         return "{}.{}".format(self.feature_type.slug, self.name)
@@ -792,6 +792,7 @@ def disable_for_loaddata(signal_handler):
     On desactive les trigger pour les loaddata, car ils créent des instances
     redondantes.
     """
+
     @wraps(signal_handler)
     def wrapper(*args, **kwargs):
         if kwargs.get('raw'):
