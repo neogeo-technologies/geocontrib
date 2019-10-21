@@ -317,7 +317,8 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
 
     def get_nb_contributors(self, obj):
         return Authorization.objects.filter(project=obj).filter(
-            Q(level_id="admin") | Q(level_id="moderator") | Q(level_id="contributor")).count()
+            level__rank__gt=1
+        ).count()
 
     class Meta:
         model = Project
