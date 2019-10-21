@@ -15,10 +15,10 @@
         <i class="user icon"></i>{{ project.nb_contributors }}
       </div>
       <div class="ui basic teal label" data-tooltip="Signalements">
-        <i class="map marker icon"></i>{{ features|length }}
+        <i class="map marker icon"></i>{{ project.nb_published_features }}
       </div>
       <div class="ui basic teal label" data-tooltip="Commentaires">
-        <i class="comment icon"></i>{{ project.nb_comments }}
+        <i class="comment icon"></i>{{ project.nb_published_features_comments }}
       </div>
     </div>
     <div class="ten wide column">
@@ -125,7 +125,7 @@
             <div class="center aligned header">Derniers commentaires</div>
             <div class="center aligned description">
               <div class="ui relaxed list">
-                {% for item in comments %}
+                {% for item in last_comments %}
                   <div class="item">
                     <div class="content">
                       <div>
