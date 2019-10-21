@@ -62,6 +62,22 @@
         </button>
         Vous pouvez utiliser une image géoréférencée pour localiser le signalement.
       </p>
+
+      <p>
+        <button id="create-point-geoposition" type="button" class="ui compact button">
+          <i class="ui map marker alternate icon"></i>Créer un signalement à partir de la géolocalisation
+        </button>
+      </p>
+      <span id="erreur-geolocalisation" style="display: none" >
+        <div class="ui negative message">
+            <div class="header">
+              Une erreur est survenue avec la fonctionnalité de géolocalisation
+            </div>
+            <p id="erreur-geolocalisation-message"></p>
+        </div>
+        <br>
+      </span>
+
       {% endif %}
 
       {{ feature_form.geom.errors }}
@@ -524,6 +540,10 @@ $(document).ready(function() {
     reader.readAsDataURL(this.files[0]);
   })
 
+  $('#create-point-geoposition').click(function() {
+    create_point_geoposition()
+  })
+
   $('#add-geo-image').click(function() {
     $('.mini.modal').modal('show')
   })
@@ -613,7 +633,6 @@ $(document).ready(function() {
     request.send(formGeoImage)
   })
 
-
   // **************************** //
   //              MAP             //
   // **************************** //
@@ -686,12 +705,57 @@ $(document).ready(function() {
     map.addControl(drawControlFull);
   {% endif %}
 
-  map.on("draw:created", function (e) {
-    var layer = e.layer
+  function create_point_geoposition() {
+
+    function success(position) {
+      const latitude  = position.coords.latitude
+      const longitude = position.coords.longitude
+
+      var layer = L.circleMarker([latitude, longitude])
+      add_layer_call_back(layer)
+      map.setView([latitude, longitude]);
+    }
+
+    function error(err) {
+
+      var error_message = document.getElementById('erreur-geolocalisation-message')
+      while( error_message.firstChild ) {
+          error_message.removeChild( error_message.firstChild );
+      }
+      error_message.appendChild( document.createTextNode(err.message) );
+
+      var span = document.getElementById('erreur-geolocalisation')
+      span.style.display = "inline"
+    }
+
+    var span = document.getElementById('erreur-geolocalisation')
+    span.style.display = "none"
+    if (!navigator.geolocation) {
+      var error_message = document.getElementById('erreur-geolocalisation-message')
+      while( error_message.firstChild ) {
+          error_message.removeChild( error_message.firstChild );
+      }
+      error_message.appendChild( document.createTextNode("La géolocalisation n'est pas supportée par votre navigateur.") );
+    } else {
+      navigator.geolocation.getCurrentPosition(success, error);
+    }
+
+  }
+
+  function add_layer_call_back(layer){
     layer.addTo(drawnItems)
     drawControlFull.remove(map)
     drawControlEditOnly.addTo(map)
     updateGeomField(wellknown.stringify(layer.toGeoJSON()))
+    if(geomType==="point"){
+      document.getElementById('create-point-geoposition').style.display = "none"
+      document.getElementById('erreur-geolocalisation').style.display = "none"
+    }
+  }
+
+  map.on("draw:created", function (e) {
+    var layer = e.layer
+    add_layer_call_back(layer)
   })
 
   map.on("draw:edited", function(e) {
@@ -705,6 +769,10 @@ $(document).ready(function() {
     drawControlEditOnly.remove(map)
     drawControlFull.addTo(map)
     updateGeomField('')
+    if(geomType==="point"){
+      document.getElementById('create-point-geoposition').style.display = "inline"
+      document.getElementById('erreur-geolocalisation').style.display = "none"
+    }
   })
 
 })
