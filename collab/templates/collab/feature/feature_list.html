@@ -64,6 +64,10 @@
             </div>
           </div>
         </div>
+        <!-- map params, updated on map move -->
+        <input type="hidden" name="zoom" value="{{ request.GET.zoom|default:'""' }}">
+        <input type="hidden" name="lat" value="{{ request.GET.lat|default:'""' }}">
+        <input type="hidden" name="lng" value="{{ request.GET.lng|default:'""' }}">
       </form>
     </div>
   </div>
@@ -204,8 +208,25 @@
     var main = parseInt($("main").css("height"),10)
     $("#map").css("height", main - 150)
 
-    var map = L.map('map', {zoomControl: false}).setView([50.00976, 2.8657699], 7)
+    // get initial zoom and center defined in the form
+    var $formFilters = $("#form-filters");
+    var zoom = $formFilters.find("input[name=zoom]").val()
+    var lat = $formFilters.find("input[name=lat]").val()
+    var lng = $formFilters.find("input[name=lng]").val()
+
+    var map = L.map('map', {zoomControl: false}).setView([
+      lat === "" ? 50.00976 : lat,
+      lng === "" ? 2.8657699 : lng
+    ], zoom === "" ? 7 : zoom)
+
     L.control.zoom({zoomInTitle:'Zoomer', zoomOutTitle:'Dézoomer'}).addTo(map)
+
+    // update zoom and center on each move
+    map.on("moveend", function() {
+      $formFilters.find("input[name=zoom]").val(map.getZoom())
+      $formFilters.find("input[name=lat]").val(map.getCenter().lat)
+      $formFilters.find("input[name=lng]").val(map.getCenter().lng)
+    })
 
     {% if layers %}
       {% for layer in layers %}
@@ -275,7 +296,11 @@
       }
     {% endfor %}
     map.addLayer(featureGroup);
-    map.fitBounds(featureGroup.getBounds())
+    
+    // fit maps to bound only if no initial zoom and center are defined
+    if (lat === "" || lng === "" || zoom === "") {
+      map.fitBounds(featureGroup.getBounds()
+    }
   })
 </script>
 {% endblock %}
