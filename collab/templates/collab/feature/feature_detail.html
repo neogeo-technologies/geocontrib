@@ -113,7 +113,7 @@
   </div>
 
   <div class="seven wide column">
-    <a href="{% url 'collab:feature_list' slug=project.slug %}">
+    <a id="feature-list-link" href="{% url 'collab:feature_list' slug=project.slug %}">
       <div id="map"></div>
     </a>
   </div>
@@ -309,6 +309,19 @@
     })
 
     var map = L.map('map', {zoomControl: false}).setView([50.00976, 2.8657699], 7)
+
+    map.on("moveend", function() {
+      // update link to feature list with map zoom and center
+      var $featureListLink = $("#feature-list-link")
+      var baseUrl = $featureListLink.attr("href").split("?")[0]
+      var queryString = $.param([
+        {name: "zoom", value: map.getZoom()},
+        {name: "lat", value: map.getCenter().lat},
+        {name: "lng", value: map.getCenter().lng},
+      ])
+      $featureListLink.attr("href", baseUrl + "?" + queryString)
+    });
+
     {% if layers %}
       {% for layer in layers %}
         var options = {{ layer.options|safe }}
