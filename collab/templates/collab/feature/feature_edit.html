@@ -9,9 +9,9 @@
 {% block content %}
 <div class="fourteen wide column">
   {% if action == 'update' %}
-    <h1>Mise à jour du signalement "{{ feature.title }}"</h1>
+  <h1>Mise à jour du signalement "{{ feature.title }}"</h1>
   {% elif action == 'create' %}
-    <h1>Création d'un signalement</h1>
+  <h1>Création d'un signalement <small>[{{feature_type}}]</small></h1>
   {% endif %}
 
 
