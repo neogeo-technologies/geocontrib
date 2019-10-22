@@ -45,7 +45,7 @@ main {
 
 .ui.dropdown .menu.text-wrap {
   max-width: 80vw;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .ui.dropdown .menu.text-wrap > .item {
