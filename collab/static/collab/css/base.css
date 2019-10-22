@@ -38,6 +38,21 @@ main {
   display: none;
 }
 
+.ui.dropdown .menu > .header {
+  font-size: 1em;
+  text-transform: none;
+}
+
+.ui.dropdown .menu.text-wrap {
+  max-width: 80vw;
+  overflow: scroll;
+}
+
+.ui.dropdown .menu.text-wrap > .item {
+  white-space: normal;
+  word-wrap: normal;
+}
+
 
 /* ---------------------------------- */
       /* LEAFLET DRAW TOOLBAR */
