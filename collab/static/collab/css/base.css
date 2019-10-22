@@ -38,6 +38,11 @@ main {
   display: none;
 }
 
+.ui.dropdown .menu > .header {
+  font-size: 1em;
+  text-transform: none;
+}
+
 
 /* ---------------------------------- */
       /* LEAFLET DRAW TOOLBAR */
