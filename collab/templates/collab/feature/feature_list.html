@@ -23,11 +23,9 @@
               <div class="header">Ajouter un signalement du type</div>
               <div class="scrolling menu text-wrap">
                 {% for type in feature_types %}
-                  <div class="item">
-                    <a href="{% url 'collab:feature_create' slug=project.slug feature_type_slug=type.slug %}">
-                      {{ type }}
-                    </a>
-                  </div>
+                  <a class="item" href="{% url 'collab:feature_create' slug=project.slug feature_type_slug=type.slug %}">
+                    {{ type }}
+                  </a>
                 {% endfor %}
               </div>
             </div>
