@@ -176,37 +176,6 @@ LOGGING = {
     },
 }
 
-# Custom Contexts: cf 'collab.context_processors.custom_contexts'
-
-APPLICATION_NAME = 'Collab'
-
-APPLICATION_ABSTRACT = "Description de l'application"
-
-LOGO_PATH = '/media/logo.png'
-
-IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
-
-FILE_MAX_SIZE = 10000000
-
-SITE_ID = 1
-
-DEFAULT_BASE_MAP = {
-    'SERVICE': 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
-    'OPTIONS': {
-        'attribution': '&copy; contributeurs d\'<a href="https://osm.org/copyright">OpenStreetMap</a>',
-        'maxZoom': 20
-    }
-}
-
-# DEFAULT_BASE_MAP = {
-#     'SERVICE': 'https://osm.geo2france.fr/mapproxy/tms/1.0.0/faded/webmercator/{z}/{x}/{y}.png',
-#     'OPTIONS': {
-#         "tms": True,
-#         "zoomOffset": -1,
-#         "attribution": "\u00a9 les contributeurs d\u2019OpenStreetMap - G\u00e9o2France",
-#         "maxZoom": 19}
-# }
-
 # SMTP dev confs
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -222,3 +191,45 @@ EMAIL_HOST_USER = 'CHANGEME'
 EMAIL_HOST_PASSWORD = 'CHANGEME'
 
 DEFAULT_FROM_EMAIL = 'no-reply@collab.fr'
+
+# Custom Contexts: cf 'collab.context_processors.custom_contexts'
+
+APPLICATION_NAME = 'Collab'
+
+APPLICATION_ABSTRACT = "Description de l'application"
+
+LOGO_PATH = '/media/logo.png'
+
+IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
+
+FILE_MAX_SIZE = 10000000
+
+SITE_ID = 1
+
+# Fond de carte par défaut
+DEFAULT_BASE_MAP = {
+    'SERVICE': 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+    'OPTIONS': {
+        'attribution': '&copy; contributeurs d\'<a href="https://osm.org/copyright">OpenStreetMap</a>',
+        'maxZoom': 20
+    }
+}
+
+# Emprise par défaut de la carte
+# Région Hauts-de-France
+# DEFAULT_MAP_VIEW = {
+#     'center': [50.00976, 2.8657699],
+#     'zoom': 7
+# }
+
+# Région Bourgogne Franche Comté
+# DEFAULT_MAP_VIEW = {
+#     'center': [47.5, 5.7],
+#     'zoom': 7
+# }
+
+# France métropolitaine
+DEFAULT_MAP_VIEW = {
+    'center': [47.0, 1.0],
+    'zoom': 4
+}

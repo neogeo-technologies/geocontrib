@@ -308,7 +308,7 @@
       $('.mini.modal').modal('show')
     })
 
-    var map = L.map('map', {zoomControl: false}).setView([50.00976, 2.8657699], 7)
+    var map = L.map('map', {zoomControl: false}).setView({{ DEFAULT_MAP_VIEW.center }}, {{ DEFAULT_MAP_VIEW.zoom }})
 
     map.on("moveend", function() {
       // update link to feature list with map zoom and center

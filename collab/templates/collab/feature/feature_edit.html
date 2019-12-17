@@ -454,8 +454,7 @@ function updateMap(map, geomFeatureJSON) {
     }
     map.fitBounds(drawnItems.getBounds())
   } else {
-    console.log('ZOOM FRANCE ENTIERE')
-    map.setView([50.00976, 2.8657699], 7)
+    map.setView({{ DEFAULT_MAP_VIEW.center }}, {{ DEFAULT_MAP_VIEW.zoom }})
   }
 }
 
@@ -638,7 +637,8 @@ $(document).ready(function() {
   // **************************** //
   var map = L.map('map', {
     zoomControl: false
-  }).setView([50.00976, 2.8657699], 7)
+  }).setView({{ DEFAULT_MAP_VIEW.center }}, {{ DEFAULT_MAP_VIEW.zoom }})
+
   L.control.zoom({zoomInTitle:'Zoomer', zoomOutTitle:'Dézoomer'}).addTo(map)
   {% if layers %}
     {% for layer in layers %}

@@ -252,8 +252,7 @@
     $('#subscribe-button').click(function(){
       $('.mini.modal.subscription').modal('show')
     })
-
-    var map = L.map('map', {zoomControl: false}).setView([50.00976, 2.8657699], 7)
+    var map = L.map('map', {zoomControl: false}).setView({{ DEFAULT_MAP_VIEW.center }}, {{ DEFAULT_MAP_VIEW.zoom }})
     {% if layers %}
       {% for layer in layers %}
         var options = {{ layer.options|safe }}

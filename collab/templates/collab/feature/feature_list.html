@@ -231,10 +231,12 @@
     var lat = $formFilters.find("input[name=lat]").val()
     var lng = $formFilters.find("input[name=lng]").val()
 
+    var mapDefaultViewCenter = {{ DEFAULT_MAP_VIEW.center }};
+    var mapDefaultViewZoom = {{ DEFAULT_MAP_VIEW.zoom }};
     var map = L.map('map', {zoomControl: false}).setView([
-      lat === "" ? 50.00976 : lat,
-      lng === "" ? 2.8657699 : lng
-    ], zoom === "" ? 7 : zoom)
+      lat === "" ? mapDefaultViewCenter[0] : lat,
+      lng === "" ? mapDefaultViewCenter[1] : lng
+    ], zoom === "" ? mapDefaultViewZoom : zoom)
 
     L.control.zoom({zoomInTitle:'Zoomer', zoomOutTitle:'Dézoomer'}).addTo(map)
 
