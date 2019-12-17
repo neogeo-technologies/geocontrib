@@ -270,7 +270,6 @@
     map.doubleClickZoom.disable()
     map.scrollWheelZoom.disable()
 
-
     var featureGroup = new L.FeatureGroup()
     {% for feature in features %}
       var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
@@ -295,8 +294,11 @@
         }).addTo(featureGroup)
       }
     {% endfor %}
-    map.addLayer(featureGroup);
-    map.fitBounds(featureGroup.getBounds())
+
+    if (featureGroup && featureGroup.getLayers().length > 0) {
+      map.addLayer(featureGroup);
+      map.fitBounds(featureGroup.getBounds())
+    }
 
   })
 </script>

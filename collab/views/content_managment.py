@@ -1035,16 +1035,17 @@ class ProjectDetail(DetailView):
 
         serialized_comments = CommentSerializer(last_comments, many=True).data
 
-        last_features = Feature.objects.filter(
+        features = Feature.objects.filter(
             project=project
-        ).order_by('-created_on')[0:5]
+        ).order_by('-created_on')
 
         serilized_projects = ProjectDetailedSerializer(project).data
 
         context['project'] = serilized_projects
         context['user'] = user
         context['last_comments'] = serialized_comments
-        context['last_features'] = last_features
+        context['last_features'] = features[0:5]
+        context['features'] = features
         context['permissions'] = permissions
         context['feature_types'] = project.featuretype_set.all()
         context['is_suscriber'] = Subscription.is_suscriber(user, project)
