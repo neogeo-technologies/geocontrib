@@ -2,61 +2,114 @@
 
 Application de signalement collaboratif
 
-# Déploiement pour dev
+## Installation
 
-## Création projet Django et clone du repo
+### Prérequis
+
+* Python 3.5
+* Instance de PostgreSQL/PostGIS avec une base de données dédiée à l'application 
+(cf. paramètre DATABASES du fichier settings.py)
+
+### Création du projet Django et clone du repo
+
 ```shell
+# Création d'un environnement virtuel Python
 python3.5 -m venv collab_venv/
+
+# Activation de cet environnement
 source collab_venv/bin/activate
-git clone git@github.com:neogeo-technologies/collab.git src/
+
+# Clonage du projet - récupération des sources
+# Actuellement, la branche par défaut du projet est develop
+# Ce sera celle qui sera active par défaut immédiatement après le clonage
+git clone https://github.com/neogeo-technologies/collab.git src/
+
 # Installer les dépendances
+pip install -r src/requirements.txt
+
+# Création d'un projet Django
 django-admin startproject config .
 
-# Ajout de liens symboliques pour que les sources git soient visible par Django
+# Création de liens symboliques pour que les sources soient visibles par Django
 ln -s src/collab/ .
 ln -s src/api/ .
 ```
 
-## Settings & URL's
+### Édition des fichiers settings.py et url.py
 
-Édition du fichier de configuration et du fichier d'url.
+Copier le contenu du fichier /src/collab_sample/settings.py dans /config/settings.py.
 
-## Migrations et ajout de données initiales
+Éditer les paramètres classiques de Django dans /config/settings.py :
+* SECRET_KEY https://docs.djangoproject.com/en/2.2/ref/settings/#secret-key
+* DEBUG https://docs.djangoproject.com/en/2.2/ref/settings/#debug
+* DATABASES https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+* TIME_ZONE https://docs.djangoproject.com/en/2.2/ref/settings/#std%3Asetting-TIME_ZONE
+* STATIC_ROOT https://docs.djangoproject.com/en/2.2/ref/settings/#static-root
+* MEDIA_ROOT https://docs.djangoproject.com/en/2.2/ref/settings/#media-root
+* LOGGING https://docs.djangoproject.com/en/2.2/ref/settings/#logging
+* EMAIL_HOST https://docs.djangoproject.com/en/2.2/ref/settings/#email-host
+* EMAIL_PORT https://docs.djangoproject.com/en/2.2/ref/settings/#email-port
+* EMAIL_USE_TLS https://docs.djangoproject.com/en/2.2/ref/settings/#email-use-tls
+* EMAIL_HOST_USER https://docs.djangoproject.com/en/2.2/ref/settings/#std%3Asetting-EMAIL_HOST_USER
+* EMAIL_HOST_PASSWORD https://docs.djangoproject.com/en/2.2/ref/settings/#email-host-password
+* DEFAULT_FROM_EMAIL https://docs.djangoproject.com/en/2.2/ref/settings/#default-from-email
+
+Éditer les paramètres spécifiques à l'outil dans /config/settings.py :
+* DEFAULT_SENDING_FREQUENCY : fréquence d'envoi des notifications par email (never/instantly/daily/weekly)
+* APPLICATION_NAME : nom de l'application telle qu'elle apparaît dans l'IHM
+* APPLICATION_ABSTRACT : description de l'application en langage naturel
+* IMAGE_FORMAT : formats autorisés des fichiers téléversés dans l'application
+* FILE_MAX_SIZE : taille maximale des fichiers téléversés dans l'application
+* DEFAULT_BASE_MAP : configuration du fond de carte par défaut
+
+Copier le contenu du fichier /src/collab_sample/urls.py dans /config/urls.py
+
+### Création des tables et ajout de données initiales dans la base de données
 
 ```shell
 python manage.py migrate
 python manage.py loaddata src/collab/data/perm.json
 ```
 
-## Définir une image par défaut.
-Fichier à copier dans dossier de stockage des média, défini dans les settings
+Ne faites pas attention aux messages d'avertissement suivants :
 ```
+Sites not migrated yet. Please make sure you have Sites setup on Django Admin
+```
+
+### Dépot des images par défaut
+
+Copier l'image par défaut et le logo de l'application dans le répertoire défini par le paramètre MEDIA_ROOT 
+du fichier settings.py.
+
+Par exemple, copier les images fournies dans les sources de l'application :
+```shell
+mkdir media
 cp src/collab/static/collab/img/default.png media/
 cp src/collab/static/collab/img/logo.png media/
 ```
 
-## Définir le domaine et le nom du site.
+### Création d'un superutilisateur
+
+Lancer la commande Django de création d'un super utilisateur et suivre les instructions :
+```shell
+python manage.py createsuperuser
+```
+
+### Paramétrage du domaine et du nom du site
 
 Ces données sont à définir depuis l'admin Django dans la section Site et
-permettent notamment d'afficher les url dans les gabarit d'e-mail
+permettent notamment d'afficher les url dans les gabarit d'e-mail.
+Pour cela, lancer l'application Django :
+```shell
+python manage.py runserver
+```
 
-## Dump et load de la base de recette sans conflits.
+Se rendre dans l'interface d'administration Django et éditer le premier enregistrement des entités 
+"Sites" (cf. yoururl.net/admin/sites/).
+
+
+## Sauvegarde des données
 
 ```
 python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > dump.json
 ```
-
-# TODO:
-
-- [x] Import en masse
-- [x] Import de photographie
-- [x] Téléchargement
-- [ ] Abonnement
-- [x] Projet: Changer niveau d'autorisation
-- [x] Projet: Administrer les membres: cf service api GET projects/<slug:slug>/utilisateurs
-- [ ] Feature: Liaison entre Features
-- [x] Feature: Affichage et edition carto
-- [x] Mon Profil: Template à revoir
-- [x] Permissions: Administrateur de projet ajout et màj
-- [x] Commentaire
-- [x] Filtrer les signalements selon autorisation de l'utilisateur
