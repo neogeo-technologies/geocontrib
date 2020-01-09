@@ -20,12 +20,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'collab-secret-key'
+SECRET_KEY = 'geocontrib-secret-key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*", "collab"]
+ALLOWED_HOSTS = ["*", "geocontrib"]
 
 
 # Application definition
@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'rest_framework',
     'rest_framework_gis',
-    'collab',
+    'geocontrib',
     'api',
 ]
 MIDDLEWARE = [
@@ -65,7 +65,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'collab.context_processors.custom_contexts',
+                'geocontrib.context_processors.custom_contexts',
             ],
         },
     },
@@ -77,9 +77,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'collab',
-        'USER': 'collab',
-        'PASSWORD': 'collab',
+        'NAME': 'geocontrib',
+        'USER': 'geocontrib',
+        'PASSWORD': 'geocontrib',
         'HOST': 'database',
         'PORT': '5432'
     },
@@ -122,10 +122,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Extended properties
 
-AUTH_USER_MODEL = 'collab.User'
-LOGIN_URL = 'collab:login'
-LOGIN_REDIRECT_URL = 'collab:index'
-LOGOUT_REDIRECT_URL = 'collab:index'
+AUTH_USER_MODEL = 'geocontrib.User'
+LOGIN_URL = 'geocontrib:login'
+LOGIN_REDIRECT_URL = 'geocontrib:index'
+LOGOUT_REDIRECT_URL = 'geocontrib:index'
 DEFAULT_SENDING_FREQUENCY = 'never'  # A choisir parmi: 'never', 'instantly', 'daily', 'weekly'
 
 # Logging properties
@@ -164,10 +164,10 @@ EMAIL_HOST = 'CHANGEME'
 # EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'CHANGEME'
 EMAIL_HOST_PASSWORD = 'CHANGEME'
-DEFAULT_FROM_EMAIL = 'no-reply@collab.fr'
+DEFAULT_FROM_EMAIL = 'no-reply@geocontrib.fr'
 
 
-# Custom Contexts: cf 'collab.context_processors.custom_contexts'
+# Custom Contexts: cf 'geocontrib.context_processors.custom_contexts'
 
 APPLICATION_NAME = 'Collab'
 APPLICATION_ABSTRACT = "Description de l'application"

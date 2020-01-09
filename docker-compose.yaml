@@ -8,15 +8,15 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - APP_PATH=/collab_app
+        - APP_PATH=/geocontrib_app
         - SRC=src
         - GIT_BRANCH=develop
     environment:
-      - SECRET_KEY=collab-secret-key
+      - SECRET_KEY=geocontrib-secret-key
       - TIME_SLEEP=5
-      - DB_USER=collab
-      - PG_PASSWD=collab
-      - DB_NAME=collab
+      - DB_USER=geocontrib
+      - PG_PASSWD=geocontrib
+      - DB_NAME=geocontrib
       - DB_HOSTNAME=database
       - COLLAB_ADMIN_USER=admin
       - COLLAB_ADMIN_PWD=admin
@@ -24,7 +24,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - web_media:/collab_app/media
+      - web_media:/geocontrib_app/media
     command: ./src/docker_data/docker_run.sh
     depends_on:
       - database
@@ -33,9 +33,9 @@ services:
   database:
     image: mdillon/postgis:latest
     environment:
-      - POSTGRES_USER=collab
-      - POSTGRES_PASSWORD=collab
-      - POSTGRES_DB=collab
+      - POSTGRES_USER=geocontrib
+      - POSTGRES_PASSWORD=geocontrib
+      - POSTGRES_DB=geocontrib
     volumes:
       - database_data:/var/lib/postgresql/data/
     restart: always

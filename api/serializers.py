@@ -5,17 +5,17 @@ from rest_framework import serializers
 # from rest_framework.reverse import reverse
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
-from collab.models import Attachment
-from collab.models import Authorization
-from collab.models import CustomField
-from collab.models import Comment
-from collab.models import Feature
-from collab.models import FeatureLink
-from collab.models import FeatureType
-from collab.models import Project
-from collab.models import Event
-from collab.models import StackedEvent
-from collab.models import Layer
+from geocontrib.models import Attachment
+from geocontrib.models import Authorization
+from geocontrib.models import CustomField
+from geocontrib.models import Comment
+from geocontrib.models import Feature
+from geocontrib.models import FeatureLink
+from geocontrib.models import FeatureType
+from geocontrib.models import Project
+from geocontrib.models import Event
+from geocontrib.models import StackedEvent
+from geocontrib.models import Layer
 
 
 import logging

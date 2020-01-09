@@ -1,0 +1,780 @@
+{% extends "geocontrib/base.html" %}
+
+{% load app_filters %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+
+{% block content %}
+<div class="fourteen wide column">
+  {% if action == 'update' %}
+  <h1>Mise à jour du signalement "{{ feature.title }}"</h1>
+  {% elif action == 'create' %}
+  <h1>Création d'un signalement <small>[{{feature_type}}]</small></h1>
+  {% endif %}
+
+
+  <form id="form-feature-edit" action="" method="post" enctype="multipart/form-data" class="ui form">
+    {% csrf_token %}
+
+    <!-- Feature Fields -->
+    <div class="two fields">
+      <div class="required field">
+        <label for="{{ feature_form.title.id_for_label }}">{{ feature_form.title.label }}</label>
+        <input type="text" required maxlength="{{ feature_form.title.field.max_length }}"
+          name="{{ feature_form.title.html_name }}" id="{{ feature_form.title.id_for_label }}"
+          value="{% if feature_form.title.value %}{{ feature_form.title.value }}{% endif %}" >
+        {{ feature_form.title.errors }}
+      </div>
+      <div class="required field">
+        <label for="{{ feature_form.status.id_for_label }}">{{ feature_form.status.label }}</label>
+        <div class="ui selection dropdown">
+          <input type="hidden"
+            name="{{ feature_form.status.html_name }}" id="{{ feature_form.status.id_for_label }}"
+            value="{% if feature_form.status.value %}{{ feature_form.status.value }}{% endif %}">
+          <div class="default text"></div>
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            {% for x,y in feature_form.status.field.choices %}
+              <div class="item" data-value="{{ x }}" {% if feature_form.status.value == x %} selected{% endif %}>{{ y }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        {{ feature_form.status.errors }}
+      </div>
+    </div>
+    <div class="field">
+      <label for="{{ feature_form.description.id_for_label }}">{{ feature_form.description.label }}</label>
+      <textarea name="{{ feature_form.description.html_name }}" rows="5">{% if feature_form.description.value %}{{ feature_form.description.value }}{% endif %}</textarea>
+      {{ feature_form.description.errors }}
+    </div>
+
+    <!-- Geom Field -->
+    <div class="field">
+      <label for="{{ feature_form.geom.id_for_label }}">{{ feature_form.geom.label }}</label>
+
+      <!-- Import GeoImage -->
+      {% if feature_type.geom_type == 'point' %}
+      <p>
+        <button id="add-geo-image" type="button" class="ui compact button">
+          <i class="file image icon"></i>Importer une image géoréférencée
+        </button>
+        Vous pouvez utiliser une image géoréférencée pour localiser le signalement.
+      </p>
+
+      <p>
+        <button id="create-point-geoposition" type="button" class="ui compact button">
+          <i class="ui map marker alternate icon"></i>Positionner le signalement à partir de votre géolocalisation
+        </button>
+      </p>
+      <span id="erreur-geolocalisation" style="display: none" >
+        <div class="ui negative message">
+            <div class="header">
+              Une erreur est survenue avec la fonctionnalité de géolocalisation
+            </div>
+            <p id="erreur-geolocalisation-message"></p>
+        </div>
+        <br>
+      </span>
+
+      {% endif %}
+
+      {{ feature_form.geom.errors }}
+
+      <!-- Map -->
+      <input type="hidden" name="{{ feature_form.geom.html_name }}" id="{{ feature_form.geom.id_for_label }}"
+        value="{% if feature_form.geom.value.ewkt %}{{ feature_form.geom.value.ewkt }}{% endif %}" />
+      <div id="map"></div>
+    </div>
+
+    <!-- Extra Fields -->
+    <div class="ui horizontal divider">DONNÉES MÉTIER</div>
+    {% for field in extra_form %}
+      <div class="field">
+        {% if field.field.widget.attrs|lookup:'field_type' == 'char' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <input type="text" name="{{ field.name }}" id="{{ field.name }}"
+            value="{% if field.value %}{{ field.value }}{% endif %}" >
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'list' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <div class="ui selection dropdown">
+            <input type="hidden"
+              name="{{ field.name }}" id="{{ field.name }}"
+              value="{% if field.value %}{{ field.value }}{% endif %}">
+            <div class="default text"></div>
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              {% for x,y in field.field.choices %}
+                <div class="item" data-value="{{ x }}" {% if field.value == x %} selected{% endif %}>{{ y }}</div>
+              {% endfor %}
+            </div>
+          </div>
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'integer' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <div class="ui input">
+            <input type="number" name="{{ field.name }}" id="{{ field.name }}"
+              value="{% if field.value %}{{ field.value }}{% endif %}">
+          </div>
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'boolean' %}
+          <div class="ui checkbox">
+            <input type="checkbox" {% if field.value %}checked{% endif %}
+              name="{{ field.name }}" id="{{ field.name }}">
+            <label for="{{ field.name }}">{{ field.label }}</label>
+          </div>
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'date' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <input type="date" name="{{ field.name }}" id="{{ field.name }}"
+            value="{% if field.value %}{{ field.value }}{% endif %}" >
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'decimal' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <div class="ui input">
+            <input type="number" step=".01" name="{{ field.name }}" id="{{ field.name }}"
+              value="{% if field.value %}{{ field.value }}{% endif %}">
+          </div>
+        {% elif field.field.widget.attrs|lookup:'field_type' == 'text' %}
+          <label for="{{ field.name }}">{{ field.label }}</label>
+          <textarea name="{{ field.name }}" rows="3">{% if field.value %}{{ field.value }}{% endif %}</textarea>
+        {% endif %}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+
+    <!-- Pièces jointes -->
+    <div class="ui horizontal divider">PIÈCES JOINTES</div>
+    {{ attachment_formset.non_form_errors }}
+    <div id="formsets-attachment">
+      {{ attachment_formset.management_form }}
+      {% for form in attachment_formset %}
+      {% if not form.DELETE.value %}
+        {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+        {% endfor %}
+        <div class="ui teal segment">
+          <h4>
+            Pièce jointe
+            <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+          </h4>
+          {{ form.errors }}
+          <div class="visible-fields">
+            <div class="two fields">
+              <div class="required field">
+                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                <input type="text" required maxlength="{{ form.title.field.max_length }}"
+                  name="{{ form.title.html_name }}" id="{{  form.title.id_for_label }}"
+                  value="{% if form.title.value %}{{ form.title.value }}{% endif %}">
+                {{ form.title.errors }}
+              </div>
+              <div class="required field">
+                <label>Fichier (PDF, PNG, JPEG)</label>
+                <label class="ui icon button" for="{{ form.attachment_file.id_for_label }}">
+                  <i class="file icon"></i>
+                  {% if form.attachment_file.value %}
+                    <span class="label">{{ form.attachment_file.value }}</span>
+                  {% else %}
+                    <span class="label">Sélectionner un fichier ...</span>
+                  {% endif %}
+                </label>
+                <input type="file" accept="{{ IMAGE_FORMAT }}" style="display:none;"
+                  name="{{ form.attachment_file.html_name }}" class="image_file" id="{{ form.attachment_file.id_for_label }}"
+                  value="{% if form.attachment_file.value %}{{ form.attachment_file.value }}{% endif %}" >
+                {{ form.attachment_file.errors }}
+              </div>
+            </div>
+            <div class="field">
+              <label for="{{ form.info.id_for_label }}">{{ form.info.label }}</label>
+              <textarea name="{{ form.info.html_name }}" rows="5">{% if form.info.value %}{{ form.info.value }}{% endif %}</textarea>
+              {{ form.info.errors }}
+            </div>
+          </div>
+          <input class="delete-hidden-field" type="checkbox"
+            name="{{ form.DELETE.html_name }}"
+            id="{{ form.DELETE.id_for_label }}">
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <button id="add-attachment" type="button" class="ui compact basic button button-hover-green">
+      <i class="ui plus icon"></i>Ajouter une pièce jointe
+    </button>
+
+    <!-- Signalements liés -->
+    <div class="ui horizontal divider">SIGNALEMENTS LIÉS</div>
+    {{ linked_formset.non_form_errors }}
+    <div id="formsets-link">
+      {{ linked_formset.management_form }}
+      {% for form in linked_formset %}
+        {% if not form.DELETE.value %}
+          {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
+
+          <div class="ui teal segment">
+            <h4>
+              Liaison
+              <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+            </h4>
+            {{ form.errors }}
+            <div class="visible-fields">
+              <div class="two fields">
+                <div class="required field">
+                  <label for="{{ form.relation_type.id_for_label }}">{{ form.relation_type.label }}</label>
+                  <div class="ui selection dropdown">
+                    <input type="hidden"
+                      name="{{ form.relation_type.html_name }}" id="{{ form.relation_type.id_for_label }}"
+                      value="{{ form.relation_type.value }}">
+                    <div class="default text"></div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                      {% for x,y in form.relation_type.field.choices %}
+                        <div class="item" data-value="{{ x }}" {% if form.relation_type.value == x %} selected{% endif %}>{{ y }}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {{ form.relation_type.errors }}
+                </div>
+                <div class="required field">
+                  <label for="{{ form.feature_to.id_for_label }}">{{ form.feature_to.label }}</label>
+                  <div class="ui selection search dropdown">
+                    <input type="hidden"
+                      name="{{ form.feature_to.html_name }}" id="{{ form.feature_to.id_for_label }}"
+                      value="{% if form.feature_to.value %}{{ form.feature_to.value }}{% endif %}">
+                    <div class="default text"></div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                      {% for x,y in form.feature_to.field.choices %}
+                        <div class="item" data-value="{{ x }}" {% if form.feature_to.value == x %} selected{% endif %}>{{ y }}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {{ form.feature_to.errors }}
+                </div>
+              </div>
+            </div>
+            <input class="delete-hidden-field" type="checkbox"
+              name="{{ form.DELETE.html_name }}"
+              id="{{ form.DELETE.id_for_label }}">
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <button id="add-link" type="button" class="ui compact basic button button-hover-green">
+      <i class="ui plus icon"></i>Ajouter une liaison
+    </button>
+
+    <div class="ui divider"></div>
+
+    <button type="submit" class="ui teal icon button">
+      <i class="white save icon"></i> Enregistrer les changements
+    </button>
+
+  </form>
+</div>
+
+<div class="ui mini modal">
+  <i class="close icon"></i>
+  <div class="content">
+    <h3>Importer une image géoréférencée</h3>
+    <form id="form-geo-image" class="ui form" enctype="multipart/form-data">
+      {% csrf_token %}
+      <p>Attention, si vous avez déjà saisi une géométrie, celle issue de l'image importée l'écrasera.</p>
+
+      <div class="field">
+        <label>Image (png ou jpeg)</label>
+        <label class="ui icon button" for="image_file">
+          <i class="file icon"></i>
+          <span class="label">Sélectionner une image ...</span>
+        </label>
+        <input type="file" accept="image/jpeg, image/png" style="display:none;"
+          name="image_file" class="image_file" id="image_file" >
+        <p class="error-message" style="color:red;"></p>
+      </div>
+
+      <button id="get-geom-from-image-file" type='button' class="ui positive right labeled icon button">
+        Importer
+        <i class="checkmark icon"></i>
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block custom_resources %}
+<style>
+#map {
+  height:350px;
+  width:100%;
+}
+</style>
+
+<script type="text/javascript">
+// Geom type + init Leaflet Draw Control
+var geomLeaflet = {
+  'point': 'circlemarker',
+  'linestring': 'polyline',
+  'polygon': 'polygon'
+}
+var geomType = "{{ feature_type.geom_type }}"
+var drawConfig = {
+  polygon: false,
+  marker: false,
+  polyline: false,
+  rectangle: false,
+  circle: false,
+  circlemarker: false,
+}
+drawConfig[geomLeaflet[geomType]] = true
+
+L.drawLocal = {
+	draw: {
+		toolbar: {
+			actions: {
+				title: 'Annuler le dessin',
+				text: 'Annuler'
+			},
+			finish: {
+				title: 'Terminer le dessin',
+				text: 'Terminer'
+			},
+			undo: {
+				title: 'Supprimer le dernier point dessiné',
+				text: 'Supprimer le dernier point'
+			},
+			buttons: {
+				polyline: 'Dessiner une polyligne',
+				polygon: 'Dessiner un polygone',
+				rectangle: 'Dessiner un rectangle',
+				circle: 'Dessiner un cercle',
+				marker: 'Dessiner une balise',
+				circlemarker: 'Dessiner un point'
+			}
+		},
+		handlers: {
+			circle: {
+				tooltip: {
+					start: 'Cliquer et glisser pour dessiner le cercle.'
+				},
+				radius: 'Rayon'
+			},
+			circlemarker: {
+				tooltip: {
+					start: 'Cliquer sur la carte pour placer le point.'
+				}
+			},
+			marker: {
+				tooltip: {
+					start: 'Cliquer sur la carte pour placer la balise.'
+				}
+			},
+			polygon: {
+				tooltip: {
+					start: 'Cliquer pour commencer à dessiner.',
+					cont: 'Cliquer pour continuer à dessiner.',
+					end: 'Cliquer sur le premier point pour terminer le dessin.'
+				}
+			},
+			polyline: {
+				error: '<strong>Error:</strong> shape edges cannot cross!',
+				tooltip: {
+					start: 'Cliquer pour commencer à dessiner.',
+					cont: 'Cliquer pour continuer à dessiner.',
+					end: 'Cliquer sur le dernier point pour terminer le dessin.'
+				}
+			},
+			rectangle: {
+				tooltip: {
+					start: 'Cliquer et glisser pour dessiner le rectangle.'
+				}
+			},
+			simpleshape: {
+				tooltip: {
+					end: 'Relâcher la souris pour terminer de dessiner.'
+				}
+			}
+		}
+	},
+	edit: {
+		toolbar: {
+			actions: {
+				save: {
+					title: 'Sauver les modifications',
+					text: 'Sauver'
+				},
+				cancel: {
+					title: 'Annuler la modification, annule toutes les modifications',
+					text: 'Annuler'
+				},
+				clearAll: {
+					title: 'Effacer l\'objet',
+					text: 'Effacer'
+				}
+			},
+			buttons: {
+				edit: 'Modifier l\'objet',
+				editDisabled: 'Aucun objet à modifier',
+				remove: 'Supprimer l\'objet',
+				removeDisabled: 'Aucun objet à supprimer'
+			}
+		},
+		handlers: {
+			edit: {
+				tooltip: {
+					text: 'Faites glisser les marqueurs ou les balises pour modifier l\'élément.',
+					subtext: 'Cliquez sur Annuler pour annuler les modifications..'
+				}
+			},
+			remove: {
+				tooltip: {
+					text: 'Cliquez sur un élément pour le supprimer.'
+				}
+			}
+		}
+	}
+};
+
+
+var drawnItems = new L.FeatureGroup()
+
+function updateGeomField(newGeom) {
+  $('#{{ feature_form.geom.id_for_label }}').val(`SRID=4326;${newGeom}`);
+}
+
+function updateMap(map, geomFeatureJSON) {
+  drawnItems.clearLayers()
+  if (geomFeatureJSON) {
+    var geomJSON = turf.flip(geomFeatureJSON)
+    if (geomType === 'point') {
+      L.circleMarker(geomJSON.coordinates).addTo(drawnItems)
+    } else if (geomType === 'linestring') {
+      L.polyline(geomJSON.coordinates).addTo(drawnItems)
+    } else if (geomType === 'polygon') {
+      L.polygon(geomJSON.coordinates).addTo(drawnItems)
+    }
+    map.fitBounds(drawnItems.getBounds())
+  } else {
+    map.setView({{ DEFAULT_MAP_VIEW.center }}, {{ DEFAULT_MAP_VIEW.zoom }})
+  }
+}
+
+function truncate(n, len) {
+  var ext = n.substring(n.lastIndexOf(".") + 1, n.length).toLowerCase()
+  var filename = n.replace('.' + ext, '')
+  if (filename.length <= len) {
+    return n
+  }
+  filename = filename.substr(0, len) + (n.length > len ? '[...]' : '')
+  return filename + '.' + ext
+}
+
+function addAttachment(geoAttachment) {
+  let title = geoAttachment ? 'Localisation' : ''
+
+  let label = geoAttachment ? geoAttachment[0].name : 'Sélectionner un fichier ...'
+  var form_idx = $('#formsets-attachment [name=attachment-TOTAL_FORMS]').val()
+  $('#formsets-attachment').append((`
+    <div class="ui teal segment">
+      <h4>
+        Pièce jointe
+        <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+      </h4>
+      <div class="visible-fields">
+        <div class="two fields">
+          <div class="required field">
+            <label for="{{ attachment_formset.empty_form.title.id_for_label }}">{{ attachment_formset.empty_form.title.label }}</label>
+            <input type="text" required maxlength="{{ attachment_formset.empty_form.title.field.max_length }}"
+              name="{{ attachment_formset.empty_form.title.html_name }}" id="{{  attachment_formset.empty_form.title.id_for_label }}"
+              value="${title}">
+            {{ attachment_formset.title.errors }}
+          </div>
+          <div class="required field">
+            <label>Fichier (PDF, PNG, JPEG)</label>
+            <label class="ui icon button" for="{{ attachment_formset.empty_form.attachment_file.id_for_label }}">
+              <i class="file icon"></i>
+              <span class="label">${label}</span>
+            </label>
+            <input type="file" accept="{{ IMAGE_FORMAT }}" style="display:none;" class="image_file"
+              name="{{ attachment_formset.empty_form.attachment_file.html_name }}" id="{{ attachment_formset.empty_form.attachment_file.id_for_label }}"
+              value="${label}">
+            {{ form.errors }}
+          </div>
+        </div>
+        <div class="field">
+          <label for="{{ attachment_formset.empty_form.info.id_for_label }}">{{ attachment_formset.empty_form.info.label }}</label>
+          <textarea name="{{ attachment_formset.empty_form.info.html_name }}" rows="5">{% if attachment_formset.empty_form.info.value %}{{ attachment_formset.empty_form.info.value }}{% endif %}</textarea>
+          {{ attachment_formset.info.errors }}
+        </div>
+      </div>
+      <input class="delete-hidden-field" type="checkbox"
+        name="{{ attachment_formset.empty_form.DELETE.html_name }}"
+        id="{{ attachment_formset.empty_form.DELETE.id_for_label }}">
+    </div>
+  `).replace(/__prefix__/g, form_idx))
+  $('#formsets-attachment [name=attachment-TOTAL_FORMS]').val(parseInt(form_idx) + 1)
+
+  if (geoAttachment) {
+    var inputFileLocalisation = $("#formsets-attachment .image_file").last()[0]
+    inputFileLocalisation.files = geoAttachment
+  }
+
+  $('.ui.dropdown').dropdown()
+}
+
+$(document).ready(function() {
+  $(document).on('click', '.remove-formset', function () {
+    var $segment = $(this).parent().parent('.segment')
+    $segment.hide()
+    $segment.children('.visible-fields').remove()
+    $segment.children('.delete-hidden-field').prop('checked', true)
+  })
+
+  $(document).on('change', '.image_file', function () {
+    var logoFile = $(this).prop('files')[0]
+    $(this).parent().children('label').children('.label').html(truncate(logoFile.name, 30))
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      $('#form-input-file-logo').attr('src', e.target.result);
+    }
+    reader.readAsDataURL(this.files[0]);
+  })
+
+  $('#create-point-geoposition').click(function() {
+    create_point_geoposition()
+  })
+
+  $('#add-geo-image').click(function() {
+    $('.mini.modal').modal('show')
+  })
+
+  $('#add-attachment').click(function() {
+    addAttachment()
+  })
+
+  $('#add-link').click(function() {
+    var form_idx = $('#formsets-link [name=linked-TOTAL_FORMS]').val();
+    $('#formsets-link').append((`
+      <div class="ui teal segment">
+        <h4>
+          Liaison
+          <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+        </h4>
+        <div class="visible-fields">
+          <div class="two fields">
+            <div class="required field">
+              <label for="{{ linked_formset.empty_form.relation_type.id_for_label }}">{{ linked_formset.empty_form.relation_type.label }}</label>
+              <div class="ui selection dropdown">
+                <input type="hidden"
+                  name="{{ linked_formset.empty_form.relation_type.html_name }}" id="{{ linked_formset.empty_form.relation_type.id_for_label }}"
+                  value="{{ linked_formset.empty_form.relation_type.value }}">
+                <div class="default text"></div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  {% for x,y in linked_formset.empty_form.relation_type.field.choices %}
+                    <div class="item" data-value="{{ x }}">{{ y }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              {{ linked_formset.relation_type.errors }}
+            </div>
+            <div class="required field">
+              <label for="{{ linked_formset.empty_form.feature_to.id_for_label }}">{{ linked_formset.empty_form.feature_to.label }}</label>
+              <div class="ui selection search dropdown">
+                <input type="hidden"
+                  name="{{ linked_formset.empty_form.feature_to.html_name }}" id="{{ linked_formset.empty_form.feature_to.id_for_label }}"
+                  value="{{ linked_formset.empty_form.feature_to.value }}">
+                <div class="default text"></div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  {% for x,y in linked_formset.empty_form.feature_to.field.choices %}
+                    <div class="item" data-value="{{ x }}">{{ y }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              {{ linked_formset.feature_to.errors }}
+            </div>
+          </div>
+        </div>
+        <input class="delete-hidden-field" type="checkbox"
+          name="{{ linked_formset.empty_form.DELETE.html_name }}"
+          id="{{ linked_formset.empty_form.DELETE.id_for_label }}">
+      </div>
+    `).replace(/__prefix__/g, form_idx))
+    $('#formsets-link [name=linked-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
+    $('.ui.dropdown').dropdown()
+  })
+
+  $('#get-geom-from-image-file').click(function() {
+    var formGeoImage = new FormData()
+    var imageFile = $('#form-geo-image .image_file').prop('files')
+    formGeoImage.append("image_file", imageFile[0])
+
+    var request = new XMLHttpRequest()
+    request.onreadystatechange = function(e) {
+      if (this.readyState === XMLHttpRequest.DONE) {
+        var responseJSON = JSON.parse(this.response);
+        if (this.status === 200) {
+          console.log('SUCCESS REQUEST', responseJSON)
+          // Set Geom
+          let responseGeomJSON = wellknown.parse(responseJSON.geom)
+          updateMap(map, responseGeomJSON)
+          updateGeomField(wellknown.stringify(responseGeomJSON))
+          $('.mini.modal').modal('hide')
+          // Set Attachment
+          addAttachment(imageFile)
+        } else {
+          console.log('ERROR REQUEST', responseJSON)
+          $('#form-geo-image .error-message').html(responseJSON.message)
+        }
+      }
+    }
+    request.open("POST", "{% url 'geocontrib:import_from_image' slug=project.slug feature_type_slug=feature_type.slug %}")
+    request.send(formGeoImage)
+  })
+
+  // **************************** //
+  //              MAP             //
+  // **************************** //
+  var map = L.map('map', {
+    zoomControl: false
+  }).setView({{ DEFAULT_MAP_VIEW.center }}, {{ DEFAULT_MAP_VIEW.zoom }})
+
+  L.control.zoom({zoomInTitle:'Zoomer', zoomOutTitle:'Dézoomer'}).addTo(map)
+  {% if layers %}
+    {% for layer in layers %}
+      var options = {{ layer.options|safe }}
+      {% if layer.schema_type == "wms" %}
+        L.tileLayer.wms('{{ layer.service }}', options).addTo(map)
+      {% elif layer.schema_type == "tms" %}
+        L.tileLayer('{{ layer.service }}', options).addTo(map)
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    L.tileLayer('{{ SERVICE }}',  JSON.parse('{{ OPTIONS | escapejs }}')).addTo(map)
+  {% endif %}
+
+  var featureGroup = new L.FeatureGroup()
+  {% for feat in features %}
+    {% if not feat.feature_id == feature.feature_id %}
+      var geomFeatureJSON = wellknown.parse("{{ feat.geom.wkt }}")
+      var geomJSON = turf.flip(geomFeatureJSON)
+      var popupContent = `{{ feat.title }}`
+      if (geomJSON.type === 'Point') {
+        L.circleMarker(geomJSON.coordinates, {
+          color: '{{ feat.feature_type.color }}',
+          radius: 4,
+          fillOpacity: 0.3,
+          weight: 1
+        }).bindPopup(popupContent).addTo(featureGroup)
+      } else if (geomJSON.type === 'LineString') {
+        L.polyline(geomJSON.coordinates, {
+          color: '{{ feat.feature_type.color }}',
+          weight: 1.5
+        }).bindPopup(popupContent).addTo(featureGroup)
+      } else if (geomJSON.type === 'Polygon') {
+        L.polygon(geomJSON.coordinates, {
+          color: '{{ feat.feature_type.color }}',
+          weight: 1.5,
+          fillOpacity: 0.3
+        }).bindPopup(popupContent).addTo(featureGroup)
+      }
+    {% endif %}
+  {% endfor %}
+  map.addLayer(featureGroup);
+
+  map.addLayer(drawnItems)
+
+  var drawControlFull = new L.Control.Draw({
+    edit: {
+      featureGroup: drawnItems
+    },
+    draw: drawConfig,
+  })
+
+  var drawControlEditOnly = new L.Control.Draw({
+    edit: {
+      featureGroup: drawnItems
+    },
+    draw: false
+  })
+
+  {% if feature_form.geom.value.wkt %}
+    updateMap(map, wellknown.parse("{{ feature_form.geom.value.wkt }}"))
+    map.addControl(drawControlEditOnly);
+  {% else %}
+    map.addControl(drawControlFull);
+  {% endif %}
+
+  function create_point_geoposition() {
+
+    function success(position) {
+      const latitude  = position.coords.latitude
+      const longitude = position.coords.longitude
+
+      var layer = L.circleMarker([latitude, longitude])
+      add_layer_call_back(layer)
+      map.setView([latitude, longitude]);
+    }
+
+    function error(err) {
+
+      var error_message = document.getElementById('erreur-geolocalisation-message')
+      while( error_message.firstChild ) {
+          error_message.removeChild( error_message.firstChild );
+      }
+      error_message.appendChild( document.createTextNode(err.message) );
+
+      var span = document.getElementById('erreur-geolocalisation')
+      span.style.display = "inline"
+    }
+
+    var span = document.getElementById('erreur-geolocalisation')
+    span.style.display = "none"
+    if (!navigator.geolocation) {
+      var error_message = document.getElementById('erreur-geolocalisation-message')
+      while( error_message.firstChild ) {
+          error_message.removeChild( error_message.firstChild );
+      }
+      error_message.appendChild( document.createTextNode("La géolocalisation n'est pas supportée par votre navigateur.") );
+    } else {
+      navigator.geolocation.getCurrentPosition(success, error);
+    }
+
+  }
+
+  function add_layer_call_back(layer){
+    layer.addTo(drawnItems)
+    drawControlFull.remove(map)
+    drawControlEditOnly.addTo(map)
+    updateGeomField(wellknown.stringify(layer.toGeoJSON()))
+    if(geomType==="point"){
+      document.getElementById('create-point-geoposition').style.display = "none"
+      document.getElementById('erreur-geolocalisation').style.display = "none"
+    }
+  }
+
+  map.on("draw:created", function (e) {
+    var layer = e.layer
+    add_layer_call_back(layer)
+  })
+
+  map.on("draw:edited", function(e) {
+    var layers = e.layers
+    layers.eachLayer(function (layer) {
+      updateGeomField(wellknown.stringify(layer.toGeoJSON()))
+    })
+  })
+
+  map.on("draw:deleted", function(e) {
+    drawControlEditOnly.remove(map)
+    drawControlFull.addTo(map)
+    updateGeomField('')
+    if(geomType==="point"){
+      document.getElementById('create-point-geoposition').style.display = "inline"
+      document.getElementById('erreur-geolocalisation').style.display = "none"
+    }
+  })
+
+})
+</script>
+{% endblock %}

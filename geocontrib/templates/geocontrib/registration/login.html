@@ -1,0 +1,51 @@
+{% extends "geocontrib/base.html" %}
+
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="fourteen wide column">
+    <img class="ui centered small image" src="{{ LOGO_PATH }}">
+    <h2 class="ui center aligned icon header">
+      <div class="content">
+        {{ APPLICATION_NAME }}
+        <div class="sub header">{{ APPLICATION_ABSTRACT }}</div>
+      </div>
+    </h2>
+  </div>
+</div>
+<div class="row">
+  <div class="six wide column">
+    <h3 class="ui horizontal divider header">CONNEXION</h3>
+    {% if form.errors %}
+    <div class="ui warning message">
+      <div class="header">
+        Les informations d'identifications sont incorrectes.
+      </div>
+        NB: Seules les comptes actifs peuvent se connecter.
+    </div>
+    {% endif %}
+    <form class="ui form" method="post"  role="form" action="/connexion/">
+      {% csrf_token %}
+      <div class="ui stacked secondary  segment">
+        <div class="six field required">
+          <div class="ui left icon input">
+             <i class="user icon"></i>
+             <input type="text" name="username" placeholder="Utilisateur">
+          </div>
+        </div>
+        <div class="six field required">
+          <div class="ui left icon input">
+             <i class="lock icon"></i>
+             <input type="password" name="password" placeholder="Mot de passe">
+          </div>
+        </div>
+        <button  class="ui fluid large teal submit button" type="submit">Login</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'rest_framework',
     'rest_framework_gis',
-    'collab',
+    'geocontrib',
     'api',
 ]
 
@@ -68,7 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'collab.context_processors.custom_contexts',
+                'geocontrib.context_processors.custom_contexts',
             ],
         },
     },
@@ -139,13 +139,13 @@ MEDIA_URL = '/media/'
 
 # Extended properties
 
-AUTH_USER_MODEL = 'collab.User'
+AUTH_USER_MODEL = 'geocontrib.User'
 
-LOGIN_URL = 'collab:login'
+LOGIN_URL = 'geocontrib:login'
 
-LOGIN_REDIRECT_URL = 'collab:index'
+LOGIN_REDIRECT_URL = 'geocontrib:index'
 
-LOGOUT_REDIRECT_URL = 'collab:index'
+LOGOUT_REDIRECT_URL = 'geocontrib:index'
 
 DEFAULT_SENDING_FREQUENCY = 'daily'  # A choisir parmi: 'never', 'instantly', 'daily', 'weekly'
 
@@ -190,9 +190,9 @@ EMAIL_HOST_USER = 'CHANGEME'
 
 EMAIL_HOST_PASSWORD = 'CHANGEME'
 
-DEFAULT_FROM_EMAIL = 'no-reply@collab.fr'
+DEFAULT_FROM_EMAIL = 'no-reply@geocontrib.fr'
 
-# Custom Contexts: cf 'collab.context_processors.custom_contexts'
+# Custom Contexts: cf 'geocontrib.context_processors.custom_contexts'
 
 APPLICATION_NAME = 'Collab'
 

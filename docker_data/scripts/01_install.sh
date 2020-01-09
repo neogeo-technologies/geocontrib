@@ -19,7 +19,7 @@ if [ -f marker_file ]; then
 else
     django-admin startproject config .
 
-    create_link $SRC/collab/ .
+    create_link $SRC/geocontrib/ .
     create_link $SRC/api/ .
 
     # Preparation spécifique
@@ -49,7 +49,7 @@ else
 
     python manage.py migrate
     python manage.py shell -c "from django.contrib.auth import get_user_model; User= get_user_model(); User.objects.create_superuser('$COLLAB_ADMIN_USER', '$COLLAB_ADMIN_EMAIL', '$COLLAB_ADMIN_PWD')"
-    python manage.py loaddata $SRC/collab/data/perm.json
+    python manage.py loaddata $SRC/geocontrib/data/perm.json
 
     echo "Ok" > $marker_file
 fi

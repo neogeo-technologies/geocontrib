@@ -1,0 +1,12 @@
+{% extends "geocontrib/403.html" %}
+
+{% block content %}
+<div class="ui one column stackable center aligned page grid">
+   <div class="column twelve wide">
+      <div class="ui error small message">
+        <div class="header">Cette ressource n'est pas accessible. </div>
+        <a href="{% url 'geocontrib:index' %}" class="ui black button">Retour à l'accueil</a>
+      </div>
+   </div>
+</div>
+{% endblock %}

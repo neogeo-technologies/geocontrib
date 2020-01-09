@@ -1,4 +1,4 @@
-# Collab
+# Geocontrib
 
 Application de signalement collaboratif
 
@@ -14,15 +14,15 @@ Application de signalement collaboratif
 
 ```shell
 # Création d'un environnement virtuel Python
-python3.5 -m venv collab_venv/
+python3.5 -m venv geocontrib_venv/
 
 # Activation de cet environnement
-source collab_venv/bin/activate
+source geocontrib_venv/bin/activate
 
 # Clonage du projet - récupération des sources
 # Actuellement, la branche par défaut du projet est develop
 # Ce sera celle qui sera active par défaut immédiatement après le clonage
-git clone https://github.com/neogeo-technologies/collab.git src/
+git clone https://github.com/neogeo-technologies/geocontrib.git src/
 
 # Installer les dépendances
 pip install -r src/requirements.txt
@@ -31,13 +31,13 @@ pip install -r src/requirements.txt
 django-admin startproject config .
 
 # Création de liens symboliques pour que les sources soient visibles par Django
-ln -s src/collab/ .
+ln -s src/geocontrib/ .
 ln -s src/api/ .
 ```
 
 ### Édition des fichiers settings.py et url.py
 
-Copier le contenu du fichier /src/collab_sample/settings.py dans /config/settings.py.
+Copier le contenu du fichier /src/config_sample/settings.py dans /config/settings.py.
 
 Éditer les paramètres classiques de Django dans /config/settings.py :
 * SECRET_KEY https://docs.djangoproject.com/en/2.2/ref/settings/#secret-key
@@ -62,13 +62,13 @@ Copier le contenu du fichier /src/collab_sample/settings.py dans /config/setting
 * FILE_MAX_SIZE : taille maximale des fichiers téléversés dans l'application
 * DEFAULT_BASE_MAP : configuration du fond de carte par défaut
 
-Copier le contenu du fichier /src/collab_sample/urls.py dans /config/urls.py
+Copier le contenu du fichier /src/config_sample/urls.py dans /config/urls.py
 
 ### Création des tables et ajout de données initiales dans la base de données
 
 ```shell
 python manage.py migrate
-python manage.py loaddata src/collab/data/perm.json
+python manage.py loaddata src/geocontrib/data/perm.json
 ```
 
 Ne faites pas attention aux messages d'avertissement suivants :
@@ -84,8 +84,8 @@ du fichier settings.py.
 Par exemple, copier les images fournies dans les sources de l'application :
 ```shell
 mkdir media
-cp src/collab/static/collab/img/default.png media/
-cp src/collab/static/collab/img/logo.png media/
+cp src/geocontrib/static/geocontrib/img/default.png media/
+cp src/geocontrib/static/geocontrib/img/logo.png media/
 ```
 
 ### Création d'un superutilisateur

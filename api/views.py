@@ -13,9 +13,9 @@ from rest_framework.response import Response
 from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureSerializer
 from api.serializers import ProjectSerializer
-from collab.models import Authorization
-from collab.models import Feature
-from collab.models import Project
+from geocontrib.models import Authorization
+from geocontrib.models import Feature
+from geocontrib.models import Project
 
 User = get_user_model()
 

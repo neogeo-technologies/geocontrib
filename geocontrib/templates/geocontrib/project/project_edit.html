@@ -1,0 +1,174 @@
+{% extends "geocontrib/base.html" %}
+
+{% load app_filters %}
+{% csrf_token %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="fourteen wide column">
+
+  <form id="form-project-edit" action="." method="post" enctype="multipart/form-data" class="ui form">
+    {% if errors %}
+    <div class="ui error message">
+      {{ form.non_field_errors }}
+
+      {% for hidden_field in form.hidden_fields %}
+        {{ hidden_field.errors }}
+        {{ hidden_field }}
+      {% endfor %}
+    </div>
+    <i class="close icon"></i>
+    {% endif %}
+
+    <h1>
+      {% if action == 'update' %}
+        Édition du projet "{{ form.instance.title }}"
+      {% elif action == 'create' %}
+        Création d'un projet
+      {% endif %}
+    </h1>
+
+    <div class="ui horizontal divider">INFORMATIONS</div>
+
+    <div class="two fields">
+      <div class="required field">
+        <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+        <input type="text" required maxlength="{{ form.title.field.max_length }}"
+          name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}"
+          value="{% if form.title.value %}{{ form.title.value }}{% endif %}" >
+        {{ form.title.errors }}
+      </div>
+      <div class="field">
+        <label>{{ form.thumbnail.label }}</label>
+        {% if form.instance.thumbnail.url %}
+          <img class="ui small image" id="form-input-file-logo" src="{{ form.instance.thumbnail.url }}">
+        {% endif %}
+        <label class="ui icon button" for="{{ form.thumbnail.id_for_label }}">
+          <i class="file icon"></i>
+          {% if form.thumbnail.value %}
+            <span class="label">{{ form.thumbnail.value }}</span>
+          {% else %}
+            <span class="label">Sélectionner une image ...</span>
+          {% endif %}
+        </label>
+        <input type="file" accept="image/jpeg, image/png" style="display:none;"
+          name="{{ form.thumbnail.html_name }}" id="{{ form.thumbnail.id_for_label }}"
+          value="{{ form.thumbnail.value }}" >
+        {{ form.thumbnail.errors }}
+      </div>
+    </div>
+    <div class="field">
+      <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+      <textarea name="{{ form.description.html_name }}" rows="5">{% if form.description.value %}{{ form.description.value }}{% endif %}</textarea>
+      {{ form.description.errors }}
+    </div>
+
+    <div class="ui horizontal divider">PARAMÈTRES</div>
+
+    <div class="four fields">
+      <div class="field">
+        <label for="{{ form.archive_feature.id_for_label }}">{{ form.archive_feature.label }}</label>
+        <div class="ui right labeled input">
+          <input type="number" min="{{ form.archive_feature.field.min_value }}"
+          name="{{ form.archive_feature.html_name }}" id="{{ form.archive_feature.id_for_label }}"
+          value="{{ form.archive_feature.value }}">
+          <div class="ui label">jour(s)</div>
+        </div>
+        {{ form.archive_feature.errors }}
+      </div>
+      <div class="field">
+        <label for="{{ form.delete_feature.id_for_label }}">{{ form.delete_feature.label }}</label>
+        <div class="ui right labeled input">
+          <input type="number" min="{{ form.delete_feature.field.min_value }}"
+          name="{{ form.delete_feature.html_name }}" id="{{ form.delete_feature.id_for_label }}"
+          value="{{ form.delete_feature.value }}">
+          <div class="ui label">jour(s)</div>
+        </div>
+        {{ form.delete_feature.errors }}
+      </div>
+      <div class="required field">
+        <label for="{{ form.access_level_pub_feature.id_for_label }}">{{ form.access_level_pub_feature.label }}</label>
+        <div class="ui selection dropdown">
+          <input type="hidden"
+            name="{{ form.access_level_pub_feature.html_name }}" id="{{ form.access_level_pub_feature.id_for_label }}"
+            value="{{ form.access_level_pub_feature.value }}">
+          <div class="default text"></div>
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            {% for x,y in form.access_level_pub_feature.field.choices %}
+              <div class="item" data-value="{{ x }}" {% if form.access_level_pub_feature.value == x %} selected{% endif %}>{{ y }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        {{ form.access_level_pub_feature.errors }}
+      </div>
+      <div class="required field">
+        <label for="{{ form.access_level_arch_feature.id_for_label }}">{{ form.access_level_arch_feature.label }}</label>
+        <div class="ui selection dropdown">
+          <input type="hidden"
+            name="{{ form.access_level_arch_feature.html_name }}" id="{{ form.access_level_arch_feature.id_for_label }}"
+            value="{{ form.access_level_arch_feature.value }}">
+          <div class="default text"></div>
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            {% for x,y in form.access_level_arch_feature.field.choices %}
+              <div class="item" data-value="{{ x }}" {% if form.access_level_arch_feature.value == x %} selected{% endif %}>{{ y }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        {{ form.access_level_arch_feature.errors }}
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="ui checkbox">
+        <input type="checkbox" {% if form.moderation.value %}checked{% endif %}
+          name="{{ form.moderation.html_name }}" id="{{ form.moderation.id_for_label }}">
+        <label for="{{ form.moderation.id_for_label }}">{{ form.moderation.label }}</label>
+      </div>
+      {{ form.moderation.errors }}
+    </div>
+
+    <div class="ui divider"></div>
+
+    <button type="submit" class="ui teal icon button">
+      <i class="white save icon"></i> Enregistrer les changements
+    </button>
+
+  </form>
+
+</div>
+{% endblock %}
+
+
+{% block custom_resources %}
+<style media="screen">
+  #form-input-file-logo {
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>
+
+<script type="text/javascript">
+  function truncate(n, len) {
+    var ext = n.substring(n.lastIndexOf(".") + 1, n.length).toLowerCase()
+    var filename = n.replace('.' + ext, '')
+    if (filename.length <= len) {
+      return n
+    }
+    filename = filename.substr(0, len) + (n.length > len ? '[...]' : '')
+    return filename + '.' + ext
+  }
+
+  $(document).on('change', 'form [name={{ form.thumbnail.html_name }}]', function () {
+    var logoFile = $(this).prop('files')[0]
+    $(this).parent().children('label').children('.label').html(truncate(logoFile.name, 30))
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      $('#form-input-file-logo').attr('src', e.target.result);
+    }
+    reader.readAsDataURL(this.files[0]);
+  })
+</script>
+{% endblock %}
