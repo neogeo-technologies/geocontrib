@@ -8,8 +8,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - APP_PATH=/geocontrib_app
-        - SRC=src
+        - APP_PATH=/home/apprunner/geocontrib_app
         - GIT_BRANCH=develop
     environment:
       - SECRET_KEY=geocontrib-secret-key
@@ -25,7 +24,7 @@ services:
       - "8000:8000"
     volumes:
       - web_media:/geocontrib_app/media
-    command: ./src/docker_data/docker_run.sh
+    #command: ./src/docker_data/docker_run.sh
     depends_on:
       - database
 
