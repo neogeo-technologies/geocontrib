@@ -8,8 +8,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - APP_PATH=/geocontrib_app
-        - SRC=src
+        - APP_PATH=/home/apprunner/geocontrib_app
         - GIT_BRANCH=develop
     environment:
       - SECRET_KEY=geocontrib-secret-key
@@ -18,14 +17,14 @@ services:
       - PG_PASSWD=geocontrib
       - DB_NAME=geocontrib
       - DB_HOSTNAME=database
-      - COLLAB_ADMIN_USER=admin
-      - COLLAB_ADMIN_PWD=admin
-      - COLLAB_ADMIN_EMAIL=admin@acme.com
+      - APP_ADMIN_USER=admin
+      - APP_ADMIN_PWD=admin
+      - APP_ADMIN_EMAIL=admin@acme.com
     ports:
       - "8000:8000"
     volumes:
       - web_media:/geocontrib_app/media
-    command: ./src/docker_data/docker_run.sh
+    #command: ./src/docker_data/docker_run.sh
     depends_on:
       - database
 

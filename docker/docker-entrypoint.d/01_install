@@ -19,8 +19,8 @@ if [ -f marker_file ]; then
 else
     django-admin startproject config .
 
-    create_link $SRC/geocontrib/ .
-    create_link $SRC/api/ .
+    create_link src/geocontrib/ .
+    create_link src/api/ .
 
     # Preparation spécifique
     # Django
@@ -30,8 +30,8 @@ else
     if [ -f "config/settings.py" ]; then
         rm config/settings.py
     fi
-    cp $SRC/docker_data/settings.py config/settings.py
-    cp $SRC/docker_data/urls.py config/urls.py
+    cp src/docker/settings.py config/settings.py
+    cp src/docker/urls.py config/urls.py
 
     # Attente du serveur postgres
     echo "Waiting for database..."
@@ -48,8 +48,8 @@ else
     done
 
     python manage.py migrate
-    python manage.py shell -c "from django.contrib.auth import get_user_model; User= get_user_model(); User.objects.create_superuser('$COLLAB_ADMIN_USER', '$COLLAB_ADMIN_EMAIL', '$COLLAB_ADMIN_PWD')"
-    python manage.py loaddata $SRC/geocontrib/data/perm.json
+    python manage.py shell -c "from django.contrib.auth import get_user_model; User= get_user_model(); User.objects.create_superuser('$APP_ADMIN_USER', '$APP_ADMIN_EMAIL', '$APP_ADMIN_PWD')"
+    python manage.py loaddata src/geocontrib/data/perm.json
 
     echo "Ok" > $marker_file
 fi
