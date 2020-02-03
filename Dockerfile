@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.7-slim-buster
 LABEL maintainer="Benjamin Chartier at neogeo.fr"
 
 ENV PYTHONUNBUFFERED=1
