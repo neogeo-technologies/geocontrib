@@ -25,7 +25,7 @@ class HomePageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "Collab"
+        context["title"] = settings.APPLICATION_NAME
 
         context["can_create_project"] = False
         user = self.request.user
