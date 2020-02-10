@@ -7,14 +7,6 @@ ENV C_INCLUDE_PATH=/usr/include/gdal
 ENV LC_ALL="C.UTF-8"
 ENV LC_CTYPE="C.UTF-8"
 
-# args
-ARG APP_PATH
-# not used ?
-ARG GIT_BRANCH
-
-# Set envs
-ENV APP_PATH=$APP_PATH
-
 RUN apt-get update && \
     apt-get install -y libproj-dev gdal-bin && \
     apt-get install -y --no-install-recommends netcat && \
@@ -27,11 +19,14 @@ RUN echo deb http://deb.debian.org/debian testing main contrib non-free >> /etc/
     apt-get purge -y --auto-remove && \
     rm -rf /var/lib/apt/lists/*
 
-
 RUN useradd -r -m apprunner
 USER apprunner
+
+# Set envs
 ENV HOME=/home/apprunner
 ENV PATH=$HOME/.local/bin:$PATH
+ENV APP_PATH=$HOME/geocontrib_app
+
 # if WORKDIR only is set, then $APP_PATH will be owned by root :-/
 RUN mkdir $APP_PATH
 WORKDIR $APP_PATH
