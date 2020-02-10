@@ -11,25 +11,27 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+# reading .env file
+environ.Env.read_env()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'geocontrib-secret-key'
+SECRET_KEY = env.str('GEOCONTRIB_SECRET_KEY', default='CHANGE_ME')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('GEOCONTRIB_DEBUG', default=True)
 
 ALLOWED_HOSTS = ["*", "geocontrib"]
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -77,11 +79,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'geocontrib',
-        'USER': 'geocontrib',
-        'PASSWORD': 'geocontrib',
-        'HOST': 'database',
-        'PORT': '5432'
+        'NAME': env.str('DB_NAME', default='geocontrib'),
+        'USER': env.str('DB_USER', default='geocontrib'),
+        'PASSWORD': env.str('DB_PWD', default='geocontrib'),
+        'HOST': env.str('DB_HOST', default='geocontrib_db'),
+        'PORT': env.str('DB_PORT', default='5432')
     },
 }
 
@@ -102,34 +104,27 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
-
 LANGUAGE_CODE = 'fr-fr'
-TIME_ZONE = 'Europe/Paris'
+TIME_ZONE = env.str('GEOCONTRIB_TIME_ZONE', default='Europe/Paris')
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
+# Static and media files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
 # Extended properties
-
 AUTH_USER_MODEL = 'geocontrib.User'
 LOGIN_URL = 'geocontrib:login'
 LOGIN_REDIRECT_URL = 'geocontrib:index'
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
-DEFAULT_SENDING_FREQUENCY = 'never'  # A choisir parmi: 'never', 'instantly', 'daily', 'weekly'
 
 # Logging properties
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -149,31 +144,35 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',  # On evite de garder des log de debug
+            'level': env.str('GEOCONTRIB_LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
     },
 }
 
-
-# SMTP dev confs
-
+# E-mail and notification parameters
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = 'CHANGEME'
+EMAIL_HOST = 'CHANGE_ME'
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'CHANGEME'
-EMAIL_HOST_PASSWORD = 'CHANGEME'
+EMAIL_HOST_USER = 'CHANGE_ME'
+EMAIL_HOST_PASSWORD = 'CHANGE_ME'
 DEFAULT_FROM_EMAIL = 'no-reply@geocontrib.fr'
 
+# Notification frequency (allowed values: 'never', 'instantly', 'daily', 'weekly')
+DEFAULT_SENDING_FREQUENCY = env.str('GEOCONTRIB_DEFAULT_SENDING_FREQUENCY', default='never')
 
 # Custom Contexts: cf 'geocontrib.context_processors.custom_contexts'
+APPLICATION_NAME = env.str('GEOCONTRIB_APPLICATION_NAME', default='Geocontrib')
+APPLICATION_ABSTRACT = env.str('GEOCONTRIB_APPLICATION_ABSTRACT', default="Description de l'application")
+LOGO_PATH = env.str('GEOCONTRIB_LOGO_PATH', default=os.path.join(MEDIA_URL, 'logo.png'))
 
-APPLICATION_NAME = 'Collab'
-APPLICATION_ABSTRACT = "Description de l'application"
-LOGO_PATH = '/media/logo.png'
-IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
-FILE_MAX_SIZE = 10000000
+# Allowed formats for file attachments
+IMAGE_FORMAT = env.str('GEOCONTRIB_IMAGE_FORMAT', default='application/pdf,image/png,image/jpeg')
+
+# Max size of file attachments
+FILE_MAX_SIZE = env.int('GEOCONTRIB_FILE_MAX_SIZE', default=10000000)
+
 SITE_ID = 1
 
 DEFAULT_BASE_MAP = {

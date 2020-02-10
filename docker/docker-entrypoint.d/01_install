@@ -38,8 +38,8 @@ else
     i=1
     while true
     do
-        if  $(nc -z ${DB_HOSTNAME} 5432) ; then
-            echo "[${DB_HOSTNAME}] The database server is ready."
+        if  $(nc -z ${DB_HOST} 5432) ; then
+            echo "[${DB_HOST}] The database server is ready."
             break
         fi
         echo "[Retry: $i] The database server is not ready. Next attempt in ${TIME_SLEEP}s"
