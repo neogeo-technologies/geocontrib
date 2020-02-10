@@ -1,0 +1,115 @@
+---
+version: "3.5"
+
+services:
+  database:
+    image: georchestra/database:latest
+    environment:
+      - POSTGRES_USER=georchestra
+      - POSTGRES_PASSWORD=georchestra
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+
+  ldap:
+    image: georchestra/ldap:latest
+    environment:
+        - SLAPD_ORGANISATION=georchestra
+        - SLAPD_DOMAIN=georchestra.org
+        - SLAPD_PASSWORD=secret
+        - SLAPD_LOG_LEVEL=32768 # See https://www.openldap.org/doc/admin24/slapdconfig.html#loglevel%20%3Clevel%3E
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap
+
+  proxy:
+    image: georchestra/security-proxy:latest
+    depends_on:
+      - ldap
+      - database
+    volumes:
+      - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/config:/etc/georchestra
+    environment:
+      - JAVA_OPTIONS=-Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF
+      - XMS=256M
+      - XMX=1G
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=sp"
+      - "traefik.frontend.rule=Host:georchestra.mydomain.org"
+      - "traefik.frontend.passHostHeader=true"
+
+  cas:
+    image: georchestra/cas:latest
+    depends_on:
+      - ldap
+    volumes:
+      - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/config:/etc/georchestra
+    environment:
+      - JAVA_OPTIONS=-Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF
+      - XMS=256M
+      - XMX=1G
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=cas"
+      - "traefik.frontend.rule=Host:georchestra.mydomain.org;PathPrefix:/cas"
+
+#  header:
+#    image: georchestra/header:latest
+#    volumes:
+#      - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/config:/etc/georchestra
+#    environment:
+#      - JAVA_OPTIONS=-Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF
+#      - XMS=256M
+#      - XMX=512M
+
+#  georchestra.mydomain.org:
+#    image: traefik:1.7
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#      # uncomment the next line to get a web ui + api at https://georchestra.mydomain.org:8080/traefik/
+#      - "8080:8080"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/resources/ssl:/etc/traefik/ssl/
+#      - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/resources/traefik.toml:/traefik.toml
+
+  smtp:
+    image: camptocamp/smtp-sink:latest
+    volumes:
+      - smtp_maildir:/home/smtp/Maildir/
+
+  courier-imap:
+    image: camptocamp/courier-imap:latest
+    volumes:
+      - smtp_maildir:/home/smtp/Maildir/
+
+  webmail:
+    image: camptocamp/sqwebmail:latest
+    environment:
+      - IMAP_HOSTNAME=courier-imap
+      - SMTP_HOSTNAME=smtp-sink
+    volumes:
+      - smtp_maildir:/home/smtp/Maildir/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=webmail"
+      - "traefik.frontend.rule=Host:georchestra.mydomain.org;PathPrefix:/webmail"
+
+#  console:
+#    image: georchestra/console:latest
+#    depends_on:
+#      - ldap
+#      - database
+#    volumes:
+#      - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/config:/etc/georchestra
+#    environment:
+#      - JAVA_OPTIONS=-Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF
+#      - XMS=256M
+#      - XMX=1G
+
+volumes:
+  postgresql_data:
+  smtp_maildir:
+  ldap_data:
+  ldap_config:
