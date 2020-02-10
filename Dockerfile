@@ -36,7 +36,7 @@ RUN pip install --user --upgrade pip
 # Install python requirements
 COPY requirements.txt .
 RUN pip install --user -r requirements.txt gunicorn
-COPY --chown=apprunner . src/
+COPY --chown=apprunner .. src/
 
 
 EXPOSE 8000

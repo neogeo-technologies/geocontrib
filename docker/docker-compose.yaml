@@ -5,10 +5,8 @@ services:
   # ---------------------------------------------------------------- #
   geocontrib:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
-    env_file:
-      - geocontrib.dev.env
     environment:
       - TIME_SLEEP=5
       - DB_USER=geocontrib
@@ -22,10 +20,9 @@ services:
     ports:
       - "8008:8000"
     volumes:
-      - ../volumes/geocontrib_media:/home/apprunner/geocontrib_app/media
-      - ../volumes/geocontrib_config:/home/apprunner/geocontrib_app/config
-      - .:/home/apprunner/geocontrib_app/src
-    command: python manage.py runserver 0.0.0.0:8000
+      - geocontrib_media:/home/apprunner/geocontrib_app/media
+      - geocontrib_config:/home/apprunner/geocontrib_app/config
+    #command: ./src/docker_data/docker_run.sh
     depends_on:
       - geocontrib_db
 
@@ -42,3 +39,5 @@ services:
 
 volumes:
   geocontrib_data:
+  geocontrib_media:
+  geocontrib_config:
