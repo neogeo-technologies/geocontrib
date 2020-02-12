@@ -25,7 +25,6 @@ services:
       - ../../volumes/geocontrib_media:/home/apprunner/geocontrib_app/media
       - ../../volumes/geocontrib_config:/home/apprunner/geocontrib_app/config
       - ..:/home/apprunner/geocontrib_app/src
-    command: python manage.py runserver 0.0.0.0:8000
     depends_on:
       - geocontrib_db
 

@@ -2,6 +2,12 @@
 docker-geocontrib-up:
 	docker-compose -f docker-compose.dev.yaml up -d
 
+docker-geocontrib-logs-f:
+	docker-compose -f docker-compose.dev.yaml logs -f
+
+docker-geocontrib-ps:
+	docker-compose -f docker-compose.dev.yaml ps
+
 docker-geocontrib-rm:
 	docker-compose -f docker-compose.dev.yaml stop
 	docker-compose -f docker-compose.dev.yaml rm -f
@@ -31,3 +37,9 @@ docker-all-clean-images:
 
 docker-all-clean-all:
 	docker-compose -f docker-compose.dev.yaml -f docker-compose.georchestra.yaml down --volumes --rmi 'all' --remove-orphans
+
+docker-all-ps:
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.georchestra.yaml ps
+
+docker-all-logs-f:
+	docker-compose -f docker-compose.dev.yaml -f docker-compose.georchestra.yaml logs -f
