@@ -31,6 +31,11 @@ ENV APP_PATH=$HOME/geocontrib_app
 RUN mkdir $APP_PATH
 WORKDIR $APP_PATH
 
+RUN mkdir $APP_PATH/config
+RUN mkdir $APP_PATH/media
+VOLUME $APP_PATH/config
+VOLUME $APP_PATH/media
+
 # Upgrade pip
 RUN pip install --user --upgrade pip
 # Install python requirements
