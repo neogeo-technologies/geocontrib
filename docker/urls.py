@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path
 from django.urls import include
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -8,6 +11,13 @@ urlpatterns = [
     path('', include('geocontrib.urls', namespace='geocontrib')),
 ]
 
-handler404 = 'geocontrib.views.error.custom_404'
+# add prefix to URL
+urlpatterns = [path('geocontrib/', include(urlpatterns))]
 
+# static and media paths
+urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# error handlers
+handler404 = 'geocontrib.views.error.custom_404'
 handler403 = 'geocontrib.views.error.custom_403'
