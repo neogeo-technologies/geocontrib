@@ -7,24 +7,13 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
-    environment:
-      - TIME_SLEEP=5
-      - DB_USER=geocontrib
-      - DB_PWD=geocontrib
-      - DB_NAME=geocontrib
-      - DB_HOST=geocontrib_db
-      - DB_PORT=5432
-      - APP_ADMIN_USER=admin
-      - APP_ADMIN_PWD=admin
-      - APP_ADMIN_EMAIL=admin@acme.com
-      - GEOCONTRIB_APPLICATION_NAME=Geocontrib
-      - GEOCONTRIB_APPLICATION_ABSTRACT=Description de l'application (docker/docker-compose.dev.env)
+    env_file:
+      - geocontrib.env
     ports:
       - "8000:8000"
     volumes:
       - geocontrib_media:/home/apprunner/geocontrib_app/media
       - geocontrib_config:/home/apprunner/geocontrib_app/config
-    #command: ./src/docker_data/docker_run.sh
     depends_on:
       - geocontrib_db
 
