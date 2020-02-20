@@ -17,6 +17,8 @@ services:
       - APP_ADMIN_USER=admin
       - APP_ADMIN_PWD=admin
       - APP_ADMIN_EMAIL=admin@acme.com
+      - GEOCONTRIB_APPLICATION_NAME=Geocontrib
+      - GEOCONTRIB_APPLICATION_ABSTRACT=Description de l'application (docker/docker-compose.dev.env)
     ports:
       - "8000:8000"
     volumes:

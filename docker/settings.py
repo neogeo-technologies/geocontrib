@@ -112,10 +112,13 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# URL prefix
+URL_PREFIX = "geocontrib/"
+
 # Static and media files
-STATIC_URL = '/static/'
+STATIC_URL = '/{}static/'.format(URL_PREFIX)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-MEDIA_URL = '/media/'
+MEDIA_URL = '/{}media/'.format(URL_PREFIX)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Extended properties

@@ -4,6 +4,7 @@ from django.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
 
+url_prefix = settings.URL_PREFIX
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -12,7 +13,7 @@ urlpatterns = [
 ]
 
 # add prefix to URL
-urlpatterns = [path('geocontrib/', include(urlpatterns))]
+urlpatterns = [path(url_prefix, include(urlpatterns))]
 
 # static and media paths
 urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
