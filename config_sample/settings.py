@@ -11,25 +11,27 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+# reading .env file
+environ.Env.read_env()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'CHANGEME'
+SECRET_KEY = env.str('GEOCONTRIB_SECRET_KEY', default='CHANGE_ME')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('GEOCONTRIB_DEBUG', default=True)
 
-ALLOWED_HOSTS = ["*"]
-
+ALLOWED_HOSTS = ["*", "geocontrib"]
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,7 +46,6 @@ INSTALLED_APPS = [
     'geocontrib',
     'api',
 ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -54,9 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 ROOT_URLCONF = 'config.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -73,27 +72,23 @@ TEMPLATES = [
         },
     },
 ]
-
 WSGI_APPLICATION = 'config.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'reporting_poc',
-        'USER': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432'
+        'NAME': env.str('GEOCONTRIB_DB_NAME', default='geocontrib'),
+        'USER': env.str('GEOCONTRIB_DB_USER', default='geocontrib'),
+        'PASSWORD': env.str('GEOCONTRIB_DB_PWD', default='geocontrib'),
+        'HOST': env.str('GEOCONTRIB_DB_HOST', default='geocontrib_db'),
+        'PORT': env.str('GEOCONTRIB_DB_PORT', default='5432')
     },
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -109,48 +104,27 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
-
 LANGUAGE_CODE = 'fr-fr'
-
-TIME_ZONE = 'Europe/Paris'
-
+TIME_ZONE = env.str('GEOCONTRIB_TIME_ZONE', default='Europe/Paris')
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
-
+# Static and media files
 STATIC_URL = '/static/'
-
-# Renseigner le path du static/
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
-
-# Renseigner le path du media/
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Extended properties
-
 AUTH_USER_MODEL = 'geocontrib.User'
-
 LOGIN_URL = 'geocontrib:login'
-
 LOGIN_REDIRECT_URL = 'geocontrib:index'
-
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
 
-DEFAULT_SENDING_FREQUENCY = 'daily'  # A choisir parmi: 'never', 'instantly', 'daily', 'weekly'
-
 # Logging properties
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -170,66 +144,63 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',  # On evite de garder des log de debug
+            'level': env.str('GEOCONTRIB_LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
     },
 }
 
-# SMTP dev confs
-
+# E-mail and notification parameters
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-EMAIL_HOST = 'CHANGEME'
-
+EMAIL_HOST = 'CHANGE_ME'
 # EMAIL_PORT = 587
-
 # EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = 'CHANGEME'
-
-EMAIL_HOST_PASSWORD = 'CHANGEME'
-
+EMAIL_HOST_USER = 'CHANGE_ME'
+EMAIL_HOST_PASSWORD = 'CHANGE_ME'
 DEFAULT_FROM_EMAIL = 'no-reply@geocontrib.fr'
 
+# Notification frequency (allowed values: 'never', 'instantly', 'daily', 'weekly')
+DEFAULT_SENDING_FREQUENCY = env.str('GEOCONTRIB_DEFAULT_SENDING_FREQUENCY', default='never')
+
 # Custom Contexts: cf 'geocontrib.context_processors.custom_contexts'
+APPLICATION_NAME = env.str('GEOCONTRIB_APPLICATION_NAME', default='Geocontrib')
+APPLICATION_ABSTRACT = env.str('GEOCONTRIB_APPLICATION_ABSTRACT', default="Description de l'application")
+LOGO_PATH = env.str('GEOCONTRIB_LOGO_PATH', default=os.path.join(MEDIA_URL, 'logo.png'))
 
-APPLICATION_NAME = 'Collab'
+# Allowed formats for file attachments
+IMAGE_FORMAT = env.str('GEOCONTRIB_IMAGE_FORMAT', default='application/pdf,image/png,image/jpeg')
 
-APPLICATION_ABSTRACT = "Description de l'application"
-
-LOGO_PATH = '/media/logo.png'
-
-IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
-
-FILE_MAX_SIZE = 10000000
+# Max size of file attachments
+FILE_MAX_SIZE = env.int('GEOCONTRIB_FILE_MAX_SIZE', default=10000000)
 
 SITE_ID = 1
 
-# Fond de carte par défaut
-DEFAULT_BASE_MAP = {
-    'SERVICE': 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
-    'OPTIONS': {
-        'attribution': '&copy; contributeurs d\'<a href="https://osm.org/copyright">OpenStreetMap</a>',
-        'maxZoom': 20
+# Default basemap config (following leaflet syntax)
+DEFAULT_BASE_MAP = env.dict('GEOCONTRIB_DEFAULT_BASE_MAP', default=
+    {
+        'SERVICE': 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+        'OPTIONS': {
+            'attribution': '&copy; contributeurs d\'<a href="https://osm.org/copyright">OpenStreetMap</a>',
+            'maxZoom': 20
+        }
     }
+)
+
+# Default project map extent
+# France (continental extent)
+DEFAULT_MAP_VIEW = {
+    'center': [47.0, 1.0],
+    'zoom': 4
 }
 
-# Emprise par défaut de la carte
-# Région Hauts-de-France
+# Hauts-de-France administrative area
 # DEFAULT_MAP_VIEW = {
 #     'center': [50.00976, 2.8657699],
 #     'zoom': 7
 # }
 
-# Région Bourgogne Franche Comté
+# Bourgogne Franche Comté administrative area
 # DEFAULT_MAP_VIEW = {
 #     'center': [47.5, 5.7],
 #     'zoom': 7
 # }
-
-# France métropolitaine
-DEFAULT_MAP_VIEW = {
-    'center': [47.0, 1.0],
-    'zoom': 4
-}

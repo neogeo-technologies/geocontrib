@@ -1,0 +1,43 @@
+---
+version: "3.5"
+
+services:
+  # ---------------------------------------------------------------- #
+  geocontrib:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    env_file:
+      - docker-compose.dev.env
+    environment:
+      - TIME_SLEEP=5
+      - DB_USER=geocontrib
+      - DB_PWD=geocontrib
+      - DB_NAME=geocontrib
+      - DB_HOST=geocontrib_db
+      - DB_PORT=5432
+      - APP_ADMIN_USER=admin
+      - APP_ADMIN_PWD=admin
+      - APP_ADMIN_EMAIL=admin@acme.com
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../volumes/geocontrib_media:/home/apprunner/geocontrib_app/media
+      - ../../volumes/geocontrib_config:/home/apprunner/geocontrib_app/config
+      - ..:/home/apprunner/geocontrib_app/src
+    depends_on:
+      - geocontrib_db
+
+  # ---------------------------------------------------------------- #
+  geocontrib_db:
+    image: mdillon/postgis:latest
+    environment:
+      - POSTGRES_USER=geocontrib
+      - POSTGRES_PASSWORD=geocontrib
+      - POSTGRES_DB=geocontrib
+    volumes:
+      - geocontrib_data:/var/lib/postgresql/data/
+    restart: always
+
+volumes:
+  geocontrib_data:
