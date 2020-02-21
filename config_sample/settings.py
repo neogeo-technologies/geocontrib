@@ -82,7 +82,7 @@ DATABASES = {
         'NAME': env.str('GEOCONTRIB_DB_NAME', default='geocontrib'),
         'USER': env.str('GEOCONTRIB_DB_USER', default='geocontrib'),
         'PASSWORD': env.str('GEOCONTRIB_DB_PWD', default='geocontrib'),
-        'HOST': env.str('GEOCONTRIB_DB_HOST', default='geocontrib_db'),
+        'HOST': env.str('GEOCONTRIB_DB_HOST', default='geocontrib-db'),
         'PORT': env.str('GEOCONTRIB_DB_PORT', default='5432')
     },
 }

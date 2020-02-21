@@ -4,21 +4,23 @@ version: "3.5"
 services:
 
   geocontrib:
+    container_name: "geocontrib_django"
     build:
       context: ..
       dockerfile: Dockerfile
     env_file:
-      - geocontrib.env
+      - geocontrib/geocontrib.env
     ports:
-      - "8000:8000"
+      - "5000:5000"
     volumes:
       - geocontrib_media:/home/apprunner/geocontrib_app/media
-      - geocontrib_config:/home/apprunner/geocontrib_app/config
+      - geocontrib_static:/home/apprunner/geocontrib_app/static
     depends_on:
-      - geocontrib_db
+      - geocontrib-db
 
   # ---------------------------------------------------------------- #
-  geocontrib_db:
+  geocontrib-db:
+    container_name: "geocontrib_db"
     image: mdillon/postgis:latest
     environment:
       - POSTGRES_USER=geocontrib
@@ -26,7 +28,22 @@ services:
       - POSTGRES_DB=geocontrib
     volumes:
       - geocontrib_data:/var/lib/postgresql/data/
-    restart: always
+
+  # ---------------------------------------------------------------- #
+  geocontrib-nginx:
+    container_name: "geocontrib_nginx"
+    image: nginx:stable
+    env_file:
+      - geocontrib/geocontrib.env
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - geocontrib_media:/opt/geocontrib/media
+      - geocontrib_static:/opt/geocontrib/static
+    ports:
+      - "8000:80"
+    depends_on:
+      - geocontrib
+    command: /bin/bash -c "envsubst '$$URL_PREFIX' < /etc/nginx/conf.d/geocontrib.template > /etc/nginx/conf.d/geocontrib.conf && nginx -g 'daemon off;'"
 
   # ---------------------------------------------------------------- #
   database:
@@ -143,7 +160,7 @@ services:
 volumes:
   geocontrib_data:
   geocontrib_media:
-  geocontrib_config:
+  geocontrib_static:
   postgresql_data:
   smtp_maildir:
   ldap_data:

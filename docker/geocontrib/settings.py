@@ -80,7 +80,7 @@ DATABASES = {
         'NAME': config("DB_NAME", default='geocontrib'),
         'USER': config("DB_USER", default='geocontrib'),
         'PASSWORD': config("DB_PWD", default='geocontrib'),
-        'HOST': config("DB_HOST", default='geocontrib_db'),
+        'HOST': config("DB_HOST", default='geocontrib-db'),
         'PORT': config("DB_PORT", default='5432')
     },
 }
