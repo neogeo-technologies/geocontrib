@@ -47,6 +47,8 @@ class Command(BaseCommand):
     """
 
     def extract_cp(self, org='psc'):
+        for key in [LDAP_URI, LDAP_BINDDN, LDAP_PASSWD]:
+            logger.debug(key)
         connexion = Connection(LDAP_URI, LDAP_BINDDN, LDAP_PASSWD, auto_bind=True)
         logger.info(connexion)
         connexion.search(

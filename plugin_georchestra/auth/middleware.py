@@ -52,6 +52,7 @@ class RemoteUserMiddleware(object):
         return True
 
     def process_request(self, request):
+        logger.debug(request.META)
         sid_user_id = request.META.get(self.header)
         if self.oidc_setted and sid_user_id:
             logger.info('HEADER_UID: {header_uid}, VALUE: {value}'.format(

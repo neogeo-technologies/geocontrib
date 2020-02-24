@@ -148,6 +148,11 @@ LOGGING = {
             'level': config('LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
+        'plugin_georchestra': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
 
