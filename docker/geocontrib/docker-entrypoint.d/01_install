@@ -21,6 +21,7 @@ else
 
     create_link src/geocontrib/ .
     create_link src/api/ .
+    create_link src/plugin_georchestra/ .
 
     # Preparation spécifique
     # Django
