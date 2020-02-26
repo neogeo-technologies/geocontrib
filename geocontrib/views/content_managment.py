@@ -850,7 +850,6 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
     slug_url_kwarg = 'feature_type_slug'
 
     def test_func(self):
-        return True
         user = self.request.user
         feature_type = self.get_object()
         project = feature_type.project
@@ -1184,13 +1183,12 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
                 layer_formset = self.LayerFormSet(queryset=layers)
         else:
             logger.error(layer_formset.errors)
-
-        context = {
-            'project': project,
-            'layers': serialized_layers.data,
-            'layer_formset': layer_formset
-        }
-        return render(request, 'geocontrib/project/project_mapping.html', context)
+            context = {
+                'project': project,
+                'layers': serialized_layers.data,
+                'layer_formset': layer_formset
+            }
+            return render(request, 'geocontrib/project/project_mapping.html', context)
 
         messages.error(request, "L'édition des couches cartographiques a échouée. ")
         logger.error(layer_formset.errors)
