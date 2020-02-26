@@ -1,9 +1,10 @@
 from collections import Counter
+import json
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from ldap3 import Connection, LEVEL
+from ldap3 import Connection, LEVEL, ALL_ATTRIBUTES, ALL_OPERATIONAL_ATTRIBUTES
 from decouple import config, Csv
 
 import logging
@@ -11,9 +12,13 @@ import logging
 
 # TODO: A voir si ces variables doivent etre définies dans les settings
 # ou juste au niveau systeme (je penche pour le systeme)
-LDAP_URI = config('LDAP_URI', default=None)
-LDAP_BINDDN = config('LDAP_BINDDN', default=None)
-LDAP_PASSWD = config('LDAP_PASSWD', default=None)
+# LDAP_URI = config('LDAP_URI', default=None)
+# LDAP_BINDDN = config('LDAP_BINDDN', default=None)
+# LDAP_PASSWD = config('LDAP_PASSWD', default=None)
+LDAP_URI = "ldap://ldap"
+LDAP_BINDDN = "cn=admin,dc=georchestra,dc=org"
+LDAP_PASSWD = "secret"
+
 LDAP_ORGS_BASEDN = config('LDAP_ORGS_BASEDN', default=None)
 LDAP_SEARCH_FILTER = config('LDAP_SEARCH_FILTER', default=None)
 ROLE_PREFIX = config('ROLE_PREFIX', default=None)
@@ -46,35 +51,23 @@ class Command(BaseCommand):
 
     """
 
-    def extract_cp(self, org='psc'):
-        for key in [LDAP_URI, LDAP_BINDDN, LDAP_PASSWD]:
-            logger.debug(key)
-        connexion = Connection(LDAP_URI, LDAP_BINDDN, LDAP_PASSWD, auto_bind=True)
-        logger.info(connexion)
-        connexion.search(
-            search_base=LDAP_ORGS_BASEDN,
-            search_filter=LDAP_SEARCH_FILTER % org,
-            search_scope=LEVEL,
-            attributes=["description"])
+    def search_ldap(self, connection):
+        connection.search(
+            search_base="dc=georchestra,dc=org",
+            search_filter="(objectClass=person)",
+            attributes=[ALL_ATTRIBUTES, ALL_OPERATIONAL_ATTRIBUTES])
 
-        for entry in connexion.entries:
-            if len(entry['description']) == 0:
-                res = []
-            else:
-                res = ','.join(entry['description']).split(',')
-            connexion.unbind()
-            return res
-
-        if not connexion.closed:
-            connexion.unbind()
-        logger.error('Error querying LDAP for org {}: entry does not exist'.format(org))
-        return []
+        return [json.loads(data.entry_to_json()) for data in connection.entries]
 
     def get_remote_data(self):
         # TODO: Lorsque le docker de geoorchestra sera en place
         # recuperer les données remote depuis ce serveur et mapper les données
         # pour en faire une liste exploitable
-        self.extract_cp()
+        for key in [LDAP_URI, LDAP_BINDDN, LDAP_PASSWD]:
+            logger.debug(key)
+        connection = Connection(LDAP_URI, LDAP_BINDDN, LDAP_PASSWD, auto_bind=True)
+        data = self.search_ldap(connection)
+        return data
 
     def check_remote_data(self, remote_data):
         if len(remote_data) == 0:

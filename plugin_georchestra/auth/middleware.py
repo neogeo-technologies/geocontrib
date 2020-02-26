@@ -32,8 +32,8 @@ IGNORE_PATH = getattr(settings, 'IGNORE_PATH', ['geocontrib:login', ])
 
 class RemoteUserMiddleware(object):
 
-    header = getattr(settings, 'HEADER_UID', 'REMOTE_USER')
-    oidc_setted = getattr(settings, 'OIDC_SETTED', False)
+    header = getattr(settings, 'HEADER_UID', 'HTTP_SEC_USERNAME')
+    sso_env_setted = getattr(settings, 'SSO_SETTED', False)
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -51,10 +51,13 @@ class RemoteUserMiddleware(object):
             return IGNORE_PATH.count(namespace) > 0
         return True
 
+    def sso_setted(self, request):
+        return self.sso_env_setted and request.META.get('HTTP_SEC_PROXY', 'false') == 'true'
+
     def process_request(self, request):
         logger.debug(request.META)
         sid_user_id = request.META.get(self.header)
-        if self.oidc_setted and sid_user_id:
+        if self.sso_setted(request) and sid_user_id:
             logger.info('HEADER_UID: {header_uid}, VALUE: {value}'.format(
                 header_uid=self.header,
                 value=sid_user_id,

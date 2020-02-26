@@ -8,7 +8,7 @@ ENV LC_ALL="C.UTF-8"
 ENV LC_CTYPE="C.UTF-8"
 
 RUN apt-get update && \
-    apt-get install -y libproj-dev gdal-bin && \
+    apt-get install -y libproj-dev gdal-bin ldap-utils && \
     apt-get install -y --no-install-recommends netcat && \
     apt-get clean -y
 
