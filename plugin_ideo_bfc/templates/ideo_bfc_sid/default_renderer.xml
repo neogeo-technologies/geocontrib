@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<error xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="error.xsd">{% if data.detail %}
+  <detail>{{data.detail}}</detail>{% else %}{% for key, value in data.items %}
+  <{{key}}>{{value}}</{{key}}>{% endfor %}{% endif %}
+</error>
