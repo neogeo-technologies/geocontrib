@@ -10,6 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls', namespace='api')),
     path('', include('geocontrib.urls', namespace='geocontrib')),
+    path('ideo-bfc/api', include('plugin_ideo_bfc.urls', namespace='plugin_ideo_bfc')),
 ]
 # add prefix to URL
 urlpatterns = [path(url_prefix, include(urlpatterns))]

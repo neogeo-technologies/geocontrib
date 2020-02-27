@@ -86,13 +86,13 @@ class RootTestCase(APITransactionTestCase):
         """
 
         with open(self.put_create_xml_path) as fp2:
-            data = {'file': fp2}
+
             resp = self.client.put(
                 reverse(
                     self.update_url_path,
                     kwargs={'username': self.username_pust}
                 ),
-                data=fp2.read(),
+                data=fp2.read(),  # {'file': fp2}
                 content_type='application/xml',
             )
             logger.info(
