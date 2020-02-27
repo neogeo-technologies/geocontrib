@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<employeeProfile>
+    <externalId>307163</externalId>
+    <id>307163</id>
+    <label>Employee test</label>
+    <name>Employee test</name>
+    <address>
+        <city>Lyon</city>
+        <country>FR</country>
+        <postalAddress>1 rue</postalAddress>
+        <postalCode>69000</postalCode>
+    </address>
+    <alfUserName>307163@294679.ternum</alfUserName>
+    <email>test@disable.com</email>
+    <enabled>false</enabled>
+    <password>$s0$e0801$g317ZcxLr17mgNnTvp8p2Q==$LG2rqztt+Nd0rhmRSTei1y/3LavAPkwtmVhVmeEvxsc=</password>
+    <prefComMedia>EMAIL</prefComMedia>
+    <roles>
+        <role>
+            <externalId>2</externalId>
+            <id>67156</id>
+            <label>Administrateur Service</label>
+            <name>Administrateur Service</name>
+            <application>
+                <externalId>6</externalId>
+                <id>67144</id>
+                <label>Salle des marchés</label>
+                <name>sdm</name>
+                <description>Les profils acheteurs de Bourgogne Franche-Comté</description>
+                <pictoUrl>https://www.google.com/</pictoUrl>
+                <url>https://www.google.com/</url>
+            </application>
+            <hidden>false</hidden>
+        </role>
+    </roles>
+    <user>
+        <externalId>316363</externalId>
+        <id>316363</id>
+        <label>test test</label>
+        <name>User test test1571836007017</name>
+        <civility>MR</civility>
+        <enabled>true</enabled>
+        <expirationDatePassword>22/10/2020</expirationDatePassword>
+        <firstname>test</firstname>
+        <lastname>test</lastname>
+        <password>$s0$e0801$g317ZcxLr17mgNnTvp8p2Q==$LG2rqztt+Nd0rhmRSTei1y/3LavAPkwtmVhVmeEvxsc=</password>
+        <sviProfile>
+            <id>195079</id>
+        </sviProfile>
+        <username>test@disable.com</username>
+    </user>
+    <username>test@disable.com</username>
+    <companyDepartment>
+        <externalId>295611</externalId>
+        <id>295611</id>
+        <label>Niveau racine</label>
+        <name>root</name>
+        <acronym>dep</acronym>
+        <address>
+            <canton>Aucun</canton>
+            <city>VILLEURBANNE</city>
+            <country>FR</country>
+            <insee>69266</insee>
+            <postalAddress>128 CRS EMILE ZOLA</postalAddress>
+            <postalCode>69100</postalCode>
+        </address>
+        <email>test@test.fr</email>
+        <company>
+            <externalId>294679</externalId>
+            <id>294679</id>
+            <label>Entreprise de Test</label>
+            <name>Entreprise de Test</name>
+            <acronym>ENT</acronym>
+            <address>
+                <canton>Aucun</canton>
+                <city>VILLEURBANNE</city>
+                <country>FR</country>
+                <insee>69266</insee>
+                <postalAddress>128 CRS EMILE ZOLA</postalAddress>
+                <postalCode>69100</postalCode>
+            </address>
+            <applications/>
+            <email>test@test.fr</email>
+            <enabled>true</enabled>
+            <siren>538711526</siren>
+            <tenantIdentifier>294679.ternum</tenantIdentifier>
+            <administrativeState>
+                <adminStateLastUpdated>2019-10-23T15:03:39+02:00</adminStateLastUpdated>
+                <adminStateValue>STATUS_UNKNOWN</adminStateValue>
+            </administrativeState>
+            <apeCode>5610C</apeCode>
+            <apeNafLabel>Restauration de type rapide</apeNafLabel>
+            <companyCategory>NON_RENSEIGNEE</companyCategory>
+            <creationDate>2010-09-04T00:00:00+01:00</creationDate>
+            <diffusableInformations>true</diffusableInformations>
+            <foreignIdentifier>false</foreignIdentifier>
+            <insee>69266</insee>
+            <lastUpdate>2019-10-23T15:03:39+02:00</lastUpdate>
+            <legalCategory>SARL</legalCategory>
+            <nic>00017</nic>
+            <RCS>false</RCS>
+            <RM>false</RM>
+            <registrationCountry>FR</registrationCountry>
+            <responsibles>
+                <responsible>
+                    <externalId>458443</externalId>
+                    <id>458443</id>
+                    <label>nom Responsable</label>
+                    <name>nom Responsable</name>
+                    <civility>MR</civility>
+                    <firstname>Jean</firstname>
+                    <function>GERANT</function>
+                    <lastname>Lo</lastname>
+                    <type>PP</type>
+                </responsible>
+            </responsibles>
+        </company>
+        <nic>00017</nic>
+    </companyDepartment>
+    <establishment>
+        <externalId>50097</externalId>
+        <id>50097</id>
+        <label>test bgu</label>
+        <name>test bgu</name>
+        <address>
+            <canton>Aucun</canton>
+            <city>VILLEURBANNE</city>
+            <country>FR</country>
+            <insee>69266</insee>
+            <postalAddress>128 CRS EMILE ZOLA</postalAddress>
+            <postalCode>69100</postalCode>
+        </address>
+        <administrativeState>
+            <adminStateLastUpdated>2019-10-23T15:03:27+02:00</adminStateLastUpdated>
+            <adminStateValue>STATUS_UNKNOWN</adminStateValue>
+        </administrativeState>
+        <apeCode>5610C</apeCode>
+        <apeNafLabel>Restauration de type rapide</apeNafLabel>
+        <company>
+            <externalId>294679</externalId>
+            <id>294679</id>
+            <label>Entreprise de Test</label>
+            <name>Entreprise de Test</name>
+            <acronym>ENT</acronym>
+            <address>
+                <canton>Aucun</canton>
+                <city>VILLEURBANNE</city>
+                <country>FR</country>
+                <insee>69266</insee>
+                <postalAddress>128 CRS EMILE ZOLA</postalAddress>
+                <postalCode>69100</postalCode>
+            </address>
+            <applications/>
+            <email>test@test.fr</email>
+            <enabled>true</enabled>
+            <siren>538711526</siren>
+            <tenantIdentifier>294679.ternum</tenantIdentifier>
+            <administrativeState>
+                <adminStateLastUpdated>2019-10-23T15:03:39+02:00</adminStateLastUpdated>
+                <adminStateValue>STATUS_UNKNOWN</adminStateValue>
+            </administrativeState>
+            <apeCode>5610C</apeCode>
+            <apeNafLabel>Restauration de type rapide</apeNafLabel>
+            <companyCategory>NON_RENSEIGNEE</companyCategory>
+            <creationDate>2010-09-04T00:00:00+01:00</creationDate>
+            <diffusableInformations>true</diffusableInformations>
+            <foreignIdentifier>false</foreignIdentifier>
+            <insee>69266</insee>
+            <lastUpdate>2019-10-23T15:03:39+02:00</lastUpdate>
+            <legalCategory>SARL</legalCategory>
+            <nic>00017</nic>
+            <RCS>false</RCS>
+            <RM>false</RM>
+            <registrationCountry>FR</registrationCountry>
+            <responsibles/>
+        </company>
+        <diffusableInformations>true</diffusableInformations>
+        <email>test@test.fr</email>
+        <foreignIdentifier>false</foreignIdentifier>
+        <isHeadOffice>true</isHeadOffice>
+        <lastUpdate>2019-06-24T13:37:47+02:00</lastUpdate>
+        <nic>00010</nic>
+        <phone>0400000000</phone>
+        <siret>53871152600017</siret>
+    </establishment>
+    <nic>00017</nic>
+</employeeProfile>

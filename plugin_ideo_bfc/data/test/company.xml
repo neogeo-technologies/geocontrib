@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<company>
+    <logoUrl>https://www.telerama.fr/sites/tr_master/files/styles/simplecrop1000/public/magnum_0.jpg</logoUrl>
+    <externalId>294679</externalId>
+    <id>294679</id>
+    <label>Entreprise de Test</label>
+    <name>Entreprise de Test</name>
+    <acronym>ENT</acronym>
+    <address>
+        <canton>Aucun</canton>
+        <city>VILLEURBANNE</city>
+        <country>FR</country>
+        <insee>69266</insee>
+        <postalAddress>128 CRS EMILE ZOLA</postalAddress>
+        <postalCode>69100</postalCode>
+        <streetName>EMILE ZOLA</streetName>
+        <streetNumber>128</streetNumber>
+        <streetType>CRS</streetType>
+    </address>
+    <applications/>
+    <email>test@test.fr</email>
+    <enabled>true</enabled>
+    <siren>538711526</siren>
+    <tenantIdentifier>294679.ternum</tenantIdentifier>
+    <administrativeState>
+        <adminStateLastUpdated>2019-10-23T15:03:38.980+02:00</adminStateLastUpdated>
+        <adminStateValue>STATUS_UNKNOWN</adminStateValue>
+    </administrativeState>
+    <apeCode>5610C</apeCode>
+    <apeNafLabel>Restauration de type rapide</apeNafLabel>
+    <companyCategory>NON_RENSEIGNEE</companyCategory>
+    <creationDate>2010-09-04T00:00:00+01:00</creationDate>
+    <diffusableInformations>true</diffusableInformations>
+    <foreignIdentifier>false</foreignIdentifier>
+    <insee>69266</insee>
+    <lastUpdate>2019-10-23T15:03:38.980+02:00</lastUpdate>
+    <legalCategory>SARL</legalCategory>
+    <legalCategoryString>SARL unipersonnelle</legalCategoryString>
+    <nic>00017</nic>
+    <RCS>false</RCS>
+    <RM>false</RM>
+    <registrationCountry>FR</registrationCountry>
+    <responsibles>
+        <responsible>
+            <externalId>458442</externalId>
+            <id>458442</id>
+            <label>nom prenom</label>
+            <name>nom prenom</name>
+            <civility>MR</civility>
+            <firstname>Prenom</firstname>
+            <function>GERANT</function>
+            <lastname>Nom</lastname>
+            <type>PP</type>
+        </responsible>
+    </responsibles>
+    <siretHeadOffice>53871152600017</siretHeadOffice>
+</company>

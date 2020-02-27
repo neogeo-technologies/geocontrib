@@ -105,9 +105,9 @@ class RootTestCase(APITransactionTestCase):
 @tag('selected')
 class TestAgent(RootTestCase):
 
-    create_xml_path = 'data/plugin_ideo_bfc/test/agent.xml'
-    update_xml_path = 'data/plugin_ideo_bfc/test/agent_update1.xml'
-    put_create_xml_path = 'data/plugin_ideo_bfc/test/agent_pust.xml'
+    create_xml_path = 'plugin_ideo_bfc/data/test/agent.xml'
+    update_xml_path = 'plugin_ideo_bfc/data/test/agent_update1.xml'
+    put_create_xml_path = 'plugin_ideo_bfc/data/test/agent_pust.xml'
     create_url_path = 'plugin_ideo_bfc:agent-list'
     update_url_path = 'plugin_ideo_bfc:agent-detail'
     username = '307164'
@@ -118,9 +118,9 @@ class TestAgent(RootTestCase):
 @tag('selected')
 class TestEmployee(RootTestCase):
 
-    create_xml_path = 'data/plugin_ideo_bfc/test/employee.xml'
-    put_create_xml_path = 'data/plugin_ideo_bfc/test/employee_pust.xml'
-    update_xml_path = 'data/plugin_ideo_bfc/test/employee_update1.xml'
+    create_xml_path = 'plugin_ideo_bfc/data/test/employee.xml'
+    put_create_xml_path = 'plugin_ideo_bfc/data/test/employee_pust.xml'
+    update_xml_path = 'plugin_ideo_bfc/data/test/employee_update1.xml'
     create_url_path = 'plugin_ideo_bfc:employee-list'
     update_url_path = 'plugin_ideo_bfc:employee-detail'
     username = '307163'

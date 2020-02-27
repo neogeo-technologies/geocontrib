@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<agentProfile>
+    <externalId>123456789</externalId>
+    <id>123456789</id>
+    <label>Agent de Test</label>
+    <name>Agent de Test</name>
+    <address>
+        <city>Lyon</city>
+        <country>FR</country>
+        <postalAddress>3 rue du Lac</postalAddress>
+        <postalCode>69007</postalCode>
+    </address>
+    <alfUserName>307164@294680.ternum</alfUserName>
+    <email>agent.test@disable.com</email>
+    <enabled>true</enabled>
+    <password>$s0$e0801$xnKms2m4aA+Pdv7M2mz9Hw==$Bj0zYE75jFYMfJUCtm/YTym0bjtiXZL5Kc2Oj8Lj1ZQ=</password>
+    <prefComMedia>EMAIL</prefComMedia>
+    <roles>
+        <role>
+            <externalId>1</externalId>
+            <id>67147</id>
+            <label>Administrateur Global</label>
+            <name>Administrateur Global</name>
+            <application>
+                <externalId>6</externalId>
+                <id>67144</id>
+                <label>Salle des marchés</label>
+                <name>sdm</name>
+                <description>Les profils acheteurs de Bourgogne Franche-Comté</description>
+                <pictoUrl>https://www.google.com/</pictoUrl>
+                <url>https://www.google.com/</url>
+            </application>
+            <hidden>false</hidden>
+        </role>
+    </roles>
+    <user>
+        <externalId>123456789</externalId>
+        <id>123456789</id>
+        <label>Agent de Test</label>
+        <name>Agent de Test</name>
+        <civility>MR</civility>
+        <enabled>true</enabled>
+        <expirationDatePassword>22/10/2020</expirationDatePassword>
+        <firstname>Agent de</firstname>
+        <lastname>Test</lastname>
+        <password>$s0$e0801$xnKms2m4aA+Pdv7M2mz9Hw==$Bj0zYE75jFYMfJUCtm/YTym0bjtiXZL5Kc2Oj8Lj1ZQ=</password>
+        <sviProfile>
+            <id>195080</id>
+        </sviProfile>
+        <username>agent.test@disable.com</username>
+    </user>
+    <username>agent.test@disable.com</username>
+    <elected>false</elected>
+    <executive>false</executive>
+    <organismDepartment>
+        <externalId>295612</externalId>
+        <id>295612</id>
+        <label>Niveau racine</label>
+        <name>root</name>
+        <acronym>dep</acronym>
+        <address>
+            <city>Lyon</city>
+            <country>FR</country>
+            <postalAddress>3 rue</postalAddress>
+            <postalCode>69007</postalCode>
+        </address>
+        <email>org.dept@test.fr</email>
+        <organism>
+            <externalId>294680</externalId>
+            <id>294680</id>
+            <label>dept test</label>
+            <name>dept test</name>
+            <acronym>y6l</acronym>
+            <address>
+                <city>Lyon</city>
+                <country>FR</country>
+                <postalAddress>3 rue</postalAddress>
+                <postalCode>69007</postalCode>
+            </address>
+            <applications/>
+            <email>org.dept@test.fr</email>
+            <enabled>true</enabled>
+            <phone>0400000000</phone>
+            <siren>479615460</siren>
+            <tenantIdentifier>294680.ternum</tenantIdentifier>
+            <apeCode>0128Z</apeCode>
+            <apiKey>Mjk0NjgwOnE2UTJaT054aW41RQ==</apiKey>
+            <article>LE</article>
+            <college>COMMUNES_MOINS_3500_HABITANTS_NIEVRE</college>
+            <customer>
+                <externalId>1</externalId>
+                <id>1</id>
+                <label>GIP e-bourgogne</label>
+                <name>EB</name>
+                <assistanceUrl>http://</assistanceUrl>
+                <documentationUrl>http://</documentationUrl>
+                <email>contact@gip.e-bourgogne.fr</email>
+                <hotlinePhone>0 970 609 909</hotlinePhone>
+                <portalUrl>https://www.ternum-bfc.fr/mon-espace</portalUrl>
+            </customer>
+            <ideoSignatureDate>17/10/2019</ideoSignatureDate>
+            <legalCategory>1</legalCategory>
+            <member>true</member>
+            <organismStatuses>
+                <organismStatus>
+                    <date>19/10/2019</date>
+                    <id>7451</id>
+                    <status>TEST</status>
+                </organismStatus>
+            </organismStatuses>
+        </organism>
+        <rootDepartment>true</rootDepartment>
+    </organismDepartment>
+    <representative>false</representative>
+    <substitute>false</substitute>
+</agentProfile>
