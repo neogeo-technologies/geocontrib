@@ -148,6 +148,11 @@ LOGGING = {
             'level': config('LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
+        'plugin_ideo_bfc': {
+            'handlers': ['console'],
+            'level': config('LOG_LEVEL', default='INFO'),
+            'propagate': True,
+        },
     },
 }
 

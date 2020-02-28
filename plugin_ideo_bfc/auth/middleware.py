@@ -16,7 +16,7 @@
 
 import logging
 
-from django.conf import settings
+from decouple import config, Csv
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login
 from django.contrib.auth import logout
@@ -27,13 +27,12 @@ from django.urls import resolve
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
-IGNORE_PATH = getattr(settings, 'IGNORE_PATH', ['geocontrib:login', ])
+IGNORED_PATHS = config('IGNORED_PATHS', default='geocontrib:logout,', cast=Csv())
+HEADER_UID = config('HEADER_UID', default='HTTP_SEC_USERNAME')
+SSO_SETTED = config('SSO_SETTED', default=False, cast=bool)
 
 
 class RemoteUserMiddleware(object):
-
-    header = getattr(settings, 'HEADER_UID', 'HTTP_SEC_USERNAME')
-    sso_env_setted = getattr(settings, 'SSO_SETTED', False)
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -48,18 +47,17 @@ class RemoteUserMiddleware(object):
         resolved = resolve(request.path)
         if len(resolved.app_names) > 0:
             namespace = "{}:{}".format(resolved.app_names[0], resolved.url_name)
-            return IGNORE_PATH.count(namespace) > 0
+            return IGNORED_PATHS.count(namespace) > 0
         return True
 
     def sso_setted(self, request):
-        return self.sso_env_setted and request.META.get('HTTP_SEC_PROXY', 'false') == 'true'
+        return SSO_SETTED and request.META.get('HTTP_SEC_PROXY', 'false') == 'true'
 
     def process_request(self, request):
-        logger.debug(request.META)
-        sid_user_id = request.META.get(self.header)
+        sid_user_id = request.META.get(HEADER_UID)
         if self.sso_setted(request) and sid_user_id:
-            logger.info('HEADER_UID: {header_uid}, VALUE: {value}'.format(
-                header_uid=self.header,
+            logger.debug('HEADER_UID: {header_uid}, VALUE: {value}'.format(
+                header_uid=HEADER_UID,
                 value=sid_user_id,
             ))
             logout(request)
@@ -73,7 +71,7 @@ class RemoteUserMiddleware(object):
                 login(request, user, backend=backend)
 
     def __call__(self, request):
-        logger.debug(request.META)
+
         if not self.path_is_ignored(request):
             self.process_request(request)
 
