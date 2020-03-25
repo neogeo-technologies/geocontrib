@@ -37,12 +37,12 @@ class RemoteUserMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def path_is_ignored(self, request, admin_ingnored=True):
+    def path_is_ignored(self, request, admin_ignored=True):
         """Détermine si la requete courante concerne une url qui n'a pas besoin
         d'etre traiter par ce middleware. Et si on traite les requete en direction
         du site d'admin Django
         """
-        if admin_ingnored and request.path.startswith(reverse('admin:index')):
+        if admin_ignored and request.path.startswith(reverse('admin:index')):
             return True
         resolved = resolve(request.path)
         if len(resolved.app_names) > 0:
