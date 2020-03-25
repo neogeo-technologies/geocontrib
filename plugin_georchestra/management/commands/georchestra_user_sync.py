@@ -20,7 +20,7 @@ PROTECTED_USERNAMES = config('PROTECTED_USERNAMES', cast=Csv())
 
 MAPPED_REMOTE_FIELDS = {
     'first_name': 'givenName',
-    'last_name': 'name',
+    'last_name': 'sn',
     'username': 'uid',
     'email': 'mail'
 }
