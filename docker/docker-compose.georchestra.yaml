@@ -145,17 +145,17 @@ services:
 #      - "traefik.backend=webmail"
 #      - "traefik.frontend.rule=Host:georchestra.mydomain.org;PathPrefix:/webmail"
 
-#  console:
-#    image: georchestra/console:latest
-#    depends_on:
-#      - ldap
-#      - database
-#    volumes:
-#      - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/config:/etc/georchestra
-#    environment:
-#      - JAVA_OPTIONS=-Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF
-#      - XMS=256M
-#      - XMX=1G
+  console:
+    image: georchestra/console:latest
+    depends_on:
+      - ldap
+      - database
+    volumes:
+      - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/config:/etc/georchestra
+    environment:
+      - JAVA_OPTIONS=-Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF
+      - XMS=256M
+      - XMX=1G
 
 volumes:
   geocontrib_data:
