@@ -37,9 +37,9 @@ class RemoteUserMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def path_is_ignored(self, request, admin_ignored=True):
-        """Détermine si la requete courante concerne une url qui n'a pas besoin
-        d'etre traiter par ce middleware. Et si on traite les requete en direction
+    def path_is_ignored(self, request, admin_ignored=False):
+        """Détermine si la requête courante concerne une url qui n'a pas besoin
+        d'être traitée par ce middleware. Et si on traite les requêtes en direction
         du site d'admin Django
         """
         if admin_ignored and request.path.startswith(reverse('admin:index')):
