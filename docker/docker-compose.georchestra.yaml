@@ -123,28 +123,7 @@ services:
       - XMS=256M
       - XMX=512M
 
-#  smtp:
-#    image: camptocamp/smtp-sink:latest
-#    volumes:
-#      - smtp_maildir:/home/smtp/Maildir/
-#
-#  courier-imap:
-#    image: camptocamp/courier-imap:latest
-#    volumes:
-#      - smtp_maildir:/home/smtp/Maildir/
-#
-#  webmail:
-#    image: camptocamp/sqwebmail:latest
-#    environment:
-#      - IMAP_HOSTNAME=courier-imap
-#      - SMTP_HOSTNAME=smtp-sink
-#    volumes:
-#      - smtp_maildir:/home/smtp/Maildir/
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.backend=webmail"
-#      - "traefik.frontend.rule=Host:georchestra.mydomain.org;PathPrefix:/webmail"
-
+  # ---------------------------------------------------------------- #
   console:
     image: georchestra/console:latest
     depends_on:
