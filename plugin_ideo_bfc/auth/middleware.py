@@ -29,7 +29,6 @@ logger = logging.getLogger(__name__)
 
 IGNORED_PATHS = config('IGNORED_PATHS', default='geocontrib:logout,', cast=Csv())
 HEADER_UID = config('HEADER_UID', default='HTTP_SEC_USERNAME')
-SSO_SETTED = config('SSO_SETTED', default=False, cast=bool)
 
 
 class RemoteUserMiddleware(object):
@@ -51,7 +50,7 @@ class RemoteUserMiddleware(object):
         return True
 
     def sso_setted(self, request):
-        return SSO_SETTED and request.META.get('HTTP_SEC_PROXY', 'false') == 'true'
+        return request.META.get('HTTP_SEC_PROXY', 'false') == 'true'
 
     def process_request(self, request):
         sid_user_id = request.META.get(HEADER_UID)
