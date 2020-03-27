@@ -2,7 +2,7 @@
 echo "Step 03."
 cd $APP_PATH/
 
-if [ -n "$OUR_PLUGIN" -a "$OUR_PLUGIN" = 'plugin_georchestra' ]; then
+if [ -n "$SSO_PLUGIN" -a "$SSO_PLUGIN" = 'plugin_georchestra' ]; then
   python manage.py georchestra_user_sync
 fi
 
