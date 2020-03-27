@@ -59,23 +59,24 @@ Les exemples de paramètres adaptés au plugin geOrchestra sont présents dans l
 
 ### Installation
 
-A compléter...
+Le plugin geOrchestra est installé avec Geocontrib.
+Il suffit de configurer les paramètres dans les settings de Geocontrib ou via des variables d'environnements 
+(voir ci-dessous).
 
 ### Exploitation du SSO de geOrchestra
 
-* SSO_PLUGIN : nom du plugin activé `plugin_georchestra`
-* SSO_MIDDLEWARE : identification du middleware utilisé pour l'authentification
-`plugin_georchestra.auth.middleware.RemoteUserMiddleware`
-* HEADER_UID : nom de l'en-tête HTTP identifiant l'utilisateur
-* IGNORED_PATHS : routes ignorés
+* SSO_PLUGIN : nom du plugin activé. Valeur par défaut : aucune. Pour activer ce plugin : `plugin_georchestra`
+* SSO_MIDDLEWARE : identification du middleware utilisé pour l'authentification. Valeur par défaut : aucune. Pour 
+activer ce plugin : `plugin_georchestra.auth.middleware.RemoteUserMiddleware`
+* HEADER_UID : nom de l'en-tête HTTP identifiant l'utilisateur. Valeur par défaut : `HTTP_SEC_USERNAME`
+* IGNORED_PATHS : liste des routes ignorées. Valeur par défaut : `geocontrib:logout,`
 
 Typiquement :
 ```
-SSO_PLUGIN = plugin_georchestra
-HEADER_UID = HTTP_SEC_USERNAME
-SSO_SETTED = True
-IGNORED_PATHS = geocontrib:logout,
-OUR_MIDDLEWARE = plugin_georchestra.auth.middleware.RemoteUserMiddleware
+SSO_PLUGIN=plugin_georchestra
+SSO_MIDDLEWARE=plugin_georchestra.auth.middleware.RemoteUserMiddleware
+HEADER_UID=HTTP_SEC_USERNAME
+IGNORED_PATHS=geocontrib:logout,
 ```
 
 ### Connexion à l'annuaire LDAP de geOrchestra
