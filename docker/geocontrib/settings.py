@@ -150,7 +150,7 @@ LOGGING = {
         },
         'plugin_georchestra': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': config('LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
     },
