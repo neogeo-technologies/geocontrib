@@ -79,8 +79,10 @@
               {% if project %}{{ USER_LEVEL_PROJECTS|lookup:project.slug }}<br>{% endif %}
               {% if user.is_administrator == True %}Gestionnaire métier{% endif %}
             </div>
-            <a class="item" href="{% url 'geocontrib:logout' %}"><i class="ui logout icon"></i></a>
-          {% else %}
+            {% if not SSO_SETTED %}
+              <a class="item" href="{% url 'geocontrib:logout' %}"><i class="ui logout icon"></i></a>
+            {% endif %}
+          {% elif not SSO_SETTED %}
             <a class="item" href="{% url 'geocontrib:login' %}">Se Connecter</a>
           {% endif %}
         </div>

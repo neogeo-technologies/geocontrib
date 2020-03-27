@@ -37,8 +37,8 @@ CORE_APPS = [
 ]
 THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis', cast=Csv())
 OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
-OUR_PLUGIN = config('OUR_PLUGIN', default='', cast=Csv())
-INSTALLED_APPS = CORE_APPS + THIRD_PARTY_DJANGO_APPS + OUR_APPS + OUR_PLUGIN
+SSO_PLUGIN = config('SSO_PLUGIN', default='', cast=Csv())
+INSTALLED_APPS = CORE_APPS + THIRD_PARTY_DJANGO_APPS + OUR_APPS + SSO_PLUGIN
 
 CORE_MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -50,8 +50,8 @@ CORE_MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.RemoteUserMiddleware',
 ]
-OUR_MIDDLEWARE = config('OUR_MIDDLEWARE', default='', cast=Csv())
-MIDDLEWARE = CORE_MIDDLEWARE + OUR_MIDDLEWARE
+SSO_MIDDLEWARE = config('SSO_MIDDLEWARE', default='', cast=Csv())
+MIDDLEWARE = CORE_MIDDLEWARE + SSO_MIDDLEWARE
 
 ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
