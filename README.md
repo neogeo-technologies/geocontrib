@@ -107,6 +107,10 @@ python manage.py runserver
 Se rendre dans l'interface d'administration Django et éditer le premier enregistrement des entités 
 "Sites" (cf. yoururl.net/admin/sites/).
 
+## Déploiement dans un environnement geOrchestra
+
+Reportez-vous au README.md présent dans le répertoire `plugin_georchestra`.
+
 
 ## Sauvegarde des données
 

@@ -170,7 +170,8 @@ DEFAULT_SENDING_FREQUENCY = config('DEFAULT_SENDING_FREQUENCY', default='never')
 
 # Custom Contexts: cf 'geocontrib.context_processors.custom_contexts'
 APPLICATION_NAME = config('APPLICATION_NAME', default='Geocontrib')
-APPLICATION_ABSTRACT = config('APPLICATION_ABSTRACT', default="Description de l'application")
+APPLICATION_ABSTRACT = config('APPLICATION_ABSTRACT',
+                              default="Application de saisie d'informations géographiques contributive")
 LOGO_PATH = config('LOGO_PATH', default=os.path.join(MEDIA_URL, 'logo.png'))
 
 # Allowed formats for file attachments
