@@ -1,5 +1,8 @@
 # Geocontrib only
-docker-geocontrib-up:
+docker-geocontrib-build:
+	docker-compose -f docker-compose.geocontrib-alone.yaml build
+
+docker-geocontrib-up-d:
 	docker-compose -f docker-compose.geocontrib-alone.yaml up -d
 
 docker-geocontrib-logs-f:
@@ -18,7 +21,10 @@ docker-geocontrib-down-clean-all:
 	docker-compose -f docker-compose.geocontrib-alone.yaml down --volumes --rmi 'all' --remove-orphans
 
 # Geocontrib + geOrchestra minimal components
-docker-with-georchestra-up:
+docker-with-georchestra-build:
+	docker-compose -f docker-compose.with-georchestra.yaml build
+
+docker-with-georchestra-up-d:
 	docker-compose -f docker-compose.with-georchestra.yaml up -d
 
 docker-with-georchestra-logs-f:

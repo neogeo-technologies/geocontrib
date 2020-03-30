@@ -9,7 +9,7 @@ services:
       context: ..
       dockerfile: Dockerfile
     env_file:
-      - geocontrib/geocontrib.env
+      - geocontrib/geocontrib-with-georchestra.env
     ports:
       - "5000:5000"
     volumes:
@@ -34,7 +34,7 @@ services:
     container_name: "geocontrib_nginx"
     image: nginx:stable
     env_file:
-      - geocontrib/geocontrib.env
+      - geocontrib/geocontrib-with-georchestra.env
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - geocontrib_media:/opt/geocontrib/media
