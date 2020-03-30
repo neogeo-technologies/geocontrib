@@ -3,9 +3,10 @@ echo "Step 02."
 cd $APP_PATH/
 marker_file="marker_file_step_02"
 
-if [ -f "marker_file" ]; then
-    echo "$marker_file exist"
+if [ -f $marker_file ]; then
+    echo "$marker_file exists"
 else
+    echo "$marker_file does not exist"
     cp src/geocontrib/static/geocontrib/img/default.png media/
     cp src/geocontrib/static/geocontrib/img/logo.png media/
     echo "Collect static"

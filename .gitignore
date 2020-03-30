@@ -94,3 +94,4 @@ manage.py
 config/settings.py
 config/wsgi.py
 config/__init__.py
+/docker/nginx/conf.d/geocontrib.conf

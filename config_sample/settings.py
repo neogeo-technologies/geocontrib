@@ -11,42 +11,36 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-import environ
-
-env = environ.Env(
-    # set casting, default value
-    DEBUG=(bool, False)
-)
-# reading .env file
-environ.Env.read_env()
+from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env.str('GEOCONTRIB_SECRET_KEY', default='CHANGE_ME')
+SECRET_KEY = config('SECRET_KEY', default="SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('GEOCONTRIB_DEBUG', default=True)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ["*", "geocontrib"]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost, 127.0.0.1, 0.0.0.0', cast=Csv())
 
 # Application definition
-INSTALLED_APPS = [
+CORE_APPS = [
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
     'django.contrib.gis',
-    'rest_framework',
-    'rest_framework_gis',
-    'geocontrib',
-    'api',
 ]
-MIDDLEWARE = [
+THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis', cast=Csv())
+OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
+SSO_PLUGIN = config('SSO_PLUGIN', default='', cast=Csv())
+INSTALLED_APPS = CORE_APPS + THIRD_PARTY_DJANGO_APPS + OUR_APPS + SSO_PLUGIN
+
+CORE_MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -54,7 +48,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.RemoteUserMiddleware',
 ]
+SSO_MIDDLEWARE = config('SSO_MIDDLEWARE', default='', cast=Csv())
+MIDDLEWARE = CORE_MIDDLEWARE + SSO_MIDDLEWARE
+
 ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
@@ -79,11 +77,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': env.str('GEOCONTRIB_DB_NAME', default='geocontrib'),
-        'USER': env.str('GEOCONTRIB_DB_USER', default='geocontrib'),
-        'PASSWORD': env.str('GEOCONTRIB_DB_PWD', default='geocontrib'),
-        'HOST': env.str('GEOCONTRIB_DB_HOST', default='geocontrib_db'),
-        'PORT': env.str('GEOCONTRIB_DB_PORT', default='5432')
+        'NAME': config("DB_NAME", default='geocontrib'),
+        'USER': config("DB_USER", default='geocontrib'),
+        'PASSWORD': config("DB_PWD", default='geocontrib'),
+        'HOST': config("DB_HOST", default='geocontrib-db'),
+        'PORT': config("DB_PORT", default='5432')
     },
 }
 
@@ -107,15 +105,18 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 LANGUAGE_CODE = 'fr-fr'
-TIME_ZONE = env.str('GEOCONTRIB_TIME_ZONE', default='Europe/Paris')
+TIME_ZONE = config("TIME_ZONE", default='Europe/Paris')
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# URL prefix
+URL_PREFIX = config('URL_PREFIX', default='')
+
 # Static and media files
-STATIC_URL = '/static/'
+STATIC_URL = '/{}static/'.format(URL_PREFIX)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-MEDIA_URL = '/media/'
+MEDIA_URL = '/{}media/'.format(URL_PREFIX)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Extended properties
@@ -144,47 +145,51 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': env.str('GEOCONTRIB_LOG_LEVEL', default='INFO'),
+            'level': config('LOG_LEVEL', default='DEBUG'),
+            'propagate': True,
+        },
+        'plugin_georchestra': {
+            'handlers': ['console'],
+            'level': config('LOG_LEVEL', default='DEBUG'),
             'propagate': True,
         },
     },
 }
 
 # E-mail and notification parameters
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = 'CHANGE_ME'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'CHANGE_ME'
-EMAIL_HOST_PASSWORD = 'CHANGE_ME'
-DEFAULT_FROM_EMAIL = 'no-reply@geocontrib.fr'
+# EMAIL_BACKEND = config('EMAIL_BACKEND', default="django.core.mail.backends.console.EmailBackend")
+# EMAIL_HOST = config('EMAIL_HOST')
+# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+# EMAIL_PORT = config('EMAIL_PORT', cast=int)
+# EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+# DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 # Notification frequency (allowed values: 'never', 'instantly', 'daily', 'weekly')
-DEFAULT_SENDING_FREQUENCY = env.str('GEOCONTRIB_DEFAULT_SENDING_FREQUENCY', default='never')
+DEFAULT_SENDING_FREQUENCY = config('DEFAULT_SENDING_FREQUENCY', default='never')
 
 # Custom Contexts: cf 'geocontrib.context_processors.custom_contexts'
-APPLICATION_NAME = env.str('GEOCONTRIB_APPLICATION_NAME', default='Geocontrib')
-APPLICATION_ABSTRACT = env.str('GEOCONTRIB_APPLICATION_ABSTRACT', default="Description de l'application")
-LOGO_PATH = env.str('GEOCONTRIB_LOGO_PATH', default=os.path.join(MEDIA_URL, 'logo.png'))
+APPLICATION_NAME = config('APPLICATION_NAME', default='Geocontrib')
+APPLICATION_ABSTRACT = config('APPLICATION_ABSTRACT',
+                              default="Application de saisie d'informations géographiques contributive")
+LOGO_PATH = config('LOGO_PATH', default=os.path.join(MEDIA_URL, 'logo.png'))
 
 # Allowed formats for file attachments
-IMAGE_FORMAT = env.str('GEOCONTRIB_IMAGE_FORMAT', default='application/pdf,image/png,image/jpeg')
+IMAGE_FORMAT = config('IMAGE_FORMAT', default='application/pdf,image/png,image/jpeg')
 
 # Max size of file attachments
-FILE_MAX_SIZE = env.int('GEOCONTRIB_FILE_MAX_SIZE', default=10000000)
+FILE_MAX_SIZE = config('FILE_MAX_SIZE', default=10000000)
 
 SITE_ID = 1
 
 # Default basemap config (following leaflet syntax)
-DEFAULT_BASE_MAP = env.dict('GEOCONTRIB_DEFAULT_BASE_MAP', default=
-    {
-        'SERVICE': 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
-        'OPTIONS': {
-            'attribution': '&copy; contributeurs d\'<a href="https://osm.org/copyright">OpenStreetMap</a>',
-            'maxZoom': 20
-        }
+DEFAULT_BASE_MAP = {
+    'SERVICE': 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+    'OPTIONS': {
+        'attribution': '&copy; contributeurs d\'<a href="https://osm.org/copyright">OpenStreetMap</a>',
+        'maxZoom': 20
     }
-)
+}
 
 # Default project map extent
 # France (continental extent)

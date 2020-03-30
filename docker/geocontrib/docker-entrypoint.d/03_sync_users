@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "Step 03."
+cd $APP_PATH/
+
+if [ -n "$SSO_PLUGIN" -a "$SSO_PLUGIN" = 'plugin_georchestra' ]; then
+  python manage.py georchestra_user_sync
+fi
+
+echo "$(basename $0) complete."

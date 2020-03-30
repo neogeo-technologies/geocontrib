@@ -6,6 +6,10 @@ import logging
 logger = logging.getLogger('django')
 
 
+def sso_setted(request):
+    return request.META.get('HTTP_SEC_PROXY', 'false') == 'true'
+
+
 def custom_contexts(request):
     try:
         user_level_projects = Authorization.get_user_level_projects(request.user)
@@ -22,5 +26,6 @@ def custom_contexts(request):
         'USER_LEVEL_PROJECTS': user_level_projects,
         'SERVICE': settings.DEFAULT_BASE_MAP.get('SERVICE'),
         'OPTIONS': json.dumps(settings.DEFAULT_BASE_MAP.get('OPTIONS')),
-        'DEFAULT_MAP_VIEW': settings.DEFAULT_MAP_VIEW
+        'DEFAULT_MAP_VIEW': settings.DEFAULT_MAP_VIEW,
+        'SSO_SETTED': sso_setted(request)
     }

@@ -1,6 +1,7 @@
-Django==2.2.9
-django-environ==0.4.5
-djangorestframework==3.9.4
+Django==2.2.10
 djangorestframework-gis==0.14
+djangorestframework==3.9.4
+ldap3==2.6.1
 Pillow==6.2.0
 psycopg2-binary==2.8.2
+python-decouple==3.3

@@ -8,7 +8,7 @@ ENV LC_ALL="C.UTF-8"
 ENV LC_CTYPE="C.UTF-8"
 
 RUN apt-get update && \
-    apt-get install -y libproj-dev gdal-bin && \
+    apt-get install -y libproj-dev gdal-bin ldap-utils && \
     apt-get install -y --no-install-recommends netcat && \
     apt-get clean -y
 
@@ -28,13 +28,10 @@ ENV PATH=$HOME/.local/bin:$PATH
 ENV APP_PATH=$HOME/geocontrib_app
 
 # if WORKDIR only is set, then $APP_PATH will be owned by root :-/
-RUN mkdir $APP_PATH
+RUN mkdir $APP_PATH $APP_PATH/config $APP_PATH/media $APP_PATH/static
 WORKDIR $APP_PATH
 
-RUN mkdir $APP_PATH/config
-RUN mkdir $APP_PATH/media
-VOLUME $APP_PATH/config
-VOLUME $APP_PATH/media
+VOLUME $APP_PATH/config $APP_PATH/media $APP_PATH/static
 
 # Upgrade pip
 RUN pip install --user --upgrade pip
@@ -43,7 +40,6 @@ COPY requirements.txt .
 RUN pip install --user -r requirements.txt gunicorn
 COPY --chown=apprunner . src/
 
-
-EXPOSE 8000
-ENTRYPOINT ["src/docker/docker-entrypoint.sh"]
-CMD ["gunicorn", "-w 3", "-b 0.0.0.0:8000", "config.wsgi:application"]
+EXPOSE 5000
+ENTRYPOINT ["src/docker/geocontrib/docker-entrypoint.sh"]
+CMD ["gunicorn", "-w 3", "-b 0.0.0.0:5000", "config.wsgi:application"]

@@ -2,6 +2,50 @@
 version: "3.5"
 
 services:
+
+  geocontrib:
+    container_name: "geocontrib_django"
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    env_file:
+      - geocontrib/geocontrib-with-georchestra.env
+    ports:
+      - "5000:5000"
+    volumes:
+      - geocontrib_media:/home/apprunner/geocontrib_app/media
+      - geocontrib_static:/home/apprunner/geocontrib_app/static
+    depends_on:
+      - geocontrib-db
+
+  # ---------------------------------------------------------------- #
+  geocontrib-db:
+    container_name: "geocontrib_db"
+    image: mdillon/postgis:latest
+    environment:
+      - POSTGRES_USER=geocontrib
+      - POSTGRES_PASSWORD=geocontrib
+      - POSTGRES_DB=geocontrib
+    volumes:
+      - geocontrib_data:/var/lib/postgresql/data/
+
+  # ---------------------------------------------------------------- #
+  geocontrib-nginx:
+    container_name: "geocontrib_nginx"
+    image: nginx:stable
+    env_file:
+      - geocontrib/geocontrib-with-georchestra.env
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - geocontrib_media:/opt/geocontrib/media
+      - geocontrib_static:/opt/geocontrib/static
+    ports:
+      - "8000:80"
+    depends_on:
+      - geocontrib
+    command: /bin/bash -c "envsubst '$$URL_PREFIX' < /etc/nginx/conf.d/geocontrib.template > /etc/nginx/conf.d/geocontrib.conf && nginx -g 'daemon off;'"
+
+  # ---------------------------------------------------------------- #
   database:
     image: georchestra/database:latest
     environment:
@@ -10,6 +54,7 @@ services:
     volumes:
       - postgresql_data:/var/lib/postgresql/data
 
+  # ---------------------------------------------------------------- #
   ldap:
     image: georchestra/ldap:latest
     environment:
@@ -21,10 +66,11 @@ services:
       - ldap_data:/var/lib/ldap
       - ldap_config:/etc/ldap
 
+  # ---------------------------------------------------------------- #
   georchestra.mydomain.org:
     image: traefik:1.7
     ports:
-      - "80:80"
+      - "8888:80"
       - "443:443"
       # uncomment the next line to get a web ui + api at https://georchestra.mydomain.org:8080/traefik/
       - "8080:8080"
@@ -33,6 +79,7 @@ services:
       - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/resources/ssl:/etc/traefik/ssl/
       - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/resources/traefik.toml:/traefik.toml
 
+  # ---------------------------------------------------------------- #
   proxy:
     image: georchestra/security-proxy:latest
     depends_on:
@@ -50,6 +97,7 @@ services:
       - "traefik.frontend.rule=Host:georchestra.mydomain.org"
       - "traefik.frontend.passHostHeader=true"
 
+  # ---------------------------------------------------------------- #
   cas:
     image: georchestra/cas:latest
     depends_on:
@@ -65,6 +113,7 @@ services:
       - "traefik.backend=cas"
       - "traefik.frontend.rule=Host:georchestra.mydomain.org;PathPrefix:/cas"
 
+  # ---------------------------------------------------------------- #
   header:
     image: georchestra/header:latest
     volumes:
@@ -74,28 +123,7 @@ services:
       - XMS=256M
       - XMX=512M
 
-  smtp:
-    image: camptocamp/smtp-sink:latest
-    volumes:
-      - smtp_maildir:/home/smtp/Maildir/
-
-  courier-imap:
-    image: camptocamp/courier-imap:latest
-    volumes:
-      - smtp_maildir:/home/smtp/Maildir/
-
-  webmail:
-    image: camptocamp/sqwebmail:latest
-    environment:
-      - IMAP_HOSTNAME=courier-imap
-      - SMTP_HOSTNAME=smtp-sink
-    volumes:
-      - smtp_maildir:/home/smtp/Maildir/
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=webmail"
-      - "traefik.frontend.rule=Host:georchestra.mydomain.org;PathPrefix:/webmail"
-
+  # ---------------------------------------------------------------- #
   console:
     image: georchestra/console:latest
     depends_on:
@@ -109,6 +137,9 @@ services:
       - XMX=1G
 
 volumes:
+  geocontrib_data:
+  geocontrib_media:
+  geocontrib_static:
   postgresql_data:
   smtp_maildir:
   ldap_data:

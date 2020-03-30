@@ -14,13 +14,15 @@ create_link()
 echo "Step 01."
 cd $APP_PATH/
 marker_file="marker_file_step_01"
-if [ -f marker_file ]; then
-    echo "$marker_file already exists."
+if [ -f $marker_file ]; then
+    echo "$marker_file already exists"
 else
+    echo "$marker_file does not exist"
     django-admin startproject config .
 
     create_link src/geocontrib/ .
     create_link src/api/ .
+    create_link src/plugin_georchestra/ .
 
     # Preparation spécifique
     # Django
@@ -30,8 +32,8 @@ else
     if [ -f "config/settings.py" ]; then
         rm config/settings.py
     fi
-    cp src/docker/settings.py config/settings.py
-    cp src/docker/urls.py config/urls.py
+    cp src/docker/geocontrib/settings.py config/settings.py
+    cp src/docker/geocontrib/urls.py config/urls.py
 
     # Attente du serveur postgres
     echo "Waiting for database..."
