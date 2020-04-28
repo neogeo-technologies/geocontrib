@@ -908,12 +908,25 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
             messages.info(request, msg)
 
     def check_feature_type_slug(self, request, data, feature_type_slug):
-        for feat in data.get('features'):
-            if feat.get('properties').get('feature_type', 'N/A') != feature_type_slug:
+        features = data.get('features', [])
+        if len(features) == 0:
+            messages.error(
+                request,
+                "Aucun signalement n'est indiqué dans l'entrée 'features'. ")
+            raise IntegrityError
+
+        for feat in features:
+            feature_type_import = feat.get('properties', {}).get('feature_type')
+            if not feature_type_import:
                 messages.error(
                     request,
-                    "Le type de signalement {source} ne correspond pas à celui en cours d'import: {dest}. ".format(
-                        source=feat.get('properties').get('feature_type'),
+                    "Le type de signalement doit etre indiqué dans l'entrée 'feature_type' de chaque signalement. ")
+                raise IntegrityError
+
+            elif feature_type_import != feature_type_slug:
+                messages.error(
+                    request,
+                    "Le type de signalement ne correspond pas à celui en cours de création: '{dest}'. ".format(
                         dest=feature_type_slug
                     ))
                 raise IntegrityError
