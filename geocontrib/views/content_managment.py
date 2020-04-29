@@ -966,7 +966,7 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
                     self.check_feature_type_slug(request, data, feature_type_slug)
                     self.create_features(request, request.user, data, feature_type)
             except IntegrityError:
-                messages.error(request, "Erreur à lors de l'ajout des signalements. ")
+                messages.error(request, "Erreur lors de l'import d'un fichier GeoJSON. ")
 
         return redirect('geocontrib:feature_type_detail', slug=slug, feature_type_slug=feature_type_slug)
 
