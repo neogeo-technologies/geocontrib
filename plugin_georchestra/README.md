@@ -101,9 +101,10 @@ LDAP_SEARCH_FILTER = (objectClass=person)
 
 * PROTECTED_USER_NAMES : liste de noms d'utilisateurs (leur identifiant unique) à ne pas supprimer lors de la
 synchronisation des utilisateurs (liste de valeurs séparées par des virgules). Exemple : `admin,super_admin`. Valeur
-par défaut : aucune.
+par défaut : aucune (chaîne vide).
 * EXCLUDED_USER_NAMES : liste des noms d'utilisateurs à ne pas importer dans Geocontrib lors de la synchronisation
-(liste de valeurs séparées par des virgules). Exemple : `geoserver_privileged_user`. Valeur par défaut : aucune.
+(liste de valeurs séparées par des virgules). Exemple : `geoserver_privileged_user`. Valeur par défaut : aucune 
+(chaîne vide).
 
 ### Liste de groupes d'utilisateurs particulières
 
@@ -119,11 +120,11 @@ importés dans Geocontrib (liste de valeurs séparées par des points-virgules).
 importés (même s'ils font partie des groupes identifiés dans ADMIN_USER_GROUPS). Chacun des groupes d'utilisateurs est
 défini à l'aide d'un filtre LDAP appliqué sur le champ `membreOf` des utilisateurs.
 Exemple : `cn=SUPERUSER,ou=roles,dc=georchestra,dc=org;cn=ADMINISTRATOR,ou=roles,dc=georchestra,dc=org;cn=GEOCONTRIB_USER,ou=roles,dc=georchestra,dc=org`.
-Valeur par défaut : aucune.
+Valeur par défaut : aucune (chaîne vide).
 * EXCLUDED_USER_GROUPS : liste des groupes d'utilisateurs à ne pas importer dans Geocontrib (liste de valeurs séparées
 par des points-virgules). Cela concerne typiquement les utilisateurs dont les comptes sont en attente de modératio.
 Chacun des groupes d'utilisateurs est défini à l'aide d'un filtre LDAP appliqué sur le champ `membreOf` des
-utilisateurs. Exemple : `cn=pendingorg,ou=pendingorgs,dc=georchestra,dc=org`. Valeur par défaut : Aucune.
+utilisateurs. Exemple : `cn=pendingorg,ou=pendingorgs,dc=georchestra,dc=org`. Valeur par défaut : aucune (chaîne vide).
 
 ### Exclure les utilisateurs en attente de modération
 
