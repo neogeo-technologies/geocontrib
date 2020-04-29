@@ -47,7 +47,7 @@ services:
 
   # ---------------------------------------------------------------- #
   database:
-    image: georchestra/database:latest
+    image: georchestra/database:20.0.2
     environment:
       - POSTGRES_USER=georchestra
       - POSTGRES_PASSWORD=georchestra
@@ -56,7 +56,7 @@ services:
 
   # ---------------------------------------------------------------- #
   ldap:
-    image: georchestra/ldap:latest
+    image: georchestra/ldap:20.0.2
     environment:
         - SLAPD_ORGANISATION=georchestra
         - SLAPD_DOMAIN=georchestra.org
@@ -81,7 +81,7 @@ services:
 
   # ---------------------------------------------------------------- #
   proxy:
-    image: georchestra/security-proxy:latest
+    image: georchestra/security-proxy:20.0.2
     depends_on:
       - ldap
       - database
@@ -99,7 +99,7 @@ services:
 
   # ---------------------------------------------------------------- #
   cas:
-    image: georchestra/cas:latest
+    image: georchestra/cas:20.0.2
     depends_on:
       - ldap
     volumes:
@@ -115,7 +115,7 @@ services:
 
   # ---------------------------------------------------------------- #
   header:
-    image: georchestra/header:latest
+    image: georchestra/header:20.0.2
     volumes:
       - ${GEORCHESTRA_DOCKER_PROJECT_ROOT_PATH}/config:/etc/georchestra
     environment:
@@ -125,7 +125,7 @@ services:
 
   # ---------------------------------------------------------------- #
   console:
-    image: georchestra/console:latest
+    image: georchestra/console:20.0.2
     depends_on:
       - ldap
       - database
