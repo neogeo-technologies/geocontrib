@@ -28,17 +28,19 @@ MAPPED_REMOTE_FIELDS = {
     'member_of': 'memberOf'
 }
 
-PROTECTED_USER_NAMES = config('PROTECTED_USER_NAMES', cast=Csv())
-EXCLUDED_USER_NAMES = config('EXCLUDED_USER_NAMES', cast=Csv())
+PROTECTED_USER_NAMES = config('PROTECTED_USER_NAMES', default='', cast=Csv())
+EXCLUDED_USER_NAMES = config('EXCLUDED_USER_NAMES', default='', cast=Csv())
 ADMIN_USER_GROUPS = config(
     'ADMIN_USER_GROUPS',
     default='cn=SUPERUSER,ou=roles,dc=georchestra,dc=org;cn=ADMINISTRATOR,ou=roles,dc=georchestra,dc=org',
     cast=Csv(delimiter=';'))
 EXCLUSIVE_USER_GROUPS = config(
     'EXCLUSIVE_USER_GROUPS',
+    default='',
     cast=Csv(delimiter=';'))
 EXCLUDED_USER_GROUPS = config(
     'EXCLUDED_USER_GROUPS',
+    default='',
     cast=Csv(delimiter=';'))
 
 User = get_user_model()
