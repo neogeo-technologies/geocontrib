@@ -27,7 +27,7 @@
         NB: Seules les comptes actifs peuvent se connecter.
     </div>
     {% endif %}
-    <form class="ui form" method="post"  role="form" action="/connexion/">
+    <form class="ui form" method="post"  role="form" action="{% url 'geocontrib:login' %}">
       {% csrf_token %}
       <div class="ui stacked secondary  segment">
         <div class="six field required">

@@ -11,41 +11,36 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'CHANGEME'
+SECRET_KEY = config('SECRET_KEY', default="SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ["*"]
-
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost, 127.0.0.1, 0.0.0.0', cast=Csv())
 
 # Application definition
-
-INSTALLED_APPS = [
+CORE_APPS = [
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
     'django.contrib.gis',
-    'rest_framework',
-    'rest_framework_gis',
-    'geocontrib',
-    'api',
 ]
+THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis', cast=Csv())
+OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
+SSO_PLUGIN = config('SSO_PLUGIN', default='', cast=Csv())
+INSTALLED_APPS = CORE_APPS + THIRD_PARTY_DJANGO_APPS + OUR_APPS + SSO_PLUGIN
 
-MIDDLEWARE = [
+CORE_MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,10 +48,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.RemoteUserMiddleware',
 ]
+SSO_MIDDLEWARE = config('SSO_MIDDLEWARE', default='', cast=Csv())
+MIDDLEWARE = CORE_MIDDLEWARE + SSO_MIDDLEWARE
 
 ROOT_URLCONF = 'config.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -73,27 +70,23 @@ TEMPLATES = [
         },
     },
 ]
-
 WSGI_APPLICATION = 'config.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'reporting_poc',
-        'USER': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432'
+        'NAME': config("DB_NAME", default='geocontrib'),
+        'USER': config("DB_USER", default='geocontrib'),
+        'PASSWORD': config("DB_PWD", default='geocontrib'),
+        'HOST': config("DB_HOST", default='geocontrib-db'),
+        'PORT': config("DB_PORT", default='5432')
     },
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -109,48 +102,30 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
-
 LANGUAGE_CODE = 'fr-fr'
-
-TIME_ZONE = 'Europe/Paris'
-
+TIME_ZONE = config("TIME_ZONE", default='Europe/Paris')
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
+# URL prefix
+URL_PREFIX = config('URL_PREFIX', default='')
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
-
-STATIC_URL = '/static/'
-
-# Renseigner le path du static/
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-MEDIA_URL = '/media/'
-
-# Renseigner le path du media/
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Static and media files
+STATIC_URL = '/{}static/'.format(URL_PREFIX)
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = '/{}media/'.format(URL_PREFIX)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Extended properties
-
 AUTH_USER_MODEL = 'geocontrib.User'
-
 LOGIN_URL = 'geocontrib:login'
-
 LOGIN_REDIRECT_URL = 'geocontrib:index'
-
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
 
-DEFAULT_SENDING_FREQUENCY = 'daily'  # A choisir parmi: 'never', 'instantly', 'daily', 'weekly'
-
 # Logging properties
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -170,43 +145,44 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',  # On evite de garder des log de debug
+            'level': config('LOG_LEVEL', default='DEBUG'),
+            'propagate': True,
+        },
+        'plugin_georchestra': {
+            'handlers': ['console'],
+            'level': config('LOG_LEVEL', default='DEBUG'),
             'propagate': True,
         },
     },
 }
 
-# SMTP dev confs
+# E-mail and notification parameters
+# EMAIL_BACKEND = config('EMAIL_BACKEND', default="django.core.mail.backends.console.EmailBackend")
+# EMAIL_HOST = config('EMAIL_HOST')
+# EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+# EMAIL_PORT = config('EMAIL_PORT', cast=int)
+# EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+# DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-EMAIL_HOST = 'CHANGEME'
-
-# EMAIL_PORT = 587
-
-# EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = 'CHANGEME'
-
-EMAIL_HOST_PASSWORD = 'CHANGEME'
-
-DEFAULT_FROM_EMAIL = 'no-reply@geocontrib.fr'
+# Notification frequency (allowed values: 'never', 'instantly', 'daily', 'weekly')
+DEFAULT_SENDING_FREQUENCY = config('DEFAULT_SENDING_FREQUENCY', default='never')
 
 # Custom Contexts: cf 'geocontrib.context_processors.custom_contexts'
+APPLICATION_NAME = config('APPLICATION_NAME', default='Geocontrib')
+APPLICATION_ABSTRACT = config('APPLICATION_ABSTRACT',
+                              default="Application de saisie d'informations géographiques contributive")
+LOGO_PATH = config('LOGO_PATH', default=os.path.join(MEDIA_URL, 'logo.png'))
 
-APPLICATION_NAME = 'Collab'
+# Allowed formats for file attachments
+IMAGE_FORMAT = config('IMAGE_FORMAT', default='application/pdf,image/png,image/jpeg')
 
-APPLICATION_ABSTRACT = "Description de l'application"
-
-LOGO_PATH = '/media/logo.png'
-
-IMAGE_FORMAT = "application/pdf,image/png,image/jpeg"
-
-FILE_MAX_SIZE = 10000000
+# Max size of file attachments
+FILE_MAX_SIZE = config('FILE_MAX_SIZE', default=10000000)
 
 SITE_ID = 1
 
-# Fond de carte par défaut
+# Default basemap config (following leaflet syntax)
 DEFAULT_BASE_MAP = {
     'SERVICE': 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
     'OPTIONS': {
@@ -215,21 +191,21 @@ DEFAULT_BASE_MAP = {
     }
 }
 
-# Emprise par défaut de la carte
-# Région Hauts-de-France
+# Default project map extent
+# France (continental extent)
+DEFAULT_MAP_VIEW = {
+    'center': [47.0, 1.0],
+    'zoom': 4
+}
+
+# Hauts-de-France administrative area
 # DEFAULT_MAP_VIEW = {
 #     'center': [50.00976, 2.8657699],
 #     'zoom': 7
 # }
 
-# Région Bourgogne Franche Comté
+# Bourgogne Franche Comté administrative area
 # DEFAULT_MAP_VIEW = {
 #     'center': [47.5, 5.7],
 #     'zoom': 7
 # }
-
-# France métropolitaine
-DEFAULT_MAP_VIEW = {
-    'center': [47.0, 1.0],
-    'zoom': 4
-}
