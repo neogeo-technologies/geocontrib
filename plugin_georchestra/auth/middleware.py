@@ -59,15 +59,27 @@ class RemoteUserMiddleware(object):
                 header_uid=HEADER_UID,
                 value=sid_user_id,
             ))
-            logout(request)
+
             try:
-                user = User.objects.get(username=sid_user_id)
+                proxy_user = User.objects.get(username=sid_user_id)
             except User.DoesNotExist as e:
                 logger.debug(e)
                 raise PermissionDenied()
-            else:
+
+            # Sanity Check: Si l'utilisateur connecté n'est pas celui envoyé par le proxy
+            if request.user.is_authenticated and proxy_user != request.user:
+                logout(request)
+                logger.debug('USER LOGGED OUT')
+                logger.debug(request.headers)
+
+            # On evite de reconnecter un utilsateur deja connecté sinon
+            # les tokens csrf sont altérés entre la création du form et son post
+            # login() n'est appelé qu'une seule fois
+            if not request.user.is_authenticated:
                 backend = 'django.contrib.auth.backends.ModelBackend'
-                login(request, user, backend=backend)
+                login(request, proxy_user, backend=backend)
+                logger.debug('USER LOGGED IN')
+                logger.debug(request.headers)
 
     def __call__(self, request):
 
