@@ -69,8 +69,8 @@ class RemoteUserMiddleware(object):
             # Sanity Check: Si l'utilisateur connecté n'est pas celui envoyé par le proxy
             if request.user.is_authenticated and proxy_user != request.user:
                 logout(request)
-                logger.debug('USER LOGGED OUT')
-                logger.debug(request.headers)
+                logger.warning('USER LOGGED OUT')
+                logger.warning(request.headers)
 
             # On evite de reconnecter un utilsateur deja connecté sinon
             # les tokens csrf sont altérés entre la création du form et son post
