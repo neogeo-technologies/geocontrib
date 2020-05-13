@@ -23,7 +23,7 @@
     {% csrf_token %}
 
     <h1>Créer un nouveau type de signalement pour le projet "{{ project.title }}"</h1>
-
+    <p>Ces champs par défaut existent pour tous les types de signalement: </p>
     <div class="two fields">
       <div class="required field">
         <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>

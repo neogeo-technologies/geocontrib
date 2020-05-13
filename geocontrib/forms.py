@@ -340,7 +340,7 @@ class FeatureLinkForm(forms.ModelForm):
 
 class FeatureTypeModelForm(forms.ModelForm):
 
-    title = forms.CharField(label='Titre', required=True)
+    title = forms.CharField(label='Nom', required=True)
 
     class Meta:
         model = FeatureType
