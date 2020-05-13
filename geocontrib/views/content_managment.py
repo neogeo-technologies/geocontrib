@@ -880,10 +880,11 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
         for feature in new_features:
             properties = feature.get('properties')
             feature_data = self.get_feature_data(feature_type, properties)
-
+            title = properties.get('title')
+            description = properties.get('description')
             current = Feature.objects.create(
-                title=properties.get('title'),
-                description=properties.get('description'),
+                title=title,
+                description=description,
                 status='draft',
                 creator=creator,
                 project=feature_type.project,
@@ -891,18 +892,18 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
                 geom=self.get_geom(feature.get('geometry')),
                 feature_data=feature_data,
             )
+            if title:
+                simili_features = Feature.objects.filter(
+                    title=title, description=description
+                ).exclude(feature_id=current.feature_id)
 
-            simili_features = Feature.objects.filter(
-                title=current.title, description=current.description
-            ).exclude(feature_id=current.feature_id)
-
-            if simili_features.count() > 0:
-                for row in simili_features:
-                    FeatureLink.objects.get_or_create(
-                        relation_type='doublon',
-                        feature_from=current.feature_id,
-                        feature_to=row.feature_id
-                    )
+                if simili_features.count() > 0:
+                    for row in simili_features:
+                        FeatureLink.objects.get_or_create(
+                            relation_type='doublon',
+                            feature_from=current.feature_id,
+                            feature_to=row.feature_id
+                        )
         if nb_features > 0:
             msg = "{nb} signalement(s) importé(s). ".format(nb=nb_features)
             messages.info(request, msg)

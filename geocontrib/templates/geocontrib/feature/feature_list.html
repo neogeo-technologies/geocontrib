@@ -17,7 +17,7 @@
       </div>
       {% if project and feature_types and permissions|lookup:'can_create_feature' %}
         <div class="item right">
-          <div class="ui dropdown top right pointing compact button button-hover-green">
+          <div class="ui dropdown top right pointing compact button button-hover-green" data-tooltip="Ajouter un signalement" data-position="bottom left">
             <i class="plus fitted icon"></i>
             <div class="menu" style="z-index:9999;">
               <div class="header">Ajouter un signalement du type</div>
@@ -315,7 +315,7 @@
       }
     {% endfor %}
     map.addLayer(featureGroup);
-    
+
     // fit maps to bound only if no initial zoom and center are defined
     if (lat === "" || lng === "" || zoom === "") {
       map.fitBounds(featureGroup.getBounds())
