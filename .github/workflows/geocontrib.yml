@@ -1,0 +1,33 @@
+name: "Docker build"
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - name: "Checking out"
+      uses: actions/checkout@v1
+    - name: "Building docker image"
+      working-directory: docker
+      run: docker-compose -f docker-compose.geocontrib-alone.yaml build geocontrib
+    - name: "Getting image tag"
+      id: version
+      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+    - name: "Tagging  image"
+      run: docker tag docker_geocontrib neogeo/geocontrib:${{ steps.version.outputs.VERSION }}
+    - name: "Logging in docker.io"
+      if: github.repository == 'neogeo-technologies/geocontrib'
+      uses: azure/docker-login@v1
+      with:
+        username: '${{ secrets.DOCKER_HUB_USERNAME }}'
+        password: '${{ secrets.DOCKER_HUB_PASSWORD }}'
+    - name: "Pushing latest to docker.io"
+      if: github.repository == 'neogeo-technologies/geocontrib'
+      run: |
+        docker push neogeo/geocontrib:${{ steps.version.outputs.VERSION }}
+
