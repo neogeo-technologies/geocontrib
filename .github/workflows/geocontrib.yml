@@ -18,8 +18,11 @@ jobs:
     - name: "Getting image tag"
       id: version
       run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
-    - name: "Tagging  image"
-      run: docker tag docker_geocontrib neogeo/geocontrib:${{ steps.version.outputs.VERSION }}
+    - name: "Tagging image"
+      run: |
+        docker tag docker_geocontrib neogeo/geocontrib:${{ steps.version.outputs.VERSION }}
+        docker tag docker_geocontrib neogeo/geocontrib:${GITHUB_SHA}
+
     - name: "Logging in docker.io"
       if: github.repository == 'neogeo-technologies/geocontrib'
       uses: azure/docker-login@v1
@@ -27,7 +30,12 @@ jobs:
         username: '${{ secrets.DOCKER_HUB_USERNAME }}'
         password: '${{ secrets.DOCKER_HUB_PASSWORD }}'
     - name: "Pushing latest to docker.io"
-      if: github.repository == 'neogeo-technologies/geocontrib'
+      if: github.repository == 'neogeo-technologies/geocontrib' && github.event_name != 'release'
+      run: |
+        docker push neogeo/geocontrib:${GITHUB_SHA}
+    - name: "Pushing tag to docker.io"
+      if: github.repository == 'neogeo-technologies/geocontrib' && github.event_name == 'release'
       run: |
         docker push neogeo/geocontrib:${{ steps.version.outputs.VERSION }}
+
 
