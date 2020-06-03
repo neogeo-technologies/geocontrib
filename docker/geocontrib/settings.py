@@ -34,6 +34,7 @@ CORE_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    'django.contrib.flatpages',
 ]
 THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis', cast=Csv())
 OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
