@@ -2,6 +2,8 @@ from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth import views as auth_views
+from django.contrib.flatpages import views
+
 
 from geocontrib.views.accounts import HomePageView
 from geocontrib.views.accounts import MyAccount
@@ -47,8 +49,12 @@ urlpatterns = [
     path('deconnexion/', auth_views.LogoutView.as_view(
         template_name='geocontrib/registration/login.html'), name='logout'),
     path('mon-compte/', MyAccount.as_view(), name='my_account'),
-    path('aide', site_help, name='help'),
-    path('mentions', legal, name='legal'),
+
+    # path('aide', site_help, name='help'),
+    # path('mentions', legal, name='legal'),
+    path('aide/', views.flatpage, {'url': '/aide/'}, name='help'),
+    path('mentions/', views.flatpage, {'url': '/mentions/'}, name='legal'),
+
 
     # Vues de gestion et d'édition des données métiers
     path('creer-projet/', ProjectCreate.as_view(), name='project_create'),  # create_project
