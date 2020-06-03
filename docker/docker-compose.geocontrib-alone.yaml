@@ -32,18 +32,17 @@ services:
   # ---------------------------------------------------------------- #
   geocontrib-nginx:
     container_name: "geocontrib_nginx"
-    image: nginx:stable
+    build:
+      context: nginx
     env_file:
       - geocontrib/geocontrib-alone.env
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
       - geocontrib_media:/opt/geocontrib/media
       - geocontrib_static:/opt/geocontrib/static
     ports:
       - "8000:80"
     depends_on:
       - geocontrib
-    command: /bin/bash -c "envsubst '$$URL_PREFIX' < /etc/nginx/conf.d/geocontrib.template > /etc/nginx/conf.d/geocontrib.conf && nginx -g 'daemon off;'"
 
 volumes:
   geocontrib_data:

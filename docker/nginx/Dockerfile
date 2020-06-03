@@ -1,4 +1,7 @@
 FROM nginx
 
-RUN rm /etc/nginx/conf.d/default.conf
-COPY this.conf /etc/nginx/conf.d
+COPY entrypoint.sh /
+COPY conf.d/geocontrib.template /etc/nginx/conf.d/geocontrib.template
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]
