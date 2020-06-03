@@ -19,6 +19,7 @@ from geocontrib.views.content_managment import ProjectMapping
 from geocontrib.views.content_managment import FeatureCreate
 from geocontrib.views.content_managment import FeatureTypeCreate
 from geocontrib.views.content_managment import FeatureTypeDetail
+from geocontrib.views.content_managment import FeatureTypeUpdate
 from geocontrib.views.content_managment import ImportFromGeoJSON
 from geocontrib.views.content_managment import ImportFromImage
 from geocontrib.views.content_managment import ProjectCreate
@@ -70,6 +71,9 @@ urlpatterns = [
 
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/',
          FeatureTypeDetail.as_view(), name='feature_type_detail'),
+
+    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/editer',
+         FeatureTypeUpdate.as_view(), name='feature_type_update'),
 
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/importer-geojson/',
          ImportFromGeoJSON.as_view(), name='import_from_geojson'),
