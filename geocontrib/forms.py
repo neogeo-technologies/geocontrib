@@ -346,6 +346,32 @@ class FeatureTypeModelForm(forms.ModelForm):
         model = FeatureType
         fields = ('title', 'geom_type', 'color')
 
+    # def __init__(self, *args, **kwargs):
+    #     feature_type = kwargs.get('instance')
+    #
+    #     super().__init__(*args, **kwargs)
+    #
+    #     if feature_type.geom_type == "point":
+    #         self.fields['geom'] = forms.PointField(
+    #             label="Localisation",
+    #             required=True,
+    #             srid=4326
+    #         )
+    #
+    #     if feature_type.geom_type == "linestring":
+    #         self.fields['geom'] = forms.LineStringField(
+    #             label="Localisation",
+    #             required=True,
+    #             srid=4326
+    #         )
+    #
+    #     if feature_type.geom_type == "polygon":
+    #         self.fields['geom'] = forms.PolygonField(
+    #             label="Localisation",
+    #             required=True,
+    #             srid=4326
+    #         )
+
 
 class LayerForm(forms.ModelForm):
 

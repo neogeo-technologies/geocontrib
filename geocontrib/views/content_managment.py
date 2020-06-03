@@ -845,6 +845,101 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
 
 
 @method_decorator(DECORATORS, name='dispatch')
+class FeatureTypeUpdate(SingleObjectMixin, UserPassesTestMixin, View):
+    queryset = FeatureType.objects.all()
+    slug_url_kwarg = 'feature_type_slug'
+    CustomFieldsFormSet = modelformset_factory(
+        CustomField,
+        can_delete=True,
+        # can_order=True,
+        form=CustomFieldModelForm,
+        formset=CustomFieldModelBaseFS,
+        extra=0,
+    )
+
+    def test_func(self):
+        user = self.request.user
+        feature_type = self.get_object()
+        project = feature_type.project
+        # if Feature.objects.filter(feature_type=feature_type).exists():
+        #     return False
+        return Authorization.has_permission(user, 'can_create_feature_type', project)
+
+    def get(self, request, slug, feature_type_slug):
+        TODO: le template ne charge pas dynamiquement les options lorsqu'on selectionne le type de champs Liste!
+        feature_type = self.get_object()
+        form = FeatureTypeModelForm(instance=feature_type)
+        formset = self.CustomFieldsFormSet(
+            queryset=CustomField.objects.filter(feature_type=feature_type)
+        )
+        project = feature_type.project
+        user = request.user
+        features = Feature.handy.availables(
+            user, project
+        ).filter(
+            feature_type=feature_type
+        ).order_by('-updated_on')[:5]
+
+        structure = FeatureTypeSerializer(feature_type, context={'request': request})
+
+        context = {
+            'feature_type': feature_type,
+            'permissions': Authorization.all_permissions(user, project),
+            # 'feature_types': project.featuretype_set.all(),
+            'features': features,
+            'project': project,
+            'structure': structure.data,
+            'form': form,
+            'formset': formset,
+        }
+
+        return render(request, 'geocontrib/feature_type/feature_type_edit.html', context)
+
+    def post(self, request, slug, feature_type_slug):
+        user = request.user
+        feature_type = self.get_object()
+        form = FeatureTypeModelForm(request.POST or None)
+        formset = self.CustomFieldsFormSet(data=request.POST or None)
+        if form.is_valid() and formset.is_valid():
+            import pdb; pdb.set_trace()
+            pass
+            # feature_type = form.save(commit=False)
+            # feature_type.project = project
+            # feature_type.save()
+            #
+            # for data in formset.cleaned_data:
+            #     if not data.get("DELETE"):
+            #         CustomField.objects.create(
+            #             feature_type=feature_type,
+            #             position=data.get("position"),
+            #             label=data.get("label"),
+            #             name=data.get("name"),
+            #             field_type=data.get("field_type"),
+            #             options=data.get("options"),
+            #         )
+            # return redirect('geocontrib:project', slug=project.slug)
+        else:
+            # formset = self.CustomFieldsFormSet(
+            #     # data=request.POST,
+            #     # queryset=CustomField.objects.filter(feature_type=feature_type)
+            # )
+
+            logger.error(form.errors)
+            logger.error(formset.errors)
+            messages.error(
+                request,
+                "Erreur lors de l'édition du type de signalement. ")
+            context = {
+                'form': form,
+                'formset': formset,
+                'permissions': Authorization.all_permissions(user, feature_type.project),
+                'project': feature_type.project,
+                'feature_type': feature_type,
+            }
+        return render(request, 'geocontrib/feature_type/feature_type_edit.html', context)
+
+
+@method_decorator(DECORATORS, name='dispatch')
 class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = FeatureType.objects.all()
     slug_url_kwarg = 'feature_type_slug'
