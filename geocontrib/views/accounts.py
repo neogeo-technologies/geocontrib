@@ -103,13 +103,3 @@ class MyAccount(View):
         context['comments'] = serialized_comment_events.data
 
         return render(request, 'geocontrib/my_account.html', context)
-
-
-def site_help(request):
-    context = {"title": "Aide"}
-    return render(request, 'geocontrib/help.html', context)
-
-
-def legal(request):
-    context = {"title": "Mentions légales"}
-    return render(request, 'geocontrib/legal.html', context)
