@@ -9,8 +9,6 @@ from geocontrib.views.accounts import HomePageView
 from geocontrib.views.accounts import MyAccount
 # from geocontrib.views.accounts import LoginView
 # from geocontrib.views.accounts import LogoutView
-from geocontrib.views.accounts import legal
-from geocontrib.views.accounts import site_help
 from geocontrib.views.content_managment import ProjectDetail
 from geocontrib.views.content_managment import FeatureList
 from geocontrib.views.content_managment import FeatureDetail
@@ -50,8 +48,6 @@ urlpatterns = [
         template_name='geocontrib/registration/login.html'), name='logout'),
     path('mon-compte/', MyAccount.as_view(), name='my_account'),
 
-    # path('aide', site_help, name='help'),
-    # path('mentions', legal, name='legal'),
     path('aide/', views.flatpage, {'url': '/aide/'}, name='help'),
     path('mentions/', views.flatpage, {'url': '/mentions/'}, name='legal'),
 
