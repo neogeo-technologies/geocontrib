@@ -861,12 +861,13 @@ class FeatureTypeUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         user = self.request.user
         feature_type = self.get_object()
         project = feature_type.project
-        # if Feature.objects.filter(feature_type=feature_type).exists():
-        #     return False
+        # On interdit l'édition d'un feature_type si des signalements ont déja été crée
+        if Feature.objects.filter(feature_type=feature_type).exists():
+            return False
         return Authorization.has_permission(user, 'can_create_feature_type', project)
 
     def get(self, request, slug, feature_type_slug):
-        TODO: le template ne charge pas dynamiquement les options lorsqu'on selectionne le type de champs Liste!
+
         feature_type = self.get_object()
         form = FeatureTypeModelForm(instance=feature_type)
         formset = self.CustomFieldsFormSet(
@@ -898,31 +899,34 @@ class FeatureTypeUpdate(SingleObjectMixin, UserPassesTestMixin, View):
     def post(self, request, slug, feature_type_slug):
         user = request.user
         feature_type = self.get_object()
-        form = FeatureTypeModelForm(request.POST or None)
+        form = FeatureTypeModelForm(request.POST or None, instance=feature_type)
         formset = self.CustomFieldsFormSet(data=request.POST or None)
         if form.is_valid() and formset.is_valid():
-            import pdb; pdb.set_trace()
-            pass
-            # feature_type = form.save(commit=False)
-            # feature_type.project = project
-            # feature_type.save()
-            #
-            # for data in formset.cleaned_data:
-            #     if not data.get("DELETE"):
-            #         CustomField.objects.create(
-            #             feature_type=feature_type,
-            #             position=data.get("position"),
-            #             label=data.get("label"),
-            #             name=data.get("name"),
-            #             field_type=data.get("field_type"),
-            #             options=data.get("options"),
-            #         )
-            # return redirect('geocontrib:project', slug=project.slug)
+
+            updated_feature_type = form.save()
+
+            for data in formset.cleaned_data:
+                custom_field = data.pop('id', None)
+
+                if custom_field and data.get('DELETE'):
+                    custom_field.delete()
+
+                if custom_field and not data.get('DELETE'):
+                    for key in ['name', 'field_type', 'position', 'label', 'options']:
+                        setattr(custom_field, key, data.get(key))
+                    custom_field.save()
+
+                if not custom_field and not data.get('DELETE'):
+                    CustomField.objects.create(
+                        name=data.get('name'),
+                        field_type=data.get('field_type'),
+                        position=data.get('position'),
+                        label=data.get('label'),
+                        options=data.get('options'),
+                        feature_type=updated_feature_type,
+                    )
+            return redirect('geocontrib:project', slug=feature_type.project.slug)
         else:
-            # formset = self.CustomFieldsFormSet(
-            #     # data=request.POST,
-            #     # queryset=CustomField.objects.filter(feature_type=feature_type)
-            # )
 
             logger.error(form.errors)
             logger.error(formset.errors)
