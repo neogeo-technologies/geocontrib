@@ -2,13 +2,11 @@ from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth import views as auth_views
-from django.contrib.flatpages import views
+from django.contrib.flatpages import views as flatpages_views
 
 
 from geocontrib.views.accounts import HomePageView
 from geocontrib.views.accounts import MyAccount
-# from geocontrib.views.accounts import LoginView
-# from geocontrib.views.accounts import LogoutView
 from geocontrib.views.content_managment import ProjectDetail
 from geocontrib.views.content_managment import FeatureList
 from geocontrib.views.content_managment import FeatureDetail
@@ -27,14 +25,6 @@ from geocontrib.views.content_managment import AttachmentCreate
 from geocontrib.views.content_managment import ProjectMembers
 from geocontrib.views.content_managment import SubscribingView
 
-# from . import views
-# import geocontrib.views.feature as feature
-# from geocontrib.views.attachment import ProjectAttachment
-# from geocontrib.views.comment import ProjectComment
-# from geocontrib.views.views import ProjectAdminView
-# from geocontrib.views.feature import ProjectFeature
-# from geocontrib.views.feature import ProjectFeatureDetail
-# from geocontrib.views.views import ProjectView
 
 app_name = 'geocontrib'
 
@@ -48,8 +38,8 @@ urlpatterns = [
         template_name='geocontrib/registration/login.html'), name='logout'),
     path('mon-compte/', MyAccount.as_view(), name='my_account'),
 
-    path('aide/', views.flatpage, {'url': '/aide/'}, name='help'),
-    path('mentions/', views.flatpage, {'url': '/mentions/'}, name='legal'),
+    path('aide/', flatpages_views.flatpage, {'url': '/aide/'}, name='help'),
+    path('mentions/', flatpages_views.flatpage, {'url': '/mentions/'}, name='legal'),
 
 
     # Vues de gestion et d'édition des données métiers
@@ -109,15 +99,6 @@ urlpatterns = [
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/piece-jointe/ajouter/',
         AttachmentCreate.as_view(),
         name='add_attachment'),
-
-    # path('mon_compte/activation', views.activation, name='activation'),
-    # path('projet/<slug:project_slug>/utilisateurs/', views.project_users, name='project_users'),
-    # path('projet/<slug:project_slug>/<slug:feature_type_slug>/<uuid:feature_id>/attachment', ProjectAttachment.as_view(),
-    #      name='project_add_attachment'),
-    # path('projet/<slug:project_slug>/import/', views.project_import_issues, name='project_import_issues'),
-    # path('projet/<slug:project_slug>/import-geo-image/', views.project_import_geo_image,
-    #      name='project_import_geo_image'),
-    # path('projet/<slug:project_slug>/export/', views.project_download_issues, name='project_download_issues'),
 ]
 
 if settings.DEBUG:
