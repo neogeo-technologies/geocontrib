@@ -1,6 +1,6 @@
-# Geocontrib
+# GéoContrib
 
-Application de signalement collaboratif
+GéoContrib est un outil libre de signalement contributif et collaboratif.
 
 ## Installation
 
@@ -69,6 +69,7 @@ Copier le contenu du fichier /src/config_sample/urls.py dans /config/urls.py
 ```shell
 python manage.py migrate
 python manage.py loaddata src/geocontrib/data/perm.json
+python manage.py loaddata src/geocontrib/data/flatpages.json
 ```
 
 Ne faites pas attention aux messages d'avertissement suivants :
