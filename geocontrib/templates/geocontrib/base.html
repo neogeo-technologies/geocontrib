@@ -75,10 +75,12 @@
             <a class="item" href="{% url 'geocontrib:my_account' %}">
               {{ user.get_full_name|default:user.username }}
             </a>
+            {% if project or user.is_administrator %}
             <div class="item ui label">
               {% if project %}{{ USER_LEVEL_PROJECTS|lookup:project.slug }}<br>{% endif %}
               {% if user.is_administrator == True %}Gestionnaire métier{% endif %}
             </div>
+            {% endif %}
             {% if not SSO_SETTED %}
               <a class="item" href="{% url 'geocontrib:logout' %}"><i class="ui logout icon"></i></a>
             {% endif %}
