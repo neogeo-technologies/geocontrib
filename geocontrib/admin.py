@@ -1,13 +1,16 @@
+from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.gis import admin
+from django.urls import path
 from django.utils.translation import ugettext_lazy as _
-from django import forms
+from django.template.response import TemplateResponse
 
 from geocontrib.models import Authorization
 from geocontrib.models import Feature
 from geocontrib.models import Project
 from geocontrib.models import Subscription
+from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import Layer
 from geocontrib.models import CustomField
@@ -81,12 +84,89 @@ class FeatureTypeForm(forms.ModelForm):
         }
 
 
+class FeaturePostgresViewSelectForm(forms.ModelForm):
+    view_name = forms.CharField(label="Nom de la vue postgres", required=True)
+
+    class Meta:
+        model = Feature
+        fields = ('view_name',)
+
+
+class SelectPostgresViewForm(forms.Form):
+    related_field = forms.ChoiceField(
+        label="Champs lié",
+        required=True,
+        )
+    alias = forms.CharField(
+        label="Alias",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Indiquez un alias pour cette colonne"
+        })
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['related_field'] = forms.ChoiceField(
+            label="Champs du type de signalement à ajouter",
+            choices=[(str(field.name), str(field.name)) for field in Feature._meta.get_fields()],
+            required=False)
+
+
 class FeatureTypeAdmin(admin.ModelAdmin):
     form = FeatureTypeForm
     readonly_fields = ('geom_type', )
     inlines = (
         CustomFieldTabular,
     )
+    change_form_template = 'admin/geocontrib/with_create_postrgres_view.html'
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path(
+                '<int:feature_type_id>/create-postgres-view/',
+                self.admin_site.admin_view(self.create_postgres_view),
+                name='create_postgres_view'),
+        ]
+        return my_urls + urls
+
+    def create_postgres_view(self, request, feature_type_id, *args, **kwargs):
+        from django.forms import formset_factory
+
+        formset = formset_factory(SelectPostgresViewForm, can_delete=True, extra=2)
+
+        # CustomFieldsFormSet = modelformset_factory(
+        #     CustomField,
+        #     can_delete=True,
+        #     # can_order=True,
+        #     form=CustomFieldModelForm,
+        #     formset=CustomFieldModelBaseFS,
+        #     extra=0,
+        # )
+
+        if request.method == 'POST':
+            feature_admin_select_form = FeaturePostgresViewSelectForm(request.POST or None)
+            # feature_admin_select_formset = CustomFieldsFormSet(request.POST or None)
+            # if feature_admin_select_form.is_valid() and feature_admin_select_formset.is_valid():
+            #     import pdb; pdb.set_trace()
+
+        else:
+            feature_admin_select_form = FeaturePostgresViewSelectForm()
+            # feature_admin_select_formset = CustomFieldsFormSet(queryset=CustomField.objects.none())
+
+        context = self.admin_site.each_context(request)
+        context['opts'] = self.model._meta
+        # context['feature_admin_select_form'] = feature_admin_select_form
+        context['formset'] = formset
+
+        return TemplateResponse(request, "admin/geocontrib/create_postrges_view_form.html", context)
+
+
+
+
+
 
 
 admin.site.register(User, UserAdmin)

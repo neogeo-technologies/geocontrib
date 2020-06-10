@@ -1,0 +1,9 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+{{ block.super }}
+<li>
+  <a href="{% url 'admin:create_postgres_view' feature_type_id=adminform.form.instance.id%}" class="viewsitelink">Crée une vue PostgreSQL</a>
+</li>
+{% endblock %}

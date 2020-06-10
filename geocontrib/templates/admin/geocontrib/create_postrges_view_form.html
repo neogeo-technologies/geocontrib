@@ -1,0 +1,38 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %} " type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'admin/js/jquery.init.js' %} " type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'geocontrib/js/formset_handlers.js' %} " type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
+
+{% block content %}
+<form action="" method="post">{% csrf_token %}
+  <h2>Sélection des champs du <b>Type de Signalement</b> à afficher :</h2>
+
+    {{ formset.management_form }}
+    <div id="formset_wrapper">
+      {% for form in formset.forms %}
+      <div class='table'>
+        <table class='no_error'>
+          {{ form.as_table }}
+        </table>
+      </div>
+      {% endfor %}
+    </div>
+    <div id="emptyform_wrapper" style="display: none">
+      <div class='table'>
+        <table class='no_error'>
+          {{ formset.empty_form.as_table }}
+        </table>
+      </div>
+    </div>
+
+    <input type="button" class="btn btn-default" value="Add More" id="add_more">
+
+	<input type="submit" name="confirm" value="Confirmer"/>
+</form>
+{% endblock %}
