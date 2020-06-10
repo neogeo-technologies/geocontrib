@@ -15,13 +15,13 @@ L'exemple suivant illustre la création d'une vue pour un type de signalements d
         geocontrib_feature.geom,
         geocontrib_feature.title,
         geocontrib_feature.description,
-        (geocontrib_feature.feature_data ->> ‘age’::text)::integer AS age,
-        (geocontrib_feature.feature_data ->> ‘taille’::text)::integer AS taille,
-        geocontrib_feature.feature_data ->> ‘espece’::text AS espece
+        (geocontrib_feature.feature_data ->> 'age'::text)::integer AS age,
+        (geocontrib_feature.feature_data ->> 'taille'::text)::integer AS taille,
+        geocontrib_feature.feature_data ->> 'espece'::text AS espece
     FROM geocontrib_feature
     WHERE geocontrib_feature.feature_type_id = 1 
         AND geocontrib_feature.project_id = 1
-        AND geocontrib_feature.status::text = ‘published’::text;
+        AND geocontrib_feature.status::text = 'published'::text;
 ​
     ALTER TABLE public.arbres
         OWNER TO geocontrib;

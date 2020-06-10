@@ -1253,16 +1253,20 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
 
     def get(self, request, slug):
 
+        user = self.request.user
         project = self.get_object()
         layers = Layer.objects.filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
         layer_formset = self.LayerFormSet(queryset=layers)
 
+        permissions = Authorization.all_permissions(user, project)
         context = {
+            'permissions': permissions,
             'project': project,
             'layers': serialized_layers.data,
             'layer_formset': layer_formset
         }
+
         return render(request, 'geocontrib/project/project_mapping.html', context)
 
     def post(self, request, slug):
