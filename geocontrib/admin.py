@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.contrib.flatpages.admin import FlatPageAdmin
+from django.contrib.flatpages.models import FlatPage
 from django.contrib.gis import admin
 from django.urls import path
 from django.utils.translation import ugettext_lazy as _
@@ -10,7 +12,6 @@ from geocontrib.models import Authorization
 from geocontrib.models import Feature
 from geocontrib.models import Project
 from geocontrib.models import Subscription
-from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import Layer
 from geocontrib.models import CustomField
@@ -169,6 +170,20 @@ class FeatureTypeAdmin(admin.ModelAdmin):
 
 
 
+class FlatPageAdmin(FlatPageAdmin):
+    fieldsets = (
+        (None, {'fields': ('url', 'title', 'content', 'sites')}),
+        (_('Advanced options'), {
+            'classes': ('collapse',),
+            'fields': (
+                'enable_comments',
+                'registration_required',
+                'template_name',
+            ),
+        }),
+    )
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(CustomField)
 admin.site.register(Layer)
@@ -179,3 +194,5 @@ admin.site.register(Project)
 admin.site.register(Subscription)
 admin.site.register(UserLevelPermission)
 # admin.site.register(CustomFieldInterface)
+admin.site.unregister(FlatPage)
+admin.site.register(FlatPage, FlatPageAdmin)
