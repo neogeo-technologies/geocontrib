@@ -1307,7 +1307,7 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
             }
             return render(request, 'geocontrib/project/project_mapping.html', context)
 
-        messages.error(request, "L'édition des couches cartographiques a échouée. ")
+        messages.error(request, "L'édition des couches cartographiques a échoué. ")
         logger.error(layer_formset.errors)
         context = {
             'project': project,

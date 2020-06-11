@@ -32,7 +32,7 @@ class ThisUserAdmin(UserAdmin):
             call_command('georchestra_user_sync')
         except Exception:
             logger.exception('Georchestra LDAP sync failed')
-            messages.error(request, "La synchronization a échouée")
+            messages.error(request, "La synchronization a échoué")
         else:
             messages.success(request, "La synchronization a réussi.")
 
