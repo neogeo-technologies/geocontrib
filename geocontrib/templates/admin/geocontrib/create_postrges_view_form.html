@@ -3,36 +3,237 @@
 
 {% block extrahead %}
 {{ block.super }}
-<script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %} " type="text/javascript" charset="utf-8"></script>
-<script src="{% static 'admin/js/jquery.init.js' %} " type="text/javascript" charset="utf-8"></script>
-<script src="{% static 'geocontrib/js/formset_handlers.js' %} " type="text/javascript" charset="utf-8"></script>
+<!-- Misc. Resources -->
+<script src="{% static 'geocontrib/js/formset_handlers.js' %}" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
-
 
 {% block content %}
 <form action="" method="post">{% csrf_token %}
-  <h2>Sélection des champs du <b>Type de Signalement</b> à afficher :</h2>
 
-    {{ formset.management_form }}
-    <div id="formset_wrapper">
-      {% for form in formset.forms %}
-      <div class='table'>
-        <table class='no_error'>
-          {{ form.as_table }}
-        </table>
-      </div>
+  <fieldset class="container fds">
+    <h2>Sélection des champs du <u>Signalement</u> à afficher :</h2>
+    {{ fds_formset.management_form }}
+    {{ fds_formset.non_form_errors.as_ul }}
+    <table class="fds__table">
+      {% for form in fds_formset %}
+      {% if forloop.first %}
+      <thead>
+        <tr>
+          {% for field in form.visible_fields %}
+          <th>{{ field.label|capfirst }}</th>
+          {% endfor %}
+          <th>Supprimer</th>
+        </tr>
+      </thead>
+      {% endif %}
       {% endfor %}
-    </div>
-    <div id="emptyform_wrapper" style="display: none">
-      <div class='table'>
-        <table class='no_error'>
-          {{ formset.empty_form.as_table }}
-        </table>
-      </div>
+      <tbody class="fds__table__tbody">
+        {% for form in fds_formset %}
+        <tr id="id_fds-{{ forloop.counter0 }}-row">
+          {# On inclus le champs caché DELETE #}
+          {% for hidden in form.hidden_fields %}
+          <td style="display: none">
+            {{ hidden }}
+          </td>
+          {% endfor %}
+          {% for field in form.visible_fields %}
+          <td>
+            {{ field.errors.as_ul }}
+            {{ field }}
+          </td>
+          {% endfor %}
+          <td>
+            <a class="remove-field" id="id_fds-{{ forloop.counter0 }}-REM" title="Supprimer">
+              <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="Supprimer">
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="fds__hidden" style="display: none">
+      <table class="fds__empty__table">
+        <tbody class="fds__empty__body">
+          <tr id="id_fds-__prefix__-row">
+            {# On inclus le champs caché DELETE #}
+            {% for hidden in fds_formset.empty_form.hidden_fields %}
+            <td style="display: none">{{ hidden }}</td>
+            {% endfor %}
+            {% for field in fds_formset.empty_form.visible_fields %}
+            <td>{{ field.errors.as_ul }}{{ field }}</td>
+            {% endfor %}
+            <td>
+              <a class="remove-field" id="id_fds-__prefix__-REM" title="Supprimer">
+                <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="Supprimer">
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <input type="button" class="btn btn-default" value="Add More" id="add_more">
+    <div class="fds__bottom_buttons">
+      <a class="add_button" title="Ajouter" for="fds">
+        <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="Ajouter">
+      </a>
+    </div>
 
-	<input type="submit" name="confirm" value="Confirmer"/>
+  </fieldset>
+
+  <fieldset class="container cfs">
+    <h2>Sélection des sous-champs du <u>Signalement</u> à afficher :</h2>
+    {{ cfs_formset.management_form }}
+    {{ cfs_formset.non_form_errors.as_ul }}
+    <table class="cfs__table">
+      {% for form in cfs_formset %}
+      {% if forloop.first %}
+      <thead>
+        <tr>
+          {% for field in form.visible_fields %}
+          <th>{{ field.label|capfirst }}</th>
+          {% endfor %}
+          <th>Supprimer</th>
+        </tr>
+      </thead>
+      {% endif %}
+      {% endfor %}
+      <tbody class="cfs__table__tbody">
+        {% for form in cfs_formset %}
+        <tr id="id_cfs-{{ forloop.counter0 }}-row">
+          {# On inclus le champs caché DELETE #}
+          {% for hidden in form.hidden_fields %}
+          <td style="display: none">
+            {{ hidden }}
+          </td>
+          {% endfor %}
+          {% for field in form.visible_fields %}
+          <td>
+            {{ field.errors.as_ul }}
+            {{ field }}
+          </td>
+          {% endfor %}
+          <td>
+            <a class="remove-field" id="id_cfs-{{ forloop.counter0 }}-REM" title="Supprimer">
+              <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="Supprimer">
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="cfs__hidden" style="display: none">
+      <table class="cfs__empty__table">
+        <tbody class="cfs__empty__body">
+          <tr id="id_cfs-__prefix__-row">
+            {# On inclus le champs caché DELETE #}
+            {% for hidden in cfs_formset.empty_form.hidden_fields %}
+            <td style="display: none">{{ hidden }}</td>
+            {% endfor %}
+            {% for field in cfs_formset.empty_form.visible_fields %}
+            <td>{{ field.errors.as_ul }}{{ field }}</td>
+            {% endfor %}
+            <td>
+              <a class="remove-field" id="id_cfs-__prefix__-REM" title="Supprimer">
+                <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="Supprimer">
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cfs__bottom_buttons">
+      <a class="add_button" title="Ajouter" for="cfs">
+        <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="Ajouter">
+      </a>
+    </div>
+
+  </fieldset>
+
+
+  <fieldset class="container sc">
+    {{ sc_formset.management_form }}
+    {{ sc_formset.non_form_errors.as_ul }}
+    <h2>Configuration des conditions de recherche :</h2>
+    <div class="container view__fields">
+      <label for="view_name">Nom la vue Postrgresql :</label>
+      <input type="text" id="id_view_name" name="view_name" required maxlength="250">
+    </div>
+    <h2>Configuration des conditions de recherche :</h2>
+    <table class="sc__table">
+      {% for form in sc_formset %}
+      {% if forloop.first %}
+      <thead>
+        <tr>
+          {% for field in form.visible_fields %}
+          <th>{{ field.label|capfirst }}</th>
+          {% endfor %}
+          <th>Supprimer</th>
+        </tr>
+      </thead>
+      {% endif %}
+      {% endfor %}
+      <tbody class="sc__table__tbody">
+        {% for form in sc_formset %}
+        <tr id="id_sc-{{ forloop.counter0 }}-row">
+          {# On inclus le champs caché DELETE #}
+          {% for hidden in form.hidden_fields %}
+          <td style="display: none">
+            {{ hidden }}
+          </td>
+          {% endfor %}
+          {% for field in form.visible_fields %}
+          <td>
+            {{ field.errors.as_ul }}
+            {{ field }}
+          </td>
+          {% endfor %}
+          <td>
+            <a class="remove-field" id="id_sc-{{ forloop.counter0 }}-REM" title="Supprimer">
+              <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="Supprimer">
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="sc__hidden" style="display: none">
+      <table class="sc__empty__table">
+        <tbody class="sc__empty__body">
+          <tr id="id_sc-__prefix__-row">
+            {# On inclus le champs caché DELETE #}
+            {% for hidden in sc_formset.empty_form.hidden_fields %}
+            <td style="display: none">{{ hidden }}</td>
+            {% endfor %}
+            {% for field in sc_formset.empty_form.visible_fields %}
+            <td>{{ field.errors.as_ul }}{{ field }}</td>
+            {% endfor %}
+            <td>
+              <a class="remove-field" id="id_sc-__prefix__-REM" title="Supprimer">
+                <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="Supprimer">
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sc__bottom_buttons">
+      <a class="add_button" title="Ajouter" for="sc">
+        <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="Ajouter">
+      </a>
+    </div>
+
+  </fieldset>
+
+  <div class="sub_butt_bott">
+    {% block submit_buttons_bottom %}
+    <a href="../"><input type="button" name="Cancel" value="Annuler"></a>
+    <input type="submit" name="confirm" value="Confirmer" />
+    {% endblock %}
+  </div>
 </form>
 {% endblock %}
