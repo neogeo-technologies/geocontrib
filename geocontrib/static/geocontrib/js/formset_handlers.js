@@ -1,46 +1,48 @@
-window.addEventListener("load", function() {
+window.addEventListener('load', function() {
 
+  // ---------------------------------------------------------------------------
   // Suppression d'un ligne de formset
-  var removables = document.getElementsByClassName("remove-field");
+  // ---------------------------------------------------------------------------
+  var removables = document.getElementsByClassName('remove-row');
   var RemoveIt = function() {
-      var id_remove_field = this.getAttribute("id")
-      var id_delete_checkbox = id_remove_field.replace('REM', 'DELETE')
-      var checkbox = document.getElementById(id_delete_checkbox);
 
-      checkbox.setAttribute("checked", true);
-      this.parentNode.parentNode.style.display = 'none';
+      var getter = this.getAttribute('id').replace('-REM', '')
+      var hidden_input_delete = document.getElementById('id_'+getter+'-DELETE');
+      var current_row = document.getElementById(getter+'-ROW');
 
+      hidden_input_delete.value = 'checked';
+      current_row.style.display = 'none';
   };
 
   for (var i = 0; i < removables.length; i++) {
       removables[i].addEventListener('click', RemoveIt, false);
   }
-  // -----------------------------------------------------------
 
+  // ---------------------------------------------------------------------------
   // Ajout d'un ligne de formset
-  var add_buttons = document.getElementsByClassName("add_button");
+  // ---------------------------------------------------------------------------
+  var add_buttons = document.getElementsByClassName('add_button');
 
   var AddRow = function() {
-    var formset_prefix = this.getAttribute("for");
-    var total_form = document.getElementById('id_'+formset_prefix+'-TOTAL_FORMS')
+    var prefix = this.getAttribute('data-related-fieldset');
+    var total_form = document.getElementById('id_'+prefix+'-TOTAL_FORMS')
     var form_idx = total_form.value;
-    var new_row_content = document.getElementsByClassName(
-        formset_prefix+'__empty__body')[0].innerHTML.replace(/__prefix__/g, form_idx)
-    var content = document.createTextNode(new_row_content);
 
-    document.getElementsByClassName(
-      formset_prefix+'__table__tbody')[0].insertAdjacentHTML('beforeend', new_row_content);
+    // Injection de l'indice de la ligne et ajout au formset
+    var empty_tbody = document.getElementById(prefix+'-EMPTY_TBODY').innerHTML.replace(/__prefix__/g, form_idx);
+    var tbody = document.getElementById(prefix+'-TBODY').insertAdjacentHTML('beforeend', empty_tbody);
 
-    // Ajout d'un de RemoveIt ciblant le nouveau ancre de suppression
-    document.getElementById('id_'+formset_prefix+'-'+form_idx+'-REM').addEventListener('click', RemoveIt, false);
 
-    total_form.setAttribute("value", parseInt(form_idx) + 1)
+    // Ajout d'un event ciblant la nouvelle ancre de suppression
+    var remove_field = document.getElementById(prefix+'-'+form_idx+'-REM');
+    remove_field.addEventListener('click', RemoveIt, false);
+
+    total_form.setAttribute("value", parseInt(form_idx) + 1);
     // total_form.value++
   };
 
   for (var i = 0; i < add_buttons.length; i++) {
       add_buttons[i].addEventListener('click', AddRow, false);
   }
-  // -----------------------------------------------------------
 
 });

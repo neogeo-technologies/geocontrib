@@ -1,5 +1,6 @@
 import logging
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.flatpages.admin import FlatPageAdmin
@@ -38,13 +39,13 @@ class CustomFieldModelForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': "Indiquez un alias pour cette colonne"
+            'placeholder': "Vous pouvez indiquez un alias pour cette colonne"
         })
     )
 
     class Meta:
         model = CustomField
-        fields = ('label', 'alias')
+        fields = ('name', 'alias')
 
     def save(self, *args, **kwargs):
         return None
@@ -63,7 +64,9 @@ class HiddenDeleteModelFormSet(forms.BaseModelFormSet, HiddenDeleteBaseFormSet):
 class FeatureSelectFieldForm(forms.Form):
     related_field = forms.ChoiceField(
         label="Champs à ajouter",
-        choices=[(str(field.name), str(field.name)) for field in Feature._meta.get_fields()],
+        choices=[(
+            str(field.name), "{0} - {1}".format(field.name, field.get_internal_type())
+        ) for field in Feature._meta.get_fields()],
         required=False
     )
     alias = forms.CharField(
@@ -78,22 +81,39 @@ class FeatureSelectFieldForm(forms.Form):
 
 class SearchConditionForm(forms.Form):
 
+    open_parenthese = forms.ChoiceField(
+        label="Parenthese ouvrante",
+        choices=[(option, option) for option in ('', '(')],
+        required=False
+    )
+
     logical_operator = forms.ChoiceField(
         label="Opérateur logique",
         choices=[(option, option) for option in ('', 'AND', 'OR', 'XOR')],
         required=False
     )
+
     related_field = forms.ChoiceField(
         label="Champs à ajouter",
-        choices=[(str(field.name), str(field.name)) for field in Feature._meta.get_fields()],
+        choices=[(
+            str(field.name), "{0} - {1}".format(field.name, field.get_internal_type())
+        ) for field in Feature._meta.get_fields()],
         required=False
     )
+
     comparison_operator = forms.ChoiceField(
         label="Opérateur de comparaison",
         choices=[(option, option) for option in ('=', '!=', '<', '<=', '>', '>=')],
         required=False
     )
+
     value = forms.CharField(label="Valeur", required=False)
+
+    close_parenthese = forms.ChoiceField(
+        label="Parenthese fermante",
+        choices=[(option, option) for option in ('', ')')],
+        required=False
+    )
 
 
 class UserAdmin(DjangoUserAdmin):
@@ -170,24 +190,23 @@ class FeatureTypeAdmin(admin.ModelAdmin):
         ]
         return my_urls + urls
 
+    def pop_deleted_forms(self, cleaned_data):
+        return [row for row in cleaned_data if row.get('DELETE') is not True]
+
+
     def create_postgres_view(self, request, feature_type_id, *args, **kwargs):
         from django.forms import formset_factory
         from django.forms import modelformset_factory
         from django.shortcuts import redirect
         from django.contrib import messages
+        from django.db.models import F
+        from django.utils.text import slugify
 
         FeatureDetailSelectionFormset = formset_factory(
             FeatureSelectFieldForm,
             formset=HiddenDeleteBaseFormSet,
             can_delete=True,
             extra=2
-        )
-
-        SearchConditionFormset = formset_factory(
-            SearchConditionForm,
-            formset=HiddenDeleteBaseFormSet,
-            can_delete=True,
-            extra=1
         )
 
         CustomFieldsFormSet = modelformset_factory(
@@ -198,24 +217,68 @@ class FeatureTypeAdmin(admin.ModelAdmin):
             extra=0,
         )
 
+        SearchConditionFormset = formset_factory(
+            SearchConditionForm,
+            formset=HiddenDeleteBaseFormSet,
+            can_delete=True,
+            extra=1
+        )
+
         if request.method == 'POST':
+            view_name = request.POST.get('view_name')
             fds_formset = FeatureDetailSelectionFormset(request.POST or None, prefix='fds')
-            sc_formset = SearchConditionFormset(request.POST or None, prefix='sc')
             cfs_formset = CustomFieldsFormSet(request.POST or None, prefix='cfs')
+            sc_formset = SearchConditionFormset(request.POST or None, prefix='sc')
             if fds_formset.is_valid() and sc_formset.is_valid() and cfs_formset.is_valid():
 
                 # handle feature field selection
-                for data in fds_formset.cleaned_data:
-                    print(data)
-                # handle feature field selection
-                for data in sc_formset.cleaned_data:
-                    print(data)
-                # handle feature field selection
-                for data in cfs_formset.cleaned_data:
-                    print(data)
+                fds_data = self.pop_deleted_forms(fds_formset.cleaned_data)
+                cfs_data = self.pop_deleted_forms(cfs_formset.cleaned_data)
+                sc_data = self.pop_deleted_forms(sc_formset.cleaned_data)
+                logger.info(fds_data)
+                logger.info(cfs_data)
+                logger.info(sc_data)
+
+                feature_detail_selection = ", ".join([
+                    "geocontrib_feature.{}{}".format(
+                        row.get('related_field'),
+                        " AS {}".format(row.get('alias')) if len(row.get('alias')) > 0 else ""
+                    ) for row in fds_data])
+
+                custom_field_selection = ", ".join([
+                    "geocontrib_feature.feature_data ->> '{}'::text AS {}".format(
+                        row.get('name'),
+                        slugify(row.get('alias') if len(row.get('alias')) > 0 else row.get('name'))
+                    ) for row in cfs_data])
+
+                search_condition = "".join([
+                    "{} geocontrib_feature.{} {} {} ".format(
+                        row.get('logical_operator'),
+                        row.get('related_field'),
+                        row.get('comparison_operator'),
+                        row.get('value'),
+                    ) for row in sc_data
+                ])
+                postgres_view = """
+CREATE OR REPLACE VIEW public.{view_name} AS
+    SELECT {feature_detail_selection},
+        {custom_field_selection}
+    FROM geocontrib_feature
+    WHERE
+        {search_condition};
+    ALTER TABLE public.{view_name}
+        OWNER TO {user};""".format(
+                    view_name=view_name,
+                    feature_detail_selection=feature_detail_selection,
+                    custom_field_selection=custom_field_selection,
+                    search_condition=search_condition,
+                    user=settings.DATABASES['default']['USER']
+                )
+                logger.info(postgres_view)
 
                 messages.success(request, 'La vue est diponible. ')
-                return redirect('admin:geocontrib_featuretype_change', feature_type_id)
+                # return redirect('admin:geocontrib_featuretype_change', feature_type_id)
+
             else:
                 for formset in [fds_formset, sc_formset, cfs_formset]:
                     logger.error(formset.errors)
@@ -224,12 +287,13 @@ class FeatureTypeAdmin(admin.ModelAdmin):
             fds_formset = FeatureDetailSelectionFormset(prefix='fds')
             sc_formset = SearchConditionFormset(prefix='sc')
             cfs_formset = CustomFieldsFormSet(
-                queryset=CustomField.objects.filter(feature_type__pk=feature_type_id), prefix='cfs')
+                queryset=CustomField.objects.filter(feature_type__pk=feature_type_id),
+                prefix='cfs')
 
         context = self.admin_site.each_context(request)
         context['opts'] = self.model._meta
-        context['cfs_formset'] = cfs_formset
         context['fds_formset'] = fds_formset
+        context['cfs_formset'] = cfs_formset
         context['sc_formset'] = sc_formset
 
         return TemplateResponse(request, "admin/geocontrib/create_postrges_view_form.html", context)
