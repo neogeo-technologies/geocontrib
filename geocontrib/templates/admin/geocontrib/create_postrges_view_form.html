@@ -3,7 +3,6 @@
 
 {% block extrahead %}
 {{ block.super }}
-<!-- Misc. Resources -->
 <script src="{% static 'geocontrib/js/formset_handlers.js' %}" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
 
@@ -11,8 +10,11 @@
 <form action="" method="post">{% csrf_token %}
   <h2>Configuration de la vue Postrgresql: </h2>
   <div class="generic__inputs">
-    <label for="view_name">Nom :</label>
-    <input type="text" id="id_view_name" name="view_name" required maxlength="250">
+    {%for field in pg_form %}
+      <label for="{{ field.id_for_label }}">{{ field.label }}: </label>
+      {{ field }}
+      {{ field.errors }}
+    {% endfor %}
   </div>
 
   <fieldset class="fds">
@@ -23,13 +25,9 @@
     {% include 'admin/geocontrib/formset_as_table.html' with formset=cfs_formset formset_title='Sélection des <u>sous-champs</u> du Signalement à afficher : '%}
   </fieldset>
 
-  <fieldset class="sc">
-    {% include 'admin/geocontrib/formset_as_table.html' with formset=sc_formset formset_title='Configuration des conditions de recherche : '%}
-  </fieldset>
-
   <div class="sub_butt_bott">
     {% block submit_buttons_bottom %}
-    <a href="../"><input type="button" name="Cancel" value="Annuler"></a>
+    <a href="../"><input type="button" name="Cancel" value="Retour"></a>
     <input type="submit" name="confirm" value="Confirmer" />
     {% endblock %}
   </div>

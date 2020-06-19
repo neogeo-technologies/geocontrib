@@ -12,7 +12,9 @@
           {% for field in form.visible_fields %}
           <th>{{ field.label|capfirst }}</th>
           {% endfor %}
+          {% if formset.can_delete %}
           <th>Supprimer</th>
+          {% endif %}
         </tr>
       </thead>
       {% endif %}
@@ -30,12 +32,14 @@
           {{ field }}
         </td>
         {% endfor %}
-        <td>
-          <a class="remove-row" id="{{ formset.prefix }}-{{ forloop.counter0 }}-REM" title="Supprimer">
-            <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="Supprimer">
-          </a>
-        </td>
-      </tr>
+        {% if formset.can_delete %}
+          <td>
+            <a class="remove-row" id="{{ formset.prefix }}-{{ forloop.counter0 }}-REM" title="Supprimer">
+              <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="Supprimer">
+            </a>
+          </td>
+        </tr>
+      {% endif %}
       {% endfor %}
     </tbody>
   </table>
@@ -51,20 +55,22 @@
           {% for field in formset.empty_form.visible_fields %}
           <td>{{ field.errors.as_ul }}{{ field }}</td>
           {% endfor %}
+          {% if formset.can_delete %}
           <td>
             <a class="remove-row" id="{{ formset.prefix }}-__prefix__-REM" title="Supprimer">
               <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="Supprimer">
             </a>
           </td>
+          {% endif %}
         </tr>
       </tbody>
     </table>
   </div>
-
+  {% if formset.can_delete %}
   <div class="{{ formset.prefix }}__bottom_buttons">
     <a class="add_button" title="Ajouter" data-related-fieldset="{{ formset.prefix }}">
       <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="Ajouter">
     </a>
   </div>
-
+  {% endif %}
 </fieldset>

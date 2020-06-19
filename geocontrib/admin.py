@@ -1,15 +1,27 @@
 import logging
-from django import forms
+
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
 from django.contrib.gis import admin
-from django.urls import path
-from django.utils.translation import ugettext_lazy as _
+from django.db import connections
+from django.forms import formset_factory
+from django.forms import modelformset_factory
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
+from django.urls import path
+from django.utils.text import slugify
+from django.utils.translation import ugettext_lazy as _
 
+from geocontrib.forms import FeatureTypeAdminForm
+from geocontrib.forms import CustomFieldModelAdminForm
+from geocontrib.forms import HiddenDeleteBaseFormSet
+from geocontrib.forms import HiddenDeleteModelFormSet
+from geocontrib.forms import FeatureSelectFieldAdminForm
+from geocontrib.forms import AddPosgresViewAdminForm
 from geocontrib.models import Authorization
 from geocontrib.models import Feature
 from geocontrib.models import Project
@@ -22,98 +34,6 @@ from geocontrib.models import UserLevelPermission
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
-
-
-class FeatureTypeForm(forms.ModelForm):
-    class Meta:
-        model = FeatureType
-        fields = '__all__'
-        widgets = {
-            'color': forms.widgets.TextInput(attrs={'type': 'color'}),
-        }
-
-
-class CustomFieldModelForm(forms.ModelForm):
-    alias = forms.CharField(
-        label="Alias",
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': "Vous pouvez indiquez un alias pour cette colonne"
-        })
-    )
-
-    class Meta:
-        model = CustomField
-        fields = ('name', 'alias')
-
-    def save(self, *args, **kwargs):
-        return None
-
-
-class HiddenDeleteBaseFormSet(forms.BaseFormSet):
-    def add_fields(self, form, index):
-        super().add_fields(form, index)
-        form.fields[forms.formsets.DELETION_FIELD_NAME].widget = forms.HiddenInput()
-
-
-class HiddenDeleteModelFormSet(forms.BaseModelFormSet, HiddenDeleteBaseFormSet):
-    pass
-
-
-class FeatureSelectFieldForm(forms.Form):
-    related_field = forms.ChoiceField(
-        label="Champs à ajouter",
-        choices=[(
-            str(field.name), "{0} - {1}".format(field.name, field.get_internal_type())
-        ) for field in Feature._meta.get_fields()],
-        required=False
-    )
-    alias = forms.CharField(
-        label="Alias",
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': "Indiquez un alias pour cette colonne"
-        })
-    )
-
-
-class SearchConditionForm(forms.Form):
-
-    open_parenthese = forms.ChoiceField(
-        label="Parenthese ouvrante",
-        choices=[(option, option) for option in ('', '(')],
-        required=False
-    )
-
-    logical_operator = forms.ChoiceField(
-        label="Opérateur logique",
-        choices=[(option, option) for option in ('', 'AND', 'OR', 'XOR')],
-        required=False
-    )
-
-    related_field = forms.ChoiceField(
-        label="Champs à ajouter",
-        choices=[(
-            str(field.name), "{0} - {1}".format(field.name, field.get_internal_type())
-        ) for field in Feature._meta.get_fields()],
-        required=False
-    )
-
-    comparison_operator = forms.ChoiceField(
-        label="Opérateur de comparaison",
-        choices=[(option, option) for option in ('=', '!=', '<', '<=', '>', '>=')],
-        required=False
-    )
-
-    value = forms.CharField(label="Valeur", required=False)
-
-    close_parenthese = forms.ChoiceField(
-        label="Parenthese fermante",
-        choices=[(option, option) for option in ('', ')')],
-        required=False
-    )
 
 
 class UserAdmin(DjangoUserAdmin):
@@ -172,7 +92,7 @@ class CustomFieldTabular(admin.TabularInline):
 
 
 class FeatureTypeAdmin(admin.ModelAdmin):
-    form = FeatureTypeForm
+    form = FeatureTypeAdminForm
     readonly_fields = ('geom_type', )
     inlines = (
         CustomFieldTabular,
@@ -191,53 +111,50 @@ class FeatureTypeAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def pop_deleted_forms(self, cleaned_data):
-        return [row for row in cleaned_data if row.get('DELETE') is not True]
+        return [row for row in cleaned_data if row.get('DELETE') is False]
 
+    def exec_sql(self, request, sql_create_view, sql_set_owner):
+        success = False
+        with connections['default'].cursor() as cursor:
+            try:
+                cursor.execute(sql_create_view)
+                cursor.execute(sql_set_owner)
+            except Exception as err:
+                logger.exception('Postgres view creation failed: {}'.format(sql_create_view))
+                logger.exception('Postgres view creation failed: {}'.format(sql_set_owner))
+                messages.error(request, "La vue postgres n'a pas pu etre générée: {}".format(err))
+            else:
+                messages.success(request, "La vue postgres est diponible. ")
+                success = True
+        return success
 
     def create_postgres_view(self, request, feature_type_id, *args, **kwargs):
-        from django.forms import formset_factory
-        from django.forms import modelformset_factory
-        from django.shortcuts import redirect
-        from django.contrib import messages
-        from django.db.models import F
-        from django.utils.text import slugify
 
         FeatureDetailSelectionFormset = formset_factory(
-            FeatureSelectFieldForm,
-            formset=HiddenDeleteBaseFormSet,
-            can_delete=True,
-            extra=2
-        )
-
-        CustomFieldsFormSet = modelformset_factory(
-            CustomField,
-            can_delete=True,
-            form=CustomFieldModelForm,
-            formset=HiddenDeleteModelFormSet,
-            extra=0,
-        )
-
-        SearchConditionFormset = formset_factory(
-            SearchConditionForm,
+            FeatureSelectFieldAdminForm,
             formset=HiddenDeleteBaseFormSet,
             can_delete=True,
             extra=1
         )
 
+        CustomFieldsFormSet = modelformset_factory(
+            CustomField,
+            can_delete=True,
+            form=CustomFieldModelAdminForm,
+            formset=HiddenDeleteModelFormSet,
+            extra=0,
+        )
+
         if request.method == 'POST':
-            view_name = request.POST.get('view_name')
             fds_formset = FeatureDetailSelectionFormset(request.POST or None, prefix='fds')
             cfs_formset = CustomFieldsFormSet(request.POST or None, prefix='cfs')
-            sc_formset = SearchConditionFormset(request.POST or None, prefix='sc')
-            if fds_formset.is_valid() and sc_formset.is_valid() and cfs_formset.is_valid():
 
-                # handle feature field selection
+            pg_form = AddPosgresViewAdminForm(request.POST or None)
+            if fds_formset.is_valid() and pg_form.is_valid() and cfs_formset.is_valid():
+                view_name = pg_form.cleaned_data.get('name')
+
                 fds_data = self.pop_deleted_forms(fds_formset.cleaned_data)
                 cfs_data = self.pop_deleted_forms(cfs_formset.cleaned_data)
-                sc_data = self.pop_deleted_forms(sc_formset.cleaned_data)
-                logger.info(fds_data)
-                logger.info(cfs_data)
-                logger.info(sc_data)
 
                 feature_detail_selection = ", ".join([
                     "geocontrib_feature.{}{}".format(
@@ -251,41 +168,41 @@ class FeatureTypeAdmin(admin.ModelAdmin):
                         slugify(row.get('alias') if len(row.get('alias')) > 0 else row.get('name'))
                     ) for row in cfs_data])
 
-                search_condition = "".join([
-                    "{} geocontrib_feature.{} {} {} ".format(
-                        row.get('logical_operator'),
-                        row.get('related_field'),
-                        row.get('comparison_operator'),
-                        row.get('value'),
-                    ) for row in sc_data
-                ])
-                postgres_view = """
-CREATE OR REPLACE VIEW public.{view_name} AS
+                search_condition = "AND geocontrib_feature.status = '{}'".format(pg_form.cleaned_data.get('status'))
+                sql = """
+DROP VIEW IF EXISTS  {schema}.{view_name};
+CREATE OR REPLACE VIEW {schema}.{view_name} AS
     SELECT {feature_detail_selection},
         {custom_field_selection}
     FROM geocontrib_feature
     WHERE
-        {search_condition};
-    ALTER TABLE public.{view_name}
-        OWNER TO {user};""".format(
-                    view_name=view_name,
+        geocontrib_feature.feature_type_id = '{feature_type_id}'
+        {search_condition}""".format(
                     feature_detail_selection=feature_detail_selection,
                     custom_field_selection=custom_field_selection,
+                    feature_type_id=feature_type_id,
                     search_condition=search_condition,
+                    schema=getattr(settings, 'DB_SCHEMA', 'public'),
+                    view_name=view_name,
+                )
+                sql2 = """ALTER TABLE {schema}.{view_name} OWNER TO {user}""".format(
+                    schema=getattr(settings, 'DB_SCHEMA', 'public'),
+                    view_name=view_name,
                     user=settings.DATABASES['default']['USER']
                 )
-                logger.info(postgres_view)
-
-                messages.success(request, 'La vue est diponible. ')
-                # return redirect('admin:geocontrib_featuretype_change', feature_type_id)
+                logger.debug(sql)
+                logger.debug(sql2)
+                its_alright = self.exec_sql(request, sql, sql2)
+                if its_alright:
+                    return redirect('admin:geocontrib_featuretype_change', feature_type_id)
 
             else:
-                for formset in [fds_formset, sc_formset, cfs_formset]:
+                for formset in [fds_formset, pg_form, cfs_formset]:
                     logger.error(formset.errors)
 
         else:
+            pg_form = AddPosgresViewAdminForm()
             fds_formset = FeatureDetailSelectionFormset(prefix='fds')
-            sc_formset = SearchConditionFormset(prefix='sc')
             cfs_formset = CustomFieldsFormSet(
                 queryset=CustomField.objects.filter(feature_type__pk=feature_type_id),
                 prefix='cfs')
@@ -294,7 +211,7 @@ CREATE OR REPLACE VIEW public.{view_name} AS
         context['opts'] = self.model._meta
         context['fds_formset'] = fds_formset
         context['cfs_formset'] = cfs_formset
-        context['sc_formset'] = sc_formset
+        context['pg_form'] = pg_form
 
         return TemplateResponse(request, "admin/geocontrib/create_postrges_view_form.html", context)
 

@@ -19,6 +19,77 @@ import logging
 logger = logging.getLogger('django')
 
 
+########################
+# DJANGO ADMIN FORMSET #
+########################
+class FeatureTypeAdminForm(forms.ModelForm):
+    class Meta:
+        model = FeatureType
+        fields = '__all__'
+        widgets = {
+            'color': forms.TextInput(attrs={'type': 'color'}),
+        }
+
+
+class CustomFieldModelAdminForm(forms.ModelForm):
+    alias = forms.CharField(
+        label="Alias",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Vous pouvez indiquez un alias pour cette colonne"
+        })
+    )
+
+    class Meta:
+        model = CustomField
+        fields = ('name', 'alias')
+
+    def save(self, *args, **kwargs):
+        return None
+
+
+class HiddenDeleteBaseFormSet(forms.BaseFormSet):
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        form.fields[forms.formsets.DELETION_FIELD_NAME].widget = forms.HiddenInput()
+
+
+class HiddenDeleteModelFormSet(forms.BaseModelFormSet, HiddenDeleteBaseFormSet):
+    pass
+
+
+class FeatureSelectFieldAdminForm(forms.Form):
+    related_field = forms.ChoiceField(
+        label="Champs à ajouter",
+        choices=[(
+            str(field.name), "{0} - {1}".format(field.name, field.get_internal_type())
+        ) for field in Feature._meta.get_fields()],
+        required=False
+    )
+    alias = forms.CharField(
+        label="Alias",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': "Vous pouvez indiquez un alias pour cette colonne"
+        })
+    )
+
+
+class AddPosgresViewAdminForm(forms.Form):
+    name = forms.CharField(
+        label="Nom",
+        required=True,
+    )
+
+    status = forms.ChoiceField(
+        label="Status",
+        choices=tuple(x for x in Feature.STATUS_CHOICES),
+        required=False
+    )
+
+
 #############################
 # CUSTOM BASE MODEL FORMSET #
 #############################
