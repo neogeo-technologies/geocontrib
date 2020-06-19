@@ -1340,7 +1340,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
         formset = self.AuthorizationFormSet(
             queryset=Authorization.objects.filter(
                 project=project, user__is_active=True
-            ).order_by('user__last_name', 'user__first_name')
+            ).order_by('user__last_name', 'user__first_name', 'user__username')
         )
         authorised = Authorization.objects.filter(project=project)
         permissions = Authorization.all_permissions(user, project)
