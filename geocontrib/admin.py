@@ -13,7 +13,7 @@ from django.forms import modelformset_factory
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import path
-from django.utils.text import slugify
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
 from geocontrib.forms import FeatureTypeAdminForm
@@ -154,38 +154,18 @@ class FeatureTypeAdmin(admin.ModelAdmin):
                 fds_data = self.pop_deleted_forms(fds_formset.cleaned_data)
                 cfs_data = self.pop_deleted_forms(cfs_formset.cleaned_data)
 
-                feature_detail_selection = ", ".join([
-                    "geocontrib_feature.{}{}".format(
-                        row.get('related_field'),
-                        " AS {}".format(row.get('alias')) if len(row.get('alias')) > 0 else ""
-                    ) for row in fds_data])
-
-                custom_field_selection = ", ".join([
-                    "geocontrib_feature.feature_data ->> '{}'::text AS {}".format(
-                        row.get('name'),
-                        slugify(row.get('alias') if len(row.get('alias')) > 0 else row.get('name'))
-                    ) for row in cfs_data])
-
-                search_condition = "AND geocontrib_feature.status = '{}'".format(pg_form.cleaned_data.get('status'))
-                sql = """
-DROP VIEW IF EXISTS  {schema}.{view_name};
-CREATE OR REPLACE VIEW {schema}.{view_name} AS
-    SELECT {feature_detail_selection},
-        {custom_field_selection}
-    FROM geocontrib_feature
-    WHERE
-        geocontrib_feature.feature_type_id = '{feature_type_id}'
-        {search_condition};
-ALTER TABLE {schema}.{view_name} OWNER TO {user}""".format(
-                    feature_detail_selection=feature_detail_selection,
-                    custom_field_selection=custom_field_selection,
-                    feature_type_id=feature_type_id,
-                    search_condition=search_condition,
-                    schema=getattr(settings, 'DB_SCHEMA', 'public'),
-                    view_name=view_name,
-                    user=settings.DATABASES['default']['USER'],
-                )
-
+                sql = render_to_string(
+                    'sql/create_view.sql',
+                    context=dict(
+                        fds_data=fds_data,
+                        cfs_data=cfs_data,
+                        feature_type_id=feature_type_id,
+                        status=pg_form.cleaned_data.get('status'),
+                        schema=getattr(settings, 'DB_SCHEMA', 'public'),
+                        view_name=view_name,
+                        user=settings.DATABASES['default']['USER'],
+                    ))
+                logger.debug(sql)
                 its_alright = self.exec_sql(request, sql, view_name)
                 if its_alright:
                     return redirect('admin:geocontrib_featuretype_change', feature_type_id)
