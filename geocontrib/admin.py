@@ -47,6 +47,8 @@ class UserAdmin(DjangoUserAdmin):
         (_('Permissions'), {
             'fields': (
                 'is_active', 'is_staff', 'is_superuser', 'is_administrator',
+                'ldap_project_contrib_groups',
+                'ldap_project_admin_groups'
                 'groups', 'user_permissions'),
         }),
         (_('Important dates'), {

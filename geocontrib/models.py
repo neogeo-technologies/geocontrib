@@ -248,6 +248,14 @@ class Project(models.Model):
     delete_feature = models.PositiveIntegerField(
         "Délai avant suppression", blank=True, null=True)
 
+    ldap_project_contrib_groups = ArrayField(
+        verbose_name="Groupes LDAP des contributeurs et modérateurs",
+        base_field=models.CharField(max_length=256), blank=True, null=True)
+
+    ldap_project_admin_groups = ArrayField(
+        verbose_name="Groupes LDAP des administrateurs",
+        base_field=models.CharField(max_length=256), blank=True, null=True)
+
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"
