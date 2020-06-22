@@ -113,18 +113,16 @@ class FeatureTypeAdmin(admin.ModelAdmin):
     def pop_deleted_forms(self, cleaned_data):
         return [row for row in cleaned_data if row.get('DELETE') is False]
 
-    def exec_sql(self, request, sql_create_view, sql_set_owner):
+    def exec_sql(self, request, sql_create_view, view_name):
         success = False
         with connections['default'].cursor() as cursor:
             try:
                 cursor.execute(sql_create_view)
-                cursor.execute(sql_set_owner)
             except Exception as err:
-                logger.exception('Postgres view creation failed: {}'.format(sql_create_view))
-                logger.exception('Postgres view creation failed: {}'.format(sql_set_owner))
-                messages.error(request, "La vue postgres n'a pas pu etre générée: {}".format(err))
+                logger.exception('Postgres view creation failed: {0}'.format(sql_create_view))
+                messages.error(request, "La vue postgres n'a pas pu etre générée: {0}".format(err))
             else:
-                messages.success(request, "La vue postgres est diponible. ")
+                messages.success(request, "La vue postgres '{0}' est diponible. ".format(view_name))
                 success = True
         return success
 
@@ -177,22 +175,18 @@ CREATE OR REPLACE VIEW {schema}.{view_name} AS
     FROM geocontrib_feature
     WHERE
         geocontrib_feature.feature_type_id = '{feature_type_id}'
-        {search_condition}""".format(
+        {search_condition};
+ALTER TABLE {schema}.{view_name} OWNER TO {user}""".format(
                     feature_detail_selection=feature_detail_selection,
                     custom_field_selection=custom_field_selection,
                     feature_type_id=feature_type_id,
                     search_condition=search_condition,
                     schema=getattr(settings, 'DB_SCHEMA', 'public'),
                     view_name=view_name,
+                    user=settings.DATABASES['default']['USER'],
                 )
-                sql2 = """ALTER TABLE {schema}.{view_name} OWNER TO {user}""".format(
-                    schema=getattr(settings, 'DB_SCHEMA', 'public'),
-                    view_name=view_name,
-                    user=settings.DATABASES['default']['USER']
-                )
-                logger.debug(sql)
-                logger.debug(sql2)
-                its_alright = self.exec_sql(request, sql, sql2)
+
+                its_alright = self.exec_sql(request, sql, view_name)
                 if its_alright:
                     return redirect('admin:geocontrib_featuretype_change', feature_type_id)
 
