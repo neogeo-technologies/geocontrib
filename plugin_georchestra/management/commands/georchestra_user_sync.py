@@ -1,5 +1,6 @@
 from argparse import RawTextHelpFormatter
 from collections import Counter
+import itertools
 import json
 import logging
 import re
@@ -123,11 +124,12 @@ synchroniser."""
 
     def sync_ldap_groups(self, user, row):
 
-        # si utilisateur déjà membre du projet et indiqué au sein d'un groupe LDAP
+        # On liste les noms de groupe auxquels est affilié l'utilisateur
         member_of = get_mapped_value(row, 'member_of', [])
-        all_groups = re.findall('cn=(.*?),', member_of)
-        if len(all_groups) > 0:
-            contrib_qs = Project.objects.filter(ldap_project_contrib_groups__overlap=all_groups)
+        all_groups = [re.findall('cn=(.*?),', item) for item in member_of]
+        flattened_groups = list(set(itertools.chain(*all_groups)))
+        if len(flattened_groups) > 0:
+            contrib_qs = Project.objects.filter(ldap_project_contrib_groups__overlap=flattened_groups)
             if contrib_qs.exists():
                 for project in contrib_qs or []:
                     # si non référencé parmi la liste des noms de Project().ldap_project_contrib_groups
@@ -145,7 +147,7 @@ synchroniser."""
                         logger.debug("User '{0}' set as moderator's Project '{1}' ".format(user.username, project.slug))
 
             # si utilisateur membre d'un groupe admin LDAP référencé dans Project().ldap_project_admin_groups
-            admin_qs = Project.objects.filter(ldap_project_admin_groups__overlap=all_groups)
+            admin_qs = Project.objects.filter(ldap_project_admin_groups__overlap=flattened_groups)
             if admin_qs.exists():
                 for project in admin_qs or []:
                     auth, created = Authorization.objects.update_or_create(
@@ -226,6 +228,7 @@ synchroniser."""
 
     def handle(self, *args, **options):
         remote_users = self.get_remote_data()
+        logger.info(remote_users)
         self.check_remote_data(remote_users)
         self.flush_local_db(remote_users)
         self.create_users(remote_users)
