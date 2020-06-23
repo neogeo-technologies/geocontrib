@@ -2,6 +2,7 @@ from argparse import RawTextHelpFormatter
 from collections import Counter
 import json
 import logging
+import re
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
@@ -26,8 +27,6 @@ MAPPED_REMOTE_FIELDS = {
     'username': 'uid',
     'email': 'mail',
     'member_of': 'memberOf',
-    'ldap_project_contrib_groups': 'contribOf',  # TODO en attente de la clé LDAP
-    'ldap_project_admin_groups': 'adminOf',  # TODO en attente de la clé LDAP
 }
 
 PROTECTED_USER_NAMES = config('PROTECTED_USER_NAMES', default='', cast=Csv())
@@ -123,37 +122,39 @@ synchroniser."""
         logger.debug("Deleted users: {0}: ".format(deleted))
 
     def sync_ldap_groups(self, user, row):
-        # si utilisateur déjà membre du projet et indiqué au sein d'un groupe LDAP
-        # référencé parmi la liste des noms de Project().ldap_project_contrib_groups
-        # alors on l'ajoute en tant que modérateur
-        # sinon on l'ajoute en tant que simple membre
-        ldap_project_contrib_groups = get_mapped_value(row, 'ldap_project_contrib_groups', [])
-        contrib_qs = Project.objects.filter(ldap_project_contrib_groups__in=ldap_project_contrib_groups)
-        if contrib_qs.exists():
-            for project in contrib_qs or []:
-                auth, created = Authorization.objects.get_or_create(
-                    project=project, user=user,
-                    defaults={
-                        'level': UserLevelPermission.objects.get(user_type_id=choices.CONTRIBUTOR)
-                    }
-                )
-                if not created:
-                    auth.level = UserLevelPermission.objects.get(user_type_id=choices.MODERATOR)
-                    auth.save(updated_fields=['level', ])
-                    logger.debug("User '{0}' set as moderator's Project '{1}' ".format(user.username, project.slug))
 
-        # si utilisateur parmi un groupe admin LDAP référencé dans Project().ldap_project_admin_groups
-        ldap_project_admin_groups = get_mapped_value(row, 'ldap_project_admin_groups', [])
-        admin_qs = Project.objects.filter(ldap_project_admin_groups__in=ldap_project_admin_groups)
-        if admin_qs.exists():
-            for project in admin_qs or []:
-                auth, created = Authorization.objects.update_or_create(
-                    project=project, user=user,
-                    defaults={
-                        'level': UserLevelPermission.objects.get(user_type_id=choices.ADMIN)
-                    }
-                )
-                logger.debug("User '{0}' set as admin's Project '{1}' ".format(user.username, project.slug))
+        # si utilisateur déjà membre du projet et indiqué au sein d'un groupe LDAP
+        member_of = get_mapped_value(row, 'member_of', [])
+        all_groups = re.findall('cn=(.*?),', member_of)
+        if len(all_groups) > 0:
+            contrib_qs = Project.objects.filter(ldap_project_contrib_groups__overlap=all_groups)
+            if contrib_qs.exists():
+                for project in contrib_qs or []:
+                    # si non référencé parmi la liste des noms de Project().ldap_project_contrib_groups
+                    # alors on l'ajoute en tant que simple contributeur
+                    auth, created = Authorization.objects.get_or_create(
+                        project=project, user=user,
+                        defaults={
+                            'level': UserLevelPermission.objects.get(user_type_id=choices.CONTRIBUTOR)
+                        }
+                    )
+                    # sinon on l'ajoute en tant que modérateur
+                    if not created:
+                        auth.level = UserLevelPermission.objects.get(user_type_id=choices.MODERATOR)
+                        auth.save(updated_fields=['level', ])
+                        logger.debug("User '{0}' set as moderator's Project '{1}' ".format(user.username, project.slug))
+
+            # si utilisateur membre d'un groupe admin LDAP référencé dans Project().ldap_project_admin_groups
+            admin_qs = Project.objects.filter(ldap_project_admin_groups__overlap=all_groups)
+            if admin_qs.exists():
+                for project in admin_qs or []:
+                    auth, created = Authorization.objects.update_or_create(
+                        project=project, user=user,
+                        defaults={
+                            'level': UserLevelPermission.objects.get(user_type_id=choices.ADMIN)
+                        }
+                    )
+                    logger.debug("User '{0}' set as admin's Project '{1}' ".format(user.username, project.slug))
 
     def user_update_or_create(self, row):
         try:
