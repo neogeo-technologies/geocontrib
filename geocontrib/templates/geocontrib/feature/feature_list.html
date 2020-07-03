@@ -320,6 +320,29 @@
     if (lat === "" || lng === "" || zoom === "") {
       map.fitBounds(featureGroup.getBounds())
     }
+
+    var geocoder = L.Control.Geocoder.adressegouv();
+    if (URLSearchParams && location.search) {
+      var params = new URLSearchParams(location.search);
+      console.log(params);
+      var geocoderString = params.get('geocoder');
+      if (geocoderString && L.Control.Geocoder[geocoderString]) {
+        console.log('Using geocoder', geocoderString);
+        geocoder = L.Control.Geocoder[geocoderString]();
+      } else if (geocoderString) {
+        console.warn('Unsupported geocoder', geocoderString);
+      }
+    }
+
+    var control = L.Control.geocoder({
+      placeholder: 'Chercher une adresse...',
+      geocoder: geocoder,
+    }).addTo(map);
+    var marker;
+
+    // setTimeout(function () {
+    //   control.setQuery('Earth');
+    // }, 12000);
   })
 </script>
 {% endblock %}
