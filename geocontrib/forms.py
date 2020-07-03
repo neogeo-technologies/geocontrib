@@ -43,7 +43,7 @@ class CustomFieldModelAdminForm(forms.ModelForm):
 
     class Meta:
         model = CustomField
-        fields = ('name', 'field_type', 'alias')
+        fields = ('name', 'alias', 'field_type')
 
     def save(self, *args, **kwargs):
         return None

@@ -1,6 +1,9 @@
 {% load i18n admin_urls static admin_modify %}
 
-<fieldset>
+<div class="tabular inline-related last-related">
+
+
+<fieldset class="module aligned">
   <h2>{{ formset_title }}</h2>
   {{ formset.management_form }}
   {{ formset.non_form_errors.as_ul }}
@@ -74,3 +77,4 @@
   </div>
   {% endif %}
 </fieldset>
+</div>
