@@ -27,5 +27,7 @@ def custom_contexts(request):
         'SERVICE': settings.DEFAULT_BASE_MAP.get('SERVICE'),
         'OPTIONS': json.dumps(settings.DEFAULT_BASE_MAP.get('OPTIONS')),
         'DEFAULT_MAP_VIEW': settings.DEFAULT_MAP_VIEW,
+        'GEOCODER_PROVIDERS': settings.GEOCODER_PROVIDERS,
+        'SELECTED_GEOCODER_PROVIDER': settings.SELECTED_GEOCODER.get('PROVIDER'),
         'SSO_SETTED': sso_setted(request)
     }

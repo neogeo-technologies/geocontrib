@@ -1,6 +1,7 @@
 /* required styles */
+/* For input, we add the strong #map selector to avoid conflicts with semantic-ui */
 
-.leaflet-control-geocoder {
+#map .leaflet-control-geocoder {
   border-radius: 4px;
   background: white;
   min-width: 26px;
@@ -37,7 +38,7 @@
 .leaflet-control-geocoder-expanded .leaflet-control-geocoder-form {
   display: inline-block;
 }
-.leaflet-control-geocoder-form input {
+#map .leaflet-control-geocoder-form input {
   font-size: 120%;
   border: 0;
   background-color: transparent;
@@ -50,7 +51,7 @@
   height: 26px;
   border: none;
   background-color: white;
-  background-image: url(../img/geocoder.svg);
+  background-image: url(./images/geocoder.svg);
   background-repeat: no-repeat;
   background-position: center;
   cursor: pointer;
@@ -62,14 +63,14 @@
 }
 
 .leaflet-control-geocoder-throbber .leaflet-control-geocoder-icon {
-  background-image: url(../img/throbber.gif);
+  background-image: url(./images/throbber.gif);
 }
 
 .leaflet-control-geocoder-form-no-error {
   display: none;
 }
 
-.leaflet-control-geocoder-form input:focus {
+#map .leaflet-control-geocoder-form input:focus {
   outline: none;
 }
 
@@ -130,7 +131,7 @@
   height: 35px;
 }
 
-.leaflet-control-geocoder-form input {
+#map .leaflet-control-geocoder-form input {
   height: 35px;
 }
 

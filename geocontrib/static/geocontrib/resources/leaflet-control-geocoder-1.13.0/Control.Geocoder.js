@@ -869,6 +869,10 @@ this.L.Control.Geocoder = (function (L) {
       );
     },
 
+    suggest: function (query, cb, context) {
+      return this.geocode(query, cb, context);
+  },
+
     reverse: function(location, scale, cb, context) {
       getJSON(
         this.options.serviceUrl + 'reverse',
@@ -1280,7 +1284,7 @@ this.L.Control.Geocoder = (function (L) {
       municipality: 'Commune',
   };
 
-  var AdresseGouv = L.Class.extend({
+  var AddOk = L.Class.extend({
       options: {
           serviceUrl: 'http://api-adresse.data.gouv.fr',
           limit: 5,
@@ -1332,7 +1336,6 @@ this.L.Control.Geocoder = (function (L) {
                       } else {
                           bbox = L.latLngBounds(latLng, latLng);
                       }
-                      console.log(f.properties);
                       
                       // Translate the type in french
                       if (f.properties.type) {
@@ -1402,8 +1405,8 @@ this.L.Control.Geocoder = (function (L) {
   });
 
 
-  function adressegouv(key) {
-      return new AdresseGouv(key);
+  function addok(key) {
+      return new AddOk(key);
   }
 
   var What3Words = L.Class.extend({
@@ -1510,8 +1513,8 @@ this.L.Control.Geocoder = (function (L) {
     openrouteservice: openrouteservice,
     Photon: Photon,
     photon: photon,
-    AdresseGouv: AdresseGouv,
-    adressegouv: adressegouv,
+    AddOk: AddOk,
+    addok: addok,
     What3Words: What3Words,
     what3words: what3words
   });

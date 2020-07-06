@@ -775,6 +775,25 @@ $(document).ready(function() {
     }
   })
 
+    // Load the geocoder specify in settings.py
+    let geocoder;
+    const geocoderLabel = '{{ SELECTED_GEOCODER_PROVIDER }}'
+    const LIMIT_RESULTS = 5;
+    
+    if (geocoderLabel === '{{ GEOCODER_PROVIDERS.ADDOK }}') {
+      geocoder = L.Control.Geocoder.addok({limit: LIMIT_RESULTS});
+    } else if (geocoderLabel === '{{ GEOCODER_PROVIDERS.PHOTO }}') {
+      geocoder = L.Control.Geocoder.photon();
+    } else if (geocoderLabel === '{{ GEOCODER_PROVIDERS.NOMINATIM }}') {
+      geocoder = L.Control.Geocoder.nominatim();
+    }
+
+    var control = L.Control.geocoder({
+      placeholder: 'Chercher une adresse...',
+      geocoder: geocoder,
+    }).addTo(map);
+    var marker;
+
 })
 </script>
 {% endblock %}

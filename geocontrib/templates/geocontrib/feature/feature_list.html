@@ -162,6 +162,10 @@
     min-height: 300px;
   }
 </style>
+
+<!-- Import settings.py variable. Will be used in the javascript. -->
+{{ SELECTED_GEOCODER_PROVIDER|json_script:'selected-provider' }}
+
 <script>
   function getDataFilters() {
     var $form = $("#form-filters").serializeArray()
@@ -321,28 +325,27 @@
       map.fitBounds(featureGroup.getBounds())
     }
 
-    var geocoder = L.Control.Geocoder.adressegouv();
-    if (URLSearchParams && location.search) {
-      var params = new URLSearchParams(location.search);
-      console.log(params);
-      var geocoderString = params.get('geocoder');
-      if (geocoderString && L.Control.Geocoder[geocoderString]) {
-        console.log('Using geocoder', geocoderString);
-        geocoder = L.Control.Geocoder[geocoderString]();
-      } else if (geocoderString) {
-        console.warn('Unsupported geocoder', geocoderString);
+    let geocoder;
+    // Get the settings.py variable SELECTED_GEOCODER_PROVIDER. This way avoids XCC attacks
+    const geocoderLabel = JSON.parse(document.getElementById('selected-provider').textContent);
+    if (geocoderLabel) {
+      const LIMIT_RESULTS = 5;
+      
+      // Load the geocoder specify in settings.py
+      if (geocoderLabel === '{{ GEOCODER_PROVIDERS.ADDOK }}') {
+        geocoder = L.Control.Geocoder.addok({limit: LIMIT_RESULTS});
+      } else if (geocoderLabel === '{{ GEOCODER_PROVIDERS.PHOTON }}') {
+        geocoder = L.Control.Geocoder.photon();
+      } else if (geocoderLabel === '{{ GEOCODER_PROVIDERS.NOMINATIM }}') {
+        geocoder = L.Control.Geocoder.nominatim();
       }
+
+      var control = L.Control.geocoder({
+        placeholder: 'Chercher une adresse...',
+        geocoder: geocoder,
+      }).addTo(map);
     }
 
-    var control = L.Control.geocoder({
-      placeholder: 'Chercher une adresse...',
-      geocoder: geocoder,
-    }).addTo(map);
-    var marker;
-
-    // setTimeout(function () {
-    //   control.setQuery('Earth');
-    // }, 12000);
   })
 </script>
 {% endblock %}
