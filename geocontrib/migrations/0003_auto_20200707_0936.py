@@ -6,8 +6,6 @@ import django.db.models.deletion
 
 
 def forwards_func(apps, schema_editor, elidible=True):
-    # We get the model from the versioned app registry;
-    # if we directly import it, it'll be the wrong version
     db_alias = schema_editor.connection.alias
     Layer = apps.get_model("geocontrib", "Layer")
     BaseMap = apps.get_model("geocontrib", "BaseMap")
@@ -48,15 +46,6 @@ class Migration(migrations.Migration):
             name='layer',
             options={'verbose_name': 'Couche', 'verbose_name_plural': 'Couches'},
         ),
-        migrations.RunPython(forwards_func, elidable=True),
-        migrations.RemoveField(
-            model_name='layer',
-            name='order',
-        ),
-        migrations.RemoveField(
-            model_name='layer',
-            name='project',
-        ),
         migrations.CreateModel(
             name='ContextLayer',
             fields=[
@@ -81,5 +70,14 @@ class Migration(migrations.Migration):
             model_name='basemap',
             name='project',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='geocontrib.Project'),
+        ),
+        migrations.RunPython(forwards_func, elidable=True),
+        migrations.RemoveField(
+            model_name='layer',
+            name='order',
+        ),
+        migrations.RemoveField(
+            model_name='layer',
+            name='project',
         ),
     ]

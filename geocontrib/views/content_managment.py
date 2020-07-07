@@ -44,6 +44,7 @@ from geocontrib.forms import LayerForm
 from geocontrib.forms import ProjectModelForm
 from geocontrib.models import Authorization
 from geocontrib.models import Attachment
+from geocontrib.models import BaseMap
 from geocontrib.models import Comment
 from geocontrib.models import CustomField
 from geocontrib.models import Event
@@ -229,7 +230,8 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
-        layers = Layer.objects.filter(project=project)
+        bm_layers_pk = BaseMap.objects.filter(project=project).values_list('layers__pk', flat=True)
+        layers = Layer.objects.filter(pk__in=bm_layers_pk)
         serialized_layers = LayerSerializer(layers, many=True)
         extra = CustomField.objects.filter(feature_type=feature_type)
 
@@ -267,7 +269,8 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
-        layers = Layer.objects.filter(project=project)
+        bm_layers_pk = BaseMap.objects.filter(project=project).values_list('layers__pk', flat=True)
+        layers = Layer.objects.filter(pk__in=bm_layers_pk)
         serialized_layers = LayerSerializer(layers, many=True)
         feature_form = FeatureBaseForm(
             request.POST, feature_type=feature_type, user=user)
@@ -405,7 +408,9 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
 
         project = self.get_object()
         user = request.user
-        layers = Layer.objects.filter(project=project).order_by('order')
+        bm_layers_pk = BaseMap.objects.filter(project=project).values_list('layers__pk', flat=True)
+        # TODO change manager by layer.handy
+        layers = Layer.objects.filter(pk__in=bm_layers_pk).order_by('order')
         serialized_layers = LayerSerializer(layers, many=True)
         permissions = Authorization.all_permissions(user, project)
         feature_types = FeatureType.objects.filter(project=project)

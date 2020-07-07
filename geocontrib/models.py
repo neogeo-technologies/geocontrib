@@ -25,6 +25,7 @@ from geocontrib.choices import TYPE_CHOICES
 from geocontrib.emails import notif_moderators_pending_features
 from geocontrib.emails import notif_creator_published_feature
 from geocontrib.managers import AvailableFeaturesManager
+from geocontrib.managers import LayerManager
 
 import logging
 
@@ -528,6 +529,10 @@ class Layer(models.Model):
     options = JSONField("Options", blank=True, null=True)
 
     # project = models.ForeignKey('geocontrib.Project', on_delete=models.CASCADE)
+
+    objects = models.Manager()
+
+    handy = LayerManager()
 
     class Meta:
         verbose_name = 'Couche'
