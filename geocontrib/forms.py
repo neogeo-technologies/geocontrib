@@ -351,7 +351,7 @@ class LayerForm(forms.ModelForm):
 
     class Meta:
         model = Layer
-        fields = ('title', 'service', 'order', 'schema_type', 'options')
+        fields = ('title', 'service', 'schema_type', 'options')
 
 
 class ProjectModelForm(forms.ModelForm):

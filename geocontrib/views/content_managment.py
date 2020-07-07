@@ -1143,7 +1143,7 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
         can_delete=True,
         form=LayerForm,
         extra=0,
-        fields=('title', 'service', 'order', 'schema_type', 'options')
+        fields=('title', 'service', 'schema_type', 'options')
     )
 
     def test_func(self):
@@ -1193,10 +1193,10 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
                     Layer.objects.create(**data)
 
                 # TODO @cbenhabib: afin d'avoir une valeur unique d'ordre.
-                layers = Layer.objects.filter(project=project).order_by('order')
-                for idx, layer in enumerate(layers):
-                    layer.order = idx
-                    layer.save(update_fields=['order'])
+                # layers = Layer.objects.filter(project=project).order_by('order')
+                # for idx, layer in enumerate(layers):
+                #     layer.order = idx
+                #     layer.save(update_fields=['order'])
                 layer_formset = self.LayerFormSet(queryset=layers)
         else:
             logger.error(layer_formset.errors)
