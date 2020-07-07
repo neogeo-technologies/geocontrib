@@ -132,10 +132,10 @@
             {% endif %}
           </td>
           <td>
-            <a href=""> {{ feature.feature_type.title }} </a>
+            <a href="{% url 'geocontrib:feature_type_detail' slug=project.slug feature_type_slug=feature.feature_type.slug %}"> {{ feature.feature_type.title }} </a>
           </td>
           <td>
-            <a href="">{{ feature.title }}</a>
+            <a href="{% url 'geocontrib:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
           </td>
           <td data-order="{{ feature.updated_on|date:'Ymd' }}">
             {{feature.updated_on|date:'d/m/Y' }}
@@ -165,9 +165,6 @@
 
 <!-- Import settings.py variable. Will be used in the javascript. -->
 {{ SELECTED_GEOCODER_PROVIDER|json_script:'selected-provider' }}
-{{ layers|json_script:'layers' }}
-{{ features|json_script:'features' }}
-
 
 
 <script>
@@ -255,11 +252,6 @@
       $formFilters.find("input[name=lng]").val(map.getCenter().lng)
     })
 
-    const layers = JSON.parse(document.getElementById('layers').textContent);
-    console.log('layers', layers);
-    const features = JSON.parse(document.getElementById('features').textContent);
-    console.log('features', features);
-    
     {% if layers %}
       {% for layer in layers %}
         var options = {{ layer.options|safe }}
@@ -277,11 +269,11 @@
     var featureGroup = new L.FeatureGroup()
     {% for feature in features %}
       var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
-      console.log(geomFeatureJSON);
-      
       var geomJSON = turf.flip(geomFeatureJSON)
       var popupContent = `
-
+        <h4>
+          <a href="{% url 'geocontrib:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
+        </h4>
         <div>
           Statut :
           {% if feature.status == 'archived' %}
@@ -294,7 +286,9 @@
             Brouillon
           {% endif %}
         </div>
- 
+        <div>
+          Type : <a href="{% url 'geocontrib:feature_type_detail' slug=project.slug feature_type_slug=feature.feature_type.slug %}"> {{ feature.feature_type.title }} </a>
+        </div>
         <div>
           Dernière mise à jour : {{feature.updated_on|date:'d/m/Y' }}
         </div>
