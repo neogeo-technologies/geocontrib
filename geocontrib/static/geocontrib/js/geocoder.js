@@ -1,177 +1,4 @@
-{% extends "geocontrib/base.html" %}
-
-{% load static %}
-{% load app_filters %}
-
-{% block content %}
-<div class="row">
-  <div class="four wide column">
-    <h1>Signalements</h1>
-  </div>
-  <div class="ten wide column">
-    <div class="ui secondary menu">
-      <a class="item active" data-tab="map" data-tooltip="Carte"><i class="map fitted icon"></i></a>
-      <a class="item" data-tab="list" data-tooltip="Liste"><i class="list fitted icon"></i></a>
-      <div class="item">
-        <h4>{{ features|length }} signalement{% if features|length > 1 %}s{% endif %}</h4>
-      </div>
-      {% if project and feature_types and permissions|lookup:'can_create_feature' %}
-        <div class="item right">
-          <div class="ui dropdown top right pointing compact button button-hover-green">
-            <i class="plus fitted icon"></i>
-            <div class="menu" style="z-index:9999;">
-              <div class="header">Ajouter un signalement du type</div>
-              <div class="scrolling menu text-wrap">
-                {% for type in feature_types %}
-                  <a class="item" href="{% url 'geocontrib:feature_create' slug=project.slug feature_type_slug=type.slug %}">
-                    {{ type }}
-                  </a>
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="four wide column">
-
-    <div>
-      <h4 class="ui horizontal divider header">FILTRES</h4>
-
-      <form id="form-filters" class="ui form" action="" method="get">
-        <div class="field">
-          <label>Type</label>
-          <div class="ui fluid search selection dropdown">
-            <input type="hidden" class="filter" name="feature_type" value="{% if request.GET.feature_type %}{{ request.GET.feature_type }}{% endif %}">
-            <div class="default text"></div>
-            <i class="dropdown icon"></i>
-            <div class="menu" style="z-index:9999">
-              {% for type in feature_types %}
-                <div class="item" data-value="{{ type.slug }}" {% if request.GET.type == type.slug %} selected{% endif %}>{{ type.title }}</div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Statut</label>
-          <div class="ui fluid search selection dropdown">
-            <input type="hidden" class="filter" name="status" value="{% if request.GET.status %}{{ request.GET.status }}{% endif %}">
-            <div class="default text"></div>
-            <i class="dropdown icon"></i>
-            <div class="menu">
-              {% for x,y in status_choices %}
-                <div class="item" data-value="{{ x }}" {% if request.GET.status == x %} selected{% endif %}>{{ y }}</div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Titre</label>
-          <div class="ui icon input">
-            <i class="search icon"></i>
-            <div class="ui action input">
-              <input type="text" name="title" value="{% if request.GET.title %}{{ request.GET.title }}{% endif %}">
-              <button type="button" class="ui teal icon button" id="submit-search">
-                <i class="search icon"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- map params, updated on map move -->
-        <input type="hidden" name="zoom" value="{{ request.GET.zoom|default:'""' }}">
-        <input type="hidden" name="lat" value="{{ request.GET.lat|default:'""' }}">
-        <input type="hidden" name="lng" value="{{ request.GET.lng|default:'""' }}">
-      </form>
-    </div>
-  </div>
-
-  <div class="ten wide column">
-
-    <div class="ui hidden divider"></div>
-    <div class="ui tab active" data-tab="map">
-      <div id="map"></div>
-    </div>
-
-    <div class="ui tab" data-tab="list">
-    <table id="table-features" class="ui compact table">
-      <thead>
-        <tr>
-          <th>Statut</th>
-          <th>Type</th>
-          <th>Titre</th>
-          <th>Dernière modification</th>
-          {% if user.is_authenticated %}
-            <th>Auteur</th>
-          {% endif %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for feature in features %}
-        <tr>
-          <td data-order="{{ feature.get_status_display }}">
-            {% if feature.status == 'archived' %}
-            <div data-tooltip="Archivé">
-              <i class="grey archive icon"></i>
-            </div>
-            {% elif feature.status == 'pending' %}
-              <div data-tooltip="En attente de publication">
-                <i class="teal hourglass outline icon"></i>
-              </div>
-            {% elif feature.status == 'published' %}
-              <div data-tooltip="Publié">
-                <i class="olive check icon"></i>
-              </div>
-            {% elif feature.status == 'draft' %}
-              <div data-tooltip="Brouillon">
-                <i class="orange pencil alternate icon"></i>
-              </div>
-            {% endif %}
-          </td>
-          <td>
-            <a href=""> {{ feature.feature_type.title }} </a>
-          </td>
-          <td>
-            <a href="">{{ feature.title }}</a>
-          </td>
-          <td data-order="{{ feature.updated_on|date:'Ymd' }}">
-            {{feature.updated_on|date:'d/m/Y' }}
-          </td>
-          {% if user.is_authenticated %}
-            <td>
-              {{ feature.creator.first_name }} {{ feature.creator.last_name }}
-            </td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  </div>
-</div>
-{% endblock %}
-
-
-{% block custom_resources %}
-<style>
-  #map {
-    width: 100%;
-    min-height: 300px;
-  }
-</style>
-
-<!-- Import settings.py variable. Will be used in the javascript. -->
-{{ SELECTED_GEOCODER_PROVIDER|json_script:'selected-provider' }}
-{{ layers|json_script:'layers' }}
-{{ features|json_script:'features' }}
-
-
-
-<script>
-  function getDataFilters() {
+function getDataFilters() {
     var $form = $("#form-filters").serializeArray()
     var requestURL = `{% url 'geocontrib:feature_list' slug=project.slug %}`
     for (var field of $form) {
@@ -255,11 +82,6 @@
       $formFilters.find("input[name=lng]").val(map.getCenter().lng)
     })
 
-    const layers = JSON.parse(document.getElementById('layers').textContent);
-    console.log('layers', layers);
-    const features = JSON.parse(document.getElementById('features').textContent);
-    console.log('features', features);
-    
     {% if layers %}
       {% for layer in layers %}
         var options = {{ layer.options|safe }}
@@ -277,11 +99,11 @@
     var featureGroup = new L.FeatureGroup()
     {% for feature in features %}
       var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
-      console.log(geomFeatureJSON);
-      
       var geomJSON = turf.flip(geomFeatureJSON)
       var popupContent = `
-
+        <h4>
+          <a href="{% url 'geocontrib:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
+        </h4>
         <div>
           Statut :
           {% if feature.status == 'archived' %}
@@ -294,7 +116,9 @@
             Brouillon
           {% endif %}
         </div>
- 
+        <div>
+          Type : <a href="{% url 'geocontrib:feature_type_detail' slug=project.slug feature_type_slug=feature.feature_type.slug %}"> {{ feature.feature_type.title }} </a>
+        </div>
         <div>
           Dernière mise à jour : {{feature.updated_on|date:'d/m/Y' }}
         </div>
@@ -337,7 +161,7 @@
     const geocoderLabel = JSON.parse(document.getElementById('selected-provider').textContent);
     if (geocoderLabel) {
       const LIMIT_RESULTS = 5;
-      
+
       // Load the geocoder specify in settings.py
       if (geocoderLabel === '{{ GEOCODER_PROVIDERS.ADDOK }}') {
         geocoder = L.Control.Geocoder.addok({limit: LIMIT_RESULTS});
@@ -352,7 +176,4 @@
         geocoder: geocoder,
       }).addTo(map);
     }
-
-  })
-</script>
-{% endblock %}
+  });
