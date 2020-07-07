@@ -11,10 +11,10 @@
 <form action="" method="post">{% csrf_token %}
 
   <fieldset class="module ">
-  <h1>Configuration de la vue Postrgresql: </h1>
+  <h1>Création d'une vue PostrgreSQL :</h1>
   <div class="generic__inputs">
     {%for field in pg_form %}
-      <label for="{{ field.id_for_label }}">{{ field.label }}: </label>
+      <label for="{{ field.id_for_label }}">{{ field.label }} : </label>
       {{ field }}
       {{ field.errors }}
     {% endfor %}
@@ -22,11 +22,11 @@
   </fieldset>
 
   <div class="fds">
-    {% include 'admin/geocontrib/formset_as_table.html' with formset=fds_formset formset_title='Selection des champs de signalement: '%}
+    {% include 'admin/geocontrib/formset_as_table.html' with formset=fds_formset formset_title='Sélection des champs à récupérer : '%}
   </div>
 
   <div class="cfs">
-    {% include 'admin/geocontrib/formset_as_table.html' with formset=cfs_formset formset_title='Sélection des <u>sous-champs</u> du Signalement à afficher : '%}
+    {% include 'admin/geocontrib/formset_as_table.html' with formset=cfs_formset formset_title='Sélection des sous-champs de <u>feature-data</u> à récupérer : '%}
   </div>
 
   <div class="sub_butt_bott">

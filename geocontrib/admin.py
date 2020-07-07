@@ -119,10 +119,10 @@ class FeatureTypeAdmin(admin.ModelAdmin):
             try:
                 cursor.execute(sql_create_view)
             except Exception as err:
-                logger.exception('Postgres view creation failed: {0}'.format(sql_create_view))
-                messages.error(request, "La vue postgres n'a pas pu etre générée: {0}".format(err))
+                logger.exception("PostgreSQL view creation failed: {0}".format(sql_create_view))
+                messages.error(request, "La vue PostgreSQL n'a pas pu être créée : {0}".format(err))
             else:
-                messages.success(request, "La vue postgres '{0}' est diponible. ".format(view_name))
+                messages.success(request, "La vue PostgreSQL '{0}' est disponible. ".format(view_name))
                 success = True
         return success
 

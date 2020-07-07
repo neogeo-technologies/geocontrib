@@ -37,7 +37,7 @@ class CustomFieldModelAdminForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': "Vous pouvez indiquez un alias pour cette colonne"
+            'placeholder': "Alias pour cette colonne"
         })
     )
 
@@ -72,7 +72,7 @@ class FeatureSelectFieldAdminForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': "Vous pouvez indiquez un alias pour cette colonne"
+            'placeholder': "Alias pour cette colonne"
         })
     )
 
@@ -84,7 +84,7 @@ class AddPosgresViewAdminForm(forms.Form):
     )
 
     status = forms.ChoiceField(
-        label="Status",
+        label="Statut",
         choices=tuple(x for x in Feature.STATUS_CHOICES),
         required=False
     )
