@@ -63,5 +63,5 @@ class LayerManager(models.Manager):
     def project_filter(self, project):
         BaseMap = apps.get_model(app_label='geocontrib', model_name='BaseMap')
         return self.get_queryset().filter(
-            pk__in=BaseMap.objects.filter(project=project).values_list('layer')
+            pk__in=BaseMap.objects.filter(project=project).values_list('layers__pk', flat=True)
         )

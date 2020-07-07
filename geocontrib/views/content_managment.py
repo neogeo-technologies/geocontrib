@@ -44,7 +44,6 @@ from geocontrib.forms import LayerForm
 from geocontrib.forms import ProjectModelForm
 from geocontrib.models import Authorization
 from geocontrib.models import Attachment
-from geocontrib.models import BaseMap
 from geocontrib.models import Comment
 from geocontrib.models import CustomField
 from geocontrib.models import Event
@@ -230,8 +229,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
-        bm_layers_pk = BaseMap.objects.filter(project=project).values_list('layers__pk', flat=True)
-        layers = Layer.objects.filter(pk__in=bm_layers_pk)
+        layers = Layer.handy.project_filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
         extra = CustomField.objects.filter(feature_type=feature_type)
 
@@ -269,8 +267,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
-        bm_layers_pk = BaseMap.objects.filter(project=project).values_list('layers__pk', flat=True)
-        layers = Layer.objects.filter(pk__in=bm_layers_pk)
+        layers = Layer.handy.project_filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
         feature_form = FeatureBaseForm(
             request.POST, feature_type=feature_type, user=user)
@@ -408,9 +405,7 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
 
         project = self.get_object()
         user = request.user
-        bm_layers_pk = BaseMap.objects.filter(project=project).values_list('layers__pk', flat=True)
-        # TODO change manager by layer.handy
-        layers = Layer.objects.filter(pk__in=bm_layers_pk).order_by('order')
+        layers = Layer.handy.project_filter(project=project).order_by('order')
         serialized_layers = LayerSerializer(layers, many=True)
         permissions = Authorization.all_permissions(user, project)
         feature_types = FeatureType.objects.filter(project=project)
@@ -452,7 +447,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature = self.get_object()
         project = feature.project
-        layers = Layer.objects.filter(project=project)
+        layers = Layer.handy.project_filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
 
         linked_features = FeatureLink.objects.filter(
@@ -512,7 +507,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         feature_type = feature.feature_type
-        layers = Layer.objects.filter(project=project)
+        layers = Layer.handy.project_filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
         extra = CustomField.objects.filter(feature_type=feature_type)
 
@@ -577,7 +572,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         ).exclude(
             feature_id=feature.feature_id
         )
-        layers = Layer.objects.filter(project=project)
+        layers = Layer.handy.project_filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
         extra = CustomField.objects.filter(feature_type=feature_type)
 
@@ -1068,7 +1063,7 @@ class ProjectDetail(DetailView):
         context['is_suscriber'] = Subscription.is_suscriber(user, project)
 
         # EDC
-        layers = Layer.objects.filter(project=project)
+        layers = Layer.handy.project_filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
         context['layers'] = serialized_layers.data
 
@@ -1160,7 +1155,7 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
 
         user = self.request.user
         project = self.get_object()
-        layers = Layer.objects.filter(project=project)
+        layers = Layer.handy.project_filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
         layer_formset = self.LayerFormSet(queryset=layers)
 
@@ -1176,7 +1171,7 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
 
     def post(self, request, slug):
         project = self.get_object()
-        layers = Layer.objects.filter(project=project)
+        layers = Layer.handy.project_filter(project=project)
         serialized_layers = LayerSerializer(layers, many=True)
         layer_formset = self.LayerFormSet(request.POST or None)
         if layer_formset.is_valid():

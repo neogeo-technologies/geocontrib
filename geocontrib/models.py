@@ -480,7 +480,7 @@ class BaseMap(models.Model):
 
     project = models.ForeignKey('geocontrib.Project', on_delete=models.CASCADE)
 
-    layers = models.ManyToManyField('Layer', through='ContextLayer')
+    layers = models.ManyToManyField('geocontrib.Layer', through='ContextLayer')
 
     class Meta:
         verbose_name = 'Fond cartographique'
