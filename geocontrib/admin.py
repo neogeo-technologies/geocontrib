@@ -132,7 +132,7 @@ class FeatureTypeAdmin(admin.ModelAdmin):
             FeatureSelectFieldAdminForm,
             formset=HiddenDeleteBaseFormSet,
             can_delete=True,
-            extra=1
+            extra=0
         )
 
         CustomFieldsFormSet = modelformset_factory(
@@ -143,8 +143,17 @@ class FeatureTypeAdmin(admin.ModelAdmin):
             extra=0,
         )
 
+        feature_detail_initial = [{
+            'related_field': (
+                str(field.name), "{0} - {1}".format(
+                    field.name, field.get_internal_type())),
+            'alias': None
+        } for field in Feature._meta.get_fields() if field.name in ('feature_id', 'title', 'description', 'geom')]
+
         if request.method == 'POST':
-            fds_formset = FeatureDetailSelectionFormset(request.POST or None, prefix='fds')
+            fds_formset = FeatureDetailSelectionFormset(
+                request.POST or None, prefix='fds',
+                initial=feature_detail_initial)
             cfs_formset = CustomFieldsFormSet(request.POST or None, prefix='cfs')
 
             pg_form = AddPosgresViewAdminForm(request.POST or None)
@@ -176,7 +185,9 @@ class FeatureTypeAdmin(admin.ModelAdmin):
 
         else:
             pg_form = AddPosgresViewAdminForm()
-            fds_formset = FeatureDetailSelectionFormset(prefix='fds')
+            fds_formset = FeatureDetailSelectionFormset(
+                prefix='fds',
+                initial=feature_detail_initial)
             cfs_formset = CustomFieldsFormSet(
                 queryset=CustomField.objects.filter(feature_type__pk=feature_type_id),
                 prefix='cfs')

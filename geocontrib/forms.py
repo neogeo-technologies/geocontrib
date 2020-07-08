@@ -45,6 +45,10 @@ class CustomFieldModelAdminForm(forms.ModelForm):
         model = CustomField
         fields = ('name', 'alias', 'field_type')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['field_type'].disabled = True
+
     def save(self, *args, **kwargs):
         return None
 
@@ -83,9 +87,10 @@ class AddPosgresViewAdminForm(forms.Form):
         required=True,
     )
 
-    status = forms.ChoiceField(
+    status = forms.MultipleChoiceField(
         label="Statut",
         choices=tuple(x for x in Feature.STATUS_CHOICES),
+        widget=forms.CheckboxSelectMultiple,
         required=False
     )
 

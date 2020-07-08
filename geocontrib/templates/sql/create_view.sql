@@ -12,6 +12,6 @@ CREATE OR REPLACE VIEW {{ schema }}.{{ view_name }} AS
     {% endfor %}
   FROM geocontrib_feature
   WHERE
-      geocontrib_feature.feature_type_id = '{{ feature_type_id }}' 
-      AND geocontrib_feature.status = '{{ status }}';
+      geocontrib_feature.feature_type_id = '{{ feature_type_id }}'
+      AND geocontrib_feature.status IN ({% for stat in status %}'{{stat}}'{% if not forloop.last %}, {% endif%}{% endfor %});
 ALTER TABLE {{ schema }}.{{ view_name }} OWNER TO {{ user }};
