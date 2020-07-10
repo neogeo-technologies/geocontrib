@@ -27,7 +27,7 @@ def forwards_func(apps, schema_editor, elidible=True):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('geocontrib', '0002_auto_20200218_1343'),
+        ('geocontrib', '0003_auto_20200619_1629'),
     ]
 
     operations = [
