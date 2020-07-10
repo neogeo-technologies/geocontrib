@@ -37,14 +37,12 @@ User = get_user_model()
 
 
 class UserAdmin(DjangoUserAdmin):
-
     list_display = (
-        'email', 'last_name', 'first_name',
+        'username', 'last_name', 'first_name', 'email',
         'is_superuser', 'is_administrator', 'is_staff', 'is_active'
     )
-    search_fields = ('id', 'email', 'first_name', 'last_name')
-
-    ordering = ('-pk', )
+    search_fields = ('id', 'username', 'first_name', 'last_name', 'email')
+    ordering = ('last_name', 'first_name', 'username', )
     verbose_name_plural = 'utilisateurs'
     verbose_name = 'utilisateur'
 
@@ -199,6 +197,20 @@ class FeatureTypeAdmin(admin.ModelAdmin):
         context['pg_form'] = pg_form
 
         return TemplateResponse(request, "admin/geocontrib/create_postrges_view_form.html", context)
+
+
+class FlatPageAdmin(FlatPageAdmin):
+    fieldsets = (
+        (None, {'fields': ('url', 'title', 'content', 'sites')}),
+        (_('Advanced options'), {
+            'classes': ('collapse',),
+            'fields': (
+                'enable_comments',
+                'registration_required',
+                'template_name',
+            ),
+        }),
+    )
 
 
 class FlatPageAdmin(FlatPageAdmin):

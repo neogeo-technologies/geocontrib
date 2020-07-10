@@ -1,0 +1,47 @@
+name: "Docker build"
+on:
+  push:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - name: "Checking out"
+      uses: actions/checkout@v1
+    - name: "Building docker image"
+      working-directory: docker
+      run: docker-compose -f docker-compose.geocontrib-alone.yaml build
+    - name: "Getting image tag"
+      id: version
+      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+    - name: "Logging in docker.io"
+      if: github.repository == 'neogeo-technologies/geocontrib'
+      uses: azure/docker-login@v1
+      with:
+        username: '${{ secrets.DOCKER_HUB_USERNAME }}'
+        password: '${{ secrets.DOCKER_HUB_PASSWORD }}'
+    - name: "Pushing latest to docker.io"
+      if: github.ref == 'refs/heads/develop' && github.event_name != 'release'
+      run: |
+        docker tag docker_geocontrib neogeo/geocontrib:latest
+        docker push neogeo/geocontrib:latest
+        docker tag docker_geocontrib-nginx neogeo/geocontrib-frontend:latest
+        docker push neogeo/geocontrib-frontend:latest
+    - name: "Pushing stable to docker.io"
+      if: github.ref == 'refs/heads/master' && github.event_name != 'release'
+      run: |
+        docker tag docker_geocontrib neogeo/geocontrib:stable
+        docker push neogeo/geocontrib:stable
+        docker tag docker_geocontrib-nginx neogeo/geocontrib-frontend:stable
+        docker push neogeo/geocontrib-frontend:stable
+    - name: "Pushing tag to docker.io"
+      if: github.event_name == 'release'
+      run: |
+        docker tag docker_geocontrib neogeo/geocontrib:${{ steps.version.outputs.VERSION }}
+        docker push neogeo/geocontrib:${{ steps.version.outputs.VERSION }}
+        docker tag docker_geocontrib-nginx neogeo/geocontrib-frontend:${{ steps.version.outputs.VERSION }}
+        docker push neogeo/geocontrib-frontend:${{ steps.version.outputs.VERSION }}
+

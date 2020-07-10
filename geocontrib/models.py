@@ -415,6 +415,10 @@ class FeatureType(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def is_editable(self):
+        Feature = apps.get_model(app_label='geocontrib', model_name="Feature")
+        return not Feature.objects.filter(feature_type=self).exists()
 
 # class CustomFieldInterface(models.Model):
 #
