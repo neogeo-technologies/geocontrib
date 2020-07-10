@@ -1,19 +1,21 @@
+from argparse import RawTextHelpFormatter
 from collections import Counter
+import itertools
 import json
+import logging
+import re
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-
-from argparse import RawTextHelpFormatter
-
 from ldap3 import Connection, ALL_ATTRIBUTES, ALL_OPERATIONAL_ATTRIBUTES
 from decouple import config, Csv
 
-import logging
+from geocontrib import choices
+from geocontrib.models import Authorization
+from geocontrib.models import Project
+from geocontrib.models import UserLevelPermission
 
 
-# TODO: A voir si ces variables doivent etre définies dans les settings
-# ou juste au niveau systeme (je penche pour le systeme)
 LDAP_URI = config('LDAP_URI', default=None)
 LDAP_USERDN = config('LDAP_BINDDN', default=None)
 LDAP_PASSWD = config('LDAP_PASSWD', default=None)
@@ -25,7 +27,7 @@ MAPPED_REMOTE_FIELDS = {
     'last_name': 'sn',
     'username': 'uid',
     'email': 'mail',
-    'member_of': 'memberOf'
+    'member_of': 'memberOf',
 }
 
 PROTECTED_USER_NAMES = config('PROTECTED_USER_NAMES', default='', cast=Csv())
@@ -62,9 +64,9 @@ class Command(BaseCommand):
 
     help = """Import de données depuis une source georchestra.
 $ python manage.py georchestra_user_sync
-Configurez les paramètres LDAP_SEARCH_BASE, PROTECTED_USER_NAMES, 
-EXCLUDED_USER_NAMES, ADMIN_USER_GROUPS, EXCLUSIVE_USER_GROUPS et 
-EXCLUDED_USER_GROUPS pour cibler plus précisément les utilisateurs à 
+Configurez les paramètres LDAP_SEARCH_BASE, PROTECTED_USER_NAMES,
+EXCLUDED_USER_NAMES, ADMIN_USER_GROUPS, EXCLUSIVE_USER_GROUPS et
+EXCLUDED_USER_GROUPS pour cibler plus précisément les utilisateurs à
 synchroniser."""
 
     def create_parser(self, *args, **kwargs):
@@ -120,6 +122,42 @@ synchroniser."""
         ).delete()
         logger.debug("Deleted users: {0}: ".format(deleted))
 
+    def sync_ldap_groups(self, user, row):
+
+        # On liste les noms de groupe auxquels est affilié l'utilisateur
+        member_of = get_mapped_value(row, 'member_of', [])
+        all_groups = [re.findall('cn=(.*?),', item) for item in member_of]
+        flattened_groups = list(set(itertools.chain(*all_groups)))
+        if len(flattened_groups) > 0:
+            contrib_qs = Project.objects.filter(ldap_project_contrib_groups__overlap=flattened_groups)
+            if contrib_qs.exists():
+                for project in contrib_qs or []:
+                    # si non référencé parmi la liste des noms de Project().ldap_project_contrib_groups
+                    # alors on l'ajoute en tant que simple contributeur
+                    auth, created = Authorization.objects.get_or_create(
+                        project=project, user=user,
+                        defaults={
+                            'level': UserLevelPermission.objects.get(user_type_id=choices.CONTRIBUTOR)
+                        }
+                    )
+                    # sinon on l'ajoute en tant que modérateur
+                    if not created:
+                        auth.level = UserLevelPermission.objects.get(user_type_id=choices.MODERATOR)
+                        auth.save(updated_fields=['level', ])
+                        logger.debug("User '{0}' set as moderator's Project '{1}' ".format(user.username, project.slug))
+
+            # si utilisateur membre d'un groupe admin LDAP référencé dans Project().ldap_project_admin_groups
+            admin_qs = Project.objects.filter(ldap_project_admin_groups__overlap=flattened_groups)
+            if admin_qs.exists():
+                for project in admin_qs or []:
+                    auth, created = Authorization.objects.update_or_create(
+                        project=project, user=user,
+                        defaults={
+                            'level': UserLevelPermission.objects.get(user_type_id=choices.ADMIN)
+                        }
+                    )
+                    logger.debug("User '{0}' set as admin's Project '{1}' ".format(user.username, project.slug))
+
     def user_update_or_create(self, row):
         try:
             user, created = User.objects.update_or_create(
@@ -141,7 +179,7 @@ synchroniser."""
                     user.is_admin = True
                     user.is_superuser = True
                     user.save()
-
+            self.sync_ldap_groups(user, row)
         except Exception:
             logger.exception('User cannot be created: {0}'.format(row))
             pass
@@ -190,6 +228,7 @@ synchroniser."""
 
     def handle(self, *args, **options):
         remote_users = self.get_remote_data()
+        logger.info(remote_users)
         self.check_remote_data(remote_users)
         self.flush_local_db(remote_users)
         self.create_users(remote_users)
