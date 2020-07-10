@@ -4,9 +4,11 @@ from django.contrib.gis import forms
 from django.forms.models import BaseModelFormSet
 from django.forms.formsets import DELETION_FIELD_NAME
 
-from geocontrib.models import Authorization
 from geocontrib.models import Attachment
+from geocontrib.models import Authorization
+from geocontrib.models import BaseMap
 from geocontrib.models import Comment
+from geocontrib.models import ContextLayer
 from geocontrib.models import CustomField
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
@@ -16,7 +18,7 @@ from geocontrib.models import Project
 from geocontrib.models import UserLevelPermission
 
 import logging
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 
 ########################
@@ -455,7 +457,27 @@ class LayerForm(forms.ModelForm):
 
     class Meta:
         model = Layer
-        fields = ('title', 'service', 'order', 'schema_type', 'options')
+        fields = ('title', 'service', 'schema_type', 'options')
+
+
+class BaseMapForm(forms.ModelForm):
+
+    # layer = forms.ModelChoiceField(label="Couche", queryset=Layer.objects.all(), empty_label=None)
+
+    class Meta:
+        model = BaseMap
+        fields = ('title', 'layers', )
+
+
+class ContextLayerForm(forms.ModelForm):
+
+    title = forms.CharField()
+    layer = forms.ModelChoiceField(label="Couche", queryset=Layer.objects.all(), empty_label=None)
+
+    class Meta:
+        model = ContextLayer
+        fields = ('title', 'layer', 'opacity', 'order')
+
 
 
 class ProjectModelForm(forms.ModelForm):

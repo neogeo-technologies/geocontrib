@@ -27,6 +27,8 @@ from geocontrib.models import Feature
 from geocontrib.models import Project
 from geocontrib.models import Subscription
 from geocontrib.models import FeatureType
+from geocontrib.models import BaseMap
+from geocontrib.models import ContextLayer
 from geocontrib.models import Layer
 from geocontrib.models import CustomField
 from geocontrib.models import UserLevelPermission
@@ -215,7 +217,24 @@ class FlatPageAdmin(FlatPageAdmin):
     )
 
 
+class ContextLayerTabular(admin.TabularInline):
+    model = ContextLayer
+    extra = 0
+    can_delete = False
+    can_order = True
+    show_change_link = True
+    view_on_site = False
+
+
+class BaseMapAdmin(admin.ModelAdmin):
+
+    inlines = (
+        ContextLayerTabular,
+    )
+
+
 admin.site.register(User, UserAdmin)
+admin.site.register(BaseMap, BaseMapAdmin)
 admin.site.register(CustomField)
 admin.site.register(Layer)
 admin.site.register(Authorization)

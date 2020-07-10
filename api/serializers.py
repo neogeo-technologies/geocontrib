@@ -1,12 +1,14 @@
-from django.contrib.auth import get_user_model
-from django.db.models import Q
+import json
 
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-# from rest_framework.reverse import reverse
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from geocontrib.models import Attachment
 from geocontrib.models import Authorization
+from geocontrib.models import BaseMap
+from geocontrib.models import ContextLayer
 from geocontrib.models import CustomField
 from geocontrib.models import Comment
 from geocontrib.models import Feature
@@ -19,7 +21,7 @@ from geocontrib.models import Layer
 
 
 import logging
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -259,12 +261,56 @@ class EventSerializer(serializers.ModelSerializer):
         )
 
 
+class ContextLayerSerializer(serializers.ModelSerializer):
+
+    id = serializers.IntegerField(source='layer.id', required=True)
+
+    title = serializers.ReadOnlyField(source='layer.title')
+
+    class Meta:
+        model = ContextLayer
+        fields = ('id', 'title', 'opacity', 'order')
+
+
+class BaseMapSerializer(serializers.ModelSerializer):
+
+    layers = ContextLayerSerializer(source='contextlayer_set', many=True)
+
+    class Meta:
+        model = BaseMap
+        fields = ('id', 'title', 'layers')
+
+    def context_layer_set(self, instance, context_layers):
+        instance.layers.clear()
+        for context_layer in context_layers:
+            layer = context_layer.pop('layer')
+            layer = get_object_or_404(Layer, id=layer['id'])
+            ctx, created = ContextLayer.objects.update_or_create(
+                base_map=instance,
+                layer=layer,
+                defaults=context_layer
+            )
+            logger.debug(ctx)
+
+    def create(self, validated_data):
+        context_layers = validated_data.pop('contextlayer_set', [])
+        instance = BaseMap.objects.create(**validated_data)
+        self.context_layer_set(instance, context_layers)
+        return instance
+
+    def update(self, instance, validated_data):
+        context_layers = validated_data.pop('contextlayer_set', [])
+        instance.email = validated_data.get('title', instance.title)
+        self.context_layer_set(instance, context_layers)
+        instance.save()
+        return instance
+
+
 class LayerSerializer(serializers.ModelSerializer):
 
     options = serializers.SerializerMethodField(read_only=True)
 
     def get_options(self, obj):
-        import json
         return json.dumps(obj.options)
 
     class Meta:

@@ -53,3 +53,15 @@ class AvailableFeaturesManager(models.Manager):
                     )
 
         return queryset
+
+
+class LayerManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+    def project_filter(self, project):
+        BaseMap = apps.get_model(app_label='geocontrib', model_name='BaseMap')
+        return self.get_queryset().filter(
+            pk__in=BaseMap.objects.filter(project=project).values_list('layers__pk', flat=True)
+        )

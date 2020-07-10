@@ -7,7 +7,7 @@ from geocontrib.models import Event
 
 import logging
 
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):

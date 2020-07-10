@@ -9,10 +9,11 @@ from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
-from django.urls import reverse
 
 from geocontrib.choices import ALL_LEVELS
 from geocontrib.choices import RELATED_MODELS
@@ -24,10 +25,11 @@ from geocontrib.choices import TYPE_CHOICES
 from geocontrib.emails import notif_moderators_pending_features
 from geocontrib.emails import notif_creator_published_feature
 from geocontrib.managers import AvailableFeaturesManager
+from geocontrib.managers import LayerManager
 
 import logging
 
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 
 #########################
@@ -485,6 +487,43 @@ class CustomField(models.Model):
             raise ValidationError("La liste d'options ne peut être vide. ")
 
 
+class BaseMap(models.Model):
+    title = models.CharField('Titre', max_length=256, blank=True, null=True)
+
+    project = models.ForeignKey('geocontrib.Project', on_delete=models.CASCADE)
+
+    layers = models.ManyToManyField('geocontrib.Layer', through='ContextLayer')
+
+    class Meta:
+        verbose_name = 'Fond cartographique'
+        verbose_name_plural = 'Fonds cartographiques'
+
+
+class ContextLayer(models.Model):
+
+    order = models.PositiveSmallIntegerField("Numéro d'ordre", default=0)
+
+    opacity = models.DecimalField(
+        "Opacité",
+        max_digits=3,
+        decimal_places=2,
+        validators=[
+            MaxValueValidator(1),
+            MinValueValidator(0)
+        ],
+        default=1)
+
+    base_map = models.ForeignKey('geocontrib.BaseMap', on_delete=models.CASCADE)
+
+    layer = models.ForeignKey('geocontrib.Layer', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Liaison Fond-Couche'
+        verbose_name_plural = 'Liaison Fond-Couche'
+        unique_together = ('base_map', 'order')
+        ordering = ('order', )
+
+
 class Layer(models.Model):
     SCHEMAS = (
         ('wms', 'WMS'),
@@ -495,20 +534,24 @@ class Layer(models.Model):
 
     service = models.CharField('Service', max_length=256)
 
-    order = models.PositiveSmallIntegerField("Numéro d'ordre", default=0)
+    # order = models.PositiveSmallIntegerField("Numéro d'ordre", default=0)
 
     schema_type = models.CharField(
         "Type de couche", choices=SCHEMAS, max_length=50, default="wms")
 
     options = JSONField("Options", blank=True, null=True)
 
-    project = models.ForeignKey('geocontrib.Project', on_delete=models.CASCADE)
+    # project = models.ForeignKey('geocontrib.Project', on_delete=models.CASCADE)
+
+    objects = models.Manager()
+
+    handy = LayerManager()
 
     class Meta:
         verbose_name = 'Couche'
         verbose_name_plural = 'Couches'
         # unique_together = ('project', 'order')
-        ordering = ['project', 'order']
+        # ordering = ['project', 'order']
 
     def __str__(self):
         return "{} - {}".format(self.pk, self.service)
