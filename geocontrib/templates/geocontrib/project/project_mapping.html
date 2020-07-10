@@ -7,12 +7,23 @@
 
 {% block content %}
 
+
+
+
 <div class="fourteen wide column">
 
   <h1 class="ui header">Administration des fonds cartographiques</h1>
 
   <form id="form-layers" action="." method="post" enctype="multipart/form-data" class="ui form">
     {% csrf_token %}
+
+    <div id="context_layer_formset">
+      {{ context_layer_formset.non_form_errors }}
+      {{ context_layer_formset.management_form }}
+      {% for form in context_layer_formset %}
+        {{ form.as_p }}
+      {% endfor %}
+    </div>
 
     {{ layer_formset.non_form_errors }}
 
@@ -42,11 +53,6 @@
                   <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
                   {{ form.title }}
                   {{ form.title.errors }}
-                </div>
-                <div class="required field">
-                  <label for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
-                  {{ form.order }}
-                  {{ form.order.errors }}
                 </div>
               </div>
               <div class="fields">

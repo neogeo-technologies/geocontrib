@@ -29,7 +29,7 @@ from geocontrib.managers import LayerManager
 
 import logging
 
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 
 #########################
@@ -509,6 +509,7 @@ class ContextLayer(models.Model):
         verbose_name = 'Liaison Fond-Couche'
         verbose_name_plural = 'Liaison Fond-Couche'
         unique_together = ('base_map', 'order')
+        ordering = ('order', )
 
 
 class Layer(models.Model):

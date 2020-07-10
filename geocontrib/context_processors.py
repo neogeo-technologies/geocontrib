@@ -3,7 +3,7 @@ from geocontrib.models import Authorization
 import json
 import logging
 
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 
 def sso_setted(request):

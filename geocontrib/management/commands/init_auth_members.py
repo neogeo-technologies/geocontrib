@@ -7,7 +7,7 @@ from geocontrib.models import UserLevelPermission
 
 import logging
 
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 

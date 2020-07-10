@@ -106,6 +106,7 @@ class FlatPageAdmin(FlatPageAdmin):
         }),
     )
 
+
 class ContextLayerTabular(admin.TabularInline):
     model = ContextLayer
     extra = 0
@@ -113,6 +114,7 @@ class ContextLayerTabular(admin.TabularInline):
     can_order = True
     show_change_link = True
     view_on_site = False
+
 
 class BaseMapAdmin(admin.ModelAdmin):
 

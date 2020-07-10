@@ -1,4 +1,6 @@
 import json
+import logging
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -28,34 +30,35 @@ from api.serializers import FeatureLinkSerializer
 from api.serializers import FeatureTypeSerializer
 from api.serializers import LayerSerializer
 from api.serializers import ProjectDetailedSerializer
+from api.serializers import BaseMapSerializer
 
 from geocontrib.exif import exif
-from geocontrib.forms import AuthorizationForm
-from geocontrib.forms import AuthorizationBaseFS
-from geocontrib.forms import CustomFieldModelForm
-from geocontrib.forms import CustomFieldModelBaseFS
 from geocontrib.forms import AttachmentForm
+from geocontrib.forms import AuthorizationBaseFS
+from geocontrib.forms import AuthorizationForm
 from geocontrib.forms import CommentForm
-from geocontrib.forms import FeatureTypeModelForm
+from geocontrib.forms import CustomFieldModelBaseFS
+from geocontrib.forms import CustomFieldModelForm
 from geocontrib.forms import FeatureBaseForm
 from geocontrib.forms import FeatureExtraForm
 from geocontrib.forms import FeatureLinkForm
-from geocontrib.forms import LayerForm
+from geocontrib.forms import FeatureTypeModelForm
 from geocontrib.forms import ProjectModelForm
-from geocontrib.models import Authorization
 from geocontrib.models import Attachment
+from geocontrib.models import Authorization
+from geocontrib.models import BaseMap
 from geocontrib.models import Comment
+from geocontrib.models import ContextLayer
 from geocontrib.models import CustomField
 from geocontrib.models import Event
 from geocontrib.models import Feature
-from geocontrib.models import FeatureType
 from geocontrib.models import FeatureLink
+from geocontrib.models import FeatureType
 from geocontrib.models import Layer
 from geocontrib.models import Project
 from geocontrib.models import Subscription
 
-import logging
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 DECORATORS = [csrf_exempt, login_required(login_url=settings.LOGIN_URL)]
 
@@ -1136,15 +1139,8 @@ class ProjectCreate(CreateView):
 
 @method_decorator(DECORATORS, name='dispatch')
 class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
-    queryset = Project.objects.all()
 
-    LayerFormSet = modelformset_factory(
-        Layer,
-        can_delete=True,
-        form=LayerForm,
-        extra=0,
-        fields=('title', 'service', 'schema_type', 'options')
-    )
+    queryset = Project.objects.all()
 
     def test_func(self):
         user = self.request.user
@@ -1152,67 +1148,76 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
         return Authorization.has_permission(user, 'can_update_project', project)
 
     def get(self, request, slug):
-
-        user = self.request.user
         project = self.get_object()
-        layers = Layer.handy.project_filter(project=project)
-        serialized_layers = LayerSerializer(layers, many=True)
-        layer_formset = self.LayerFormSet(queryset=layers)
 
-        permissions = Authorization.all_permissions(user, project)
+        serialized_base_maps = BaseMapSerializer(
+            BaseMap.objects.filter(project=project),
+            many=True
+        )
+
+        serialized_layers = LayerSerializer(
+            Layer.objects.all(),
+            many=True
+        )
+
+        logger.debug(json.dumps(serialized_base_maps.data, indent=4))
+        logger.debug(json.dumps(serialized_layers.data, indent=4))
+
         context = {
-            'permissions': permissions,
             'project': project,
-            'layers': serialized_layers.data,
-            'layer_formset': layer_formset
+            'serialized_base_maps': serialized_base_maps.data,
+            'serialized_layers': serialized_layers.data
         }
 
         return render(request, 'geocontrib/project/project_mapping.html', context)
 
+    def create_or_update_base_map(self, request, project):
+        body = json.loads(request.body.decode('utf-8'))
+        base_map_batch = []
+        for data in body:
+            defaults = {'data': data}
+            if data.get('id'):
+                defaults['instance'] = get_object_or_404(
+                    BaseMap, id=data['id'], project=project
+                )
+            logger.debug(defaults)
+            serialized_base_maps = BaseMapSerializer(**defaults)
+            if not serialized_base_maps.is_valid():
+                logger.error(serialized_base_maps.errors)
+                raise Exception
+
+            base_map = serialized_base_maps.save(project=project)
+            base_map_batch.append(base_map)
+        # cleaning deleted projects's base_map
+        qs = BaseMap.objects.filter(
+            project=project
+        ).exclude(pk__in=[row.pk for row in base_map_batch])
+        qs.delete()
+
     def post(self, request, slug):
         project = self.get_object()
-        layers = Layer.handy.project_filter(project=project)
-        serialized_layers = LayerSerializer(layers, many=True)
-        layer_formset = self.LayerFormSet(request.POST or None)
-        if layer_formset.is_valid():
-
-            for data in layer_formset.cleaned_data:
-                # id contient l'instance si existante
-                layer = data.pop("id", None)
-                is_deleted = data.pop("DELETE", False)
-                if layer:
-                    if is_deleted:
-                        layer.delete()
-                    else:
-                        for attr, value in data.items():
-                            setattr(layer, attr, value)
-                        layer.save()
-
-                elif not layer and not is_deleted:
-                    data['project'] = project
-                    Layer.objects.create(**data)
-
-                # TODO @cbenhabib: afin d'avoir une valeur unique d'ordre.
-                # layers = Layer.objects.filter(project=project).order_by('order')
-                # for idx, layer in enumerate(layers):
-                #     layer.order = idx
-                #     layer.save(update_fields=['order'])
-                layer_formset = self.LayerFormSet(queryset=layers)
+        try:
+            self.create_or_update_base_map(request, project)
+        except Exception:
+            logger.exception('BaseMap Update failed')
+            messages.error(request, "L'édition des couches cartographiques a échoué. ")
         else:
-            logger.error(layer_formset.errors)
-            context = {
-                'project': project,
-                'layers': serialized_layers.data,
-                'layer_formset': layer_formset
-            }
-            return render(request, 'geocontrib/project/project_mapping.html', context)
+            messages.info(request, "L'édition des couches cartographiques a réussi. ")
 
-        messages.error(request, "L'édition des couches cartographiques a échoué. ")
-        logger.error(layer_formset.errors)
+        serialized_base_maps = BaseMapSerializer(
+            BaseMap.objects.filter(project=project),
+            many=True
+        )
+        serialized_layers = LayerSerializer(
+            Layer.objects.all(),
+            many=True
+        )
+        logger.debug(json.dumps(serialized_base_maps.data, indent=4))
+
         context = {
             'project': project,
-            'layers': layers,
-            'layer_formset': layer_formset
+            'serialized_base_maps': serialized_base_maps.data,
+            'serialized_layers': serialized_layers.data
         }
         return render(request, 'geocontrib/project/project_mapping.html', context)
 

@@ -6,7 +6,7 @@ from django.contrib.sites.models import Site
 
 import logging
 
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 try:
     CURRENT_SITE_DOMAIN = Site.objects.get_current().domain

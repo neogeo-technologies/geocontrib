@@ -13,7 +13,7 @@ from geocontrib.models import StackedEvent
 from geocontrib.models import Subscription
 
 import logging
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
