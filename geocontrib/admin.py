@@ -64,8 +64,6 @@ class UserAdmin(DjangoUserAdmin):
         (_('Permissions'), {
             'fields': (
                 'is_active', 'is_staff', 'is_superuser', 'is_administrator',
-                'ldap_project_contrib_groups',
-                'ldap_project_admin_groups'
                 'groups', 'user_permissions'),
         }),
         (_('Important dates'), {
@@ -78,7 +76,8 @@ class UserAdmin(DjangoUserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': (
-                'username', 'email', 'password1', 'password2', 'first_name', 'last_name',
+                'username', 'email', 'password1', 'password2',
+                'first_name', 'last_name',
                 'is_active', 'is_staff', 'is_superuser'),
         }),
     )
@@ -231,6 +230,19 @@ class BaseMapAdmin(admin.ModelAdmin):
     inlines = (
         ContextLayerTabular,
     )
+
+    def save_formset(self, request, form, formset, change):
+        # TODO @cbenhabib force reordering for next week
+        # if formset.model == ContextLayer:
+        #     instances = formset.save(commit=False)
+        #     for obj in formset.deleted_objects:
+        #         obj.delete()
+        #     for order, instance in enumerate(instances):
+        #         import pdb; pdb.set_trace()
+        #
+        #         instance.order = order
+        #         instance.save(update_fields=['order'])
+        super().save_formset(request, form, formset, change)
 
 
 admin.site.register(User, UserAdmin)
