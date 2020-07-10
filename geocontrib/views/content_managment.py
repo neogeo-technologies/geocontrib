@@ -845,6 +845,105 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
 
 
 @method_decorator(DECORATORS, name='dispatch')
+class FeatureTypeUpdate(SingleObjectMixin, UserPassesTestMixin, View):
+    queryset = FeatureType.objects.all()
+    slug_url_kwarg = 'feature_type_slug'
+    CustomFieldsFormSet = modelformset_factory(
+        CustomField,
+        can_delete=True,
+        # can_order=True,
+        form=CustomFieldModelForm,
+        formset=CustomFieldModelBaseFS,
+        extra=0,
+    )
+
+    def test_func(self):
+        user = self.request.user
+        feature_type = self.get_object()
+        project = feature_type.project
+        # On interdit l'édition d'un feature_type si des signalements ont déja été crée
+        if Feature.objects.filter(feature_type=feature_type).exists():
+            return False
+        return Authorization.has_permission(user, 'can_create_feature_type', project)
+
+    def get(self, request, slug, feature_type_slug):
+
+        feature_type = self.get_object()
+        form = FeatureTypeModelForm(instance=feature_type)
+        formset = self.CustomFieldsFormSet(
+            queryset=CustomField.objects.filter(feature_type=feature_type)
+        )
+        project = feature_type.project
+        user = request.user
+        features = Feature.handy.availables(
+            user, project
+        ).filter(
+            feature_type=feature_type
+        ).order_by('-updated_on')[:5]
+
+        structure = FeatureTypeSerializer(feature_type, context={'request': request})
+
+        context = {
+            'feature_type': feature_type,
+            'permissions': Authorization.all_permissions(user, project),
+            # 'feature_types': project.featuretype_set.all(),
+            'features': features,
+            'project': project,
+            'structure': structure.data,
+            'form': form,
+            'formset': formset,
+        }
+
+        return render(request, 'geocontrib/feature_type/feature_type_edit.html', context)
+
+    def post(self, request, slug, feature_type_slug):
+        user = request.user
+        feature_type = self.get_object()
+        form = FeatureTypeModelForm(request.POST or None, instance=feature_type)
+        formset = self.CustomFieldsFormSet(data=request.POST or None)
+        if form.is_valid() and formset.is_valid():
+
+            updated_feature_type = form.save()
+
+            for data in formset.cleaned_data:
+                custom_field = data.pop('id', None)
+
+                if custom_field and data.get('DELETE'):
+                    custom_field.delete()
+
+                if custom_field and not data.get('DELETE'):
+                    for key in ['name', 'field_type', 'position', 'label', 'options']:
+                        setattr(custom_field, key, data.get(key))
+                    custom_field.save()
+
+                if not custom_field and not data.get('DELETE'):
+                    CustomField.objects.create(
+                        name=data.get('name'),
+                        field_type=data.get('field_type'),
+                        position=data.get('position'),
+                        label=data.get('label'),
+                        options=data.get('options'),
+                        feature_type=updated_feature_type,
+                    )
+            return redirect('geocontrib:project', slug=feature_type.project.slug)
+        else:
+
+            logger.error(form.errors)
+            logger.error(formset.errors)
+            messages.error(
+                request,
+                "Erreur lors de l'édition du type de signalement. ")
+            context = {
+                'form': form,
+                'formset': formset,
+                'permissions': Authorization.all_permissions(user, feature_type.project),
+                'project': feature_type.project,
+                'feature_type': feature_type,
+            }
+        return render(request, 'geocontrib/feature_type/feature_type_edit.html', context)
+
+
+@method_decorator(DECORATORS, name='dispatch')
 class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
     queryset = FeatureType.objects.all()
     slug_url_kwarg = 'feature_type_slug'
@@ -880,10 +979,11 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
         for feature in new_features:
             properties = feature.get('properties')
             feature_data = self.get_feature_data(feature_type, properties)
-
+            title = properties.get('title')
+            description = properties.get('description')
             current = Feature.objects.create(
-                title=properties.get('title'),
-                description=properties.get('description'),
+                title=title,
+                description=description,
                 status='draft',
                 creator=creator,
                 project=feature_type.project,
@@ -891,18 +991,18 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
                 geom=self.get_geom(feature.get('geometry')),
                 feature_data=feature_data,
             )
+            if title:
+                simili_features = Feature.objects.filter(
+                    title=title, description=description
+                ).exclude(feature_id=current.feature_id)
 
-            simili_features = Feature.objects.filter(
-                title=current.title, description=current.description
-            ).exclude(feature_id=current.feature_id)
-
-            if simili_features.count() > 0:
-                for row in simili_features:
-                    FeatureLink.objects.get_or_create(
-                        relation_type='doublon',
-                        feature_from=current.feature_id,
-                        feature_to=row.feature_id
-                    )
+                if simili_features.count() > 0:
+                    for row in simili_features:
+                        FeatureLink.objects.get_or_create(
+                            relation_type='doublon',
+                            feature_from=current.feature_id,
+                            feature_to=row.feature_id
+                        )
         if nb_features > 0:
             msg = "{nb} signalement(s) importé(s). ".format(nb=nb_features)
             messages.info(request, msg)
@@ -1239,7 +1339,9 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
         project = self.get_object()
         formset = self.AuthorizationFormSet(
             queryset=Authorization.objects.filter(
-                project=project, user__is_active=True))
+                project=project, user__is_active=True
+            ).order_by('user__last_name', 'user__first_name', 'user__username')
+        )
         authorised = Authorization.objects.filter(project=project)
         permissions = Authorization.all_permissions(user, project)
         context = {
