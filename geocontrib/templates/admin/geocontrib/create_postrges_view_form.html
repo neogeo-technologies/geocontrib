@@ -1,0 +1,41 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'geocontrib/css/base.css' %}"/>
+<script src="{% static 'geocontrib/js/formset_handlers.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
+{% block content %}
+<form action="" method="post">{% csrf_token %}
+
+  <fieldset class="module ">
+  <h1>Création d'une vue PostrgreSQL :</h1>
+  <div class="generic__inputs">
+    {%for field in pg_form %}
+      <label for="{{ field.id_for_label }}">{{ field.label }} : </label>
+      {{ field }}
+      {{ field.errors }}
+      <br>
+    {% endfor %}
+  </div>
+  </fieldset>
+
+  <div class="fds">
+    {% include 'admin/geocontrib/formset_as_table.html' with formset=fds_formset formset_title='Sélection des champs à récupérer : '%}
+  </div>
+
+  <div class="cfs">
+    {% include 'admin/geocontrib/formset_as_table.html' with formset=cfs_formset formset_title='Sélection des sous-champs de <u>feature-data</u> à récupérer : '%}
+  </div>
+
+  <div class="sub_butt_bott">
+    {% block submit_buttons_bottom %}
+    <a href="../"><input type="button" name="Cancel" value="Retour"></a>
+    <input type="submit" name="confirm" value="Confirmer" />
+    {% endblock %}
+  </div>
+
+</form>
+{% endblock %}
