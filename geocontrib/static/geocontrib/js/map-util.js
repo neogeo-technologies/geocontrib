@@ -69,7 +69,7 @@ const mapUtil = {
     _createContentPopup: function (feature) {
         const author = feature.properties.creator.full_name ?
             `<div>
-              Auteur : ${feature.properties.creator.first_name} ${feature.properties.creator.last_name}
+              Auteur : ${feature.properties.creator.first_name} ${feature.properties.creator.last_name} ${feature.properties.creator.last_name} ${feature.properties.creator.last_name}
             </div>`: ''
 
         return `
