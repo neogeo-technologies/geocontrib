@@ -1,0 +1,149 @@
+.sidebar-container {
+  /* display: none; */
+  padding: 2rem;
+  height: 100%;
+  width: 250px;
+  left: -250px;
+  background-color: rgba(255, 255, 255, 1);
+  border: 1px solid grey;
+  top: 0;
+  position: absolute;
+  z-index: 5;
+  overflow-y: scroll;
+}
+
+.sidebar-layers {
+  position: absolute;
+  right: -40px;
+}
+
+.layers-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  border: 1px solid grey;
+  border-radius: 0 5px 5px 0;
+  border-left: none;
+  position: absolute;
+  right: -40px;
+  top: 10px;
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.sidebar-container.expanded {
+  left: 0;
+  animation: 0.4s ease-out open-sidebar;
+}
+
+.sidebar-container.closing {
+  left: 0;
+  animation: 0.4s ease-out close-sidebar;
+}
+
+/* .sidebar-container.expanded .layers-icon {
+    right: 5px;
+    border: none;
+    animation: 0.4s ease-out expand-icon;
+    animation-delay: 40ms;
+  } */
+
+@keyframes open-sidebar {
+  0% {
+    left: -250px;
+  }
+
+  20% {
+    left: -200px;
+  }
+
+  100% {
+    left: 0;
+  }
+}
+
+@keyframes close-sidebar {
+  from {
+    left: 0;
+  }
+
+  to {
+    left: -250px;
+  }
+}
+
+@keyframes expand-icon {
+  0% {
+    left: -40px;
+  }
+
+  100% {
+    left: -5px;
+  }
+}
+
+.layers-icon svg {
+  height: 30px;
+  width: 30px;
+}
+
+.layers-icon svg path {
+  fill: 'black';
+  transition: fill 0.3s ease-out;
+}
+
+.layers-icon:hover svg path {
+  fill: #00b5ad;
+}
+
+.basemaps-title {
+  margin-bottom: 1rem;
+}
+
+.basemap-item {
+  padding: 0.5rem;
+}
+
+.layer-item {
+  padding-bottom: 0.5rem;
+  cursor: move;
+}
+
+.layer-item .ui.divider {
+  margin: 0.5rem 0;
+}
+
+.blue-background-class {
+  background-color: rgb(205, 229, 245);
+}
+
+.white-opacity-background-class {
+  background-color: white;
+  opacity: 0.9;
+}
+
+.range-container {
+  display: flex;
+}
+
+.bubble {
+  color: white;
+  margin-left: 5px;
+  padding: 4px 7px;
+  border-radius: 40px;
+  background-color: #2c3e50;
+}
+
+/* .close-icon {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    background-image: url(../img/close-icon.svg);
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+  } */

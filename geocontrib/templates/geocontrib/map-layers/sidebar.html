@@ -1,0 +1,238 @@
+<div class="sidebar-container">
+    <div class="sidebar-layers"></div>
+    <div class="layers-icon">
+        <?xml version="1.0" encoding="iso-8859-1"?>
+        <!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+        <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+            x="0px" y="0px" viewBox="0 0 491.203 491.203" style="enable-background:new 0 0 491.203 491.203;"
+            xml:space="preserve">
+            <g>
+                <g>
+                    <path d="M487.298,326.733l-62.304-37.128l62.304-37.128c2.421-1.443,3.904-4.054,3.904-6.872s-1.483-5.429-3.904-6.872
+                    l-62.304-37.128l62.304-37.128c3.795-2.262,5.038-7.172,2.776-10.968c-0.68-1.142-1.635-2.096-2.776-2.776l-237.6-141.6
+                    c-2.524-1.504-5.669-1.504-8.192,0l-237.6,141.6c-3.795,2.262-5.038,7.172-2.776,10.968c0.68,1.142,1.635,2.096,2.776,2.776
+                    l62.304,37.128L3.905,238.733c-3.795,2.262-5.038,7.172-2.776,10.968c0.68,1.142,1.635,2.096,2.776,2.776l62.304,37.128
+                    L3.905,326.733c-3.795,2.262-5.038,7.172-2.776,10.968c0.68,1.142,1.635,2.096,2.776,2.776l237.6,141.6
+                    c2.526,1.494,5.666,1.494,8.192,0l237.6-141.6c3.795-2.262,5.038-7.172,2.776-10.968
+                    C489.393,328.368,488.439,327.414,487.298,326.733z M23.625,157.605L245.601,25.317l221.976,132.288L245.601,289.893
+                    L23.625,157.605z M23.625,245.605l58.208-34.68l159.672,95.2c2.524,1.504,5.668,1.504,8.192,0l159.672-95.2l58.208,34.68
+                    L245.601,377.893L23.625,245.605z M245.601,465.893L23.625,333.605l58.208-34.68l159.672,95.2c2.524,1.504,5.668,1.504,8.192,0
+                    l159.672-95.2l58.208,34.68L245.601,465.893z" />
+                </g>
+            </g>
+
+        </svg>
+
+    </div>
+
+    <div class="basemaps-title">
+        <h4>Fonds cartographiques
+
+            <!-- <span data-tooltip="Il est possible pour chaque fond cartographique de modifier l'ordre des couches"
+            data-position="bottom left">
+                <i class="question circle outline icon"></i>
+            </span> -->
+        </h4>
+    </div>
+
+    <div class="basemaps-items ui accordion styled"></div>
+</div>
+
+<script>
+
+    // Fake fonds and layers
+    const baseMaps =
+        [
+            {
+                "id": 7,
+                "title": "Open Street Map",
+                "layers": [
+                    {
+                        "id": 3,
+                        "title": "WMS fond de carte basic",
+                        "opacity": "1.00",
+                        "order": 0
+                    },
+                    {
+                        "id": 3,
+                        "title": "WMS fond de carte basic",
+                        "opacity": "1.00",
+                        "order": 0
+                    },
+                    {
+                        "id": 3,
+                        "title": "WMS fond de carte basic",
+                        "opacity": "1.00",
+                        "order": 0
+                    },
+                    {
+                        "id": 3,
+                        "title": "WMS fond de carte basic",
+                        "opacity": "1.00",
+                        "order": 0
+                    },
+                    {
+                        "id": 3,
+                        "title": "WMS fond de carte basic",
+                        "opacity": "1.00",
+                        "order": 0
+                    },
+                    {
+                        "id": 5,
+                        "title": "TM fond de carte cyclables",
+                        "opacity": "0.80",
+                        "order": 1
+                    },
+                    {
+                        "id": 4,
+                        "title": "Orthophoto 2018",
+                        "opacity": "0.40",
+                        "order": 2
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "title": "Picardie Forever",
+                "layers": [
+                    {
+                        "id": 5,
+                        "title": "Couche des sentiers perdus",
+                        "opacity": "0.30",
+                        "order": 0
+                    },
+                    {
+                        "id": 4,
+                        "title": "Les plus beaux lacs et lagunes",
+                        "opacity": "1.00",
+                        "order": 1
+                    }
+                ]
+            },
+            {
+                "title": "On aime la Bretagne",
+                "layers": [
+                    {
+                        "id": 3,
+                        "title": "TMS des meilleurs bars",
+                        "opacity": "1.00",
+                        "order": 0
+                    },
+                    {
+                        "id": 5,
+                        "title": "Surface des crêperies",
+                        "opacity": "1.00",
+                        "order": 1
+                    }
+                ]
+            }
+        ];
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        $('.ui.accordion')
+            .accordion({ exclusive: false })
+            ;
+
+        let expanded = false;
+
+        const layerIcon = document.getElementsByClassName('layers-icon')[0];
+
+        // Toggle the expand of the sidebar
+        layerIcon.addEventListener('click', () => {
+            const sidebar = document.getElementsByClassName('sidebar-container')[0];
+            expanded = !expanded;
+            expanded ? sidebar.classList.add('expanded') : sidebar.classList.remove('expanded');
+            if (!expanded) {
+                sidebar.classList.add('closing')
+                setTimeout(() => {
+                    sidebar.classList.remove('closing')
+                }, 400);
+            }
+        });
+
+        const basemapContainer = document.getElementsByClassName('basemaps-items')[0];
+
+        // Add the base maps
+        baseMaps.forEach((basemap, index) => {
+            const basemapItem = document.createElement('div');
+            basemapItem.classList.add('basemap-item', 'title');
+            basemapItem.innerHTML = basemap.title;
+            const layersContainer = document.createElement('div');
+            layersContainer.classList.add('content');
+            layersContainer.id = `list-${index}`;
+
+            basemap.layers.forEach((layer, i) => {
+                const layerElement = document.createElement('div');
+                layerElement.classList.add('layer-item');
+                const layerTitleElement = document.createElement('p');
+                layerTitleElement.innerHTML = layer.title;
+                const layerLabelInput = document.createElement('label');
+                const labelPercentage = document.createElement('span');
+                labelPercentage.innerHTML = '(%)';
+
+                layerLabelInput.innerHTML = "Opacité &nbsp;";
+                layerLabelInput.for = "opacity";
+                layerLabelInput.append(labelPercentage);
+
+                // Range container
+                const rangeContainer = document.createElement('div');
+                rangeContainer.classList.add('range-container');
+
+                const rangeInput = document.createElement('input');
+                rangeInput.id = 'opacity';
+                rangeInput.type = 'range';
+                rangeInput.min = 0;
+                rangeInput.max = 100;
+                rangeInput.value = layer.opacity * 100;
+
+                // Range value in bubble
+                const rangeBubble = document.createElement('output');
+                rangeBubble.classList.add('bubble');
+                rangeInput.addEventListener("input", () => {
+                    setBubble(rangeInput, rangeBubble);
+                });
+                setBubble(rangeInput, rangeBubble);
+
+                layerElement.append(layerTitleElement);
+                layerElement.append(layerLabelInput);
+
+                rangeContainer.append(rangeInput);
+                rangeContainer.append(rangeBubble);
+                layerElement.append(rangeContainer);
+
+
+
+                // Horizontal divider if not last layer
+                // if (basemap.layers.length - 1 > i) {
+                const horizontalDivider = document.createElement('div');
+                horizontalDivider.classList.add('ui', 'divider')
+                layerElement.append(horizontalDivider);
+                // }
+
+                layersContainer.append(layerElement);
+            });
+            basemapContainer.append(basemapItem);
+
+            basemapContainer.append(layersContainer);
+
+            new Sortable(layersContainer, {
+                animation: 150,
+                // handle: 'my-handle',
+                ghostClass: 'blue-background-class',
+                dragClass: 'white-opacity-background-class',
+                filter: 'input[type=range]',
+                preventOnFilter: false,
+            });
+        });
+
+        function setBubble(range, bubble) {
+            const val = range.value;
+            const min = range.min ? range.min : 0;
+            const max = range.max ? range.max : 100;
+            const newVal = Number(((val - min) * 100) / (max - min));
+            bubble.innerHTML = val;
+        };
+
+    });
+</script>

@@ -309,6 +309,15 @@
 }
 </style>
 
+{{ layers|json_script:'layers' }}
+{{ serialized_features|json_script:'features' }}
+{{ feature.feature_id|json_script:'currentFeatureId' }}
+{{ SERVICE|json_script:'serviceMap' }}
+{{ OPTIONS|json_script:'optionsMap' }}
+{{ DEFAULT_MAP_VIEW|json_script:'defaultMapView' }}
+
+<script src="{% static 'geocontrib/js/map-util.js' %}"></script>
+
 <script type="text/javascript">
 // Geom type + init Leaflet Draw Control
 var geomLeaflet = {
@@ -635,54 +644,35 @@ $(document).ready(function() {
   // **************************** //
   //              MAP             //
   // **************************** //
-  var map = L.map('map', {
-    zoomControl: false
-  }).setView({{ DEFAULT_MAP_VIEW.center }}, {{ DEFAULT_MAP_VIEW.zoom }})
 
-  L.control.zoom({zoomInTitle:'Zoomer', zoomOutTitle:'Dézoomer'}).addTo(map)
-  {% if layers %}
-    {% for layer in layers %}
-      var options = {{ layer.options|safe }}
-      {% if layer.schema_type == "wms" %}
-        L.tileLayer.wms('{{ layer.service }}', options).addTo(map)
-      {% elif layer.schema_type == "tms" %}
-        L.tileLayer('{{ layer.service }}', options).addTo(map)
-      {% endif %}
-    {% endfor %}
-  {% else %}
-    L.tileLayer('{{ SERVICE }}',  JSON.parse('{{ OPTIONS | escapejs }}')).addTo(map)
-  {% endif %}
+  // Load into js variables the python context.
+  const layers = JSON.parse(document.getElementById('layers').textContent);
+  const features = JSON.parse(document.getElementById('features').textContent).features;
+  const serviceMap = JSON.parse(document.getElementById('serviceMap').textContent);
+  const optionsMap = JSON.parse(document.getElementById('optionsMap').textContent);
+  const defaultMapView = JSON.parse(document.getElementById('defaultMapView').textContent);
+  const currentFeatureId = JSON.parse(document.getElementById('currentFeatureId').textContent);
 
-  var featureGroup = new L.FeatureGroup()
-  {% for feat in features %}
-    {% if not feat.feature_id == feature.feature_id %}
-      var geomFeatureJSON = wellknown.parse("{{ feat.geom.wkt }}")
-      var geomJSON = turf.flip(geomFeatureJSON)
-      var popupContent = `{{ feat.title }}`
-      if (geomJSON.type === 'Point') {
-        L.circleMarker(geomJSON.coordinates, {
-          color: '{{ feat.feature_type.color }}',
-          radius: 4,
-          fillOpacity: 0.3,
-          weight: 1
-        }).bindPopup(popupContent).addTo(featureGroup)
-      } else if (geomJSON.type === 'LineString') {
-        L.polyline(geomJSON.coordinates, {
-          color: '{{ feat.feature_type.color }}',
-          weight: 1.5
-        }).bindPopup(popupContent).addTo(featureGroup)
-      } else if (geomJSON.type === 'Polygon') {
-        L.polygon(geomJSON.coordinates, {
-          color: '{{ feat.feature_type.color }}',
-          weight: 1.5,
-          fillOpacity: 0.3
-        }).bindPopup(popupContent).addTo(featureGroup)
-      }
-    {% endif %}
-  {% endfor %}
-  map.addLayer(featureGroup);
+  var mapDefaultViewCenter = defaultMapView.center;
+  var mapDefaultViewZoom = defaultMapView.zoom;
 
-  map.addLayer(drawnItems)
+  // Create the map, then init the layers and features
+  const map = mapUtil.createMap({
+      mapDefaultViewCenter,
+      mapDefaultViewZoom,
+      serviceMap,
+      optionsMap
+    });
+
+  mapUtil.addLayers(map, layers, serviceMap, optionsMap);
+  console.log(features);
+  if (features) {
+    const allFeaturesExceptCurrent = features.filter(feat => feat.id !== currentFeatureId);
+    mapUtil.addFeatures(map, allFeaturesExceptCurrent);
+  }
+
+
+  map.addLayer(drawnItems);
 
   var drawControlFull = new L.Control.Draw({
     edit: {
