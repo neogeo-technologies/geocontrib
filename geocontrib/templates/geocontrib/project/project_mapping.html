@@ -216,42 +216,14 @@
       <i class="white save icon"></i> Enregistrer les changements
     </button> -->
 
-    <div v-for="(basemap, indexBaseMap) in baseMaps" class="basemap">
-      <h2>Fond de carte</h2>
-      <div class="field">
-        <label class="label" for="basemap-title">Titre</label>
-        <input id=basemap-title type="text" v-model="basemap.title" class="input">
-      </div>
-
-      <div>
-        <h4>Couches</h4>
-        <div v-for="(layer, indexLayer) in basemap.layers" class="layer">
-          <div class="field">
-            <label class="label" for="layer-title">Titre</label>
-            <input id=layer-title type="text" v-model="layer.title" class="input">
-            <i class="close icon" @click="deleteFromList(indexBaseMap, indexLayer)"></i>
-          </div>
-          <div class="field">
-            <label for="layer-opacity">Opacité</label>
-            <div class="range-container">
-              <input type="range" name="layer-opacity" min="0" max="1" step="0.01" v-model="layer.opacity">
-              <output class="bubble">[[ getOpacityInPercentage(layer.opacity)]]</output>
-            </div>
-          </div>
-          <div class="field">
-            <label for="layer-order">Ordre</label>
-            <input class="input" type="number" name="layer-order" id="layer-order" v-model="layer.order">
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div>
-      <base-map-item></base-map-item>
+      <basemap-form-item v-for="(basemap, indexBaseMap) in basemaps" :index-base-map="indexBaseMap" :basemap="basemap"
+        :key="basemap.id" @delete-from-list="deleteFromList">
+        </base-map-item>
     </div>
 
   </form>
-  <button id="add-basemap" type="button" class="ui compact button button-hover-green">
+  <button id="add-basemap" type="button" class="ui compact button button-hover-green" @click="addNewBasemap">
     <i class="ui plus icon"></i>Ajouter un fond cartographique
   </button>
 
@@ -300,7 +272,7 @@
   }
 </style>
 
-<script src="{% static 'geocontrib/js/components/base-map.js' %}"></script>
+<script src="{% static 'geocontrib/js/components/basemap-form-item.js' %}"></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -309,15 +281,17 @@
       el: '#form-layers',
       delimiters: ['[[', ']]'],
       data: {
-        baseMaps: baseMaps,
+        basemaps: baseMaps,
         message: 'Hello Vue!'
       },
       methods: {
-        getOpacityInPercentage: function (opacity) {
-          return Math.round(opacity * 100);
-        },
         deleteFromList: function (indexBaseMap, indexLayer) {
-          this.baseMaps[indexBaseMap].layers.splice(indexLayer, 1);
+          console.log(indexBaseMap);
+          console.log(indexLayer);
+          this.basemaps[indexBaseMap].layers.splice(indexLayer, 1);
+        },
+        addNewBasemap: function () {
+
         }
       }
     });
@@ -421,11 +395,11 @@
     }
 
     // Add a new base map section
-    document.getElementById('add-basemap').addEventListener('click', () => {
-      const [basemapItem, layersContainer] = createBaseMapItem();
-      formContainer.append(basemapItem);
-      formContainer.append(layersContainer);
-    });
+    // document.getElementById('add-basemap').addEventListener('click', () => {
+    //   const [basemapItem, layersContainer] = createBaseMapItem();
+    //   formContainer.append(basemapItem);
+    //   formContainer.append(layersContainer);
+    // });
 
   });
 
