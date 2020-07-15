@@ -48,7 +48,6 @@ from geocontrib.models import Attachment
 from geocontrib.models import Authorization
 from geocontrib.models import BaseMap
 from geocontrib.models import Comment
-from geocontrib.models import ContextLayer
 from geocontrib.models import CustomField
 from geocontrib.models import Event
 from geocontrib.models import Feature
@@ -63,6 +62,40 @@ logger = logging.getLogger(__name__)
 DECORATORS = [csrf_exempt, login_required(login_url=settings.LOGIN_URL)]
 
 User = get_user_model()
+
+
+####################
+# BASE MAP CONTEXT #
+####################
+
+
+class BaseMapContextMixin(SingleObjectMixin):
+
+    def get_context_data(self, **kwargs):
+        self.object = self.get_object()
+        context = super().get_context_data(**kwargs)
+
+        try:
+            project = None
+            if isinstance(self.object, Project):
+                project = self.object
+            elif isinstance(self.object, FeatureType) or isinstance(self.object, Feature):
+                project = self.object.project
+
+            serialized_base_maps = BaseMapSerializer(
+                BaseMap.objects.filter(project=project),
+                many=True
+            )
+            serialized_layers = LayerSerializer(
+                Layer.objects.all(),
+                many=True
+            )
+            context['serialized_base_maps'] = serialized_base_maps.data
+            context['serialized_layers'] = serialized_layers.data
+        except Exception:
+            logger.exception('BaseMapContext error')
+        return context
+
 
 ####################
 # ATTACHMENT VIEWS #
@@ -204,7 +237,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
+class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
     """
         TODO @cbenhabib: les vues FeatureCreate et FeatureUpdate doivent etre mergées.
     """
@@ -232,8 +265,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
-        layers = Layer.handy.project_filter(project=project)
-        serialized_layers = LayerSerializer(layers, many=True)
+
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         feature_form = FeatureBaseForm(
@@ -252,7 +284,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
             queryset=Attachment.objects.none()
         )
 
-        context = {
+        context = {**self.get_context_data(), **{
             'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_type': feature_type,
             'project': project,
@@ -261,8 +293,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'linked_formset': linked_formset,
             'attachment_formset': attachment_formset,
             'action': 'create',
-            'layers': serialized_layers.data
-        }
+        }}
         return render(request, 'geocontrib/feature/feature_edit.html', context)
 
     def post(self, request, slug, feature_type_slug):
@@ -270,8 +301,7 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
-        layers = Layer.handy.project_filter(project=project)
-        serialized_layers = LayerSerializer(layers, many=True)
+
         feature_form = FeatureBaseForm(
             request.POST, feature_type=feature_type, user=user)
         extra = CustomField.objects.filter(feature_type=feature_type)
@@ -384,19 +414,17 @@ class FeatureCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_type': feature_type,
             'project': project,
-            # 'permissions': Authorization.all_permissions(user, project),
             'feature_form': feature_form,
             'extra_form': extra_form,
             'linked_formset': linked_formset,
             'attachment_formset': attachment_formset,
             'action': 'create',
-            'layers': serialized_layers.data
         }
         return render(request, 'geocontrib/feature/feature_edit.html', context)
 
 
 @method_decorator(DECORATORS[0], name='dispatch')
-class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
+class FeatureList(BaseMapContextMixin, UserPassesTestMixin, View):
     queryset = Project.objects.all()
 
     def test_func(self):
@@ -405,11 +433,10 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
         return Authorization.has_permission(user, 'can_view_feature', project)
 
     def get(self, request, slug, *args, **kwargs):
-
         project = self.get_object()
+
         user = request.user
-        layers = Layer.handy.project_filter(project=project).order_by('order')
-        serialized_layers = LayerSerializer(layers, many=True)
+
         permissions = Authorization.all_permissions(user, project)
         feature_types = FeatureType.objects.filter(project=project)
         features = Feature.handy.availables(user, project).order_by('-updated_on')
@@ -421,21 +448,19 @@ class FeatureList(SingleObjectMixin, UserPassesTestMixin, View):
         if filters:
             filters = {k: v for k, v in filters.items() if v is not None}
             features = features.filter(**filters)
-
-        context = {
+        context = {**self.get_context_data(), **{
             'features': features,
             'feature_types': feature_types,
-            'layers': serialized_layers.data,
             'project': project,
             'permissions': permissions,
             'status_choices': Feature.STATUS_CHOICES,
-        }
+        }}
 
         return render(request, 'geocontrib/feature/feature_list.html', context)
 
 
 @method_decorator(DECORATORS[0], name='dispatch')
-class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
+class FeatureDetail(BaseMapContextMixin, UserPassesTestMixin, View):
 
     queryset = Feature.objects.all()
     pk_url_kwarg = 'feature_id'
@@ -450,8 +475,6 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         user = request.user
         feature = self.get_object()
         project = feature.project
-        layers = Layer.handy.project_filter(project=project)
-        serialized_layers = LayerSerializer(layers, many=True)
 
         linked_features = FeatureLink.objects.filter(
             feature_from=feature.feature_id
@@ -461,7 +484,7 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
         events = Event.objects.filter(feature_id=feature.feature_id).order_by('created_on')
         serialized_events = EventSerializer(events, many=True)
 
-        context = {
+        context = {**self.get_context_data(), **{
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
             'feature_types': FeatureType.objects.filter(project=project),
@@ -474,14 +497,13 @@ class FeatureDetail(SingleObjectMixin, UserPassesTestMixin, View):
                 project=project, feature_id=feature.feature_id, object_type='feature'),
             'events': serialized_events.data,
             'comment_form': CommentForm(),
-            'layers': serialized_layers.data,
-        }
+        }}
 
         return render(request, 'geocontrib/feature/feature_detail.html', context)
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
+class FeatureUpdate(BaseMapContextMixin, UserPassesTestMixin, View):
 
     queryset = Feature.objects.all()
 
@@ -510,8 +532,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         feature_type = feature.feature_type
-        layers = Layer.handy.project_filter(project=project)
-        serialized_layers = LayerSerializer(layers, many=True)
+
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         availables_features = Feature.objects.filter(
@@ -545,7 +566,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             queryset=attachments
         )
 
-        context = {
+        context = {**self.get_context_data(), **{
             'feature': feature,
             'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_data': feature.custom_fields_as_list,
@@ -560,8 +581,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'attachment_formset': attachment_formset,
             'attachments': attachments,
             'action': 'update',
-            'layers': serialized_layers.data
-        }
+        }}
         return render(request, 'geocontrib/feature/feature_edit.html', context)
 
     def post(self, request, slug, feature_type_slug, feature_id):
@@ -575,8 +595,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         ).exclude(
             feature_id=feature.feature_id
         )
-        layers = Layer.handy.project_filter(project=project)
-        serialized_layers = LayerSerializer(layers, many=True)
+
         extra = CustomField.objects.filter(feature_type=feature_type)
 
         feature_form = FeatureBaseForm(
@@ -617,7 +636,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             logger.error(request.FILES)
             messages.error(request, "Erreur à la mise à jour du signalement. ")
 
-            context = {
+            context = {**self.get_context_data(), **{
                 'feature': feature,
                 'features': Feature.handy.availables(user, project).order_by('updated_on'),
                 'feature_types': FeatureType.objects.filter(project=project),
@@ -631,8 +650,7 @@ class FeatureUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 'attachment_formset': attachment_formset,
                 'attachments': attachments,
                 'action': 'update',
-                'layers': serialized_layers.data,
-            }
+            }}
             return render(request, 'geocontrib/feature/feature_edit.html', context)
         else:
 
@@ -854,7 +872,6 @@ class FeatureTypeUpdate(SingleObjectMixin, UserPassesTestMixin, View):
     CustomFieldsFormSet = modelformset_factory(
         CustomField,
         can_delete=True,
-        # can_order=True,
         form=CustomFieldModelForm,
         formset=CustomFieldModelBaseFS,
         extra=0,
@@ -889,7 +906,6 @@ class FeatureTypeUpdate(SingleObjectMixin, UserPassesTestMixin, View):
         context = {
             'feature_type': feature_type,
             'permissions': Authorization.all_permissions(user, project),
-            # 'feature_types': project.featuretype_set.all(),
             'features': features,
             'project': project,
             'structure': structure.data,
@@ -1129,7 +1145,7 @@ class ImportFromImage(SingleObjectMixin, UserPassesTestMixin, View):
 #################
 
 @method_decorator(DECORATORS[0], name='dispatch')
-class ProjectDetail(DetailView):
+class ProjectDetail(BaseMapContextMixin, DetailView):
 
     model = Project
 
@@ -1138,10 +1154,8 @@ class ProjectDetail(DetailView):
 
     def get_context_data(self, **kwargs):
 
-        context = super().get_context_data(**kwargs)
-        project = self.get_object()
         user = self.request.user
-
+        project = self.get_object()
         permissions = Authorization.all_permissions(user, project)
 
         last_comments = Comment.objects.filter(
@@ -1156,6 +1170,9 @@ class ProjectDetail(DetailView):
 
         serilized_projects = ProjectDetailedSerializer(project).data
 
+        context = super().get_context_data(**kwargs)
+        logger.debug(context)
+
         context['project'] = serilized_projects
         context['user'] = user
         context['last_comments'] = serialized_comments
@@ -1164,11 +1181,6 @@ class ProjectDetail(DetailView):
         context['permissions'] = permissions
         context['feature_types'] = project.featuretype_set.all()
         context['is_suscriber'] = Subscription.is_suscriber(user, project)
-
-        # EDC
-        layers = Layer.handy.project_filter(project=project)
-        serialized_layers = LayerSerializer(layers, many=True)
-        context['layers'] = serialized_layers.data
 
         return context
 
