@@ -96,13 +96,13 @@
                 "title": "Picardie Forever",
                 "layers": [
                     {
-                        "id": 5,
+                        "id": 2,
                         "title": "Couche des sentiers perdus",
                         "opacity": "0.30",
                         "order": 0
                     },
                     {
-                        "id": 4,
+                        "id": 3,
                         "title": "Les plus beaux lacs et lagunes",
                         "opacity": "1.00",
                         "order": 1
@@ -128,11 +128,34 @@
             }
         ];
 
-    document.addEventListener("DOMContentLoaded", function () {
+    const layers = [
+        {
+            "id": 2,
+            "options": {
+                "attribution": "R\u00e9gion Hauts-de-France",
+                "layers": "geopicardie:picardie_ortho_ign_2013_vis",
+                "format": "image/png",
+                "transparent": true
+            },
+            "title": "Geopicardie",
+            "service": " https://www.geopicardie.fr/geoserver/ows",
+            "schema_type": "wms"
+        },
+        {
+            "id": 3,
+            "options": {
+                "tms": true,
+                "zoomOffset": -1,
+                "attribution": "\u00a9 les contributeurs d\u2019OpenStreetMap - G\u00e9o2France",
+                "maxZoom": 19
+            },
+            "title": "Géo2France",
+            "service": "https://osm.geo2france.fr/mapproxy/tms/1.0.0/faded/webmercator/{z}/{x}/{y}.png",
+            "schema_type": "tms"
+        },
+    ]
 
-        $('.ui.accordion')
-            .accordion({ exclusive: false })
-            ;
+    document.addEventListener("DOMContentLoaded", function () {
 
         let expanded = false;
 
@@ -167,6 +190,12 @@
                 layerElement.classList.add('layer-item');
                 const layerTitleElement = document.createElement('p');
                 layerTitleElement.innerHTML = layer.title;
+                layerTitleElement.classList.add('layer-handle-sort');
+
+                const iconDrag = document.createElement('i');
+                iconDrag.classList.add('th', 'icon');
+                layerTitleElement.prepend(iconDrag);
+
                 const layerLabelInput = document.createElement('label');
                 const labelPercentage = document.createElement('span');
                 labelPercentage.innerHTML = '(%)';
@@ -218,11 +247,11 @@
 
             new Sortable(layersContainer, {
                 animation: 150,
-                // handle: 'my-handle',
+                handle: '.layer-handle-sort',
                 ghostClass: 'blue-background-class',
                 dragClass: 'white-opacity-background-class',
-                filter: 'input[type=range]',
-                preventOnFilter: false,
+                // filter: 'input[type=range]',
+                // preventOnFilter: false,
             });
         });
 
@@ -234,5 +263,23 @@
             bubble.innerHTML = val;
         };
 
+        // TODO get in the localstorage ?
+        const selectedBasemapIndex = 1;
+
+        $('.ui.accordion').accordion('open', selectedBasemapIndex);
+        // Load layer of the selected basemap
+        const layersToAdd = []
+        baseMaps[selectedBasemapIndex].layers.forEach(layer => {
+            const layerInformation = layers.find(l => l.id === layer.id);
+            layersToAdd.push(layerInformation);
+        });
+        console.log(layersToAdd);
+
+        console.log('Finished load sidebar');
+
+        window.addEventListener("load", function () {
+            const event = new CustomEvent('add-layers', { detail: layersToAdd })
+            document.dispatchEvent(event)
+        });
     });
 </script>

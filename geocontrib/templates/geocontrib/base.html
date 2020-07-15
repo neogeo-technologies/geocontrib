@@ -10,6 +10,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>{% block title %}{% endblock %}</title>
 
+  <!-- Sortable JS -->
+  <script src="http://SortableJS.github.io/Sortable/Sortable.js"></script>
+
   <!-- jQuery Core 3.3.1 -->
   <script src="{% static 'geocontrib/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script>
   <!-- Semantic UI -->
@@ -34,6 +37,7 @@
 
   <!-- Custom -->
   <link rel="stylesheet" href="{% static 'geocontrib/css/base.css' %}"/>
+  <link rel="stylesheet" href="{% static 'geocontrib/css/sidebar-layers.css' %}"/>
   <script src="{% static 'geocontrib/js/base.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   {% block custom_resources %}

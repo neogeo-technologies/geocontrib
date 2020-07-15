@@ -31,6 +31,7 @@ const mapUtil = {
                     L.tileLayer(layer.service, options).addTo(map)
                 }
             });
+        } else {
             L.tileLayer(serviceMap, optionsMap).addTo(map)
         }
     },

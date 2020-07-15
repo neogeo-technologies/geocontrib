@@ -9,7 +9,6 @@
   top: 0;
   position: absolute;
   z-index: 5;
-  overflow-y: scroll;
 }
 
 .sidebar-layers {
@@ -36,6 +35,7 @@
 .sidebar-container.expanded {
   left: 0;
   animation: 0.4s ease-out open-sidebar;
+  overflow-y: auto;
 }
 
 .sidebar-container.closing {
@@ -43,12 +43,12 @@
   animation: 0.4s ease-out close-sidebar;
 }
 
-/* .sidebar-container.expanded .layers-icon {
+.sidebar-container.expanded .layers-icon {
     right: 5px;
     border: none;
-    animation: 0.4s ease-out expand-icon;
-    animation-delay: 40ms;
-  } */
+    /* animation: 0.4s ease-out expand-icon;
+    animation-delay: 40ms; */
+  }
 
 @keyframes open-sidebar {
   0% {
@@ -74,7 +74,7 @@
   }
 }
 
-@keyframes expand-icon {
+/* @keyframes expand-icon {
   0% {
     left: -40px;
   }
@@ -82,7 +82,7 @@
   100% {
     left: -5px;
   }
-}
+} */
 
 .layers-icon svg {
   height: 30px;

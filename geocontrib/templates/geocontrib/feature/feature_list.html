@@ -180,13 +180,14 @@
 
 </style>
 
+{{ serialized_base_maps|json_script:'basemaps' }}
 {{ layers|json_script:'layers' }}
 {{ serialized_features|json_script:'features' }}
 {{ SERVICE|json_script:'serviceMap' }}
 {{ OPTIONS|json_script:'optionsMap' }}
 {{ DEFAULT_MAP_VIEW|json_script:'defaultMapView' }}
 
-<script src="{% static 'geocontrib/js/leaflet-layers-control.js' %}"></script>
+<!-- <script src="{% static 'geocontrib/js/leaflet-layers-control.js' %}"></script> -->
 <script src="{% static 'geocontrib/js/map-util.js' %}"></script>
 
 
@@ -260,7 +261,6 @@
     const optionsMap = JSON.parse(document.getElementById('optionsMap').textContent);
     const defaultMapView = JSON.parse(document.getElementById('defaultMapView').textContent);
 
-
     // get initial zoom and center defined in the form
     var $formFilters = $("#form-filters");
     var zoom = $formFilters.find("input[name=zoom]").val()
@@ -270,19 +270,20 @@
     var mapDefaultViewCenter = defaultMapView.center;
     var mapDefaultViewZoom = defaultMapView.zoom;
 
-    console.log(document.getElementById('#map'));
-
     const map = mapUtil.createMap({
       zoom,
       lat,
       lng,
       mapDefaultViewCenter,
       mapDefaultViewZoom,
-      serviceMap,
-      optionsMap
     });
 
-    mapUtil.addLayers(map, layers, serviceMap, optionsMap);
+    document.addEventListener('add-layers', (event) => {
+      console.log('listen event', event);
+      console.log('listen event', event.detail);
+      mapUtil.addLayers(map, event.detail, serviceMap, optionsMap);
+    });
+
     const featureGroup = mapUtil.addFeatures(map, features);
     // Fit the map to bound only if no initial zoom and center are defined
     if (lat === "" || lng === "" || zoom === "") {
@@ -295,6 +296,9 @@
       $formFilters.find("input[name=lat]").val(map.getCenter().lat)
       $formFilters.find("input[name=lng]").val(map.getCenter().lng)
     })
+
+    console.log('Finished load feature_list');
+
 
   });
 </script>
