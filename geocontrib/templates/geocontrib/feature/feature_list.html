@@ -279,9 +279,15 @@
     });
 
     document.addEventListener('add-layers', (event) => {
-      console.log('listen event', event);
-      console.log('listen event', event.detail);
       mapUtil.addLayers(map, event.detail, serviceMap, optionsMap);
+    });
+
+    document.addEventListener('update-opacity', (event) => {
+      mapUtil.updateOpacity(map, event.detail.layerId, event.detail.opacity);
+    });
+
+    document.addEventListener('change-layers-order', (event) => {
+      mapUtil.updateOrder(map, event.detail.layers);
     });
 
     const featureGroup = mapUtil.addFeatures(map, features);
@@ -296,9 +302,6 @@
       $formFilters.find("input[name=lat]").val(map.getCenter().lat)
       $formFilters.find("input[name=lng]").val(map.getCenter().lng)
     })
-
-    console.log('Finished load feature_list');
-
 
   });
 </script>

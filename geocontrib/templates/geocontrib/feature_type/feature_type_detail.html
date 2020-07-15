@@ -156,6 +156,10 @@
     return filename + '.' + ext
   }
 
+  document.addEventListener("DOMContentLoaded", function () {
+    $('.ui.accordion').accordion();
+  });
+
   $(document).on('change', 'form [name=json_file]', function () {
     var logoFile = $(this).prop('files')[0]
     $(this).parent().children('label').children('.label').html(truncate(logoFile.name, 30))

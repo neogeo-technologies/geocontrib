@@ -156,6 +156,8 @@
     ]
 
     document.addEventListener("DOMContentLoaded", function () {
+        // TODO get in the localstorage ?
+        const selectedBasemapIndex = 1;
 
         let expanded = false;
 
@@ -186,7 +188,15 @@
             layersContainer.id = `list-${index}`;
 
             basemap.layers.forEach((layer, i) => {
+
+                // Add options information to the object
+                layers.forEach(layerOptions => {
+                    if (layer.id === layerOptions.id) {
+                        layer = Object.assign(layer, layerOptions);
+                    }
+                });
                 const layerElement = document.createElement('div');
+                layerElement.setAttribute('data-id', layer.id);
                 layerElement.classList.add('layer-item');
                 const layerTitleElement = document.createElement('p');
                 layerTitleElement.innerHTML = layer.title;
@@ -212,15 +222,27 @@
                 rangeInput.id = 'opacity';
                 rangeInput.type = 'range';
                 rangeInput.min = 0;
-                rangeInput.max = 100;
-                rangeInput.value = layer.opacity * 100;
+                rangeInput.max = 1;
+                rangeInput.step = 0.01;
+                rangeInput.value = layer.opacity;
 
                 // Range value in bubble
                 const rangeBubble = document.createElement('output');
                 rangeBubble.classList.add('bubble');
                 rangeInput.addEventListener("input", () => {
+                    layer.opacity = rangeInput.value;
                     setBubble(rangeInput, rangeBubble);
+
+                    // Update the map
+                    const event = new CustomEvent('update-opacity', {
+                        detail: {
+                            layerId: layer.id,
+                            opacity: rangeInput.value
+                        }
+                    })
+                    document.dispatchEvent(event);
                 });
+
                 setBubble(rangeInput, rangeBubble);
 
                 layerElement.append(layerTitleElement);
@@ -229,7 +251,6 @@
                 rangeContainer.append(rangeInput);
                 rangeContainer.append(rangeBubble);
                 layerElement.append(rangeContainer);
-
 
 
                 // Horizontal divider if not last layer
@@ -241,6 +262,7 @@
 
                 layersContainer.append(layerElement);
             });
+            console.log(baseMaps);;
             basemapContainer.append(basemapItem);
 
             basemapContainer.append(layersContainer);
@@ -252,31 +274,35 @@
                 dragClass: 'white-opacity-background-class',
                 // filter: 'input[type=range]',
                 // preventOnFilter: false,
+                onEnd: (event) => {
+                    baseMaps[selectedBasemapIndex].layers.splice(event.newIndex, 0, baseMaps[selectedBasemapIndex].layers.splice(event.oldIndex, 1)[0]);
+                    const eventOrder = new CustomEvent('change-layers-order', {
+                        detail: {
+                           layers:  baseMaps[selectedBasemapIndex].layers
+                        }
+                    })
+                    document.dispatchEvent(eventOrder)
+                }
             });
         });
 
         function setBubble(range, bubble) {
-            const val = range.value;
+            const val = Math.round(range.value * 100);
             const min = range.min ? range.min : 0;
             const max = range.max ? range.max : 100;
             const newVal = Number(((val - min) * 100) / (max - min));
             bubble.innerHTML = val;
         };
 
-        // TODO get in the localstorage ?
-        const selectedBasemapIndex = 1;
-
-        $('.ui.accordion').accordion('open', selectedBasemapIndex);
+        $('.ui.accordion').accordion('open', selectedBasemapIndex).accordion('setting', 'collapsible', false);
         // Load layer of the selected basemap
         const layersToAdd = []
         baseMaps[selectedBasemapIndex].layers.forEach(layer => {
             const layerInformation = layers.find(l => l.id === layer.id);
             layersToAdd.push(layerInformation);
         });
-        console.log(layersToAdd);
 
-        console.log('Finished load sidebar');
-
+        // Add custom events that will be used in the map
         window.addEventListener("load", function () {
             const event = new CustomEvent('add-layers', { detail: layersToAdd })
             document.dispatchEvent(event)
