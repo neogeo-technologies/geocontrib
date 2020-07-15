@@ -26,6 +26,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from api.serializers import CommentSerializer
 from api.serializers import EventSerializer
+from api.serializers import FeatureDetailedSerializer
 from api.serializers import FeatureLinkSerializer
 from api.serializers import FeatureTypeSerializer
 from api.serializers import LayerSerializer
@@ -76,6 +77,7 @@ class BaseMapContextMixin(SingleObjectMixin):
         context = super().get_context_data(**kwargs)
 
         try:
+            request = self.request
             project = None
             if isinstance(self.object, Project):
                 project = self.object
@@ -90,6 +92,14 @@ class BaseMapContextMixin(SingleObjectMixin):
                 Layer.objects.all(),
                 many=True
             )
+            features = Feature.objects.filter(project=project)
+            serialized_features = FeatureDetailedSerializer(
+                features,
+                is_authenticated=request.user.is_authenticated,
+                context={'request': request},
+                many=True)
+
+            context['serialized_features'] = serialized_features.data
             context['serialized_base_maps'] = serialized_base_maps.data
             context['serialized_layers'] = serialized_layers.data
         except Exception:
@@ -1250,7 +1260,7 @@ class ProjectCreate(CreateView):
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
+class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
 
     queryset = Project.objects.all()
 
@@ -1262,24 +1272,9 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
     def get(self, request, slug):
         project = self.get_object()
 
-        serialized_base_maps = BaseMapSerializer(
-            BaseMap.objects.filter(project=project),
-            many=True
-        )
-
-        serialized_layers = LayerSerializer(
-            Layer.objects.all(),
-            many=True
-        )
-
-        logger.debug(json.dumps(serialized_base_maps.data, indent=4))
-        logger.debug(json.dumps(serialized_layers.data, indent=4))
-
-        context = {
+        context = {**self.get_context_data(), **{
             'project': project,
-            'serialized_base_maps': serialized_base_maps.data,
-            'serialized_layers': serialized_layers.data
-        }
+        }}
 
         return render(request, 'geocontrib/project/project_mapping.html', context)
 
@@ -1316,21 +1311,9 @@ class ProjectMapping(SingleObjectMixin, UserPassesTestMixin, View):
         else:
             messages.info(request, "L'édition des couches cartographiques a réussi. ")
 
-        serialized_base_maps = BaseMapSerializer(
-            BaseMap.objects.filter(project=project),
-            many=True
-        )
-        serialized_layers = LayerSerializer(
-            Layer.objects.all(),
-            many=True
-        )
-        logger.debug(json.dumps(serialized_base_maps.data, indent=4))
-
-        context = {
+        context = {**self.get_context_data(), **{
             'project': project,
-            'serialized_base_maps': serialized_base_maps.data,
-            'serialized_layers': serialized_layers.data
-        }
+        }}
         return render(request, 'geocontrib/project/project_mapping.html', context)
 
 

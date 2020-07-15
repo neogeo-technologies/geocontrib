@@ -3,6 +3,7 @@ import json
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from geocontrib.models import Attachment
@@ -61,6 +62,18 @@ class FeatureTypeSerializer(serializers.ModelSerializer):
             'slug',
             'geom_type',
             'customfield_set',
+        )
+
+
+class FeatureTypeColoredSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = FeatureType
+        fields = (
+            'title',
+            'slug',
+            'geom_type',
+            'color',
         )
 
 
@@ -159,6 +172,88 @@ class FeatureSerializer(serializers.ModelSerializer):
             'created_on',
             'user',
         )
+
+
+class FeatureDetailedSerializer(GeoFeatureModelSerializer):
+
+    feature_url = serializers.SerializerMethodField(read_only=True)
+
+    feature_type_url = serializers.SerializerMethodField(read_only=True)
+
+    feature_type = FeatureTypeColoredSerializer(read_only=True)
+
+    status = serializers.SerializerMethodField(read_only=True)
+
+    creator = serializers.SerializerMethodField(read_only=True)
+
+    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+
+    updated_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+
+    archived_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+
+    class Meta:
+        model = Feature
+        geo_field = 'geom'
+        fields = (
+            'feature_id',
+            'title',
+            'description',
+            'status',
+            'creator',
+            'created_on',
+            'updated_on',
+            'archived_on',
+            'deletion_on',
+            'feature_type',
+            'feature_url',
+            'feature_type_url',
+        )
+
+    def __init__(self, *args, **kwargs):
+        self.is_authenticated = kwargs.pop('is_authenticated', False)
+        super().__init__(*args, **kwargs)
+
+    def get_properties(self, instance, fields):
+        # Ici on retourne les champs extra d'une feature au meme niveau
+        # que les champs de bases
+        properties = super().get_properties(instance, fields)
+        if instance.feature_data:
+            for key, value in instance.feature_data.items():
+                properties[key] = value
+        return properties
+
+    def get_status(self, obj):
+        return {'value': obj.status, 'label': obj.get_status_display()}
+
+    def get_creator(self, obj):
+        res = {}
+        if self.is_authenticated:
+            res = {
+                'full_name': obj.creator.get_full_name(),
+                'first_name': obj.creator.first_name,
+                'last_name': obj.creator.last_name,
+                'username': obj.creator.username,
+            }
+        return res
+
+    def get_feature_url(self, obj):
+        return reverse(
+            'geocontrib:feature_detail', request=self.context.get('request'), kwargs={
+                'slug': obj.project.slug,
+                'feature_type_slug': obj.feature_type.slug,
+                'feature_id': obj.feature_id})
+
+    def get_feature_type_url(self, obj):
+        return reverse(
+            'geocontrib:feature_type_detail',
+            request=self.context.get('request'),
+            kwargs={
+                'slug': obj.project.slug,
+                'feature_type_slug': obj.feature_type.slug
+        })
+
+
 
 
 class FeatureLinkSerializer(serializers.ModelSerializer):
