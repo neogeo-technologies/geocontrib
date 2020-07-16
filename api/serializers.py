@@ -254,8 +254,6 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
         })
 
 
-
-
 class FeatureLinkSerializer(serializers.ModelSerializer):
 
     feature_to = serializers.SerializerMethodField()
@@ -403,10 +401,7 @@ class BaseMapSerializer(serializers.ModelSerializer):
 
 class LayerSerializer(serializers.ModelSerializer):
 
-    options = serializers.SerializerMethodField(read_only=True)
-
-    def get_options(self, obj):
-        return json.dumps(obj.options)
+    options = serializers.JSONField(read_only=True)
 
     class Meta:
         model = Layer

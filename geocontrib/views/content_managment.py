@@ -98,7 +98,7 @@ class BaseMapContextMixin(SingleObjectMixin):
                 is_authenticated=request.user.is_authenticated,
                 context={'request': request},
                 many=True)
-
+            logger.debug(serialized_layers.data)
             context['serialized_features'] = serialized_features.data
             context['serialized_base_maps'] = serialized_base_maps.data
             context['serialized_layers'] = serialized_layers.data
@@ -1278,33 +1278,32 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
 
         return render(request, 'geocontrib/project/project_mapping.html', context)
 
-    def create_or_update_base_map(self, request, project):
-        body = json.loads(request.body.decode('utf-8'))
-        base_map_batch = []
-        for data in body:
-            defaults = {'data': data}
-            if data.get('id'):
-                defaults['instance'] = get_object_or_404(
-                    BaseMap, id=data['id'], project=project
-                )
-            logger.debug(defaults)
-            serialized_base_maps = BaseMapSerializer(**defaults)
-            if not serialized_base_maps.is_valid():
-                logger.error(serialized_base_maps.errors)
-                raise Exception
-
-            base_map = serialized_base_maps.save(project=project)
-            base_map_batch.append(base_map)
-        # cleaning deleted projects's base_map
-        qs = BaseMap.objects.filter(
-            project=project
-        ).exclude(pk__in=[row.pk for row in base_map_batch])
-        qs.delete()
-
     def post(self, request, slug):
         project = self.get_object()
+        errors = []
         try:
-            self.create_or_update_base_map(request, project)
+            body = json.loads(request.body.decode('utf-8'))
+            base_map_batch = []
+            for data in body:
+                defaults = {'data': data}
+                if data.get('id'):
+                    defaults['instance'] = get_object_or_404(
+                        BaseMap, id=data['id'], project=project
+                    )
+                logger.debug(defaults)
+                serialized_base_maps = BaseMapSerializer(**defaults)
+                if not serialized_base_maps.is_valid():
+                    logger.error(serialized_base_maps.errors)
+                    errors = serialized_base_maps.errors
+                    break
+
+                base_map = serialized_base_maps.save(project=project)
+                base_map_batch.append(base_map)
+            # cleaning deleted projects's base_map
+            qs = BaseMap.objects.filter(
+                project=project
+            ).exclude(pk__in=[row.pk for row in base_map_batch])
+            qs.delete()
         except Exception:
             logger.exception('BaseMap Update failed')
             messages.error(request, "L'édition des couches cartographiques a échoué. ")
@@ -1313,6 +1312,7 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
 
         context = {**self.get_context_data(), **{
             'project': project,
+            'errors': errors
         }}
         return render(request, 'geocontrib/project/project_mapping.html', context)
 
