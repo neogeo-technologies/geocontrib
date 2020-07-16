@@ -45,50 +45,20 @@
         [
             {
                 "id": 7,
-                "title": "Open Street Map",
+                "title": "Relief",
                 "layers": [
-                    {
-                        "id": 3,
-                        "title": "WMS fond de carte basic",
+                {
+                        "id": 0,
+                        "title": "USGSHydroCached",
                         "opacity": "1.00",
                         "order": 0
                     },
                     {
-                        "id": 3,
-                        "title": "WMS fond de carte basic",
+                        "id": 1,
+                        "title": "Relief",
                         "opacity": "1.00",
                         "order": 0
                     },
-                    {
-                        "id": 3,
-                        "title": "WMS fond de carte basic",
-                        "opacity": "1.00",
-                        "order": 0
-                    },
-                    {
-                        "id": 3,
-                        "title": "WMS fond de carte basic",
-                        "opacity": "1.00",
-                        "order": 0
-                    },
-                    {
-                        "id": 3,
-                        "title": "WMS fond de carte basic",
-                        "opacity": "1.00",
-                        "order": 0
-                    },
-                    {
-                        "id": 5,
-                        "title": "TM fond de carte cyclables",
-                        "opacity": "0.80",
-                        "order": 1
-                    },
-                    {
-                        "id": 4,
-                        "title": "Orthophoto 2018",
-                        "opacity": "0.40",
-                        "order": 2
-                    }
                 ]
             },
             {
@@ -130,6 +100,30 @@
 
     const layers = [
         {
+            "id": 0,
+            "options": {
+                "attribution": "R\u00e9gion Hauts-de-France",
+                "format": "image/png",
+                "layers": "0",
+                "transparent": true
+            },
+            "title": "USGSHydroCached",
+            "service": "https://basemap.nationalmap.gov/arcgis/services/USGSHydroCached/MapServer/WMSServer",
+            "schema_type": "wms"
+        },
+        {
+            "id": 1,
+            "options": {
+                "attribution": "R\u00e9gion Hauts-de-France",
+                "format": "image/png",
+                "layers": "0",
+                "transparent": true
+            },
+            "title": "Relief",
+            "service": " https://basemap.nationalmap.gov/arcgis/services/USGSShadedReliefOnly/MapServer/WMSServer",
+            "schema_type": "wms"
+        },
+        {
             "id": 2,
             "options": {
                 "attribution": "R\u00e9gion Hauts-de-France",
@@ -157,7 +151,7 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         // TODO get in the localstorage ?
-        const selectedBasemapIndex = 1;
+        let selectedBasemapIndex = 0;
 
         let expanded = false;
 
@@ -186,6 +180,7 @@
             const layersContainer = document.createElement('div');
             layersContainer.classList.add('content');
             layersContainer.id = `list-${index}`;
+            layersContainer.setAttribute('data-basemap-index', index);
 
             basemap.layers.forEach((layer, i) => {
 
@@ -262,7 +257,6 @@
 
                 layersContainer.append(layerElement);
             });
-            console.log(baseMaps);;
             basemapContainer.append(basemapItem);
 
             basemapContainer.append(layersContainer);
@@ -272,13 +266,12 @@
                 handle: '.layer-handle-sort',
                 ghostClass: 'blue-background-class',
                 dragClass: 'white-opacity-background-class',
-                // filter: 'input[type=range]',
-                // preventOnFilter: false,
                 onEnd: (event) => {
+                    // Change order of the selected layer
                     baseMaps[selectedBasemapIndex].layers.splice(event.newIndex, 0, baseMaps[selectedBasemapIndex].layers.splice(event.oldIndex, 1)[0]);
                     const eventOrder = new CustomEvent('change-layers-order', {
                         detail: {
-                           layers:  baseMaps[selectedBasemapIndex].layers
+                            layers: baseMaps[selectedBasemapIndex].layers
                         }
                     })
                     document.dispatchEvent(eventOrder)
@@ -294,7 +287,16 @@
             bubble.innerHTML = val;
         };
 
-        $('.ui.accordion').accordion('open', selectedBasemapIndex).accordion('setting', 'collapsible', false);
+        $('.ui.accordion')
+        .accordion('open', selectedBasemapIndex)
+        .accordion('setting', 'collapsible', false)
+        .accordion('setting', 'onOpen', function()  {
+            const basemapIndex = this.dataset.basemapIndex;
+            selectedBasemapIndex = basemapIndex;
+            const event = new CustomEvent('add-layers', { detail: baseMaps[basemapIndex].layers })
+            document.dispatchEvent(event)
+        });
+
         // Load layer of the selected basemap
         const layersToAdd = []
         baseMaps[selectedBasemapIndex].layers.forEach(layer => {

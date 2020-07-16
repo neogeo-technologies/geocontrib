@@ -279,7 +279,10 @@
     });
 
     document.addEventListener('add-layers', (event) => {
-      mapUtil.addLayers(map, event.detail, serviceMap, optionsMap);
+      mapUtil.removeLayers(map);
+      // Reverse is done because the first layer in order has to be added in the map in last.
+      // Slice is done because reverse() changes the original array, so we make a copy first
+      mapUtil.addLayers(map, event.detail.slice().reverse(), serviceMap, optionsMap);
     });
 
     document.addEventListener('update-opacity', (event) => {
@@ -287,7 +290,9 @@
     });
 
     document.addEventListener('change-layers-order', (event) => {
-      mapUtil.updateOrder(map, event.detail.layers);
+      // Reverse is done because the first layer in order has to be added in the map in last.
+      // Slice is done because reverse() changes the original array, so we make a copy first
+      mapUtil.updateOrder(map, event.detail.layers.slice().reverse());
     });
 
     const featureGroup = mapUtil.addFeatures(map, features);

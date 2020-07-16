@@ -39,12 +39,16 @@ const mapUtil = {
 		} else {
 			L.tileLayer(serviceMap, optionsMap).addTo(map)
 		}
-		console.log(dictLayersToLeaflet);
+	},
+
+	removeLayers: function (map) {
+		dictLayersToLeaflet = {};
+		map.eachLayer((leafLetlayer) => {
+			map.removeLayer(leafLetlayer);
+		});
 	},
 
 	updateOpacity(map, layerId, opacity) {
-		console.log(dictLayersToLeaflet);
-		console.log(layerId);
 		const internalLeafletLayerId = dictLayersToLeaflet[layerId];
 		map.eachLayer((layer) => {
 			if (layer._leaflet_id === internalLeafletLayerId) {
@@ -58,7 +62,7 @@ const mapUtil = {
 		// First remove existing layers
 		map.eachLayer((leafLetlayer) => {
 			layers.forEach((layerOptions) => {
-				if(dictLayersToLeaflet[layerOptions.id] === leafLetlayer._leaflet_id) {
+				if (dictLayersToLeaflet[layerOptions.id] === leafLetlayer._leaflet_id) {
 					map.removeLayer(leafLetlayer);
 				}
 			});
