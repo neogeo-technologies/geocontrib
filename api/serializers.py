@@ -360,12 +360,6 @@ class ContextLayerSerializer(serializers.ModelSerializer):
 
     title = serializers.ReadOnlyField(source='layer.title')
 
-    opacity = serializers.DecimalField(
-        max_digits=3,
-        decimal_places=2,
-        coerce_to_string=False,
-    )
-
     class Meta:
         model = ContextLayer
         fields = ('id', 'title', 'opacity', 'order')

@@ -98,7 +98,6 @@ class BaseMapContextMixin(SingleObjectMixin):
                 is_authenticated=request.user.is_authenticated,
                 context={'request': request},
                 many=True)
-            logger.debug(serialized_layers.data)
             context['serialized_features'] = serialized_features.data
             context['serialized_base_maps'] = serialized_base_maps.data
             context['serialized_layers'] = serialized_layers.data
@@ -1181,7 +1180,6 @@ class ProjectDetail(BaseMapContextMixin, DetailView):
         serilized_projects = ProjectDetailedSerializer(project).data
 
         context = super().get_context_data(**kwargs)
-        logger.debug(context)
 
         context['project'] = serilized_projects
         context['user'] = user
@@ -1290,7 +1288,6 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
                     defaults['instance'] = get_object_or_404(
                         BaseMap, id=data['id'], project=project
                     )
-                logger.debug(defaults)
                 serialized_base_maps = BaseMapSerializer(**defaults)
                 if not serialized_base_maps.is_valid():
                     logger.error(serialized_base_maps.errors)
