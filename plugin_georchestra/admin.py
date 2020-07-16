@@ -8,16 +8,18 @@ from django.shortcuts import redirect
 from django.urls import path
 
 from geocontrib.admin import UserAdmin
+from geocontrib.admin import AuthorizationAdmin
+from geocontrib.models import Authorization
 
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
 admin.site.unregister(User)
-# admin.site.unregister(UserAdmin)
+admin.site.unregister(Authorization)
 
 
-class ThisUserAdmin(UserAdmin):
+class OverridenChangeList():
     change_list_template = 'admin/plugin_georchestra/user_change_list.html'
 
     def get_urls(self):
@@ -28,6 +30,7 @@ class ThisUserAdmin(UserAdmin):
         return my_urls + urls
 
     def sync_users_ldap_view(self, request):
+
         try:
             call_command('georchestra_user_sync')
         except Exception:
@@ -36,7 +39,17 @@ class ThisUserAdmin(UserAdmin):
         else:
             messages.success(request, "La synchronization a réussi.")
 
-        return redirect('admin:geocontrib_user_changelist')
+        # on retourne sur la page courante
+        return redirect(request.META.get('HTTP_REFERER'))
+
+
+class ThisAuthorizationAdmin(OverridenChangeList, AuthorizationAdmin):
+    pass
+
+
+class ThisUserAdmin(OverridenChangeList, UserAdmin):
+    pass
 
 
 admin.site.register(User, ThisUserAdmin)
+admin.site.register(Authorization, ThisAuthorizationAdmin)
