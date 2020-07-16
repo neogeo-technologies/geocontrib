@@ -98,7 +98,10 @@
     <div class="ui tab active map-container" data-tab="map">
       <div id="map">
       </div>
-      {% include "geocontrib/map-layers/sidebar.html" %}
+      {% if serialized_base_maps|length > 0 %} 
+         {% include "geocontrib/map-layers/sidebar-layers.html" with basemaps=serialized_base_maps layers=serialized_layers%}
+      {% endif %}
+      
     </div>
 
     <div class="ui tab" data-tab="list">
@@ -180,15 +183,13 @@
 
 </style>
 
-{{ serialized_base_maps|json_script:'basemaps' }}
-{{ layers|json_script:'layers' }}
 {{ serialized_features|json_script:'features' }}
 {{ SERVICE|json_script:'serviceMap' }}
 {{ OPTIONS|json_script:'optionsMap' }}
 {{ DEFAULT_MAP_VIEW|json_script:'defaultMapView' }}
 
-<!-- <script src="{% static 'geocontrib/js/leaflet-layers-control.js' %}"></script> -->
 <script src="{% static 'geocontrib/js/map-util.js' %}"></script>
+<script src="{% static 'geocontrib/js/localstorage.js' %}"></script>
 
 
 <script>
@@ -270,7 +271,7 @@
     var mapDefaultViewCenter = defaultMapView.center;
     var mapDefaultViewZoom = defaultMapView.zoom;
 
-    const map = mapUtil.createMap({
+    mapUtil.createMap({
       zoom,
       lat,
       lng,
@@ -282,32 +283,35 @@
       mapUtil.removeLayers(map);
       // Reverse is done because the first layer in order has to be added in the map in last.
       // Slice is done because reverse() changes the original array, so we make a copy first
-      mapUtil.addLayers(map, event.detail.slice().reverse(), serviceMap, optionsMap);
+      mapUtil.addLayers(event.detail.slice().reverse(), serviceMap, optionsMap);
     });
 
     document.addEventListener('update-opacity', (event) => {
-      mapUtil.updateOpacity(map, event.detail.layerId, event.detail.opacity);
+      mapUtil.updateOpacity(event.detail.layerId, event.detail.opacity);
     });
 
     document.addEventListener('change-layers-order', (event) => {
       // Reverse is done because the first layer in order has to be added in the map in last.
       // Slice is done because reverse() changes the original array, so we make a copy first
-      mapUtil.updateOrder(map, event.detail.layers.slice().reverse());
+      mapUtil.updateOrder(event.detail.layers.slice().reverse());
     });
 
-    const featureGroup = mapUtil.addFeatures(map, features);
+    const featureGroup = mapUtil.addFeatures(features);
     // Fit the map to bound only if no initial zoom and center are defined
     if (lat === "" || lng === "" || zoom === "") {
-      map.fitBounds(featureGroup.getBounds())
+      mapUtil.getMap().fitBounds(featureGroup.getBounds())
     }
 
-    // update zoom and center on each move
-    map.on("moveend", function () {
-      $formFilters.find("input[name=zoom]").val(map.getZoom())
-      $formFilters.find("input[name=lat]").val(map.getCenter().lat)
-      $formFilters.find("input[name=lng]").val(map.getCenter().lng)
-    })
+    // Update zoom and center on each move
+    mapUtil.addMapEventListener("moveend", () => {
+      $formFilters.find("input[name=zoom]").val(mapUtil.getMap().getZoom())
+      $formFilters.find("input[name=lat]").val(mapUtil.getMap().getCenter().lat)
+      $formFilters.find("input[name=lng]").val(mapUtil.getMap().getCenter().lng)
+    });
 
+    // Save to localstorage the basemap options
+    const basemapStorage = new LocalStorage('map-options');
+    basemapStorage.set('basemaps', JSON.stringify(basemaps));
   });
 </script>
 {% endblock %}

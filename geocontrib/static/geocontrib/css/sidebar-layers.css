@@ -25,9 +25,8 @@
   cursor: pointer;
   border: 1px solid grey;
   border-radius: 0 5px 5px 0;
-  border-left: none;
   position: absolute;
-  right: -40px;
+  right: -41px;
   top: 10px;
   background-color: rgba(255, 255, 255, 1);
 }

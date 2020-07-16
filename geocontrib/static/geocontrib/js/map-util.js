@@ -1,12 +1,16 @@
+let map;
 let dictLayersToLeaflet = {};
 
 const mapUtil = {
 
+	getMap: () => {
+		return map;
+	},
 
 	createMap: function (options) {
 		const { lat, lng, mapDefaultViewCenter, mapDefaultViewZoom, zoom } = options;
 
-		const map = L.map('map', {
+		map = L.map('map', {
 			zoomControl: false,
 		})
 			.setView(
@@ -17,13 +21,9 @@ const mapUtil = {
 				!zoom ? mapDefaultViewZoom : zoom);
 
 		L.control.zoom({ zoomInTitle: 'Zoomer', zoomOutTitle: 'Dézoomer', position: 'topright' }).addTo(map);
-		// L.control.layers().addTo(map);
-
-
-		return map;
 	},
 
-	addLayers: function (map, layers, serviceMap, optionsMap) {
+	addLayers: function (layers, serviceMap, optionsMap) {
 		console.log(layers);
 		if (layers) {
 			layers.forEach((layer) => {
@@ -41,24 +41,27 @@ const mapUtil = {
 		}
 	},
 
-	removeLayers: function (map) {
-		dictLayersToLeaflet = {};
+	// Remove the base layers (not the features)
+	removeLayers: function () {
 		map.eachLayer((leafLetlayer) => {
-			map.removeLayer(leafLetlayer);
+			if (Object.values(dictLayersToLeaflet).includes(leafLetlayer._leaflet_id)) {
+				map.removeLayer(leafLetlayer);
+			}
 		});
+		dictLayersToLeaflet = {};
+
 	},
 
-	updateOpacity(map, layerId, opacity) {
+	updateOpacity(layerId, opacity) {
 		const internalLeafletLayerId = dictLayersToLeaflet[layerId];
 		map.eachLayer((layer) => {
 			if (layer._leaflet_id === internalLeafletLayerId) {
 				layer.setOpacity(opacity);
-
 			}
 		});
 	},
 
-	updateOrder(map, layers) {
+	updateOrder(layers) {
 		// First remove existing layers
 		map.eachLayer((leafLetlayer) => {
 			layers.forEach((layerOptions) => {
@@ -70,11 +73,11 @@ const mapUtil = {
 		dictLayersToLeaflet = {};
 
 		// Redraw the layers
-		this.addLayers(map, layers);
+		this.addLayers(layers);
 	},
 
-	addFeatures: function (map, features) {
-		var featureGroup = new L.FeatureGroup()
+	addFeatures: function (features) {
+		featureGroup = new L.FeatureGroup()
 		features.forEach((feature) => {
 			const geomJSON = turf.flip(feature.geometry);
 
@@ -102,6 +105,10 @@ const mapUtil = {
 		});
 		map.addLayer(featureGroup);
 		return featureGroup;
+	},
+
+	addMapEventListener: function(eventName, callback) {
+		map.on(eventName, callback);
 	},
 
 	_createContentPopup: function (feature) {
