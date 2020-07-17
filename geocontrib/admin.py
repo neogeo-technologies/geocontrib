@@ -219,7 +219,7 @@ class FlatPageAdmin(FlatPageAdmin):
 class ContextLayerTabular(admin.TabularInline):
     model = ContextLayer
     extra = 0
-    can_delete = False
+    can_delete = True
     can_order = True
     show_change_link = True
     view_on_site = False
