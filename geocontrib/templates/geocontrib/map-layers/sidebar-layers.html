@@ -1,5 +1,5 @@
 <div class="sidebar-container">
-    <div class="sidebar-layers"></div>
+    <!-- <div class="sidebar-layers"></div> -->
     <div class="layers-icon">
         <?xml version="1.0" encoding="iso-8859-1"?>
         <!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
@@ -47,14 +47,11 @@
     const baseMapsFromServer = JSON.parse(document.getElementById('basemaps').textContent);
     const layers = JSON.parse(document.getElementById('layers').textContent);
 
-console.log(baseMapsFromServer);
     document.addEventListener("DOMContentLoaded", function () {
         // Check in the locastorage the options already exists
         if (localStorage.getItem('map-options')) {
-            console.log('Get from localstorage');
             baseMaps = JSON.parse(localStorage.getItem('map-options'));
         } else {
-            console.log('Get from server');
             baseMaps = baseMapsFromServer;
         }
 
@@ -71,7 +68,7 @@ console.log(baseMapsFromServer);
                 sidebar.classList.add('closing')
                 setTimeout(() => {
                     sidebar.classList.remove('closing')
-                }, 400);
+                }, 390);
             }
         });
 
@@ -154,18 +151,17 @@ console.log(baseMapsFromServer);
                 rangeContainer.append(rangeBubble);
                 layerElement.append(rangeContainer);
 
-
                 // Horizontal divider if not last layer
-                // if (basemap.layers.length - 1 > i) {
-                const horizontalDivider = document.createElement('div');
-                horizontalDivider.classList.add('ui', 'divider')
-                layerElement.append(horizontalDivider);
-                // }
+                if (basemap.layers.length - 1 > i) {
+                    const horizontalDivider = document.createElement('div');
+                    horizontalDivider.classList.add('ui', 'divider')
+                    layerElement.append(horizontalDivider);
+                }
 
                 layersContainer.append(layerElement);
             });
-            basemapContainer.append(basemapItem);
 
+            basemapContainer.append(basemapItem);
             basemapContainer.append(layersContainer);
 
             new Sortable(layersContainer, {
@@ -211,12 +207,6 @@ console.log(baseMapsFromServer);
         baseMaps[selectedBasemapIndex].layers.forEach(layer => {
             const layerInformation = layers.find(l => l.id === layer.id);
             layersToAdd.push(layerInformation);
-        });
-
-        // Add custom events that will be used in the map
-        window.addEventListener("load", function () {
-            const event = new CustomEvent('add-layers', { detail: layersToAdd })
-            document.dispatchEvent(event)
         });
 
         // Save the basemaps options into the localstorage

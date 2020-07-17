@@ -4,7 +4,7 @@
 {% load app_filters %}
 
 {% block content %}
-<div class="row">
+<div class="feature-list-container row">
   <div class="four wide column">
     <h1>Signalements</h1>
   </div>
@@ -101,7 +101,6 @@
       {% if serialized_base_maps|length > 0 %} 
          {% include "geocontrib/map-layers/sidebar-layers.html" with basemaps=serialized_base_maps layers=serialized_layers%}
       {% endif %}
-      
     </div>
 
     <div class="ui tab" data-tab="list">
@@ -175,14 +174,19 @@
     border: 1px solid grey;
   }
 
+  /* The overflow hidden is used to allow the sidebar-layers animation */
   .map-container {
     position: relative;
     overflow: hidden;
   }
 
-
+  #form-filters, .ui.centered > .row.feature-list-container {
+    justify-content: flex-start;
+  }
 </style>
 
+<!--  These Context variables will be accessible in the javascript after json_script (it set the values in the DOM) -->
+{{ serialized_base_maps|json_script:'basemaps' }}
 {{ serialized_features|json_script:'features' }}
 {{ SERVICE|json_script:'serviceMap' }}
 {{ OPTIONS|json_script:'optionsMap' }}
@@ -256,13 +260,13 @@
     $("#map").css("height", main - 150)
 
     // Load into js variables the python context.
-    const layers = JSON.parse(document.getElementById('layers').textContent);
-    const features = JSON.parse(document.getElementById('features').textContent).features;
+    const features = JSON.parse(document.getElementById('features').textContent) ? 
+      JSON.parse(document.getElementById('features').textContent).features : null;
     const serviceMap = JSON.parse(document.getElementById('serviceMap').textContent);
     const optionsMap = JSON.parse(document.getElementById('optionsMap').textContent);
     const defaultMapView = JSON.parse(document.getElementById('defaultMapView').textContent);
 
-    // get initial zoom and center defined in the form
+    // Get initial zoom and center defined in the form
     var $formFilters = $("#form-filters");
     var zoom = $formFilters.find("input[name=zoom]").val()
     var lat = $formFilters.find("input[name=lat]").val()
@@ -279,6 +283,7 @@
       mapDefaultViewZoom,
     });
 
+    // Listen custom events triggered by the sidebar-layers
     document.addEventListener('add-layers', (event) => {
       mapUtil.removeLayers(map);
       // Reverse is done because the first layer in order has to be added in the map in last.
@@ -309,9 +314,11 @@
       $formFilters.find("input[name=lng]").val(mapUtil.getMap().getCenter().lng)
     });
 
-    // Save to localstorage the basemap options
-    const basemapStorage = new LocalStorage('map-options');
-    basemapStorage.set('basemaps', JSON.stringify(basemaps));
+    // Check if at least one basemap exist. If not, use the default application
+    const basemaps = JSON.parse(document.getElementById('basemaps').textContent);
+    if (!basemaps || basemaps && basemaps.length === 0) {
+      mapUtil.addLayers(null, serviceMap, optionsMap);
+    }
   });
 </script>
 {% endblock %}

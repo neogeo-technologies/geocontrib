@@ -24,10 +24,11 @@ const mapUtil = {
 	},
 
 	addLayers: function (layers, serviceMap, optionsMap) {
-		console.log(layers);
 		if (layers) {
 			layers.forEach((layer) => {
 				const options = layer.options;
+				options.opacity = layer.opacity;
+
 				if (layer.schema_type === 'wms') {
 					const leafletLayer = L.tileLayer.wms(layer.service, options).addTo(map);
 					dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
@@ -54,6 +55,7 @@ const mapUtil = {
 
 	updateOpacity(layerId, opacity) {
 		const internalLeafletLayerId = dictLayersToLeaflet[layerId];
+		console.log(opacity);
 		map.eachLayer((layer) => {
 			if (layer._leaflet_id === internalLeafletLayerId) {
 				layer.setOpacity(opacity);
@@ -114,7 +116,7 @@ const mapUtil = {
 	_createContentPopup: function (feature) {
 		const author = feature.properties.creator.full_name ?
 			`<div>
-              Auteur : ${feature.properties.creator.first_name} ${feature.properties.creator.last_name} ${feature.properties.creator.last_name} ${feature.properties.creator.last_name}
+              Auteur : ${feature.properties.creator.first_name} ${feature.properties.creator.last_name}
             </div>`: ''
 
 		return `
