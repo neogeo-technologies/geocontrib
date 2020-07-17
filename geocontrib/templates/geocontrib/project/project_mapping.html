@@ -8,121 +8,7 @@
 {% block content %}
 
 
-<script>
-  // Fake fonds and layers
-  const baseMaps =
-    [
-      {
-        "id": 7,
-        "title": "Open Street Map",
-        "layers": [
-          {
-            "id": 3,
-            "title": "WMS fond de carte basic",
-            "opacity": "1.00",
-            "order": 0
-          },
-          {
-            "id": 3,
-            "title": "WMS ",
-            "opacity": "1.00",
-            "order": 0
-          },
-          {
-            "id": 3,
-            "title": "Ortho super cool",
-            "opacity": "1.00",
-            "order": 0
-          },
-          {
-            "id": 5,
-            "title": "TM fond de carte cyclables",
-            "opacity": "0.80",
-            "order": 1
-          },
-          {
-            "id": 4,
-            "title": "Orthophoto 2018",
-            "opacity": "0.40",
-            "order": 2
-          }
-        ]
-      },
-      {
-        "id": 2,
-        "title": "Picardie Forever",
-        "layers": [
-          {
-            "id": 5,
-            "title": "Couche des sentiers perdus",
-            "opacity": "0.30",
-            "order": 0
-          },
-          {
-            "id": 4,
-            "title": "Les plus beaux lacs et lagunes",
-            "opacity": "1.00",
-            "order": 1
-          }
-        ]
-      },
-      {
-        "title": "On aime la Bretagne",
-        "layers": [
-          {
-            "id": 3,
-            "title": "TMS des meilleurs bars",
-            "opacity": "1.00",
-            "order": 0
-          },
-          {
-            "id": 5,
-            "title": "Surface des crêperies",
-            "opacity": "1.00",
-            "order": 1
-          }
-        ]
-      }
-    ];
-  const layers =
-    [
-    {
-        "id": 1,
-        "options": "null",
-        "title": "couche uno uno",
-        "service": "pouet",
-        "schema_type": "wms"
-      },
-      {
-        "id": 2,
-        "options": "null",
-        "title": "couche uno uno",
-        "service": "pouet",
-        "schema_type": "wms"
-      },
-      {
-        "id": 3,
-        "options": "null",
-        "title": "couche uno dos",
-        "service": "pouet",
-        "schema_type": "wms"
-      },
-      {
-        "id": 5,
-        "options": "null",
-        "title": "couche dos dos",
-        "service": "pouet",
-        "schema_type": "wms"
-      },
-      {
-        "id": 4,
-        "options": "null",
-        "title": "couche dos uno",
-        "service": "pouet",
-        "schema_type": "wms"
-      }
-    ] 
-</script>
+
 
 <div class="fourteen wide column">
 
@@ -131,11 +17,11 @@
   <form id="form-layers" action="." method="post" enctype="multipart/form-data" class="ui form">
     {% csrf_token %}
 
-    <!-- <div id="context_layer_formset">
+    <div id="context_layer_formset">
       {{ context_layer_formset.non_form_errors }}
       {{ context_layer_formset.management_form }}
       {% for form in context_layer_formset %}
-      {{ form.as_p }}
+        {{ form.as_p }}
       {% endfor %}
     </div>
 
@@ -144,69 +30,69 @@
     <div id="formsets-layers">
       {{ layer_formset.management_form }}
       {% for form in layer_formset %}
-      {% if not form.DELETE.value %}
-      {% for hidden in form.hidden_fields %}
-      {{ hidden }}
-      {% endfor %}
-      <div class="ui teal segment">
-        <h4>
-          Couche
-          <button class="ui small compact right floated icon button remove-formset" type="button"><i
-              class="ui times icon"></i></button>
-        </h4>
-        {{ form.errors }}
-        {% if form.non_field_errors %}
-        <div class="alert alert-danger" role="alert">
-          {% for error in form.non_field_errors %}
-          {{ error }}
+        {% if not form.DELETE.value %}
+          {% for hidden in form.hidden_fields %}
+            {{ hidden }}
           {% endfor %}
-        </div>
-        {% endif %}
-        <div class="visible-fields">
-          <div class="two fields">
-            <div class="field">
-              <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
-              {{ form.title }}
-              {{ form.title.errors }}
+          <div class="ui teal segment">
+            <h4>
+              Couche
+              <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+            </h4>
+            {{ form.errors }}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
             </div>
-          </div>
-          <div class="fields">
-            <div class="required field">
-              <label for="{{ form.schema_type.id_for_label }}">{{ form.schema_type.label }}</label>
-              <div class="ui selection dropdown">
-                <input type="hidden" name="{{ form.schema_type.html_name }}" id="{{ form.schema_type.id_for_label }}"
-                  value="{{ form.schema_type.value }}">
-                <div class="default text"></div>
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                  {% for x,y in form.schema_type.field.choices %}
-                  <div class="item" data-value="{{ x }}" {% if form.schema_type.value == x %} selected{% endif %}>
-                    {{ y }}</div>
-                  {% endfor %}
+            {% endif %}
+            <div class="visible-fields">
+              <div class="two fields">
+                <div class="field">
+                  <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                  {{ form.title }}
+                  {{ form.title.errors }}
                 </div>
               </div>
-              {{ form.schema_type.errors }}
+              <div class="fields">
+                <div class="required field">
+                  <label for="{{ form.schema_type.id_for_label }}">{{ form.schema_type.label }}</label>
+                  <div class="ui selection dropdown">
+                    <input type="hidden"
+                      name="{{ form.schema_type.html_name }}" id="{{ form.schema_type.id_for_label }}"
+                      value="{{ form.schema_type.value }}">
+                    <div class="default text"></div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                      {% for x,y in form.schema_type.field.choices %}
+                        <div class="item" data-value="{{ x }}" {% if form.schema_type.value == x %} selected{% endif %}>{{ y }}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {{ form.schema_type.errors }}
+                </div>
+                <div class="required thirteen wide field">
+                  <label for="{{ form.service.id_for_label }}">{{ form.service.label }}</label>
+                  {{ form.service }}
+                  {{ form.service.errors }}
+                </div>
+              </div>
+              <div class="field">
+                <label for="{{ form.options.id_for_label }}">{{ form.options.label }}</label>
+                {{ form.options }}
+                {{ form.options.errors }}
+              </div>
             </div>
-            <div class="required thirteen wide field">
-              <label for="{{ form.service.id_for_label }}">{{ form.service.label }}</label>
-              {{ form.service }}
-              {{ form.service.errors }}
-            </div>
+            <input class="delete-hidden-field" type="checkbox"
+              name="{{ form.DELETE.html_name }}"
+              id="{{ form.DELETE.id_for_label }}">
           </div>
-          <div class="field">
-            <label for="{{ form.options.id_for_label }}">{{ form.options.label }}</label>
-            {{ form.options }}
-            {{ form.options.errors }}
-          </div>
-        </div>
-        <input class="delete-hidden-field" type="checkbox" name="{{ form.DELETE.html_name }}"
-          id="{{ form.DELETE.id_for_label }}">
-      </div>
-      {% endif %}
+        {% endif %}
       {% endfor %}
     </div>
 
-   <button id="add-layer" type="button" class="ui compact button button-hover-green">
+    <button id="add-layer" type="button" class="ui compact button button-hover-green">
       <i class="ui plus icon"></i>Ajouter une couche
     </button>
 
@@ -214,267 +100,83 @@
 
     <button type="submit" class="ui teal icon button">
       <i class="white save icon"></i> Enregistrer les changements
-    </button> -->
-
-    <div>
-      <basemap-form-item v-for="(basemap, indexBaseMap) in basemaps" :index-base-map="indexBaseMap" :basemap="basemap"
-        :key="basemap.id" @delete-from-list="deleteFromList">
-        </base-map-item>
-    </div>
-
+    </button>
   </form>
-  <button id="add-basemap" type="button" class="ui compact button button-hover-green" @click="addNewBasemap">
-    <i class="ui plus icon"></i>Ajouter un fond cartographique
-  </button>
 
 </div>
 
-<!-- Serialize python variables in json -->
-{{ serialized_base_maps|json_script:'baseMaps' }}
-{{ serialized_layers|json_script:'features' }}
-
-<style>
-  #form-layers {
-    margin-bottom: 1rem;
-  }
-
-  #form-layers .input {
-    width: 300px;
-  }
-
-  .layer {
-    padding: 1rem;
-  }
-
-  .layer:nth-child(even) {
-    background-color: lightgrey;
-  }
-
-  .range-container {
-    display: flex;
-  }
-
-  .layer-title {
-    display: flex;
-    ;
-  }
-
-  .close.icon {
-    cursor: pointer;
-  }
-
-  .bubble {
-    color: white;
-    margin-left: 5px;
-    padding: 4px 7px;
-    border-radius: 40px;
-    background-color: #2c3e50;
-  }
-</style>
-
-<script src="{% static 'geocontrib/js/components/basemap-form-item.js' %}"></script>
-
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-
-    var app = new Vue({
-      el: '#form-layers',
-      delimiters: ['[[', ']]'],
-      data: {
-        basemaps: baseMaps,
-        message: 'Hello Vue!'
-      },
-      methods: {
-        deleteFromList: function (indexBaseMap, indexLayer) {
-          console.log(indexBaseMap);
-          console.log(indexLayer);
-          this.basemaps[indexBaseMap].layers.splice(indexLayer, 1);
-        },
-        addNewBasemap: function () {
-
-        }
-      }
-    });
-
-
-    // Add the base maps
-    // baseMaps.forEach((basemap, index) => {
-    //   const [basemapItem, layersContainer] = createBaseMapItem(basemap);
-
-    //   basemap.layers.forEach((layer, i) => {
-    //     const layerElement = document.createElement('div');
-    //     layerElement.classList.add('layer-item');
-    //     const layerTitleElement = document.createElement('p');
-    //     layerTitleElement.innerHTML = layer.title;
-    //     const layerLabelInput = document.createElement('label');
-    //     const labelPercentage = document.createElement('span');
-    //     labelPercentage.innerHTML = '(%)';
-
-    //     layerLabelInput.innerHTML = "Opacité &nbsp;";
-    //     layerLabelInput.for = "opacity";
-    //     layerLabelInput.append(labelPercentage);
-
-    //     // Range container
-    //     const rangeContainer = document.createElement('div');
-    //     rangeContainer.classList.add('range-container');
-
-    //     const rangeInput = document.createElement('input');
-    //     rangeInput.id = 'opacity';
-    //     rangeInput.type = 'range';
-    //     rangeInput.min = 0;
-    //     rangeInput.max = 100;
-    //     rangeInput.value = layer.opacity * 100;
-
-    //     // Range value in bubble
-    //     const rangeBubble = document.createElement('output');
-    //     rangeBubble.classList.add('bubble');
-    //     rangeInput.addEventListener("input", () => {
-    //       setBubble(rangeInput, rangeBubble);
-    //     });
-    //     // setBubble(rangeInput, rangeBubble);
-
-    //     layerElement.append(layerTitleElement);
-    //     layerElement.append(layerLabelInput);
-
-    //     rangeContainer.append(rangeInput);
-    //     rangeContainer.append(rangeBubble);
-    //     layerElement.append(rangeContainer);
-
-
-
-    //     // Horizontal divider if not last layer
-    //     // if (basemap.layers.length - 1 > i) {
-    //     const horizontalDivider = document.createElement('div');
-    //     horizontalDivider.classList.add('ui', 'divider')
-    //     layerElement.append(horizontalDivider);
-    //     // }
-
-    //     layersContainer.append(layerElement);
-    //   });
-    //   formContainer.append(basemapItem);
-    //   formContainer.append(layersContainer);
-    // });
-
-    function createBaseMapItem(basemap = null) {
-      const basemapItem = document.createElement('div');
-      basemapItem.classList.add('basemap-item', 'title');
-
-      // Title input
-      const titleSection = createInputSection({
-        label: 'Titre',
-        typeInput: 'text',
-        inputValue: basemap ? basemap.title : ''
-      })
-
-      basemapItem.append(titleSection);
-
-      const layersContainer = document.createElement('div');
-      layersContainer.classList.add('content');
-      // layersContainer.id = `list-${index}`;
-      const layersTitle = document.createElement('div');
-      const layersTitleP = document.createElement('h4');
-      layersTitleP.innerHTML = 'Couches';
-
-      layersTitle.append(layersTitleP);
-      layersContainer.append(layersTitle);
-      return [basemapItem, layersContainer];
-    }
-
-    function createInputSection(options) {
-      const titleDiv = document.createElement('div');
-      titleDiv.classList.add('field');
-      const labelTitle = document.createElement('label');
-      labelTitle.innerHTML = options.label;
-      const inputTitle = document.createElement('input');
-      inputTitle.type = options.typeInput;
-      inputTitle.classList.add('ui', 'input', 'big')
-      inputTitle.value = options.inputValue;
-      titleDiv.append(labelTitle);
-      titleDiv.append(inputTitle);
-      return titleDiv;
-    }
-
-    // Add a new base map section
-    // document.getElementById('add-basemap').addEventListener('click', () => {
-    //   const [basemapItem, layersContainer] = createBaseMapItem();
-    //   formContainer.append(basemapItem);
-    //   formContainer.append(layersContainer);
-    // });
-
+  $('#add_more').click(function() {
+  	var form_idx = $('#id_form-TOTAL_FORMS').val();
+  	$('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+  	$('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
   });
 
+  $(document).ready(function() {
+    $(document).on('click', '.remove-formset', function () {
+      var $segment = $(this).parent().parent('.segment')
+      $segment.hide()
+      $segment.children('.visible-fields').remove()
+      $segment.children('.delete-hidden-field').prop('checked', true)
+    })
 
-  // $('#add_more').click(function () {
-  //   var form_idx = $('#id_form-TOTAL_FORMS').val();
-  //   $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-  //   $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-  // });
-
-  // $(document).ready(function () {
-  //   $(document).on('click', '.remove-formset', function () {
-  //     var $segment = $(this).parent().parent('.segment')
-  //     $segment.hide()
-  //     $segment.children('.visible-fields').remove()
-  //     $segment.children('.delete-hidden-field').prop('checked', true)
-  //   })
-
-  //   $('#add-layer').click(function () {
-  //     var form_idx = $('#formsets-layers [name=form-TOTAL_FORMS]').val();
-  //     $('#formsets-layers').append((`
-  //       <div class="ui teal segment">
-  //         <h4>
-  //           Couche
-  //           <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
-  //         </h4>
-  //         <div class="visible-fields">
-  //           <div class="two fields">
-  //             <div class="field">
-  //               <label for="{{ layer_formset.empty_form.title.id_for_label }}">{{ layer_formset.empty_form.title.label }}</label>
-  //               {{ layer_formset.empty_form.title }}
-  //             </div>
-  //             <div class="required field">
-  //               <label for="{{ layer_formset.empty_form.order.id_for_label }}">{{ layer_formset.empty_form.order.label }}</label>
-  //               <div class="ui input">
-  //                 <input type="number" min="{{ layer_formset.empty_form.order.field.min_value }}"
-  //                 name="{{ layer_formset.empty_form.order.html_name }}" id="{{ layer_formset.empty_form.order.id_for_label }}"
-  //                 value="${form_idx}">
-  //               </div>
-  //             </div>
-  //           </div>
-  //           <div class="fields">
-  //             <div class="required field">
-  //               <label for="{{ layer_formset.empty_form.schema_type.id_for_label }}">{{ layer_formset.empty_form.schema_type.label }}</label>
-  //               <div class="ui selection dropdown">
-  //                 <input type="hidden"
-  //                   name="{{ layer_formset.empty_form.schema_type.html_name }}" id="{{ layer_formset.empty_form.schema_type.id_for_label }}"
-  //                   value="{{ layer_formset.empty_form.schema_type.value }}">
-  //                 <div class="default text"></div>
-  //                 <i class="dropdown icon"></i>
-  //                 <div class="menu">
-  //                   {% for x,y in layer_formset.empty_form.schema_type.field.choices %}
-  //                     <div class="item" data-value="{{ x }}" {% if layer_formset.empty_form.schema_type.value == x %} selected{% endif %}>{{ y }}</div>
-  //                   {% endfor %}
-  //                 </div>
-  //               </div>
-  //             </div>
-  //             <div class="required thirteen wide field">
-  //               <label for="{{ layer_formset.empty_form.service.id_for_label }}">{{ layer_formset.empty_form.service.label }}</label>
-  //               {{ layer_formset.empty_form.service }}
-  //             </div>
-  //           </div>
-  //           <div class="field">
-  //             <label for="{{ layer_formset.empty_form.options.id_for_label }}">{{ layer_formset.empty_form.options.label }}</label>
-  //             {{ layer_formset.empty_form.options }}
-  //           </div>
-  //         </div>
-  //         <input class="delete-hidden-field" type="checkbox"
-  //           name="{{ layer_formset.empty_form.DELETE.html_name }}"
-  //           id="{{ layer_formset.empty_form.DELETE.id_for_label }}">
-  //       </div>
-  //     `).replace(/__prefix__/g, form_idx))
-  //     $('#formsets-layers [name=form-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
-  //     $('.ui.dropdown').dropdown()
-  //   })
-  // })
+    $('#add-layer').click(function() {
+      var form_idx = $('#formsets-layers [name=form-TOTAL_FORMS]').val();
+      $('#formsets-layers').append((`
+        <div class="ui teal segment">
+          <h4>
+            Couche
+            <button class="ui small compact right floated icon button remove-formset" type="button"><i class="ui times icon"></i></button>
+          </h4>
+          <div class="visible-fields">
+            <div class="two fields">
+              <div class="field">
+                <label for="{{ layer_formset.empty_form.title.id_for_label }}">{{ layer_formset.empty_form.title.label }}</label>
+                {{ layer_formset.empty_form.title }}
+              </div>
+              <div class="required field">
+                <label for="{{ layer_formset.empty_form.order.id_for_label }}">{{ layer_formset.empty_form.order.label }}</label>
+                <div class="ui input">
+                  <input type="number" min="{{ layer_formset.empty_form.order.field.min_value }}"
+                  name="{{ layer_formset.empty_form.order.html_name }}" id="{{ layer_formset.empty_form.order.id_for_label }}"
+                  value="${form_idx}">
+                </div>
+              </div>
+            </div>
+            <div class="fields">
+              <div class="required field">
+                <label for="{{ layer_formset.empty_form.schema_type.id_for_label }}">{{ layer_formset.empty_form.schema_type.label }}</label>
+                <div class="ui selection dropdown">
+                  <input type="hidden"
+                    name="{{ layer_formset.empty_form.schema_type.html_name }}" id="{{ layer_formset.empty_form.schema_type.id_for_label }}"
+                    value="{{ layer_formset.empty_form.schema_type.value }}">
+                  <div class="default text"></div>
+                  <i class="dropdown icon"></i>
+                  <div class="menu">
+                    {% for x,y in layer_formset.empty_form.schema_type.field.choices %}
+                      <div class="item" data-value="{{ x }}" {% if layer_formset.empty_form.schema_type.value == x %} selected{% endif %}>{{ y }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              <div class="required thirteen wide field">
+                <label for="{{ layer_formset.empty_form.service.id_for_label }}">{{ layer_formset.empty_form.service.label }}</label>
+                {{ layer_formset.empty_form.service }}
+              </div>
+            </div>
+            <div class="field">
+              <label for="{{ layer_formset.empty_form.options.id_for_label }}">{{ layer_formset.empty_form.options.label }}</label>
+              {{ layer_formset.empty_form.options }}
+            </div>
+          </div>
+          <input class="delete-hidden-field" type="checkbox"
+            name="{{ layer_formset.empty_form.DELETE.html_name }}"
+            id="{{ layer_formset.empty_form.DELETE.id_for_label }}">
+        </div>
+      `).replace(/__prefix__/g, form_idx))
+      $('#formsets-layers [name=form-TOTAL_FORMS]').val(parseInt(form_idx) + 1);
+      $('.ui.dropdown').dropdown()
+    })
+  })
 </script>
 {% endblock %}
