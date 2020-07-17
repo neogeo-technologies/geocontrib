@@ -85,7 +85,13 @@
       <!-- Map -->
       <input type="hidden" name="{{ feature_form.geom.html_name }}" id="{{ feature_form.geom.id_for_label }}"
         value="{% if feature_form.geom.value.ewkt %}{{ feature_form.geom.value.ewkt }}{% endif %}" />
-      <div id="map"></div>
+        <div class="ui tab active map-container" data-tab="map">
+          <div id="map">
+          </div>
+          {% if serialized_base_maps|length > 0 %} 
+             {% include "geocontrib/map-layers/sidebar-layers.html" with basemaps=serialized_base_maps layers=serialized_layers%}
+          {% endif %}
+        </div>
     </div>
 
     <!-- Extra Fields -->
@@ -304,12 +310,18 @@
 {% block custom_resources %}
 <style>
 #map {
-  height:350px;
+  height:70vh;
   width:100%;
-}
+  border: 1px solid grey;
+  }
+
+@media only screen and (max-width: 767px) {
+  #map {
+    height: 80vh;
+  }
+} 
 </style>
 
-{{ layers|json_script:'layers' }}
 {{ serialized_features|json_script:'features' }}
 {{ feature.feature_id|json_script:'currentFeatureId' }}
 {{ SERVICE|json_script:'serviceMap' }}
@@ -664,17 +676,37 @@ $(document).ready(function() {
       optionsMap
     });
 
-  mapUtil.addLayers(map, layers, serviceMap, optionsMap);
-  console.log(features);
+  // mapUtil.addLayers(layers, serviceMap, optionsMap);
   if (features) {
     const allFeaturesExceptCurrent = features.filter(feat => feat.id !== currentFeatureId);
-    mapUtil.addFeatures(map, allFeaturesExceptCurrent);
+    mapUtil.addFeatures(allFeaturesExceptCurrent);
   }
 
+      // ------   Listen Sidebar events ---------- // 
+    // Listen custom events triggered by the sidebar-layers
+    document.addEventListener('add-layers', (event) => {
+      mapUtil.removeLayers(map);
+      // Reverse is done because the first layer in order has to be added in the map in last.
+      // Slice is done because reverse() changes the original array, so we make a copy first
+      mapUtil.addLayers(event.detail.slice().reverse(), serviceMap, optionsMap);
+    });
+
+    document.addEventListener('update-opacity', (event) => {
+      mapUtil.updateOpacity(event.detail.layerId, event.detail.opacity);
+    });
+
+    document.addEventListener('change-layers-order', (event) => {
+      // Reverse is done because the first layer in order has to be added in the map in last.
+      // Slice is done because reverse() changes the original array, so we make a copy first
+      mapUtil.updateOrder(event.detail.layers.slice().reverse());
+    });
+
+    // --------- End sidebar events ----------
 
   map.addLayer(drawnItems);
 
   var drawControlFull = new L.Control.Draw({
+    position: 'topright',
     edit: {
       featureGroup: drawnItems
     },
@@ -682,6 +714,7 @@ $(document).ready(function() {
   })
 
   var drawControlEditOnly = new L.Control.Draw({
+    position: 'topright',
     edit: {
       featureGroup: drawnItems
     },

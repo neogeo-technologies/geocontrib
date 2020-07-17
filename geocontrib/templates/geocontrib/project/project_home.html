@@ -298,8 +298,9 @@
             }
         });
       });
+      layersToLoad.reverse()
     }
-    mapUtil.addLayers(layersToLoad.reverse(), serviceMap, optionsMap);
+    mapUtil.addLayers(layersToLoad, serviceMap, optionsMap);
 
     // Remove multiple interactions with the map
     mapUtil.getMap().dragging.disable();
@@ -309,7 +310,7 @@
     // Add the features
     const featureGroup = mapUtil.addFeatures(features);
     if (featureGroup && featureGroup.getLayers().length > 0) {
-      map.fitBounds(featureGroup.getBounds())
+      mapUtil.getMap().fitBounds(featureGroup.getBounds())
     }
 
   })

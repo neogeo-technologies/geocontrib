@@ -8,7 +8,13 @@ const mapUtil = {
 	},
 
 	createMap: function (options) {
-		const { lat, lng, mapDefaultViewCenter, mapDefaultViewZoom, zoom } = options;
+    const {
+      lat,
+      lng,
+      mapDefaultViewCenter,
+      mapDefaultViewZoom,
+      zoom,
+      zoomControl = true } = options;
 
 		map = L.map('map', {
 			zoomControl: false,
@@ -20,7 +26,11 @@ const mapUtil = {
 				],
 				!zoom ? mapDefaultViewZoom : zoom);
 
-		L.control.zoom({ zoomInTitle: 'Zoomer', zoomOutTitle: 'Dézoomer', position: 'topright' }).addTo(map);
+		if (zoomControl) {
+		  L.control.zoom({ zoomInTitle: 'Zoomer', zoomOutTitle: 'Dézoomer', position: 'topright' }).addTo(map);
+    }
+    
+    return map;
 	},
 
 	addLayers: function (layers, serviceMap, optionsMap) {
@@ -109,7 +119,7 @@ const mapUtil = {
 		return featureGroup;
 	},
 
-	addMapEventListener: function(eventName, callback) {
+	addMapEventListener: function (eventName, callback) {
 		map.on(eventName, callback);
 	},
 

@@ -94,7 +94,6 @@
 <div class="row">
   <div class="sixteen wide column">
 
-    <!-- <div class="ui hidden divider"></div> -->
     <div class="ui tab active map-container" data-tab="map">
       <div id="map">
       </div>
@@ -170,14 +169,9 @@
   #map {
     width: 100%;
     min-height: 300px;
-    z-index: 1;
     border: 1px solid grey;
-  }
-
-  /* The overflow hidden is used to allow the sidebar-layers animation */
-  .map-container {
-    position: relative;
-    overflow: hidden;
+    /* To not hide the filters */
+    z-index: 1;
   }
 
   #form-filters, .ui.centered > .row.feature-list-container {
@@ -283,6 +277,7 @@
       mapDefaultViewZoom,
     });
 
+    // ------   Listen Sidebar events ---------- // 
     // Listen custom events triggered by the sidebar-layers
     document.addEventListener('add-layers', (event) => {
       mapUtil.removeLayers(map);
@@ -300,6 +295,8 @@
       // Slice is done because reverse() changes the original array, so we make a copy first
       mapUtil.updateOrder(event.detail.layers.slice().reverse());
     });
+
+    // --------- End sidebar events ----------
 
     const featureGroup = mapUtil.addFeatures(features);
     // Fit the map to bound only if no initial zoom and center are defined
