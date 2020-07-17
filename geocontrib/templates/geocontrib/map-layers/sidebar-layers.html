@@ -48,12 +48,28 @@
     const layers = JSON.parse(document.getElementById('layers').textContent);
 
     document.addEventListener("DOMContentLoaded", function () {
-        // Check in the locastorage the options already exists
+        // Check in the locastorage if the options already exists
         if (localStorage.getItem('map-options')) {
-            baseMaps = JSON.parse(localStorage.getItem('map-options'));
+
+            // If already in the storage, we need to check if the admin did some 
+            // modification in the basemaps on the server side. The rule is: if one layer has been added
+            // or deleted in the server, then we reset the localstorage.
+            const baseMapsFromLocalstorage = JSON.parse(localStorage.getItem('map-options'));
+            const areChanges = areChangesInBasemaps(baseMapsFromServer, baseMapsFromLocalstorage);
+            console.log(areChanges);
+            if (areChanges) {
+                console.log('from server, changes');
+                baseMaps = baseMapsFromServer;
+                localStorage.removeItem('map-options');
+            } else {
+                console.log('from storage');
+                baseMaps = baseMapsFromLocalstorage;
+            }
         } else {
+            console.log('from server');
             baseMaps = baseMapsFromServer;
         }
+
 
         let selectedBasemapIndex = 0;
         let expanded = false;
@@ -184,14 +200,6 @@
             });
         });
 
-        function setBubble(range, bubble) {
-            const val = Math.round(range.value * 100);
-            const min = range.min ? range.min : 0;
-            const max = range.max ? range.max : 100;
-            const newVal = Number(((val - min) * 100) / (max - min));
-            bubble.innerHTML = val;
-        };
-
         $('.ui.accordion')
             .accordion('open', selectedBasemapIndex)
             .accordion('setting', 'collapsible', false)
@@ -212,4 +220,37 @@
         // Save the basemaps options into the localstorage
         localStorage.setItem('map-options', JSON.stringify(baseMaps));
     });
+
+    function areChangesInBasemaps(basemapFromServer, basemapFromLocalstorage) {
+        let isSameBasemaps = false;
+        let isSameLayers = true;
+
+        const idBasemapsServer = basemapFromServer.map(b => b.id).sort();
+        const idBasemapsLocalstorage = basemapFromLocalstorage.map(b => b.id).sort();
+        isSameBasemaps = (idBasemapsServer.length === idBasemapsLocalstorage.length
+            && idBasemapsServer.every((value, index) => value === idBasemapsLocalstorage[index]))
+
+        basemapFromServer.forEach((basemapServer) => {
+            let idLayersServer = basemapServer.layers.map(b => b.id).sort();
+            for (let basemapLocalstorage of basemapFromLocalstorage) {
+                let idLayersLocalstorage = basemapLocalstorage.layers.map(b => b.id).sort();
+                isSameLayers = (idLayersServer.length === idLayersLocalstorage.length
+                    && idLayersServer.every((value, index) => value === idLayersLocalstorage[index]));
+                if (!isSameLayers) {
+                    break;
+                }
+            }
+
+        });
+
+        return isSameBasemaps && isSameLayers;
+    }
+
+    function setBubble(range, bubble) {
+        const val = Math.round(range.value * 100);
+        const min = range.min ? range.min : 0;
+        const max = range.max ? range.max : 100;
+        const newVal = Number(((val - min) * 100) / (max - min));
+        bubble.innerHTML = val;
+    };
 </script>
