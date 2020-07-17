@@ -65,7 +65,6 @@ const mapUtil = {
 
 	updateOpacity(layerId, opacity) {
 		const internalLeafletLayerId = dictLayersToLeaflet[layerId];
-		console.log(opacity);
 		map.eachLayer((layer) => {
 			if (layer._leaflet_id === internalLeafletLayerId) {
 				layer.setOpacity(opacity);
