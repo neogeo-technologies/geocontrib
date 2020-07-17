@@ -238,7 +238,6 @@ class BaseMapAdmin(admin.ModelAdmin):
         #     for obj in formset.deleted_objects:
         #         obj.delete()
         #     for order, instance in enumerate(instances):
-        #         import pdb; pdb.set_trace()
         #
         #         instance.order = order
         #         instance.save(update_fields=['order'])

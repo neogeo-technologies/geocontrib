@@ -48,6 +48,7 @@ from geocontrib.forms import ProjectModelForm
 from geocontrib.models import Attachment
 from geocontrib.models import Authorization
 from geocontrib.models import BaseMap
+from geocontrib.models import ContextLayer
 from geocontrib.models import Comment
 from geocontrib.models import CustomField
 from geocontrib.models import Event
@@ -1256,6 +1257,130 @@ class ProjectCreate(CreateView):
         context['action'] = 'create'
         return context
 
+# FORM
+##########################
+
+from django.forms.models import BaseInlineFormSet
+from django.forms.models import inlineformset_factory
+from django.forms.formsets import DELETION_FIELD_NAME
+from django.forms import HiddenInput
+
+LayerFormset = inlineformset_factory(BaseMap, ContextLayer, fields=['layer', 'order', 'opacity'], extra=0)
+
+
+class BaseContextLayerFormset(BaseInlineFormSet):
+    """
+    @https://www.yergler.net/2009/09/27/nested-formsets-with-django/
+    """
+    def add_fields(self, form, index):
+        # allow the super class to create the fields as usual
+        super().add_fields(form, index)
+
+        # for hidding delete input
+        # form.fields[DELETION_FIELD_NAME].widget = HiddenInput()
+
+        # created the nested formset
+        try:
+            instance = self.get_queryset()[index]
+            pk_value = instance.pk
+        except IndexError:
+            instance = None
+            pk_value = hash(form.prefix)
+
+        # store the formset in the .nested property
+        formset = LayerFormset(
+            data=self.data if any(self.data) else None,
+            instance=instance,
+            prefix='LAYERS_%s' % pk_value
+        )
+        # split each form instance in the .nested property
+        form.nested = [row for row in formset]
+
+    def is_valid(self):
+        result = super().is_valid()
+
+        for form in self.forms:
+            if hasattr(form, 'nested'):
+                for n in form.nested:
+                    # make sure each nested formset is valid as well
+                    result = result and n.is_valid()
+
+        return result
+
+    def save_new(self, form, commit=True):
+        """Saves and returns a new model instance for the given form."""
+
+        instance = super().save_new(form, commit=commit)
+
+        # update the form’s instance reference
+        form.instance = instance
+
+        # update the instance reference on nested forms
+        for nested in form.nested:
+            nested.instance = instance
+
+            # iterate over the cleaned_data of the nested formset and update the foreignkey reference
+            for cd in nested.cleaned_data:
+                cd[nested.fk.name] = instance
+
+        return instance
+
+    def should_delete(self, form):
+        """Convenience method for determining if the form’s object will
+        be deleted; cribbed from BaseModelFormSet.save_existing_objects."""
+
+        if self.can_delete:
+            raw_delete_value = form._raw_value(DELETION_FIELD_NAME)
+            should_delete = form.fields[DELETION_FIELD_NAME].clean(raw_delete_value)
+            return should_delete
+        return False
+
+    def save_all(self, commit=True):
+        """Save all formsets and along with their nested formsets."""
+
+        # Save without committing (so self.saved_forms is populated)
+        # — We need self.saved_forms so we can go back and access
+        # the nested formsets
+        objects = self.save(commit=False)
+
+        # Save each instance if commit=True
+        if commit:
+            for o in objects:
+                o.save()
+
+        # save many to many fields if needed
+        if not commit:
+            self.save_m2m()
+
+        # save the nested formsets
+        for form in set(self.initial_forms + self.saved_forms):
+            if self.should_delete(form):
+                continue
+
+            for nested in form.nested:
+                nested.save(commit=commit)
+
+    @property
+    def empty_form(self):
+        import pdb; pdb.set_trace()
+        
+        form = self.form(
+            auto_id=self.auto_id,
+            prefix=self.add_prefix('__prefix__'),
+            empty_permitted=True,
+            use_required_attribute=False,
+            **self.get_form_kwargs(None)
+        )
+        self.add_fields(form, None)
+        return form
+
+
+ContextLayerFormset = inlineformset_factory(
+    Project, BaseMap, formset=BaseContextLayerFormset,
+    fields=['title', ], extra=0, can_delete=True
+)
+##########################
+
 
 @method_decorator(DECORATORS, name='dispatch')
 class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
@@ -1268,10 +1393,13 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
         return Authorization.has_permission(user, 'can_update_project', project)
 
     def get(self, request, slug):
-        project = self.get_object()
 
+        project = self.get_object()
+        formset = ContextLayerFormset(instance=project)
+        logger.debug(formset)
         context = {**self.get_context_data(), **{
             'project': project,
+            'formset': formset
         }}
 
         return render(request, 'geocontrib/project/project_mapping.html', context)
