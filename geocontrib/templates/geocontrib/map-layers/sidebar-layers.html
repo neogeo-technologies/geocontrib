@@ -223,29 +223,35 @@
     return rangeContainer;
   }
 
+  // Check if there are changes in the basemaps settings. Changes are detected if:
+  // - one basemap has been added or deleted
+  // - one layer has been added or deleted to a basemap
   function areChangesInBasemaps(basemapFromServer, basemapFromLocalstorage) {
     let isSameBasemaps = false;
     let isSameLayers = true;
 
+    // Compare the length and the id values of the basemaps
     const idBasemapsServer = basemapFromServer.map(b => b.id).sort();
     const idBasemapsLocalstorage = basemapFromLocalstorage.map(b => b.id).sort();
     isSameBasemaps = (idBasemapsServer.length === idBasemapsLocalstorage.length
       && idBasemapsServer.every((value, index) => value === idBasemapsLocalstorage[index]))
 
+    // For each basemap, compare the length and id values of the layers
     basemapFromServer.forEach((basemapServer) => {
       let idLayersServer = basemapServer.layers.map(b => b.id).sort();
       for (let basemapLocalstorage of basemapFromLocalstorage) {
-        let idLayersLocalstorage = basemapLocalstorage.layers.map(b => b.id).sort();
-        isSameLayers = (idLayersServer.length === idLayersLocalstorage.length
-          && idLayersServer.every((value, index) => value === idLayersLocalstorage[index]));
-        if (!isSameLayers) {
-          break;
+        if (basemapServer.id === basemapLocalstorage.id) {
+          let idLayersLocalstorage = basemapLocalstorage.layers.map(b => b.id).sort();
+          isSameLayers = (idLayersServer.length === idLayersLocalstorage.length
+            && idLayersServer.every((value, index) => value === idLayersLocalstorage[index]));
+          if (!isSameLayers) {
+            break;
+          }
         }
       }
 
     });
-
-    return isSameBasemaps && isSameLayers;
+    return !(isSameBasemaps && isSameLayers);
   }
 
   function setBubble(range, bubble) {
