@@ -1,8 +1,8 @@
-  /* The overflow hidden is used to allow the sidebar-layers animation */
-  .map-container {
-    position: relative;
-    overflow: hidden;
-  }
+/* The overflow hidden is used to allow the sidebar-layers animation */
+.map-container {
+  position: relative;
+  overflow: hidden;
+}
 
 .sidebar-container {
   padding: 1rem;
@@ -14,7 +14,7 @@
   top: 0;
   position: absolute;
   /* Under this value, the map hide the sidebar */
-  z-index: 400; 
+  z-index: 400;
 }
 
 .sidebar-layers {
@@ -54,7 +54,7 @@
   animation: 0.4s ease-out expand-icon;
 }
 
-.sidebar-container.closing .layers-icon{
+.sidebar-container.closing .layers-icon {
   right: -41px;
   border: none;
   animation: 0.4s ease-in collapse-icon;
@@ -99,7 +99,7 @@
   }
 
   30% {
-    right: 10px
+    right: 10px;
   }
 
   100% {
@@ -175,16 +175,15 @@
   display: flex;
 }
 
-.bubble {
+.range-output-bubble {
   color: white;
-  margin-left: 5px;;
+  margin-left: 5px;
   padding: 4px 7px;
   border-radius: 40px;
   background-color: #2c3e50;
 }
 
-/* Overrides default padding of accordion */
+/* Overrides default padding of semantic-ui accordion */
 .ui.styled.accordion .content {
   padding-bottom: 0.5rem;
-
 }

@@ -299,7 +299,7 @@
 
     const featureGroup = mapUtil.addFeatures(features);
     // Fit the map to bound only if no initial zoom and center are defined
-    if (lat === "" || lng === "" || zoom === "") {
+    if ((lat === "" || lng === "" || zoom === "") && features.length > 0) {
       mapUtil.getMap().fitBounds(featureGroup.getBounds())
     }
 

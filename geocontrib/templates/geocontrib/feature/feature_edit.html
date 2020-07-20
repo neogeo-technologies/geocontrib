@@ -322,7 +322,9 @@
 } 
 </style>
 
+{{ serialized_base_maps|json_script:'basemaps' }}
 {{ serialized_features|json_script:'features' }}
+{{ serialized_layers|json_script:'layers' }}
 {{ feature.feature_id|json_script:'currentFeatureId' }}
 {{ SERVICE|json_script:'serviceMap' }}
 {{ OPTIONS|json_script:'optionsMap' }}
@@ -702,6 +704,12 @@ $(document).ready(function() {
     });
 
     // --------- End sidebar events ----------
+
+    // Check if at least one basemap exist. If not, use the default application
+    const basemaps = JSON.parse(document.getElementById('basemaps').textContent);
+    if (!basemaps || basemaps && basemaps.length === 0) {
+      mapUtil.addLayers(null, serviceMap, optionsMap);
+    }
 
   map.addLayer(drawnItems);
 
