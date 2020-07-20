@@ -31,6 +31,7 @@
       </div>
         <div class="inline">
           {% if form.nested %}
+          {{ form.nested.management_form }}
           <div class="ui segments">
             {% for subform in form.nested %}
             <div class="ui segment">
@@ -45,6 +46,11 @@
       <div class="ui primary button">Supprimer ce fond cartographique</div>
       {% endfor %}
 
+      <div class="formset_hidden" style="display: none">
+      {{ formset.empty_form }}
+      {{ formset.empty_nested.empty_form }}
+      </div>
+
       <div class="{{ formset.prefix }}__bottom_buttons">
         <button class="ui right labeled icon button" data-related-fieldset="{{ formset.prefix }}">
           <i class="right add icon"></i>
@@ -52,9 +58,6 @@
         </button>
       </div>
 
-      <div class="formset_hidden" style="display: none">
-        {{ formset.empty_form }}
-      </div>
 
     </div>
 

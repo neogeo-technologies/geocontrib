@@ -3,6 +3,9 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.gis import forms
 from django.forms.models import BaseModelFormSet
 from django.forms.formsets import DELETION_FIELD_NAME
+from django.forms.models import BaseInlineFormSet
+from django.forms.models import inlineformset_factory
+from django.forms import HiddenInput
 
 from geocontrib.models import Attachment
 from geocontrib.models import Authorization
@@ -479,7 +482,6 @@ class ContextLayerForm(forms.ModelForm):
         fields = ('title', 'layer', 'opacity', 'order')
 
 
-
 class ProjectModelForm(forms.ModelForm):
 
     title = forms.CharField(label='Titre', max_length=100)
@@ -552,3 +554,57 @@ class ProjectModelForm(forms.ModelForm):
                 "Le délai d'archivage doit être inférieur au délai de suppression. "
             )
         return cleaned_data
+
+
+ContextLayerFormset = inlineformset_factory(
+    BaseMap, ContextLayer, fields=['layer', 'order', 'opacity'], extra=0)
+
+
+class BaseMapInlineFormset(BaseInlineFormSet):
+    """
+    from wsimmerson@https://github.com/wsimmerson/DjangoNestedForms
+    """
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+
+        # for hidding delete input
+        # form.fields[DELETION_FIELD_NAME].widget = HiddenInput()
+
+        # save the formset in the 'nested' property
+        data = form.data if any(form.data) else None
+
+        form.nested = ContextLayerFormset(
+            instance=form.instance,
+            data=data,
+            files=form.files if form.is_bound else None,
+            prefix='contextlayer-%s-%s' % (
+                form.prefix,
+                ContextLayerFormset.get_default_prefix()))
+
+        self.empty_nested = ContextLayerFormset(instance=form.instance)
+
+    def is_valid(self):
+        result = super().is_valid()
+
+        if self.is_bound:
+            for form in self.forms:
+                if hasattr(form, 'nested'):
+                    # logger.debug(form.nested.is_valid())
+                    result = result and form.nested.is_valid()
+
+        return result
+
+    def save(self, commit=True):
+
+        result = super().save(commit=commit)
+
+        for form in self.forms:
+            if hasattr(form, 'nested'):
+                if not self._should_delete_form(form):
+                    form.nested.save(commit=commit)
+        return result
+
+
+ProjectBaseMapInlineFormset = inlineformset_factory(
+    parent_model=Project, model=BaseMap, formset=BaseMapInlineFormset,
+    fields=['title', ], extra=0, can_delete=True)
