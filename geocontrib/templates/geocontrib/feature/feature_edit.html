@@ -85,7 +85,13 @@
       <!-- Map -->
       <input type="hidden" name="{{ feature_form.geom.html_name }}" id="{{ feature_form.geom.id_for_label }}"
         value="{% if feature_form.geom.value.ewkt %}{{ feature_form.geom.value.ewkt }}{% endif %}" />
-      <div id="map"></div>
+        <div class="ui tab active map-container" data-tab="map">
+          <div id="map">
+          </div>
+          {% if serialized_base_maps|length > 0 %} 
+             {% include "geocontrib/map-layers/sidebar-layers.html" with basemaps=serialized_base_maps layers=serialized_layers%}
+          {% endif %}
+        </div>
     </div>
 
     <!-- Extra Fields -->
@@ -304,10 +310,27 @@
 {% block custom_resources %}
 <style>
 #map {
-  height:350px;
+  height:70vh;
   width:100%;
-}
+  border: 1px solid grey;
+  }
+
+@media only screen and (max-width: 767px) {
+  #map {
+    height: 80vh;
+  }
+} 
 </style>
+
+{{ serialized_base_maps|json_script:'basemaps' }}
+{{ serialized_features|json_script:'features' }}
+{{ serialized_layers|json_script:'layers' }}
+{{ feature.feature_id|json_script:'currentFeatureId' }}
+{{ SERVICE|json_script:'serviceMap' }}
+{{ OPTIONS|json_script:'optionsMap' }}
+{{ DEFAULT_MAP_VIEW|json_script:'defaultMapView' }}
+
+<script src="{% static 'geocontrib/js/map-util.js' %}"></script>
 
 <script type="text/javascript">
 // Geom type + init Leaflet Draw Control
@@ -635,56 +658,63 @@ $(document).ready(function() {
   // **************************** //
   //              MAP             //
   // **************************** //
-  var map = L.map('map', {
-    zoomControl: false
-  }).setView({{ DEFAULT_MAP_VIEW.center }}, {{ DEFAULT_MAP_VIEW.zoom }})
 
-  L.control.zoom({zoomInTitle:'Zoomer', zoomOutTitle:'Dézoomer'}).addTo(map)
-  {% if layers %}
-    {% for layer in layers %}
-      var options = {{ layer.options|safe }}
-      {% if layer.schema_type == "wms" %}
-        L.tileLayer.wms('{{ layer.service }}', options).addTo(map)
-      {% elif layer.schema_type == "tms" %}
-        L.tileLayer('{{ layer.service }}', options).addTo(map)
-      {% endif %}
-    {% endfor %}
-  {% else %}
-    L.tileLayer('{{ SERVICE }}',  JSON.parse('{{ OPTIONS | escapejs }}')).addTo(map)
-  {% endif %}
+  // Load into js variables the python context.
+  const layers = JSON.parse(document.getElementById('layers').textContent);
+  const features = JSON.parse(document.getElementById('features').textContent).features;
+  const serviceMap = JSON.parse(document.getElementById('serviceMap').textContent);
+  const optionsMap = JSON.parse(document.getElementById('optionsMap').textContent);
+  const defaultMapView = JSON.parse(document.getElementById('defaultMapView').textContent);
+  const currentFeatureId = JSON.parse(document.getElementById('currentFeatureId').textContent);
 
-  var featureGroup = new L.FeatureGroup()
-  {% for feat in features %}
-    {% if not feat.feature_id == feature.feature_id %}
-      var geomFeatureJSON = wellknown.parse("{{ feat.geom.wkt }}")
-      var geomJSON = turf.flip(geomFeatureJSON)
-      var popupContent = `{{ feat.title }}`
-      if (geomJSON.type === 'Point') {
-        L.circleMarker(geomJSON.coordinates, {
-          color: '{{ feat.feature_type.color }}',
-          radius: 4,
-          fillOpacity: 0.3,
-          weight: 1
-        }).bindPopup(popupContent).addTo(featureGroup)
-      } else if (geomJSON.type === 'LineString') {
-        L.polyline(geomJSON.coordinates, {
-          color: '{{ feat.feature_type.color }}',
-          weight: 1.5
-        }).bindPopup(popupContent).addTo(featureGroup)
-      } else if (geomJSON.type === 'Polygon') {
-        L.polygon(geomJSON.coordinates, {
-          color: '{{ feat.feature_type.color }}',
-          weight: 1.5,
-          fillOpacity: 0.3
-        }).bindPopup(popupContent).addTo(featureGroup)
-      }
-    {% endif %}
-  {% endfor %}
-  map.addLayer(featureGroup);
+  var mapDefaultViewCenter = defaultMapView.center;
+  var mapDefaultViewZoom = defaultMapView.zoom;
 
-  map.addLayer(drawnItems)
+  // Create the map, then init the layers and features
+  const map = mapUtil.createMap({
+      mapDefaultViewCenter,
+      mapDefaultViewZoom,
+      serviceMap,
+      optionsMap
+    });
+
+  // mapUtil.addLayers(layers, serviceMap, optionsMap);
+  if (features) {
+    const allFeaturesExceptCurrent = features.filter(feat => feat.id !== currentFeatureId);
+    mapUtil.addFeatures(allFeaturesExceptCurrent);
+  }
+
+      // ------   Listen Sidebar events ---------- // 
+    // Listen custom events triggered by the sidebar-layers
+    document.addEventListener('add-layers', (event) => {
+      mapUtil.removeLayers(map);
+      // Reverse is done because the first layer in order has to be added in the map in last.
+      // Slice is done because reverse() changes the original array, so we make a copy first
+      mapUtil.addLayers(event.detail.slice().reverse(), serviceMap, optionsMap);
+    });
+
+    document.addEventListener('update-opacity', (event) => {
+      mapUtil.updateOpacity(event.detail.layerId, event.detail.opacity);
+    });
+
+    document.addEventListener('change-layers-order', (event) => {
+      // Reverse is done because the first layer in order has to be added in the map in last.
+      // Slice is done because reverse() changes the original array, so we make a copy first
+      mapUtil.updateOrder(event.detail.layers.slice().reverse());
+    });
+
+    // --------- End sidebar events ----------
+
+    // Check if at least one basemap exist. If not, use the default application
+    const basemaps = JSON.parse(document.getElementById('basemaps').textContent);
+    if (!basemaps || basemaps && basemaps.length === 0) {
+      mapUtil.addLayers(null, serviceMap, optionsMap);
+    }
+
+  map.addLayer(drawnItems);
 
   var drawControlFull = new L.Control.Draw({
+    position: 'topright',
     edit: {
       featureGroup: drawnItems
     },
@@ -692,6 +722,7 @@ $(document).ready(function() {
   })
 
   var drawControlEditOnly = new L.Control.Draw({
+    position: 'topright',
     edit: {
       featureGroup: drawnItems
     },

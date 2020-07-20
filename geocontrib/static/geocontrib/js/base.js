@@ -1,6 +1,6 @@
 $(document).ready(function() {
   // INITIALISATION SEMANTIC UI COMPONENTS
-  $('.ui.accordion').accordion()
+  // $('.ui.accordion').accordion()
   $('.ui.dropdown').dropdown()
   $('.menu .item').tab()
 

@@ -1,0 +1,264 @@
+<div class="sidebar-container">
+  <!-- <div class="sidebar-layers"></div> -->
+  <div class="layers-icon">
+    <?xml version="1.0" encoding="iso-8859-1"?>
+    <!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+    <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+      y="0px" viewBox="0 0 491.203 491.203" style="enable-background:new 0 0 491.203 491.203;" xml:space="preserve">
+      <g>
+        <g>
+          <path d="M487.298,326.733l-62.304-37.128l62.304-37.128c2.421-1.443,3.904-4.054,3.904-6.872s-1.483-5.429-3.904-6.872
+                    l-62.304-37.128l62.304-37.128c3.795-2.262,5.038-7.172,2.776-10.968c-0.68-1.142-1.635-2.096-2.776-2.776l-237.6-141.6
+                    c-2.524-1.504-5.669-1.504-8.192,0l-237.6,141.6c-3.795,2.262-5.038,7.172-2.776,10.968c0.68,1.142,1.635,2.096,2.776,2.776
+                    l62.304,37.128L3.905,238.733c-3.795,2.262-5.038,7.172-2.776,10.968c0.68,1.142,1.635,2.096,2.776,2.776l62.304,37.128
+                    L3.905,326.733c-3.795,2.262-5.038,7.172-2.776,10.968c0.68,1.142,1.635,2.096,2.776,2.776l237.6,141.6
+                    c2.526,1.494,5.666,1.494,8.192,0l237.6-141.6c3.795-2.262,5.038-7.172,2.776-10.968
+                    C489.393,328.368,488.439,327.414,487.298,326.733z M23.625,157.605L245.601,25.317l221.976,132.288L245.601,289.893
+                    L23.625,157.605z M23.625,245.605l58.208-34.68l159.672,95.2c2.524,1.504,5.668,1.504,8.192,0l159.672-95.2l58.208,34.68
+                    L245.601,377.893L23.625,245.605z M245.601,465.893L23.625,333.605l58.208-34.68l159.672,95.2c2.524,1.504,5.668,1.504,8.192,0
+                    l159.672-95.2l58.208,34.68L245.601,465.893z" />
+        </g>
+      </g>
+
+    </svg>
+
+  </div>
+
+  <div class="basemaps-title">
+    <h4>Fonds cartographiques
+
+      <!-- <span data-tooltip="Il est possible pour chaque fond cartographique de modifier l'ordre des couches"
+            data-position="bottom left">
+                <i class="question circle outline icon"></i>
+            </span> -->
+    </h4>
+  </div>
+
+  <div class="basemaps-items ui accordion styled"></div>
+</div>
+
+{{ basemaps|json_script:'basemaps' }}
+{{ layers|json_script:'layers' }}
+
+
+<script>
+
+  const baseMapsFromServer = JSON.parse(document.getElementById('basemaps').textContent);
+  const layers = JSON.parse(document.getElementById('layers').textContent);
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Check in the locastorage if the options already exists
+    if (localStorage.getItem('map-options')) {
+
+      // If already in the storage, we need to check if the admin did some 
+      // modification in the basemaps on the server side. The rule is: if one layer has been added
+      // or deleted in the server, then we reset the localstorage.
+      const baseMapsFromLocalstorage = JSON.parse(localStorage.getItem('map-options'));
+      const areChanges = areChangesInBasemaps(baseMapsFromServer, baseMapsFromLocalstorage);
+      if (areChanges) {
+        baseMaps = baseMapsFromServer;
+        localStorage.removeItem('map-options');
+      } else {
+        baseMaps = baseMapsFromLocalstorage;
+      }
+    } else {
+      baseMaps = baseMapsFromServer;
+    }
+
+
+    let selectedBasemapIndex = 0;
+    let expanded = false;
+    const layerIcon = document.getElementsByClassName('layers-icon')[0];
+
+    // Toggle the expand of the sidebar
+    layerIcon.addEventListener('click', () => {
+      const sidebar = document.getElementsByClassName('sidebar-container')[0];
+      expanded = !expanded;
+      expanded ? sidebar.classList.add('expanded') : sidebar.classList.remove('expanded');
+      if (!expanded) {
+        sidebar.classList.add('closing')
+        setTimeout(() => {
+          sidebar.classList.remove('closing')
+        }, 390);
+      }
+    });
+
+    const basemapContainer = document.getElementsByClassName('basemaps-items')[0];
+
+    // Add the base maps
+    baseMaps.forEach((basemap, index) => {
+      const basemapItem = document.createElement('div');
+      basemapItem.classList.add('basemap-item', 'title');
+      basemapItem.innerHTML = basemap.title;
+      const layersContainer = document.createElement('div');
+      layersContainer.classList.add('content');
+      layersContainer.id = `list-${index}`;
+      layersContainer.setAttribute('data-basemap-index', index);
+
+      basemap.layers.forEach((layer, i) => {
+
+        // Add options information to the layer object
+        layers.forEach(layerOptions => {
+          if (layer.id === layerOptions.id) {
+            layer = Object.assign(layer, layerOptions);
+          }
+        });
+        const layerElement = document.createElement('div');
+        layerElement.setAttribute('data-id', layer.id);
+        layerElement.classList.add('layer-item');
+        const layerTitleElement = document.createElement('p');
+        layerTitleElement.innerHTML = layer.title;
+        layerTitleElement.classList.add('layer-handle-sort');
+
+        const iconDrag = document.createElement('i');
+        iconDrag.classList.add('th', 'icon');
+        layerTitleElement.prepend(iconDrag);
+
+        const layerLabelInput = document.createElement('label');
+        const labelPercentage = document.createElement('span');
+        labelPercentage.innerHTML = '(%)';
+
+        layerLabelInput.innerHTML = "Opacité &nbsp;";
+        layerLabelInput.for = "opacity";
+        layerLabelInput.append(labelPercentage);
+
+        layerElement.append(layerTitleElement);
+        layerElement.append(layerLabelInput);
+
+        // Range container
+        const rangeContainer = _createRangeContainer(layer);
+        layerElement.append(rangeContainer);
+
+        // Horizontal divider if not last layer
+        if (basemap.layers.length - 1 > i) {
+          const horizontalDivider = document.createElement('div');
+          horizontalDivider.classList.add('ui', 'divider')
+          layerElement.append(horizontalDivider);
+        }
+
+        layersContainer.append(layerElement);
+      });
+
+      basemapContainer.append(basemapItem);
+      basemapContainer.append(layersContainer);
+
+      // Drag and drop feature to change the order of the layers
+      new Sortable(layersContainer, {
+        animation: 150,
+        handle: '.layer-handle-sort', // The element that is active to drag
+        ghostClass: 'blue-background-class',
+        dragClass: 'white-opacity-background-class',
+        onEnd: (event) => {
+          // Change order of the selected layer
+          baseMaps[selectedBasemapIndex].layers.splice(event.newIndex, 0, baseMaps[selectedBasemapIndex].layers.splice(event.oldIndex, 1)[0]);
+          const eventOrder = new CustomEvent('change-layers-order', {
+            detail: {
+              layers: baseMaps[selectedBasemapIndex].layers
+            }
+          })
+          document.dispatchEvent(eventOrder);
+          // Save the basemaps options into the localstorage
+          localStorage.setItem('map-options', JSON.stringify(baseMaps));
+        }
+      });
+    });
+
+    // Init the accordion element/
+    $('.ui.accordion')
+      .accordion('open', selectedBasemapIndex)
+      .accordion('setting', 'collapsible', false)
+      .accordion('setting', 'onOpen', function () {
+        const basemapIndex = this.dataset.basemapIndex;
+        selectedBasemapIndex = basemapIndex;
+        const event = new CustomEvent('add-layers', { detail: baseMaps[basemapIndex].layers })
+        document.dispatchEvent(event)
+      });
+
+    // Load layer of the selected basemap
+    const layersToAdd = []
+    baseMaps[selectedBasemapIndex].layers.forEach(layer => {
+      const layerInformation = layers.find(l => l.id === layer.id);
+      layersToAdd.push(layerInformation);
+    });
+
+    // Save the basemaps options into the localstorage
+    localStorage.setItem('map-options', JSON.stringify(baseMaps));
+  });
+
+  function _createRangeContainer(layer) {
+    const rangeContainer = document.createElement('div');
+    rangeContainer.classList.add('range-container');
+
+    const rangeInput = document.createElement('input');
+    rangeInput.id = 'opacity';
+    rangeInput.type = 'range';
+    rangeInput.min = 0;
+    rangeInput.max = 1;
+    rangeInput.step = 0.01;
+    rangeInput.value = layer.opacity;
+
+    // Range value in bubble
+    const rangeBubble = document.createElement('output');
+    rangeBubble.classList.add('range-output-bubble');
+    rangeInput.addEventListener("input", () => {
+      layer.opacity = rangeInput.value;
+      setBubble(rangeInput, rangeBubble);
+
+      // Update the map
+      const event = new CustomEvent('update-opacity', {
+        detail: {
+          layerId: layer.id,
+          opacity: rangeInput.value
+        }
+      })
+      document.dispatchEvent(event);
+      // Save the basemaps options into the localstorage
+      localStorage.setItem('map-options', JSON.stringify(baseMaps));
+    });
+
+    setBubble(rangeInput, rangeBubble);
+
+    rangeContainer.append(rangeInput);
+    rangeContainer.append(rangeBubble);
+    return rangeContainer;
+  }
+
+  // Check if there are changes in the basemaps settings. Changes are detected if:
+  // - one basemap has been added or deleted
+  // - one layer has been added or deleted to a basemap
+  function areChangesInBasemaps(basemapFromServer, basemapFromLocalstorage) {
+    let isSameBasemaps = false;
+    let isSameLayers = true;
+
+    // Compare the length and the id values of the basemaps
+    const idBasemapsServer = basemapFromServer.map(b => b.id).sort();
+    const idBasemapsLocalstorage = basemapFromLocalstorage.map(b => b.id).sort();
+    isSameBasemaps = (idBasemapsServer.length === idBasemapsLocalstorage.length
+      && idBasemapsServer.every((value, index) => value === idBasemapsLocalstorage[index]))
+
+    // For each basemap, compare the length and id values of the layers
+    basemapFromServer.forEach((basemapServer) => {
+      let idLayersServer = basemapServer.layers.map(b => b.id).sort();
+      for (let basemapLocalstorage of basemapFromLocalstorage) {
+        if (basemapServer.id === basemapLocalstorage.id) {
+          let idLayersLocalstorage = basemapLocalstorage.layers.map(b => b.id).sort();
+          isSameLayers = (idLayersServer.length === idLayersLocalstorage.length
+            && idLayersServer.every((value, index) => value === idLayersLocalstorage[index]));
+          if (!isSameLayers) {
+            break;
+          }
+        }
+      }
+
+    });
+    return !(isSameBasemaps && isSameLayers);
+  }
+
+  function setBubble(range, bubble) {
+    const val = Math.round(range.value * 100);
+    const min = range.min ? range.min : 0;
+    const max = range.max ? range.max : 100;
+    const newVal = Number(((val - min) * 100) / (max - min));
+    bubble.innerHTML = val;
+  };
+</script>

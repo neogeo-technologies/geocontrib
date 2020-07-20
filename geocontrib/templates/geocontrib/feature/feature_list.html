@@ -4,7 +4,7 @@
 {% load app_filters %}
 
 {% block content %}
-<div class="row">
+<div class="feature-list-container row">
   <div class="four wide column">
     <h1>Signalements</h1>
   </div>
@@ -16,140 +16,149 @@
         <h4>{{ features|length }} signalement{% if features|length > 1 %}s{% endif %}</h4>
       </div>
       {% if project and feature_types and permissions|lookup:'can_create_feature' %}
-        <div class="item right">
-          <div class="ui dropdown top right pointing compact button button-hover-green" data-tooltip="Ajouter un signalement" data-position="bottom left">
-            <i class="plus fitted icon"></i>
-            <div class="menu" style="z-index:9999;">
-              <div class="header">Ajouter un signalement du type</div>
-              <div class="scrolling menu text-wrap">
-                {% for type in feature_types %}
-                  <a class="item" href="{% url 'geocontrib:feature_create' slug=project.slug feature_type_slug=type.slug %}">
-                    {{ type }}
-                  </a>
-                {% endfor %}
-              </div>
+      <div class="item right">
+        <div class="ui dropdown top right pointing compact button button-hover-green">
+          <i class="plus fitted icon"></i>
+          <div class="menu" style="z-index:9999;">
+            <div class="header">Ajouter un signalement du type</div>
+            <div class="scrolling menu text-wrap">
+              {% for type in feature_types %}
+              <a class="item"
+                href="{% url 'geocontrib:feature_create' slug=project.slug feature_type_slug=type.slug %}">
+                {{ type }}
+              </a>
+              {% endfor %}
             </div>
           </div>
         </div>
+      </div>
       {% endif %}
     </div>
   </div>
 </div>
 
-<div class="row">
-  <div class="four wide column">
-
-    <div>
-      <h4 class="ui horizontal divider header">FILTRES</h4>
-
-      <form id="form-filters" class="ui form" action="" method="get">
-        <div class="field">
-          <label>Type</label>
-          <div class="ui fluid search selection dropdown">
-            <input type="hidden" class="filter" name="feature_type" value="{% if request.GET.feature_type %}{{ request.GET.feature_type }}{% endif %}">
-            <div class="default text"></div>
-            <i class="dropdown icon"></i>
-            <div class="menu" style="z-index:9999">
-              {% for type in feature_types %}
-                <div class="item" data-value="{{ type.slug }}" {% if request.GET.type == type.slug %} selected{% endif %}>{{ type.title }}</div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Statut</label>
-          <div class="ui fluid search selection dropdown">
-            <input type="hidden" class="filter" name="status" value="{% if request.GET.status %}{{ request.GET.status }}{% endif %}">
-            <div class="default text"></div>
-            <i class="dropdown icon"></i>
-            <div class="menu">
-              {% for x,y in status_choices %}
-                <div class="item" data-value="{{ x }}" {% if request.GET.status == x %} selected{% endif %}>{{ y }}</div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Nom</label>
-          <div class="ui icon input">
-            <i class="search icon"></i>
-            <div class="ui action input">
-              <input type="text" name="title" value="{% if request.GET.title %}{{ request.GET.title }}{% endif %}">
-              <button type="button" class="ui teal icon button" id="submit-search">
-                <i class="search icon"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- map params, updated on map move -->
-        <input type="hidden" name="zoom" value="{{ request.GET.zoom|default:'""' }}">
-        <input type="hidden" name="lat" value="{{ request.GET.lat|default:'""' }}">
-        <input type="hidden" name="lng" value="{{ request.GET.lng|default:'""' }}">
-      </form>
+<!-- <div class="row">
+  <div class="column">
+    <h4 class="ui horizontal divider header">FILTRES</h4>
+  </div>
+</div> -->
+<!-- <div class="row"> -->
+<form id="form-filters" class="ui form row" action="" method="get">
+  <div class="field wide three column">
+    <label>Type</label>
+    <div class="ui fluid search selection dropdown">
+      <input type="hidden" class="filter" name="feature_type"
+        value="{% if request.GET.feature_type %}{{ request.GET.feature_type }}{% endif %}">
+      <div class="default text"></div>
+      <i class="dropdown icon"></i>
+      <div class="menu" style="z-index:9999">
+        {% for type in feature_types %}
+        <div class="item" data-value="{{ type.slug }}" {% if request.GET.type == type.slug %} selected{% endif %}>
+          {{ type.title }}</div>
+        {% endfor %}
+      </div>
     </div>
   </div>
+  <div class="field wide three column">
+    <label>Statut</label>
+    <div class="ui fluid search selection dropdown">
+      <input type="hidden" class="filter" name="status"
+        value="{% if request.GET.status %}{{ request.GET.status }}{% endif %}">
+      <div class="default text"></div>
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        {% for x,y in status_choices %}
+        <div class="item" data-value="{{ x }}" {% if request.GET.status == x %} selected{% endif %}>{{ y }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="field wide three column">
+    <label>Titre</label>
+    <div class="ui icon input">
+      <i class="search icon"></i>
+      <div class="ui action input">
+        <input type="text" name="title" value="{% if request.GET.title %}{{ request.GET.title }}{% endif %}">
+        <button type="button" class="ui teal icon button" id="submit-search">
+          <i class="search icon"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- map params, updated on map move -->
+  <input type="hidden" name="zoom" value="{{ request.GET.zoom|default:'""' }}">
+  <input type="hidden" name="lat" value="{{ request.GET.lat|default:'""' }}">
+  <input type="hidden" name="lng" value="{{ request.GET.lng|default:'""' }}">
+</form>
+<!-- </div> -->
+<div class="row">
+  <div class="sixteen wide column">
 
-  <div class="ten wide column">
-
-    <div class="ui hidden divider"></div>
-    <div class="ui tab active" data-tab="map">
-      <div id="map"></div>
+    <div class="ui tab active map-container" data-tab="map">
+      <div id="map">
+      </div>
+      {% if serialized_base_maps|length > 0 %} 
+         {% include "geocontrib/map-layers/sidebar-layers.html" with basemaps=serialized_base_maps layers=serialized_layers%}
+      {% endif %}
     </div>
 
     <div class="ui tab" data-tab="list">
-    <table id="table-features" class="ui compact table">
-      <thead>
-        <tr>
-          <th>Statut</th>
-          <th>Type</th>
-          <th>Nom</th>
-          <th>Dernière modification</th>
-          {% if user.is_authenticated %}
+      <table id="table-features" class="ui compact table">
+        <thead>
+          <tr>
+            <th>Statut</th>
+            <th>Type</th>
+            <th>Titre</th>
+            <th>Dernière modification</th>
+            {% if user.is_authenticated %}
             <th>Auteur</th>
-          {% endif %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for feature in features %}
-        <tr>
-          <td data-order="{{ feature.get_status_display }}">
-            {% if feature.status == 'archived' %}
-            <div data-tooltip="Archivé">
-              <i class="grey archive icon"></i>
-            </div>
-            {% elif feature.status == 'pending' %}
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for feature in features %}
+          <tr>
+            <td data-order="{{ feature.get_status_display }}">
+              {% if feature.status == 'archived' %}
+              <div data-tooltip="Archivé">
+                <i class="grey archive icon"></i>
+              </div>
+              {% elif feature.status == 'pending' %}
               <div data-tooltip="En attente de publication">
                 <i class="teal hourglass outline icon"></i>
               </div>
-            {% elif feature.status == 'published' %}
+              {% elif feature.status == 'published' %}
               <div data-tooltip="Publié">
                 <i class="olive check icon"></i>
               </div>
-            {% elif feature.status == 'draft' %}
+              {% elif feature.status == 'draft' %}
               <div data-tooltip="Brouillon">
                 <i class="orange pencil alternate icon"></i>
               </div>
-            {% endif %}
-          </td>
-          <td>
-            <a href="{% url 'geocontrib:feature_type_detail' slug=project.slug feature_type_slug=feature.feature_type.slug %}"> {{ feature.feature_type.title }} </a>
-          </td>
-          <td>
-            <a href="{% url 'geocontrib:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
-          </td>
-          <td data-order="{{ feature.updated_on|date:'Ymd' }}">
-            {{feature.updated_on|date:'d/m/Y' }}
-          </td>
-          {% if user.is_authenticated %}
+              {% endif %}
+            </td>
+            <td>
+              <a
+                href="{% url 'geocontrib:feature_type_detail' slug=project.slug feature_type_slug=feature.feature_type.slug %}">
+                {{ feature.feature_type.title }} </a>
+            </td>
+            <td>
+              <a
+                href="{% url 'geocontrib:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
+            </td>
+            <td data-order="{{ feature.updated_on|date:'Ymd' }}">
+              {{feature.updated_on|date:'d/m/Y' }}
+            </td>
+            {% if user.is_authenticated %}
             <td>
               {{ feature.creator.first_name }} {{ feature.creator.last_name }}
             </td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -160,8 +169,26 @@
   #map {
     width: 100%;
     min-height: 300px;
+    border: 1px solid grey;
+    /* To not hide the filters */
+    z-index: 1;
+  }
+
+  #form-filters, .ui.centered > .row.feature-list-container {
+    justify-content: flex-start;
   }
 </style>
+
+<!--  These Context variables will be accessible in the javascript after json_script (it set the values in the DOM) -->
+{{ serialized_base_maps|json_script:'basemaps' }}
+{{ serialized_features|json_script:'features' }}
+{{ SERVICE|json_script:'serviceMap' }}
+{{ OPTIONS|json_script:'optionsMap' }}
+{{ DEFAULT_MAP_VIEW|json_script:'defaultMapView' }}
+
+<script src="{% static 'geocontrib/js/map-util.js' %}"></script>
+
+
 <script>
   function getDataFilters() {
     var $form = $("#form-filters").serializeArray()
@@ -178,7 +205,7 @@
     document.location = requestURL
   }
 
-  $(document).ready(function() {
+  $(document).ready(function () {
 
     $('#form-filters .ui.selection.dropdown').dropdown({
       clearable: true
@@ -193,133 +220,101 @@
 
     $('#table-features').DataTable({
       "language": {
-          "sProcessing":     "Traitement en cours...",
-          "sSearch":         "",
-          "sLengthMenu":     "Afficher _MENU_ &eacute;l&eacute;ments",
-          "sInfo":           "Affichage de l'&eacute;l&eacute;ment _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments",
-          "sInfoEmpty":      "Affichage de l'&eacute;l&eacute;ment 0 &agrave; 0 sur 0 &eacute;l&eacute;ment",
-          "sInfoFiltered":   "(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)",
-          "sInfoPostFix":    "",
-          "sLoadingRecords": "Chargement en cours...",
-          "sZeroRecords":    "Aucun &eacute;l&eacute;ment &agrave; afficher",
-          "sEmptyTable":     "Aucune donn&eacute;e disponible",
-          "oPaginate": {
-              "sFirst":      "Premier",
-              "sPrevious":   "Pr&eacute;c&eacute;dent",
-              "sNext":       "Suivant",
-              "sLast":       "Dernier"
-          },
-          "oAria": {
-              "sSortAscending":  ": activer pour trier la colonne par ordre croissant",
-              "sSortDescending": ": activer pour trier la colonne par ordre d&eacute;croissant"
-          }
+        "sProcessing": "Traitement en cours...",
+        "sSearch": "",
+        "sLengthMenu": "Afficher _MENU_ &eacute;l&eacute;ments",
+        "sInfo": "Affichage de l'&eacute;l&eacute;ment _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments",
+        "sInfoEmpty": "Affichage de l'&eacute;l&eacute;ment 0 &agrave; 0 sur 0 &eacute;l&eacute;ment",
+        "sInfoFiltered": "(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)",
+        "sInfoPostFix": "",
+        "sLoadingRecords": "Chargement en cours...",
+        "sZeroRecords": "Aucun &eacute;l&eacute;ment &agrave; afficher",
+        "sEmptyTable": "Aucune donn&eacute;e disponible",
+        "oPaginate": {
+          "sFirst": "Premier",
+          "sPrevious": "Pr&eacute;c&eacute;dent",
+          "sNext": "Suivant",
+          "sLast": "Dernier"
+        },
+        "oAria": {
+          "sSortAscending": ": activer pour trier la colonne par ordre croissant",
+          "sSortDescending": ": activer pour trier la colonne par ordre d&eacute;croissant"
+        }
       },
-      "searching" : false,
-      "ordering" : true,
+      "searching": false,
+      "ordering": true,
       "order": [],
-      "lengthChange" : false,
+      "lengthChange": false,
       "pageLength": 15,
       "columnDefs": [{ className: "dt-center", targets: "_all" }]
     })
 
-    var main = parseInt($("main").css("height"),10)
+    var main = parseInt($("main").css("height"), 10)
     $("#map").css("height", main - 150)
 
-    // get initial zoom and center defined in the form
+    // Load into js variables the python context.
+    const features = JSON.parse(document.getElementById('features').textContent) ? 
+      JSON.parse(document.getElementById('features').textContent).features : null;
+    const serviceMap = JSON.parse(document.getElementById('serviceMap').textContent);
+    const optionsMap = JSON.parse(document.getElementById('optionsMap').textContent);
+    const defaultMapView = JSON.parse(document.getElementById('defaultMapView').textContent);
+
+    // Get initial zoom and center defined in the form
     var $formFilters = $("#form-filters");
     var zoom = $formFilters.find("input[name=zoom]").val()
     var lat = $formFilters.find("input[name=lat]").val()
     var lng = $formFilters.find("input[name=lng]").val()
 
-    var mapDefaultViewCenter = {{ DEFAULT_MAP_VIEW.center }};
-    var mapDefaultViewZoom = {{ DEFAULT_MAP_VIEW.zoom }};
-    var map = L.map('map', {zoomControl: false}).setView([
-      lat === "" ? mapDefaultViewCenter[0] : lat,
-      lng === "" ? mapDefaultViewCenter[1] : lng
-    ], zoom === "" ? mapDefaultViewZoom : zoom)
+    var mapDefaultViewCenter = defaultMapView.center;
+    var mapDefaultViewZoom = defaultMapView.zoom;
 
-    L.control.zoom({zoomInTitle:'Zoomer', zoomOutTitle:'Dézoomer'}).addTo(map)
+    mapUtil.createMap({
+      zoom,
+      lat,
+      lng,
+      mapDefaultViewCenter,
+      mapDefaultViewZoom,
+    });
 
-    // update zoom and center on each move
-    map.on("moveend", function() {
-      $formFilters.find("input[name=zoom]").val(map.getZoom())
-      $formFilters.find("input[name=lat]").val(map.getCenter().lat)
-      $formFilters.find("input[name=lng]").val(map.getCenter().lng)
-    })
+    // ------   Listen Sidebar events ---------- // 
+    // Listen custom events triggered by the sidebar-layers
+    document.addEventListener('add-layers', (event) => {
+      mapUtil.removeLayers(map);
+      // Reverse is done because the first layer in order has to be added in the map in last.
+      // Slice is done because reverse() changes the original array, so we make a copy first
+      mapUtil.addLayers(event.detail.slice().reverse(), serviceMap, optionsMap);
+    });
 
-    {% if layers %}
-      {% for layer in layers %}
-        var options = {{ layer.options|safe }}
-        console.log(`{{ layer.service }}`, options);
-        {% if layer.schema_type == "wms" %}
-          L.tileLayer.wms('{{ layer.service }}', options).addTo(map)
-        {% elif layer.schema_type == "tms" %}
-          L.tileLayer('{{ layer.service }}', options).addTo(map)
-        {% endif %}
-      {% endfor %}
-    {% else %}
-      L.tileLayer('{{ SERVICE }}',  JSON.parse('{{ OPTIONS | escapejs }}')).addTo(map)
-    {% endif %}
+    document.addEventListener('update-opacity', (event) => {
+      mapUtil.updateOpacity(event.detail.layerId, event.detail.opacity);
+    });
 
-    var featureGroup = new L.FeatureGroup()
-    {% for feature in features %}
-      var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
-      var geomJSON = turf.flip(geomFeatureJSON)
-      var popupContent = `
-        <h4>
-          <a href="{% url 'geocontrib:feature_detail' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id  %}">{{ feature.title }}</a>
-        </h4>
-        <div>
-          Statut :
-          {% if feature.status == 'archived' %}
-            Archivé
-          {% elif feature.status == 'pending' %}
-            En attente de publication
-          {% elif feature.status == 'published' %}
-            Publié
-          {% elif feature.status == 'draft' %}
-            Brouillon
-          {% endif %}
-        </div>
-        <div>
-          Type : <a href="{% url 'geocontrib:feature_type_detail' slug=project.slug feature_type_slug=feature.feature_type.slug %}"> {{ feature.feature_type.title }} </a>
-        </div>
-        <div>
-          Dernière mise à jour : {{feature.updated_on|date:'d/m/Y' }}
-        </div>
-        {% if user.is_authenticated %}
-          <div>
-            Auteur : {{ feature.creator.first_name }} {{ feature.creator.last_name }}
-          </div>
-        {% endif %}
-      `
+    document.addEventListener('change-layers-order', (event) => {
+      // Reverse is done because the first layer in order has to be added in the map in last.
+      // Slice is done because reverse() changes the original array, so we make a copy first
+      mapUtil.updateOrder(event.detail.layers.slice().reverse());
+    });
 
-      if (geomJSON.type === 'Point') {
-        L.circleMarker(geomJSON.coordinates, {
-          color: '{{ feature.feature_type.color }}',
-          radius: 4,
-          fillOpacity: 0.3,
-          weight: 1
-        }).bindPopup(popupContent).addTo(featureGroup)
-      } else if (geomJSON.type === 'LineString') {
-        L.polyline(geomJSON.coordinates, {
-          color: '{{ feature.feature_type.color }}',
-          weight: 1.5
-        }).bindPopup(popupContent).addTo(featureGroup)
-      } else if (geomJSON.type === 'Polygon') {
-        L.polygon(geomJSON.coordinates, {
-          color: '{{ feature.feature_type.color }}',
-          weight: 1.5,
-          fillOpacity: 0.3
-        }).bindPopup(popupContent).addTo(featureGroup)
-      }
-    {% endfor %}
-    map.addLayer(featureGroup);
+    // --------- End sidebar events ----------
 
-    // fit maps to bound only if no initial zoom and center are defined
-    if (lat === "" || lng === "" || zoom === "") {
-      map.fitBounds(featureGroup.getBounds())
+    const featureGroup = mapUtil.addFeatures(features);
+    // Fit the map to bound only if no initial zoom and center are defined
+    if ((lat === "" || lng === "" || zoom === "") && features.length > 0) {
+      mapUtil.getMap().fitBounds(featureGroup.getBounds())
     }
-  })
+
+    // Update zoom and center on each move
+    mapUtil.addMapEventListener("moveend", () => {
+      $formFilters.find("input[name=zoom]").val(mapUtil.getMap().getZoom())
+      $formFilters.find("input[name=lat]").val(mapUtil.getMap().getCenter().lat)
+      $formFilters.find("input[name=lng]").val(mapUtil.getMap().getCenter().lng)
+    });
+
+    // Check if at least one basemap exist. If not, use the default application
+    const basemaps = JSON.parse(document.getElementById('basemaps').textContent);
+    if (!basemaps || basemaps && basemaps.length === 0) {
+      mapUtil.addLayers(null, serviceMap, optionsMap);
+    }
+  });
 </script>
 {% endblock %}

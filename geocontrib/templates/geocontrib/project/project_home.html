@@ -253,57 +253,64 @@
   }
 </style>
 
+<script src="{% static 'geocontrib/js/map-util.js' %}"></script>
+
+<!--  These Context variables will be accessible in the javascript after json_script (it set the values in the DOM) -->
+{{ serialized_base_maps|json_script:'basemaps' }}
+{{ serialized_layers|json_script:'layers' }}
+{{ serialized_features|json_script:'features' }}
+{{ SERVICE|json_script:'serviceMap' }}
+{{ OPTIONS|json_script:'optionsMap' }}
+{{ DEFAULT_MAP_VIEW|json_script:'defaultMapView' }}
+
 <script type="text/javascript">
   $(document).ready(function() {
     $('#subscribe-button').click(function(){
       $('.mini.modal.subscription').modal('show')
     })
-    var map = L.map('map', {zoomControl: false}).setView({{ DEFAULT_MAP_VIEW.center }}, {{ DEFAULT_MAP_VIEW.zoom }})
-    {% if layers %}
-      {% for layer in layers %}
-        var options = {{ layer.options|safe }}
-        {% if layer.schema_type == "wms" %}
-          L.tileLayer.wms('{{ layer.service }}', options).addTo(map)
-        {% elif layer.schema_type == "tms" %}
-          L.tileLayer('{{ layer.service }}', options).addTo(map)
-        {% endif %}
-      {% endfor %}
-    {% else %}
-      L.tileLayer('{{ SERVICE }}',  JSON.parse('{{ OPTIONS | escapejs }}')).addTo(map)
-    {% endif %}
 
-    map.dragging.disable()
-    map.doubleClickZoom.disable()
-    map.scrollWheelZoom.disable()
+    // Load into js variables the python context.
+    const baseMaps = JSON.parse(document.getElementById('basemaps').textContent);
+    const layers = JSON.parse(document.getElementById('layers').textContent);
+    const features = JSON.parse(document.getElementById('features').textContent) ? 
+      JSON.parse(document.getElementById('features').textContent).features : null;
+    const serviceMap = JSON.parse(document.getElementById('serviceMap').textContent);
+    const optionsMap = JSON.parse(document.getElementById('optionsMap').textContent);
+    const defaultMapView = JSON.parse(document.getElementById('defaultMapView').textContent);
 
-    var featureGroup = new L.FeatureGroup()
-    {% for feature in features %}
-      var geomFeatureJSON = wellknown.parse("{{ feature.geom.wkt }}")
-      var geomJSON = turf.flip(geomFeatureJSON)
-      if (geomJSON.type === 'Point') {
-        L.circleMarker(geomJSON.coordinates, {
-          color: '{{ feature.feature_type.color }}',
-          radius: 4,
-          fillOpacity: 0.3,
-          weight: 1
-        }).addTo(featureGroup)
-      } else if (geomJSON.type === 'LineString') {
-        L.polyline(geomJSON.coordinates, {
-          color: '{{ feature.feature_type.color }}',
-          weight: 1.5
-        }).addTo(featureGroup)
-      } else if (geomJSON.type === 'Polygon') {
-        L.polygon(geomJSON.coordinates, {
-          color: '{{ feature.feature_type.color }}',
-          weight: 1.5,
-          fillOpacity: 0.3
-        }).addTo(featureGroup)
-      }
-    {% endfor %}
+    var mapDefaultViewCenter = defaultMapView.center;
+    var mapDefaultViewZoom = defaultMapView.zoom;
+    mapUtil.createMap({
+      mapDefaultViewCenter,
+      mapDefaultViewZoom,
+    });
 
+    // Load the layers.
+    // - if one basemap exists, we load the layers of the first one
+    // - if not, load the default map and service options
+    let layersToLoad = null;
+    if (baseMaps && baseMaps.length > 0) {
+      layersToLoad = baseMaps[0].layers;
+      layersToLoad.forEach(layerToLoad => {
+          layers.forEach(layer => {
+            if (layer.id === layerToLoad.id) {
+              layerToLoad = Object.assign(layerToLoad, layer);
+            }
+        });
+      });
+      layersToLoad.reverse()
+    }
+    mapUtil.addLayers(layersToLoad, serviceMap, optionsMap);
+
+    // Remove multiple interactions with the map
+    mapUtil.getMap().dragging.disable();
+    mapUtil.getMap().doubleClickZoom.disable();
+    mapUtil.getMap().scrollWheelZoom.disable();
+
+    // Add the features
+    const featureGroup = mapUtil.addFeatures(features);
     if (featureGroup && featureGroup.getLayers().length > 0) {
-      map.addLayer(featureGroup);
-      map.fitBounds(featureGroup.getBounds())
+      mapUtil.getMap().fitBounds(featureGroup.getBounds())
     }
 
   })
