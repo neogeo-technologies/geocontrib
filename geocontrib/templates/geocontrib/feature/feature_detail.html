@@ -356,7 +356,10 @@
     // - if not, load the default map and service options
     let layersToLoad = null;
     if (baseMaps && baseMaps.length > 0) {
-      layersToLoad = baseMaps[0].layers;
+      const currentBasemapIndex = localStorage.getItem('current-basemap-index');
+      // Use active one if exists, otherwise index 0 (first basemap in the list)
+      const basemapIndex = currentBasemapIndex ? currentBasemapIndex : 0;
+      layersToLoad = baseMaps[basemapIndex].layers;
       layersToLoad.forEach(layerToLoad => {
           layers.forEach(layer => {
             if (layer.id === layerToLoad.id) {
