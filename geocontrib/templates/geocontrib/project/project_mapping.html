@@ -5,10 +5,9 @@
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block extrahead %}
+{% block custom_resources %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'geocontrib/css/base.css' %}" />
-<script src="{% static 'geocontrib/js/formset_handlers.js' %}" type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'geocontrib/js/nested_formset_handlers.js' %}" type="text/javascript" charset="utf-8"></script>
 {% endblock %}
 
 {% block content %}
@@ -21,55 +20,27 @@
   <form id="form-layers" action="." method="post" enctype="multipart/form-data" class="ui form">
     {% csrf_token %}
 
-    <div id="test_formset_nested">
-      {{ formset.management_form }}
-      <div class="ui segments">
+    {{ formset.management_form }}
+    <div class="ui buttons">
+      <a class="ui compact small icon left floated button button-hover-green" data-tooltip="Créer un fond cartographique"
+        data-position="right center" data-variation="mini" data-add-form="{{ formset.prefix }}-ADD">
+        <i class="ui plus icon"></i>
+      </a>
+    </div>
+    <div class="ui segments" data-segments="{{ formset.prefix }}-SEGMENTS">
       {% for form in formset.forms %}
-      <div class="ui placeholder segment">
-        <div class="ui icon header">
-        {{ form.as_table }}
-      </div>
-        <div class="inline">
-          {% if form.nested %}
-          {{ form.nested.management_form }}
-          <div class="ui segments">
-            {% for subform in form.nested %}
-            <div class="ui segment">
-              {{ subform.as_table }}
-            </div>
-            {% endfor %}
-          </div>
-          {% endif %}
-          <div class="ui button">Ajouter une couche</div>
-        </div>
-      </div>
-      <div class="ui primary button">Supprimer ce fond cartographique</div>
+        {% include 'geocontrib/project/project_mapping_basemap.html' with formset=formset form=form is_empty=False %}
       {% endfor %}
-
-      <div class="formset_hidden" style="display: none">
-      {{ formset.empty_form }}
-      {{ formset.empty_nested.empty_form }}
+      <div class="formset_hidden" data-empty-form="{{ formset.prefix }}-EMPTY" style="display: none">
+        {% include 'geocontrib/project/project_mapping_basemap.html' with formset=formset form=formset.empty_form is_empty=True %}
       </div>
-
-      <div class="{{ formset.prefix }}__bottom_buttons">
-        <button class="ui right labeled icon button" data-related-fieldset="{{ formset.prefix }}">
-          <i class="right add icon"></i>
-          Ajouter un Fond cartographique
-        </button>
-      </div>
-
-
     </div>
 
-    </div>
 
-    <div class="ui divider"></div>
-
-    <button type="submit" class="ui teal icon button">
+    <button type="submit" class="ui teal icon floated button">
       <i class="white save icon"></i> Enregistrer les changements
     </button>
+
+
   </form>
-
-</div>
-
-{% endblock %}
+  {% endblock %}

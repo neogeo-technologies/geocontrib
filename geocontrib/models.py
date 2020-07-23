@@ -513,9 +513,9 @@ class ContextLayer(models.Model):
         ],
         default=1)
 
-    base_map = models.ForeignKey('geocontrib.BaseMap', on_delete=models.CASCADE)
+    base_map = models.ForeignKey(verbose_name="Fond cartographique", to='geocontrib.BaseMap', on_delete=models.CASCADE)
 
-    layer = models.ForeignKey('geocontrib.Layer', on_delete=models.CASCADE)
+    layer = models.ForeignKey(verbose_name="Couche", to='geocontrib.Layer', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Liaison Fond-Couche'
@@ -534,14 +534,10 @@ class Layer(models.Model):
 
     service = models.CharField('Service', max_length=256)
 
-    # order = models.PositiveSmallIntegerField("Numéro d'ordre", default=0)
-
     schema_type = models.CharField(
         "Type de couche", choices=SCHEMAS, max_length=50, default="wms")
 
     options = JSONField("Options", blank=True, null=True)
-
-    # project = models.ForeignKey('geocontrib.Project', on_delete=models.CASCADE)
 
     objects = models.Manager()
 
@@ -550,11 +546,9 @@ class Layer(models.Model):
     class Meta:
         verbose_name = 'Couche'
         verbose_name_plural = 'Couches'
-        # unique_together = ('project', 'order')
-        # ordering = ['project', 'order']
 
     def __str__(self):
-        return "{} - {}".format(self.pk, self.service)
+        return "{0} ({1})".format(self.service, self.pk)
 
 
 ###############################

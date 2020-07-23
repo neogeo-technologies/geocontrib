@@ -45,21 +45,4 @@ window.addEventListener('load', function() {
     add_buttons[i].addEventListener('click', AddRow, false);
   }
 
-  const test_button = document.getElementById('test_button');
-  function FetchInfo(){
-    let url = test_button.getAttribute('data-test-url');
-    fetch(url, {
-        method: 'GET',
-        // body: JSON.stringify(body),
-        headers: {
-            'Content-type': 'application/json; charset=UTF-8'
-        }
-    })
-    .then(response => response.json())
-    .then(json => {
-        console.log(json);
-    });
-  }
-  test_button.addEventListener('click', FetchInfo, false);
-
 });

@@ -1,0 +1,54 @@
+<div class="ui teal segment" data-segment="{{ formset.prefix }}-{% if not is_empty %}{{ forloop.counter0 }}{% else %}__prefix__{% endif %}-SEGMENT">
+  {% for hidden in form.hidden_fields %}{{ hidden.errors }}{{ hidden }}{% endfor %}
+  {% if form.non_field_errors %}
+  <div class="ui segment">
+    {{ form.non_field_errors }}
+  </div>
+  {% endif %}
+  <div class="ui divided items">
+
+    <div class="item">
+      <label for="{{ form.layer.id_for_label }}">{{ form.layer.label }}</label>
+      {% if is_empty %}
+      {# TODO arranger le dropdown pour les ajout à la volée #}
+      {# le selecteur de couche ne s'affichant pas correctement on passe par un field django par defaut en attendant #}
+      {{ form.layer }}
+      {% else %}
+      <div class="ui fluid search selection dropdown">
+        <input type="hidden" name="{{ form.layer.html_name }}" {% if form.layer.value %}value="{{ form.layer.value }}"{% endif %}>
+        <i class="dropdown icon"></i>
+        <div class="default text">Sélectionner une couche</div>
+        <div class="menu">
+        {% for x,y in form.layer.field.choices %}
+        <div class="item{% if form.layer.value == x %} active selected{% endif %}" data-value="{{ x }}">{{ y }}</div>
+        {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {{ form.layer.errors }}
+    </div>
+
+    <div class="item">
+      <label for="{{ form.opacity.id_for_label }}">{{ form.opacity.label }}</label>
+      <input type="number" name="{{ form.opacity.html_name }}" id="{{ form.opacity.id_for_label }}" value="{{ form.opacity.value }}" step="0.01" min="{{ form.opacity.field.min_value }}"
+        max="{{ form.opacity.field.max_value }}">
+      {{ form.opacity.errors }}
+    </div>
+    <div class="item">
+      <label for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
+      <input type="number" name="{{ form.order.html_name }}" id="{{ form.order.id_for_label }}" value="{{ form.order.value }}" step="1" min="{{ form.order.field.min_value }}" max="{{ form.order.field.max_value }}">
+      {{ form.order.errors }}
+    </div>
+    <div class="item">
+      <a class="ui compact small icon floated button button-hover-red"
+        data-tooltip="Supprimer cette couche"
+        data-position="right center" data-variation="mini"
+        data-delete-form="{{ formset.prefix }}-{% if not is_empty %}{{ forloop.counter0 }}{% else %}__prefix__{% endif %}-DELETE">
+        <i class="ui grey trash alternate icon"></i>
+        <div style="display: none">
+          {{ form.DELETE }}
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

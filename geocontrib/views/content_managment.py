@@ -1282,14 +1282,15 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
 
     def post(self, request, slug):
         project = self.get_object()
-        formset = ProjectBaseMapInlineFormset(request.POST or None, instance=project)
+        formset = ProjectBaseMapInlineFormset(data=request.POST or None, instance=project)
 
         if formset.is_valid():
             formset.save()
             return redirect('geocontrib:project_mapping', slug=project.slug)
         else:
             logger.debug(formset.errors)
-            formset = ProjectBaseMapInlineFormset(instance=project)
+            messages.error(request, "L'édition des fonds cartographiques a échouée. ")
+            formset = ProjectBaseMapInlineFormset(data=request.POST or None, instance=project)
 
         context = {**self.get_context_data(), **{
             'project': project,

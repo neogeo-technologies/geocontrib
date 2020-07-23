@@ -456,32 +456,6 @@ class FeatureTypeModelForm(forms.ModelForm):
     #         )
 
 
-class LayerForm(forms.ModelForm):
-
-    class Meta:
-        model = Layer
-        fields = ('title', 'service', 'schema_type', 'options')
-
-
-class BaseMapForm(forms.ModelForm):
-
-    # layer = forms.ModelChoiceField(label="Couche", queryset=Layer.objects.all(), empty_label=None)
-
-    class Meta:
-        model = BaseMap
-        fields = ('title', 'layers', )
-
-
-class ContextLayerForm(forms.ModelForm):
-
-    title = forms.CharField()
-    layer = forms.ModelChoiceField(label="Couche", queryset=Layer.objects.all(), empty_label=None)
-
-    class Meta:
-        model = ContextLayer
-        fields = ('title', 'layer', 'opacity', 'order')
-
-
 class ProjectModelForm(forms.ModelForm):
 
     title = forms.CharField(label='Titre', max_length=100)
@@ -556,8 +530,16 @@ class ProjectModelForm(forms.ModelForm):
         return cleaned_data
 
 
+class ContextLayerForm(forms.ModelForm):
+    layer = forms.ModelChoiceField(label="Couche", queryset=Layer.objects.all(), empty_label=None)
+
+    class Meta:
+        model = ContextLayer
+        fields = ['layer', 'order', 'opacity']
+
+
 ContextLayerFormset = inlineformset_factory(
-    BaseMap, ContextLayer, fields=['layer', 'order', 'opacity'], extra=0)
+    BaseMap, ContextLayer, form=ContextLayerForm, fields=['layer', 'order', 'opacity'], extra=0)
 
 
 class BaseMapInlineFormset(BaseInlineFormSet):
@@ -581,16 +563,19 @@ class BaseMapInlineFormset(BaseInlineFormSet):
                 form.prefix,
                 ContextLayerFormset.get_default_prefix()))
 
-        self.empty_nested = ContextLayerFormset(instance=form.instance)
+        self.empty_nested = ContextLayerFormset(
+            data=data,
+            prefix='contextlayer-%s-%s' % (
+                form.prefix,
+                ContextLayerFormset.get_default_prefix()))
 
     def is_valid(self):
         result = super().is_valid()
-
         if self.is_bound:
             for form in self.forms:
                 if hasattr(form, 'nested'):
-                    # logger.debug(form.nested.is_valid())
                     result = result and form.nested.is_valid()
+                    logger.debug(form.nested.errors)
 
         return result
 
@@ -601,7 +586,9 @@ class BaseMapInlineFormset(BaseInlineFormSet):
         for form in self.forms:
             if hasattr(form, 'nested'):
                 if not self._should_delete_form(form):
+                    logger.debug(form.nested)
                     form.nested.save(commit=commit)
+
         return result
 
 
