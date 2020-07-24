@@ -1,4 +1,4 @@
-<div class="ui teal segment" data-segment="{{ formset.prefix }}-{% if not is_empty %}{{ forloop.counter0 }}{% else %}__prefix__{% endif %}-SEGMENT">
+<div class="ui teal segment" data-segment="{{ form.prefix }}-SEGMENT">
   {% for hidden in form.hidden_fields %}{{ hidden.errors }}{{ hidden }}{% endfor %}
   {% if form.non_field_errors %}
   <div class="ui segment">
@@ -43,7 +43,7 @@
       <a class="ui compact small icon floated button button-hover-red"
         data-tooltip="Supprimer cette couche"
         data-position="right center" data-variation="mini"
-        data-delete-form="{{ formset.prefix }}-{% if not is_empty %}{{ forloop.counter0 }}{% else %}__prefix__{% endif %}-DELETE">
+        data-delete-form="{{ form.prefix }}-DELETE">
         <i class="ui grey trash alternate icon"></i>
         <div style="display: none">
           {{ form.DELETE }}

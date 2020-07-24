@@ -1,7 +1,7 @@
 $(document).ready(function() {
   // INITIALISATION SEMANTIC UI COMPONENTS
   // $('.ui.accordion').accordion()
-  $('.ui.dropdown').dropdown()
+  $('.ui.dropdown').dropdown('refresh')
   $('.menu .item').tab()
 
   updateCSSMinHeight()

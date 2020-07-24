@@ -15,7 +15,11 @@
       data-position="right center" data-variation="mini" data-delete-form="{{ formset.prefix }}-{% if not is_empty %}{{ forloop.counter0 }}{% else %}__prefix__{% endif %}-DELETE">
       <i class="ui grey trash alternate icon"></i>
       <div style="display: none">
+        {% if is_empty %}
+        <input type="text" name="{{ formset.prefix }}-__prefix__-DELETE" id="id_{{ formset.prefix }}-__prefix__-DELETE">
+        {% else %}
         {{ form.DELETE }}
+        {% endif %}
       </div>
     </a>
   </div>
@@ -24,11 +28,11 @@
     {{ form.nested.management_form }}
     <div class="ui segments" data-segments="{{ form.nested.prefix }}-SEGMENTS">
       {% for contextlayer_form in form.nested %}
-      {% include 'geocontrib/project/project_mapping_contextlayer.html' with formset=form.nested form=contextlayer_form is_empty=False %}
+      {% include 'geocontrib/project/project_mapping_contextlayer.html' with formset=form.nested form=contextlayer_form is_empty=False is_empty_basemap=is_empty_basemap %}
       {% endfor %}
     </div>
     <div class="formset_hidden" data-empty-form="{{ form.nested.prefix }}-EMPTY" style="display: none">
-      {% include 'geocontrib/project/project_mapping_contextlayer.html' with formset=form.nested form=form.nested.empty_form is_empty=True %}
+      {% include 'geocontrib/project/project_mapping_contextlayer.html' with formset=form.nested form=form.nested.empty_form is_empty=True is_empty_basemap=is_empty_basemap %}
     </div>
 
     <div class="ui buttons">

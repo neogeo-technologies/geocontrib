@@ -563,12 +563,6 @@ class BaseMapInlineFormset(BaseInlineFormSet):
                 form.prefix,
                 ContextLayerFormset.get_default_prefix()))
 
-        self.empty_nested = ContextLayerFormset(
-            data=data,
-            prefix='contextlayer-%s-%s' % (
-                form.prefix,
-                ContextLayerFormset.get_default_prefix()))
-
     def is_valid(self):
         result = super().is_valid()
         if self.is_bound:
@@ -586,7 +580,6 @@ class BaseMapInlineFormset(BaseInlineFormSet):
         for form in self.forms:
             if hasattr(form, 'nested'):
                 if not self._should_delete_form(form):
-                    logger.debug(form.nested)
                     form.nested.save(commit=commit)
 
         return result

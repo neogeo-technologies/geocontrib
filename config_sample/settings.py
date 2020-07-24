@@ -105,10 +105,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
-LANGUAGE_CODE = 'fr-fr'
+LANGUAGE_CODE = config('LANGUAGE_CODE', default='fr-FR')
 TIME_ZONE = config("TIME_ZONE", default='Europe/Paris')
 USE_I18N = True
-USE_L10N = True
+USE_L10N = config('USE_L10N', default=False, cast=bool)
 USE_TZ = True
 
 # URL prefix

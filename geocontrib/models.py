@@ -498,6 +498,10 @@ class BaseMap(models.Model):
         verbose_name = 'Fond cartographique'
         verbose_name_plural = 'Fonds cartographiques'
 
+    def __str__(self):
+        title = self.title or 'N/A'
+        return "{0} - ({1})".format(title, self.project)
+
 
 class ContextLayer(models.Model):
 
@@ -548,7 +552,8 @@ class Layer(models.Model):
         verbose_name_plural = 'Couches'
 
     def __str__(self):
-        return "{0} ({1})".format(self.service, self.pk)
+        title = self.title or ''
+        return "{0} - {1} ({2})".format(title, self.service, self.schema_type)
 
 
 ###############################

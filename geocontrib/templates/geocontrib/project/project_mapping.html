@@ -29,10 +29,10 @@
     </div>
     <div class="ui segments" data-segments="{{ formset.prefix }}-SEGMENTS">
       {% for form in formset.forms %}
-        {% include 'geocontrib/project/project_mapping_basemap.html' with formset=formset form=form is_empty=False %}
+        {% include 'geocontrib/project/project_mapping_basemap.html' with formset=formset form=form is_empty=False is_empty_basemap=False %}
       {% endfor %}
       <div class="formset_hidden" data-empty-form="{{ formset.prefix }}-EMPTY" style="display: none">
-        {% include 'geocontrib/project/project_mapping_basemap.html' with formset=formset form=formset.empty_form is_empty=True %}
+        {% include 'geocontrib/project/project_mapping_basemap.html' with formset=formset form=formset.empty_form is_empty=True is_empty_basemap=True %}
       </div>
     </div>
 
