@@ -58,6 +58,7 @@
       if (areChanges) {
         baseMaps = baseMapsFromServer;
         localStorage.removeItem('map-options');
+        localStorage.removeItem('current-basemap-index');
       } else {
         baseMaps = baseMapsFromLocalstorage;
       }
@@ -65,8 +66,11 @@
       baseMaps = baseMapsFromServer;
     }
 
+    // Basemap selected by default: 
+    // use the active one if exists (set in localstorage), otherwise the index 0 (first basemap in the list)
+    const currentBasemapIndex = localStorage.getItem('current-basemap-index');
+    let selectedBasemapIndex = currentBasemapIndex ? currentBasemapIndex : 0;
 
-    let selectedBasemapIndex = 0;
     let expanded = false;
     const layerIcon = document.getElementsByClassName('layers-icon')[0];
 
@@ -165,13 +169,16 @@
 
     // Init the accordion element/
     $('.ui.accordion')
-      .accordion('open', selectedBasemapIndex)
+      .accordion('open', parseInt(selectedBasemapIndex))
       .accordion('setting', 'collapsible', false)
       .accordion('setting', 'onOpen', function () {
         const basemapIndex = this.dataset.basemapIndex;
         selectedBasemapIndex = basemapIndex;
         const event = new CustomEvent('add-layers', { detail: baseMaps[basemapIndex].layers })
         document.dispatchEvent(event)
+
+        // Set in the store the last basemap used
+        localStorage.setItem('current-basemap-index', basemapIndex);
       });
 
     // Load layer of the selected basemap
