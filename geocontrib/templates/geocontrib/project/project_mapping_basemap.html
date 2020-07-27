@@ -1,28 +1,36 @@
-<div class="ui segment" data-segment="{{ formset.prefix }}-{% if not is_empty %}{{ forloop.counter0 }}{% else %}__prefix__{% endif %}-SEGMENT">
+<div class="ui segment" data-segment="{{ form.prefix }}-SEGMENT">
   {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
   {% if form.non_field_errors %}
   <div class="ui segment">
     {{ form.non_field_errors }}
   </div>
   {% endif %}
-  <div class="ui labeled input">
-    <div class="ui label">{{ form.title.label }}</div>
-    {{ form.title }}
+  {# TODO permettre l'ajout de couche à la volée #}
+  {% if is_empty %}
+  <div class="ui ignored info message">
+    Veuillez enregistrer un titre avant d'ajouter une couche.
   </div>
-  <div class="ui buttons">
+  {% endif %}
 
-    <a class="ui compact small icon floated button button-hover-red" data-tooltip="Supprimer ce fond cartographique"
-      data-position="right center" data-variation="mini" data-delete-form="{{ formset.prefix }}-{% if not is_empty %}{{ forloop.counter0 }}{% else %}__prefix__{% endif %}-DELETE">
+  <div class="ui action input">
+    <div class="ui labeled input">
+      <div class="ui label">{{ form.title.label }}</div>
+      {{ form.title }}
+    </div>
+    <div class="ui button button-hover-red compact" data-tooltip="Supprimer ce fond cartographique"
+      data-position="right center" data-variation="mini" data-delete-form="{{ form.prefix }}-DELETE">
       <i class="ui grey trash alternate icon"></i>
       <div style="display: none">
         {% if is_empty %}
-        <input type="text" name="{{ formset.prefix }}-__prefix__-DELETE" id="id_{{ formset.prefix }}-__prefix__-DELETE">
+        <input type="text" name="{{ form.prefix }}-DELETE" id="id_{{ form.prefix }}-DELETE">
         {% else %}
         {{ form.DELETE }}
         {% endif %}
       </div>
-    </a>
+    </div>
   </div>
+
+
   <div class="nested">
     {% if form.nested %}
     {{ form.nested.management_form }}
@@ -36,9 +44,12 @@
     </div>
 
     <div class="ui buttons">
+      {# TODO permettre l'ajout de couches à la volée #}
+      {% if not is_empty %}
       <a class="ui compact small icon left floated button button-hover-green" data-tooltip="Ajouter une couche" data-position="right center" data-variation="mini" data-add-form="{{ form.nested.prefix }}-ADD">
         <i class="ui plus icon"></i>
       </a>
+      {% endif %}
     </div>
     {% endif %}
   </div>

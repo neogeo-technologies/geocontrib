@@ -40,15 +40,20 @@
       {{ form.order.errors }}
     </div>
     <div class="item">
-      <a class="ui compact small icon floated button button-hover-red"
+      <div class="ui compact small icon floated button button-hover-red"
         data-tooltip="Supprimer cette couche"
         data-position="right center" data-variation="mini"
         data-delete-form="{{ form.prefix }}-DELETE">
         <i class="ui grey trash alternate icon"></i>
         <div style="display: none">
+          {% if is_empty %}
+          <p>POUET</p>
+          <input type="text" name="{{ form.prefix }}-DELETE" id="id_{{ form.prefix }}-DELETE">
+          {% else %}
           {{ form.DELETE }}
+          {% endif %}
         </div>
-      </a>
+      </div>
     </div>
   </div>
 </div>

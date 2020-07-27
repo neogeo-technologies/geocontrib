@@ -3,7 +3,7 @@ window.addEventListener('load', function() {
   // ---------------------------------------------------------------------------
   // Suppression d'un form
   // ---------------------------------------------------------------------------
-  let form_deleters = document.querySelectorAll("a[data-delete-form]");
+  let form_deleters = document.querySelectorAll("div[data-delete-form]");
 
   function RemoveIt() {
     let data_segment_attr = this.getAttribute('data-delete-form').replace('-DELETE', '-SEGMENT');
@@ -26,24 +26,35 @@ window.addEventListener('load', function() {
   function AddIt() {
     let prefix = this.getAttribute('data-add-form').replace('-ADD', '');
     let total_forms = document.getElementById('id_' + prefix + '-TOTAL_FORMS')
+
     let form_idx = total_forms.value;
 
     let segments = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]");
 
+    // TODO:
+    // Si form vide de context layers
+    // on index le bouton de suppression de couche en fonction du TOTAL_FORMS de contextlayer
+    // on increment ensuite ce TOTAL_FORMS de contextlayer
+    if (prefix.startsWith('contextlayer')){
+      // <input type="hidden" name="contextlayer-basemap_set-1-contextlayer_set-TOTAL_FORMS" value="0" id="id_contextlayer-basemap_set-1-contextlayer_set-TOTAL_FORMS">
+      // let contextlayer_total_forms = document.getElementById('id_' + prefix + '-TOTAL_FORMS')
+    }
+
     let new_form = document.querySelector("div[data-empty-form=" + prefix + "-EMPTY]").innerHTML.replace(/__prefix__/g, form_idx);
     let add_form = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]").insertAdjacentHTML('beforeend', new_form);
 
-    // scroller sur le nouveau form
+    // Scroll sur le nouveau form
     let element = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]")
     element.scrollIntoView({block: "end"});
 
+
     // Ajout d'un event ciblant la nouvelle ancre de suppression
-    let remove_field = document.querySelector("a[data-delete-form=" + prefix + "-" + form_idx + "-DELETE]");
+    let remove_field = document.querySelector("div[data-delete-form=" + prefix + "-" + form_idx + "-DELETE]");
     remove_field.addEventListener('click', RemoveIt, false);
 
     total_forms.value++
 
-    // Ajout d'un event ciblant de potentielle bouttons d'ajout
+    // Ajout d'un event ciblant de potentiels boutons d'ajout
     // vrai lorsqu'on crée un nouveau basemap et son les contextlayer imbriqué
     if (prefix.startsWith('basemap')){
       let sub_creators = document.querySelectorAll("a[data-add-form]");
