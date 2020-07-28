@@ -26,33 +26,31 @@ window.addEventListener('load', function() {
   function AddIt() {
     let prefix = this.getAttribute('data-add-form').replace('-ADD', '');
     let total_forms = document.getElementById('id_' + prefix + '-TOTAL_FORMS')
-
     let form_idx = total_forms.value;
+    let new_form = document.querySelector("div[data-empty-form=" + prefix + "-EMPTY]")
+    let marked_form = '';
 
-    let segments = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]");
-
-    // TODO:
-    // Si form vide de context layers
-    // on index le bouton de suppression de couche en fonction du TOTAL_FORMS de contextlayer
-    // on increment ensuite ce TOTAL_FORMS de contextlayer
-    if (prefix.startsWith('contextlayer')){
-      // <input type="hidden" name="contextlayer-basemap_set-1-contextlayer_set-TOTAL_FORMS" value="0" id="id_contextlayer-basemap_set-1-contextlayer_set-TOTAL_FORMS">
-      // let contextlayer_total_forms = document.getElementById('id_' + prefix + '-TOTAL_FORMS')
+    // Si ajout d'un basemap
+    if (prefix.startsWith('basemap')){
+      // on recupere le gabarit d'un form de basemap vide (contenant aussi les form.nested de contextlayer)
+      // on change basemap_set-__prefix__ par basemap_set-N ou N est le total des form de basemap
+      marked_form = new_form.innerHTML.replace(/basemap_set-__prefix__/g, 'basemap_set-' + form_idx);
+      // on ne modifie pas le pattern contextlayer_set-__prefix__
+    } else {
+      // sinon si ajout d'un context layer
+      // alors on modifie les __prefix__ par le total des form de contextlayer
+      marked_form = new_form.innerHTML.replace(/__prefix__/g, form_idx);
     }
 
-    let new_form = document.querySelector("div[data-empty-form=" + prefix + "-EMPTY]").innerHTML.replace(/__prefix__/g, form_idx);
-    let add_form = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]").insertAdjacentHTML('beforeend', new_form);
+    let add_form = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]").insertAdjacentHTML('beforeend', marked_form);
 
     // Scroll sur le nouveau form
     let element = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]")
     element.scrollIntoView({block: "end"});
 
-
     // Ajout d'un event ciblant la nouvelle ancre de suppression
     let remove_field = document.querySelector("div[data-delete-form=" + prefix + "-" + form_idx + "-DELETE]");
     remove_field.addEventListener('click', RemoveIt, false);
-
-    total_forms.value++
 
     // Ajout d'un event ciblant de potentiels boutons d'ajout
     // vrai lorsqu'on crée un nouveau basemap et son les contextlayer imbriqué
@@ -63,9 +61,10 @@ window.addEventListener('load', function() {
       }
     }
 
+    // on incremente le nombre total de form du type de celui ajouté
+    total_forms.value++
   }
   for (let i = 0; i < form_creators.length; i++) {
     form_creators[i].addEventListener('click', AddIt, false);
   }
-
 })

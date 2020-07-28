@@ -569,7 +569,6 @@ class BaseMapInlineFormset(BaseInlineFormSet):
             for form in self.forms:
                 if hasattr(form, 'nested'):
                     result = result and form.nested.is_valid()
-                    logger.debug(form.nested.errors)
 
         return result
 
