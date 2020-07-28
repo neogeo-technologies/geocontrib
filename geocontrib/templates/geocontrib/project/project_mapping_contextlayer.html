@@ -35,11 +35,6 @@
       {{ form.opacity.errors }}
     </div>
     <div class="item">
-      <label for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
-      <input type="number" name="{{ form.order.html_name }}" id="{{ form.order.id_for_label }}" value="{{ form.order.value }}" step="1" min="{{ form.order.field.min_value }}" max="{{ form.order.field.max_value }}">
-      {{ form.order.errors }}
-    </div>
-    <div class="item">
       <div class="ui compact small icon floated button button-hover-red"
         data-tooltip="Supprimer cette couche"
         data-position="right center" data-variation="mini"

@@ -537,6 +537,10 @@ class ContextLayerForm(forms.ModelForm):
         model = ContextLayer
         fields = ['layer', 'order', 'opacity']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['order'].widget = HiddenInput()
+
 
 ContextLayerFormset = inlineformset_factory(
     BaseMap, ContextLayer, form=ContextLayerForm, fields=['layer', 'order', 'opacity'], extra=0)
