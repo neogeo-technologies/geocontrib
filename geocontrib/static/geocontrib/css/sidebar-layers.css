@@ -157,20 +157,6 @@
   margin: 0.5rem 0;
 }
 
-/* Sortable */
-.layer-handle-sort {
-  cursor: grab;
-}
-
-.blue-background-class {
-  background-color: rgb(205, 229, 245);
-}
-
-.white-opacity-background-class {
-  background-color: white;
-  opacity: 0.9;
-}
-
 .range-container {
   display: flex;
 }

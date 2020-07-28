@@ -30,6 +30,7 @@ window.addEventListener('load', function() {
 
     // Injection de l'indice de la ligne et ajout au formset
     let empty_tbody = document.getElementById(prefix+'-EMPTY_TBODY').innerHTML.replace(/__prefix__/g, form_idx);
+    console.log(empty_tbody);
     let tbody = document.getElementById(prefix+'-TBODY').insertAdjacentHTML('beforeend', empty_tbody);
 
 

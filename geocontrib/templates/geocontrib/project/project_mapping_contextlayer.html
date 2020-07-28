@@ -1,14 +1,16 @@
-<div class="ui teal segment" data-segment="{{ form.prefix }}-SEGMENT">
+<div class="ui segment layer-item" data-segment="{{ form.prefix }}-SEGMENT">
   {% for hidden in form.hidden_fields %}{{ hidden.errors }}{{ hidden }}{% endfor %}
   {% if form.non_field_errors %}
-  <div class="ui segment">
+  <div class="ui message negative">
     {{ form.non_field_errors }}
   </div>
   {% endif %}
-  <div class="ui divided items">
+  <div class="ui divided form">
 
-    <div class="item">
-      <label for="{{ form.layer.id_for_label }}">{{ form.layer.label }}</label>
+    <div class="field" data-type='layer-field'>
+      <label for="{{ form.layer.id_for_label }}" class="layer-handle-sort">
+       <i class="th icon"></i> {{ form.layer.label }}
+      </label>
       {% if is_empty %}
       {# TODO arranger le dropdown pour les ajout à la volée #}
       {# le selecteur de couche ne s'affichant pas correctement on passe par un field django par defaut en attendant #}
@@ -27,19 +29,21 @@
       {% endif %}
       {{ form.layer.errors }}
     </div>
-
-    <div class="item">
-      <label for="{{ form.opacity.id_for_label }}">{{ form.opacity.label }}</label>
-      <input type="number" name="{{ form.opacity.html_name }}" id="{{ form.opacity.id_for_label }}" value="{{ form.opacity.value }}" step="0.01" min="{{ form.opacity.field.min_value }}"
-        max="{{ form.opacity.field.max_value }}">
-      {{ form.opacity.errors }}
+    <div class="fields">
+      <div class="field three wide {% if form.opacity.errors %} error{% endif %}">
+        <label for="{{ form.opacity.id_for_label }}">{{ form.opacity.label }}</label>
+        <input type="number" name="{{ form.opacity.html_name }}" id="{{ form.opacity.id_for_label }}" value="{{ form.opacity.value }}" step="0.01" min="{{ form.opacity.field.min_value }}"
+          max="{{ form.opacity.field.max_value }}">
+        {{ form.opacity.errors }}
+      </div>
     </div>
-    <div class="item">
+
+    <div class="field">
       <div class="ui compact small icon floated button button-hover-red"
-        data-tooltip="Supprimer cette couche"
-        data-position="right center" data-variation="mini"
+        data-variation="mini"
         data-delete-form="{{ form.prefix }}-DELETE">
         <i class="ui grey trash alternate icon"></i>
+        <span>Supprimer cette couche</span>
         <div style="display: none">
           {{ form.DELETE }}
         </div>

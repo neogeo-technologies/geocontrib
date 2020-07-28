@@ -22,12 +22,12 @@
 
     {{ formset.management_form }}
     <div class="ui buttons">
-      <a class="ui compact small icon left floated button button-hover-green" data-tooltip="Créer un fond cartographique"
-        data-position="right center" data-variation="mini" data-add-form="{{ formset.prefix }}-ADD">
+      <a class="ui compact small icon left floated button green"  data-variation="mini" data-add-form="{{ formset.prefix }}-ADD">
         <i class="ui plus icon"></i>
+        <span>Créer un fond cartographique</span>
       </a>
     </div>
-    <div class="ui segments" data-segments="{{ formset.prefix }}-SEGMENTS">
+    <div class="ui " data-segments="{{ formset.prefix }}-SEGMENTS">
       {% for form in formset.forms %}
         {% include 'geocontrib/project/project_mapping_basemap.html' with formset=formset form=form is_empty=False %}
       {% endfor %}

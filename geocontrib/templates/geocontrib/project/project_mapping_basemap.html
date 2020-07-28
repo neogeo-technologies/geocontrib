@@ -6,23 +6,18 @@
   </div>
   {% endif %}
   <div class="ui action input">
-    <div class="ui labeled input">
-      <div class="ui label">{{ form.title.label }}</div>
+    <div class="ui labeled field">
+       <label for="">{{ form.title.label }}</label>
       {{ form.title }}
-    </div>
-    <div class="ui button button-hover-red compact" data-tooltip="Supprimer ce fond cartographique"
-      data-position="right center" data-variation="mini" data-delete-form="{{ form.prefix }}-DELETE">
-      <i class="ui grey trash alternate icon"></i>
-      <div style="display: none">
-        {{ form.DELETE }}
       </div>
-    </div>
   </div>
+
+
 
   <div class="nested">
     {% if form.nested %}
     {{ form.nested.management_form }}
-    <div class="ui segments" data-segments="{{ form.nested.prefix }}-SEGMENTS">
+    <div class="ui segments layers-container" data-segments="{{ form.nested.prefix }}-SEGMENTS">
       {% for contextlayer_form in form.nested %}
       {% include 'geocontrib/project/project_mapping_contextlayer.html' with formset=form.nested form=contextlayer_form is_empty=False %}
       {% endfor %}
@@ -32,11 +27,25 @@
     </div>
 
     <div class="ui buttons">
-      <a class="ui compact small icon left floated button button-hover-green" data-tooltip="Ajouter une couche" data-position="right center" data-variation="mini" data-add-form="{{ form.nested.prefix }}-ADD">
+      <a class="ui compact small icon left floated button green" data-variation="mini" data-add-form="{{ form.nested.prefix }}-ADD">
         <i class="ui plus icon"></i>
+        <span>Ajouter une couche</span>
       </a>
     </div>
 
+    <div class="ui buttons" data-variation="mini" data-delete-form="{{ form.prefix }}-DELETE">
+      <a class="ui compact red small icon right floated button button-hover-green">
+        <i class="ui trash alternate icon"></i>
+        <span>Supprimer ce fond cartographique</span>
+      </a>
+      <div style="display: none">
+        {% if is_empty %}
+        <input type="text" name="{{ form.prefix }}-DELETE" id="id_{{ form.prefix }}-DELETE">
+        {% else %}
+        {{ form.DELETE }}
+        {% endif %}
+      </div>
+    </div>  
     {% endif %}
   </div>
 </div>

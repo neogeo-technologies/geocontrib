@@ -53,6 +53,39 @@ main {
 }
 
 
+/* Add basemap view */
+#form-layers .ui.buttons{
+  margin-bottom: 1rem;
+}
+
+#form-layers .errorlist{
+  list-style: none;
+  padding-left: 0;
+  color: #9f3a38;
+}
+
+/* Needs this unfortunatly, because semantic overrides the background-color */
+#form-layers .blue-background-class {
+  background-color: rgb(205, 229, 245);
+}
+
+
+/* Sortable */
+.layer-handle-sort {
+  cursor: grab;
+}
+
+.blue-background-class {
+  background-color: rgb(205, 229, 245);
+}
+
+.white-opacity-background-class {
+  background-color: white;
+  opacity: 0.9;
+}
+
+/*  */
+
 /* ---------------------------------- */
       /* LEAFLET DRAW TOOLBAR */
 /* ---------------------------------- */

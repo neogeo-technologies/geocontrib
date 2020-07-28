@@ -1,18 +1,24 @@
-window.addEventListener('load', function() {
-
+window.addEventListener('load', function () {
   // ---------------------------------------------------------------------------
   // Suppression d'un form
   // ---------------------------------------------------------------------------
-  let form_deleters = document.querySelectorAll("div[data-delete-form]");
+  let form_deleters = document.querySelectorAll('div[data-delete-form]');
 
   function RemoveIt() {
-    let data_segment_attr = this.getAttribute('data-delete-form').replace('-DELETE', '-SEGMENT');
-    let data_segment = document.querySelector("div[data-segment='" + data_segment_attr + "']")
-    let hidden_input_delete = document.getElementById("id_" + this.getAttribute('data-delete-form'))
+    let data_segment_attr = this.getAttribute('data-delete-form').replace(
+      '-DELETE',
+      '-SEGMENT'
+    );
+    let data_segment = document.querySelector(
+      "div[data-segment='" + data_segment_attr + "']"
+    );
+    let hidden_input_delete = document.getElementById(
+      'id_' + this.getAttribute('data-delete-form')
+    );
 
     hidden_input_delete.checked = true;
     data_segment.style.display = 'none';
-  };
+  }
 
   for (let i = 0; i < form_deleters.length; i++) {
     form_deleters[i].addEventListener('click', RemoveIt, false);
@@ -21,7 +27,7 @@ window.addEventListener('load', function() {
   // ---------------------------------------------------------------------------
   // Ajout d'un form
   // ---------------------------------------------------------------------------
-  let form_creators = document.querySelectorAll("a[data-add-form]");
+  let form_creators = document.querySelectorAll('a[data-add-form]');
 
   function AddIt() {
     let prefix = this.getAttribute('data-add-form').replace('-ADD', '');
@@ -43,19 +49,23 @@ window.addEventListener('load', function() {
     }
 
     let add_form = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]").insertAdjacentHTML('beforeend', marked_form);
-
+document
+      .querySelector('[data-type="layer-field"] > .dropdown')
+      .classList.add('ui', 'fluid', 'search', 'selection', 'dropdown');
     // Scroll sur le nouveau form
     let element = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]")
     element.scrollIntoView({block: "end"});
 
     // Ajout d'un event ciblant la nouvelle ancre de suppression
-    let remove_field = document.querySelector("div[data-delete-form=" + prefix + "-" + form_idx + "-DELETE]");
+    let remove_field = document.querySelector(
+      'div[data-delete-form=' + prefix + '-' + form_idx + '-DELETE]'
+    );
     remove_field.addEventListener('click', RemoveIt, false);
 
     // Ajout d'un event ciblant de potentiels boutons d'ajout
     // vrai lorsqu'on crée un nouveau basemap et son les contextlayer imbriqué
-    if (prefix.startsWith('basemap')){
-      let sub_creators = document.querySelectorAll("a[data-add-form]");
+    if (prefix.startsWith('basemap')) {
+      let sub_creators = document.querySelectorAll('a[data-add-form]');
       for (let i = 0; i < sub_creators.length; i++) {
         sub_creators[i].addEventListener('click', AddIt, false);
       }
@@ -67,4 +77,26 @@ window.addEventListener('load', function() {
   for (let i = 0; i < form_creators.length; i++) {
     form_creators[i].addEventListener('click', AddIt, false);
   }
-})
+
+  // ---------------------------------------------------------------------------
+  // Utilisation de sortable.js pour changer l'ordre des couches
+  // ---------------------------------------------------------------------------
+  const layersContainer = document.getElementsByClassName('layers-container');
+  Array.from(layersContainer).forEach((layerContainer) => {
+    // Drag and drop feature to change the order of the layers
+    console.log(layerContainer);
+    new Sortable(layerContainer, {
+      animation: 150,
+      handle: '.layer-handle-sort', // The element that is active to drag
+      ghostClass: 'blue-background-class',
+      dragClass: 'white-opacity-background-class',
+      onEnd: () => {
+        // Update the order of the layers in the hidden input
+        const layerItems = layerContainer.querySelectorAll('input[name*="-order"]');
+        layerItems.forEach((layerItem, index) => {
+          layerItem.value = index;
+        });
+      },
+    });
+  });
+});
