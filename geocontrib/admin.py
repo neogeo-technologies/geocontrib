@@ -232,16 +232,12 @@ class BaseMapAdmin(admin.ModelAdmin):
     )
 
     def save_formset(self, request, form, formset, change):
-        # TODO @cbenhabib force reordering for next week
-        # if formset.model == ContextLayer:
-        #     instances = formset.save(commit=False)
-        #     for obj in formset.deleted_objects:
-        #         obj.delete()
-        #     for order, instance in enumerate(instances):
-        #
-        #         instance.order = order
-        #         instance.save(update_fields=['order'])
         super().save_formset(request, form, formset, change)
+        ctx_lyrs = ContextLayer.objects.filter(
+            base_map=formset.instance).order_by('order')
+        for idx, ctx in enumerate(ctx_lyrs):
+            ctx.order = idx
+            ctx.save(update_fields=['order'])
 
 
 admin.site.register(User, UserAdmin)

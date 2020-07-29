@@ -524,7 +524,6 @@ class ContextLayer(models.Model):
     class Meta:
         verbose_name = 'Liaison Fond-Couche'
         verbose_name_plural = 'Liaison Fond-Couche'
-        unique_together = ('base_map', 'order')
         ordering = ('order', )
 
 
