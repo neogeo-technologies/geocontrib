@@ -91,7 +91,6 @@ window.addEventListener('load', function () {
   const layersContainer = document.getElementsByClassName('layers-container');
   Array.from(layersContainer).forEach((layerContainer) => {
     // Drag and drop feature to change the order of the layers
-    console.log(layerContainer);
     new Sortable(layerContainer, {
       animation: 150,
       handle: '.layer-handle-sort', // The element that is active to drag
