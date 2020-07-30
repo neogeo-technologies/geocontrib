@@ -1,9 +1,7 @@
-import json
-
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.reverse import reverse
+from django.shortcuts import reverse
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from geocontrib.models import Attachment
@@ -239,7 +237,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
 
     def get_feature_url(self, obj):
         return reverse(
-            'geocontrib:feature_detail', request=self.context.get('request'), kwargs={
+            'geocontrib:feature_detail', kwargs={
                 'slug': obj.project.slug,
                 'feature_type_slug': obj.feature_type.slug,
                 'feature_id': obj.feature_id})
@@ -247,7 +245,6 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
     def get_feature_type_url(self, obj):
         return reverse(
             'geocontrib:feature_type_detail',
-            request=self.context.get('request'),
             kwargs={
                 'slug': obj.project.slug,
                 'feature_type_slug': obj.feature_type.slug
