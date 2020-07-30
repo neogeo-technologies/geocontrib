@@ -31,16 +31,21 @@ window.addEventListener('load', function () {
 
   function AddIt() {
     let prefix = this.getAttribute('data-add-form').replace('-ADD', '');
-    let total_forms = document.getElementById('id_' + prefix + '-TOTAL_FORMS')
+    let total_forms = document.getElementById('id_' + prefix + '-TOTAL_FORMS');
     let form_idx = total_forms.value;
-    let new_form = document.querySelector("div[data-empty-form=" + prefix + "-EMPTY]")
+    let new_form = document.querySelector(
+      'div[data-empty-form=' + prefix + '-EMPTY]'
+    );
     let marked_form = '';
 
     // Si ajout d'un basemap
-    if (prefix.startsWith('basemap')){
+    if (prefix.startsWith('basemap')) {
       // on recupere le gabarit d'un form de basemap vide (contenant aussi les form.nested de contextlayer)
       // on change basemap_set-__prefix__ par basemap_set-N ou N est le total des form de basemap
-      marked_form = new_form.innerHTML.replace(/basemap_set-__prefix__/g, 'basemap_set-' + form_idx);
+      marked_form = new_form.innerHTML.replace(
+        /basemap_set-__prefix__/g,
+        'basemap_set-' + form_idx
+      );
       // on ne modifie pas le pattern contextlayer_set-__prefix__
     } else {
       // sinon si ajout d'un context layer
@@ -48,13 +53,15 @@ window.addEventListener('load', function () {
       marked_form = new_form.innerHTML.replace(/__prefix__/g, form_idx);
     }
 
-    let add_form = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]").insertAdjacentHTML('beforeend', marked_form);
-document
-      .querySelector('[data-type="layer-field"] > .dropdown')
-      .classList.add('ui', 'fluid', 'search', 'selection', 'dropdown');
+    let add_form = document
+      .querySelector('div[data-segments=' + prefix + '-SEGMENTS]')
+      .insertAdjacentHTML('beforeend', marked_form);
+
     // Scroll sur le nouveau form
-    let element = document.querySelector("div[data-segments=" + prefix + "-SEGMENTS]")
-    element.scrollIntoView({block: "end"});
+    let element = document.querySelector(
+      'div[data-segments=' + prefix + '-SEGMENTS]'
+    );
+    element.scrollIntoView({ block: 'end' });
 
     // Ajout d'un event ciblant la nouvelle ancre de suppression
     let remove_field = document.querySelector(
@@ -72,7 +79,7 @@ document
     }
 
     // on incremente le nombre total de form du type de celui ajouté
-    total_forms.value++
+    total_forms.value++;
   }
   for (let i = 0; i < form_creators.length; i++) {
     form_creators[i].addEventListener('click', AddIt, false);
@@ -92,7 +99,9 @@ document
       dragClass: 'white-opacity-background-class',
       onEnd: () => {
         // Update the order of the layers in the hidden input
-        const layerItems = layerContainer.querySelectorAll('input[name*="-order"]');
+        const layerItems = layerContainer.querySelectorAll(
+          'input[name*="-order"]'
+        );
         layerItems.forEach((layerItem, index) => {
           layerItem.value = index;
         });
