@@ -17,7 +17,7 @@
       </div>
       {% if project and feature_types and permissions|lookup:'can_create_feature' %}
       <div class="item right">
-        <div class="ui dropdown top right pointing compact button button-hover-green">
+        <div class="ui dropdown top right pointing compact button button-hover-green" data-tooltip="Ajouter un signalement" data-position="bottom left">
           <i class="plus fitted icon"></i>
           <div class="menu" style="z-index:9999;">
             <div class="header">Ajouter un signalement du type</div>
@@ -74,7 +74,7 @@
     </div>
   </div>
   <div class="field wide three column">
-    <label>Titre</label>
+    <label>Nom</label>
     <div class="ui icon input">
       <i class="search icon"></i>
       <div class="ui action input">
@@ -97,7 +97,7 @@
     <div class="ui tab active map-container" data-tab="map">
       <div id="map">
       </div>
-      {% if serialized_base_maps|length > 0 %} 
+      {% if serialized_base_maps|length > 0 %}
          {% include "geocontrib/map-layers/sidebar-layers.html" with basemaps=serialized_base_maps layers=serialized_layers%}
       {% endif %}
     </div>
@@ -108,7 +108,7 @@
           <tr>
             <th>Statut</th>
             <th>Type</th>
-            <th>Titre</th>
+            <th>Nom</th>
             <th>Dernière modification</th>
             {% if user.is_authenticated %}
             <th>Auteur</th>
@@ -253,7 +253,7 @@
     $("#map").css("height", main - 150)
 
     // Load into js variables the python context.
-    const features = JSON.parse(document.getElementById('features').textContent) ? 
+    const features = JSON.parse(document.getElementById('features').textContent) ?
       JSON.parse(document.getElementById('features').textContent).features : null;
     const serviceMap = JSON.parse(document.getElementById('serviceMap').textContent);
     const optionsMap = JSON.parse(document.getElementById('optionsMap').textContent);
@@ -276,7 +276,7 @@
       mapDefaultViewZoom,
     });
 
-    // ------   Listen Sidebar events ---------- // 
+    // ------   Listen Sidebar events ---------- //
     // Listen custom events triggered by the sidebar-layers
     document.addEventListener('add-layers', (event) => {
       mapUtil.removeLayers(map);

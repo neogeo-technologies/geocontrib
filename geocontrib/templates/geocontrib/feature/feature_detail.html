@@ -12,18 +12,24 @@
     <h1 class="ui header">
       <div class="content">
         {{ feature.title }}
-        {% if permissions|lookup:'can_update_feature' %}
-          <div class="ui icon right floated compact buttons">
-            <a href="{% url 'geocontrib:feature_update' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id %}" class="ui button button-hover-orange">
-              <i class="inverted grey pencil alternate icon"></i>
-            </a>
-          {% if permissions|lookup:'can_delete_feature' %}
-            <a id="feature-delete" class="ui button button-hover-red">
-              <i class="inverted grey trash alternate icon"></i>
+        <div class="ui icon right floated compact buttons">
+          {% if permissions|lookup:'can_create_feature' %}
+          {# <div class="ui dropdown top right pointing compact button button-hover-green"> #}
+            <a href="{% url 'geocontrib:feature_create' slug=project.slug feature_type_slug=feature.feature_type.slug %}" class="ui button button-hover-orange" data-tooltip="Ajouter un signalement" data-position="bottom left">
+              <i class="plus fitted icon"></i>
             </a>
           {% endif %}
-          </div>
-        {% endif %}
+          {% if permissions|lookup:'can_update_feature' %}
+          <a href="{% url 'geocontrib:feature_update' slug=project.slug feature_type_slug=feature.feature_type.slug feature_id=feature.feature_id %}" class="ui button button-hover-orange">
+            <i class="inverted grey pencil alternate icon"></i>
+          </a>
+          {% endif %}
+          {% if permissions|lookup:'can_delete_feature' %}
+          <a id="feature-delete" class="ui button button-hover-red">
+            <i class="inverted grey trash alternate icon"></i>
+          </a>
+          {% endif %}
+        </div>
         <div class="ui hidden divider"></div>
         <div class="sub header">
           {{ feature.description|linebreaks }}
@@ -319,11 +325,11 @@
       $('.mini.modal').modal('show')
     })
 
-    
+
     // Load into js variables the python context.
     const baseMaps = JSON.parse(document.getElementById('basemaps').textContent);
     const layers = JSON.parse(document.getElementById('layers').textContent);
-    const features = JSON.parse(document.getElementById('features').textContent) ? 
+    const features = JSON.parse(document.getElementById('features').textContent) ?
       JSON.parse(document.getElementById('features').textContent).features : null;
     const serviceMap = JSON.parse(document.getElementById('serviceMap').textContent);
     const optionsMap = JSON.parse(document.getElementById('optionsMap').textContent);
@@ -378,7 +384,7 @@
     const currentFeature = features.filter(feat => feat.id === currentFeatureId);
     const featureGroup = mapUtil.addFeatures(currentFeature);
     mapUtil.getMap().fitBounds(featureGroup.getBounds());
-    
+
   })
 </script>
 {% endblock %}
