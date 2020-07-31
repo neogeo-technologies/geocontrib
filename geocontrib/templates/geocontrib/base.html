@@ -27,8 +27,14 @@
   <link rel="stylesheet" href="{% static 'geocontrib/resources/leaflet-1.5.1/leaflet.css' %}" />
   <script src="{% static 'geocontrib/resources/leaflet-1.5.1/leaflet.js' %}"></script>
   <!-- Leaflet Draw -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" integrity="sha256-XzD3RpaHPv7lzX9qt+2n1j5cWj48O24KsgaGYpKN8x8=" crossorigin="anonymous" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha256-siofc4Uwjlra3YWkwthOn8Uj69cNN4aMug/iOHNiRgs=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
+    integrity="sha256-XzD3RpaHPv7lzX9qt+2n1j5cWj48O24KsgaGYpKN8x8=" crossorigin="anonymous" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"
+    integrity="sha256-siofc4Uwjlra3YWkwthOn8Uj69cNN4aMug/iOHNiRgs=" crossorigin="anonymous"></script>
+
+  <!-- Leaflet Control search -->
+  <link rel="stylesheet" href="{% static 'geocontrib/resources/leaflet-control-geocoder-1.13.0/Control.Geocoder.css' %}" />
+  <script src="{% static 'geocontrib/resources/leaflet-control-geocoder-1.13.0/Control.Geocoder.js' %}"></script>
 
   <!-- WellKnown JS -->
   <script src="https://cdn.rawgit.com/mapbox/wellknown/master/wellknown.js"></script>
@@ -53,65 +59,65 @@
           {{ APPLICATION_NAME }}
         </a>
         {% if project %}
-          <div class="ui dropdown item">
-            Projet&nbsp;: {{ project.title }}
-            <i class="dropdown icon"></i>
-            <div class="menu" style="z-index:401;">
-              <a class="item" href="{% url 'geocontrib:project' slug=project.slug %}">
-                <i class="home icon"></i>Accueil
-              </a>
-              <a class="item" href="{% url 'geocontrib:feature_list' slug=project.slug %}">
-                <i class="list icon"></i>Liste & Carte
-              </a>
+        <div class="ui dropdown item">
+          Projet&nbsp;: {{ project.title }}
+          <i class="dropdown icon"></i>
+          <div class="menu" style="z-index:401;">
+            <a class="item" href="{% url 'geocontrib:project' slug=project.slug %}">
+              <i class="home icon"></i>Accueil
+            </a>
+            <a class="item" href="{% url 'geocontrib:feature_list' slug=project.slug %}">
+              <i class="list icon"></i>Liste & Carte
+            </a>
             {% if project and permissions|lookup:'is_project_administrator' %}
-              <a class="item" href="{% url 'geocontrib:project_mapping' slug=project.slug %}">
-                <i class="map icon"></i>Fonds cartographiques
-              </a>
-              <a class="item" href="{% url 'geocontrib:project_members' slug=project.slug %}">
-                <i class="users icon"></i>Membres
-              </a>
+            <a class="item" href="{% url 'geocontrib:project_mapping' slug=project.slug %}">
+              <i class="map icon"></i>Fonds cartographiques
+            </a>
+            <a class="item" href="{% url 'geocontrib:project_members' slug=project.slug %}">
+              <i class="users icon"></i>Membres
+            </a>
             {% endif %}
-            </div>
           </div>
+        </div>
         {% endif %}
         <div class="right menu">
           {% if user.is_authenticated %}
-            <a class="item" href="{% url 'geocontrib:my_account' %}">
-              {{ user.get_full_name|default:user.username }}
-            </a>
-            {% if project or user.is_administrator %}
-            <div class="item ui label">
-              {% if project %}{{ USER_LEVEL_PROJECTS|lookup:project.slug }}<br>{% endif %}
-              {% if user.is_administrator == True %}Gestionnaire métier{% endif %}
-            </div>
-            {% endif %}
-            {% if not SSO_SETTED %}
-              <a class="item" href="{% url 'geocontrib:logout' %}"><i class="ui logout icon"></i></a>
-            {% endif %}
+          <a class="item" href="{% url 'geocontrib:my_account' %}">
+            {{ user.get_full_name|default:user.username }}
+          </a>
+          {% if project or user.is_administrator %}
+          <div class="item ui label">
+            {% if project %}{{ USER_LEVEL_PROJECTS|lookup:project.slug }}<br>{% endif %}
+            {% if user.is_administrator == True %}Gestionnaire métier{% endif %}
+          </div>
+          {% endif %}
+          {% if not SSO_SETTED %}
+          <a class="item" href="{% url 'geocontrib:logout' %}"><i class="ui logout icon"></i></a>
+          {% endif %}
           {% elif not SSO_SETTED %}
-            <a class="item" href="{% url 'geocontrib:login' %}">Se Connecter</a>
+          <a class="item" href="{% url 'geocontrib:login' %}">Se Connecter</a>
           {% endif %}
         </div>
       </div>
     </div>
   </header>
   <main>
-    <div class="ui stackable grid centered container">
+    <div class="ui stackable grid centered">
       {% if messages %}
-        <div class="row">
-          <div class="fourteen wide column">
-            <div class="ui info message">
-              <div class="header">
-                <i class="info circle icon"></i> Informations
-              </div>
-              <ul class="list">
-                {% for message in messages %}
-                  {{ message }}
-                {% endfor %}
-              </ul>
+      <div class="row">
+        <div class="fourteen wide column">
+          <div class="ui info message">
+            <div class="header">
+              <i class="info circle icon"></i> Informations
             </div>
+            <ul class="list">
+              {% for message in messages %}
+              {{ message }}
+              {% endfor %}
+            </ul>
           </div>
         </div>
+      </div>
       {% endif %}
 
       {% block content %}
@@ -127,4 +133,5 @@
   </footer>
 
 </body>
+
 </html>

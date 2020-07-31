@@ -186,6 +186,9 @@
 {{ OPTIONS|json_script:'optionsMap' }}
 {{ DEFAULT_MAP_VIEW|json_script:'defaultMapView' }}
 
+<!-- Import settings.py variable. Will be used in the javascript. -->
+{{ SELECTED_GEOCODER_PROVIDER|json_script:'selected-provider' }}
+
 <script src="{% static 'geocontrib/js/map-util.js' %}"></script>
 
 
@@ -315,6 +318,29 @@
     if (!basemaps || basemaps && basemaps.length === 0) {
       mapUtil.addLayers(null, serviceMap, optionsMap);
     }
-  });
+
+    let geocoder;
+    // Get the settings.py variable SELECTED_GEOCODER_PROVIDER. This way avoids XCC attacks
+    const geocoderLabel = JSON.parse(document.getElementById('selected-provider').textContent);
+    if (geocoderLabel) {
+      const LIMIT_RESULTS = 5;
+      
+      // Load the geocoder specify in settings.py
+      if (geocoderLabel === '{{ GEOCODER_PROVIDERS.ADDOK }}') {
+        geocoder = L.Control.Geocoder.addok({limit: LIMIT_RESULTS});
+      } else if (geocoderLabel === '{{ GEOCODER_PROVIDERS.PHOTON }}') {
+        geocoder = L.Control.Geocoder.photon();
+      } else if (geocoderLabel === '{{ GEOCODER_PROVIDERS.NOMINATIM }}') {
+        geocoder = L.Control.Geocoder.nominatim();
+      }
+
+      var control = L.Control.geocoder({
+        placeholder: 'Chercher une adresse...',
+        geocoder: geocoder,
+      }).addTo(map);
+    }
+
+  })
+
 </script>
 {% endblock %}
