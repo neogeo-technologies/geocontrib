@@ -72,7 +72,7 @@
               </a>
               {% endif %}
               {% if project and feature_types and permissions|lookup:'can_create_feature' and type.is_editable %}
-              <a class="ui compact small icon right floated button button-hover-green" data-tooltip="Editer le type de signalement" data-position="left center" data-variation="mini"
+              <a class="ui compact small icon right floated button button-hover-green" data-tooltip="Éditer le type de signalement" data-position="left center" data-variation="mini"
                  href="{% url 'geocontrib:feature_type_update' slug=project.slug feature_type_slug=type.slug %}">
                 <i class="inverted grey pencil alternate icon"></i>
               </a>
