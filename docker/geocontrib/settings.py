@@ -197,3 +197,15 @@ DEFAULT_MAP_VIEW = {
     'center': [47.0, 1.0],
     'zoom': 4
 }
+
+# Available geocoders
+GEOCODER_PROVIDERS = {
+    'ADDOK': 'addok',
+    'NOMINATIM': 'nominatim',
+    'PHOTON': 'photon'
+}
+
+# Active geocoder
+SELECTED_GEOCODER = {
+    'PROVIDER': config('SELECTED_GEOCODER_PROVIDER', default='addok')
+}
