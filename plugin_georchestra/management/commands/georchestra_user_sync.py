@@ -129,46 +129,44 @@ synchroniser."""
         all_groups = [re.findall('cn=(.*?),', item) for item in member_of]
         flattened_groups = list(set(itertools.chain(*all_groups)))
         if len(flattened_groups) > 0:
+            # Pour identifier les contributeurs et modérateurs de ce projet
+            # il faut faire l'union des utilisateurs de ces filtres (noms de groupes)
             contrib_qs = Project.objects.filter(ldap_project_contrib_groups__overlap=flattened_groups)
             if contrib_qs.exists():
                 for project in contrib_qs or []:
-                    # si aucune autorisation n'est definie pour le couple projet/utilisateur:
-                    # on le reference en tant que simple utilisateur connecté
-                    auth, created = Authorization.objects.get_or_create(
-                        project=project, user=user,
-                        defaults={
-                            'level': UserLevelPermission.objects.get(user_type_id=choices.LOGGED_USER)
-                        }
-                    )
+                    # si l'utilisateur est référencé en tant que simple utilisateur
+                    # et qu'il est membre d'un des groupe ldap_project_contrib_groups du projet
+                    # alors il passe contributeur pour ce projet
+                    try:
+                        auth = Authorization.objects.get(
+                            project=project, user=user,
+                            level__user_type_id=choices.LOGGED_USER)
 
-                    # si une autorisation existait avant cette synchro
-                    # et qu'il est parmi les groupes de contributeur/moderateur du projet
-                    # alors on lui attribut un role en fonction de son role précédent
-                    # si CONTRIBUTOR || MODERATOR alors MODERATOR
-                    # si LOGGED_USER || ADMINISTRATOR alors CONTRIBUTOR
-                    if not created:
-                        if auth.level.user_type_id in [choices.CONTRIBUTOR, choices.MODERATOR]:
-                            set_level = UserLevelPermission.objects.get(user_type_id=choices.MODERATOR)
-                        else:
-                            set_level = UserLevelPermission.objects.get(user_type_id=choices.CONTRIBUTOR)
-
-                        auth.level = set_level
+                    except Authorization.DoesNotExist:
+                        pass
+                    else:
+                        auth.level = UserLevelPermission.objects.get(user_type_id=choices.CONTRIBUTOR)
                         auth.save(update_fields=['level', ])
                         logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
-                            user.username, set_level.user_type_id, project.slug)
+                            user.username, auth.level.user_type_id, project.slug)
                         )
 
-            # si utilisateur membre d'un groupe admin LDAP référencé dans Project().ldap_project_admin_groups
             admin_qs = Project.objects.filter(ldap_project_admin_groups__overlap=flattened_groups)
             if admin_qs.exists():
                 for project in admin_qs or []:
+                    # Si un utilisateur d’un rôle animateur dans le LDAP est déjà
+                    # présent dans le projet comme contributeur ou modérateur (idem pour simple utilisateur?)
+                    # il se verra automatiquement appliqué le rôle d’administrateur du projet
                     auth, created = Authorization.objects.update_or_create(
                         project=project, user=user,
                         defaults={
                             'level': UserLevelPermission.objects.get(user_type_id=choices.ADMIN)
                         }
                     )
-                    logger.debug("User '{0}' set as admin's Project '{1}' ".format(user.username, project.slug))
+
+                    logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
+                        user.username, auth.level.user_type_id, project.slug)
+                    )
 
     def user_update_or_create(self, row):
         try:
