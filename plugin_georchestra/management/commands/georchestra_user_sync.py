@@ -123,40 +123,50 @@ synchroniser."""
         logger.debug("Deleted users: {0}: ".format(deleted))
 
     def sync_ldap_groups(self, user, row):
+        # Tous les utilisateurs LDAP doivent au moins avoir le role "utilisateur connecté"
+        for project in Project.objects.all():
+            Authorization.objects.get_or_create(
+                project=project, user=user,
+                defaults={'level': UserLevelPermission.objects.get(user_type_id=choices.LOGGED_USER)}
+            )
 
         # On liste les noms de groupe auxquels est affilié l'utilisateur
         member_of = get_mapped_value(row, 'member_of', [])
         all_groups = [re.findall('cn=(.*?),', item) for item in member_of]
         flattened_groups = list(set(itertools.chain(*all_groups)))
         if len(flattened_groups) > 0:
-            # Pour identifier les contributeurs et modérateurs de ce projet
-            # il faut faire l'union des utilisateurs de ces filtres (noms de groupes)
+            # Tous les utilisateurs LDAP membres de groupe référencé dans des 'ldap_project_contrib_groups'
+            # et qui sont "utilisateur connecté" de ces projets devienne contributeurs
             contrib_qs = Project.objects.filter(ldap_project_contrib_groups__overlap=flattened_groups)
             if contrib_qs.exists():
                 for project in contrib_qs or []:
-                    # si l'utilisateur est référencé en tant que simple utilisateur
-                    # et qu'il est membre d'un des groupe ldap_project_contrib_groups du projet
-                    # alors il passe contributeur pour ce projet
                     try:
-                        auth = Authorization.objects.get(
-                            project=project, user=user,
-                            level__user_type_id=choices.LOGGED_USER)
-
+                        auth = Authorization.objects.get(project=project, user=user)
                     except Authorization.DoesNotExist:
                         pass
                     else:
-                        auth.level = UserLevelPermission.objects.get(user_type_id=choices.CONTRIBUTOR)
-                        auth.save(update_fields=['level', ])
-                        logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
-                            user.username, auth.level.user_type_id, project.slug)
-                        )
+                        # Si un utilisateur d’un rôle rédacteur ou membre dans
+                        # le LDAP est déjà présent dans le projet comme modérateur
+                        # il ne sera pas déclassé en contributeur,
+
+                        # Si un utilisateur d’un rôle rédacteur ou membre dans
+                        # le LDAP est déjà présent dans le projet comme administrateur projet
+                        # il sera automatiquement déclassé en contributeur,
+                        # idem pour simple utilisateur
+                        if auth.level.user_type_id != choices.MODERATOR:
+                            auth.level = UserLevelPermission.objects.get(user_type_id=choices.CONTRIBUTOR)
+                            auth.save(update_fields=['level', ])
+                            logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
+                                user.username, auth.level.user_type_id, project.slug)
+                            )
 
             admin_qs = Project.objects.filter(ldap_project_admin_groups__overlap=flattened_groups)
             if admin_qs.exists():
                 for project in admin_qs or []:
                     # Si un utilisateur d’un rôle animateur dans le LDAP est déjà
-                    # présent dans le projet comme contributeur ou modérateur (idem pour simple utilisateur?)
+                    # présent dans le projet comme contributeur ou modérateur
                     # il se verra automatiquement appliqué le rôle d’administrateur du projet
+                    # (idem pour simple utilisateur)
                     auth, created = Authorization.objects.update_or_create(
                         project=project, user=user,
                         defaults={
