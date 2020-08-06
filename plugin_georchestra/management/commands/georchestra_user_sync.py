@@ -135,8 +135,11 @@ synchroniser."""
         all_groups = [re.findall('cn=(.*?),', item) for item in member_of]
         flattened_groups = list(set(itertools.chain(*all_groups)))
         if len(flattened_groups) > 0:
-            # Tous les utilisateurs LDAP membres de groupe référencé dans des 'ldap_project_contrib_groups'
-            # et qui sont "utilisateur connecté" de ces projets devienne contributeurs
+            # Tous les utilisateurs LDAP membres de groupes référencés dans des 'ldap_project_contrib_groups'
+            # et qui sont "utilisateur connecté" de ces projets deviennent contributeurs
+
+            # On liste les projets pour lesquels l'utilisateur est membre des groupes 'ldap_project_contrib_groups'
+            # Ces utilisateurs se retrouvent "contributeur" s'ils n'étaient pas déjà "modérateur"
             contrib_qs = Project.objects.filter(ldap_project_contrib_groups__overlap=flattened_groups)
             if contrib_qs.exists():
                 for project in contrib_qs or []:
@@ -145,12 +148,12 @@ synchroniser."""
                     except Authorization.DoesNotExist:
                         pass
                     else:
-                        # Si un utilisateur d’un rôle rédacteur ou membre dans
-                        # le LDAP est déjà présent dans le projet comme modérateur
+                        # Si un utilisateur d’un des groupes de 'ldap_project_contrib_groups'
+                        # est déjà présent dans le projet comme modérateur
                         # il ne sera pas déclassé en contributeur,
 
-                        # Si un utilisateur d’un rôle rédacteur ou membre dans
-                        # le LDAP est déjà présent dans le projet comme administrateur projet
+                        # Si un utilisateur d’un des groupes de 'ldap_project_contrib_groups'
+                        # est déjà présent dans le projet comme administrateur projet
                         # il sera automatiquement déclassé en contributeur,
                         # idem pour simple utilisateur
                         if auth.level.user_type_id != choices.MODERATOR:
@@ -160,6 +163,8 @@ synchroniser."""
                                 user.username, auth.level.user_type_id, project.slug)
                             )
 
+            # On liste les projets pour lesquels l'utilisateur est membre des groupes 'ldap_project_admin_groups'
+            # Les utilisateurs de ces groupes se retrouvent "administrateur de projet"
             admin_qs = Project.objects.filter(ldap_project_admin_groups__overlap=flattened_groups)
             if admin_qs.exists():
                 for project in admin_qs or []:
@@ -171,6 +176,24 @@ synchroniser."""
                         project=project, user=user,
                         defaults={
                             'level': UserLevelPermission.objects.get(user_type_id=choices.ADMIN)
+                        }
+                    )
+
+                    logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
+                        user.username, auth.level.user_type_id, project.slug)
+                    )
+
+            # On liste les projets pour lesquels l'utilisateur n'est ni membre des groupes 'ldap_project_admin_groups'
+            # ni membre des goupes 'ldap_project_contrib_groups'
+            # Les utilisateurs absent de ces groupes se retrouvent simples "utilisateur connecté"
+            not_admin_and_not_contrib_qs = Project.objects.exclude(ldap_project_admin_groups__overlap=flattened_groups)\
+                .exclude(ldap_project_contrib_groups__overlap=flattened_groups)
+            if not_admin_and_not_contrib_qs.exists():
+                for project in not_admin_and_not_contrib_qs or []:
+                    auth, created = Authorization.objects.update_or_create(
+                        project=project, user=user,
+                        defaults={
+                            'level': UserLevelPermission.objects.get(user_type_id=choices.LOGGED_USER)
                         }
                     )
 
