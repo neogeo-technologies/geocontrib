@@ -93,7 +93,7 @@ class BaseMapContextMixin(SingleObjectMixin):
                 Layer.objects.all(),
                 many=True
             )
-            features = Feature.objects.filter(project=project)
+            features = Feature.handy.availables(user=self.request.user, project=project)
             serialized_features = FeatureDetailedSerializer(
                 features,
                 is_authenticated=request.user.is_authenticated,
