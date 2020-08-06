@@ -123,40 +123,83 @@ synchroniser."""
         logger.debug("Deleted users: {0}: ".format(deleted))
 
     def sync_ldap_groups(self, user, row):
+        # Tous les utilisateurs LDAP doivent au moins avoir le role "utilisateur connecté"
+        for project in Project.objects.all():
+            Authorization.objects.get_or_create(
+                project=project, user=user,
+                defaults={'level': UserLevelPermission.objects.get(user_type_id=choices.LOGGED_USER)}
+            )
 
         # On liste les noms de groupe auxquels est affilié l'utilisateur
         member_of = get_mapped_value(row, 'member_of', [])
         all_groups = [re.findall('cn=(.*?),', item) for item in member_of]
         flattened_groups = list(set(itertools.chain(*all_groups)))
         if len(flattened_groups) > 0:
+            # Tous les utilisateurs LDAP membres de groupes référencés dans des 'ldap_project_contrib_groups'
+            # et qui sont "utilisateur connecté" de ces projets deviennent contributeurs
+
+            # On liste les projets pour lesquels l'utilisateur est membre des groupes 'ldap_project_contrib_groups'
+            # Ces utilisateurs se retrouvent "contributeur" s'ils n'étaient pas déjà "modérateur"
             contrib_qs = Project.objects.filter(ldap_project_contrib_groups__overlap=flattened_groups)
             if contrib_qs.exists():
                 for project in contrib_qs or []:
-                    # si non référencé parmi la liste des noms de Project().ldap_project_contrib_groups
-                    # alors on l'ajoute en tant que simple contributeur
-                    auth, created = Authorization.objects.get_or_create(
-                        project=project, user=user,
-                        defaults={
-                            'level': UserLevelPermission.objects.get(user_type_id=choices.CONTRIBUTOR)
-                        }
-                    )
-                    # sinon on l'ajoute en tant que modérateur
-                    if not created:
-                        auth.level = UserLevelPermission.objects.get(user_type_id=choices.MODERATOR)
-                        auth.save(updated_fields=['level', ])
-                        logger.debug("User '{0}' set as moderator's Project '{1}' ".format(user.username, project.slug))
+                    try:
+                        auth = Authorization.objects.get(project=project, user=user)
+                    except Authorization.DoesNotExist:
+                        pass
+                    else:
+                        # Si un utilisateur d’un des groupes de 'ldap_project_contrib_groups'
+                        # est déjà présent dans le projet comme modérateur
+                        # il ne sera pas déclassé en contributeur,
 
-            # si utilisateur membre d'un groupe admin LDAP référencé dans Project().ldap_project_admin_groups
+                        # Si un utilisateur d’un des groupes de 'ldap_project_contrib_groups'
+                        # est déjà présent dans le projet comme administrateur projet
+                        # il sera automatiquement déclassé en contributeur,
+                        # idem pour simple utilisateur
+                        if auth.level.user_type_id != choices.MODERATOR:
+                            auth.level = UserLevelPermission.objects.get(user_type_id=choices.CONTRIBUTOR)
+                            auth.save(update_fields=['level', ])
+                            logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
+                                user.username, auth.level.user_type_id, project.slug)
+                            )
+
+            # On liste les projets pour lesquels l'utilisateur est membre des groupes 'ldap_project_admin_groups'
+            # Les utilisateurs de ces groupes se retrouvent "administrateur de projet"
             admin_qs = Project.objects.filter(ldap_project_admin_groups__overlap=flattened_groups)
             if admin_qs.exists():
                 for project in admin_qs or []:
+                    # Si un utilisateur d’un rôle animateur dans le LDAP est déjà
+                    # présent dans le projet comme contributeur ou modérateur
+                    # il se verra automatiquement appliqué le rôle d’administrateur du projet
+                    # (idem pour simple utilisateur)
                     auth, created = Authorization.objects.update_or_create(
                         project=project, user=user,
                         defaults={
                             'level': UserLevelPermission.objects.get(user_type_id=choices.ADMIN)
                         }
                     )
-                    logger.debug("User '{0}' set as admin's Project '{1}' ".format(user.username, project.slug))
+
+                    logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
+                        user.username, auth.level.user_type_id, project.slug)
+                    )
+
+            # On liste les projets pour lesquels l'utilisateur n'est ni membre des groupes 'ldap_project_admin_groups'
+            # ni membre des goupes 'ldap_project_contrib_groups'
+            # Les utilisateurs absent de ces groupes se retrouvent simples "utilisateur connecté"
+            not_admin_and_not_contrib_qs = Project.objects.exclude(ldap_project_admin_groups__overlap=flattened_groups)\
+                .exclude(ldap_project_contrib_groups__overlap=flattened_groups)
+            if not_admin_and_not_contrib_qs.exists():
+                for project in not_admin_and_not_contrib_qs or []:
+                    auth, created = Authorization.objects.update_or_create(
+                        project=project, user=user,
+                        defaults={
+                            'level': UserLevelPermission.objects.get(user_type_id=choices.LOGGED_USER)
+                        }
+                    )
+
+                    logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
+                        user.username, auth.level.user_type_id, project.slug)
+                    )
 
     def user_update_or_create(self, row):
         try:

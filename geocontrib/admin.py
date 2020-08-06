@@ -240,11 +240,23 @@ class BaseMapAdmin(admin.ModelAdmin):
             ctx.save(update_fields=['order'])
 
 
+class AuthorizationAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'user', 'full_name', 'project', 'level'
+    )
+    ordering = ('project', 'user__last_name')
+    list_editable = ('level', )
+
+    def full_name(self, obj):
+        return " ".join([obj.user.last_name, obj.user.first_name])
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(BaseMap, BaseMapAdmin)
 admin.site.register(CustomField)
 admin.site.register(Layer)
-admin.site.register(Authorization)
+admin.site.register(Authorization, AuthorizationAdmin)
 admin.site.register(Feature)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(Project)
