@@ -1,4 +1,4 @@
-# GéoContrib
+![alt text](geocontrib/static/geocontrib/img/logo-geocontrib.png?raw=true)
 
 GéoContrib est un outil libre de signalement contributif et collaboratif.
 
