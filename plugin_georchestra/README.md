@@ -3,13 +3,13 @@
 
 ## Objectifs
 
-Le plugin geOrchestra réalise quelques adaptation de Geocontrib pour son intégration dans un environnement geOrchestra :
+Le plugin geOrchestra réalise quelques adaptation de GéoContrib pour son intégration dans un environnement geOrchestra :
 * exploiter l'authentification de l'utilisateur. Le plugin exploite les en-têtes HTTP insérées par le proxy/CAS de
 geOrchestra après l'authentification de l'utilisateur ;
-* mettre à jour la base de données des utilisateurs de Geocontrib à partir de l'annuaire LDAP de geOrchestra. La
-gestion des droits des utilisateurs est toujours réalisée dans l'interface de Geocontrib. Cette mise à jour de la base
+* mettre à jour la base de données des utilisateurs de GéoContrib à partir de l'annuaire LDAP de geOrchestra. La
+gestion des droits des utilisateurs est toujours réalisée dans l'interface de GéoContrib. Cette mise à jour de la base
 des utilisateurs est appelée "synchronisation" dans le reste du présent document ;
-* désactiver les fonctions d'authentification native de Geocontrib.
+* désactiver les fonctions d'authentification native de GéoContrib.
 
 ## Principes de fonctionnement
 
@@ -21,7 +21,7 @@ dans la documentation de geOrchestra : https://github.com/georchestra/georchestr
 ### Synchronisation des utilisateurs
 
 La synchronisation des utilisateurs peut être lancée de 2 manières :
-* dans l'interface d'administration de Geocontrib dans la partie "Utilisateurs", un bouton
+* dans l'interface d'administration de GéoContrib dans la partie "Utilisateurs", un bouton
 "Synchroniser les utilisateurs" est présent en haut de la page. Ce bouton lance immédiatement la synchronisation des
 utilisateurs ;
 * via une commande Django incluse dans le fichier manage.py. Pour la lancer : `python manage.py georchestra_user_sync`.
@@ -41,14 +41,14 @@ Certains utilisateurs de l'annuaire ne sont pas importés lors de la synchronisa
 `EXCLUSIVE_USER_GROUPS`.
 
 Certains utilisateurs sont supprimés lors de la synchronisation :
-* utilisateurs déjà présents dans Geocontrib et qui ne sont pas importés lors de la synchronisation pour les raisons
+* utilisateurs déjà présents dans GéoContrib et qui ne sont pas importés lors de la synchronisation pour les raisons
 évoquées précédemment ;
-* utilisateurs déjà présents dans Geocontrib mais ne figurant pas dans l'annuaire LDAP.
+* utilisateurs déjà présents dans GéoContrib mais ne figurant pas dans l'annuaire LDAP.
 
 Néanmoins, les utilisateurs figurant dans `PROTECTED_USER_NAMES` ne sont jamais supprimés par la synchronisation. Ils
-peuvent l'être manuellement via l'interface d'administration de Geocontrib.
+peuvent l'être manuellement via l'interface d'administration de GéoContrib.
 
-Certains utilisateurs se voient automatiquement attribués des droits de superutilisateurs dans Geocontrib lors de la
+Certains utilisateurs se voient automatiquement attribués des droits de superutilisateurs dans GéoContrib lors de la
 synchronisation : ceux figurant dans au moins un groupe d'utilisateurs présent dans `ADMIN_USER_GROUPS`.
 
 
@@ -59,8 +59,8 @@ Les exemples de paramètres adaptés au plugin geOrchestra sont présents dans l
 
 ### Installation
 
-Le plugin geOrchestra est installé avec Geocontrib.
-Il suffit de configurer les paramètres dans les settings de Geocontrib ou via des variables d'environnements 
+Le plugin geOrchestra est installé avec GéoContrib.
+Il suffit de configurer les paramètres dans les settings de GéoContrib ou via des variables d'environnements 
 (voir ci-dessous).
 
 ### Exploitation du SSO de geOrchestra
@@ -102,7 +102,7 @@ LDAP_SEARCH_FILTER = (objectClass=person)
 * PROTECTED_USER_NAMES : liste de noms d'utilisateurs (leur identifiant unique) à ne pas supprimer lors de la
 synchronisation des utilisateurs (liste de valeurs séparées par des virgules). Exemple : `admin,super_admin`. Valeur
 par défaut : aucune (chaîne vide).
-* EXCLUDED_USER_NAMES : liste des noms d'utilisateurs à ne pas importer dans Geocontrib lors de la synchronisation
+* EXCLUDED_USER_NAMES : liste des noms d'utilisateurs à ne pas importer dans GéoContrib lors de la synchronisation
 (liste de valeurs séparées par des virgules). Exemple : `geoserver_privileged_user`. Valeur par défaut : aucune 
 (chaîne vide).
 
@@ -116,12 +116,12 @@ droits d'administration via l'interface d'administration de l'application. Chacu
 Exemple : `cn=SUPERUSER,ou=roles,dc=georchestra,dc=org;cn=ADMINISTRATOR,ou=roles,dc=georchestra,dc=org;cn=GEOCONTRIB_ADMIN,ou=roles,dc=georchestra,dc=org`.
 Valeur par défaut : `cn=SUPERUSER,ou=roles,dc=georchestra,dc=org;cn=ADMINISTRATOR,ou=roles,dc=georchestra,dc=org`.
 * EXCLUSIVE_USER_GROUPS : liste des groupes d'utilisateurs auxquels les utilisateurs doivent appartenir pour être
-importés dans Geocontrib (liste de valeurs séparées par des points-virgules). Seuls les membres de ces groupes sont
+importés dans GéoContrib (liste de valeurs séparées par des points-virgules). Seuls les membres de ces groupes sont
 importés (même s'ils font partie des groupes identifiés dans ADMIN_USER_GROUPS). Chacun des groupes d'utilisateurs est
 défini à l'aide d'un filtre LDAP appliqué sur le champ `membreOf` des utilisateurs.
 Exemple : `cn=SUPERUSER,ou=roles,dc=georchestra,dc=org;cn=ADMINISTRATOR,ou=roles,dc=georchestra,dc=org;cn=GEOCONTRIB_USER,ou=roles,dc=georchestra,dc=org`.
 Valeur par défaut : aucune (chaîne vide).
-* EXCLUDED_USER_GROUPS : liste des groupes d'utilisateurs à ne pas importer dans Geocontrib (liste de valeurs séparées
+* EXCLUDED_USER_GROUPS : liste des groupes d'utilisateurs à ne pas importer dans GéoContrib (liste de valeurs séparées
 par des points-virgules). Cela concerne typiquement les utilisateurs dont les comptes sont en attente de modératio.
 Chacun des groupes d'utilisateurs est défini à l'aide d'un filtre LDAP appliqué sur le champ `membreOf` des
 utilisateurs. Exemple : `cn=pendingorg,ou=pendingorgs,dc=georchestra,dc=org`. Valeur par défaut : aucune (chaîne vide).
