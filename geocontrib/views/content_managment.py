@@ -1289,7 +1289,7 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
             return redirect('geocontrib:project_mapping', slug=project.slug)
         else:
             logger.debug(formset.errors)
-            messages.error(request, "L'édition des fonds cartographiques a échouée. ")
+            messages.error(request, "L'édition des fonds cartographiques a échoué. ")
             formset = ProjectBaseMapInlineFormset(data=request.POST or None, instance=project)
 
         context = {**self.get_context_data(), **{
