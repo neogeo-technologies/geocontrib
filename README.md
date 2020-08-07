@@ -87,6 +87,7 @@ Par exemple, copier les images fournies dans les sources de l'application :
 mkdir media
 cp src/geocontrib/static/geocontrib/img/default.png media/
 cp src/geocontrib/static/geocontrib/img/logo.png media/
+cp src/geocontrib/static/geocontrib/img/logo-neogeo*.png media/
 ```
 
 ### Création d'un superutilisateur

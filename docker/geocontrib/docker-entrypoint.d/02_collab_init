@@ -9,6 +9,8 @@ else
     echo "$marker_file does not exist"
     cp src/geocontrib/static/geocontrib/img/default.png media/
     cp src/geocontrib/static/geocontrib/img/logo.png media/
+    cp src/geocontrib/static/geocontrib/img/logo.png media/
+    cp src/geocontrib/static/geocontrib/img/logo-neogeo*.png media/
     echo "Collect static"
     echo "Copy file(s) in static root directory [$(python manage.py collectstatic --noinput | wc -l)]"
     sleep $TIME_SLEEP
