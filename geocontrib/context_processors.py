@@ -21,6 +21,7 @@ def custom_contexts(request):
         'APPLICATION_NAME': settings.APPLICATION_NAME,
         'LOGO_PATH': settings.LOGO_PATH,
         'APPLICATION_ABSTRACT': settings.APPLICATION_ABSTRACT,
+        'FAVICON_PATH': settings.FAVICON_PATH,
         'IMAGE_FORMAT': settings.IMAGE_FORMAT,
         'FILE_MAX_SIZE': settings.FILE_MAX_SIZE,
         'USER_LEVEL_PROJECTS': user_level_projects,
