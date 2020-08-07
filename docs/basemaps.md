@@ -1,31 +1,31 @@
 # Fonds cartographiques
 
-Chaque projet dispose de sa propre configuration des fonds cartographiques. Cette fonction estaccessible dans le menu 
-du projet et est accessible aux administrateurs du projet.
+La gestion des fonds cartographiques est divisée en deux partie dans GéoContrib :
+* la gestion des couches de données
+* la gestion des fonds cartographiques
 
-Deux types de fonds cartographiques sont exploitables :
+## Couches de données
+
+Les couches de données sont gérées par les administrateurs de GéoContrib (via la page d'administration 
+/admin/geocontrib/layer/).
+Deux types de couches peuvent y être configurées :
 * des couches WMS (Web Map Service - standard de l'OGC) ;
 * des couches TMS (Tiled Map Service - standard de fait issue de la communauté géospatiale open source).
 
-L'administrateur du projet peut empiler plusieurs couches, qu'il s'agisse de fonds de cartes (comme 
-des cartes topographiques, des modèles numériques de terrain ou des orthophotographies) ou qu'il s'agisse de couches 
-métier (réseaux, zonages...). Ces couches sont uniquement affichées sous forme d'images dans les cartes. Elles ne 
-peuvent pas être utilisées comme couches d'accrochage lors de la saisie (aucune fonction d'accrochage n'existe dans 
-l'application).
+Chacune de ces couches est décrite par :
+* un titre (charge à l'administrateur de l'outil de choisir le titre qui conviendra le mieux)
+* une URL de service
+* des options : structure JSON directement interprétable par Leaflet (cf. 
+https://leafletjs.com/reference-1.6.0.html#tilelayer).
 
-L'ordre des couches et leur transparence peuvent être modifiés par les administrateur du projet.
+Étant donné que la configuration d'une couche est très liée aux capacités de Leaflet et qu'elle ne bénéficie pas d'une 
+interface adaptée à des non-spécialistes, nous donnons ci-dessous quelques exemples de configuration.
+
 Seules les couches affichables dans la projection EPSG:3857 sont supportées.
 
-Ces configurations ne peuvent pas être partagées entre projets. Pour utiliser une même chose dans plusieurs projets il
-faut procéder par recopie manuelle.
+### Exemples de configuration de couches WMS
 
-Étant donné que la configuration d'une couche est très liée aux capacités de Leaflet à gérer ces types de couches et 
-qu'elle ne bénéficie pas d'une interface adaptée à des non-spécialistes, nous donnons ci-dessous quelques exemples de 
-configuration.
-
-## Exemples de configuration de couches WMS
-
-### Couche WMS au format PNG
+**Couche WMS au format PNG :**
 ```Titre : Ortho 2013 Picardie
 Type de couche : WMS
 Service : https://www.geopicardie.fr/geoserver/ows
@@ -36,7 +36,7 @@ Options : {
     "transparent": true}
 ```
 
-### Couche WMS au format JPEG avec transparence
+**Couche WMS au format JPEG avec transparence :**
 ```Titre : Scan25
 Type de couche : WMS
 Service : https://www.geopicardie.fr/geoserver/ows
@@ -47,12 +47,9 @@ Options : {
     "transparent": true}
 ```
 
-## Exemples de configuration de couches TMS
+### Exemples de configuration de couches TMS
 
-### Couche faded du serveur OSM de Géo2France
-
-Notez l'utilisation des deux options `tms` et `zoomOffSet` que l'on ne retrouve pas dans le paramétrage des couches 
-OpenStreetMap officielles.
+**Couche faded du serveur OSM de Géo2France :**
 
 ```Titre : OSM Géo2France - Faded
 Type de couche : TMS
@@ -63,8 +60,10 @@ Options : {
     "attribution": "\u00a9 les contributeurs d\u2019OpenStreetMap - G\u00e9o2France",
     "maxZoom": 19}
 ```
+Remarque : Notez l'utilisation des deux options `tms` et `zoomOffSet` que l'on ne retrouve pas dans le paramétrage des 
+couches OpenStreetMap officielles.
 
-### Couche OpenStreetMap normal
+**Couche OpenStreetMap normal :**
 ```Titre : OpenStreetMap France
 Type de couche : TMS
 Service : https://{s}.tile.osm.org/{z}/{x}/{y}.png
@@ -73,7 +72,7 @@ Options : {
     "maxZoom": 20}
 ```
 
-### Couche OpenStreetMap France
+**Couche OpenStreetMap France :**
 ```Titre : OpenStreetMap France
 Type de couche : TMS
 Service : https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png
@@ -82,9 +81,9 @@ Options : {
     "maxZoom": 20}
 ```
 
-## Options de Leaflet
+### Options de Leaflet
 
-### minZoom et maxZoom
+**minZoom et maxZoom :**
 `minZoom` et `maxZoom` vous permettent de définir la plage d'échelles pour laquelle la couche en question est visible.
 Il s'agit de nombres entiers qui se référèrent aux niveaux de zoom utilisés par GoogleMaps.
 Les plus petits nombres correspondent aux échelles cartographiques les plus petites (niveau mondial, international) 
@@ -94,6 +93,22 @@ cf. https://leafletjs.com/examples/zoom-levels/
 Vous pouvez utiliser ces paramètres avec plusieurs couches pour ainsi rendre visible une couche à certaines échelles et 
 une autre couche à d'autres échelles.
 
-### opacity
+**opacity :**
 Vous pouvez moduler l'opacité d'une couche à l'aide de l'option `opacity` 
 (cf. https://leafletjs.com/reference-1.5.0.html#gridlayer-opacity)
+
+## Fonds cartographiques
+Chaque projet dispose de sa propre configuration des fonds cartographiques. Cette fonction est accessible aux 
+administrateurs de chaque projet via le menu "Fonds cartographiques".
+
+Un fond cartographique est une liste de couches ordonnées (couches décrites plus haut et mise à disposition des 
+administrateurs des projets par les administrateur de l'outil). Ces couches sont uniquement affichées sous forme 
+d'images dans les cartes. Elles ne peuvent pas être utilisées comme couches d'accrochage lors de la saisie 
+(aucune fonction d'accrochage n'existe dans l'application).
+
+L'ordre des couches et leur transparence peuvent être modifiés par les administrateurs du projet.
+
+Les fonds cartographiques sont mis à disposition des utilisateurs qui exploitent les outils cartographiques de 
+GéoContrib. Chacun d'eux peut activer le fond cartographique qui lui convient le mieux, voire modifier l'ordre des
+couches et leur transparence. Ces personnalisées sont enregistrées au niveau du navigateur web et n'ont pas d'impact 
+sur les autres utilisateurs de l'application.
