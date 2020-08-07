@@ -275,6 +275,7 @@ class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
+        permissions = Authorization.all_permissions(user, project)
 
         extra = CustomField.objects.filter(feature_type=feature_type)
 
@@ -298,6 +299,7 @@ class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
             'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_type': feature_type,
             'project': project,
+            'permissions': permissions,
             'feature_form': feature_form,
             'extra_form': extra_form,
             'linked_formset': linked_formset,
@@ -311,6 +313,7 @@ class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
         user = request.user
         feature_type = self.get_object()
         project = feature_type.project
+        permissions = Authorization.all_permissions(user, project)
 
         feature_form = FeatureBaseForm(
             request.POST, feature_type=feature_type, user=user)
@@ -424,6 +427,7 @@ class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
             'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_type': feature_type,
             'project': project,
+            'permissions': permissions,
             'feature_form': feature_form,
             'extra_form': extra_form,
             'linked_formset': linked_formset,
@@ -1270,18 +1274,23 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
 
     def get(self, request, slug):
 
+        user = self.request.user
         project = self.get_object()
+        permissions = Authorization.all_permissions(user, project)
         formset = ProjectBaseMapInlineFormset(instance=project)
 
         context = {**self.get_context_data(), **{
             'project': project,
+            'permissions': permissions,
             'formset': formset,
         }}
 
         return render(request, 'geocontrib/project/project_mapping.html', context)
 
     def post(self, request, slug):
+        user = self.request.user
         project = self.get_object()
+        permissions = Authorization.all_permissions(user, project)
         formset = ProjectBaseMapInlineFormset(data=request.POST or None, instance=project)
 
         if formset.is_valid():
@@ -1294,6 +1303,7 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
 
         context = {**self.get_context_data(), **{
             'project': project,
+            'permissions': permissions,
             'formset': formset
         }}
         return render(request, 'geocontrib/project/project_mapping.html', context)
