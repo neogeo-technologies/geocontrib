@@ -157,6 +157,11 @@
   margin: 0.5rem 0;
 }
 
+.error-options {
+  font-size: 12px;
+  color: red;
+}
+
 .range-container {
   display: flex;
 }

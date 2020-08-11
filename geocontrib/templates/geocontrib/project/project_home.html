@@ -262,6 +262,7 @@
 {{ SERVICE|json_script:'serviceMap' }}
 {{ OPTIONS|json_script:'optionsMap' }}
 {{ DEFAULT_MAP_VIEW|json_script:'defaultMapView' }}
+{{ project.slug|json_script:'project' }}
 
 <script type="text/javascript">
   $(document).ready(function() {
@@ -277,6 +278,7 @@
     const serviceMap = JSON.parse(document.getElementById('serviceMap').textContent);
     const optionsMap = JSON.parse(document.getElementById('optionsMap').textContent);
     const defaultMapView = JSON.parse(document.getElementById('defaultMapView').textContent);
+    const project = JSON.parse(document.getElementById('project').textContent);
 
     var mapDefaultViewCenter = defaultMapView.center;
     var mapDefaultViewZoom = defaultMapView.zoom;
@@ -291,9 +293,10 @@
     // - if not, load the default map and service options
     let layersToLoad = null;
     if (baseMaps && baseMaps.length > 0) {
-      const currentBasemapIndex = localStorage.getItem('current-basemap-index');
       // Use active one if exists, otherwise index 0 (first basemap in the list)
-      const basemapIndex = currentBasemapIndex ? currentBasemapIndex : 0;
+      const mapOptions = JSON.parse(localStorage.getItem('geocontrib-map-options'));
+      const basemapIndex = mapOptions && mapOptions[project] && mapOptions[project]['current-basemap-index'] ?
+                                  mapOptions[project]['current-basemap-index'] : 0;
       layersToLoad = baseMaps[basemapIndex].layers;
       layersToLoad.forEach(layerToLoad => {
           layers.forEach(layer => {
