@@ -188,7 +188,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
 
     updated_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
 
-    archived_on = serializers.DateField(format="%d/%m/%Y", read_only=True)
+    archived_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
 
     class Meta:
         model = Feature
@@ -226,7 +226,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
 
     def get_creator(self, obj):
         res = {}
-        if self.is_authenticated:
+        if self.is_authenticated and obj.creator:
             res = {
                 'full_name': obj.creator.get_full_name(),
                 'first_name': obj.creator.first_name,
@@ -267,7 +267,7 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
                     'title': str(feature.title),
                     'feature_url': feature.get_view_url(),
                     'created_on': feature.created_on.strftime("%d/%m/%Y %H:%M"),
-                    'creator': feature.creator.get_full_name(),
+                    'creator': feature.creator.display_creator,
                 }
             except Exception:
                 logger.exception('No related feature found')
