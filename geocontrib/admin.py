@@ -252,12 +252,17 @@ class AuthorizationAdmin(admin.ModelAdmin):
         return " ".join([obj.user.last_name, obj.user.first_name])
 
 
+class FeatureAdmin(admin.ModelAdmin):
+    list_display = ('title', 'project', 'feature_type')
+    ordering = ('project', 'feature_type', 'title')
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(BaseMap, BaseMapAdmin)
 admin.site.register(CustomField)
 admin.site.register(Layer)
 admin.site.register(Authorization, AuthorizationAdmin)
-admin.site.register(Feature)
+admin.site.register(Feature, FeatureAdmin)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(Project)
 admin.site.register(Subscription)

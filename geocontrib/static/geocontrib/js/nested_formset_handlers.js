@@ -18,6 +18,9 @@ window.addEventListener('load', function () {
 
     hidden_input_delete.checked = true;
     data_segment.style.display = 'none';
+
+    // On submit a chaque suppression d'un form
+    // document.getElementById("form-layers").submit();
   }
 
   for (let i = 0; i < form_deleters.length; i++) {

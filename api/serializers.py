@@ -188,7 +188,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
 
     updated_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
 
-    archived_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+    archived_on = serializers.DateField(format="%d/%m/%Y", read_only=True)
 
     class Meta:
         model = Feature
