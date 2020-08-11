@@ -39,26 +39,34 @@
 
 {{ basemaps|json_script:'basemaps' }}
 {{ layers|json_script:'layers' }}
+{{ project|json_script:'project' }}
 
 
 <script>
 
   const baseMapsFromServer = JSON.parse(document.getElementById('basemaps').textContent);
   const layers = JSON.parse(document.getElementById('layers').textContent);
+  const project = JSON.parse(document.getElementById('project').textContent);
 
   document.addEventListener("DOMContentLoaded", function () {
     // Check in the locastorage if the options already exists
-    if (localStorage.getItem('map-options')) {
+    const mapOptions = JSON.parse(localStorage.getItem('geocontrib-map-options'));
+    if (mapOptions 
+        && mapOptions[project]) {
 
       // If already in the storage, we need to check if the admin did some 
       // modification in the basemaps on the server side. The rule is: if one layer has been added
       // or deleted in the server, then we reset the localstorage.
-      const baseMapsFromLocalstorage = JSON.parse(localStorage.getItem('map-options'));
+      const baseMapsFromLocalstorage = mapOptions[project]['basemaps'];
       const areChanges = areChangesInBasemaps(baseMapsFromServer, baseMapsFromLocalstorage);
+
       if (areChanges) {
         baseMaps = baseMapsFromServer;
-        localStorage.removeItem('map-options');
-        localStorage.removeItem('current-basemap-index');
+        mapOptions[project] = {
+          'map-options': baseMaps,
+          'current-basemap-index': 0,
+        };
+        localStorage.setItem('geocontrib-map-options', JSON.stringify(mapOptions));
       } else {
         baseMaps = baseMapsFromLocalstorage;
       }
@@ -68,9 +76,8 @@
 
     // Basemap selected by default: 
     // use the active one if exists (set in localstorage), otherwise the index 0 (first basemap in the list)
-    const currentBasemapIndex = localStorage.getItem('current-basemap-index');
-    let selectedBasemapIndex = currentBasemapIndex ? currentBasemapIndex : 0;
-
+    let selectedBasemapIndex = mapOptions && mapOptions[project] && mapOptions[project]['current-basemap-index'] ?
+                                  mapOptions[project]['current-basemap-index'] : 0;
     let expanded = false;
     const layerIcon = document.getElementsByClassName('layers-icon')[0];
 
@@ -113,6 +120,12 @@
         const layerTitleElement = document.createElement('p');
         layerTitleElement.innerHTML = layer.title;
         layerTitleElement.classList.add('layer-handle-sort');
+        let layerErrorOptions = null
+        if (layer.options === null) {
+          layerErrorOptions = document.createElement('p');
+          layerErrorOptions.innerHTML = 'Couche mal configurée - contactez l’administrateur de l’outil';
+          layerErrorOptions.classList.add('error-options');
+        }
 
         const iconDrag = document.createElement('i');
         iconDrag.classList.add('th', 'icon');
@@ -127,6 +140,9 @@
         layerLabelInput.append(labelPercentage);
 
         layerElement.append(layerTitleElement);
+        if (layerErrorOptions) {
+          layerElement.append(layerErrorOptions);
+        }
         layerElement.append(layerLabelInput);
 
         // Range container
@@ -162,7 +178,7 @@
           })
           document.dispatchEvent(eventOrder);
           // Save the basemaps options into the localstorage
-          localStorage.setItem('map-options', JSON.stringify(baseMaps));
+          setLocalstorageMapOptions(baseMaps) 
         }
       });
     });
@@ -178,7 +194,14 @@
         document.dispatchEvent(event)
 
         // Set in the store the last basemap used
-        localStorage.setItem('current-basemap-index', basemapIndex);
+        let mapOptions = localStorage.getItem('geocontrib-map-options') || {};
+        mapOptions = mapOptions ? JSON.parse(mapOptions) : {};
+
+        mapOptions[project] = {
+          ...mapOptions[project],
+          'current-basemap-index': basemapIndex
+        };
+        localStorage.setItem('geocontrib-map-options', JSON.stringify(mapOptions));
       });
 
     // Load layer of the selected basemap
@@ -189,7 +212,7 @@
     });
 
     // Save the basemaps options into the localstorage
-    localStorage.setItem('map-options', JSON.stringify(baseMaps));
+    setLocalstorageMapOptions(baseMaps);
   });
 
   function _createRangeContainer(layer) {
@@ -220,7 +243,7 @@
       })
       document.dispatchEvent(event);
       // Save the basemaps options into the localstorage
-      localStorage.setItem('map-options', JSON.stringify(baseMaps));
+      setLocalstorageMapOptions(baseMaps) 
     });
 
     setBubble(rangeInput, rangeBubble);
@@ -244,21 +267,33 @@
       && idBasemapsServer.every((value, index) => value === idBasemapsLocalstorage[index]))
 
     // For each basemap, compare the length and id values of the layers
-    basemapFromServer.forEach((basemapServer) => {
+    outer_block: {
+    for(let basemapServer of basemapFromServer) {
       let idLayersServer = basemapServer.layers.map(b => b.id).sort();
+  
       for (let basemapLocalstorage of basemapFromLocalstorage) {
         if (basemapServer.id === basemapLocalstorage.id) {
           let idLayersLocalstorage = basemapLocalstorage.layers.map(b => b.id).sort();
           isSameLayers = (idLayersServer.length === idLayersLocalstorage.length
             && idLayersServer.every((value, index) => value === idLayersLocalstorage[index]));
           if (!isSameLayers) {
-            break;
+            break outer_block;
           }
         }
       }
-
-    });
+    }
+  }
     return !(isSameBasemaps && isSameLayers);
+  }
+
+  function setLocalstorageMapOptions(basemaps) {
+    let mapOptions = localStorage.getItem('geocontrib-map-options');
+    mapOptions = mapOptions ? JSON.parse(mapOptions) : {};
+    mapOptions[project] = {
+      ...mapOptions[project],
+      'basemaps': basemaps
+    };
+    localStorage.setItem('geocontrib-map-options', JSON.stringify(mapOptions));
   }
 
   function setBubble(range, bubble) {

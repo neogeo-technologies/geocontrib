@@ -94,7 +94,7 @@
       <div id="map">
       </div>
       {% if serialized_base_maps|length > 0 %}
-         {% include "geocontrib/map-layers/sidebar-layers.html" with basemaps=serialized_base_maps layers=serialized_layers%}
+         {% include "geocontrib/map-layers/sidebar-layers.html" with basemaps=serialized_base_maps layers=serialized_layers project=project.slug%}
       {% endif %}
     </div>
 
