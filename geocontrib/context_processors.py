@@ -26,7 +26,7 @@ def custom_contexts(request):
         'FILE_MAX_SIZE': settings.FILE_MAX_SIZE,
         'USER_LEVEL_PROJECTS': user_level_projects,
         'SERVICE': settings.DEFAULT_BASE_MAP.get('SERVICE'),
-        'OPTIONS': json.dumps(settings.DEFAULT_BASE_MAP.get('OPTIONS')),
+        'OPTIONS': settings.DEFAULT_BASE_MAP.get('OPTIONS'),
         'DEFAULT_MAP_VIEW': settings.DEFAULT_MAP_VIEW,
         'GEOCODER_PROVIDERS': settings.GEOCODER_PROVIDERS,
         'SELECTED_GEOCODER_PROVIDER': settings.SELECTED_GEOCODER.get('PROVIDER'),
