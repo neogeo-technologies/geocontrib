@@ -367,6 +367,13 @@ class Feature(models.Model):
                 })
         return res
 
+    @property
+    def display_creator(self):
+        res = "Utilisateur supprimé"
+        if self.creator:
+            res = self.creator.get_full_name() or self.creator.username
+        return res
+
 
 class FeatureLink(models.Model):
     REL_TYPES = (

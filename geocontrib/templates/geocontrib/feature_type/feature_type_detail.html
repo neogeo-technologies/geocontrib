@@ -123,7 +123,7 @@
             [
             Créé le {{ feature.created_on }}
             {% if user.is_authenticated %}
-              par {{ feature.creator.get_full_name|default:feature.creator.username }}
+              par {{ feature.creator.display_creator }}
             {% endif %}
             ]
           </div>

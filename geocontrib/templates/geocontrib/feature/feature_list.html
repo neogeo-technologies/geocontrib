@@ -147,7 +147,11 @@
             </td>
             {% if user.is_authenticated %}
             <td>
+              {% if feature.creator %}
               {{ feature.creator.first_name }} {{ feature.creator.last_name }}
+              {% else %}
+              Utilisateur supprimé
+              {% endif %}
             </td>
             {% endif %}
           </tr>
@@ -334,7 +338,7 @@
     const geocoderLabel = JSON.parse(document.getElementById('selected-provider').textContent);
     if (geocoderLabel) {
       const LIMIT_RESULTS = 5;
-      
+
       // Load the geocoder specify in settings.py
       if (geocoderLabel === '{{ GEOCODER_PROVIDERS.ADDOK }}') {
         geocoder = L.Control.Geocoder.addok({limit: LIMIT_RESULTS});
