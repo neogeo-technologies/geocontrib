@@ -86,9 +86,6 @@
   <input type="hidden" name="lat" value="{{ request.GET.lat|default:'""' }}">
   <input type="hidden" name="lng" value="{{ request.GET.lng|default:'""' }}">
 </form>
-<!-- </div> -->
-<div class="row">
-  <div class="sixteen wide column">
 
     <div class="ui tab active map-container" data-tab="map">
       <div id="map">
@@ -159,8 +156,7 @@
         </tbody>
       </table>
     </div>
-  </div>
-</div>
+
 
 </div>
 
@@ -181,16 +177,27 @@
     justify-content: flex-start;
   }
 
+  .feature-list-container .ui.menu:not(.vertical) .right.item {
+    padding-right: 0;
+  }
+
+  .map-container {
+    width: 80vw;
+    transform: translateX(-50%);
+    margin-left: 50%;
+  }
+
   @media screen and (max-width: 767px) {
     #form-filters > .field.column {
       width: 100% !important
     }
+
+    .map-container {
+      width: 100%;
+    }
   }
 
-
-  .feature-list-container .ui.menu:not(.vertical) .right.item {
-    padding-right: 0;
-  }
+    
 </style>
 
 <!--  These Context variables will be accessible in the javascript after json_script (it set the values in the DOM) -->
