@@ -35,7 +35,7 @@ class EmptyGpsInfoException(ExifException):
         super().__init__(message, image_file_path)
 
 
-get_float = lambda x: float(x[0]) / float(x[1])
+get_float = lambda x: float(x.real)
 
 
 class Exif():
