@@ -6,9 +6,10 @@
 Le plugin geOrchestra réalise quelques adaptation de GéoContrib pour son intégration dans un environnement geOrchestra :
 * exploiter l'authentification de l'utilisateur. Le plugin exploite les en-têtes HTTP insérées par le proxy/CAS de
 geOrchestra après l'authentification de l'utilisateur ;
-* mettre à jour la base de données des utilisateurs de GéoContrib à partir de l'annuaire LDAP de geOrchestra. La
-gestion des droits des utilisateurs est toujours réalisée dans l'interface de GéoContrib. Cette mise à jour de la base
-des utilisateurs est appelée "synchronisation" dans le reste du présent document ;
+* mettre à jour la base de données des utilisateurs de GéoContrib à partir de l'annuaire LDAP de geOrchestra, avec une 
+attribution des droits par défaut. La gestion des droits des utilisateurs est toujours réalisée dans l'interface de 
+GéoContrib. Cette mise à jour de la base des utilisateurs est appelée "synchronisation" dans le reste du présent 
+document ;
 * désactiver les fonctions d'authentification native de GéoContrib.
 
 ## Principes de fonctionnement
@@ -48,8 +49,19 @@ Certains utilisateurs sont supprimés lors de la synchronisation :
 Néanmoins, les utilisateurs figurant dans `PROTECTED_USER_NAMES` ne sont jamais supprimés par la synchronisation. Ils
 peuvent l'être manuellement via l'interface d'administration de GéoContrib.
 
-Certains utilisateurs se voient automatiquement attribués des droits de superutilisateurs dans GéoContrib lors de la
+### Attribution automatique de rôles lors de la synchronisation
+
+Certains utilisateurs se voient automatiquement attribuer des droits de super utilisateur dans GéoContrib lors de la
 synchronisation : ceux figurant dans au moins un groupe d'utilisateurs présent dans `ADMIN_USER_GROUPS`.
+
+Certains utilisateurs se voient automatiquement attribuer des droits sur les projets de GéoContrib lors de la 
+synchronisation :
+* les utilisateurs appartenant aux groupes paramétrés dans le champ "Groupes LDAP des contributeurs et modérateurs" du
+projet (cf. interface d'administrration Django de GéoContrib dans le formulaire du projet) recoivent automatiquement le 
+rôle de contributeur pour le projet. Néanmoins un utilisateur ayant déjà le rôle de modérateur reste modérateur.
+* les utilisateurs appartenant aux groupes paramétrés dans le champ "Groupes LDAP des administrateurs" du
+projet (cf. interface d'administrration Django de GéoContrib dans le formulaire du projet) recoivent automatiquement le 
+rôle d'administrateur du projet.
 
 
 ## Déploiement et configuration
