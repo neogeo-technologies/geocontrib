@@ -50,6 +50,8 @@ signalement.
 Chaque type de signalements est également caractérisé par une couleur qui est utilisé pour la présentation des 
 signalements sur les cartes.
 
+Le modèle de données d'un type de signalement peut être modifié tant qu'aucun signalement n'y est associé.
+
 ### Statut d'un signalement
 
 Chaque signalement possède un statut indiquant son état en terme de publication :
