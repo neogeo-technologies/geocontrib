@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+- update addok geocoder provider url in leaflet-control-geocoder to fix a mixed content error on client side
 
 ## [1.1.0-rc1] - 2020-08-19
 ### Added
