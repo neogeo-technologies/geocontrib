@@ -1286,7 +1286,7 @@ this.L.Control.Geocoder = (function (L) {
 
   var AddOk = L.Class.extend({
       options: {
-          serviceUrl: 'http://api-adresse.data.gouv.fr',
+          serviceUrl: 'https://api-adresse.data.gouv.fr',
           limit: 5,
           htmlTemplate: function (r) {
               var parts = [];
