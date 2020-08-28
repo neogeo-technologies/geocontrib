@@ -52,7 +52,13 @@ else
     python manage.py migrate
     python manage.py shell -c "from django.contrib.auth import get_user_model; User= get_user_model(); User.objects.create_superuser('$APP_ADMIN_USER', '$APP_ADMIN_EMAIL', '$APP_ADMIN_PWD')"
     python manage.py loaddata src/geocontrib/data/perm.json
-    python manage.py loaddata src/geocontrib/data/flatpages.json
+
+    # Check if flatpages exists before loading flatpages.json
+    num_flatpages=`python manage.py shell --command="from django.contrib.flatpages.models import FlatPage; print(len(FlatPage.objects.all()))"`
+    if [ $num_flatpages -eq 0 ]; then
+        # if the number of flatpages is 0, then we load the data file
+        python manage.py loaddata src/geocontrib/data/flatpages.json
+    fi
 
     echo "Ok" > $marker_file
 fi
