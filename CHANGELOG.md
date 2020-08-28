@@ -3,10 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [1.1.0] - 2020-08-28
+
+### Changed
+- increase thickness of segments borders in the basemap project management form
 
 ### Fixed
 - update addok geocoder provider url in leaflet-control-geocoder to fix a mixed content error on client side
+- doest not reload flatpages.json if flatpages records exist in database
+- fix incoherent ending h3 tags in flatpages.json
 
 ## [1.1.0-rc1] - 2020-08-19
 ### Added
