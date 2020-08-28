@@ -69,6 +69,12 @@ main {
   background-color: rgb(205, 229, 245);
 }
 
+/* Thicker borders for each basemap segment */
+#form-layers [data-segments=basemap_set-SEGMENTS] > .ui.segment {
+  margin-bottom: 3rem;
+  border: 1px solid rgba(34,36,38,.30);
+}
+
 
 /* Sortable */
 .layer-handle-sort {
