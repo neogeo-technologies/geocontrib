@@ -3,6 +3,8 @@
 {% load static %}
 {% load app_filters %}
 
+{% block title %}{{ title }}{% endblock %}
+
 {% block content %}
 <div class="fourteen wide column">
 
@@ -197,7 +199,7 @@
     }
   }
 
-    
+
 </style>
 
 <!--  These Context variables will be accessible in the javascript after json_script (it set the values in the DOM) -->

@@ -80,6 +80,9 @@ class BaseMapContextMixin(SingleObjectMixin):
         try:
             request = self.request
             project = None
+            title = None
+            if any([isinstance(self.object, model) for model in [Project, FeatureType, Feature]]):
+                title = self.object.title
             if isinstance(self.object, Project):
                 project = self.object
             elif isinstance(self.object, FeatureType) or isinstance(self.object, Feature):
@@ -102,6 +105,7 @@ class BaseMapContextMixin(SingleObjectMixin):
             context['serialized_features'] = serialized_features.data
             context['serialized_base_maps'] = serialized_base_maps.data
             context['serialized_layers'] = serialized_layers.data
+            context['title'] = title
         except Exception:
             logger.exception('BaseMapContext error')
         return context
@@ -223,7 +227,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         events = Event.objects.filter(feature_id=feature.feature_id).order_by('created_on')
         serialized_events = EventSerializer(events, many=True)
 
-        context = {
+        context = {**self.get_context_data(), **{
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
             'feature_types': FeatureType.objects.filter(project=project),
@@ -236,7 +240,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
                 project=project, feature_id=feature.feature_id, object_type='feature'),
             'events': serialized_events.data,
             'comment_form': CommentForm(),
-        }
+        }}
 
         return render(request, 'geocontrib/feature/feature_detail.html', context)
 

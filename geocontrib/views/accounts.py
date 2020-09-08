@@ -101,5 +101,6 @@ class MyAccount(View):
         context['events'] = serialized_events.data
         context['features'] = serialized_feature_events.data
         context['comments'] = serialized_comment_events.data
+        context['title'] = "Mon compte"
 
         return render(request, 'geocontrib/my_account.html', context)
