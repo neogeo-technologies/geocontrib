@@ -156,7 +156,7 @@ class Authorization(models.Model):
 
             user_rank = cls.get_rank(user, project)
 
-            if user_rank >= project_rank_min or project_rank_min < 2:
+            if user_rank >= project_rank_min or project_rank_min == 0:
                 user_perms['can_view_project'] = True
                 user_perms['can_view_feature'] = True
                 user_perms['can_view_feature_type'] = True
