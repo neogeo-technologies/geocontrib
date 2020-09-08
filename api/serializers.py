@@ -267,7 +267,7 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
                     'title': str(feature.title),
                     'feature_url': feature.get_view_url(),
                     'created_on': feature.created_on.strftime("%d/%m/%Y %H:%M"),
-                    'creator': feature.creator.display_creator,
+                    'creator': feature.display_creator,
                 }
             except Exception:
                 logger.exception('No related feature found')

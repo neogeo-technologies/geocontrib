@@ -414,7 +414,7 @@ class FeatureLinkForm(forms.ModelForm):
 
             self.fields['feature_to'].choices = tuple(
                 (feat.feature_id, "{} ({} - {})".format(
-                    feat.title, feat.creator.display_creator, feat.created_on.strftime("%d/%m/%Y %H:%M"))) for feat in qs
+                    feat.title, feat.display_creator, feat.created_on.strftime("%d/%m/%Y %H:%M"))) for feat in qs
             )
 
         except Exception:
