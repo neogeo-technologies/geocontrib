@@ -1,7 +1,8 @@
-from django.conf import settings
-from geocontrib.models import Authorization
-import json
 import logging
+
+from django.conf import settings
+
+from geocontrib.models import Authorization
 
 logger = logging.getLogger(__name__)
 
