@@ -64,6 +64,15 @@ main {
   color: #9f3a38;
 }
 
+/* Fix semantic ui overflow when is too long */
+.layer-item .form div.text {
+  width: 100%
+}
+
+.ui.selection.dropdown .menu>.item {
+  word-break: break-all;
+}
+
 /* Needs this unfortunatly, because semantic overrides the background-color */
 #form-layers .blue-background-class {
   background-color: rgb(205, 229, 245);
