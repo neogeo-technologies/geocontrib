@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block title %}Projet {{ project.title }}{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block content %}
 
@@ -273,7 +273,7 @@
     // Load into js variables the python context.
     const baseMaps = JSON.parse(document.getElementById('basemaps').textContent);
     const layers = JSON.parse(document.getElementById('layers').textContent);
-    const features = JSON.parse(document.getElementById('features').textContent) ? 
+    const features = JSON.parse(document.getElementById('features').textContent) ?
       JSON.parse(document.getElementById('features').textContent).features : null;
     const serviceMap = JSON.parse(document.getElementById('serviceMap').textContent);
     const optionsMap = JSON.parse(document.getElementById('optionsMap').textContent);
