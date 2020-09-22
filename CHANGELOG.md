@@ -6,10 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Unreleased
 
 ### Fixed
-- Display creator 
-- Responsive issue when the layer is very long in the basemap form.
-- Added missing title
-- Project detail Access
+- Display creator in feature and feature type
+- Responsive issue when the layer is very long in the basemap form
+- Add title in project, feature type and feature
+- Access to the project when no project rank defined 
 
 ## [1.1.0] - 2020-08-28
 
