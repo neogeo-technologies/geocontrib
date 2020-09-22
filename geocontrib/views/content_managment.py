@@ -427,7 +427,7 @@ class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
         attachment_formset = self.AttachmentFormset(
             request.POST or None, request.FILES, prefix='attachment')
 
-        context = {
+        context = {**self.get_context_data(), **{
             'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_type': feature_type,
             'project': project,
@@ -437,7 +437,7 @@ class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
             'linked_formset': linked_formset,
             'attachment_formset': attachment_formset,
             'action': 'create',
-        }
+        }}
         return render(request, 'geocontrib/feature/feature_edit.html', context)
 
 
@@ -812,6 +812,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'permissions': Authorization.all_permissions(user, project),
             'feature_types': project.featuretype_set.all(),
             'project': project,
+            'title': "Création d'un type de signalement",
         }
         return render(request, 'geocontrib/feature_type/feature_type_create.html', context)
 
@@ -844,6 +845,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
                 'permissions': Authorization.all_permissions(user, project),
                 'feature_types': project.featuretype_set.all(),
                 'project': project,
+                'title': "Création d'un type de signalement",
             }
             return render(request, 'geocontrib/feature_type/feature_type_create.html', context)
 
@@ -877,7 +879,8 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_types': project.featuretype_set.all(),
             'features': features,
             'project': project,
-            'structure': structure.data
+            'structure': structure.data,
+            'title': feature_type.title,
         }
 
         return render(request, 'geocontrib/feature_type/feature_type_detail.html', context)
@@ -929,6 +932,7 @@ class FeatureTypeUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'structure': structure.data,
             'form': form,
             'formset': formset,
+            'title': feature_type.title,
         }
 
         return render(request, 'geocontrib/feature_type/feature_type_edit.html', context)
@@ -976,6 +980,7 @@ class FeatureTypeUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 'permissions': Authorization.all_permissions(user, feature_type.project),
                 'project': feature_type.project,
                 'feature_type': feature_type,
+                'title': feature_type.title
             }
         return render(request, 'geocontrib/feature_type/feature_type_edit.html', context)
 
@@ -1191,6 +1196,7 @@ class ProjectDetail(BaseMapContextMixin, DetailView):
         context = super().get_context_data(**kwargs)
 
         context['project'] = serilized_projects
+        context['title'] = project.title
         context['user'] = user
         context['last_comments'] = serialized_comments
         context['last_features'] = features[0:5]
@@ -1221,7 +1227,8 @@ class ProjectUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'permissions': Authorization.all_permissions(request.user, project),
             'feature_types': project.featuretype_set.all(),
             'is_suscriber': Subscription.is_suscriber(request.user, project),
-            'action': 'update'
+            'action': 'update',
+            'title': project.title,
         }
         return render(request, 'geocontrib/project/project_edit.html', context)
 
@@ -1238,7 +1245,8 @@ class ProjectUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'permissions': Authorization.all_permissions(request.user, project),
             'feature_types': project.featuretype_set.all(),
             'is_suscriber': Subscription.is_suscriber(request.user, project),
-            'action': 'update'
+            'action': 'update',
+            'title': project.title,
         }
         return render(request, 'geocontrib/project/project_edit.html', context)
 
@@ -1263,6 +1271,7 @@ class ProjectCreate(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = 'create'
+        context['title'] = "Création d'un projet"
         return context
 
 
@@ -1287,6 +1296,7 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
             'project': project,
             'permissions': permissions,
             'formset': formset,
+            'title': project.title,
         }}
 
         return render(request, 'geocontrib/project/project_mapping.html', context)
@@ -1308,7 +1318,8 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
         context = {**self.get_context_data(), **{
             'project': project,
             'permissions': permissions,
-            'formset': formset
+            'formset': formset,
+            'title': project.title,
         }}
         return render(request, 'geocontrib/project/project_mapping.html', context)
 
