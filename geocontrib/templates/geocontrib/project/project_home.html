@@ -115,7 +115,7 @@
                         <a href="{% url 'geocontrib:feature_detail' slug=project.slug feature_type_slug=item.feature_type.slug feature_id=item.feature_id  %}">{{ item.title }}</a>
                       </div>
                       <div class="description">
-                        <i>[ {{ item.created_on|date:"d/m/Y" }}{% if user.is_authenticated %}, par {{ item.creator.first_name }} {{ item.creator.last_name }}{% endif %} ]</i>
+                        <i>[ {{ item.created_on|date:"d/m/Y" }}{% if user.is_authenticated %}, par {{ item.display_creator }} {% endif %} ]</i>
                       </div>
                     </div>
                   </div>
@@ -138,7 +138,7 @@
                         <a href="{{ item.related_feature.feature_url}}">"{{ item.comment }}"</a>
                       </div>
                       <div class="description">
-                        <i>[ {{ item.created_on }}{% if user.is_authenticated %}, par {{ item.author.full_name }}{% endif %} ]</i>
+                        <i>[ {{ item.created_on }}{% if user.is_authenticated %}, par {{ item.display_author }}{% endif %} ]</i>
                       </div>
                     </div>
                   </div>
