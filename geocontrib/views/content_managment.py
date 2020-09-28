@@ -1181,15 +1181,19 @@ class ProjectDetail(BaseMapContextMixin, DetailView):
         project = self.get_object()
         permissions = Authorization.all_permissions(user, project)
 
-        last_comments = Comment.objects.filter(
+        # On filtre les signalements selon leur statut et l'utilisateur courant
+        features = Feature.handy.availables(
+            user=user,
             project=project
+        ).order_by('-created_on')
+
+        # On filtre les commentaire selon les signalements visibles
+        last_comments = Comment.objects.filter(
+            project=project,
+            feature_id__in=[feat.feature_id for feat in features]
         ).order_by('-created_on')[0:5]
 
         serialized_comments = CommentSerializer(last_comments, many=True).data
-
-        features = Feature.objects.filter(
-            project=project
-        ).order_by('-created_on')
 
         serilized_projects = ProjectDetailedSerializer(project).data
 
