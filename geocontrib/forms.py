@@ -205,7 +205,7 @@ class AuthorizationForm(forms.ModelForm):
 
     username = forms.CharField(label="Nom d'utilisateur")
 
-    email = forms.EmailField(label="Adresse email")
+    email = forms.EmailField(label="Adresse email", required=False)
 
     level = forms.ModelChoiceField(
         label="Niveau d'autorisation",

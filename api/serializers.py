@@ -99,7 +99,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
 
-    author = UserSerializer(read_only=True)
+    display_author = serializers.ReadOnlyField()
 
     related_feature = serializers.SerializerMethodField()
 
@@ -122,7 +122,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = (
             'created_on',
             'comment',
-            'author',
+            'display_author',
             'related_feature',
         )
 

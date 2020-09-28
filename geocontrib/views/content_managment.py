@@ -1372,6 +1372,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
         formset = self.AuthorizationFormSet(request.POST or None)
         authorised = Authorization.objects.filter(project=project)
         permissions = Authorization.all_permissions(user, project)
+
         if formset.is_valid():
 
             for data in formset.cleaned_data:
@@ -1393,16 +1394,17 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
                     authorization.save()
 
             return redirect('geocontrib:project_members', slug=slug)
-
-        context = {
-            "title": "Gestion des membres du projet {}".format(project.title),
-            'authorised': authorised,
-            'permissions': permissions,
-            'project': project,
-            'formset': formset,
-            'feature_types': FeatureType.objects.filter(project=project)
-        }
-        return render(request, 'geocontrib/project/project_members.html', context)
+        else:
+            logger.error(formset.errors)
+            context = {
+                "title": "Gestion des membres du projet {}".format(project.title),
+                'authorised': authorised,
+                'permissions': permissions,
+                'project': project,
+                'formset': formset,
+                'feature_types': FeatureType.objects.filter(project=project)
+            }
+            return render(request, 'geocontrib/project/project_members.html', context)
 
 
 ######################

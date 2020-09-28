@@ -592,6 +592,13 @@ class AnnotationAbstract(models.Model):
             self.created_on = timezone.now()
         super().save(*args, **kwargs)
 
+    @property
+    def display_author(self):
+        res = "Utilisateur supprimé"
+        if self.author:
+            res = self.author.get_full_name() or self.author.username
+        return res
+
 
 class Attachment(AnnotationAbstract):
 
