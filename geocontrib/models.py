@@ -692,6 +692,13 @@ class Event(models.Model):
         super().save(*args, **kwargs)
 
     @property
+    def display_user(self):
+        res = "Utilisateur supprimé"
+        if self.user:
+            res = self.user.get_full_name() or self.user.username
+        return res
+
+    @property
     def contextualize_action(self):
         evt = 'Aucun evenement'
         obj = 'defini'

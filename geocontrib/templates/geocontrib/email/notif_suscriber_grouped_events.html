@@ -16,7 +16,7 @@
               {% if event.event_type == 'delete' %}
                 {% if event.object_type == 'feature' %}
                 {{ event.created_on }} - "{{ event.data.feature_title }}"
-                  Signalement supprimé par {{ event.user.full_name }}
+                  Signalement supprimé par {{ event.display_user }}
                 {% endif %}
               {% else %}
 
@@ -29,10 +29,10 @@
                 {% if event.event_type == 'create' %}
 
                   {% if event.object_type == 'feature' %}
-                    Signalement créé par {{ event.user.full_name }}
+                    Signalement créé par {{ event.display_user }}
 
                   {% elif event.object_type == 'comment' %}
-                    - Commentaire créé par {{ event.user.full_name }}
+                    - Commentaire créé par {{ event.display_user }}
                     <strong>{{ event.related_comment.comment }}</strong>
                     {% if event.related_comment.attachments %}
                       {% for att in event.related_comment.attachments %}
@@ -41,16 +41,16 @@
                     {% endif %}
 
                   {% elif event.object_type == 'attachment' %}
-                    {{ event.created_on }} - Pièce-jointe ajoutée par {{ event.user.full_name }}
+                    {{ event.created_on }} - Pièce-jointe ajoutée par {{ event.display_user }}
                   {% endif %}
 
                 {% elif event.event_type == 'update' %}
 
                   {% if event.object_type == 'feature' %}
-                    Signalement mis à jour par {{ event.user.full_name }}
+                    Signalement mis à jour par {{ event.display_user }}
 
                   {% elif event.object_type == 'attachment' %}
-                    Pièce-jointe mise à jour par {{ event.user.full_name }}
+                    Pièce-jointe mise à jour par {{ event.display_user }}
                   {% endif %}
 
                 {% endif %}
