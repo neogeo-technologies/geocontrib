@@ -114,7 +114,7 @@ class CustomFieldModelBaseFS(BaseModelFormSet):
                 continue
             name = form.cleaned_data.get('name')
             if name in names:
-                raise forms.ValidationError("Les champs supplémentaires ne peuvent avoir des nom similaires.")
+                raise forms.ValidationError("Les champs supplémentaires ne peuvent avoir des noms similaires.")
             names.append(name)
 
 
@@ -149,7 +149,7 @@ class CommentForm(forms.ModelForm):
     attachment_file = forms.FileField(label="Fichier joint", required=False)
 
     info = forms.CharField(
-        label="Information additonelle au fichier joint", required=False, widget=forms.Textarea())
+        label="Information additionnelle au fichier joint", required=False, widget=forms.Textarea())
 
     class Meta:
         model = Comment
