@@ -186,20 +186,25 @@ synchroniser."""
             # On liste les projets pour lesquels l'utilisateur n'est ni membre des groupes 'ldap_project_admin_groups'
             # ni membre des goupes 'ldap_project_contrib_groups'
             # Les utilisateurs absent de ces groupes se retrouvent simples "utilisateur connecté"
+            # sauf si ils ont déja un role defini à posteriori dans geocontrib
             not_admin_and_not_contrib_qs = Project.objects.exclude(ldap_project_admin_groups__overlap=flattened_groups)\
                 .exclude(ldap_project_contrib_groups__overlap=flattened_groups)
             if not_admin_and_not_contrib_qs.exists():
                 for project in not_admin_and_not_contrib_qs or []:
-                    auth, created = Authorization.objects.update_or_create(
+                    auth, created = Authorization.objects.get_or_create(
                         project=project, user=user,
                         defaults={
                             'level': UserLevelPermission.objects.get(user_type_id=choices.LOGGED_USER)
                         }
                     )
-
-                    logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
-                        user.username, auth.level.user_type_id, project.slug)
-                    )
+                    if not created:
+                        logger.debug("User '{0}' is already {1}'s Project '{2}' ".format(
+                            user.username, auth.level.user_type_id, project.slug)
+                        )
+                    else:
+                        logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
+                            user.username, auth.level.user_type_id, project.slug)
+                        )
 
     def user_update_or_create(self, row):
         try:
