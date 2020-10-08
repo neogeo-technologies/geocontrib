@@ -80,7 +80,7 @@ class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
 
     def get_full_name(self, obj):
-        return obj.get_full_name()
+        return obj.get_full_name() or obj.username
 
     class Meta:
         model = User
@@ -285,7 +285,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
 
-    user = UserSerializer(read_only=True)
+    display_user = serializers.ReadOnlyField()
 
     related_comment = serializers.SerializerMethodField()
 
@@ -344,7 +344,7 @@ class EventSerializer(serializers.ModelSerializer):
             'feature_id',
             'comment_id',
             'attachment_id',
-            'user',
+            'display_user',
             'related_comment',
             'related_feature',
             'project_url',

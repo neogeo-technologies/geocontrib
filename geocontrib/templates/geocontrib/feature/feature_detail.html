@@ -168,7 +168,7 @@
                   {{ event.created_on }}
                 </div>
                 Création du signalement
-                {% if user.is_authenticated %} par {{ event.user.full_name }}{% endif %}
+                {% if user.is_authenticated %} par {{ event.display_user }}{% endif %}
               </div>
             </div>
           </div>
@@ -180,7 +180,7 @@
                   {{ event.created_on }}
                 </div>
                 Commentaire
-                {% if user.is_authenticated %} par {{ event.user.full_name }}{% endif %}
+                {% if user.is_authenticated %} par {{ event.display_user }}{% endif %}
               </div>
               <div class="extra text">
                 {{ event.related_comment.comment }}
@@ -201,7 +201,7 @@
                 {{ event.created_on }}
               </div>
               Signalement mis à jour
-              {% if user.is_authenticated %} par {{ event.user.full_name }}{% endif %}
+              {% if user.is_authenticated %} par {{ event.display_user }}{% endif %}
             </div>
           </div>
         </div>
