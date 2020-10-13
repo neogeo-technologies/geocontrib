@@ -100,7 +100,6 @@ const mapUtil = {
   },
 
   addFeatures: function (features, filter) {
-    console.log(features, filter)
     featureGroup = new L.FeatureGroup();
     features.forEach((feature) => {
 
@@ -119,23 +118,23 @@ const mapUtil = {
           L.circleMarker(geomJSON.coordinates, {
             color: feature.properties.feature_type.color,
             radius: 4,
-            fillOpacity: 0.3,
-            weight: 1,
+            fillOpacity: 0.5,
+            weight: 3,
           })
             .bindPopup(popupContent)
             .addTo(featureGroup);
         } else if (geomJSON.type === 'LineString') {
           L.polyline(geomJSON.coordinates, {
             color: feature.properties.feature_type.color,
-            weight: 1.5,
+            weight: 3,
           })
             .bindPopup(popupContent)
             .addTo(featureGroup);
         } else if (geomJSON.type === 'Polygon') {
           L.polygon(geomJSON.coordinates, {
             color: feature.properties.feature_type.color,
-            weight: 1.5,
-            fillOpacity: 0.3,
+            weight: 3,
+            fillOpacity: 0.5,
           })
             .bindPopup(popupContent)
             .addTo(featureGroup);
