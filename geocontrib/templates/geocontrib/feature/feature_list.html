@@ -242,6 +242,9 @@
     })
     $(document).on('change', '#form-filters .filter', function () {
       getDataFilters()
+      // const urlParams = new URLSearchParams(window.location.search);
+      // const myParam = urlParams.get('feature_type');
+      // console.log(myParam)
     })
 
     $('#table-features').DataTable({
@@ -323,7 +326,11 @@
 
     // --------- End sidebar events ----------
 
-    const featureGroup = mapUtil.addFeatures(features);
+    const urlParams = new URLSearchParams(window.location.search);
+    const featureType = urlParams.get('feature_type');
+    const featureStatus = urlParams.get('status');
+    const featureTitle = urlParams.get('title');
+    const featureGroup = mapUtil.addFeatures(features, {featureType, featureStatus, featureTitle});
     // Fit the map to bound only if no initial zoom and center are defined
     if ((lat === "" || lng === "" || zoom === "") && features.length > 0) {
       mapUtil.getMap().fitBounds(featureGroup.getBounds())
