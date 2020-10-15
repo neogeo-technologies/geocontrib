@@ -146,11 +146,7 @@
             </td>
             {% if user.is_authenticated %}
             <td>
-              {% if feature.creator %}
-              {{ feature.creator.first_name }} {{ feature.creator.last_name }}
-              {% else %}
-              Utilisateur supprimé
-              {% endif %}
+              {{ feature.display_creator }}
             </td>
             {% endif %}
           </tr>
