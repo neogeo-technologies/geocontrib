@@ -218,20 +218,26 @@
 <script>
   function getDataFilters() {
     var $form = $("#form-filters").serializeArray()
-    var requestURL = `{% url 'geocontrib:feature_list' slug=project.slug %}`
+    // var requestURL = `{% url 'geocontrib:feature_list' slug=project.slug %}`
+    var requestURL = '';
     for (var field of $form) {
       if (field.value) {
         if (requestURL.includes('?')) {
           requestURL = `${requestURL}&${field.name}=${field.value}`
         } else {
-          requestURL = `${requestURL}?${field.name}=${field.value}`
+          requestURL = `?${field.name}=${field.value}`
         }
       }
     }
-    document.location = requestURL
+    document.location.search = requestURL
   }
 
   $(document).ready(function () {
+
+    $('.ui.menu .item').tab({
+      history: true,
+      historyType: 'hash'
+    });
 
     $('#form-filters .ui.selection.dropdown').dropdown({
       clearable: true
