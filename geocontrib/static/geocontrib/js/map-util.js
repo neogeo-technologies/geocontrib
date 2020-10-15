@@ -99,37 +99,46 @@ const mapUtil = {
     this.addLayers(layers);
   },
 
-  addFeatures: function (features) {
+  addFeatures: function (features, filter) {
     featureGroup = new L.FeatureGroup();
     features.forEach((feature) => {
-      const geomJSON = turf.flip(feature.geometry);
 
-      const popupContent = this._createContentPopup(feature);
+      const typeCheck = filter.featureType && feature.properties.feature_type.slug === filter.featureType;
+      const statusCheck = filter.featureStatus && feature.properties.status.value === filter.featureStatus;
+      const titleCheck = filter.featureTitle && feature.properties.title.includes(filter.featureTitle);
+      const filters = [typeCheck, statusCheck, titleCheck]
 
-      if (geomJSON.type === 'Point') {
-        L.circleMarker(geomJSON.coordinates, {
-          color: feature.properties.feature_type.color,
-          radius: 4,
-          fillOpacity: 0.3,
-          weight: 1,
-        })
-          .bindPopup(popupContent)
-          .addTo(featureGroup);
-      } else if (geomJSON.type === 'LineString') {
-        L.polyline(geomJSON.coordinates, {
-          color: feature.properties.feature_type.color,
-          weight: 1.5,
-        })
-          .bindPopup(popupContent)
-          .addTo(featureGroup);
-      } else if (geomJSON.type === 'Polygon') {
-        L.polygon(geomJSON.coordinates, {
-          color: feature.properties.feature_type.color,
-          weight: 1.5,
-          fillOpacity: 0.3,
-        })
-          .bindPopup(popupContent)
-          .addTo(featureGroup);
+      if (!Object.values(filter).some(val => val) || Object.values(filter).some(val => val) && filters.every(val => val !== false)) {
+
+        const geomJSON = turf.flip(feature.geometry);
+
+        const popupContent = this._createContentPopup(feature);
+
+        if (geomJSON.type === 'Point') {
+          L.circleMarker(geomJSON.coordinates, {
+            color: feature.properties.feature_type.color,
+            radius: 4,
+            fillOpacity: 0.5,
+            weight: 3,
+          })
+            .bindPopup(popupContent)
+            .addTo(featureGroup);
+        } else if (geomJSON.type === 'LineString') {
+          L.polyline(geomJSON.coordinates, {
+            color: feature.properties.feature_type.color,
+            weight: 3,
+          })
+            .bindPopup(popupContent)
+            .addTo(featureGroup);
+        } else if (geomJSON.type === 'Polygon') {
+          L.polygon(geomJSON.coordinates, {
+            color: feature.properties.feature_type.color,
+            weight: 3,
+            fillOpacity: 0.5,
+          })
+            .bindPopup(popupContent)
+            .addTo(featureGroup);
+        }
       }
     });
     map.addLayer(featureGroup);
