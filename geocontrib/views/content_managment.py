@@ -171,6 +171,13 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         project = feature.project
         return Authorization.has_permission(user, 'can_create_feature', project)
 
+    def get(self, request, slug, feature_type_slug, feature_id):
+        return redirect(
+            'geocontrib:feature_detail',
+            slug=slug,
+            feature_type_slug=feature_type_slug,
+            feature_id=feature_id)
+
     def post(self, request, slug, feature_type_slug, feature_id):
         feature = self.get_object()
         project = feature.project
@@ -227,7 +234,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         events = Event.objects.filter(feature_id=feature.feature_id).order_by('created_on')
         serialized_events = EventSerializer(events, many=True)
 
-        context = {**self.get_context_data(), **{
+        context = {
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
             'feature_types': FeatureType.objects.filter(project=project),
@@ -239,8 +246,8 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'attachments': Attachment.objects.filter(
                 project=project, feature_id=feature.feature_id, object_type='feature'),
             'events': serialized_events.data,
-            'comment_form': CommentForm(),
-        }}
+            'comment_form': form,
+        }
 
         return render(request, 'geocontrib/feature/feature_detail.html', context)
 
