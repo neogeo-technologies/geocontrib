@@ -161,7 +161,7 @@ class AttachmentCreate(SingleObjectMixin, UserPassesTestMixin, View):
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
+class CommentCreate(BaseMapContextMixin, UserPassesTestMixin, View):
     queryset = Feature.objects.all()
     pk_url_kwarg = 'feature_id'
 
@@ -234,7 +234,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         events = Event.objects.filter(feature_id=feature.feature_id).order_by('created_on')
         serialized_events = EventSerializer(events, many=True)
 
-        context = {
+        context = {**self.get_context_data(), **{
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
             'feature_types': FeatureType.objects.filter(project=project),
@@ -247,7 +247,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
                 project=project, feature_id=feature.feature_id, object_type='feature'),
             'events': serialized_events.data,
             'comment_form': form,
-        }
+        }}
 
         return render(request, 'geocontrib/feature/feature_detail.html', context)
 
