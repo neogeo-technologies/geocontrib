@@ -218,7 +218,6 @@
 <script>
   function getDataFilters() {
     var $form = $("#form-filters").serializeArray()
-    // var requestURL = `{% url 'geocontrib:feature_list' slug=project.slug %}`
     var requestURL = '';
     for (var field of $form) {
       if (field.value) {
