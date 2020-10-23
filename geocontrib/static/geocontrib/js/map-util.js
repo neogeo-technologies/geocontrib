@@ -103,11 +103,13 @@ const mapUtil = {
     featureGroup = new L.FeatureGroup();
     features.forEach((feature) => {
 
+      let filters = [];
+
       if (filter) {
         const typeCheck = filter.featureType && feature.properties.feature_type.slug === filter.featureType;
         const statusCheck = filter.featureStatus && feature.properties.status.value === filter.featureStatus;
         const titleCheck = filter.featureTitle && feature.properties.title.includes(filter.featureTitle);
-        const filters = [typeCheck, statusCheck, titleCheck];
+        filters = [typeCheck, statusCheck, titleCheck];
       }
 
       if (!filter || !Object.values(filter).some(val => val) || Object.values(filter).some(val => val) && filters.length && filters.every(val => val !== false)) {
