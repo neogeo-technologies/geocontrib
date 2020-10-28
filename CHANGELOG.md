@@ -5,11 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [1.1.1] - 2020-10-29
+
+### Changed
+- increase thickness of segments of features and reduced the transparency of dotted features
+
 ### Fixed
 - Display creator in feature and feature type
 - Responsive issue when the layer is very long in the basemap form
 - Add title in project, feature type and feature
-- Access to the project when no project rank defined 
+- Access to the project when no project rank defined
+- Some pages where missing the title in the browser tabs
+- The features are now filtered when search on the map
+- The search in the list of features now stay in the same page
+- The Georchestra plugin now keeps user rights defined in GeoContrib
+- Draft features are now hidden on the section "Last features"
+- Empty comments are now blocked
 
 ## [1.1.0] - 2020-08-28
 
@@ -23,7 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [1.1.0-rc1] - 2020-08-19
 ### Added
-- geOrchestra plugin: automatically associate role to users when the user database is synchronised (see 
+- geOrchestra plugin: automatically associate role to users when the user database is synchronised (see
 [geOrchestra plugin](plugin_georchestra/README.md))
 - add a function to search for places and addresses in the interactive maps. This new feature comes with new settings:
 `GEOCODER_PROVIDERS` and `SELECTED_GEOCODER`
@@ -37,10 +48,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - change the label of the feature type field `title` in the front-end form (Titre -> Nom)
 - change the data model for basemaps: one basemap may contain several layers. Layers are declared by GéoContrib
 admin users. Basemaps are created by project admin users by selecting layers, ordering them and setting the opacity
-of each of them. End users may switch from one basemap to another in the interactive maps. One user can change 
-the order of the layers and their opacity in the interactive maps. These personnal adjustments are stored in the 
+of each of them. End users may switch from one basemap to another in the interactive maps. One user can change
+the order of the layers and their opacity in the interactive maps. These personnal adjustments are stored in the
 web browser of the user (local storage) and do not alter the basemaps as seen by other users.
-- change default value for `LOGO_PATH` setting: Neogeo Technologie logo. This new image is located in the media 
+- change default value for `LOGO_PATH` setting: Neogeo Technologie logo. This new image is located in the media
 directory.
 - change all visible names in front-end and docs from `Geocontrib` to `GéoContrib`
 - set the leaflet background container to white
