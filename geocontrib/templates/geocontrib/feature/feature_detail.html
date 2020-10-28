@@ -224,8 +224,8 @@
           {% endif %}
           <div class="required field">
             <label for="{{ comment_form.comment.id_for_label }}">Ajouter un commentaire</label>
-            <textarea name="{{ comment_form.comment.html_name }}" rows="2">{% if comment_form.comment.value %}{{ comment_form.comment.value }}{% endif %}</textarea>
             {{ comment_form.comment.errors }}
+            <textarea name="{{ comment_form.comment.html_name }}" rows="2">{% if comment_form.comment.value %}{{ comment_form.comment.value }}{% endif %}</textarea>
           </div>
           <label>Pièce jointe (facultative)</label>
           <div class="two fields">
@@ -239,8 +239,7 @@
               {{ comment_form.attachment_file.errors }}
             </div>
             <div class="field">
-              <input type="text" name="{{ comment_form.title.html_name }}" id="{{ comment_form.title.id_for_label }}"
-                value="{% if comment_form.title.value %}{{ comment_form.title.value }}{% endif %}" >
+              <input type="text" name="{{ comment_form.title.html_name }}" id="{{ comment_form.title.id_for_label }}">
               {{ comment_form.title.errors }}
             </div>
           </div>
