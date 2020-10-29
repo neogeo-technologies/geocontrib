@@ -114,7 +114,7 @@ class CustomFieldModelBaseFS(BaseModelFormSet):
                 continue
             name = form.cleaned_data.get('name')
             if name in names:
-                raise forms.ValidationError("Les champs supplémentaires ne peuvent avoir des nom similaires.")
+                raise forms.ValidationError("Les champs supplémentaires ne peuvent avoir des noms similaires.")
             names.append(name)
 
 
@@ -149,7 +149,7 @@ class CommentForm(forms.ModelForm):
     attachment_file = forms.FileField(label="Fichier joint", required=False)
 
     info = forms.CharField(
-        label="Information additonelle au fichier joint", required=False, widget=forms.Textarea())
+        label="Information additionnelle au fichier joint", required=False, widget=forms.Textarea())
 
     class Meta:
         model = Comment
@@ -205,7 +205,7 @@ class AuthorizationForm(forms.ModelForm):
 
     username = forms.CharField(label="Nom d'utilisateur")
 
-    email = forms.EmailField(label="Adresse email")
+    email = forms.EmailField(label="Adresse email", required=False)
 
     level = forms.ModelChoiceField(
         label="Niveau d'autorisation",
@@ -414,7 +414,7 @@ class FeatureLinkForm(forms.ModelForm):
 
             self.fields['feature_to'].choices = tuple(
                 (feat.feature_id, "{} ({} - {})".format(
-                    feat.title, feat.creator.display_creator, feat.created_on.strftime("%d/%m/%Y %H:%M"))) for feat in qs
+                    feat.title, feat.display_creator, feat.created_on.strftime("%d/%m/%Y %H:%M"))) for feat in qs
             )
 
         except Exception:

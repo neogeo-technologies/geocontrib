@@ -156,7 +156,7 @@ class Authorization(models.Model):
 
             user_rank = cls.get_rank(user, project)
 
-            if user_rank >= project_rank_min or project_rank_min < 2:
+            if user_rank >= project_rank_min or project_rank_min == 0:
                 user_perms['can_view_project'] = True
                 user_perms['can_view_feature'] = True
                 user_perms['can_view_feature_type'] = True
@@ -592,6 +592,13 @@ class AnnotationAbstract(models.Model):
             self.created_on = timezone.now()
         super().save(*args, **kwargs)
 
+    @property
+    def display_author(self):
+        res = "Utilisateur supprimé"
+        if self.author:
+            res = self.author.get_full_name() or self.author.username
+        return res
+
 
 class Attachment(AnnotationAbstract):
 
@@ -683,6 +690,13 @@ class Event(models.Model):
         if not self.pk:
             self.created_on = timezone.now()
         super().save(*args, **kwargs)
+
+    @property
+    def display_user(self):
+        res = "Utilisateur supprimé"
+        if self.user:
+            res = self.user.get_full_name() or self.user.username
+        return res
 
     @property
     def contextualize_action(self):

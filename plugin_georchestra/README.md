@@ -62,7 +62,8 @@ rôle de contributeur pour le projet. Néanmoins un utilisateur ayant déjà le 
 * les utilisateurs appartenant aux groupes paramétrés dans le champ "Groupes LDAP des administrateurs" du
 projet (cf. interface d'administrration Django de GéoContrib dans le formulaire du projet) recoivent automatiquement le 
 rôle d'administrateur du projet.
-
+* les utilisateurs qui ne font pas partis des groupes LDAP mentionnés dans l'interface d'admin, et auxquels des rôles
+ont été attribués depuis l'onglet "Membres" d'un projet, conservent bien leurs rôles après une synchronisation.
 
 ## Déploiement et configuration
 

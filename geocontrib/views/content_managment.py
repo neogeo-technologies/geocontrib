@@ -80,6 +80,9 @@ class BaseMapContextMixin(SingleObjectMixin):
         try:
             request = self.request
             project = None
+            title = None
+            if any([isinstance(self.object, model) for model in [Project, FeatureType, Feature]]):
+                title = self.object.title
             if isinstance(self.object, Project):
                 project = self.object
             elif isinstance(self.object, FeatureType) or isinstance(self.object, Feature):
@@ -102,6 +105,7 @@ class BaseMapContextMixin(SingleObjectMixin):
             context['serialized_features'] = serialized_features.data
             context['serialized_base_maps'] = serialized_base_maps.data
             context['serialized_layers'] = serialized_layers.data
+            context['title'] = title
         except Exception:
             logger.exception('BaseMapContext error')
         return context
@@ -157,7 +161,7 @@ class AttachmentCreate(SingleObjectMixin, UserPassesTestMixin, View):
 
 
 @method_decorator(DECORATORS, name='dispatch')
-class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
+class CommentCreate(BaseMapContextMixin, UserPassesTestMixin, View):
     queryset = Feature.objects.all()
     pk_url_kwarg = 'feature_id'
 
@@ -166,6 +170,13 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
         return Authorization.has_permission(user, 'can_create_feature', project)
+
+    def get(self, request, slug, feature_type_slug, feature_id):
+        return redirect(
+            'geocontrib:feature_detail',
+            slug=slug,
+            feature_type_slug=feature_type_slug,
+            feature_id=feature_id)
 
     def post(self, request, slug, feature_type_slug, feature_id):
         feature = self.get_object()
@@ -223,7 +234,7 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
         events = Event.objects.filter(feature_id=feature.feature_id).order_by('created_on')
         serialized_events = EventSerializer(events, many=True)
 
-        context = {
+        context = {**self.get_context_data(), **{
             'feature': feature,
             'feature_data': feature.custom_fields_as_list,
             'feature_types': FeatureType.objects.filter(project=project),
@@ -235,8 +246,8 @@ class CommentCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'attachments': Attachment.objects.filter(
                 project=project, feature_id=feature.feature_id, object_type='feature'),
             'events': serialized_events.data,
-            'comment_form': CommentForm(),
-        }
+            'comment_form': form,
+        }}
 
         return render(request, 'geocontrib/feature/feature_detail.html', context)
 
@@ -423,7 +434,7 @@ class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
         attachment_formset = self.AttachmentFormset(
             request.POST or None, request.FILES, prefix='attachment')
 
-        context = {
+        context = {**self.get_context_data(), **{
             'features': Feature.handy.availables(user, project).order_by('updated_on'),
             'feature_type': feature_type,
             'project': project,
@@ -433,7 +444,7 @@ class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
             'linked_formset': linked_formset,
             'attachment_formset': attachment_formset,
             'action': 'create',
-        }
+        }}
         return render(request, 'geocontrib/feature/feature_edit.html', context)
 
 
@@ -808,6 +819,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
             'permissions': Authorization.all_permissions(user, project),
             'feature_types': project.featuretype_set.all(),
             'project': project,
+            'title': "Création d'un type de signalement",
         }
         return render(request, 'geocontrib/feature_type/feature_type_create.html', context)
 
@@ -840,6 +852,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
                 'permissions': Authorization.all_permissions(user, project),
                 'feature_types': project.featuretype_set.all(),
                 'project': project,
+                'title': "Création d'un type de signalement",
             }
             return render(request, 'geocontrib/feature_type/feature_type_create.html', context)
 
@@ -873,7 +886,8 @@ class FeatureTypeDetail(SingleObjectMixin, UserPassesTestMixin, View):
             'feature_types': project.featuretype_set.all(),
             'features': features,
             'project': project,
-            'structure': structure.data
+            'structure': structure.data,
+            'title': feature_type.title,
         }
 
         return render(request, 'geocontrib/feature_type/feature_type_detail.html', context)
@@ -925,6 +939,7 @@ class FeatureTypeUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'structure': structure.data,
             'form': form,
             'formset': formset,
+            'title': feature_type.title,
         }
 
         return render(request, 'geocontrib/feature_type/feature_type_edit.html', context)
@@ -972,6 +987,7 @@ class FeatureTypeUpdate(SingleObjectMixin, UserPassesTestMixin, View):
                 'permissions': Authorization.all_permissions(user, feature_type.project),
                 'project': feature_type.project,
                 'feature_type': feature_type,
+                'title': feature_type.title
             }
         return render(request, 'geocontrib/feature_type/feature_type_edit.html', context)
 
@@ -1172,21 +1188,26 @@ class ProjectDetail(BaseMapContextMixin, DetailView):
         project = self.get_object()
         permissions = Authorization.all_permissions(user, project)
 
-        last_comments = Comment.objects.filter(
+        # On filtre les signalements selon leur statut et l'utilisateur courant
+        features = Feature.handy.availables(
+            user=user,
             project=project
+        ).order_by('-created_on')
+
+        # On filtre les commentaire selon les signalements visibles
+        last_comments = Comment.objects.filter(
+            project=project,
+            feature_id__in=[feat.feature_id for feat in features]
         ).order_by('-created_on')[0:5]
 
         serialized_comments = CommentSerializer(last_comments, many=True).data
-
-        features = Feature.objects.filter(
-            project=project
-        ).order_by('-created_on')
 
         serilized_projects = ProjectDetailedSerializer(project).data
 
         context = super().get_context_data(**kwargs)
 
         context['project'] = serilized_projects
+        context['title'] = project.title
         context['user'] = user
         context['last_comments'] = serialized_comments
         context['last_features'] = features[0:5]
@@ -1217,7 +1238,8 @@ class ProjectUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'permissions': Authorization.all_permissions(request.user, project),
             'feature_types': project.featuretype_set.all(),
             'is_suscriber': Subscription.is_suscriber(request.user, project),
-            'action': 'update'
+            'action': 'update',
+            'title': project.title,
         }
         return render(request, 'geocontrib/project/project_edit.html', context)
 
@@ -1234,7 +1256,8 @@ class ProjectUpdate(SingleObjectMixin, UserPassesTestMixin, View):
             'permissions': Authorization.all_permissions(request.user, project),
             'feature_types': project.featuretype_set.all(),
             'is_suscriber': Subscription.is_suscriber(request.user, project),
-            'action': 'update'
+            'action': 'update',
+            'title': project.title,
         }
         return render(request, 'geocontrib/project/project_edit.html', context)
 
@@ -1259,6 +1282,7 @@ class ProjectCreate(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['action'] = 'create'
+        context['title'] = "Création d'un projet"
         return context
 
 
@@ -1283,6 +1307,7 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
             'project': project,
             'permissions': permissions,
             'formset': formset,
+            'title': project.title,
         }}
 
         return render(request, 'geocontrib/project/project_mapping.html', context)
@@ -1304,7 +1329,8 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
         context = {**self.get_context_data(), **{
             'project': project,
             'permissions': permissions,
-            'formset': formset
+            'formset': formset,
+            'title': project.title,
         }}
         return render(request, 'geocontrib/project/project_mapping.html', context)
 
@@ -1353,6 +1379,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
         formset = self.AuthorizationFormSet(request.POST or None)
         authorised = Authorization.objects.filter(project=project)
         permissions = Authorization.all_permissions(user, project)
+
         if formset.is_valid():
 
             for data in formset.cleaned_data:
@@ -1374,16 +1401,17 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
                     authorization.save()
 
             return redirect('geocontrib:project_members', slug=slug)
-
-        context = {
-            "title": "Gestion des membres du projet {}".format(project.title),
-            'authorised': authorised,
-            'permissions': permissions,
-            'project': project,
-            'formset': formset,
-            'feature_types': FeatureType.objects.filter(project=project)
-        }
-        return render(request, 'geocontrib/project/project_members.html', context)
+        else:
+            logger.error(formset.errors)
+            context = {
+                "title": "Gestion des membres du projet {}".format(project.title),
+                'authorised': authorised,
+                'permissions': permissions,
+                'project': project,
+                'formset': formset,
+                'feature_types': FeatureType.objects.filter(project=project)
+            }
+            return render(request, 'geocontrib/project/project_members.html', context)
 
 
 ######################

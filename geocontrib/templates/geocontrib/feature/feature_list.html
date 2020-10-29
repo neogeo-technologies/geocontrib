@@ -3,6 +3,8 @@
 {% load static %}
 {% load app_filters %}
 
+{% block title %}{{ title }}{% endblock %}
+
 {% block content %}
 <div class="fourteen wide column">
 
@@ -144,11 +146,7 @@
             </td>
             {% if user.is_authenticated %}
             <td>
-              {% if feature.creator %}
-              {{ feature.creator.first_name }} {{ feature.creator.last_name }}
-              {% else %}
-              Utilisateur supprimé
-              {% endif %}
+              {{ feature.display_creator }}
             </td>
             {% endif %}
           </tr>
@@ -197,7 +195,7 @@
     }
   }
 
-    
+
 </style>
 
 <!--  These Context variables will be accessible in the javascript after json_script (it set the values in the DOM) -->
@@ -216,20 +214,25 @@
 <script>
   function getDataFilters() {
     var $form = $("#form-filters").serializeArray()
-    var requestURL = `{% url 'geocontrib:feature_list' slug=project.slug %}`
+    var requestURL = '';
     for (var field of $form) {
       if (field.value) {
         if (requestURL.includes('?')) {
           requestURL = `${requestURL}&${field.name}=${field.value}`
         } else {
-          requestURL = `${requestURL}?${field.name}=${field.value}`
+          requestURL = `?${field.name}=${field.value}`
         }
       }
     }
-    document.location = requestURL
+    document.location.search = requestURL
   }
 
   $(document).ready(function () {
+
+    $('.ui.menu .item').tab({
+      history: true,
+      historyType: 'hash'
+    });
 
     $('#form-filters .ui.selection.dropdown').dropdown({
       clearable: true
@@ -321,7 +324,11 @@
 
     // --------- End sidebar events ----------
 
-    const featureGroup = mapUtil.addFeatures(features);
+    const urlParams = new URLSearchParams(window.location.search);
+    const featureType = urlParams.get('feature_type');
+    const featureStatus = urlParams.get('status');
+    const featureTitle = urlParams.get('title');
+    const featureGroup = mapUtil.addFeatures(features, {featureType, featureStatus, featureTitle});
     // Fit the map to bound only if no initial zoom and center are defined
     if ((lat === "" || lng === "" || zoom === "") && features.length > 0) {
       mapUtil.getMap().fitBounds(featureGroup.getBounds())

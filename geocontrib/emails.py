@@ -76,7 +76,7 @@ def notif_creator_published_feature(emails, context):
 
     context['url_feature'] = urljoin(CURRENT_SITE_DOMAIN, feature.get_view_url())
 
-    subject = "[Collab:{project_slug}] Confirmation de la publication de l'un de vos signalement.".format(
+    subject = "[Collab:{project_slug}] Confirmation de la publication de l'un de vos signalements.".format(
         project_slug=feature.project.slug
     )
 

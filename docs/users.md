@@ -9,6 +9,7 @@ Autorisations attribuables par projet :
 Autorisations indépendantes des projets :
 * Super utilisateur
 * Gestionnaire métier
+* Statut équipe
 
 
 ## Autorisations liées aux projets
@@ -88,4 +89,10 @@ Un gestionnaire métier peut :
 * Créer de nouveaux projets
 
 Le créateur d'un nouveau projet en devient automatiquement administrateur projet du projet en question. 
+
+
+### Statut équipe
+
+Un utilisateur avec le statut équipe peut se connecter à l'interface administrateur.
+Il accède aux fonctionnalités de l'interface selon les permissions qui lui ont été accordées.
 
