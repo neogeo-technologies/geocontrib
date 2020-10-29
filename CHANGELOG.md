@@ -11,11 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - increase thickness of segments of features and reduced the transparency of dotted features
 
 ### Fixed
-- Display creator in feature and feature type
-- Responsive issue when the layer is very long in the basemap form
-- Add title in project, feature type and feature
-- Access to the project when no project rank defined
-- Some pages where missing the title in the browser tabs
+- The creator is correctly displayed in the features and the feature types
+- In the basemaps form, the display of a very long layer name is now responsive
+- A browser title (tab) is now displayed for all pages
+- Projects with limited access are no longer accessible to everyone
 - The features are now filtered when search on the map
 - The search in the list of features now stay in the same page
 - The Georchestra plugin now keeps user rights defined in GeoContrib
