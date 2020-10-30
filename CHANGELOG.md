@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [1.1.2] - 2020-10-30
+
+### Fixed
+- The custom basemaps appears correctly in the list of features
+
 ## [1.1.1] - 2020-10-29
 
 ### Changed
