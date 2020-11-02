@@ -158,7 +158,7 @@ const mapUtil = {
       ? `<div>
               Auteur : ${feature.properties.creator.first_name} ${feature.properties.creator.last_name}
             </div>`
-      : '';
+      : feature.properties.creator.username ? `Auteur: ${feature.properties.creator.username}` : '';
 
     return `
           <h4>
