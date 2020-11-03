@@ -119,9 +119,9 @@ class FeatureTypeAdmin(admin.ModelAdmin):
         with connections['default'].cursor() as cursor:
             try:
                 cursor.execute(sql_create_view)
-            except Exception as err:
+            except Exception:
                 logger.exception("PostgreSQL view creation failed: {0}".format(sql_create_view))
-                messages.error(request, "La vue PostgreSQL n'a pas pu être créée : {0}".format(err))
+                messages.error(request, "La vue PostgreSQL n'a pas pu être créée. ")
             else:
                 messages.success(request, "La vue PostgreSQL '{0}' est disponible. ".format(view_name))
                 success = True
@@ -175,14 +175,9 @@ class FeatureTypeAdmin(admin.ModelAdmin):
                         view_name=view_name,
                         user=settings.DATABASES['default']['USER'],
                     ))
-                logger.debug(sql)
                 its_alright = self.exec_sql(request, sql, view_name)
                 if its_alright:
                     return redirect('admin:geocontrib_featuretype_change', feature_type_id)
-
-            else:
-                for formset in [fds_formset, pg_form, cfs_formset]:
-                    logger.error(formset.errors)
 
         else:
             pg_form = AddPosgresViewAdminForm()
