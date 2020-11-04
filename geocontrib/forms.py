@@ -246,13 +246,20 @@ class AuthorizationForm(forms.ModelForm):
 
 
 class CustomFieldModelForm(forms.ModelForm):
+    name = forms.CharField(
+        label="Nom", max_length=128, required=True,
+        help_text=(
+            "Nom technique du champ tel qu'il apparaît dans la base de données "
+            "ou dans l'export GeoJSON. "
+            "Seuls les caractères alphanumériques et les traits d'union "
+            "sont autorisés: a-z, A-Z, 0-9, _ et -)"),
+        validators=[alphanumeric])
 
     class Meta:
         model = CustomField
         fields = ('label', 'name', 'field_type', 'position', 'options')
         help_texts = {
             'label': "Nom en language naturel du champ",
-            'name': "Nom technique du champ tel qu'il apparaît dans la base de données ou dans l'export GeoJSON (sans accents, sans espaces, ni caractères exotiques)",
             'position': "Numéro d'ordre du champ dans le formulaire de saisie du signalement",
             'options': "Valeurs possibles de ce champ, séparées par des virgules"
         }
