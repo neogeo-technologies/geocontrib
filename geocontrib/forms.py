@@ -539,9 +539,9 @@ class ProjectModelForm(forms.ModelForm):
         archive_feature = cleaned_data.get('archive_feature', None)
         delete_feature = cleaned_data.get('delete_feature', None)
         if archive_feature and delete_feature and archive_feature > delete_feature:
-            raise forms.ValidationError(
-                "Le délai d'archivage doit être inférieur au délai de suppression. "
-            )
+            raise forms.ValidationError({
+                'archive_feature': "Le délais de suppression doit être supérieur au délais d'archivage. "
+            })
         return cleaned_data
 
 
