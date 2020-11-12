@@ -3,7 +3,7 @@
 DROP VIEW IF EXISTS  {{ schema }}.{{ view_name }};
 CREATE OR REPLACE VIEW {{ schema }}.{{ view_name }} AS
   SELECT {% for data in fds_data %}
-      geocontrib_feature.{{ data|lookup:'related_field' }}{% if data|lookup:'alias'|length > 0 %} AS {{ data|lookup:'alias' }}{% endif %},
+      geocontrib_feature.{{ data|lookup:'related_field' }}{% if data|lookup:'alias'|length > 0 %} AS {{ data|lookup:'alias' }}{% endif %}{% if not forloop.last or cfs_data %},{% endif %}
   {% endfor %}
     {% for data in cfs_data %}{% if data|lookup:'field_type' in 'integer,decimal,date,boolean' %}
     (geocontrib_feature.feature_data ->> '{{ data|lookup:'name' }}'::text)::{{ data|lookup:'field_type' }}
