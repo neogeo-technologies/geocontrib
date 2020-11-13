@@ -2,6 +2,7 @@ import json
 
 from django.contrib.gis import forms
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.validators import RegexValidator
 from django.forms import HiddenInput
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
@@ -24,6 +25,11 @@ from geocontrib.models import UserLevelPermission
 
 import logging
 logger = logging.getLogger(__name__)
+
+alphanumeric = RegexValidator(
+    r'^[0-9a-zA-Z_-]*$',
+    "Seuls les caractères alphanumeriques 0-9 a-z A-Z _ - sont autorisés. "
+)
 
 
 ########################
@@ -84,7 +90,8 @@ class FeatureSelectFieldAdminForm(forms.Form):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': "Alias pour cette colonne"
-        })
+        }),
+        validators=[alphanumeric]
     )
 
 
@@ -92,6 +99,7 @@ class AddPosgresViewAdminForm(forms.Form):
     name = forms.CharField(
         label="Nom",
         required=True,
+        validators=[alphanumeric]
     )
 
     status = forms.MultipleChoiceField(
@@ -240,13 +248,20 @@ class AuthorizationForm(forms.ModelForm):
 
 
 class CustomFieldModelForm(forms.ModelForm):
+    name = forms.CharField(
+        label="Nom", max_length=128, required=True,
+        help_text=(
+            "Nom technique du champ tel qu'il apparaît dans la base de données "
+            "ou dans l'export GeoJSON. "
+            "Seuls les caractères alphanumériques et les traits d'union "
+            "sont autorisés: a-z, A-Z, 0-9, _ et -)"),
+        validators=[alphanumeric])
 
     class Meta:
         model = CustomField
         fields = ('label', 'name', 'field_type', 'position', 'options')
         help_texts = {
             'label': "Nom en language naturel du champ",
-            'name': "Nom technique du champ tel qu'il apparaît dans la base de données ou dans l'export GeoJSON (sans accents, sans espaces, ni caractères exotiques)",
             'position': "Numéro d'ordre du champ dans le formulaire de saisie du signalement",
             'options': "Valeurs possibles de ce champ, séparées par des virgules"
         }
@@ -551,9 +566,9 @@ class ProjectModelForm(forms.ModelForm):
         archive_feature = cleaned_data.get('archive_feature', None)
         delete_feature = cleaned_data.get('delete_feature', None)
         if archive_feature and delete_feature and archive_feature > delete_feature:
-            raise forms.ValidationError(
-                "Le délai d'archivage doit être inférieur au délai de suppression. "
-            )
+            raise forms.ValidationError({
+                'archive_feature': "Le délais de suppression doit être supérieur au délais d'archivage. "
+            })
         return cleaned_data
 
 

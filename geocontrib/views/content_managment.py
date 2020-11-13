@@ -1247,7 +1247,7 @@ class ProjectUpdate(SingleObjectMixin, UserPassesTestMixin, View):
     def post(self, request, slug):
         project = self.get_object()
         form = ProjectModelForm(request.POST, request.FILES, instance=project)
-        if form.is_valid() and form.has_changed():
+        if form.is_valid():
             form.save()
             return redirect('geocontrib:project', slug=project.slug)
 
