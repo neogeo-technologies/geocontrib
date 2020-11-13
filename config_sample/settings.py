@@ -223,3 +223,12 @@ GEOCODER_PROVIDERS = {
 SELECTED_GEOCODER = {
     'PROVIDER': config('SELECTED_GEOCODER_PROVIDER', default='addok')
 }
+
+# Project duplication settings
+PROJECT_COPY_RELATED = {
+    'AUTHORIZATION': True,
+    'BASE_MAP': True,
+    'FEATURE': True,
+    'FEATURE_TYPE': True,
+    'THUMBNAIL': True,
+}

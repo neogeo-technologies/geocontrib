@@ -18,11 +18,12 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
-from django.views.decorators.csrf import csrf_exempt
 
 from api.serializers import CommentSerializer
 from api.serializers import EventSerializer
@@ -1271,12 +1272,91 @@ class ProjectCreate(CreateView):
 
     template_name = 'geocontrib/project/project_edit.html'
 
+    PROJECT_COPY_RELATED = getattr(settings, 'PROJECT_COPY_RELATED', {})
+
     def test_func(self):
         user = self.request.user
         return user.is_superuser or user.is_administrator
 
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super().get_form_kwargs(*args, **kwargs)
+        kwargs.update({'create_from': self.request.GET.get('create_from')})
+        return kwargs
+
+    def _duplicate_project_related_sets(self, instance, project_template):
+        copy_feature_types = self.PROJECT_COPY_RELATED.get('FEATURE_TYPE', False)
+        copy_features = self.PROJECT_COPY_RELATED.get('FEATURE', False)
+        if project_template and isinstance(project_template, Project) and copy_feature_types:
+            for feature_type in project_template.featuretype_set.all():
+                # Pour manipuler une copie immuable
+                legit_feature_type = FeatureType.objects.get(pk=feature_type.pk)
+                feature_type.pk = None
+                feature_type.project = instance
+                feature_type.save()
+                for custom_field in legit_feature_type.customfield_set.all():
+                    custom_field.pk = None
+                    custom_field.feature_type = feature_type
+                    custom_field.save()
+                if copy_features:
+                    for feature in legit_feature_type.feature_set.all():
+                        feature.pk = None
+                        feature.created_on = None
+                        feature.updated_on = None
+                        feature.creator = self.request.user
+                        feature.project = instance
+                        feature.feature_type = feature_type
+                        feature.save()
+
+    def _duplicate_project_base_map(self, instance, project_template):
+        copy_related = self.PROJECT_COPY_RELATED.get('BASE_MAP', False)
+        if project_template and isinstance(project_template, Project) and copy_related:
+            for base_map in project_template.basemap_set.all():
+                legit_base_map = BaseMap.objects.get(pk=base_map.pk)
+                base_map.pk = None
+                base_map.project = instance
+                base_map.save()
+                for ctx_layer in legit_base_map.contextlayer_set.all():
+                    ctx_layer.pk = None
+                    ctx_layer.base_map = base_map
+                    ctx_layer.save()
+
+    def _duplicate_project_authorization(self, instance, project_template):
+        """
+        Un signale est deja en place pour appliquer les permissions initiales
+        à la creation d'un projet:
+        - createur = rank 4
+        - autres = rank 1
+        Ici on ecrase ces permissions initiales avec celles du projet type parent
+        à l'exclusion de la permission relative au créateur de l'instance courante
+        """
+        copy_related = self.PROJECT_COPY_RELATED.get('AUTHORIZATION', False)
+        if project_template and isinstance(project_template, Project) and copy_related:
+            for auth in instance.authorization_set.exclude(user=instance.creator):
+                auth.level = Authorization.objects.get(
+                    user=auth.user, project=project_template).level
+                auth.save()
+
+    def _set_thumbnail(self, instance, form, project_template):
+        thumbnail = form.cleaned_data.get('thumbnail')
+        copy_related = self.PROJECT_COPY_RELATED.get('THUMBNAIL', False)
+        if not thumbnail and hasattr(project_template, 'thumbnail') and copy_related:
+            instance.thumbnail = project_template.thumbnail
+        return instance
+
+    def _set_creator(self, instance):
+        instance.creator = self.request.user
+        return instance
+
     def form_valid(self, form):
-        form.instance.creator = self.request.user
+        slug = form.cleaned_data.get('create_from')
+        project_template = Project.objects.filter(slug=slug).first()
+        instance = form.save(commit=False)
+        self._set_thumbnail(instance, form, project_template)
+        self._set_creator(instance)
+        instance.save()
+        self._duplicate_project_related_sets(instance, project_template)
+        self._duplicate_project_base_map(instance, project_template)
+        self._duplicate_project_authorization(instance, project_template)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -1412,6 +1492,25 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
                 'feature_types': FeatureType.objects.filter(project=project)
             }
             return render(request, 'geocontrib/project/project_members.html', context)
+
+
+class ProjectTypeListView(TemplateView, UserPassesTestMixin):
+
+    template_name = "geocontrib/project/project_type_list.html"
+
+    def test_func(self):
+        user = self.request.user
+        return user.is_superuser or user.is_administrator
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = settings.APPLICATION_NAME
+        serilized_projects = ProjectDetailedSerializer(
+            Project.objects.filter(is_project_type=True).order_by('-created_on'),
+            many=True
+        )
+        context['projects'] = serilized_projects.data
+        return context
 
 
 ######################

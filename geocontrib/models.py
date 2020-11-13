@@ -258,6 +258,9 @@ class Project(models.Model):
         verbose_name="Groupes LDAP des administrateurs",
         base_field=models.CharField(max_length=256), blank=True, null=True)
 
+    is_project_type = models.BooleanField(
+        "Est un projet type", default=False, blank=True)
+
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"
@@ -330,7 +333,7 @@ class Feature(models.Model):
             raise ValidationError('Format de donnée invalide')
 
     def save(self, *args, **kwargs):
-        if self._state.adding is True:
+        if self.pk is None:
             self.created_on = timezone.now()
         self.updated_on = timezone.now()
         super().save(*args, **kwargs)
@@ -588,6 +591,8 @@ class AnnotationAbstract(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
+        # On ne check pas la pk car custom field
+        # donc on passe par _state
         if self._state.adding is True:
             self.created_on = timezone.now()
         super().save(*args, **kwargs)
@@ -880,10 +885,13 @@ def disable_for_loaddata(signal_handler):
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
     Supprime les fichiers image lors de la suppression d'une instance projet.
+    Seulement s'ils ne sont pas attachés à un autre projet
     """
-    if instance.thumbnail and instance.thumbnail.name != 'default.png':
-        if os.path.isfile(instance.thumbnail.path):
-            os.remove(instance.thumbnail.path)
+    if instance.thumbnail \
+            and instance.thumbnail.name != 'default.png' \
+            and sender.objects.filter(thumbnail=instance.thumbnail).count() < 2 \
+            and os.path.isfile(instance.thumbnail.path):
+        os.remove(instance.thumbnail.path)
 
 
 @receiver(models.signals.pre_delete, sender=User)
@@ -942,7 +950,7 @@ def delete_symetrical_relation(sender, instance, **kwargs):
 @disable_for_loaddata
 def update_feature_dates(sender, instance, **kwargs):
     if instance.project.archive_feature and instance.project.delete_feature:
-        if instance._state.adding and instance.project:
+        if instance.pk is None and instance.project:
             instance.archived_on = instance.created_on + timezone.timedelta(
                 days=instance.project.archive_feature)
             instance.deletion_on = instance.created_on + timezone.timedelta(

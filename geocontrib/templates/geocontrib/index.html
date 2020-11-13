@@ -17,6 +17,14 @@
   </h2>
 
   <h4 id="les_projets" class="ui horizontal divider header">PROJETS</h4>
+  {% if can_create_project %}
+  <a class="ui green basic button" href="{% url 'geocontrib:project_create' %}">
+    <i class="plus icon"></i> Créer un nouveau projet
+  </a>
+  <a class="ui blue basic button right floated" href="{% url 'geocontrib:project_type_list' %}">
+    <i class="copy icon"></i> Accéder à la liste des modèles de projets
+  </a>
+  {% endif %}
   <div class="ui divided items">
     {% for project in projects %}
     <div class="item">
@@ -62,12 +70,6 @@
     <div class="item">
     </div>
   </div>
-
-  {% if can_create_project %}
-  <a class="ui green basic button" href="{% url 'geocontrib:project_create' %}">
-    <i class="plus icon"></i> Créer un nouveau projet
-  </a>
-  {% endif %}
 
 </div>
 {% endblock %}

@@ -1,11 +1,13 @@
 import json
-from django.core.serializers.json import DjangoJSONEncoder
+
 from django.contrib.gis import forms
-from django.forms.models import BaseModelFormSet
+from django.core.serializers.json import DjangoJSONEncoder
+from django.forms import HiddenInput
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
+from django.forms.models import BaseModelFormSet
 from django.forms.models import inlineformset_factory
-from django.forms import HiddenInput
+from django.utils import timezone
 
 from geocontrib.models import Attachment
 from geocontrib.models import Authorization
@@ -467,6 +469,9 @@ class ProjectModelForm(forms.ModelForm):
 
     moderation = forms.BooleanField(label='Modération', required=False)
 
+    is_project_type = forms.BooleanField(
+        label="Est un projet type", required=False)
+
     archive_feature = forms.IntegerField(
         label='Délai avant archivage', required=False)
 
@@ -483,6 +488,8 @@ class ProjectModelForm(forms.ModelForm):
         queryset=UserLevelPermission.objects.filter(rank__lte=4).order_by('rank'),
         empty_label=None,)
 
+    create_from = forms.CharField(required=False, widget=HiddenInput())
+
     class Meta:
         model = Project
         fields = [
@@ -494,15 +501,35 @@ class ProjectModelForm(forms.ModelForm):
             'access_level_arch_feature',
             'archive_feature',
             'delete_feature',
+            'is_project_type',
+            'create_from',
         ]
 
     def __init__(self, *args, **kwargs):
+
+        slug = kwargs.pop('create_from', None)
+        project_type = Project.objects.filter(slug=slug).first()
+
         super().__init__(*args, **kwargs)
         instance = kwargs.get('instance')
 
         if instance:
-            self.fields['archive_feature'].initial = instance.archive_feature
-            self.fields['delete_feature'].initial = instance.delete_feature
+            # Optionnel
+            for key in ['archive_feature', 'delete_feature']:
+                source = getattr(instance, key)
+                self.fields[key].initial = source
+        elif project_type:
+            for key in [
+                    'archive_feature', 'delete_feature',
+                    'access_level_pub_feature', 'access_level_arch_feature',
+                    'description', 'moderation', 'thumbnail']:
+                source = getattr(project_type, key)
+                self.fields[key].initial = source
+            self.fields['title'].initial = "{} (Copie-{})".format(
+                project_type.title, timezone.now().strftime("%d/%m/%Y %H:%M")
+            )
+            self.fields['title'].help_text = "Le titre d'un projet doit etre unique. "
+            self.fields['create_from'].initial = slug
         else:
             self.fields['archive_feature'].initial = 0
             self.fields['delete_feature'].initial = 0
