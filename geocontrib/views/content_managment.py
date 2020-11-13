@@ -11,18 +11,20 @@ from django.contrib.gis.geos.error import GEOSException
 from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.forms import modelformset_factory
+from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.detail import DetailView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
-from django.views.decorators.csrf import csrf_exempt
 
 from api.serializers import CommentSerializer
 from api.serializers import EventSerializer
@@ -796,7 +798,6 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
     CustomFieldsFormSet = modelformset_factory(
         CustomField,
         can_delete=True,
-        # can_order=True,
         form=CustomFieldModelForm,
         formset=CustomFieldModelBaseFS,
         extra=0,
@@ -810,8 +811,23 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
     def get(self, request, slug):
         project = self.get_object()
         user = request.user
-        form = FeatureTypeModelForm()
-        formset = self.CustomFieldsFormSet(queryset=CustomField.objects.none())
+        slug = request.GET.get('create_from')
+        feature_type = FeatureType.objects.filter(slug=slug).first()
+        if feature_type and isinstance(feature_type, FeatureType):
+            initial = model_to_dict(feature_type)
+            if initial.get('title'):
+                initial.update({
+                    'title': "{} (Copie {})".format(
+                        initial['title'],
+                        timezone.now().strftime("%d/%m/%Y %H:%M"))
+                })
+            form = FeatureTypeModelForm(initial=initial)
+            formset = self.CustomFieldsFormSet(
+                queryset=CustomField.objects.filter(feature_type=feature_type),
+            )
+        else:
+            form = FeatureTypeModelForm()
+            formset = self.CustomFieldsFormSet(queryset=CustomField.objects.none())
 
         context = {
             'form': form,

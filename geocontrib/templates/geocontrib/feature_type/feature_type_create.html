@@ -165,6 +165,21 @@
     }
   })
 
+  $(document).ready(function () {
+    var all_fields = $(".field-type").select()
+    for(i=0; i<all_fields.length; i++){
+      var $this_field  = $("#"+all_fields[i].id).select()
+      var $option = $this_field.parent().parent('.field').parent('.fields').children('.field-list-options')
+      if ($this_field.val() === "list") {
+        $option.find('input').prop('required', true)
+        $option.show()
+      } else {
+        $option.find('input').prop('required',false)
+        $option.hide()
+      }
+    }
+  })
+
   $('#add-field').click(function() {
     var form_idx = $('#id_form-TOTAL_FORMS').val();
 
