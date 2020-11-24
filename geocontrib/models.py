@@ -168,7 +168,8 @@ class Authorization(models.Model):
                 user_perms['can_create_feature_type'] = True
 
             # Visibilité des features archivés
-            if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
+            # if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
+            if user_rank >= project_arch_rank_min:
                 user_perms['can_view_archived_feature'] = True
 
             # On permet à son auteur de modifier un feature s'il est encore contributeur
