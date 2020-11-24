@@ -546,7 +546,8 @@ class ProjectModelForm(forms.ModelForm):
 
 
 class ContextLayerForm(forms.ModelForm):
-    layer = forms.ModelChoiceField(label="Couche", queryset=Layer.objects.all(), empty_label=None)
+    layer = forms.ModelChoiceField(
+        label="Couche", queryset=Layer.objects.all(), empty_label=None)
 
     class Meta:
         model = ContextLayer
@@ -558,7 +559,8 @@ class ContextLayerForm(forms.ModelForm):
 
 
 ContextLayerFormset = inlineformset_factory(
-    BaseMap, ContextLayer, form=ContextLayerForm, fields=['layer', 'order', 'opacity'], extra=0)
+    BaseMap, ContextLayer, form=ContextLayerForm,
+    fields=['layer', 'order', 'opacity'], extra=0)
 
 
 class BaseMapInlineFormset(BaseInlineFormSet):
@@ -598,6 +600,7 @@ class BaseMapInlineFormset(BaseInlineFormSet):
         for form in self.forms:
             if hasattr(form, 'nested'):
                 if not self._should_delete_form(form):
+                    form.save(commit=commit)  # ???
                     form.nested.save(commit=commit)
 
         return result
