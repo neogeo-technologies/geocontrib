@@ -210,3 +210,6 @@ GEOCODER_PROVIDERS = {
 SELECTED_GEOCODER = {
     'PROVIDER': config('SELECTED_GEOCODER_PROVIDER', default='addok')
 }
+
+# 9745 & 9645 don't create temp files with 0o000
+FILE_UPLOAD_PERMISSIONS = 0o644
