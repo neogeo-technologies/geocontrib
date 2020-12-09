@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, When, Case, CharField, Value
 from django.apps import apps
 from geocontrib.choices import MODERATOR
 
@@ -65,3 +65,26 @@ class LayerManager(models.Manager):
         return self.get_queryset().filter(
             pk__in=BaseMap.objects.filter(project=project).values_list('layers__pk', flat=True)
         )
+
+
+class FeatureLinkManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+    def context(self, feature_id):
+        res = self.get_queryset().filter(
+            Q(feature_from__feature_id=feature_id) | Q(feature_to__feature_id=feature_id)
+        ).annotate(
+            relation_display=Case(
+                # TODO: Les conditions sur champs liés feature_to / feature_from ne passent pas
+                When(feature_to__feature_id=feature_id, relation_type='est_remplace_par', then=Value('Est remplacé par')),
+                When(feature_from__feature_id=feature_id, relation_type='remplace', then=Value('Remplace')),
+
+                When(relation_type='doublon', then=Value('Doublon')),
+                When(relation_type='depend_de', then=Value('Dépend de')),
+                default=Value('N/A'),
+                output_field=CharField(),
+            )
+        ).values_list('relation_display', 'relation_type')
+        return res

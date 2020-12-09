@@ -10,6 +10,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos.error import GEOSException
 from django.db import IntegrityError, transaction
 from django.db.models import F
+from django.db.models import Q
 from django.forms import modelformset_factory
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -18,11 +19,11 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.detail import DetailView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
-from django.views.decorators.csrf import csrf_exempt
 
 from api.serializers import CommentSerializer
 from api.serializers import EventSerializer
@@ -368,7 +369,6 @@ class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
 
                 # Traitement des signalements liés
                 for data in linked_formset.cleaned_data:
-
                     feature_link = data.pop('id', None)
 
                     if feature_link:
@@ -383,7 +383,7 @@ class FeatureCreate(BaseMapContextMixin, UserPassesTestMixin, View):
                     if not feature_link and not data.get('DELETE'):
                         FeatureLink.objects.create(
                             relation_type=data.get('relation_type'),
-                            feature_from=feature.feature_id,
+                            feature_from=feature,
                             feature_to=data.get('feature_to')
                         )
 
@@ -629,7 +629,7 @@ class FeatureUpdate(BaseMapContextMixin, UserPassesTestMixin, View):
         extra_form = FeatureExtraForm(request.POST, feature=feature, extra=extra)
 
         linked_formset = self.LinkedFormset(
-            request.POST or None,
+            request.POST,
             prefix='linked',
             form_kwargs={'feature_type': feature_type, 'feature': feature},
             queryset=FeatureLink.objects.filter(feature_from=feature.feature_id))
@@ -713,7 +713,6 @@ class FeatureUpdate(BaseMapContextMixin, UserPassesTestMixin, View):
 
             # Traitement des signalements liés
             for data in linked_formset.cleaned_data:
-
                 feature_link = data.pop('id', None)
 
                 if feature_link:
@@ -728,7 +727,7 @@ class FeatureUpdate(BaseMapContextMixin, UserPassesTestMixin, View):
                 if not feature_link and not data.get('DELETE'):
                     FeatureLink.objects.create(
                         relation_type=data.get('relation_type'),
-                        feature_from=feature_id,
+                        feature_from=updated_feature,
                         feature_to=data.get('feature_to')
                     )
 
@@ -1042,15 +1041,15 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
             )
             if title:
                 simili_features = Feature.objects.filter(
-                    title=title, description=description
+                    Q(title=title, description=description) | Q(geom=current.geom)
                 ).exclude(feature_id=current.feature_id)
 
                 if simili_features.count() > 0:
                     for row in simili_features:
                         FeatureLink.objects.get_or_create(
                             relation_type='doublon',
-                            feature_from=current.feature_id,
-                            feature_to=row.feature_id
+                            feature_from=current,
+                            feature_to=row
                         )
         if nb_features > 0:
             msg = "{nb} signalement(s) importé(s). ".format(nb=nb_features)
