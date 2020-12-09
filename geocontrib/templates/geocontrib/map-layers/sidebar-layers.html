@@ -259,10 +259,12 @@
   function areChangesInBasemaps(basemapFromServer, basemapFromLocalstorage) {
     let isSameBasemaps = false;
     let isSameLayers = true;
+    let isSameTitles = true;
 
     // Compare the length and the id values of the basemaps
     const idBasemapsServer = basemapFromServer.map(b => b.id).sort();
     const idBasemapsLocalstorage = basemapFromLocalstorage.map(b => b.id).sort();
+    console.log(basemapFromServer, basemapFromLocalstorage)
     isSameBasemaps = (idBasemapsServer.length === idBasemapsLocalstorage.length
       && idBasemapsServer.every((value, index) => value === idBasemapsLocalstorage[index]))
 
@@ -282,8 +284,22 @@
         }
       }
     }
+
+    // Compare basemaps titles
+    for(let basemapServer of basemapFromServer) {
+      let titleLayersServer = basemapServer.layers.map(b => b.title).sort();
+
+      for (let basemapLocalstorage of basemapFromLocalstorage) {
+        if (basemapServer.id === basemapLocalstorage.id) {
+          isSameTitles = basemapServer.title === basemapLocalstorage.title;
+        }
+        if (!isSameTitles) {
+          break outer_block;
+        }
+      }
+    }
   }
-    return !(isSameBasemaps && isSameLayers);
+    return !(isSameBasemaps && isSameLayers && isSameTitles);
   }
 
   function setLocalstorageMapOptions(basemaps) {
