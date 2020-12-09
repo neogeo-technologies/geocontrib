@@ -286,17 +286,13 @@
     }
 
     // Compare basemaps titles
-    for(let basemapServer of basemapFromServer) {
-      let titleLayersServer = basemapServer.layers.map(b => b.title).sort();
+    const titlesBasemapsServer = basemapFromServer.map(b => b.title).sort();
+    const titlesBasemapsLocalstorage = basemapFromLocalstorage.map(b => b.title).sort();
 
-      for (let basemapLocalstorage of basemapFromLocalstorage) {
-        if (basemapServer.id === basemapLocalstorage.id) {
-          isSameTitles = basemapServer.title === basemapLocalstorage.title;
-        }
-        if (!isSameTitles) {
-          break outer_block;
-        }
-      }
+    isSameTitles = titlesBasemapsServer.every((title, index) => title === titlesBasemapsLocalstorage[index]);
+
+    if (!isSameTitles) {
+      break outer_block;
     }
   }
     return !(isSameBasemaps && isSameLayers && isSameTitles);
