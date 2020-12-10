@@ -98,3 +98,6 @@ config/__init__.py
 
 # MacOS
 .DS_Store
+
+# npm
+node_modules

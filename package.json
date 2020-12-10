@@ -1,0 +1,30 @@
+{
+  "name": "geocontrib",
+  "version": "1.0.0",
+  "description": "![alt text](geocontrib/static/geocontrib/img/logo-geocontrib.png?raw=true)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^5.10.0",
+    "webpack-cli": "^4.2.0"
+  },
+  "scripts": {
+    "dev": "webpack --mode=development --watch",
+    "build": "webpack --mode=production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neogeo-technologies/geocontrib.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/neogeo-technologies/geocontrib/issues"
+  },
+  "homepage": "https://github.com/neogeo-technologies/geocontrib#readme"
+}
