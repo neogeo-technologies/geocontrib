@@ -53,6 +53,7 @@ Copier le contenu du fichier /src/config_sample/settings.py dans /config/setting
 * EMAIL_HOST_USER https://docs.djangoproject.com/en/2.2/ref/settings/#std%3Asetting-EMAIL_HOST_USER
 * EMAIL_HOST_PASSWORD https://docs.djangoproject.com/en/2.2/ref/settings/#email-host-password
 * DEFAULT_FROM_EMAIL https://docs.djangoproject.com/en/2.2/ref/settings/#default-from-email
+* DATA_UPLOAD_MAX_NUMBER_FIELDS https://docs.djangoproject.com/fr/2.2/ref/settings/#data-upload-max-number-fields
 
 Éditer les paramètres spécifiques à l'outil dans /config/settings.py :
 * DEFAULT_SENDING_FREQUENCY : fréquence d'envoi des notifications par email (never/instantly/daily/weekly)
