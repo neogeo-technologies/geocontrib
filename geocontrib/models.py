@@ -25,6 +25,7 @@ from geocontrib.choices import TYPE_CHOICES
 from geocontrib.emails import notif_moderators_pending_features
 from geocontrib.emails import notif_creator_published_feature
 from geocontrib.managers import AvailableFeaturesManager
+from geocontrib.managers import FeatureLinkManager
 from geocontrib.managers import LayerManager
 
 import logging
@@ -264,6 +265,7 @@ class Project(models.Model):
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"
+        ordering = ('title', )
 
     def __str__(self):
         return self.title
@@ -385,18 +387,39 @@ class FeatureLink(models.Model):
         ('est_remplace_par', 'Est remplacé par'),
         ('depend_de', 'Dépend de'),
     )
+
     relation_type = models.CharField(
         'Type de liaison', choices=REL_TYPES, max_length=50, default='doublon')
 
-    # TODO@cbenhabib: a voir si on ne met pas des FK au lieu d'une ref uuid
-    feature_from = models.UUIDField(
-        "Identifiant du signalement source", max_length=32, blank=True, null=True)
-    feature_to = models.UUIDField(
-        "Identifiant du signalement lié", max_length=32, blank=True, null=True)
+    feature_from = models.ForeignKey(
+        "geocontrib.Feature", verbose_name="Signalement source",
+        on_delete=models.CASCADE, related_name='feature_from', db_column='feature_from')
+
+    feature_to = models.ForeignKey(
+        "geocontrib.Feature", verbose_name="Signalement lié",
+        on_delete=models.CASCADE, related_name='feature_to', db_column='feature_to')
+
+    objects = models.Manager()
+
+    handy = FeatureLinkManager()
 
     class Meta:
-        verbose_name = "Type de liaison"
-        verbose_name_plural = "Types de liaison"
+        verbose_name = "Liaison entre signalements"
+        verbose_name_plural = "Liaisons entre signalements"
+
+    def update_relations(self, relation_type):
+        new_relation = relation_type
+        if new_relation in ['doublon', 'depend_de']:
+            recip = new_relation
+        else:
+            recip = 'est_remplace_par' if (new_relation == 'remplace') else 'remplace'
+        # Maj des réciproques
+        FeatureLink.objects.update_or_create(
+            feature_from=self.feature_to, feature_to=self.feature_from,
+            defaults={'relation_type': recip}
+        )
+        self.relation_type = new_relation
+        self.save(update_fields=['relation_type', ])
 
 
 class FeatureType(models.Model):

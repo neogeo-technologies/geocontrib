@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [1.1.3] - 2020-11-13
+
+### Changed
+- Docker image can handle forms with 10000 parameters (or more via the `DATA_UPLOAD_MAX_NUMBER_FIELDS` environement variable).
+  This allows to handle more than 500 users in the projet
+
 ## [1.1.2] - 2020-10-30
 
 ### Fixed
