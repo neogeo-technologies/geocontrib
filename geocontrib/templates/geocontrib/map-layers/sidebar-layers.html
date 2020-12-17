@@ -264,7 +264,6 @@
     // Compare the length and the id values of the basemaps
     const idBasemapsServer = basemapFromServer.map(b => b.id).sort();
     const idBasemapsLocalstorage = basemapFromLocalstorage.map(b => b.id).sort();
-    console.log(basemapFromServer, basemapFromLocalstorage)
     isSameBasemaps = (idBasemapsServer.length === idBasemapsLocalstorage.length
       && idBasemapsServer.every((value, index) => value === idBasemapsLocalstorage[index]))
 
