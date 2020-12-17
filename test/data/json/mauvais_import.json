@@ -1,0 +1,121 @@
+{
+    "features": [
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            4.518451,
+                            44.862925
+                        ],
+                        [
+                            4.538371,
+                            44.896492
+                        ],
+                        [
+                            4.569626,
+                            44.88336
+                        ],
+                        [
+                            4.547644,
+                            44.870954
+                        ],
+                        [
+                            4.56207,
+                            44.859519
+                        ],
+                        [
+                            4.521885,
+                            44.862439
+                        ],
+                        [
+                            4.518451,
+                            44.862925
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": "bcc78877-ecbb-47cc-9cbc-ddbec72d0ee1",
+            "properties": {
+                "archived_on": null,
+                "created_on": "2020-11-27T10:16:21.193604+01:00",
+                "deletion_on": null,
+                "description": "",
+                "feature_type": "120-type_mauvais_import",
+                "firstobs": "1981-07-06",
+                "importance": "haute",
+                "json": true,
+                "status": "published",
+                "title": "mauvais2",
+                "updated_on": "2020-11-27T10:16:21.193623+01:00"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            1.328252,
+                            48.893912
+                        ],
+                        [
+                            3.405478,
+                            49.282376
+                        ],
+                        [
+                            3.900056,
+                            48.407699
+                        ],
+                        [
+                            3.394487,
+                            48.239708
+                        ],
+                        [
+                            1.965708,
+                            48.290894
+                        ],
+                        [
+                            1.635989,
+                            48.647763
+                        ],
+                        [
+                            2.00967,
+                            48.770988
+                        ],
+                        [
+                            2.570191,
+                            48.88669
+                        ],
+                        [
+                            2.295426,
+                            48.937225
+                        ],
+                        [
+                            1.328252,
+                            48.893912
+                        ]
+                    ]
+                ],
+                "type": "Polygon"
+            },
+            "id": "50253011-059d-4297-b996-fbd76934abe5",
+            "properties": {
+                "archived_on": null,
+                "created_on": "2020-11-27T10:15:31.971317+01:00",
+                "deletion_on": null,
+                "description": "",
+                "feature_type": "120-type_mauvais_import",
+                "firstobs": "2020-11-02",
+                "importance": "haute",
+                "json": true,
+                "status": "published",
+                "title": "mauvais1",
+                "updated_on": "2020-11-27T10:15:31.971335+01:00"
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
+}
