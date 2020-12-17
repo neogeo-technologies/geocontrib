@@ -408,7 +408,9 @@ class FeatureExtraForm(forms.Form):
 
 class FeatureLinkForm(forms.ModelForm):
 
-    feature_to = forms.ChoiceField(label='Signalement lié')
+    feature_to = forms.ModelChoiceField(
+        label="Signalement lié", queryset=Feature.objects.all(),
+        empty_label=None)
 
     class Meta:
         model = FeatureLink
@@ -421,19 +423,21 @@ class FeatureLinkForm(forms.ModelForm):
         feature_type = kwargs.pop('feature_type', None)
         feature = kwargs.pop('feature', None)
         super().__init__(*args, **kwargs)
-
-        try:
-            qs = Feature.objects.filter(feature_type=feature_type)
-            if feature:
-                qs = qs.exclude(feature_id=feature.feature_id)
-
-            self.fields['feature_to'].choices = tuple(
-                (feat.feature_id, "{} ({} - {})".format(
-                    feat.title, feat.display_creator, feat.created_on.strftime("%d/%m/%Y %H:%M"))) for feat in qs
+        qs = Feature.objects.all()
+        if feature_type:
+            qs = qs.filter(
+                feature_type=feature_type
             )
-
+        if feature:
+            qs = qs.exclude(
+                feature_id=feature.feature_id
+            )
+        try:
+            self.fields['feature_to'].queryset = qs
+            self.fields['feature_to'].label_from_instance = lambda obj: "{} ({} - {})".format(
+                obj.title, obj.display_creator, obj.created_on.strftime("%d/%m/%Y %H:%M"))
         except Exception:
-            logger.exception('No feature_type found')
+            logger.exception('No related features found')
 
 
 class FeatureTypeModelForm(forms.ModelForm):

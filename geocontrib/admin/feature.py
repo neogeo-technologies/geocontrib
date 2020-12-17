@@ -3,9 +3,6 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-from django.contrib.flatpages.admin import FlatPageAdmin
-from django.contrib.flatpages.models import FlatPage
 from django.contrib.gis import admin
 from django.db import connections
 from django.forms import formset_factory
@@ -14,73 +11,23 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import path
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
 
+from geocontrib.admin.filters import FeatureTypeFilter
+from geocontrib.admin.filters import ProjectFilter
 from geocontrib.forms import FeatureTypeAdminForm
 from geocontrib.forms import CustomFieldModelAdminForm
 from geocontrib.forms import HiddenDeleteBaseFormSet
 from geocontrib.forms import HiddenDeleteModelFormSet
 from geocontrib.forms import FeatureSelectFieldAdminForm
 from geocontrib.forms import AddPosgresViewAdminForm
-from geocontrib.models import Authorization
 from geocontrib.models import Feature
-from geocontrib.models import Project
-from geocontrib.models import Subscription
 from geocontrib.models import FeatureType
-from geocontrib.models import BaseMap
-from geocontrib.models import ContextLayer
-from geocontrib.models import Layer
+from geocontrib.models import FeatureLink
 from geocontrib.models import CustomField
-from geocontrib.models import UserLevelPermission
-# from geocontrib.models import CustomFieldInterface
+
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
-
-
-class UserAdmin(DjangoUserAdmin):
-    list_display = (
-        'username', 'last_name', 'first_name', 'email',
-        'is_superuser', 'is_administrator', 'is_staff', 'is_active'
-    )
-    search_fields = ('id', 'username', 'first_name', 'last_name', 'email')
-    ordering = ('last_name', 'first_name', 'username', )
-    verbose_name_plural = 'utilisateurs'
-    verbose_name = 'utilisateur'
-
-    readonly_fields = (
-        'id',
-        'date_joined',
-        'last_login',
-    )
-
-    fieldsets = (
-        (None, {
-            'fields': ('username', 'email', 'password')
-        }),
-        (_('Personal info'), {
-            'fields': ('first_name', 'last_name',)
-        }),
-        (_('Permissions'), {
-            'fields': (
-                'is_active', 'is_staff', 'is_superuser', 'is_administrator',
-                'groups', 'user_permissions'),
-        }),
-        (_('Important dates'), {
-            'fields': (
-                'last_login', 'date_joined'),
-        }),
-    )
-
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': (
-                'username', 'email', 'password1', 'password2',
-                'first_name', 'last_name',
-                'is_active', 'is_staff', 'is_superuser'),
-        }),
-    )
 
 
 class CustomFieldTabular(admin.TabularInline):
@@ -202,71 +149,136 @@ class FeatureTypeAdmin(admin.ModelAdmin):
         return TemplateResponse(request, "admin/geocontrib/create_postrges_view_form.html", context)
 
 
-class FlatPageAdmin(FlatPageAdmin):
-    fieldsets = (
-        (None, {'fields': ('url', 'title', 'content', 'sites')}),
-        (_('Advanced options'), {
-            'classes': ('collapse',),
-            'fields': (
-                'enable_comments',
-                'registration_required',
-                'template_name',
-            ),
-        }),
-    )
-
-
-class ContextLayerTabular(admin.TabularInline):
-    model = ContextLayer
-    extra = 0
-    can_delete = True
-    can_order = True
-    show_change_link = True
-    view_on_site = False
-
-
-class BaseMapAdmin(admin.ModelAdmin):
-
-    inlines = (
-        ContextLayerTabular,
-    )
-
-    def save_formset(self, request, form, formset, change):
-        super().save_formset(request, form, formset, change)
-        ctx_lyrs = ContextLayer.objects.filter(
-            base_map=formset.instance).order_by('order')
-        for idx, ctx in enumerate(ctx_lyrs):
-            ctx.order = idx
-            ctx.save(update_fields=['order'])
-
-
-class AuthorizationAdmin(admin.ModelAdmin):
-
-    list_display = (
-        'user', 'full_name', 'project', 'level'
-    )
-    ordering = ('project', 'user__last_name')
-    list_editable = ('level', )
-
-    def full_name(self, obj):
-        return " ".join([obj.user.last_name, obj.user.first_name])
-
-
 class FeatureAdmin(admin.ModelAdmin):
     list_display = ('title', 'project', 'feature_type')
+    list_filter = ('project',)
     ordering = ('project', 'feature_type', 'title')
 
 
-admin.site.register(User, UserAdmin)
-admin.site.register(BaseMap, BaseMapAdmin)
+class FeatureLinkAdmin(admin.ModelAdmin):
+    list_filter = (
+        ProjectFilter,
+        FeatureTypeFilter,
+        'relation_type',
+    )
+
+    search_fields = (
+        'feature_from__title',
+        'feature_to__title'
+    )
+
+    list_display = (
+        'feature_from',
+        'get_status',
+        'get_creator_from',
+        'get_created_on',
+        'relation_type',
+        '_feature_to',
+        'get_feature_type',
+    )
+    # ordering = ('_feature_from', )
+
+    list_per_page = 10
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return self.readonly_fields + ('relation_type', 'feature_from', 'feature_to')
+        return self.readonly_fields
+
+    def get_creator_from(self, obj):
+        res = "N/A"
+        try:
+            res = obj.feature_from.display_creator
+        except Exception:
+            pass
+        return res
+    get_creator_from.admin_order_field = 'feature_from__creator__last_name'
+    get_creator_from.short_description = 'Créateur (source)'
+
+    def get_created_on(self, obj):
+        res = "N/A"
+        try:
+            res = obj.feature_from.created_on.strftime("%d/%m/%Y %H:%M")
+        except Exception:
+            pass
+        return res
+    get_created_on.admin_order_field = 'feature_from__created_on'
+    get_created_on.short_description = 'Date création (source)'
+
+    def get_status(self, obj):
+        res = "N/A"
+        try:
+            res = obj.feature_from.get_status_display()
+        except Exception:
+            pass
+        return res
+    get_status.short_description = 'Statut (source)'
+
+    def get_feature_type(self, obj):
+        res = "N/A"
+        try:
+            res = obj.feature_from.feature_type.title
+        except Exception:
+            pass
+        return res
+    get_feature_type.short_description = 'Type de signalement'
+
+    def _feature_to(self, obj):
+        res = "N/A"
+        try:
+            feat = obj.feature_to
+            res = "{0} ({1}, {2}) - {3}".format(
+                feat.title, feat.display_creator,
+                feat.created_on.strftime("%d/%m/%Y %H:%M"),
+                feat.get_status_display())
+        except Exception:
+            pass
+        return res
+    _feature_to.short_description = 'Signalement (lié)'
+
+    actions = [
+        'set_replacing',
+        'set_replaced_by',
+        'set_depends_on',
+        'delete_instances',
+        'delete_feature_from',
+    ]
+
+    def delete_instances(self, request, queryset):
+        for elm in queryset:
+            elm.delete()
+    delete_instances.short_description = "Effacer ces liaisons entre signalements"
+
+    def delete_feature_from(self, request, queryset):
+        for elm in queryset:
+            # Supprime de fait la feature_link et son inverse
+            elm.feature_from.delete()
+    delete_feature_from.short_description = "Supprimer ces signalements"
+
+    def set_replacing(self, request, queryset):
+        for elm in queryset:
+            elm.update_relations('remplace')
+    set_replacing.short_description = "Mettre 'Remplace' dans la liaison de ce signalement"
+
+    def set_replaced_by(self, request, queryset):
+        for elm in queryset:
+            elm.update_relations('est_remplace_par')
+    set_replaced_by.short_description = "Mettre 'Est remplacer par' dans la liaison de ce signalement"
+
+    def set_depends_on(self, request, queryset):
+        for elm in queryset:
+            elm.update_relations('depend_de')
+    set_depends_on.short_description = "Mettre 'Dépend de' dans la liaison de ce signalement"
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            # Remplacer par delete_instances() qui
+            del actions['delete_selected']
+        return actions
+
+
 admin.site.register(CustomField)
-admin.site.register(Layer)
-admin.site.register(Authorization, AuthorizationAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(FeatureType, FeatureTypeAdmin)
-admin.site.register(Project)
-admin.site.register(Subscription)
-admin.site.register(UserLevelPermission)
-# admin.site.register(CustomFieldInterface)
-admin.site.unregister(FlatPage)
-admin.site.register(FlatPage, FlatPageAdmin)
+admin.site.register(FeatureLink, FeatureLinkAdmin)
