@@ -224,6 +224,15 @@ SELECTED_GEOCODER = {
     'PROVIDER': config('SELECTED_GEOCODER_PROVIDER', default='addok')
 }
 
+# Project duplication settings
+PROJECT_COPY_RELATED = {
+    'AUTHORIZATION': True,
+    'BASE_MAP': True,
+    'FEATURE': True,
+    'FEATURE_TYPE': True,
+    'THUMBNAIL': True,
+}
+
 DATA_UPLOAD_MAX_NUMBER_FIELDS = config('DATA_UPLOAD_MAX_NUMBER_FIELDS', default=10000)
 
 # 9745 & 9645 don't create temp files with 0o000

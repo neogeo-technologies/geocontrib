@@ -34,6 +34,7 @@
     <div class="two fields">
       <div class="required field">
         <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+        <small>{{ form.title.help_text|safe }}</small>
         <input type="text" required maxlength="{{ form.title.field.max_length }}"
           name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}"
           value="{% if form.title.value %}{{ form.title.value }}{% endif %}" >
@@ -130,7 +131,21 @@
       {{ form.moderation.errors }}
     </div>
 
+    <div class="field">
+      <div class="ui checkbox">
+        <input type="checkbox" {% if form.is_project_type.value %}checked{% endif %}
+          name="{{ form.is_project_type.html_name }}" id="{{ form.is_project_type.id_for_label }}">
+        <label for="{{ form.is_project_type.id_for_label }}">{{ form.is_project_type.label }}</label>
+      </div>
+      {{ form.is_project_type.errors }}
+    </div>
+
     <div class="ui divider"></div>
+
+    {% for hidden_field in form.hidden_fields %}
+      <!-- pour passer le slug du projet parent entre GET et POST -->
+      {{ hidden_field }}
+    {% endfor %}
 
     <button type="submit" class="ui teal icon button">
       <i class="white save icon"></i> Enregistrer les changements
