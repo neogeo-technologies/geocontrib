@@ -269,31 +269,31 @@
 
     // For each basemap, compare the length and id values of the layers
     outer_block: {
-    for(let basemapServer of basemapFromServer) {
-      let idLayersServer = basemapServer.layers.map(b => b.id).sort();
-  
-      for (let basemapLocalstorage of basemapFromLocalstorage) {
-        if (basemapServer.id === basemapLocalstorage.id) {
-          let idLayersLocalstorage = basemapLocalstorage.layers.map(b => b.id).sort();
-          isSameLayers = (idLayersServer.length === idLayersLocalstorage.length
-            && idLayersServer.every((value, index) => value === idLayersLocalstorage[index]));
-          if (!isSameLayers) {
-            break outer_block;
+      for(let basemapServer of basemapFromServer) {
+        let idLayersServer = basemapServer.layers.map(b => b.id).sort();
+      
+        for (let basemapLocalstorage of basemapFromLocalstorage) {
+          if (basemapServer.id === basemapLocalstorage.id) {
+            let idLayersLocalstorage = basemapLocalstorage.layers.map(b => b.id).sort();
+            isSameLayers = (idLayersServer.length === idLayersLocalstorage.length
+              && idLayersServer.every((value, index) => value === idLayersLocalstorage[index]));
+            if (!isSameLayers) {
+              break outer_block;
+            }
           }
         }
       }
+
+      // Compare basemaps titles
+      const titlesBasemapsServer = basemapFromServer.map(b => b.title).sort();
+      const titlesBasemapsLocalstorage = basemapFromLocalstorage.map(b => b.title).sort();
+
+      isSameTitles = titlesBasemapsServer.every((title, index) => title === titlesBasemapsLocalstorage[index]);
+
+      if (!isSameTitles) {
+        break outer_block;
+      }
     }
-
-    // Compare basemaps titles
-    const titlesBasemapsServer = basemapFromServer.map(b => b.title).sort();
-    const titlesBasemapsLocalstorage = basemapFromLocalstorage.map(b => b.title).sort();
-
-    isSameTitles = titlesBasemapsServer.every((title, index) => title === titlesBasemapsLocalstorage[index]);
-
-    if (!isSameTitles) {
-      break outer_block;
-    }
-  }
     return !(isSameBasemaps && isSameLayers && isSameTitles);
   }
 
