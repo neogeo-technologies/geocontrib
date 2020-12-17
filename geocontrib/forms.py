@@ -108,6 +108,12 @@ class AddPosgresViewAdminForm(forms.Form):
     )
 
 
+class ProjectAdminForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['creator'].required = True
+
+
 #############################
 # CUSTOM BASE MODEL FORMSET #
 #############################

@@ -262,6 +262,7 @@ class Project(models.Model):
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"
+        ordering = ('title', )
 
     def __str__(self):
         return self.title
