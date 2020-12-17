@@ -3,6 +3,7 @@ import logging
 from django.contrib.auth import get_user_model
 from django.contrib.gis import admin
 
+from geocontrib.forms import ProjectAdminForm
 from geocontrib.models import Project
 from geocontrib.models import BaseMap
 from geocontrib.models import ContextLayer
@@ -37,6 +38,11 @@ class BaseMapAdmin(admin.ModelAdmin):
             ctx.save(update_fields=['order'])
 
 
+class ProjectAdmin(admin.ModelAdmin):
+    form = ProjectAdminForm
+    ordering = ('title', )
+
+
 admin.site.register(BaseMap, BaseMapAdmin)
 admin.site.register(Layer)
-admin.site.register(Project)
+admin.site.register(Project, ProjectAdmin)
