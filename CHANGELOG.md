@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [1.2.0] - 2020-12-17
+
+### Changed
+- Redmine 9704: Allow the management of feature links in Django admin
+- Redmine 8551: Can import features files with extention "geojson" in addition to "json"
+- Redmine 9330: A feature type can be duplicated
+- Redmine 9329: Can turn a project into a project template and instatiate a project from a project model
+- Django admin improvements
+  - Projects list ordered by title
+  - FeatureType list ordered by project, title
+  - FeatureType list grouped by project
+  - Users list ordered by username, last_name, first_name
+  - FeatureType geom editable on create (read-only on update)
+  - CustomField list ordered by feature_type, label
+  - Project creator required (fixing 500 on edit)
+
+### Fixed
+- Docker, prevent creating files not readable by nginx
+- Redmine 9706: The modification of the basemap form are recorded
+- Redmine 9654: Creating a basemap without title doesn't crash
+- Redmine 9623: A connected user doesn't see achived features if he is not allowed
+
 ## [1.1.3] - 2020-11-13
 
 ### Changed

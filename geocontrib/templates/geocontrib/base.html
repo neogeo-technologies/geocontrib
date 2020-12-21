@@ -13,6 +13,7 @@
 
   <!-- Sortable JS -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <script src="{% static 'geocontrib/resources/sortablejs-1.10.2/Sortable.min.js'%}"></script>
 
   <!-- jQuery Core 3.3.1 -->
   <script src="{% static 'geocontrib/resources/jquery-3.3.1/jquery-3.3.1.min.js'%}"></script>
@@ -28,22 +29,20 @@
   <link rel="stylesheet" href="{% static 'geocontrib/resources/leaflet-1.5.1/leaflet.css' %}" />
   <script src="{% static 'geocontrib/resources/leaflet-1.5.1/leaflet.js' %}"></script>
   <!-- Leaflet Draw -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
-    integrity="sha256-XzD3RpaHPv7lzX9qt+2n1j5cWj48O24KsgaGYpKN8x8=" crossorigin="anonymous" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"
-    integrity="sha256-siofc4Uwjlra3YWkwthOn8Uj69cNN4aMug/iOHNiRgs=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{% static 'geocontrib/resources/leaflet-draw-1.0.4/leaflet.draw.css'%}" />
+  <script src="{% static 'geocontrib/resources/leaflet-draw-1.0.4/leaflet.draw.js'%}" />
 
   <!-- Leaflet Control search -->
   <link rel="stylesheet" href="{% static 'geocontrib/resources/leaflet-control-geocoder-1.13.0/Control.Geocoder.css' %}" />
   <script src="{% static 'geocontrib/resources/leaflet-control-geocoder-1.13.0/Control.Geocoder.js' %}"></script>
 
   <!-- WellKnown JS -->
-  <script src="https://cdn.rawgit.com/mapbox/wellknown/master/wellknown.js"></script>
+  <script src="{% static 'geocontrib/resources/wellknown/wellknown.js' %}"></script>
   <!-- Turf.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script>
+  <script src="{% static 'geocontrib/resources/turf-5/turf.min.js' %}"></script>
 
   <!-- Asual -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.address/1.6/jquery.address.js"></script>
+  <script src="{% static 'geocontrib/resources/jquery-address-1.6/jquery.address.js' %}"></script>
 
   <!-- Custom -->
   <link rel="stylesheet" href="{% static 'geocontrib/css/base.css' %}"/>

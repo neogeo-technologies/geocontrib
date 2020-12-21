@@ -248,7 +248,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
             kwargs={
                 'slug': obj.project.slug,
                 'feature_type_slug': obj.feature_type.slug
-        })
+            })
 
 
 class FeatureLinkSerializer(serializers.ModelSerializer):
@@ -261,7 +261,7 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
         res = {}
         if obj.feature_to:
             try:
-                feature = Feature.objects.get(feature_id=obj.feature_to)
+                feature = obj.feature_to
                 res = {
                     'feature_id': str(feature.feature_id),
                     'title': str(feature.title),

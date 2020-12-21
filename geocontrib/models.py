@@ -25,6 +25,7 @@ from geocontrib.choices import TYPE_CHOICES
 from geocontrib.emails import notif_moderators_pending_features
 from geocontrib.emails import notif_creator_published_feature
 from geocontrib.managers import AvailableFeaturesManager
+from geocontrib.managers import FeatureLinkManager
 from geocontrib.managers import LayerManager
 
 import logging
@@ -168,7 +169,7 @@ class Authorization(models.Model):
                 user_perms['can_create_feature_type'] = True
 
             # Visibilité des features archivés
-            if user_rank >= project_arch_rank_min or project_arch_rank_min < 2:
+            if user_rank >= project_arch_rank_min:
                 user_perms['can_view_archived_feature'] = True
 
             # On permet à son auteur de modifier un feature s'il est encore contributeur
@@ -258,9 +259,13 @@ class Project(models.Model):
         verbose_name="Groupes LDAP des administrateurs",
         base_field=models.CharField(max_length=256), blank=True, null=True)
 
+    is_project_type = models.BooleanField(
+        "Est un projet type", default=False, blank=True)
+
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"
+        ordering = ('title', )
 
     def __str__(self):
         return self.title
@@ -330,7 +335,7 @@ class Feature(models.Model):
             raise ValidationError('Format de donnée invalide')
 
     def save(self, *args, **kwargs):
-        if self._state.adding is True:
+        if self.pk is None:
             self.created_on = timezone.now()
         self.updated_on = timezone.now()
         super().save(*args, **kwargs)
@@ -382,18 +387,39 @@ class FeatureLink(models.Model):
         ('est_remplace_par', 'Est remplacé par'),
         ('depend_de', 'Dépend de'),
     )
+
     relation_type = models.CharField(
         'Type de liaison', choices=REL_TYPES, max_length=50, default='doublon')
 
-    # TODO@cbenhabib: a voir si on ne met pas des FK au lieu d'une ref uuid
-    feature_from = models.UUIDField(
-        "Identifiant du signalement source", max_length=32, blank=True, null=True)
-    feature_to = models.UUIDField(
-        "Identifiant du signalement lié", max_length=32, blank=True, null=True)
+    feature_from = models.ForeignKey(
+        "geocontrib.Feature", verbose_name="Signalement source",
+        on_delete=models.CASCADE, related_name='feature_from', db_column='feature_from')
+
+    feature_to = models.ForeignKey(
+        "geocontrib.Feature", verbose_name="Signalement lié",
+        on_delete=models.CASCADE, related_name='feature_to', db_column='feature_to')
+
+    objects = models.Manager()
+
+    handy = FeatureLinkManager()
 
     class Meta:
-        verbose_name = "Type de liaison"
-        verbose_name_plural = "Types de liaison"
+        verbose_name = "Liaison entre signalements"
+        verbose_name_plural = "Liaisons entre signalements"
+
+    def update_relations(self, relation_type):
+        new_relation = relation_type
+        if new_relation in ['doublon', 'depend_de']:
+            recip = new_relation
+        else:
+            recip = 'est_remplace_par' if (new_relation == 'remplace') else 'remplace'
+        # Maj des réciproques
+        FeatureLink.objects.update_or_create(
+            feature_from=self.feature_to, feature_to=self.feature_from,
+            defaults={'relation_type': recip}
+        )
+        self.relation_type = new_relation
+        self.save(update_fields=['relation_type', ])
 
 
 class FeatureType(models.Model):
@@ -588,6 +614,8 @@ class AnnotationAbstract(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
+        # On ne check pas la pk car custom field
+        # donc on passe par _state
         if self._state.adding is True:
             self.created_on = timezone.now()
         super().save(*args, **kwargs)
@@ -880,10 +908,13 @@ def disable_for_loaddata(signal_handler):
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
     Supprime les fichiers image lors de la suppression d'une instance projet.
+    Seulement s'ils ne sont pas attachés à un autre projet
     """
-    if instance.thumbnail and instance.thumbnail.name != 'default.png':
-        if os.path.isfile(instance.thumbnail.path):
-            os.remove(instance.thumbnail.path)
+    if instance.thumbnail \
+            and instance.thumbnail.name != 'default.png' \
+            and sender.objects.filter(thumbnail=instance.thumbnail).count() < 2 \
+            and os.path.isfile(instance.thumbnail.path):
+        os.remove(instance.thumbnail.path)
 
 
 @receiver(models.signals.pre_delete, sender=User)
@@ -942,7 +973,7 @@ def delete_symetrical_relation(sender, instance, **kwargs):
 @disable_for_loaddata
 def update_feature_dates(sender, instance, **kwargs):
     if instance.project.archive_feature and instance.project.delete_feature:
-        if instance._state.adding and instance.project:
+        if instance.pk is None and instance.project:
             instance.archived_on = instance.created_on + timezone.timedelta(
                 days=instance.project.archive_feature)
             instance.deletion_on = instance.created_on + timezone.timedelta(

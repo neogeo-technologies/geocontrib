@@ -70,6 +70,10 @@
                  href="{% url 'geocontrib:feature_create' slug=project.slug feature_type_slug=type.slug %}">
                 <i class="ui plus icon"></i>
               </a>
+              <a class="ui compact small icon right floated button button-hover-green" data-tooltip="Dupliquer un type de signalement" data-position="left center" data-variation="mini"
+                 href="{% url 'geocontrib:feature_type_create' slug=project.slug %}?create_from={{type.slug}}">
+                <i class="inverted grey copy alternate icon"></i>
+              </a>
               {% endif %}
               {% if project and feature_types and permissions|lookup:'can_create_feature' and type.is_editable %}
               <a class="ui compact small icon right floated button button-hover-green" data-tooltip="Éditer le type de signalement" data-position="left center" data-variation="mini"
@@ -165,7 +169,7 @@
                 <div class="content">Délai avant archivage automatique</div>
               </h4>
             </div>
-            <div class="center aligned extra content">{{ project.archive_feature }} jours</div>
+            <div class="center aligned extra content">{{ project.archive_feature|default_if_none:"0" }} jours</div>
           </div>
           <div class="card">
             <div class="content">
@@ -174,7 +178,7 @@
                 <div class="content">Délai avant suppression automatique</div>
               </h4>
             </div>
-            <div class="center aligned extra content">{{ project.delete_feature }} jours</div>
+            <div class="center aligned extra content">{{ project.delete_feature|default_if_none:"0" }} jours</div>
           </div>
           <div class="card">
             <div class="content">

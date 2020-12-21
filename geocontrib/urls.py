@@ -24,6 +24,7 @@ from geocontrib.views.content_managment import ProjectCreate
 from geocontrib.views.content_managment import CommentCreate
 from geocontrib.views.content_managment import AttachmentCreate
 from geocontrib.views.content_managment import ProjectMembers
+from geocontrib.views.content_managment import ProjectTypeListView
 from geocontrib.views.content_managment import SubscribingView
 
 
@@ -44,11 +45,13 @@ urlpatterns = [
 
 
     # Vues de gestion et d'édition des données métiers
-    path('creer-projet/', ProjectCreate.as_view(), name='project_create'),  # create_project
+    path('creer-projet/', ProjectCreate.as_view(), name='project_create'),
+
+    path('projet-type/', ProjectTypeListView.as_view(), name='project_type_list'),
 
     path('projet/<slug:slug>/', ProjectDetail.as_view(), name='project'),
 
-    path('projet/<slug:slug>/editer/', ProjectUpdate.as_view(), name='project_update'),  # admin_project
+    path('projet/<slug:slug>/editer/', ProjectUpdate.as_view(), name='project_update'),
 
     path('projet/<slug:slug>/membres/', ProjectMembers.as_view(), name='project_members'),
 
@@ -59,7 +62,7 @@ urlpatterns = [
         name='subscription'),
 
     path('projet/<slug:slug>/type-signalement/ajouter/',
-         FeatureTypeCreate.as_view(), name="feature_type_create"),  # add_feature_type
+         FeatureTypeCreate.as_view(), name="feature_type_create"),
 
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/',
          FeatureTypeDetail.as_view(), name='feature_type_detail'),
@@ -74,7 +77,7 @@ urlpatterns = [
          ImportFromImage.as_view(), name='import_from_image'),
 
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/ajouter/',
-         FeatureCreate.as_view(), name='feature_create'),  # add_feature
+         FeatureCreate.as_view(), name='feature_create'),
 
     path('projet/<slug:slug>/signalement/lister/',
          FeatureList.as_view(), name='feature_list'),

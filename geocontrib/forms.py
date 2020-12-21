@@ -1,11 +1,14 @@
 import json
-from django.core.serializers.json import DjangoJSONEncoder
+
 from django.contrib.gis import forms
-from django.forms.models import BaseModelFormSet
+from django.core.serializers.json import DjangoJSONEncoder
+from django.core.validators import RegexValidator
+from django.forms import HiddenInput
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
+from django.forms.models import BaseModelFormSet
 from django.forms.models import inlineformset_factory
-from django.forms import HiddenInput
+from django.utils import timezone
 
 from geocontrib.models import Attachment
 from geocontrib.models import Authorization
@@ -22,6 +25,11 @@ from geocontrib.models import UserLevelPermission
 
 import logging
 logger = logging.getLogger(__name__)
+
+alphanumeric = RegexValidator(
+    r'^[0-9a-zA-Z_-]*$',
+    "Seuls les caractères alphanumeriques 0-9 a-z A-Z _ - sont autorisés. "
+)
 
 
 ########################
@@ -82,7 +90,8 @@ class FeatureSelectFieldAdminForm(forms.Form):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': "Alias pour cette colonne"
-        })
+        }),
+        validators=[alphanumeric]
     )
 
 
@@ -90,6 +99,7 @@ class AddPosgresViewAdminForm(forms.Form):
     name = forms.CharField(
         label="Nom",
         required=True,
+        validators=[alphanumeric]
     )
 
     status = forms.MultipleChoiceField(
@@ -98,6 +108,12 @@ class AddPosgresViewAdminForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
+
+
+class ProjectAdminForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['creator'].required = True
 
 
 #############################
@@ -238,13 +254,20 @@ class AuthorizationForm(forms.ModelForm):
 
 
 class CustomFieldModelForm(forms.ModelForm):
+    name = forms.CharField(
+        label="Nom", max_length=128, required=True,
+        help_text=(
+            "Nom technique du champ tel qu'il apparaît dans la base de données "
+            "ou dans l'export GeoJSON. "
+            "Seuls les caractères alphanumériques et les traits d'union "
+            "sont autorisés: a-z, A-Z, 0-9, _ et -)"),
+        validators=[alphanumeric])
 
     class Meta:
         model = CustomField
         fields = ('label', 'name', 'field_type', 'position', 'options')
         help_texts = {
             'label': "Nom en language naturel du champ",
-            'name': "Nom technique du champ tel qu'il apparaît dans la base de données ou dans l'export GeoJSON (sans accents, sans espaces, ni caractères exotiques)",
             'position': "Numéro d'ordre du champ dans le formulaire de saisie du signalement",
             'options': "Valeurs possibles de ce champ, séparées par des virgules"
         }
@@ -393,7 +416,9 @@ class FeatureExtraForm(forms.Form):
 
 class FeatureLinkForm(forms.ModelForm):
 
-    feature_to = forms.ChoiceField(label='Signalement lié')
+    feature_to = forms.ModelChoiceField(
+        label="Signalement lié", queryset=Feature.objects.all(),
+        empty_label=None)
 
     class Meta:
         model = FeatureLink
@@ -406,19 +431,21 @@ class FeatureLinkForm(forms.ModelForm):
         feature_type = kwargs.pop('feature_type', None)
         feature = kwargs.pop('feature', None)
         super().__init__(*args, **kwargs)
-
-        try:
-            qs = Feature.objects.filter(feature_type=feature_type)
-            if feature:
-                qs = qs.exclude(feature_id=feature.feature_id)
-
-            self.fields['feature_to'].choices = tuple(
-                (feat.feature_id, "{} ({} - {})".format(
-                    feat.title, feat.display_creator, feat.created_on.strftime("%d/%m/%Y %H:%M"))) for feat in qs
+        qs = Feature.objects.all()
+        if feature_type:
+            qs = qs.filter(
+                feature_type=feature_type
             )
-
+        if feature:
+            qs = qs.exclude(
+                feature_id=feature.feature_id
+            )
+        try:
+            self.fields['feature_to'].queryset = qs
+            self.fields['feature_to'].label_from_instance = lambda obj: "{} ({} - {})".format(
+                obj.title, obj.display_creator, obj.created_on.strftime("%d/%m/%Y %H:%M"))
         except Exception:
-            logger.exception('No feature_type found')
+            logger.exception('No related features found')
 
 
 class FeatureTypeModelForm(forms.ModelForm):
@@ -467,6 +494,9 @@ class ProjectModelForm(forms.ModelForm):
 
     moderation = forms.BooleanField(label='Modération', required=False)
 
+    is_project_type = forms.BooleanField(
+        label="Est un projet type", required=False)
+
     archive_feature = forms.IntegerField(
         label='Délai avant archivage', required=False)
 
@@ -483,6 +513,8 @@ class ProjectModelForm(forms.ModelForm):
         queryset=UserLevelPermission.objects.filter(rank__lte=4).order_by('rank'),
         empty_label=None,)
 
+    create_from = forms.CharField(required=False, widget=HiddenInput())
+
     class Meta:
         model = Project
         fields = [
@@ -494,15 +526,35 @@ class ProjectModelForm(forms.ModelForm):
             'access_level_arch_feature',
             'archive_feature',
             'delete_feature',
+            'is_project_type',
+            'create_from',
         ]
 
     def __init__(self, *args, **kwargs):
+
+        slug = kwargs.pop('create_from', None)
+        project_type = Project.objects.filter(slug=slug).first()
+
         super().__init__(*args, **kwargs)
         instance = kwargs.get('instance')
 
         if instance:
-            self.fields['archive_feature'].initial = instance.archive_feature
-            self.fields['delete_feature'].initial = instance.delete_feature
+            # Optionnel
+            for key in ['archive_feature', 'delete_feature']:
+                source = getattr(instance, key)
+                self.fields[key].initial = source
+        elif project_type:
+            for key in [
+                    'archive_feature', 'delete_feature',
+                    'access_level_pub_feature', 'access_level_arch_feature',
+                    'description', 'moderation', 'thumbnail']:
+                source = getattr(project_type, key)
+                self.fields[key].initial = source
+            self.fields['title'].initial = "{} (Copie-{})".format(
+                project_type.title, timezone.now().strftime("%d/%m/%Y %H:%M")
+            )
+            self.fields['title'].help_text = "Le titre d'un projet doit etre unique. "
+            self.fields['create_from'].initial = slug
         else:
             self.fields['archive_feature'].initial = 0
             self.fields['delete_feature'].initial = 0
@@ -524,14 +576,15 @@ class ProjectModelForm(forms.ModelForm):
         archive_feature = cleaned_data.get('archive_feature', None)
         delete_feature = cleaned_data.get('delete_feature', None)
         if archive_feature and delete_feature and archive_feature > delete_feature:
-            raise forms.ValidationError(
-                "Le délai d'archivage doit être inférieur au délai de suppression. "
-            )
+            raise forms.ValidationError({
+                'archive_feature': "Le délais de suppression doit être supérieur au délais d'archivage. "
+            })
         return cleaned_data
 
 
 class ContextLayerForm(forms.ModelForm):
-    layer = forms.ModelChoiceField(label="Couche", queryset=Layer.objects.all(), empty_label=None)
+    layer = forms.ModelChoiceField(
+        label="Couche", queryset=Layer.objects.all(), empty_label=None)
 
     class Meta:
         model = ContextLayer
@@ -543,7 +596,8 @@ class ContextLayerForm(forms.ModelForm):
 
 
 ContextLayerFormset = inlineformset_factory(
-    BaseMap, ContextLayer, form=ContextLayerForm, fields=['layer', 'order', 'opacity'], extra=0)
+    BaseMap, ContextLayer, form=ContextLayerForm,
+    fields=['layer', 'order', 'opacity'], extra=0)
 
 
 class BaseMapInlineFormset(BaseInlineFormSet):
@@ -583,6 +637,7 @@ class BaseMapInlineFormset(BaseInlineFormSet):
         for form in self.forms:
             if hasattr(form, 'nested'):
                 if not self._should_delete_form(form):
+                    form.save(commit=commit)  # ???
                     form.nested.save(commit=commit)
 
         return result
