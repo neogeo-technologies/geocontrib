@@ -27,7 +27,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 9654: Creating a basemap without title doesn't crash
 - Redmine 9623: A connected user doesn't see achived features if he is not allowed
 
-
 ## [1.1.3] - 2020-11-13
 
 ### Changed
