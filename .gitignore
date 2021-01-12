@@ -98,3 +98,5 @@ config/__init__.py
 
 # MacOS
 .DS_Store
+
+docker/docker-compose.override.yaml
