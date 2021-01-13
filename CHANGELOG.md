@@ -15,6 +15,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 8551: Can import features files with extention "geojson" in addition to "json"
 - Redmine 9330: A feature type can be duplicated
 - Redmine 9329: Can turn a project into a project template and instatiate a project from a project model
+- Redmine 9544: Addition of Sortable JS library
+- Redmine 9507: Added help on authorized characters
+- Redmine 9331: Reports with identical geometry are considered to be duplicates 
 - Django admin improvements
   - Projects list ordered by title
   - FeatureType list ordered by project, title
@@ -23,12 +26,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - FeatureType geom editable on create (read-only on update)
   - CustomField list ordered by feature_type, label
   - Project creator required (fixing 500 on edit)
+  - Added help on authorized characters when user create a view PostgreSQL
 
 ### Fixed
 - Docker, prevent creating files not readable by nginx
 - Redmine 9706: The modification of the basemap form are recorded
 - Redmine 9654: Creating a basemap without title doesn't crash
 - Redmine 9623: A connected user doesn't see achived features if he is not allowed
+- Redmine 9745: Geolocalised images are visible
+- Redmine 9619 : Fix bug for project creation from Django
+- Redmine 9490: Fix bug when a custom field is duplicated 
+- Redmine 9527: Show "0" instead of « None » in the project settings
+- Redmine 9526: Fix bug for view creation from Django
+- Redmine 9498: Display the login if the user does not have a first and last name
+- Redmine 9402: Return to the project page after modifying the project
+- Redmine 9401: Error message if the archiving time is greater than the deletion time 
 
 ## [1.1.3] - 2020-11-13
 
