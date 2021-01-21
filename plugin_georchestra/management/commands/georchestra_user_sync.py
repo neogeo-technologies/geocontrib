@@ -79,7 +79,7 @@ synchroniser."""
             search_base=LDAP_SEARCH_BASE,
             search_filter=LDAP_SEARCH_FILTER,
             attributes=[ALL_ATTRIBUTES, ALL_OPERATIONAL_ATTRIBUTES],
-            paged_size=20000, generator=True)
+            paged_size=200, generator=True)
         for entry in entry_generator:
             entries.append(entry.get('attributes', {}))
         return entries
