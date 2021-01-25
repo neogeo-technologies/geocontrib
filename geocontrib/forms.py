@@ -81,7 +81,7 @@ class FeatureSelectFieldAdminForm(forms.Form):
         label="Champs à ajouter",
         choices=[(
             str(field.name), "{0} - {1}".format(field.name, field.get_internal_type())
-        ) for field in Feature._meta.get_fields()],
+        ) for field in Feature._meta.get_fields(include_parents=False) if field.concrete is True],
         required=False
     )
     alias = forms.CharField(
