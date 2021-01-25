@@ -124,11 +124,10 @@ class FeatureTypeAdmin(admin.ModelAdmin):
                 request.POST or None, prefix='fds',
                 initial=feature_detail_initial)
             cfs_formset = CustomFieldsFormSet(request.POST or None, prefix='cfs')
-
             pg_form = AddPosgresViewAdminForm(request.POST or None)
             if fds_formset.is_valid() and pg_form.is_valid() and cfs_formset.is_valid():
                 view_name = pg_form.cleaned_data.get('name')
-
+                status = pg_form.cleaned_data.get('status') or (stat[0] for stat in Feature.STATUS_CHOICES)
                 fds_data = self.pop_deleted_forms(fds_formset.cleaned_data)
                 cfs_data = self.pop_deleted_forms(cfs_formset.cleaned_data)
 
@@ -138,7 +137,7 @@ class FeatureTypeAdmin(admin.ModelAdmin):
                         fds_data=fds_data,
                         cfs_data=cfs_data,
                         feature_type_id=feature_type_id,
-                        status=pg_form.cleaned_data.get('status'),
+                        status=status,
                         schema=getattr(settings, 'DB_SCHEMA', 'public'),
                         view_name=view_name,
                         user=settings.DATABASES['default']['USER'],
