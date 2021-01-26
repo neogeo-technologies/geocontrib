@@ -3,7 +3,6 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.gis import admin
 from django.db import connections
 from django.forms import formset_factory
@@ -11,7 +10,6 @@ from django.forms import modelformset_factory
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import path
-from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 
 from geocontrib.admin.filters import FeatureTypeFilter
@@ -22,6 +20,7 @@ from geocontrib.forms import HiddenDeleteBaseFormSet
 from geocontrib.forms import HiddenDeleteModelFormSet
 from geocontrib.forms import FeatureSelectFieldAdminForm
 from geocontrib.forms import AddPosgresViewAdminForm
+from geocontrib.models import Authorization
 from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import FeatureLink
@@ -196,9 +195,18 @@ class FeatureLinkAdmin(admin.ModelAdmin):
         '_feature_to',
         'get_feature_type',
     )
-    # ordering = ('_feature_from', )
 
     list_per_page = 10
+
+    def get_queryset(self, request):
+        user = request.user
+        qs = super().get_queryset(request)
+        if user.is_superuser:
+            return qs
+        moderation_projects_pk = Authorization.objects.filter(
+            user=user, level__rank__gte=3
+        ).values_list('project__pk', flat=True)
+        return qs.filter(feature_to__project__in=moderation_projects_pk)
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
