@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - Docker, give default values for email configuration
+- Redmine 9985: fix PostgreSQL view creation of a feature when adding/removing custom fields
 
 ## [1.2.0] - 2020-12-17
 
