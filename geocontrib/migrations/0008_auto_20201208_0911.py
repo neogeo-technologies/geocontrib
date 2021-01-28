@@ -4,13 +4,19 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+def clean_deleted_feature_links(apps, schema_editor, elidible=True):
+    from django.core.management import call_command
+    call_command('data_cleansing', 'clean_feature_link')
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('geocontrib', '0007_auto_20200729_0916'),
+        ('geocontrib', '0008_project_is_project_type'),
     ]
 
     operations = [
+        migrations.RunPython(clean_deleted_feature_links, elidable=True),
         migrations.AlterModelOptions(
             name='featurelink',
             options={'verbose_name': 'Liaison entre signalements', 'verbose_name_plural': 'Liaisons entre signalements'},
