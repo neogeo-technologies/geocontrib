@@ -110,6 +110,21 @@ python manage.py runserver
 Se rendre dans l'interface d'administration Django et éditer le premier enregistrement des entités 
 "Sites" (cf. yoururl.net/admin/sites/).
 
+## Configuration des tâches périodiques
+
+Deux types de tâches requièrent d'invoquer une commande régulièrement (depuis un cron par exemple)
+
+L'envoi de mails de norifications, vous pouvez l'appeler toutes les minutes ou tous les jours selon vos préférences d'envoi
+```shell
+python manage.py notify_subscribers
+```
+
+L'archivage et la suppression des signalements, à invoquer une fois par jour
+```shell
+python manage.py data_cleansing
+```
+
+
 ## Déploiement dans un environnement geOrchestra
 
 Reportez-vous au README.md présent dans le répertoire `plugin_georchestra`.
