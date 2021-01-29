@@ -4,6 +4,7 @@ from django.contrib.gis import forms
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator
 from django.forms import HiddenInput
+from django.forms import ModelForm
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
 from django.forms.models import BaseModelFormSet
@@ -643,6 +644,15 @@ class BaseMapInlineFormset(BaseInlineFormSet):
         return result
 
 
+class BaseMapForm(ModelForm):
+    class Meta:
+        model = BaseMap
+        fields = ['title']
+        widgets = {
+            'title': forms.TextInput(attrs={'required': True})
+        }
+
+
 ProjectBaseMapInlineFormset = inlineformset_factory(
-    parent_model=Project, model=BaseMap, formset=BaseMapInlineFormset,
+    parent_model=Project, form=BaseMapForm, model=BaseMap, formset=BaseMapInlineFormset,
     fields=['title', ], extra=0, can_delete=True)
