@@ -77,10 +77,9 @@ User = get_user_model()
 
 class BaseMapContextMixin(SingleObjectMixin):
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, feature_id=None, **kwargs):
         self.object = self.get_object()
         context = super().get_context_data(**kwargs)
-
         try:
             request = self.request
             project = None
@@ -101,11 +100,16 @@ class BaseMapContextMixin(SingleObjectMixin):
                 many=True
             )
             features = Feature.handy.availables(user=self.request.user, project=project)
+
+            if feature_id:
+                features = features.filter(feature_id=feature_id)
+
             serialized_features = FeatureDetailedSerializer(
                 features,
                 is_authenticated=request.user.is_authenticated,
                 context={'request': request},
-                many=True)
+                many=True
+            )
             context['serialized_features'] = serialized_features.data
             context['serialized_base_maps'] = serialized_base_maps.data
             context['serialized_layers'] = serialized_layers.data
@@ -476,14 +480,12 @@ class FeatureList(BaseMapContextMixin, UserPassesTestMixin, View):
         if filters:
             filters = {k: v for k, v in filters.items() if v is not None}
             features = features.filter(**filters)
-        context = {**self.get_context_data(), **{
-            'features': features,
-            'feature_types': feature_types,
-            'project': project,
-            'permissions': permissions,
-            'status_choices': Feature.STATUS_CHOICES,
-        }}
-
+        context = self.get_context_data()
+        context['features'] = features
+        context['feature_types'] = feature_types
+        context['project'] = project
+        context['permissions'] = permissions
+        context['status_choices'] = Feature.STATUS_CHOICES
         return render(request, 'geocontrib/feature/feature_list.html', context)
 
 
@@ -504,29 +506,23 @@ class FeatureDetail(BaseMapContextMixin, UserPassesTestMixin, View):
         feature = self.get_object()
         project = feature.project
 
-        linked_features = FeatureLink.objects.filter(
-            feature_from=feature.feature_id
+        linked_features = FeatureLink.handy.related(
+            feature.feature_id
         )
         serialized_link = FeatureLinkSerializer(linked_features, many=True)
-
         events = Event.objects.filter(feature_id=feature.feature_id).order_by('created_on')
         serialized_events = EventSerializer(events, many=True)
 
-        context = {**self.get_context_data(), **{
-            'feature': feature,
-            'feature_data': feature.custom_fields_as_list,
-            'feature_types': FeatureType.objects.filter(project=project),
-            'feature_type': feature.feature_type,
-            'linked_features': serialized_link.data,
-            'project': project,
-            'permissions': Authorization.all_permissions(user, project, feature),
-            'comments': Comment.objects.filter(project=project, feature_id=feature.feature_id),
-            'attachments': Attachment.objects.filter(
-                project=project, feature_id=feature.feature_id, object_type='feature'),
-            'events': serialized_events.data,
-            'comment_form': CommentForm(),
-        }}
-
+        context = self.get_context_data(feature_id=feature_id)
+        logger.error(context['serialized_features'])
+        context['feature'] = feature
+        context['feature_data'] = feature.custom_fields_as_list
+        context['linked_features'] = serialized_link.data
+        context['permissions'] = Authorization.all_permissions(user, project, feature)
+        context['events'] = serialized_events.data
+        context['attachments'] = Attachment.objects.filter(
+            project=project, feature_id=feature.feature_id, object_type='feature')
+        context['comment_form'] = CommentForm()
         return render(request, 'geocontrib/feature/feature_detail.html', context)
 
 
@@ -1231,7 +1227,6 @@ class ProjectDetail(BaseMapContextMixin, DetailView):
         context['permissions'] = permissions
         context['feature_types'] = project.featuretype_set.all()
         context['is_suscriber'] = Subscription.is_suscriber(user, project)
-
         return context
 
 
