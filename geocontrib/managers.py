@@ -7,7 +7,11 @@ from geocontrib.choices import MODERATOR
 class AvailableFeaturesManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset()
+        queryset = super().get_queryset()
+        queryset = queryset.select_related('creator')
+        queryset = queryset.select_related('feature_type')
+        queryset = queryset.select_related('project')
+        return queryset
 
     def availables(self, user, project):
         Authorization = apps.get_model(app_label='geocontrib', model_name='Authorization')
@@ -70,7 +74,10 @@ class LayerManager(models.Manager):
 class FeatureLinkManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset()
+        queryset = super().get_queryset()
+        queryset = queryset.select_related('feature_from')
+        queryset = queryset.select_related('feature_to')
+        return queryset
 
     def context(self, feature_id):
         res = self.get_queryset().filter(
@@ -88,3 +95,9 @@ class FeatureLinkManager(models.Manager):
             )
         ).values_list('relation_display', 'relation_type')
         return res
+
+    def related(self, feature_id):
+        queryset = self.get_queryset().filter(
+            Q(feature_from__feature_id=feature_id) | Q(feature_to__feature_id=feature_id)
+        )
+        return queryset
