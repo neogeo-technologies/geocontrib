@@ -6,9 +6,9 @@ from django.contrib.gis.geos import Polygon
 from django.contrib.gis.geos.error import GEOSException
 from django.http import Http404
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import generics
-
-from rest_framework import status
+# from rest_framework import status
 from rest_framework import views
 from rest_framework import permissions
 from rest_framework.pagination import LimitOffsetPagination
@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureSerializer
 from api.serializers import FeatureDetailedSerializer
-from api.serializers import FeatureSerializerPOC
+from api.serializers import FeatureSearchSerializer
 from geocontrib.models import Feature
 from geocontrib.models import Project
 
@@ -61,17 +61,23 @@ class AvailablesFeatureLinkList(views.APIView):
         return Response(serializer.data)
 
 
-class FeatureSearch(generics.ListAPIView, generics.GenericAPIView):
+class FeatureSearch(generics.ListAPIView):
 
-    permission_classes = [
-        permissions.IsAuthenticated,
-    ]
+    # permission_classes = [
+    #     permissions.IsAuthenticated,
+    # ]
 
     queryset = Feature.objects.all()
 
+    serializer_class = FeatureSearchSerializer
+
+    pagination_class = LimitOffsetPagination
+
     http_method_names = ['get', ]
 
-    def get_queryset(self, slug):
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        project = get_object_or_404(Project, slug=slug)
         geom = self.request.query_params.get('geom')
         status = self.request.query_params.get('status')
         feature_type_slug = self.request.query_params.get('feature_type_slug')
@@ -79,7 +85,8 @@ class FeatureSearch(generics.ListAPIView, generics.GenericAPIView):
         feature_id = self.request.query_params.get('feature_id')
         exclude_feature_id = self.request.query_params.get('exclude_feature_id')
 
-        queryset = self.queryset.filter(project__slug=slug)
+        # queryset = self.queryset.filter(project=project)
+        queryset = Feature.handy.availables(user=self.request.user, project=project)
         queryset = queryset.select_related('creator')
         queryset = queryset.select_related('feature_type')
         queryset = queryset.select_related('project')
@@ -102,17 +109,15 @@ class FeatureSearch(generics.ListAPIView, generics.GenericAPIView):
 
         return queryset
 
-    def get(self, request, slug):
-        # queryset = self.get_queryset(slug)
-        features = Feature.handy.availables(user=request.user, project=Project.objects.get(slug=slug))
-        try:
-            data = FeatureSerializerPOC(
-                features,
-                # is_authenticated=True,
-                # context={'request': request},
-                many=True
-            ).data
-        except Exception:
-            logger.exception('API FeatureView error')
-            raise Http404
-        return Response(data=data, status=status.HTTP_200_OK)
+    # def get(self, request, slug):
+    #
+    #     queryset = self.get_queryset()
+    #     try:
+    #         data = self.get_serializer(
+    #             queryset,
+    #             many=True
+    #         ).data
+    #     except Exception:
+    #         logger.exception('API FeatureView error')
+    #         raise Http404
+    #     return Response(data=data, status=status.HTTP_200_OK)

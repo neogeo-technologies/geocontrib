@@ -172,30 +172,28 @@ class FeatureSerializer(serializers.ModelSerializer):
         )
 
 
-class FeatureSerializerPOC(serializers.ModelSerializer):
-
-    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
-    feature_url = serializers.SerializerMethodField(read_only=True)
-    user = UserSerializer(read_only=True)
+class FeatureSearchSerializer(serializers.ModelSerializer):
+    project_slug = serializers.ReadOnlyField(source='project.slug')
+    feature_type_slug = serializers.ReadOnlyField(source='feature_type.slug')
+    creator = UserSerializer()
 
     class Meta:
         model = Feature
         fields = (
             'feature_id',
             'title',
+            'description',
+            'status',
+            'creator',
             'created_on',
-            'user',
-            'feature_url',
+            'updated_on',
+            'archived_on',
+            'deletion_on',
+            'project_slug',
+            'feature_type_slug',
             'geom',
         )
         read_only_fields = fields
-
-    def get_feature_url(self, obj):
-        return reverse(
-            'geocontrib:feature_detail', kwargs={
-                'slug': obj.project.slug,
-                'feature_type_slug': obj.feature_type.slug,
-                'feature_id': obj.feature_id})
 
 
 class FeatureDetailedSerializer(GeoFeatureModelSerializer):
