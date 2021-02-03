@@ -278,6 +278,12 @@ class FeatureBaseForm(forms.ModelForm):
 
     title = forms.CharField(label='Nom', required=True)
 
+    geom = forms.GeometryField(
+        label="Localisation",
+        required=True,
+        srid=4326,
+    )
+
     class Meta:
         model = Feature
         fields = (
@@ -315,26 +321,26 @@ class FeatureBaseForm(forms.ModelForm):
         )
 
         # TODO: factoriser les attributs de champs geom
-        if feature_type.geom_type == "point":
-            self.fields['geom'] = forms.PointField(
-                label="Localisation",
-                required=True,
-                srid=4326
-            )
-
-        if feature_type.geom_type == "linestring":
-            self.fields['geom'] = forms.LineStringField(
-                label="Localisation",
-                required=True,
-                srid=4326
-            )
-
-        if feature_type.geom_type == "polygon":
-            self.fields['geom'] = forms.PolygonField(
-                label="Localisation",
-                required=True,
-                srid=4326
-            )
+        # if feature_type.geom_type == "point":
+        #     self.fields['geom'] = forms.GeometryField(
+        #         label="Localisation",
+        #         required=True,
+        #         srid=4326,
+        #     )
+        #
+        # if feature_type.geom_type == "linestring":
+        #     self.fields['geom'] = forms.LineStringField(
+        #         label="Localisation",
+        #         required=True,
+        #         srid=4326
+        #     )
+        #
+        # if feature_type.geom_type == "polygon":
+        #     self.fields['geom'] = forms.PolygonField(
+        #         label="Localisation",
+        #         required=True,
+        #         srid=4326
+        #     )
 
     def save(self, commit=True, *args, **kwargs):
 
