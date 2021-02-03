@@ -81,11 +81,9 @@
       {% endif %}
 
       {{ feature_form.geom.errors }}
-      <span>GEOM: {{ feature_form.geom.value }}</span>
-      <span>EWKT: {{ feature_form.geom.value.ewkt }}</span>
       <!-- Map -->
       <input type="hidden" name="{{ feature_form.geom.html_name }}" id="{{ feature_form.geom.id_for_label }}"
-        value="{{ feature_form.geom.value }}" />
+        value="{{ feature_form.geom.value }}"/>
         <div class="ui tab active map-container" data-tab="map">
           <div id="map">
           </div>
@@ -730,8 +728,8 @@ $(document).ready(function() {
     draw: false
   })
 
-  {% if feature_form.geom.value.wkt %}
-    updateMap(map, wellknown.parse("{{ feature_form.geom.value.wkt }}"))
+  {% if feature_form.geom.value %}
+    updateMap(map, wellknown.parse("{{ feature_form.geom.value }}"))
     map.addControl(drawControlEditOnly);
   {% else %}
     map.addControl(drawControlFull);
