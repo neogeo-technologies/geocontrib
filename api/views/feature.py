@@ -4,19 +4,13 @@ import logging
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Polygon
 from django.contrib.gis.geos.error import GEOSException
-from django.http import Http404
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
-# from rest_framework import status
 from rest_framework import views
-from rest_framework import permissions
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.response import Response
 
 from api.serializers import FeatureGeoJSONSerializer
-from api.serializers import FeatureSerializer
-from api.serializers import FeatureDetailedSerializer
 from api.serializers import FeatureSearchSerializer
 from geocontrib.models import Feature
 from geocontrib.models import Project
@@ -27,7 +21,7 @@ User = get_user_model()
 
 
 class CustomPagination(LimitOffsetPagination):
-    default_limit = 3
+    default_limit = 25
 
 
 class ExportFeatureList(views.APIView):
@@ -46,51 +40,26 @@ class ExportFeatureList(views.APIView):
         return response
 
 
-class AvailablesFeatureLinkList(views.APIView):
-
-    http_method_names = ['get', ]
-
-    def get(self, request, slug, feature_type_slug):
-        """
-            Vue retournant un abstract des signalements d'un type donnée,
-            permettant de rechercher les signalements liés
-        """
-        features = Feature.objects.filter(
-            status="published", project__slug=slug, feature_type__slug=feature_type_slug)
-        serializer = FeatureSerializer(features, many=True, context={'request': request})
-        return Response(serializer.data)
-
-
 class FeatureSearch(generics.ListAPIView):
-
-    # permission_classes = [
-    #     permissions.IsAuthenticated,
-    # ]
 
     queryset = Feature.objects.all()
 
     serializer_class = FeatureSearchSerializer
 
-    pagination_class = LimitOffsetPagination
+    pagination_class = CustomPagination
 
     http_method_names = ['get', ]
 
-    def get_queryset(self):
-        slug = self.kwargs.get('slug')
-        project = get_object_or_404(Project, slug=slug)
+    def filter_queryset(self, queryset):
+        """
+        Surchargeant ListModelMixin
+        """
         geom = self.request.query_params.get('geom')
         status = self.request.query_params.get('status')
         feature_type_slug = self.request.query_params.get('feature_type_slug')
         title = self.request.query_params.get('title')
         feature_id = self.request.query_params.get('feature_id')
         exclude_feature_id = self.request.query_params.get('exclude_feature_id')
-
-        # queryset = self.queryset.filter(project=project)
-        queryset = Feature.handy.availables(user=self.request.user, project=project)
-        queryset = queryset.select_related('creator')
-        queryset = queryset.select_related('feature_type')
-        queryset = queryset.select_related('project')
-
         if geom:
             try:
                 queryset = queryset.filter(geom__intersects=Polygon.from_bbox(geom.split(',')))
@@ -106,18 +75,17 @@ class FeatureSearch(generics.ListAPIView):
             queryset = queryset.filter(feature_id=feature_id)
         if exclude_feature_id:
             queryset = queryset.exclude(feature_id=exclude_feature_id)
-
         return queryset
 
-    # def get(self, request, slug):
-    #
-    #     queryset = self.get_queryset()
-    #     try:
-    #         data = self.get_serializer(
-    #             queryset,
-    #             many=True
-    #         ).data
-    #     except Exception:
-    #         logger.exception('API FeatureView error')
-    #         raise Http404
-    #     return Response(data=data, status=status.HTTP_200_OK)
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        project = get_object_or_404(Project, slug=slug)
+
+        # queryset = self.queryset.filter(project=project)
+        queryset = Feature.handy.availables(user=self.request.user, project=project)
+
+        queryset = queryset.select_related('creator')
+        queryset = queryset.select_related('feature_type')
+        queryset = queryset.select_related('project')
+        # NB filter_queryset() bien appelé par ListModelMixin
+        return queryset
