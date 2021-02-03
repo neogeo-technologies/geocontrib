@@ -172,23 +172,49 @@ class FeatureSerializer(serializers.ModelSerializer):
         )
 
 
-class FeatureDetailedSerializer(GeoFeatureModelSerializer):
-
-    feature_url = serializers.SerializerMethodField(read_only=True)
-
-    feature_type_url = serializers.SerializerMethodField(read_only=True)
-
-    feature_type = FeatureTypeColoredSerializer(read_only=True)
-
-    status = serializers.SerializerMethodField(read_only=True)
-
-    creator = serializers.SerializerMethodField(read_only=True)
+class FeatureSerializerPOC(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+    feature_url = serializers.SerializerMethodField(read_only=True)
+    user = UserSerializer(read_only=True)
 
-    updated_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+    class Meta:
+        model = Feature
+        fields = (
+            'feature_id',
+            'title',
+            'created_on',
+            'user',
+            'feature_url',
+            'geom',
+        )
+        read_only_fields = fields
 
-    archived_on = serializers.DateField(format="%d/%m/%Y", read_only=True)
+    def get_feature_url(self, obj):
+        return reverse(
+            'geocontrib:feature_detail', kwargs={
+                'slug': obj.project.slug,
+                'feature_type_slug': obj.feature_type.slug,
+                'feature_id': obj.feature_id})
+
+
+class FeatureDetailedSerializer(GeoFeatureModelSerializer):
+
+    feature_url = serializers.SerializerMethodField()
+
+    feature_type_url = serializers.SerializerMethodField()
+
+    feature_type = FeatureTypeColoredSerializer()
+
+    status = serializers.SerializerMethodField()
+
+    creator = serializers.SerializerMethodField()
+
+    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M")
+
+    updated_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M")
+
+    archived_on = serializers.DateField(format="%d/%m/%Y")
 
     class Meta:
         model = Feature
@@ -207,6 +233,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
             'feature_url',
             'feature_type_url',
         )
+        read_only_fields = fields
 
     def __init__(self, *args, **kwargs):
         self.is_authenticated = kwargs.pop('is_authenticated', False)
