@@ -1026,20 +1026,22 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
             geom = None
         return geom
 
-    def get_feature_data(self, feature_type, properties):
+    def get_feature_data(self, feature_type, properties, field_names):
 
         feature_data = {}
         if hasattr(feature_type, 'customfield_set'):
-            for field in feature_type.customfield_set.all():
-                feature_data[field.name] = properties.get(field.name)
+            for field in field_names:
+                feature_data[field] = properties.get(field)
         return feature_data
 
     def create_features(self, request, creator, data, feature_type):
         new_features = data.get('features')
         nb_features = len(new_features)
+        field_names = feature_type.customfield_set.values_list('name', flat=True)
+
         for feature in new_features:
             properties = feature.get('properties')
-            feature_data = self.get_feature_data(feature_type, properties)
+            feature_data = self.get_feature_data(feature_type, properties, field_names)
             title = properties.get('title')
             description = properties.get('description')
             current = Feature.objects.create(
