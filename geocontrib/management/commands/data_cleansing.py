@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.db import connections
 from django.db.models import Q
 from django.utils import timezone
 
@@ -16,9 +17,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            dest='task_name', type=str, choices=['all', 'delete_feature', 'archive_feature'],
+            dest='task_name', type=str, choices=['all', 'delete_feature', 'archive_feature', 'clean_feature_link'],
             help="""Nom de la tache à executer et à choisir parmi:
-                'all', 'delete_feature', 'archive_feature' """
+                'all', 'delete_feature', 'archive_feature', 'clean_feature_link' """
         )
 
     def delete_feature(self):
@@ -56,6 +57,15 @@ class Command(BaseCommand):
             logger.info('Feature {0} archived'.format(feature.feature_id))
         logger.info('NB archived features: {}'.format(nb_features))
 
+    def feature_link(self):
+        # Facilite la migration 0008_auto
+        # le signal post_delete de FeatureLink
+        # étant bloquant on passe par du raw sql
+        with connections['default'].cursor() as cursor:
+            for field in ['feature_from', 'feature_to']:
+                sql = "DELETE FROM geocontrib_featurelink WHERE {} not in (SELECT feature_id FROM geocontrib_feature)".format(field)
+                cursor.execute(sql)
+
     def handle(self, *args, **options):
         tasks = options['task_name']
         if 'all' not in tasks:
@@ -63,6 +73,8 @@ class Command(BaseCommand):
                 self.delete_feature()
             if 'archive_feature' in tasks:
                 self.archive_feature()
+            if 'clean_feature_link' in tasks:
+                self.feature_link()
         else:
             self.delete_feature()
             self.archive_feature()

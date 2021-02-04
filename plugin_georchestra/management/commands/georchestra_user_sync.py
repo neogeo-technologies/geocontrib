@@ -1,7 +1,6 @@
 from argparse import RawTextHelpFormatter
 from collections import Counter
 import itertools
-import json
 import logging
 import re
 
@@ -75,12 +74,15 @@ synchroniser."""
         return parser
 
     def search_ldap(self, connection):
-        connection.search(
+        entries = []
+        entry_generator = connection.extend.standard.paged_search(
             search_base=LDAP_SEARCH_BASE,
             search_filter=LDAP_SEARCH_FILTER,
-            attributes=[ALL_ATTRIBUTES, ALL_OPERATIONAL_ATTRIBUTES])
-
-        return [json.loads(data.entry_to_json()).get('attributes', {}) for data in connection.entries]
+            attributes=[ALL_ATTRIBUTES, ALL_OPERATIONAL_ATTRIBUTES],
+            paged_size=200, generator=True)
+        for entry in entry_generator:
+            entries.append(entry.get('attributes', {}))
+        return entries
 
     def get_remote_data(self):
         # récupérer les données remote depuis ce serveur et mapper les données

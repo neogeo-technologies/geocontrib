@@ -335,7 +335,7 @@ class Feature(models.Model):
             raise ValidationError('Format de donnée invalide')
 
     def save(self, *args, **kwargs):
-        if self.pk is None:
+        if self._state.adding:
             self.created_on = timezone.now()
         self.updated_on = timezone.now()
         super().save(*args, **kwargs)

@@ -16,7 +16,7 @@ jobs:
       uses: actions/checkout@v1
     - name: "Building docker image"
       working-directory: docker
-      run: docker-compose -f docker-compose.geocontrib-alone.yaml build
+      run: docker-compose build
     - name: "Getting image tag"
       id: version
       run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)

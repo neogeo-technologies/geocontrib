@@ -4,6 +4,7 @@ from django.contrib.gis import forms
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator
 from django.forms import HiddenInput
+from django.forms import ModelForm
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
 from django.forms.models import BaseModelFormSet
@@ -81,7 +82,7 @@ class FeatureSelectFieldAdminForm(forms.Form):
         label="Champs à ajouter",
         choices=[(
             str(field.name), "{0} - {1}".format(field.name, field.get_internal_type())
-        ) for field in Feature._meta.get_fields()],
+        ) for field in Feature._meta.get_fields(include_parents=False) if field.concrete is True],
         required=False
     )
     alias = forms.CharField(
@@ -277,6 +278,12 @@ class FeatureBaseForm(forms.ModelForm):
 
     title = forms.CharField(label='Nom', required=True)
 
+    geom = forms.GeometryField(
+        label="Localisation",
+        required=True,
+        srid=4326,
+    )
+
     class Meta:
         model = Feature
         fields = (
@@ -314,26 +321,26 @@ class FeatureBaseForm(forms.ModelForm):
         )
 
         # TODO: factoriser les attributs de champs geom
-        if feature_type.geom_type == "point":
-            self.fields['geom'] = forms.PointField(
-                label="Localisation",
-                required=True,
-                srid=4326
-            )
-
-        if feature_type.geom_type == "linestring":
-            self.fields['geom'] = forms.LineStringField(
-                label="Localisation",
-                required=True,
-                srid=4326
-            )
-
-        if feature_type.geom_type == "polygon":
-            self.fields['geom'] = forms.PolygonField(
-                label="Localisation",
-                required=True,
-                srid=4326
-            )
+        # if feature_type.geom_type == "point":
+        #     self.fields['geom'] = forms.GeometryField(
+        #         label="Localisation",
+        #         required=True,
+        #         srid=4326,
+        #     )
+        #
+        # if feature_type.geom_type == "linestring":
+        #     self.fields['geom'] = forms.LineStringField(
+        #         label="Localisation",
+        #         required=True,
+        #         srid=4326
+        #     )
+        #
+        # if feature_type.geom_type == "polygon":
+        #     self.fields['geom'] = forms.PolygonField(
+        #         label="Localisation",
+        #         required=True,
+        #         srid=4326
+        #     )
 
     def save(self, commit=True, *args, **kwargs):
 
@@ -643,6 +650,15 @@ class BaseMapInlineFormset(BaseInlineFormSet):
         return result
 
 
+class BaseMapForm(ModelForm):
+    class Meta:
+        model = BaseMap
+        fields = ['title']
+        widgets = {
+            'title': forms.TextInput(attrs={'required': True})
+        }
+
+
 ProjectBaseMapInlineFormset = inlineformset_factory(
-    parent_model=Project, model=BaseMap, formset=BaseMapInlineFormset,
+    parent_model=Project, form=BaseMapForm, model=BaseMap, formset=BaseMapInlineFormset,
     fields=['title', ], extra=0, can_delete=True)

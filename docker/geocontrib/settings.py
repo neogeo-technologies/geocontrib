@@ -122,7 +122,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Extended properties
 AUTH_USER_MODEL = 'geocontrib.User'
-LOGIN_URL = 'geocontrib:login'
+LOGIN_URL = config("LOGIN_URL", default='geocontrib:login')
 LOGIN_REDIRECT_URL = 'geocontrib:index'
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
 
@@ -159,12 +159,12 @@ LOGGING = {
 
 # E-mail and notification parameters
 EMAIL_BACKEND = config('EMAIL_BACKEND', default="django.core.mail.backends.console.EmailBackend")
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+EMAIL_HOST = config('EMAIL_HOST', default="")
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default="")
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default="")
+EMAIL_PORT = config('EMAIL_PORT', cast=int, default=22)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=True)
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default="")
 
 # Notification frequency (allowed values: 'never', 'instantly', 'daily', 'weekly')
 DEFAULT_SENDING_FREQUENCY = config('DEFAULT_SENDING_FREQUENCY', default='never')
@@ -209,6 +209,15 @@ GEOCODER_PROVIDERS = {
 # Active geocoder
 SELECTED_GEOCODER = {
     'PROVIDER': config('SELECTED_GEOCODER_PROVIDER', default='addok')
+}
+
+# Project duplication settings
+PROJECT_COPY_RELATED = {
+    'AUTHORIZATION': True,
+    'BASE_MAP': True,
+    'FEATURE': False,
+    'FEATURE_TYPE': True,
+    'THUMBNAIL': True,
 }
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = config('DATA_UPLOAD_MAX_NUMBER_FIELDS', default=10000)

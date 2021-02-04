@@ -106,11 +106,13 @@ La page d'accueil de l'application contient :
   s'authentifier,
   * si un utilisateur est connecté : le nom de l'utilisateur courant et un bouton de déconnexion. Un clic sur le nom de 
   l'utilisateur renvoie vers sa page "Mon compte"
+* un bouton de création d'un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire 
+métier);
+* un bouton permettant à la liste des modèles de projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier);
 * la liste des projets existants avec une courte description et quelques indicateurs. Un clic sur un projet renvoie 
 vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un 
-message d'erreur lui est présenté ;
-* un bouton de création d'un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire 
-métier).
+message d'erreur lui est présenté.
+
 
 ### Menu d'un projet
 
@@ -195,7 +197,7 @@ page) :
 * une vue tabulaire paginée :
   * tri par ordre chronologique inverse (les signalements les plus récents sont affichés en premier),
   * présentation des caractéristiques principales : statut (représenté par un pictogramme), type de signalements, titre, 
-  et date de dernière modification,
+  date de dernière modification, et auteur du signalement,
   * le clic sur le titre renvoie vers la fiche détaillée du signalement,
   * le clic sur le type de signalements renvoie vers la fiche détaillée du signalement.
 
@@ -203,7 +205,7 @@ Chacune d'entre elles propose un bloc "Filtres" permettant à l'utilisateur de r
 qu'il recherche :
 * filtre sur le type de signalements ;
 * filtre sur le statut des signalements ;
-* filtre textuel recherchant la chaîne de caractères saisie par l'utilisateur dans le titre des signalements
+* filtre textuel recherchant la chaîne de caractères saisie par l'utilisateur dans le titre des signalements.
 
 ### Page de consultation d'un signalement
 

@@ -81,14 +81,13 @@
       {% endif %}
 
       {{ feature_form.geom.errors }}
-
       <!-- Map -->
       <input type="hidden" name="{{ feature_form.geom.html_name }}" id="{{ feature_form.geom.id_for_label }}"
-        value="{% if feature_form.geom.value.ewkt %}{{ feature_form.geom.value.ewkt }}{% endif %}" />
+        value="{{ feature_form.geom.value }}"/>
         <div class="ui tab active map-container" data-tab="map">
           <div id="map">
           </div>
-          {% if serialized_base_maps|length > 0 %} 
+          {% if serialized_base_maps|length > 0 %}
              {% include "geocontrib/map-layers/sidebar-layers.html" with basemaps=serialized_base_maps layers=serialized_layers project=project.slug%}
           {% endif %}
         </div>
@@ -319,7 +318,7 @@
   #map {
     height: 80vh;
   }
-} 
+}
 </style>
 
 {{ serialized_base_maps|json_script:'basemaps' }}
@@ -684,7 +683,7 @@ $(document).ready(function() {
     mapUtil.addFeatures(allFeaturesExceptCurrent);
   }
 
-      // ------   Listen Sidebar events ---------- // 
+      // ------   Listen Sidebar events ---------- //
     // Listen custom events triggered by the sidebar-layers
     document.addEventListener('add-layers', (event) => {
       mapUtil.removeLayers(map);
@@ -729,8 +728,8 @@ $(document).ready(function() {
     draw: false
   })
 
-  {% if feature_form.geom.value.wkt %}
-    updateMap(map, wellknown.parse("{{ feature_form.geom.value.wkt }}"))
+  {% if feature_form.geom.value %}
+    updateMap(map, wellknown.parse("{{ feature_form.geom.value }}"))
     map.addControl(drawControlEditOnly);
   {% else %}
     map.addControl(drawControlFull);
@@ -810,7 +809,7 @@ $(document).ready(function() {
     let geocoder;
     const geocoderLabel = '{{ SELECTED_GEOCODER_PROVIDER }}'
     const LIMIT_RESULTS = 5;
-    
+
     if (geocoderLabel === '{{ GEOCODER_PROVIDERS.ADDOK }}') {
       geocoder = L.Control.Geocoder.addok({limit: LIMIT_RESULTS});
     } else if (geocoderLabel === '{{ GEOCODER_PROVIDERS.PHOTO }}') {

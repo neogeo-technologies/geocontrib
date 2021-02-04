@@ -54,6 +54,7 @@ Copier le contenu du fichier /src/config_sample/settings.py dans /config/setting
 * EMAIL_HOST_PASSWORD https://docs.djangoproject.com/en/2.2/ref/settings/#email-host-password
 * DEFAULT_FROM_EMAIL https://docs.djangoproject.com/en/2.2/ref/settings/#default-from-email
 * DATA_UPLOAD_MAX_NUMBER_FIELDS https://docs.djangoproject.com/fr/2.2/ref/settings/#data-upload-max-number-fields
+* LOGIN_URL https://docs.djangoproject.com/fr/3.1/ref/settings/#login-url
 
 Éditer les paramètres spécifiques à l'outil dans /config/settings.py :
 * DEFAULT_SENDING_FREQUENCY : fréquence d'envoi des notifications par email (never/instantly/daily/weekly)
@@ -62,6 +63,7 @@ Copier le contenu du fichier /src/config_sample/settings.py dans /config/setting
 * IMAGE_FORMAT : formats autorisés des fichiers téléversés dans l'application
 * FILE_MAX_SIZE : taille maximale des fichiers téléversés dans l'application
 * DEFAULT_BASE_MAP : configuration du fond de carte par défaut
+* PROJECT_COPY_RELATED : configuration des modèles de projets
 
 Copier le contenu du fichier /src/config_sample/urls.py dans /config/urls.py
 
@@ -109,6 +111,21 @@ python manage.py runserver
 
 Se rendre dans l'interface d'administration Django et éditer le premier enregistrement des entités 
 "Sites" (cf. yoururl.net/admin/sites/).
+
+## Configuration des tâches périodiques
+
+Deux types de tâches requièrent d'invoquer une commande régulièrement (depuis un cron par exemple)
+
+L'envoi de mails de norifications, vous pouvez l'appeler toutes les minutes ou tous les jours selon vos préférences d'envoi
+```shell
+python manage.py notify_subscribers
+```
+
+L'archivage et la suppression des signalements, à invoquer une fois par jour
+```shell
+python manage.py data_cleansing
+```
+
 
 ## Déploiement dans un environnement geOrchestra
 
