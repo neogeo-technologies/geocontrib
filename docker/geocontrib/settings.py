@@ -215,7 +215,7 @@ SELECTED_GEOCODER = {
 PROJECT_COPY_RELATED = {
     'AUTHORIZATION': True,
     'BASE_MAP': True,
-    'FEATURE': True,
+    'FEATURE': False,
     'FEATURE_TYPE': True,
     'THUMBNAIL': True,
 }
