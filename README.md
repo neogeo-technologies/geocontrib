@@ -62,6 +62,7 @@ Copier le contenu du fichier /src/config_sample/settings.py dans /config/setting
 * IMAGE_FORMAT : formats autorisés des fichiers téléversés dans l'application
 * FILE_MAX_SIZE : taille maximale des fichiers téléversés dans l'application
 * DEFAULT_BASE_MAP : configuration du fond de carte par défaut
+* PROJECT_COPY_RELATED : configuration des modèles de projets
 
 Copier le contenu du fichier /src/config_sample/urls.py dans /config/urls.py
 
