@@ -22,7 +22,7 @@ class ContextLayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContextLayer
-        fields = ('id', 'title', 'opacity', 'order')
+        fields = ('id', 'title', 'opacity', 'order', 'queryable')
 
 
 class BaseMapSerializer(serializers.ModelSerializer):
