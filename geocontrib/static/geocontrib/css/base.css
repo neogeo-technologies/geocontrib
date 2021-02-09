@@ -142,12 +142,12 @@ footer .ui.text.menu .item:not(:first-child) {
 /* ---------------------------------- */
       /* ERROR LIST */
 /* ---------------------------------- */
-#form-project-edit .errorlist {
+.errorlist {
   margin-top: 1rem;
   padding: 0;
 }
 
-#form-project-edit .errorlist > li {
+.errorlist > li {
   list-style: none;
   color: rgb(177, 55, 55);
   border:  thin solid rgb(197, 157, 157);
