@@ -1,6 +1,91 @@
 let map;
 let dictLayersToLeaflet = {};
 
+L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
+
+  onAdd: function (map) {
+    // Triggered when the layer is added to a map.
+    //   Register a click listener, then do all the upstream WMS things
+    L.TileLayer.WMS.prototype.onAdd.call(this, map);
+    map.on('click', this.getFeatureInfo, this);
+  },
+
+  onRemove: function (map) {
+    // Triggered when the layer is removed from a map.
+    //   Unregister a click listener, then do all the upstream WMS things
+    L.TileLayer.WMS.prototype.onRemove.call(this, map);
+    map.off('click', this.getFeatureInfo, this);
+  },
+
+  getFeatureInfo: function (evt) {
+    // Make an AJAX request to the server and hope for the best
+    console.log(evt);
+    var url = this.getFeatureInfoUrl(evt.latlng),
+        showResults = L.Util.bind(this.showGetFeatureInfo, this);
+    $.ajax({
+      url: url,
+      success: function (data, status, xhr) {
+        console.log(typeof data);
+        var err = typeof data === 'object' ? null : data;
+        console.log(data);
+        showResults(err, evt.latlng, data);
+      },
+      error: function (xhr, status, error) {
+        showResults(error);  
+      }
+    });
+  },
+  
+  getFeatureInfoUrl: function (latlng) {
+    console.log(this);
+    // Construct a GetFeatureInfo request URL given a point
+    var point = this._map.latLngToContainerPoint(latlng, this._map.getZoom()),
+        size = this._map.getSize(),
+        
+        params = {
+          request: 'GetFeatureInfo',
+          service: 'WMS',
+          // srs: this.wmsParams.srs,
+          srs: 'EPSG:4326',
+          styles: this.wmsParams.styles,
+          // transparent: this.wmsParams.transparent,
+          version: this.wmsParams.version,      
+          format: this.wmsParams.format,
+          bbox: this._map.getBounds().toBBoxString(),
+          height: size.y,
+          width: size.x,
+          layers: this.wmsParams.layers,
+          query_layers: this.wmsParams.layers,
+          info_format: 'application/json'
+        };
+        console.log(params);
+        console.log(point);
+        console.log(size);
+    
+    params[params.version === '1.3.0' ? 'i' : 'x'] = Math.floor(point.x);
+    params[params.version === '1.3.0' ? 'j' : 'y'] = Math.floor(point.y);
+    console.log(this._url + L.Util.getParamString(params, this._url, true));
+    
+    return this._url + L.Util.getParamString(params, this._url, true);
+  },
+  
+  showGetFeatureInfo: function (err, latlng, data) {
+    if (err) { console.log(err); return; } // do nothing if there's an error
+    
+    // Otherwise show the content in a popup, or something.
+    let content = JSON.stringify(data.features[0].properties);
+    L.popup({ maxWidth: 800})
+      .setLatLng(latlng)
+      .setContent(content)
+      .openOn(this._map);
+  }
+
+});
+
+L.tileLayer.betterWms = function (url, options) {
+  return new L.TileLayer.BetterWMS(url, options);  
+};
+
 const mapUtil = {
   getMap: () => {
     return map;
@@ -47,8 +132,11 @@ const mapUtil = {
 					options.opacity = layer.opacity;
 
 					if (layer.schema_type === 'wms') {
-						const leafletLayer = L.tileLayer
-							.wms(layer.service, options)
+						// const leafletLayer = L.tileLayer
+						// 	.wms(layer.service, options)
+						// 	.addTo(map);
+            const leafletLayer = L.tileLayer
+							.betterWms(layer.service, options)
 							.addTo(map);
 						dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
 					} else if (layer.schema_type === 'tms') {
