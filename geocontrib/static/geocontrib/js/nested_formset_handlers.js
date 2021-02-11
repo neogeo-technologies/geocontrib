@@ -60,6 +60,10 @@ window.addEventListener('load', function () {
       .querySelector('div[data-segments=' + prefix + '-SEGMENTS]')
       .insertAdjacentHTML('beforeend', marked_form);
 
+    if (prefix.startsWith('basemap')) {
+      document.getElementById('id_basemap_set-' + form_idx + '-title').required = true;
+    }
+
     // Scroll sur le nouveau form
     let element = document.querySelector(
       'div[data-segments=' + prefix + '-SEGMENTS]'
