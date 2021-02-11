@@ -523,6 +523,7 @@ class FeatureDetail(BaseMapContextMixin, UserPassesTestMixin, View):
         context['attachments'] = Attachment.objects.filter(
             project=project, feature_id=feature.feature_id, object_type='feature')
         context['comment_form'] = CommentForm()
+        context['project'] = project
         return render(request, 'geocontrib/feature/feature_detail.html', context)
 
 

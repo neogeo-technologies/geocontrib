@@ -650,13 +650,13 @@ class BaseMapInlineFormset(BaseInlineFormSet):
         return result
 
 
-class BaseMapForm(ModelForm):
+class BaseMapForm(forms.ModelForm):
+
+    title = forms.CharField(label="Titre", required=True)
+
     class Meta:
         model = BaseMap
-        fields = ['title']
-        widgets = {
-            'title': forms.TextInput(attrs={'required': True})
-        }
+        fields = ['title', ]
 
 
 ProjectBaseMapInlineFormset = inlineformset_factory(
