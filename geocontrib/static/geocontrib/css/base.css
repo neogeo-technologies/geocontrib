@@ -139,3 +139,19 @@ footer .ui.text.menu a.item:hover {
 footer .ui.text.menu .item:not(:first-child) {
     border-left: 1px solid rgba(34,36,38,.15);
 }
+/* ---------------------------------- */
+      /* ERROR LIST */
+/* ---------------------------------- */
+.errorlist {
+  margin-top: 1rem;
+  padding: 0;
+}
+
+.errorlist > li {
+  list-style: none;
+  color: rgb(177, 55, 55);
+  border:  thin solid rgb(197, 157, 157);
+  border-radius: 3px;
+  background-color: rgb(250, 241, 242);
+  padding: 1rem;
+}
