@@ -4,7 +4,6 @@ from django.contrib.gis import forms
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator
 from django.forms import HiddenInput
-from django.forms import ModelForm
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
 from django.forms.models import BaseModelFormSet
@@ -593,9 +592,11 @@ class ContextLayerForm(forms.ModelForm):
     layer = forms.ModelChoiceField(
         label="Couche", queryset=Layer.objects.all(), empty_label=None)
 
+    queryable = forms.BooleanField(label='Requêtable', required=False)
+
     class Meta:
         model = ContextLayer
-        fields = ['layer', 'order', 'opacity']
+        fields = ['layer', 'order', 'opacity', 'queryable']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -604,7 +605,7 @@ class ContextLayerForm(forms.ModelForm):
 
 ContextLayerFormset = inlineformset_factory(
     BaseMap, ContextLayer, form=ContextLayerForm,
-    fields=['layer', 'order', 'opacity'], extra=0)
+    fields=['layer', 'order', 'opacity', 'queryable'], extra=0)
 
 
 class BaseMapInlineFormset(BaseInlineFormSet):

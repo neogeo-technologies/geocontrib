@@ -550,6 +550,8 @@ class ContextLayer(models.Model):
         ],
         default=1)
 
+    queryable = models.BooleanField("Requêtable", default=False)
+
     base_map = models.ForeignKey(verbose_name="Fond cartographique", to='geocontrib.BaseMap', on_delete=models.CASCADE)
 
     layer = models.ForeignKey(verbose_name="Couche", to='geocontrib.Layer', on_delete=models.CASCADE)
