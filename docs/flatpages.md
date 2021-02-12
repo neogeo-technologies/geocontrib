@@ -13,7 +13,7 @@ de ces pages. Ce contenu doit être du code HTML composé d'éléments `<h2>`, `
 habituels.
 
 Dans la partie avancée du formulaire, il est possible d'indiquer le nom d'un modèle de page à appliquer à la page 
-(champ initulé ""). Ce champ peut prendre deux valeurs :
+(champ intitulé ""). Ce champ peut prendre deux valeurs :
 * flatpages/default.html (valeur par défaut) : modèle de page simple. Ce modèle est à privilégier pour les pages dont 
 le contenu est court.
 * flatpages/with_right_menu.html : modèle de page avec une table des matières à droite qui référence les entrées `<h2>` 
