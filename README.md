@@ -1,6 +1,6 @@
 ![alt text](geocontrib/static/geocontrib/img/logo-geocontrib.png?raw=true)
 
-GéoContrib est un outil libre de signalement contributif et collaboratif.
+GéoContrib est un outil libre de signalement contributif et collaboratif. Une version de démonstration est accessible sur https://geocontrib.recette.neogeo.fr/.
 
 ## Installation
 
