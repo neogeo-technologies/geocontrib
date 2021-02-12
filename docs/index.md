@@ -60,16 +60,15 @@ avant de le publier ou de demander sa publication ;
 * en attente de publication : statut d'un signalement dont l'auteur a demandé sa publication (uniquement si le projet 
 est modéré) ;
 * publié : donne la visibilité la plus large possible au signalement ;
-* archivé : correspond à un signalement obsolète mais que l'on souhaite toutefois conservé en base.
+* archivé : correspond à un signalement obsolète mais que l'on souhaite toutefois conserver en base.
 
 La liste ci-dessus est donnée dans l'ordre logique du cycle de vie d'un signalement.
-Modération
 
 ### Commentaire
 
 À l’image de ce qui existe sur les outils en ligne de gestion de tickets (Github et Redmine par exemple) chaque 
 signalement peut être commenté par son auteur et par les autres usagers du projet afin de permettre l’amélioration de 
-la base de données de manière collaborative. Chaque commentaire peut-être être accompagné de pièces jointes.
+la base de données de manière collaborative. Chaque commentaire peut être accompagné de pièces jointes.
 
 ### Pièce jointe
 
@@ -84,7 +83,7 @@ La modification d'un signalement, son changement de statut, l'ajout d'un comment
 pour :
 * mettre à jour la liste des évènements qui apparaît dans la fiche du signalement dans la rubrique "Activité et 
 commentaires" ;
-* envoyés des notifications par messages électroniques aux modérateurs, administrateurs ainsi que les autres 
+* envoyer des notifications par messages électroniques aux modérateurs, administrateurs ainsi que les autres 
 utilisateurs qui se sont abonnés au projet.
 
 
@@ -99,7 +98,7 @@ Elle alimente une base de données PostgreSQL/PostGIS.
 ### Page d'accueil de l'application
 
 La page d'accueil de l'application contient :
-* un bandeau horizontal qui contient :
+* un bandeau horizontal avec :
   * le logo et le nom de l'application (cliquable pour revenir à la page d'accueil de l'application depuis n'importe 
   quelle autre page),
   * si aucun utilisateur n'est connecté : un bouton "Se connecter" permettant à l'utilisateur de 

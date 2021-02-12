@@ -31,7 +31,7 @@ Voici la liste des fournisseurs diposnibles, avec leur valeur à utiliser dans l
 
 ## Source
 
-Le module de géocodage intégrer à GéoContrib provient du projet suivant :
+Le module de géocodage intégré à GéoContrib provient du projet suivant :
 https://github.com/perliedman/leaflet-control-geocoder
 
 Les adaptations de ce projet pour GéoContrib ont été déposées dans le dépôt suivant :
