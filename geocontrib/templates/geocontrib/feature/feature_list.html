@@ -310,6 +310,7 @@
       // Reverse is done because the first layer in order has to be added in the map in last.
       // Slice is done because reverse() changes the original array, so we make a copy first
       mapUtil.addLayers(event.detail.slice().reverse(), serviceMap, optionsMap);
+      console.log(event);
     });
 
     document.addEventListener('update-opacity', (event) => {
