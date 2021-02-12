@@ -19,7 +19,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 
   getFeatureInfo: function (evt) {
     // Make an AJAX request to the server and hope for the best
-<<<<<<< HEAD
     var url = this.getFeatureInfoUrl(evt.latlng),
         showResults = L.Util.bind(this.showGetFeatureInfo, this);
     console.log(url);
@@ -30,18 +29,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         if (data.features && data.features.length) {
           showResults(err, evt.latlng, data);
         }
-=======
-    console.log(evt);
-    var url = this.getFeatureInfoUrl(evt.latlng),
-        showResults = L.Util.bind(this.showGetFeatureInfo, this);
-    $.ajax({
-      url: url,
-      success: function (data, status, xhr) {
-        console.log(typeof data);
-        var err = typeof data === 'object' ? null : data;
-        console.log(data);
-        showResults(err, evt.latlng, data);
->>>>>>> 1ff53eaf77b4587e3bd0cd469f62d5028435dc1f
       },
       error: function (xhr, status, error) {
         showResults(error);  
@@ -50,10 +37,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   },
   
   getFeatureInfoUrl: function (latlng) {
-<<<<<<< HEAD
-=======
-    console.log(this);
->>>>>>> 1ff53eaf77b4587e3bd0cd469f62d5028435dc1f
     // Construct a GetFeatureInfo request URL given a point
     var point = this._map.latLngToContainerPoint(latlng, this._map.getZoom()),
         size = this._map.getSize(),
@@ -74,19 +57,9 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
           query_layers: this.wmsParams.layers,
           info_format: 'application/json'
         };
-<<<<<<< HEAD
     
     params[params.version === '1.3.0' ? 'i' : 'x'] = Math.floor(point.x);
     params[params.version === '1.3.0' ? 'j' : 'y'] = Math.floor(point.y);
-=======
-        console.log(params);
-        console.log(point);
-        console.log(size);
-    
-    params[params.version === '1.3.0' ? 'i' : 'x'] = Math.floor(point.x);
-    params[params.version === '1.3.0' ? 'j' : 'y'] = Math.floor(point.y);
-    console.log(this._url + L.Util.getParamString(params, this._url, true));
->>>>>>> 1ff53eaf77b4587e3bd0cd469f62d5028435dc1f
     
     return this._url + L.Util.getParamString(params, this._url, true);
   },
@@ -94,7 +67,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   showGetFeatureInfo: function (err, latlng, data) {
     if (err) { console.log(err); return; } // do nothing if there's an error
     
-<<<<<<< HEAD
     // Otherwise show the content in a popup
     let contentLines = [];
     Object.entries(data.features[0].properties).forEach(entry => {
@@ -106,10 +78,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     let content = contentTitle.concat(contentLines.join(''));
 
 
-=======
-    // Otherwise show the content in a popup, or something.
-    let content = JSON.stringify(data.features[0].properties);
->>>>>>> 1ff53eaf77b4587e3bd0cd469f62d5028435dc1f
     L.popup({ maxWidth: 800})
       .setLatLng(latlng)
       .setContent(content)
@@ -168,7 +136,6 @@ const mapUtil = {
 					options.opacity = layer.opacity;
 
 					if (layer.schema_type === 'wms') {
-<<<<<<< HEAD
             console.log(layer);
             let leafletLayer;
             if (layer.queryable) {
@@ -181,14 +148,6 @@ const mapUtil = {
 							  .wms(layer.service, options)
 							  .addTo(map);
             }
-=======
-						// const leafletLayer = L.tileLayer
-						// 	.wms(layer.service, options)
-						// 	.addTo(map);
-            const leafletLayer = L.tileLayer
-							.betterWms(layer.service, options)
-							.addTo(map);
->>>>>>> 1ff53eaf77b4587e3bd0cd469f62d5028435dc1f
 						dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
 					} else if (layer.schema_type === 'tms') {
 						const leafletLayer = L.tileLayer(layer.service, options).addTo(map);
