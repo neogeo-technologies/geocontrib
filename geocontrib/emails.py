@@ -47,7 +47,7 @@ def notif_moderators_pending_features(emails, context):
 
     context['url_feature'] = urljoin(CURRENT_SITE_DOMAIN, feature.get_absolute_url())
 
-    subject = "[Collab:{project_slug}] Un signalement est en attente de publication.".format(
+    subject = "[GéoContrib:{project_slug}] Un signalement est en attente de publication.".format(
         project_slug=feature.project.slug
     )
     email = EmailBaseBuilder(
@@ -60,7 +60,7 @@ def notif_moderators_pending_features(emails, context):
 def notif_suscribers_project_event(emails, context):
 
     project = context['project']
-    subject = "[Collab:{project_slug}] Un projet a été mis à jour.".format(
+    subject = "[GéoContrib:{project_slug}] Un projet a été mis à jour.".format(
         project_slug=project.slug
     )
 
@@ -76,7 +76,7 @@ def notif_creator_published_feature(emails, context):
 
     context['url_feature'] = urljoin(CURRENT_SITE_DOMAIN, feature.get_view_url())
 
-    subject = "[Collab:{project_slug}] Confirmation de la publication de l'un de vos signalements.".format(
+    subject = "[GéoContrib:{project_slug}] Confirmation de la publication de l'un de vos signalements.".format(
         project_slug=feature.project.slug
     )
 
