@@ -19,7 +19,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 
   getFeatureInfo: function (evt) {
     console.log(document.getElementById('queryable-layers-selector'), this);
-    const queryableLayerSelected = document.getElementById('queryable-layers-selector').getElementsByClassName('selected')[0].innerHTML;
+    const queryableLayerSelected = document.getElementById(`queryable-layers-selector-${this.wmsParams.basemapId}`).getElementsByClassName('selected')[0].innerHTML;
     if (queryableLayerSelected === this.wmsParams.title) {
       // Make an AJAX request to the server and hope for the best
       var url = this.getFeatureInfoUrl(evt.latlng),
