@@ -18,22 +18,26 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   },
 
   getFeatureInfo: function (evt) {
-    // Make an AJAX request to the server and hope for the best
-    var url = this.getFeatureInfoUrl(evt.latlng),
-        showResults = L.Util.bind(this.showGetFeatureInfo, this);
-    console.log(url);
-    $.ajax({
-      url: url,
-      success: function (data, status, xhr) {
-        var err = typeof data === 'object' ? null : data;
-        if (data.features && data.features.length) {
-          showResults(err, evt.latlng, data);
+    console.log(document.getElementById('queryable-layers-selector'), this);
+    const queryableLayerSelected = document.getElementById('queryable-layers-selector').getElementsByClassName('selected')[0].innerHTML;
+    if (queryableLayerSelected === this.wmsParams.title) {
+      // Make an AJAX request to the server and hope for the best
+      var url = this.getFeatureInfoUrl(evt.latlng),
+          showResults = L.Util.bind(this.showGetFeatureInfo, this);
+      console.log(this, url);
+      $.ajax({
+        url: url,
+        success: function (data, status, xhr) {
+          var err = typeof data === 'object' ? null : data;
+          if (data.features && data.features.length || err) {
+            showResults(err, evt.latlng, data);
+          }
+        },
+        error: function (xhr, status, error) {
+          showResults(error, evt.latlng);
         }
-      },
-      error: function (xhr, status, error) {
-        showResults(error);  
-      }
-    });
+      });
+    }
   },
   
   getFeatureInfoUrl: function (latlng) {
@@ -65,17 +69,29 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   },
   
   showGetFeatureInfo: function (err, latlng, data) {
-    if (err) { console.log(err); return; } // do nothing if there's an error
-    
-    // Otherwise show the content in a popup
-    let contentLines = [];
-    Object.entries(data.features[0].properties).forEach(entry => {
-      const [key, value] = entry;
-      contentLines.push(`<div>${key}: ${value}</div>`)
-    })
-    let contentTitle = `<h4>${this.options.title}</h4>`;
 
-    let content = contentTitle.concat(contentLines.join(''));
+    let content;
+
+    if (err) {
+      console.log('Erreur lors du getFeatureInfo sur la carte');
+      content = `
+        <h4>${this.options.title}</h4>
+        <p>Données de la couche inaccessibles</p>
+      `
+    } else {
+    
+      // Otherwise show the content in a popup
+      let contentLines = [];
+      Object.entries(data.features[0].properties).forEach(entry => {
+        const [key, value] = entry;
+        if (key !== 'bbox') {
+          contentLines.push(`<div>${key}: ${value}</div>`);
+        }
+      })
+      let contentTitle = `<h4>${this.options.title}</h4>`;
+
+      content = contentTitle.concat(contentLines.join(''));
+    }
 
 
     L.popup({ maxWidth: 800})

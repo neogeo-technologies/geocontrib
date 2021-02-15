@@ -106,6 +106,47 @@
       layersContainer.id = `list-${index}`;
       layersContainer.setAttribute('data-basemap-index', index);
 
+      if (basemap.layers.filter(l => l.queryable === true).length > 0) {
+        // Create queryable layers dropdown selector
+        const queryableLayerSelector = document.createElement('div');
+        queryableLayerSelector.id = 'queryable-layers-selector';
+        queryableLayerSelector.classList.add('ui', 'field');
+        const dropdownTitle = document.createElement('label');
+        dropdownTitle.innerHTML = 'Couche requêtable';
+        queryableLayerSelector.append(dropdownTitle);
+        const queryableLayersDropdown = document.createElement('div');
+        queryableLayersDropdown.classList.add('ui', 'fluid', 'dropdown', 'selection');
+        const queryableLayersInput = document.createElement('input');
+        queryableLayersInput.type = 'hidden';
+        queryableLayersInput.value = '0';
+        queryableLayersDropdown.append(queryableLayersInput);
+        const queryableLayersDropdownIcon = document.createElement('i');
+        queryableLayersDropdownIcon.classList.add('dropdown', 'icon');
+        queryableLayersDropdown.append(queryableLayersDropdownIcon);
+        const queryableLayerText = document.createElement('div');
+        queryableLayerText.classList.add('default', 'text');
+        queryableLayersDropdown.append(queryableLayerText);
+        const queryableLayersDropdownMenu = document.createElement('div');
+        queryableLayersDropdownMenu.classList.add('menu');
+        let dataValue = 0;
+        for (const layer of basemap.layers) {
+          if (layer.queryable) {
+            const queryableLayerItem = document.createElement('div');
+            queryableLayerItem.classList.add('item');
+            if (dataValue === 0) {
+              queryableLayerItem.classList.add('active', 'selected');
+            }
+            queryableLayerItem.innerHTML = layer.title;
+            queryableLayerItem.setAttribute("data-value", dataValue.toString());
+            dataValue += 1;
+            queryableLayersDropdownMenu.append(queryableLayerItem);
+          }
+        }
+        queryableLayersDropdown.append(queryableLayersDropdownMenu);
+        queryableLayerSelector.append(queryableLayersDropdown);
+        layersContainer.append(queryableLayerSelector);
+      }
+
       basemap.layers.forEach((layer, i) => {
 
         // Add options information to the layer object
@@ -315,3 +356,12 @@
     bubble.innerHTML = val;
   };
 </script>
+
+<style>
+  #queryable-layers-selector {
+    margin-bottom: 1em;
+  }
+  #queryable-layers-selector > label {
+    font-weight: bold;
+  }
+</style>
