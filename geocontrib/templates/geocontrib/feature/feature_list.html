@@ -309,7 +309,6 @@
       mapUtil.removeLayers(map);
       // Reverse is done because the first layer in order has to be added in the map in last.
       // Slice is done because reverse() changes the original array, so we make a copy first
-      console.log(event);
       mapUtil.addLayers(event.detail.slice().reverse(), serviceMap, optionsMap);
     });
 
@@ -345,7 +344,6 @@
     // Check if at least one basemap exist. If not, use the default application
     const basemaps = JSON.parse(document.getElementById('basemaps').textContent);
     if (!basemaps || basemaps && basemaps.length === 0) {
-      console.log(serviceMap, optionsMap);
       mapUtil.addLayers(null, serviceMap, optionsMap);
     }
 
