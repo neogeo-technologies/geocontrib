@@ -154,7 +154,6 @@
         layers.forEach(layerOptions => {
           if (layer.id === layerOptions.id) {
             layer = Object.assign(layer, layerOptions);
-            layer.options.basemapId = basemap.id;
           }
         });
         const layerElement = document.createElement('div');
@@ -233,6 +232,11 @@
       .accordion('setting', 'onOpen', function () {
         const basemapIndex = this.dataset.basemapIndex;
         selectedBasemapIndex = basemapIndex;
+
+        // Add basemapId to layers
+        baseMaps[basemapIndex].layers.forEach(layer => {
+          layer.options.basemapId = baseMaps[basemapIndex].id;
+        })
 
         const event = new CustomEvent('add-layers', { detail: baseMaps[basemapIndex].layers })
         document.dispatchEvent(event)
