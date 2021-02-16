@@ -1,18 +1,15 @@
-import logging
-
 from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
+from api import logger
 from api.serializers.misc import UserSerializer
 from geocontrib.models import CustomField
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
 from geocontrib.models import FeatureType
 
-
-logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -143,6 +140,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
             'feature_type',
             'feature_url',
             'feature_type_url',
+            'color',
         )
         read_only_fields = fields
 

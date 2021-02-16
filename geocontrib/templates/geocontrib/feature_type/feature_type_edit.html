@@ -54,6 +54,13 @@
           value="{% if form.color.value %}{{ form.color.value }}{% endif %}">
         {{ form.color.errors }}
       </div>
+      <!-- TODO uniquement pour tester la partie back -->
+      <div class="field">
+        <label for="{{ form.colors_style.id_for_label }}">{{ form.colors_style.label }}</label>
+        {{ form.colors_style.errors }}
+        <textarea cols="40" rows="10"
+          name="{{ form.colors_style.html_name }}" id="{{ form.colors_style.id_for_label }}">{{ form.colors_style.value }}</textarea>
+      </div>
     </div>
     {% for error in form.non_field_errors %}{% endfor %}
     <div id="formsets">

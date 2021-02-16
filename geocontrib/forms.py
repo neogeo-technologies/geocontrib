@@ -4,6 +4,7 @@ from django.contrib.gis import forms
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator
 from django.forms import HiddenInput
+from django.contrib.postgres.forms import JSONField
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
 from django.forms.models import BaseModelFormSet
@@ -458,35 +459,16 @@ class FeatureTypeModelForm(forms.ModelForm):
 
     title = forms.CharField(label='Titre', required=True)
 
+    colors_style = JSONField(
+        label='Style Couleur', required=False,
+        # TODO voir si nécessaire au front
+        initial={'custom_field_name': '', 'colors': {}}
+    )
+
     class Meta:
         model = FeatureType
-        fields = ('title', 'geom_type', 'color')
+        fields = ('title', 'geom_type', 'color', 'colors_style')
 
-    # def __init__(self, *args, **kwargs):
-    #     feature_type = kwargs.get('instance')
-    #
-    #     super().__init__(*args, **kwargs)
-    #
-    #     if feature_type.geom_type == "point":
-    #         self.fields['geom'] = forms.PointField(
-    #             label="Localisation",
-    #             required=True,
-    #             srid=4326
-    #         )
-    #
-    #     if feature_type.geom_type == "linestring":
-    #         self.fields['geom'] = forms.LineStringField(
-    #             label="Localisation",
-    #             required=True,
-    #             srid=4326
-    #         )
-    #
-    #     if feature_type.geom_type == "polygon":
-    #         self.fields['geom'] = forms.PolygonField(
-    #             label="Localisation",
-    #             required=True,
-    #             srid=4326
-    #         )
 
 
 class ProjectModelForm(forms.ModelForm):
@@ -614,9 +596,6 @@ class BaseMapInlineFormset(BaseInlineFormSet):
     """
     def add_fields(self, form, index):
         super().add_fields(form, index)
-
-        # for hidding delete input
-        # form.fields[DELETION_FIELD_NAME].widget = HiddenInput()
 
         # save the formset in the 'nested' property
         data = form.data if any(form.data) else None

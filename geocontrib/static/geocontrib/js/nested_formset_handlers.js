@@ -81,12 +81,54 @@ window.addEventListener('load', function () {
       }
     }
 
+    // Ajout d'un event ciblant la nouvelle checkbox queryable
+    try {
+      let selector = 'input[id="id_'+ prefix + '-' + form_idx +'-queryable"]'
+      let queryable = document.querySelector(selector);
+      queryable.addEventListener('click', UncheckOthers, false);
+    } catch (error) {
+      console.error(error);
+    }
+
     // on incremente le nombre total de form du type de celui ajouté
     total_forms.value++;
   }
   for (let i = 0; i < form_creators.length; i++) {
     form_creators[i].addEventListener('click', AddIt, false);
   }
+
+  // ---------------------------------------------------------------------------
+  // Décoche les autre checkbox si un queryable est coché
+  // ---------------------------------------------------------------------------
+  const queryabeContainers = document.getElementsByClassName('layers-container');
+  Array.from(queryabeContainers).forEach((queryableContainer) => {
+    const queryableItems = queryableContainer.querySelectorAll(
+      'input[name*="-queryable"]'
+    );
+    queryableItems.forEach((queryableItem) => {
+      queryableItem.onclick = UncheckOthers;
+    });
+  });
+
+  function UncheckOthers(e) {
+    // switcher avec UncheckOthersDisabeled si besoin d'un queryable unique
+    console.log('disabled');
+  }
+  function UncheckOthersDisabeled(e) {
+    // on snap le début de l'identifiant du queryable
+    let re = /(\d*)-queryable/;
+    let start_as = e.target.id.replace(re, '');
+    // si coché on décoche les queryable du sous-formulaire courant (meme début d'identifiant)
+    // en excluant le queryable courant
+    if (e.target.checked) {
+      let selector = 'input[name*="-queryable"][id^="'+start_as+'"]:not([id*="'+e.target.id+'"])'
+      let others = document.querySelectorAll(selector);
+      Array.from(others).forEach((other) => {
+        other.checked = false;
+      });
+    }
+  }
+
 
   // ---------------------------------------------------------------------------
   // Utilisation de sortable.js pour changer l'ordre des couches

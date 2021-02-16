@@ -66,6 +66,7 @@ class AuthorizationAdmin(admin.ModelAdmin):
     )
     ordering = ('project', 'user__last_name')
     list_editable = ('level', )
+    search_fields = ('user__username', )
 
     def full_name(self, obj):
         return " ".join([obj.user.last_name, obj.user.first_name])
