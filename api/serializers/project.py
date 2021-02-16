@@ -1,5 +1,3 @@
-import logging
-
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -8,8 +6,6 @@ from geocontrib.models import Comment
 from geocontrib.models import Feature
 from geocontrib.models import Project
 
-
-logger = logging.getLogger(__name__)
 
 User = get_user_model()
 

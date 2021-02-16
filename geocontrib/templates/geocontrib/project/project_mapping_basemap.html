@@ -11,7 +11,7 @@
     <small>{{ form.title.help_text|safe }}</small>
     <input type="text" maxlength="{{ form.title.field.max_length }}"
       name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}"
-      value="{% if form.title.value %}{{ form.title.value }}{% endif %}" {% if not is_empty %}required{% endif %}>
+      value="{% if form.title.value %}{{ form.title.value }}{% endif %}" required>
     {{ form.title.errors }}
   </div>
 

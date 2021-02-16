@@ -31,9 +31,11 @@
       {% for form in formset.forms %}
         {% include 'geocontrib/project/project_mapping_basemap.html' with formset=formset form=form is_empty=False %}
       {% endfor %}
-      <div class="formset_hidden" data-empty-form="{{ formset.prefix }}-EMPTY" style="display: none">
-        {% include 'geocontrib/project/project_mapping_basemap.html' with formset=formset form=formset.empty_form is_empty=True %}
-      </div>
+      <fieldset disabled="disabled" style="display: none">
+        <div class="formset_hidden" data-empty-form="{{ formset.prefix }}-EMPTY" style="display: none">
+          {% include 'geocontrib/project/project_mapping_basemap.html' with formset=formset form=formset.empty_form is_empty=True %}
+        </div>
+      </fieldset>
     </div>
 
 
