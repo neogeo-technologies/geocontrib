@@ -45,13 +45,6 @@
 <script>
 
   const baseMapsFromServer = JSON.parse(document.getElementById('basemaps').textContent);
-  console.log(baseMapsFromServer);
-  // Add basemapID in layers
-  for (const basemap of baseMapsFromServer) {
-    basemap.layers.forEach(layer => {
-      layer.basemapId = basemap.id;
-    })
-  }
   const layers = JSON.parse(document.getElementById('layers').textContent);
   const project = JSON.parse(document.getElementById('project').textContent);
 
@@ -60,14 +53,6 @@
     const mapOptions = JSON.parse(localStorage.getItem('geocontrib-map-options'));
     if (mapOptions 
         && mapOptions[project]) {
-          console.log(mapOptions[project]);
-      // Add basemapID in layers
-      for (const basemap of mapOptions[project].basemaps) {
-        basemap.layers.forEach(layer => {
-          layer.options.basemapId = basemap.id;
-        })
-      }
-      console.log(mapOptions[project]);
 
       // If already in the storage, we need to check if the admin did some 
       // modification in the basemaps on the server side. The rule is: if one layer has been added
@@ -120,7 +105,6 @@
       layersContainer.classList.add('content');
       layersContainer.id = `list-${index}`;
       layersContainer.setAttribute('data-basemap-index', index);
-      console.log(basemap);
 
       if (basemap.layers.filter(l => l.queryable === true).length > 0) {
         // Create queryable layers dropdown selector
@@ -170,6 +154,7 @@
         layers.forEach(layerOptions => {
           if (layer.id === layerOptions.id) {
             layer = Object.assign(layer, layerOptions);
+            layer.options.basemapId = basemap.id;
           }
         });
         const layerElement = document.createElement('div');
@@ -249,10 +234,6 @@
         const basemapIndex = this.dataset.basemapIndex;
         selectedBasemapIndex = basemapIndex;
 
-        baseMaps[basemapIndex].layers.forEach(layer => {
-          layer.basemapId = baseMaps[basemapIndex].id;
-        })
-        console.log(baseMaps[basemapIndex]);
         const event = new CustomEvent('add-layers', { detail: baseMaps[basemapIndex].layers })
         document.dispatchEvent(event)
 
@@ -269,12 +250,8 @@
 
     // Load layer of the selected basemap
     const layersToAdd = []
-    console.log(baseMaps[selectedBasemapIndex]);
-    const basemapId = baseMaps[selectedBasemapIndex].id;
     baseMaps[selectedBasemapIndex].layers.forEach(layer => {
       let layerInformation = layers.find(l => l.id === layer.id);
-      layerInformation.options.basemapId = basemapId;
-      console.log(layerInformation);
       layersToAdd.push(layerInformation);
     });
 

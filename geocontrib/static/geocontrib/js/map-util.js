@@ -18,8 +18,9 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   },
 
   getFeatureInfo: function (evt) {
-    console.log(document.getElementById('queryable-layers-selector'), this);
+    console.log(this.wmsParams.basemapId);
     const queryableLayerSelected = document.getElementById(`queryable-layers-selector-${this.wmsParams.basemapId}`).getElementsByClassName('selected')[0].innerHTML;
+    console.log(queryableLayerSelected, this.wmsParams.title);
     if (queryableLayerSelected === this.wmsParams.title) {
       // Make an AJAX request to the server and hope for the best
       var url = this.getFeatureInfoUrl(evt.latlng),
@@ -34,6 +35,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
           }
         },
         error: function (xhr, status, error) {
+          if (!error) { error = 'Données de la couche inaccessibles' }
           showResults(error, evt.latlng);
         }
       });
@@ -152,7 +154,6 @@ const mapUtil = {
 					options.opacity = layer.opacity;
 
 					if (layer.schema_type === 'wms') {
-            console.log(layer);
             let leafletLayer;
             if (layer.queryable) {
               options.title = layer.title;
