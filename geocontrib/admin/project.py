@@ -21,6 +21,7 @@ class ContextLayerTabular(admin.TabularInline):
     can_order = True
     show_change_link = True
     view_on_site = False
+    fields = ('order', 'opacity', 'layer', 'queryable')
 
 
 class BaseMapAdmin(admin.ModelAdmin):

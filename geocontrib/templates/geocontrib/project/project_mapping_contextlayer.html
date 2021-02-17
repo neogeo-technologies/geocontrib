@@ -36,6 +36,14 @@
           max="{{ form.opacity.field.max_value }}">
         {{ form.opacity.errors }}
       </div>
+      <div class="field three wide">
+        <div class="ui checkbox">
+          <input type="checkbox" {% if form.queryable.value %}checked{% endif %}
+            name="{{ form.queryable.html_name }}" id="{{ form.queryable.id_for_label }}">
+          <label for="{{ form.queryable.id_for_label }}">{{ form.queryable.label }}</label>
+        </div>
+        {{ form.queryable.errors }}
+      </div>
     </div>
 
     <div class="field">

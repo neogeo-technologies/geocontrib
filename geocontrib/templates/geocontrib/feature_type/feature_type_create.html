@@ -53,6 +53,13 @@
           name="{{ form.color.html_name }}" id="{{ form.color.id_for_label }}">
         {{ form.color.errors }}
       </div>
+      <!-- TODO uniquement pour tester la partie back -->
+      <div class="field">
+        <label for="{{ form.colors_style.id_for_label }}">{{ form.colors_style.label }}</label>
+        <textarea cols="40" rows="10"
+          name="{{ form.colors_style.html_name }}" id="{{ form.colors_style.id_for_label }}">{{ form.colors_style.value }}</textarea>
+        {{ form.colors_style.errors }}
+      </div>
     </div>
 
     <div id="formsets">
