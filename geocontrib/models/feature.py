@@ -8,6 +8,7 @@ from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 from geocontrib.choices import TYPE_CHOICES
 from geocontrib.managers import AvailableFeaturesManager
@@ -113,7 +114,7 @@ class Feature(models.Model):
             res = self.creator.get_full_name() or self.creator.username
         return res
 
-    @property
+    @cached_property
     def color(self):
         color = self.feature_type.color
         if self.feature_data and self.feature_type.colors_style:
