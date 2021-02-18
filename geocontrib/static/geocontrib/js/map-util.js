@@ -22,7 +22,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 		if (queryableLayerSelected === this.wmsParams.title) {
 			// Make an AJAX request to the server and hope for the best
 			var params = this.getFeatureInfoUrl(evt.latlng);
-			console.log(params);
 			var showResults = L.Util.bind(this.showGetFeatureInfo, this);
 			$.ajax({
 				url: `/api/proxy/`,
@@ -68,7 +67,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 		params[params.version === '1.3.0' ? 'i' : 'x'] = Math.floor(point.x);
 		params[params.version === '1.3.0' ? 'j' : 'y'] = Math.floor(point.y);
 		
-		// return this._url + L.Util.getParamString(params, this._url, true);
 		return params;
 	},
 	
