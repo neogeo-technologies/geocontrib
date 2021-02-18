@@ -1,7 +1,12 @@
 {% extends "geocontrib/base.html" %}
-
+{% load staticfiles %}
 
 {% block title %}{{ title }}{% endblock %}
+
+{% block custom_resources %}
+{{ block.super }}
+<script src="{% static 'geocontrib/js/colors_style.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
 
 {% block content %}
 
@@ -27,21 +32,18 @@
     <div class="two fields">
       <div class="required field">
         <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
-        <input type="text" required maxlength="{{ form.title.field.max_length }}"
-          name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}"
-          value="{% if form.title.value %}{{ form.title.value }}{% endif %}">
+        <input type="text" required maxlength="{{ form.title.field.max_length }}" name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}" value="{% if form.title.value %}{{ form.title.value }}{% endif %}">
         {{ form.title.errors }}
       </div>
       <div class="required field">
         <label for="{{ form.geom_type.id_for_label }}">{{ form.geom_type.label }}</label>
         <div class="ui selection dropdown">
-          <input type="hidden" name="{{ form.geom_type.html_name }}" id="{{ form.geom_type.id_for_label }}"
-            value="{% if form.geom_type.value %}{{ form.geom_type.value }}{% endif %}">
+          <input type="hidden" name="{{ form.geom_type.html_name }}" id="{{ form.geom_type.id_for_label }}" value="{% if form.geom_type.value %}{{ form.geom_type.value }}{% endif %}">
           <div class="default text"></div>
           <i class="dropdown icon"></i>
           <div class="menu">
             {% for x,y in form.geom_type.field.choices %}
-              <div class="item" data-value="{{ x }}" {% if form.geom_type.value == x %} selected{% endif %}>{{ y }}</div>
+            <div class="item" data-value="{{ x }}" {% if form.geom_type.value == x %} selected{% endif %}>{{ y }}</div>
             {% endfor %}
           </div>
         </div>
@@ -49,93 +51,72 @@
       </div>
       <div class="required field">
         <label for="{{ form.color.id_for_label }}">{{ form.color.label }}</label>
-        <input type="color" required style="width:100%;height:38px;"
-          name="{{ form.color.html_name }}" id="{{ form.color.id_for_label }}"
-          value="{% if form.color.value %}{{ form.color.value }}{% endif %}">
+        <input type="color" required style="width:100%;height:38px;" name="{{ form.color.html_name }}" id="{{ form.color.id_for_label }}" value="{% if form.color.value %}{{ form.color.value }}{% endif %}">
         {{ form.color.errors }}
       </div>
-      <!-- TODO uniquement pour tester la partie back -->
-      <div class="field">
-        <label for="{{ form.colors_style.id_for_label }}">{{ form.colors_style.label }}</label>
-        {{ form.colors_style.errors }}
-        <textarea cols="40" rows="10"
-          name="{{ form.colors_style.html_name }}" id="{{ form.colors_style.id_for_label }}">{{ form.colors_style.value }}</textarea>
-      </div>
+
     </div>
     {% for error in form.non_field_errors %}{% endfor %}
     <div id="formsets">
       {{ formset.management_form }}
       {{ formset.non_form_errors }}
       {% for form in formset %}
-          {% for hidden in form.hidden_fields %}
-            {{ hidden }}
-          {% endfor %}
-        <div class="ui teal segment">
-          <h4>
-            Champ personnalisé
-            <button class="ui small compact right floated icon button remove-field" type="button"><i class="ui times icon"></i></button>
-          </h4>
-          <div class="visible-fields">
-            <div class="two fields">
-              <div class="required field">
-                <label for="{{ form.label.id_for_label }}">{{ form.label.label }}</label>
-                <input type="text" required maxlength="{{  form.label.field.max_length }}"
-                name="{{ form.label.html_name }}" id="{{  form.label.id_for_label }}"
-                value="{% if form.label.value %}{{ form.label.value }}{% endif %}">
-                <small>{{ form.label.help_text }}</small>
-                {{ form.label.errors }}
-              </div>
-              <div class="required field">
-                <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
-                <input type="text" required
-                maxlength="{{  form.name.field.max_length }}" name="{{ form.name.html_name }}"
-                id="{{  form.name.id_for_label }}"
-                value="{% if form.name.value %}{{ form.name.value }}{% endif %}">
-                <small>{{ form.name.help_text }}</small>
-                {{ form.name.errors }}
-              </div>
+      {% for hidden in form.hidden_fields %}
+      {{ hidden }}
+      {% endfor %}
+      <div class="ui teal segment">
+        <h4>
+          Champ personnalisé
+          <button class="ui small compact right floated icon button remove-field" type="button"><i class="ui times icon"></i></button>
+        </h4>
+        <div class="visible-fields">
+          <div class="two fields">
+            <div class="required field">
+              <label for="{{ form.label.id_for_label }}">{{ form.label.label }}</label>
+              <input type="text" required maxlength="{{  form.label.field.max_length }}" name="{{ form.label.html_name }}" id="{{  form.label.id_for_label }}" value="{% if form.label.value %}{{ form.label.value }}{% endif %}">
+              <small>{{ form.label.help_text }}</small>
+              {{ form.label.errors }}
             </div>
-            <div class="three fields">
-              <div class="required field">
-                <label for="{{ form.position.id_for_label }}">{{ form.position.label }}</label>
-                <div class="ui input">
-                  <input type="number" min="{{ form.position.field.min_value }}"
-                  name="{{ form.position.html_name }}" id="{{ form.position.id_for_label }}"
-                  value="{{ form.position.value }}">
-                </div>
-                <small>{{ form.position.help_text }}</small>
-                {{ form.position.errors }}
-              </div>
-              <div class="required field">
-                <label for="{{ form.field_type.id_for_label }}">{{ form.field_type.label }}</label>
-                <div class="ui selection dropdown">
-                  <input type="hidden" class="field-type"
-                    name="{{ form.field_type.html_name }}" id="{{ form.field_type.id_for_label }}"
-                    value="{{ form.field_type.value }}">
-                  <div class="default text"></div>
-                  <i class="dropdown icon"></i>
-                  <div class="menu">
-                    {% for x,y in form.field_type.field.choices %}
-                      <div class="item" data-value="{{ x }}" {% if form.field_type.value == x %} selected{% endif %}>{{ y }}</div>
-                    {% endfor %}
-                  </div>
-                </div>
-                {{ form.field_type.errors }}
-              </div>
-              <div class="field field-list-options required field" style="display:none;">
-                <label for="{{ form.options.id_for_label }}">{{ form.options.label }}</label>
-                <input type="text" maxlength="{{  form.options.field.max_length }}"
-                  name="{{ form.options.html_name }}" id="{{  form.options.id_for_label }}"
-                  value="{{ form.options.value }}">
-                <small>{{ form.options.help_text }}</small>
-                {{ form.options.errors }}
-              </div>
+            <div class="required field">
+              <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+              <input type="text" required maxlength="{{  form.name.field.max_length }}" name="{{ form.name.html_name }}" id="{{  form.name.id_for_label }}" value="{% if form.name.value %}{{ form.name.value }}{% endif %}">
+              <small>{{ form.name.help_text }}</small>
+              {{ form.name.errors }}
             </div>
           </div>
-          <input class="delete-hidden-field" type="checkbox"
-            name="{{ form.DELETE.html_name }}"
-            id="{{ form.DELETE.id_for_label }}">
+          <div class="three fields">
+            <div class="required field">
+              <label for="{{ form.position.id_for_label }}">{{ form.position.label }}</label>
+              <div class="ui input">
+                <input type="number" min="{{ form.position.field.min_value }}" name="{{ form.position.html_name }}" id="{{ form.position.id_for_label }}" value="{{ form.position.value }}">
+              </div>
+              <small>{{ form.position.help_text }}</small>
+              {{ form.position.errors }}
+            </div>
+            <div class="required field">
+              <label for="{{ form.field_type.id_for_label }}">{{ form.field_type.label }}</label>
+              <div class="ui selection dropdown">
+                <input type="hidden" class="field-type" name="{{ form.field_type.html_name }}" id="{{ form.field_type.id_for_label }}" value="{{ form.field_type.value }}">
+                <div class="default text"></div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                  {% for x,y in form.field_type.field.choices %}
+                  <div class="item" data-value="{{ x }}" {% if form.field_type.value == x %} selected{% endif %}>{{ y }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              {{ form.field_type.errors }}
+            </div>
+            <div class="field field-list-options required field" style="display:none;">
+              <label for="{{ form.options.id_for_label }}">{{ form.options.label }}</label>
+              <input type="text" maxlength="{{  form.options.field.max_length }}" name="{{ form.options.html_name }}" id="{{  form.options.id_for_label }}" value="{{ form.options.value }}">
+              <small>{{ form.options.help_text }}</small>
+              {{ form.options.errors }}
+            </div>
           </div>
+        </div>
+        <input class="delete-hidden-field" type="checkbox" name="{{ form.DELETE.html_name }}" id="{{ form.DELETE.id_for_label }}">
+      </div>
       {% endfor %}
     </div>
     {# <div id="formsets"></div> #}
@@ -144,6 +125,41 @@
       <i class="ui plus icon"></i>Ajouter un champ personnalisé
     </button>
 
+    <div class="ui divider"></div>
+
+    <button id="id_custom_style_button" type="button" class="ui compact basic button button-hover-green">
+      <i class="ui pen square icon"></i>Configurer le style de coloration
+    </button>
+    <div class="custom_style" id="id_style_container" hidden>
+      <div class="list_selection" id="id_list_selection">
+        <div class="ui selection dropdown" tabindex="0">
+          <div class="text" id="id_list_label_selected">Sélectionner la liste de valeurs</div>
+          <i class="dropdown icon"></i>
+          <div class="menu" tabindex="-1" id="id_list_menu">
+            <!-- liste des field-type == liste a généré depuis le js -->
+            <!-- <div class="item" data-value="list_name_1">list_label_1</div>
+            <div class="item" data-value="list_name_2">list_label_2</div>
+            <div class="item active selected" data-value="list_name_selected" selected="">list_label_selected</div> -->
+          </div>
+        </div>
+      </div>
+      <div class="colors_selection" id="id_colors_selection" hidden>
+        <!-- Liste de couleurs à généré depuis le js -->
+        <!-- <label for="id_color_preums">preums</label>
+        <input type="color" style="width:100%;height:38px;" id="id_color_preums" value="id_color_value">
+        <label for="id_color_deuz">deuz</label>
+        <input type="color" style="width:100%;height:38px;" id="id_color_deuz" value="id_color_value">
+        <label for="id_color_tercio">tercio</label>
+        <input type="color" style="width:100%;height:38px;" id="id_color_tercio" value="id_color_value"> -->
+      </div>
+    </div>
+    <!-- A partir des valeur choisis dans id_list_menu et id_colors_selection  on le mettra dabs form.colors_style.value -->
+    <div class="hidden_field" id="id_colors_style_textarea" hidden>
+      <label for="{{ form.colors_style.id_for_label }}">{{ form.colors_style.label }}</label>
+      {{ form.colors_style.errors }}
+      <textarea cols="40" rows="10" name="{{ form.colors_style.html_name }}" id="{{ form.colors_style.id_for_label }}">{{ form.colors_style.value }}</textarea>
+    </div>
+    </div>
     <div class="ui divider"></div>
 
     <button type="submit" class="ui teal icon button">
@@ -156,34 +172,34 @@
 
 
 <script>
-  $(document).on('click', '.remove-field', function () {
+  $(document).on('click', '.remove-field', function() {
     var $segment = $(this).parent().parent('.segment')
     $segment.hide()
     $segment.children('.visible-fields').remove()
     $segment.children('.delete-hidden-field').prop('checked', true)
   })
 
-  $(document).on('change', '.field-type', function () {
+  $(document).on('change', '.field-type', function() {
     var $options = $(this).parent().parent('.field').parent('.fields').children('.field-list-options')
     if ($(this).val() === "list") {
       $options.find('input').prop('required', true)
       $options.show()
     } else {
-      $options.find('input').prop('required',false)
+      $options.find('input').prop('required', false)
       $options.hide()
     }
   })
 
-  $(document).ready(function () {
+  $(document).ready(function() {
     var all_fields = $(".field-type").select()
-    for(i=0; i<all_fields.length; i++){
-      var $this_field  = $("#"+all_fields[i].id).select()
+    for (i = 0; i < all_fields.length; i++) {
+      var $this_field = $("#" + all_fields[i].id).select()
       var $option = $this_field.parent().parent('.field').parent('.fields').children('.field-list-options')
       if ($this_field.val() === "list") {
         $option.find('input').prop('required', true)
         $option.show()
       } else {
-        $option.find('input').prop('required',false)
+        $option.find('input').prop('required', false)
         $option.hide()
       }
     }
@@ -263,6 +279,5 @@
 
     $('.ui.dropdown').dropdown()
   })
-
 </script>
 {% endblock %}
