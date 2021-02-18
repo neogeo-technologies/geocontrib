@@ -36,17 +36,15 @@ class GetFeatureInfo(APIView):
     if request.GET.get('j') is not None:
       payload['j'] = request.GET.get('j', '')
 
-    r = requests.get(url, params=payload)
+    r = requests.get(url, params=payload, timeout=60)
 
     try:
       response = r.json()
-      print(r.json())
 
       if r.status_code == 200 and r.json()['type'] == 'FeatureCollection':
-        return Response(data=r.json(), status=200)
+        return Response(data=r.json(), status=r.status_code)
       else:
-        return Response(data="Les données ne sont pas au format geoJSON", status=200)
+        return Response(data="Les données ne sont pas au format geoJSON", status=r.status_code)
 
     except:
-      print(r.content)
-      return Response(data="Les données sont inaccessibles", status=404)
+      return Response(data="Les données sont inaccessibles", status=r.status_code)
