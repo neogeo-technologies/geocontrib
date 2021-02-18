@@ -5,6 +5,7 @@ from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureSearch
 from api.views.project import ProjectView
 from api.views.project import ProjectAuthorization
+from api.views.base_map import GetFeatureInfo
 
 
 app_name = 'api'
@@ -22,6 +23,9 @@ urlpatterns = [
     path(
         'projet/<slug:slug>/signalement/recherche/',
         FeatureSearch.as_view(), name='feature-search'),
+    path(
+        'proxy/',
+        GetFeatureInfo.as_view(), name='proxy'),
 ]
 
 

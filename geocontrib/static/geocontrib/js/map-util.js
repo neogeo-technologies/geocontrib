@@ -21,10 +21,12 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 		const queryableLayerSelected = document.getElementById(`queryable-layers-selector-${this.wmsParams.basemapId}`).getElementsByClassName('selected')[0].innerHTML;
 		if (queryableLayerSelected === this.wmsParams.title) {
 			// Make an AJAX request to the server and hope for the best
-			var url = this.getFeatureInfoUrl(evt.latlng);
+			var params = this.getFeatureInfoUrl(evt.latlng);
 			var showResults = L.Util.bind(this.showGetFeatureInfo, this);
 			$.ajax({
-				url: url,
+				url: `/api/proxy/`,
+				data: params,
+				dataType: "json",
 				success: function (data, status, xhr) {
 					var err = typeof data === 'object' ? null : data;
 					if (data.features || err) {
@@ -32,7 +34,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 					}
 				},
 				error: function (xhr, status, error) {
-					if (!error) { error = 'Données de la couche inaccessibles' }
+					if (!error) { error = 'Erreur lors du getFeatureInfo sur la carte' }
 					showResults(error, evt.latlng);
 				}
 			});
@@ -45,6 +47,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 		var size = this._map.getSize(),
 				
 				params = {
+					url: this._url,
 					request: 'GetFeatureInfo',
 					service: 'WMS',
 					// srs: this.wmsParams.srs,
@@ -52,7 +55,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 					// styles: this.wmsParams.styles,
 					// transparent: this.wmsParams.transparent,
 					version: this.wmsParams.version,      
-					format: this.wmsParams.format,
+					// format: this.wmsParams.format,
 					bbox: this._map.getBounds().toBBoxString(),
 					height: size.y,
 					width: size.x,
@@ -64,7 +67,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 		params[params.version === '1.3.0' ? 'i' : 'x'] = Math.floor(point.x);
 		params[params.version === '1.3.0' ? 'j' : 'y'] = Math.floor(point.y);
 		
-		return this._url + L.Util.getParamString(params, this._url, true);
+		return params;
 	},
 	
 	showGetFeatureInfo: function (err, latlng, data) {
@@ -72,11 +75,16 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 		let content;
 
 		if (err) {
-			console.log('Erreur lors du getFeatureInfo sur la carte');
+			console.log(err);
 			content = `
 				<h4>${this.options.title}</h4>
 				<p>Données de la couche inaccessibles</p>
 			`
+
+			L.popup({ maxWidth: 800})
+					.setLatLng(latlng)
+					.setContent(content)
+					.openOn(this._map);
 		} else {
 		
 			// Otherwise show the content in a popup
