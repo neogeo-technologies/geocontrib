@@ -73,7 +73,6 @@ function initColorDisplay() {
 
 function displayColorSelection() {
   let styleData = JSON.parse(document.getElementById('id_colors_style').value);
-  console.log(this.value, styleData.custom_field_name);
 
   if (this.value && this.value !== styleData.custom_field_name) {
     let colors_selection_container = document.getElementById('id_colors_selection');
@@ -139,6 +138,7 @@ window.addEventListener('load', function () {
   let field_type_selection = document.getElementById('id_list_selection').getElementsByTagName('input')[0];
   field_type_selection.addEventListener('change', displayColorSelection, false);
 
+  // On affiche les sélecteurs de couleurs si on a style enregistré
   let styleData = JSON.parse(document.getElementById('id_colors_style').value);
   if (styleData.custom_field_name.length) {
     let customFieldInput = document.getElementById('id_list_selection').getElementsByTagName('input')[0];
