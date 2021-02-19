@@ -43,8 +43,39 @@ function LoadDropdown () {
   }
 }
 
+function initColorDisplay() {
+  let colors_selection_container = document.getElementById('id_colors_selection');
+  colors_selection_container.hidden = false;
+  colors_selection_container.innerHTML = '';
+
+  let styleData = JSON.parse(document.getElementById('id_colors_style').value);
+  if (Object.keys(styleData.colors).length) {
+    for (const [label, color] of Object.entries(styleData.colors)) {
+      const colorDiv = document.createElement('div');
+      colorDiv.classList.add('color-input')
+      const colorLabel = document.createElement('label');
+      colorLabel.innerHTML = label;
+      const colorInput = document.createElement('input');
+      colorInput.type = 'color';
+      colorInput.value = color;
+      colorDiv.appendChild(colorLabel);
+      colorDiv.appendChild(colorInput);
+      colors_selection_container.appendChild(colorDiv);
+    }
+  }
+
+  let color_selection_fields = document.getElementsByClassName('color-input');
+  for (let color_field of color_selection_fields) {
+    let color_input = color_field.getElementsByTagName('input')[0];
+    color_input.addEventListener('change', saveStyle, false)
+  }
+}
+
 function displayColorSelection() {
-  if (this.value) {
+  let styleData = JSON.parse(document.getElementById('id_colors_style').value);
+  console.log(this.value, styleData.custom_field_name);
+
+  if (this.value && this.value !== styleData.custom_field_name) {
     let colors_selection_container = document.getElementById('id_colors_selection');
     colors_selection_container.hidden = false;
     colors_selection_container.innerHTML = '';
@@ -63,10 +94,37 @@ function displayColorSelection() {
       colorDiv.appendChild(colorInput);
       colors_selection_container.appendChild(colorDiv);
     }
+
+    let color_selection_fields = document.getElementsByClassName('color-input');
+    for (let color_field of color_selection_fields) {
+      let color_input = color_field.getElementsByTagName('input')[0];
+      color_input.addEventListener('change', saveStyle, false)
+    }
+  } else {
+    initColorDisplay();
   }
 }
 
+function saveStyle() {
+  let savingArea = document.getElementById('id_colors_style');
+  let styleData = {
+    custom_field_name: '',
+    colors: {}
+  }
+
+  let customFieldName = document.getElementById('id_list_selection').getElementsByClassName('item active selected')[0];
+  styleData.custom_field_name = customFieldName.getAttribute('data-value');
+
+  for (let color_field of document.getElementsByClassName('color-input')) {
+    let label = color_field.getElementsByTagName('label')[0].innerHTML;
+    let color = color_field.getElementsByTagName('input')[0].value;
+    styleData.colors[label] = color;
+  }
+  savingArea.value = JSON.stringify(styleData);
+}
+
 window.addEventListener('load', function () {
+
   LoadDropdown();
 
   // On parcoure les formets de champs personnalisé
@@ -80,4 +138,20 @@ window.addEventListener('load', function () {
 
   let field_type_selection = document.getElementById('id_list_selection').getElementsByTagName('input')[0];
   field_type_selection.addEventListener('change', displayColorSelection, false);
+
+  let styleData = JSON.parse(document.getElementById('id_colors_style').value);
+  if (styleData.custom_field_name.length) {
+    let customFieldInput = document.getElementById('id_list_selection').getElementsByTagName('input')[0];
+    let customFieldText = document.getElementById('id_list_selection').getElementsByClassName('text')[0];
+    let customFieldItems = document.getElementById('id_list_selection').getElementsByClassName('item');
+    for (let item of customFieldItems) {
+      if (item.dataset.value === styleData.custom_field_name) {
+        item.classList.add('active', 'selected');
+        customFieldInput.value = styleData.custom_field_name;
+        customFieldText.innerHTML = item.innerHTML;
+      }
+    }
+    let initColorDisplayBinded = initColorDisplay.bind(field_type_selection);
+    initColorDisplayBinded();
+  }
 });

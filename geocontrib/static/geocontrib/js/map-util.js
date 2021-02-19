@@ -235,7 +235,7 @@ const mapUtil = {
 
 				if (geomJSON.type === 'Point') {
 					L.circleMarker(geomJSON.coordinates, {
-						color: feature.properties.feature_type.color,
+						color: feature.properties.color,
 						radius: 4,
 						fillOpacity: 0.5,
 						weight: 3,
@@ -244,14 +244,14 @@ const mapUtil = {
 						.addTo(featureGroup);
 				} else if (geomJSON.type === 'LineString') {
 					L.polyline(geomJSON.coordinates, {
-						color: feature.properties.feature_type.color,
+						color: feature.properties.color,
 						weight: 3,
 					})
 						.bindPopup(popupContent)
 						.addTo(featureGroup);
 				} else if (geomJSON.type === 'Polygon') {
 					L.polygon(geomJSON.coordinates, {
-						color: feature.properties.feature_type.color,
+						color: feature.properties.color,
 						weight: 3,
 						fillOpacity: 0.5,
 					})
