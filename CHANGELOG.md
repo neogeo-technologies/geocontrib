@@ -5,12 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [1.3.0] - 2021-02-22
+
+### Changed
+- Redmine 10053 : Can change color of a feature against its custom field value
+- Redmine 10054 + 10266 : Can query properties of basemaps
+- Added a scale on the maps
+
 ## [1.2.3] - 2021-02-11
 
 ### Fixed
 - Redmine 10209 fixed basemaps can't be saved
 - Redmine 10228 added project menu on feature details
 - Redmine 9962 highlight django errors
+
+## [1.2.2] - 2021-02-11
+
+Never released
 
 ## [1.2.1] - 2021-02-04
 
