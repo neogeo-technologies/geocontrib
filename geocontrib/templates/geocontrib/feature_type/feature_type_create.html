@@ -1,7 +1,12 @@
 {% extends "geocontrib/base.html" %}
-
+{% load staticfiles %}
 
 {% block title %}{{ title }}{% endblock %}
+
+{% block custom_resources %}
+{{ block.super }}
+<script src="{% static 'geocontrib/js/colors_style.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
 
 {% block content %}
 
@@ -53,12 +58,24 @@
           name="{{ form.color.html_name }}" id="{{ form.color.id_for_label }}">
         {{ form.color.errors }}
       </div>
-      <!-- TODO uniquement pour tester la partie back -->
-      <div class="field">
+      <div class="custom_style" id="id_style_container" style="display: none;">
+        <div class="list_selection" id="id_list_selection">
+          <div class="ui selection dropdown" tabindex="0">
+            <input type="hidden">
+            <div class="text" id="id_list_label_selected">Sélectionner la liste de valeurs</div>
+            <i class="dropdown icon"></i>
+            <div class="menu" tabindex="-1" id="id_list_menu">
+            </div>
+          </div>
+        </div>
+        <div class="colors_selection" id="id_colors_selection" hidden>
+        </div>
+      </div>
+      <!-- A partir des valeur choisis dans id_list_menu et id_colors_selection  on le mettra dabs form.colors_style.value -->
+      <div class="hidden_field" id="id_colors_style_textarea" hidden>
         <label for="{{ form.colors_style.id_for_label }}">{{ form.colors_style.label }}</label>
-        <textarea cols="40" rows="10"
-          name="{{ form.colors_style.html_name }}" id="{{ form.colors_style.id_for_label }}">{{ form.colors_style.value }}</textarea>
         {{ form.colors_style.errors }}
+        <textarea cols="40" rows="10" name="{{ form.colors_style.html_name }}" id="{{ form.colors_style.id_for_label }}">{{ form.colors_style.value }}</textarea>
       </div>
     </div>
 
@@ -69,7 +86,7 @@
           {% for hidden in form.hidden_fields %}
             {{ hidden }}
           {% endfor %}
-        <div class="ui teal segment">
+        <div class="ui teal segment pers-field">
           <h4>
             Champ personnalisé
             <button class="ui small compact right floated icon button remove-field" type="button"><i class="ui times icon"></i></button>
@@ -192,7 +209,7 @@
 
     console.log('add-field', form_idx);
     $('#formsets').append((`
-      <div class="ui teal segment">
+      <div class="ui teal segment pers-field">
         <h4>
           Champ personnalisé
           <button class="ui small compact right floated icon button remove-field" type="button"><i class="ui times icon"></i></button>
@@ -263,4 +280,27 @@
   })
 
 </script>
+
+<style>
+  #add-field {
+    margin-top: 1em;
+  }
+
+  #id_style_container {
+    display: flex;
+    height: 100%;
+  }
+
+  #id_colors_selection {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+  }
+  .color-input {
+    margin-left: 1em;
+  }
+  .color-input > label {
+    margin-right: 0.5em;
+  }
+</style>
 {% endblock %}
