@@ -151,6 +151,8 @@ const mapUtil = {
 				.addTo(map);
 		}
 
+		L.control.scale().addTo(map);
+
 		return map;
 	},
 
