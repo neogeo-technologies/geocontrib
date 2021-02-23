@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 10054 + 10266 : Can query properties of basemaps
 - Added a scale on the maps
 
+### Fixed
+- Renamed Collab to Geocontrib in some mails
+
 ## [1.2.3] - 2021-02-11
 
 ### Fixed
