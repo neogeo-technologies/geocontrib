@@ -4,28 +4,27 @@ from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.contrib.flatpages import views as flatpages_views
 
-
-from geocontrib.views.accounts import HomePageView
-from geocontrib.views.accounts import MyAccount
-from geocontrib.views.content_managment import ProjectDetail
-from geocontrib.views.content_managment import FeatureList
-from geocontrib.views.content_managment import FeatureDetail
-from geocontrib.views.content_managment import FeatureUpdate
-from geocontrib.views.content_managment import FeatureDelete
-from geocontrib.views.content_managment import ProjectUpdate
-from geocontrib.views.content_managment import ProjectMapping
-from geocontrib.views.content_managment import FeatureCreate
-from geocontrib.views.content_managment import FeatureTypeCreate
-from geocontrib.views.content_managment import FeatureTypeDetail
-from geocontrib.views.content_managment import FeatureTypeUpdate
-from geocontrib.views.content_managment import ImportFromGeoJSON
-from geocontrib.views.content_managment import ImportFromImage
-from geocontrib.views.content_managment import ProjectCreate
-from geocontrib.views.content_managment import CommentCreate
-from geocontrib.views.content_managment import AttachmentCreate
-from geocontrib.views.content_managment import ProjectMembers
-from geocontrib.views.content_managment import ProjectTypeListView
-from geocontrib.views.content_managment import SubscribingView
+from geocontrib.views import HomePageView
+from geocontrib.views import MyAccount
+from geocontrib.views import ProjectDetail
+from geocontrib.views import FeatureList
+from geocontrib.views import FeatureDetail
+from geocontrib.views import FeatureUpdate
+from geocontrib.views import FeatureDelete
+from geocontrib.views import ProjectUpdate
+from geocontrib.views import ProjectMapping
+from geocontrib.views import FeatureCreate
+from geocontrib.views import FeatureTypeCreate
+from geocontrib.views import FeatureTypeDetail
+from geocontrib.views import FeatureTypeUpdate
+from geocontrib.views import ImportFromGeoJSON
+from geocontrib.views import ImportFromImage
+from geocontrib.views import ProjectCreate
+from geocontrib.views import CommentCreate
+from geocontrib.views import AttachmentCreate
+from geocontrib.views import ProjectMembers
+from geocontrib.views import ProjectTypeListView
+from geocontrib.views import SubscribingView
 
 
 app_name = 'geocontrib'

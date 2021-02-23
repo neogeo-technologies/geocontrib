@@ -1,5 +1,4 @@
 import json
-import logging
 
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Polygon
@@ -10,12 +9,12 @@ from rest_framework import generics
 from rest_framework import views
 from rest_framework.pagination import LimitOffsetPagination
 
+from api import logger
 from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureSearchSerializer
 from geocontrib.models import Feature
 from geocontrib.models import Project
 
-logger = logging.getLogger(__name__)
 
 User = get_user_model()
 

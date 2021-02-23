@@ -94,8 +94,7 @@ Vous pouvez utiliser ces paramètres avec plusieurs couches pour ainsi rendre vi
 une autre couche à d'autres échelles.
 
 **opacity :**
-Vous pouvez moduler l'opacité d'une couche à l'aide de l'option `opacity` 
-(cf. https://leafletjs.com/reference-1.5.0.html#gridlayer-opacity)
+Vous pouvez moduler l'opacité d'une couche à l'aide de l'option `opacity`.
 
 ## Fonds cartographiques
 Chaque projet dispose de sa propre configuration des fonds cartographiques. Cette fonction est accessible aux 

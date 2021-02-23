@@ -1,7 +1,12 @@
 {% extends "geocontrib/base.html" %}
-
+{% load staticfiles %}
 
 {% block title %}{{ title }}{% endblock %}
+
+{% block custom_resources %}
+{{ block.super }}
+<script src="{% static 'geocontrib/js/colors_style.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
 
 {% block content %}
 
@@ -55,6 +60,26 @@
       </div>
     </div>
 
+    <div class="custom_style" id="id_style_container" style="display: none;">
+      <div class="list_selection" id="id_list_selection">
+        <div class="ui selection dropdown" tabindex="0">
+          <input type="hidden">
+          <div class="text" id="id_list_label_selected">Sélectionner la liste de valeurs</div>
+          <i class="dropdown icon"></i>
+          <div class="menu" tabindex="-1" id="id_list_menu">
+          </div>
+        </div>
+      </div>
+      <div class="colors_selection" id="id_colors_selection" hidden>
+      </div>
+    </div>
+    <!-- A partir des valeur choisis dans id_list_menu et id_colors_selection  on le mettra dabs form.colors_style.value -->
+    <div class="hidden_field" id="id_colors_style_textarea" hidden>
+      <label for="{{ form.colors_style.id_for_label }}">{{ form.colors_style.label }}</label>
+      {{ form.colors_style.errors }}
+      <textarea cols="40" rows="10" name="{{ form.colors_style.html_name }}" id="{{ form.colors_style.id_for_label }}">{{ form.colors_style.value }}</textarea>
+    </div>
+
     <div id="formsets">
       {{ formset.management_form }}
       {{ formset.non_form_errors }}
@@ -62,7 +87,7 @@
           {% for hidden in form.hidden_fields %}
             {{ hidden }}
           {% endfor %}
-        <div class="ui teal segment">
+        <div class="ui teal segment pers-field">
           <h4>
             Champ personnalisé
             <button class="ui small compact right floated icon button remove-field" type="button"><i class="ui times icon"></i></button>
@@ -100,7 +125,7 @@
               </div>
               <div class="required field">
                 <label for="{{ form.field_type.id_for_label }}">{{ form.field_type.label }}</label>
-                <div class="ui selection dropdown">
+                <div class="ui selection dropdown disabled">
                   <input type="hidden" class="field-type"
                     name="{{ form.field_type.html_name }}" id="{{ form.field_type.id_for_label }}"
                     value="{{ form.field_type.value }}">
@@ -118,7 +143,7 @@
                 <label for="{{ form.options.id_for_label }}">{{ form.options.label }}</label>
                 <input type="text" maxlength="{{  form.options.field.max_length }}"
                   name="{{ form.options.html_name }}" id="{{  form.options.id_for_label }}"
-                  value="{{ form.options.value }}">
+                  value="{{ form.options.value }}" class="options-field">
                 <small>{{ form.options.help_text }}</small>
                 {{ form.options.errors }}
               </div>
@@ -185,7 +210,7 @@
 
     console.log('add-field', form_idx);
     $('#formsets').append((`
-      <div class="ui teal segment">
+      <div class="ui teal segment pers-field">
         <h4>
           Champ personnalisé
           <button class="ui small compact right floated icon button remove-field" type="button"><i class="ui times icon"></i></button>
@@ -221,7 +246,7 @@
             </div>
             <div class="required field">
               <label for="{{ formset.empty_form.field_type.id_for_label }}">{{ formset.empty_form.field_type.label }}</label>
-              <div class="ui selection dropdown">
+              <div class="ui selection dropdown disabled">
                 <input type="hidden" class="field-type"
                   name="{{ formset.empty_form.field_type.html_name }}" id="{{ formset.empty_form.field_type.id_for_label }}"
                   value="{{ formset.empty_form.field_type.value }}">
@@ -238,7 +263,7 @@
             <div class="field field-list-options required field" style="display:none;">
               <label for="{{ formset.empty_form.options.id_for_label }}">{{ formset.empty_form.options.label }}</label>
               <input type="text" maxlength="{{  formset.empty_form.options.field.max_length }}"
-                name="{{ formset.empty_form.options.html_name }}" id="{{  formset.empty_form.options.id_for_label }}">
+                name="{{ formset.empty_form.options.html_name }}" id="{{  formset.empty_form.options.id_for_label }}" class="options-field">
               <small>{{ formset.empty_form.options.help_text }}</small>
               {{ formset.options.errors }}
             </div>
@@ -252,8 +277,34 @@
     `).replace(/__prefix__/g, form_idx))
     $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
-    $('.ui.dropdown').dropdown()
+    $('.ui.dropdown').dropdown();
+
+    let event = new Event('add-field');
+    document.dispatchEvent(event);
   })
 
 </script>
+
+<style>
+  #add-field {
+    margin-top: 1em;
+  }
+
+  #id_style_container {
+    display: flex;
+    height: 100%;
+  }
+
+  #id_colors_selection {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+  }
+  .color-input {
+    margin-left: 1em;
+  }
+  .color-input > label {
+    margin-right: 0.5em;
+  }
+</style>
 {% endblock %}
