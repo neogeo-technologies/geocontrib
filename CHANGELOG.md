@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
-## [1.3.0] - 2021-02-23
+## [1.3.1] - 2021-02-23
 
 ### Changed
 - Redmine 10053 : Can change color of a feature against its custom field value
@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - Renamed Collab to Geocontrib in some mails
+
+## [1.3.0] - 2021-02-23
+Never released
 
 ## [1.2.3] - 2021-02-11
 
