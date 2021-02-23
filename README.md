@@ -137,3 +137,11 @@ Reportez-vous au README.md présent dans le répertoire `plugin_georchestra`.
 ```
 python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > dump.json
 ```
+
+## Génération du graphique du modèle
+
+Après avoir install graphiz et les django extensions
+
+    ./manage.py graph_models --pygraphviz geocontrib --output docs/model.png
+
+Le graphique est disponible ici ![docs/model.png](docs/model.png)
