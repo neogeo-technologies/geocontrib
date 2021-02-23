@@ -63,21 +63,10 @@
           <div class="text" id="id_list_label_selected">Sélectionner la liste de valeurs</div>
           <i class="dropdown icon"></i>
           <div class="menu" tabindex="-1" id="id_list_menu">
-            <!-- liste des field-type == liste a généré depuis le js -->
-            <!-- <div class="item" data-value="list_name_1">list_label_1</div>
-            <div class="item" data-value="list_name_2">list_label_2</div>
-            <div class="item active selected" data-value="list_name_selected" selected="">list_label_selected</div> -->
           </div>
         </div>
       </div>
       <div class="colors_selection" id="id_colors_selection" hidden>
-        <!-- Liste de couleurs à généré depuis le js -->
-        <!-- <label for="id_color_preums">preums</label>
-        <input type="color" style="width:100%;height:38px;" id="id_color_preums" value="id_color_value">
-        <label for="id_color_deuz">deuz</label>
-        <input type="color" style="width:100%;height:38px;" id="id_color_deuz" value="id_color_value">
-        <label for="id_color_tercio">tercio</label>
-        <input type="color" style="width:100%;height:38px;" id="id_color_tercio" value="id_color_value"> -->
       </div>
     </div>
     <!-- A partir des valeur choisis dans id_list_menu et id_colors_selection  on le mettra dabs form.colors_style.value -->
@@ -126,7 +115,7 @@
               </div>
               <div class="required field">
                 <label for="{{ form.field_type.id_for_label }}">{{ form.field_type.label }}</label>
-                <div class="ui selection dropdown">
+                <div class="ui selection dropdown disabled">
                   <input type="hidden" class="field-type" name="{{ form.field_type.html_name }}" id="{{ form.field_type.id_for_label }}" value="{{ form.field_type.value }}">
                   <div class="default text"></div>
                   <i class="dropdown icon"></i>
@@ -140,7 +129,14 @@
               </div>
               <div class="field field-list-options required field" style="display:none;">
                 <label for="{{ form.options.id_for_label }}">{{ form.options.label }}</label>
-                <input type="text" maxlength="{{  form.options.field.max_length }}" name="{{ form.options.html_name }}" id="{{  form.options.id_for_label }}" value="{{ form.options.value }}">
+                <input
+                  type="text"
+                  maxlength="{{  form.options.field.max_length }}"
+                  name="{{ form.options.html_name }}"
+                  id="{{  form.options.id_for_label }}"
+                  class="options-field"
+                  value="{{ form.options.value }}"
+                >
                 <small>{{ form.options.help_text }}</small>
                 {{ form.options.errors }}
               </div>
@@ -212,7 +208,7 @@
 
     console.log('add-field', form_idx);
     $('#formsets').append((`
-      <div class="ui teal segment">
+      <div class="ui teal segment pers-field">
         <h4>
           Champ personnalisé
           <button class="ui small compact right floated icon button remove-field" type="button"><i class="ui times icon"></i></button>
@@ -248,7 +244,7 @@
             </div>
             <div class="required field">
               <label for="{{ formset.empty_form.field_type.id_for_label }}">{{ formset.empty_form.field_type.label }}</label>
-              <div class="ui selection dropdown">
+              <div class="ui selection dropdown disabled">
                 <input type="hidden" class="field-type"
                   name="{{ formset.empty_form.field_type.html_name }}" id="{{ formset.empty_form.field_type.id_for_label }}"
                   value="{{ formset.empty_form.field_type.value }}">
@@ -265,7 +261,7 @@
             <div class="field field-list-options required field" style="display:none;">
               <label for="{{ formset.empty_form.options.id_for_label }}">{{ formset.empty_form.options.label }}</label>
               <input type="text" maxlength="{{  formset.empty_form.options.field.max_length }}"
-                name="{{ formset.empty_form.options.html_name }}" id="{{  formset.empty_form.options.id_for_label }}">
+                name="{{ formset.empty_form.options.html_name }}" id="{{  formset.empty_form.options.id_for_label }}" class="options-field">
               <small>{{ formset.empty_form.options.help_text }}</small>
               {{ formset.options.errors }}
             </div>
@@ -279,7 +275,10 @@
     `).replace(/__prefix__/g, form_idx))
     $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
-    $('.ui.dropdown').dropdown()
+    $('.ui.dropdown').dropdown();
+
+    let event = new Event('add-field');
+    document.dispatchEvent(event);
   })
 </script>
 
