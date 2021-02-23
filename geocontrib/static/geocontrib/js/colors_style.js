@@ -75,6 +75,12 @@ function initColorDisplay() {
   colors_selection_container.innerHTML = '';
 
   let styleData = JSON.parse(document.getElementById('id_colors_style').value);
+  if (!styleData) {
+    styleData = {
+      custom_field_name: "",
+      colors: {}
+    }
+  }
   if (Object.keys(styleData.colors).length) {
     for (const [label, color] of Object.entries(styleData.colors)) {
       const colorDiv = document.createElement('div');
@@ -99,6 +105,12 @@ function initColorDisplay() {
 
 function displayColorSelection() {
   let styleData = JSON.parse(document.getElementById('id_colors_style').value);
+  if (!styleData) {
+    styleData = {
+      custom_field_name: "",
+      colors: {}
+    }
+  }
   let colors_selection_container = document.getElementById('id_colors_selection');
 
   if (this.value && this.value !== styleData.custom_field_name) {
@@ -203,6 +215,12 @@ window.addEventListener('load', function () {
 
   // On affiche les sélecteurs de couleurs si on a style enregistré
   let styleData = JSON.parse(document.getElementById('id_colors_style').value);
+  if (!styleData) {
+    styleData = {
+      custom_field_name: "",
+      colors: {}
+    }
+  }
   if (styleData.custom_field_name.length) {
     let customFieldInput = document.getElementById('id_list_selection').getElementsByTagName('input')[0];
     let customFieldText = document.getElementById('id_list_selection').getElementsByClassName('text')[0];
