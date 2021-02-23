@@ -23,4 +23,4 @@ __all__ = [
 
 logger = logging.getLogger(__name__)
 
-default_app_config = 'geocontrib.apps.CollabConfig'
+default_app_config = 'geocontrib.apps.GeocontribConfig'
