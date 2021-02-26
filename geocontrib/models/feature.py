@@ -203,10 +203,6 @@ class FeatureType(models.Model):
         if self.colors_style:
             if not isinstance(self.colors_style, dict):
                 raise ValidationError('Format de donnée invalide')
-            custom_field_name = self.colors_style.get('custom_field_name')
-            colors = self.colors_style.get('colors')
-            if not custom_field_name or not colors:
-                raise ValidationError('Format de donnée invalide')
 
     def save(self, *args, **kwargs):
         if not self.pk and self.title:
