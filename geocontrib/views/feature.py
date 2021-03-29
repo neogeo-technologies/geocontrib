@@ -276,7 +276,6 @@ class FeatureDetail(BaseMapContextMixin, UserPassesTestMixin, View):
         serialized_events = EventSerializer(events, many=True)
 
         context = self.get_context_data(feature_id=feature_id)
-        logger.error(context['serialized_features'])
         context['feature'] = feature
         context['feature_data'] = feature.custom_fields_as_list
         context['linked_features'] = serialized_link.data

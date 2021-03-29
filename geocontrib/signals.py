@@ -197,6 +197,8 @@ def create_event_on_project_creation(sender, instance, created, **kwargs):
 def create_event_on_feature_create(sender, instance, created, **kwargs):
     # Pour la modification d'un signalement l'évènement est generé parallelement
     # à l'update() afin de recupere l'utilisateur courant.
+    # Le signalement peut etre en 'pending' dés la création
+    # on force le has_changed pour event.ping_users()
     if created:
         Event = apps.get_model(app_label='geocontrib', model_name="Event")
         Event.objects.create(
@@ -208,7 +210,11 @@ def create_event_on_feature_create(sender, instance, created, **kwargs):
             feature_type_slug=instance.feature_type.slug,
             data={
                 'extra': instance.feature_data,
-                'feature_title': instance.title
+                'feature_title': instance.title,
+                'feature_status': {
+                    'has_changed': True,
+                    'new_status': instance.status
+                }
             }
         )
 
