@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+### Fixed
+- Security issues with Pillow and DRF
+
 ## [1.3.2] - 2021-02-23
 
 ### Changed
