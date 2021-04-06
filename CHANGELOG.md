@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Redmine 10338 : can create a feature type that has no list of values custom field and colors associated to it
 - Redmine 10472 : moderators are notified on pending features
+- Redmine 10683 : send valid links in emails
 - Security issues with Pillow and DRF
 
 ## [1.3.2] - 2021-02-23

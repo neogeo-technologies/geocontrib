@@ -57,6 +57,7 @@ Copier le contenu du fichier /src/config_sample/settings.py dans /config/setting
 * LOGIN_URL https://docs.djangoproject.com/fr/3.1/ref/settings/#login-url
 
 Éditer les paramètres spécifiques à l'outil dans /config/settings.py :
+* BASE_URL : URL du site, par exemple "https://geocontrib.deme.neogeo.fr"
 * DEFAULT_SENDING_FREQUENCY : fréquence d'envoi des notifications par email (never/instantly/daily/weekly)
 * APPLICATION_NAME : nom de l'application telle qu'elle apparaît dans l'IHM
 * APPLICATION_ABSTRACT : description de l'application en langage naturel
