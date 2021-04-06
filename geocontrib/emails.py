@@ -3,16 +3,12 @@ from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from django.contrib.sites.models import Site
 
 import logging
 logger = logging.getLogger(__name__)
 
-try:
-    CURRENT_SITE_DOMAIN = Site.objects.get_current().domain
-except Exception:
-    CURRENT_SITE_DOMAIN = 'http://SETUP-URL-IN-ADMIN'
-    logger.warning('Sites not migrated yet. Please make sure you have Sites setup on Django Admin')
+
+BASE_URL = getattr(settings, 'BASE_URL', '')
 
 
 class EmailBaseBuilder(object):
@@ -45,7 +41,7 @@ class EmailBaseBuilder(object):
 def notif_moderators_pending_features(emails, context):
     feature = context['feature']
 
-    context['url_feature'] = urljoin(CURRENT_SITE_DOMAIN, feature.get_absolute_url())
+    context['url_feature'] = urljoin(BASE_URL, feature.get_absolute_url())
 
     subject = "[GéoContrib:{project_slug}] Un signalement est en attente de publication.".format(
         project_slug=feature.project.slug
@@ -74,7 +70,7 @@ def notif_suscribers_project_event(emails, context):
 def notif_creator_published_feature(emails, context):
     feature = context['feature']
 
-    context['url_feature'] = urljoin(CURRENT_SITE_DOMAIN, feature.get_view_url())
+    context['url_feature'] = urljoin(BASE_URL, feature.get_view_url())
 
     subject = "[GéoContrib:{project_slug}] Confirmation de la publication de l'un de vos signalements.".format(
         project_slug=feature.project.slug
