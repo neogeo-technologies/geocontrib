@@ -42,8 +42,7 @@ def get_identity(user_a, user_b):
 
 @register.filter
 def absurl(relative_url):
-    if isinstance(relative_url, str):
-        url = urljoin(CURRENT_SITE_DOMAIN, relative_url)
-    else:
-        url = str(relative_url)
+    if not isinstance(relative_url, str):
+        relative_url = str(relative_url)
+    url = urljoin(CURRENT_SITE_DOMAIN, relative_url)
     return url
