@@ -6,7 +6,7 @@ GéoContrib est un outil libre de signalement contributif et collaboratif. Une v
 
 ### Prérequis
 
-* Python 3.5
+* Python 3.7 (minimum 3.6)
 * Instance de PostgreSQL/PostGIS avec une base de données dédiée à l'application 
 (cf. paramètre DATABASES du fichier settings.py)
 
