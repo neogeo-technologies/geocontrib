@@ -211,6 +211,7 @@ class Event(models.Model):
                     context = {
                         'feature': feature,
                         'event_initiator': event_initiator,
+                        'user_organization_name': settings.USER_ORGANIZATION_NAME,
                     }
                     logger.debug(moderators__emails)
                     try:
