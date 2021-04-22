@@ -162,29 +162,30 @@ const mapUtil = {
 	addLayers: function (layers, serviceMap, optionsMap) {
 		if (layers) {
 			layers.forEach((layer) => {
-				const options = layer.options;
-				if (options) {
-					options.opacity = layer.opacity;
+				if(layer){
+					const options = layer.options;
+					if (options) {
+						options.opacity = layer.opacity;
 
-					if (layer.schema_type === 'wms') {
-						let leafletLayer;
-						if (layer.queryable) {
-							options.title = layer.title;
-							leafletLayer = L.tileLayer
-								.betterWms(layer.service, options)
-								.addTo(map);
-						} else {
-							leafletLayer = L.tileLayer
-								.wms(layer.service, options)
-								.addTo(map);
+						if (layer.schema_type === 'wms') {
+							let leafletLayer;
+							if (layer.queryable) {
+								options.title = layer.title;
+								leafletLayer = L.tileLayer
+									.betterWms(layer.service, options)
+									.addTo(map);
+							} else {
+								leafletLayer = L.tileLayer
+									.wms(layer.service, options)
+									.addTo(map);
+							}
+							dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
+						} else if (layer.schema_type === 'tms') {
+							const leafletLayer = L.tileLayer(layer.service, options).addTo(map);
+							dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
 						}
-						dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
-					} else if (layer.schema_type === 'tms') {
-						const leafletLayer = L.tileLayer(layer.service, options).addTo(map);
-						dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
 					}
 				}
-			 
 			});
 		} else {
 			L.tileLayer(serviceMap, optionsMap).addTo(map);
@@ -213,6 +214,10 @@ const mapUtil = {
 	},
 
 	updateOrder(layers) {
+		// First remove existing layers undefined
+		layers = layers.filter(function(x) {
+			return x !== undefined;
+		});
 		// First remove existing layers
 		map.eachLayer((leafLetlayer) => {
 			layers.forEach((layerOptions) => {

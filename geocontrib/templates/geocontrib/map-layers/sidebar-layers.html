@@ -211,8 +211,11 @@
         ghostClass: 'blue-background-class',
         dragClass: 'white-opacity-background-class',
         onEnd: (event) => {
-          // Change order of the selected layer
           baseMaps[selectedBasemapIndex].layers.splice(event.newIndex, 0, baseMaps[selectedBasemapIndex].layers.splice(event.oldIndex, 1)[0]);
+          // Remove existing layers undefined
+          baseMaps[selectedBasemapIndex].layers = baseMaps[selectedBasemapIndex].layers.filter(function(x) {
+            return x !== undefined;
+          });
           const eventOrder = new CustomEvent('change-layers-order', {
             detail: {
               layers: baseMaps[selectedBasemapIndex].layers
