@@ -23,8 +23,11 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 			// Make an AJAX request to the server and hope for the best
 			var params = this.getFeatureInfoUrl(evt.latlng);
 			var showResults = L.Util.bind(this.showGetFeatureInfo, this);
+			let getUrl = window.location;
+			let baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+			let url = baseUrl + `/api/proxy/`;
 			$.ajax({
-				url: `/api/proxy/`,
+				url: url,
 				data: params,
 				dataType: "json",
 				success: function (data, status, xhr) {
