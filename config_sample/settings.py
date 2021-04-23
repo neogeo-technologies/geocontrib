@@ -240,6 +240,3 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 
 # 10683
 BASE_URL = config('BASE_URL', default='http://localhost:8000')
-
-# User organization
-USER_ORGANIZATION_NAME = 'GéoContrib de Géo2France'
