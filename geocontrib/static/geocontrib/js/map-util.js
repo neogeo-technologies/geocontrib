@@ -19,35 +19,35 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 
 	getFeatureInfo: function (evt) {
 		if (this.wmsParams.basemapId != undefined) {
-      const queryableLayerSelected = document.getElementById(`queryable-layers-selector-${this.wmsParams.basemapId}`).getElementsByClassName('selected')[0].innerHTML;
-      if (queryableLayerSelected === this.wmsParams.title) {
-        // Make an AJAX request to the server and hope for the best
-        var params = this.getFeatureInfoUrl(evt.latlng);
-        var showResults = L.Util.bind(this.showGetFeatureInfo, this);
-        let getUrl = window.location;
-        let baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
-        let url = baseUrl + `/api/proxy/`;
-        $.ajax({
-          url: url,
-          data: params,
-          dataType: "json",
-          success: function (data, status, xhr) {
-            var err = typeof data === 'object' ? null : data;
-            if (data.features || err) {
-              showResults(err, evt.latlng, data);
-            }
+			const queryableLayerSelected = document.getElementById(`queryable-layers-selector-${this.wmsParams.basemapId}`).getElementsByClassName('selected')[0].innerHTML;
+			if (queryableLayerSelected === this.wmsParams.title) {
+				// Make an AJAX request to the server and hope for the best
+				var params = this.getFeatureInfoUrl(evt.latlng);
+				var showResults = L.Util.bind(this.showGetFeatureInfo, this);
+				let getUrl = window.location;
+				let baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+				let url = baseUrl + `/api/proxy/`;
+				$.ajax({
+					url: url,
+					data: params,
+					dataType: "json",
+					success: function (data, status, xhr) {
+						var err = typeof data === 'object' ? null : data;
+						if (data.features || err) {
+							showResults(err, evt.latlng, data);
+						}
 
 					}
 				});
 			}
 		}
 	},
-	
+
 	getFeatureInfoUrl: function (latlng) {
 		// Construct a GetFeatureInfo request URL given a point
 		var point = this._map.latLngToContainerPoint(latlng, this._map.getZoom());
 		var size = this._map.getSize(),
-				
+
 				params = {
 					url: this._url,
 					request: 'GetFeatureInfo',
@@ -56,7 +56,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 					srs: 'EPSG:4326',
 					// styles: this.wmsParams.styles,
 					// transparent: this.wmsParams.transparent,
-					version: this.wmsParams.version,      
+					version: this.wmsParams.version,
 					// format: this.wmsParams.format,
 					bbox: this._map.getBounds().toBBoxString(),
 					height: size.y,
@@ -65,13 +65,13 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 					query_layers: this.wmsParams.layers,
 					info_format: 'application/json'
 				};
-		
+
 		params[params.version === '1.3.0' ? 'i' : 'x'] = Math.floor(point.x);
 		params[params.version === '1.3.0' ? 'j' : 'y'] = Math.floor(point.y);
-		
+
 		return params;
 	},
-	
+
 	showGetFeatureInfo: function (err, latlng, data) {
 
 		let content;
@@ -88,7 +88,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 					.setContent(content)
 					.openOn(this._map);
 		} else {
-		
+
 			// Otherwise show the content in a popup
 			let contentLines = [];
 			let contentTitle;
@@ -115,7 +115,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 });
 
 L.tileLayer.betterWms = function (url, options) {
-	return new L.TileLayer.BetterWMS(url, options);  
+	return new L.TileLayer.BetterWMS(url, options);
 };
 
 const mapUtil = {
