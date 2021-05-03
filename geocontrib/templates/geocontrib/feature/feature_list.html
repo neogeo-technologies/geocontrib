@@ -212,6 +212,7 @@
 
 
 <script>
+
   function getDataFilters() {
     var $form = $("#form-filters").serializeArray()
     var requestURL = '';
@@ -281,6 +282,8 @@
     var main = parseInt($("main").css("height"), 10)
     $("#map").css("height", main - 150)
 
+
+    window.proxy_url = "{% url "api:proxy" %}";
     // Load into js variables the python context.
     const features = JSON.parse(document.getElementById('features').textContent) ?
       JSON.parse(document.getElementById('features').textContent).features : null;
@@ -350,6 +353,7 @@
     }
 
     let geocoder;
+
     // Get the settings.py variable SELECTED_GEOCODER_PROVIDER. This way avoids XCC attacks
     const geocoderLabel = JSON.parse(document.getElementById('selected-provider').textContent);
     if (geocoderLabel) {
