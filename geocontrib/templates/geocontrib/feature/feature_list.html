@@ -228,6 +228,8 @@
   }
 
   $(document).ready(function () {
+    // FIX TEMPORAIRE POUR EFFACER TOUJOURS LE LOCALSTORAGE
+    localStorage.removeItem('geocontrib-map-options');
 
     $('.ui.menu .item').tab({
       history: true,

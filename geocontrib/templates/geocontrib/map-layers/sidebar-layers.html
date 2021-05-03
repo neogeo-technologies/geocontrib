@@ -50,7 +50,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     // Check in the locastorage if the options already exists
-    const mapOptions = JSON.parse(localStorage.getItem('geocontrib-map-options'));
+    const mapOptions = JSON.parse(localStorage.getItem('geocontrib-map-options')) || {};
     if (mapOptions 
         && mapOptions[project]) {
 
@@ -246,7 +246,7 @@
 
         // Set in the store the last basemap used
         let mapOptions = localStorage.getItem('geocontrib-map-options') || {};
-        mapOptions = mapOptions ? JSON.parse(mapOptions) : {};
+        mapOptions = mapOptions.length ? JSON.parse(mapOptions) : {};
 
         mapOptions[project] = {
           ...mapOptions[project],
@@ -307,14 +307,14 @@
   // Check if there are changes in the basemaps settings. Changes are detected if:
   // - one basemap has been added or deleted
   // - one layer has been added or deleted to a basemap
-  function areChangesInBasemaps(basemapFromServer, basemapFromLocalstorage) {
+  function areChangesInBasemaps(basemapFromServer, basemapFromLocalstorage={}) {
     let isSameBasemaps = false;
     let isSameLayers = true;
     let isSameTitles = true;
 
     // Compare the length and the id values of the basemaps
     const idBasemapsServer = basemapFromServer.map(b => b.id).sort();
-    const idBasemapsLocalstorage = basemapFromLocalstorage.map(b => b.id).sort();
+    const idBasemapsLocalstorage = basemapFromLocalstorage.length ? basemapFromLocalstorage.map(b => b.id).sort() : {};
     isSameBasemaps = (idBasemapsServer.length === idBasemapsLocalstorage.length
       && idBasemapsServer.every((value, index) => value === idBasemapsLocalstorage[index]))
 
@@ -322,14 +322,15 @@
     outer_block: {
       for(let basemapServer of basemapFromServer) {
         let idLayersServer = basemapServer.layers.map(b => b.id).sort();
-      
-        for (let basemapLocalstorage of basemapFromLocalstorage) {
-          if (basemapServer.id === basemapLocalstorage.id) {
-            let idLayersLocalstorage = basemapLocalstorage.layers.map(b => b.id).sort();
-            isSameLayers = (idLayersServer.length === idLayersLocalstorage.length
-              && idLayersServer.every((value, index) => value === idLayersLocalstorage[index]));
-            if (!isSameLayers) {
-              break outer_block;
+        if (basemapFromLocalstorage.length){
+          for (let basemapLocalstorage of basemapFromLocalstorage) {
+            if (basemapServer.id === basemapLocalstorage.id) {
+              let idLayersLocalstorage = basemapLocalstorage.layers.map(b => b.id).sort();
+              isSameLayers = (idLayersServer.length === idLayersLocalstorage.length
+                && idLayersServer.every((value, index) => value === idLayersLocalstorage[index]));
+              if (!isSameLayers) {
+                break outer_block;
+              }
             }
           }
         }
@@ -337,7 +338,7 @@
 
       // Compare basemaps titles
       const titlesBasemapsServer = basemapFromServer.map(b => b.title).sort();
-      const titlesBasemapsLocalstorage = basemapFromLocalstorage.map(b => b.title).sort();
+      const titlesBasemapsLocalstorage = basemapFromLocalstorage.length ? basemapFromLocalstorage.map(b => b.title).sort() : {};
 
       isSameTitles = titlesBasemapsServer.every((title, index) => title === titlesBasemapsLocalstorage[index]);
 
@@ -349,8 +350,8 @@
   }
 
   function setLocalstorageMapOptions(basemaps) {
-    let mapOptions = localStorage.getItem('geocontrib-map-options');
-    mapOptions = mapOptions ? JSON.parse(mapOptions) : {};
+    let mapOptions = localStorage.getItem('geocontrib-map-options') || {};
+    mapOptions = mapOptions.length ? JSON.parse(mapOptions) : {};
     mapOptions[project] = {
       ...mapOptions[project],
       'basemaps': basemaps
