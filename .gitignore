@@ -99,4 +99,7 @@ config/__init__.py
 # MacOS
 .DS_Store
 
+# vim
+*.sw[op]
+
 docker/docker-compose.override.yaml

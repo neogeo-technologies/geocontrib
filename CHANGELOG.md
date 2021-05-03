@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 10338 : can create a feature type that has no list of values custom field and colors associated to it
 - Redmine 10472 : moderators are notified on pending features
 - Redmine 10683 : send valid links in emails
+- Redmine 10571 : in the search map, layers can be moved if a layer is queryable
+- Redmine 10570 : in the search map, can query a layer if a URL prefix is in use
+- Redmine 10709 : improved the mail sent to the moderators
+- Redmine 10344 : in the search map, old users can see the dropdown to select the layer to query
+- Redmine 10683 : links in the email notifications now work
 - Security issues with Pillow and DRF
 
 ## [1.3.2] - 2021-02-23
