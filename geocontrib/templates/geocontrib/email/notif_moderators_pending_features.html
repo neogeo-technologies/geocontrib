@@ -3,14 +3,15 @@
   <br>
   <p>Vous recevez ce message automatique en tant que modérateur du projet {{ feature.project.title|title }}.</p>
   <p>Nous vous signalons que le signalement suivant est mis attente de publication par {{ event_initiator.get_full_name|default:event_initiator.username }},</p>
-  <p>Vous pouvez confirmer sa publication en editant son statut.</p>
+  <p>Vous pouvez confirmer sa publication en passant son statut de « en attente de publication » à « publié ».</p>
   <br>
-  <a
+  <p>Lien direct vers le signalement : <a
     href="{{ url_feature }}">
       {{ feature.title }}
-  </a>
+    </a>
+  </p>
   <br>
   <span style="font-family:verdana,geneva,sans-serif; font-size:11px">
-    -- Ce message a été automatiquement envoyé par le site GéoContrib.
+    -- Ce message a été automatiquement envoyé par l'outil {{ application_name }} de {{ application_abstract }}.
   </span>
 </span>

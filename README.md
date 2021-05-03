@@ -14,7 +14,7 @@ GéoContrib est un outil libre de signalement contributif et collaboratif. Une v
 
 ```shell
 # Création d'un environnement virtuel Python
-python3.5 -m venv geocontrib_venv/
+python3 -m venv geocontrib_venv/
 
 # Activation de cet environnement
 source geocontrib_venv/bin/activate

@@ -18,25 +18,25 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 	},
 
 	getFeatureInfo: function (evt) {
-		if (this.wmsParams.basemapId != undefined){
-			const queryableLayerSelected = document.getElementById(`queryable-layers-selector-${this.wmsParams.basemapId}`).getElementsByClassName('selected')[0].innerHTML;
-			if (queryableLayerSelected === this.wmsParams.title) {
-				// Make an AJAX request to the server and hope for the best
-				var params = this.getFeatureInfoUrl(evt.latlng);
-				var showResults = L.Util.bind(this.showGetFeatureInfo, this);
-				$.ajax({
-					url: `/api/proxy/`,
-					data: params,
-					dataType: "json",
-					success: function (data, status, xhr) {
-						var err = typeof data === 'object' ? null : data;
-						if (data.features || err) {
-							showResults(err, evt.latlng, data);
-						}
-					},
-					error: function (xhr, status, error) {
-						if (!error) { error = 'Erreur lors du getFeatureInfo sur la carte' }
-						showResults(error, evt.latlng);
+		if (this.wmsParams.basemapId != undefined) {
+      const queryableLayerSelected = document.getElementById(`queryable-layers-selector-${this.wmsParams.basemapId}`).getElementsByClassName('selected')[0].innerHTML;
+      if (queryableLayerSelected === this.wmsParams.title) {
+        // Make an AJAX request to the server and hope for the best
+        var params = this.getFeatureInfoUrl(evt.latlng);
+        var showResults = L.Util.bind(this.showGetFeatureInfo, this);
+        let getUrl = window.location;
+        let baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+        let url = baseUrl + `/api/proxy/`;
+        $.ajax({
+          url: url,
+          data: params,
+          dataType: "json",
+          success: function (data, status, xhr) {
+            var err = typeof data === 'object' ? null : data;
+            if (data.features || err) {
+              showResults(err, evt.latlng, data);
+            }
+
 					}
 				});
 			}
