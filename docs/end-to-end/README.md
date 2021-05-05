@@ -23,7 +23,6 @@ http://www.apache.org/licenses/LICENSE-2.0
 - [Fonctionnalités testées](#Fonctionnalités-testées)
     - [Connexion](#Connexion)
     - [Création d'objets](#Création-d'objets)
-    - [En cours de développement : GeoJson](#En-cours-de-développement-:-GeoJson)
 - [Lancement des tests](#Lancement-des-tests)
 - [Méthodologie utilisée](#Méthodologie-utilisée)
 
@@ -35,11 +34,13 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 ### Prérequis
 
-GeoContrib
-geocontrib_venv activé
+Mozilla Firefox 88.0
+GeoContrib 1.2 ou 1.3
+
+L'utilisation d'un environnement virtuel est recommandée
 
 ```shell
-# Installation des outils de test
+# Installation des outils de test et du driver
 pip install -r src/docs/end-to-end/requirements.txt
 ```
 
@@ -48,24 +49,22 @@ pip install -r src/docs/end-to-end/requirements.txt
 ### Variables à éditer dans test_suite.robot
 
 - ${URL}
-- ${SUPERUSERNAME} : attention, dans cette version, l'utilisateur doit avoir les droits d'administration
+- ${SUPERUSERNAME}  Utilisateur avec droits d'administration, de super-utilisateur et de gestionnaire équipe
 - ${SUPERUSERPASSWORD} 
 
 
 ## Fonctionnalités testées
 
 ### Connexion
+
     - avec un compte superuser
     - déconnexion
 
 ### Création d'objets
+
     - projet
     - type de signalement
     - signalement
-
-### En cours de développement : GeoJson
-    - import
-    - export
 
 
 ## Lancement des tests
@@ -77,7 +76,6 @@ robot test_suite.robot
 
 ## Méthodologie utilisée
 
-- Scenarios de tests avec Katalon
-- Écriture et révision des tests avec RobotFramework
-- Création des bibliothèques Python utilisées dans les tests RobotFramework
-    
+- Enregistrement de scenarios de tests avec l'extension Katalon Recorder sur Chromium (documentation disponible sur https://docs.katalon.com/katalon-recorder/docs/overview.html)
+- Structure des tests avec RobotFramework (documentation disponible sur https://robotframework.org/)
+- Création des bibliothèques en Python
