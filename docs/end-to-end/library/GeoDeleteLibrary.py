@@ -18,10 +18,6 @@ from selenium.webdriver.support.ui import Select
 
 from utils import get_driver
 
-# TODO : il faudrait plutôt supprimer les objets directement depuis la base de données.
-# En attendant, on le fait depuis l'interface admin.
-# L'utilisateur de test doit forcément avoir les droits d'administration
-
 
 def geo_delete_project(projectname, adminurl):
     get_driver().get(adminurl)
