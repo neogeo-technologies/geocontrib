@@ -10,10 +10,11 @@ Library  ./library/GeoJson.py
 
 *** Variables ***
 
+# TODO: mettre ces variables dans un fichier à part, qui ira dans gitignore
 ${URL}  https://geocontrib.dev.neogeo.fr
 ${ADMINURL}  https://geocontrib.dev.neogeo.fr/admin
-${SUPERUSERNAME}    test_premier_utilisateur
-${SUPERUSERPASSWORD}    4uL9jyGqRiddT7X
+${SUPERUSERNAME}    [CHANGE ME]
+${SUPERUSERPASSWORD}    [CHANGE ME]
 
 ${RANDOMPROJECTNAME}   ${{ "{}eme projet".format(random.randint(1, 1000)) }}
 ${RANDOMFEATURETYPENAME}    ${{ "{}eme type".format(random.randint(1, 1000)) }}
