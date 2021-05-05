@@ -34,8 +34,8 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 ### Prérequis
 
-Mozilla Firefox 88.0
-GeoContrib 1.2 ou 1.3
+- Mozilla Firefox avec Geckodriver (https://pypi.org/project/geckodriver-autoinstaller/) ou navigateur Chromium avec ChromeDriver (https://pypi.org/project/chromedriver-py/)
+- Version de GeoContrib fournie
 
 L'utilisation d'un environnement virtuel est recommandée
 
