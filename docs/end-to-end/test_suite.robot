@@ -7,14 +7,10 @@ Library  ./library/GeoCreateLibrary.py
 Library  ./library/GeoDeleteLibrary.py
 Library  ./library/GeoJson.py
 
+Variables   ./library/tests_settings.py
+
 
 *** Variables ***
-
-# TODO: mettre ces variables dans un fichier à part, qui ira dans gitignore
-${URL}  https://geocontrib.dev.neogeo.fr
-${ADMINURL}  https://geocontrib.dev.neogeo.fr/admin
-${SUPERUSERNAME}    [CHANGE ME]
-${SUPERUSERPASSWORD}    [CHANGE ME]
 
 ${RANDOMPROJECTNAME}   ${{ "{}eme projet".format(random.randint(1, 1000)) }}
 ${RANDOMFEATURETYPENAME}    ${{ "{}eme type".format(random.randint(1, 1000)) }}
@@ -27,27 +23,33 @@ ${RANDOMFEATURENAME}    ${{ "{}eme signalement".format(random.randint(1, 1000)) 
 
 Connect GeoContrib
     Geo Connect Superuser  ${SUPERUSERNAME}  ${SUPERUSERPASSWORD}
+    Page Should Not Contain    Se connecter
 
 Create Project with Random Projectname
     Geo Create Project  ${RANDOMPROJECTNAME}
+    Page Should Contain     ${RANDOMPROJECTNAME}
 
 Create Feature Type with Random Featuretypename
     Geo Create Featuretype  ${RANDOMFEATURETYPENAME}
+    Page Should Contain     ${RANDOMFEATURETYPENAME}
 
 Create Feature with Random Featurename
-    ${X}    Generate Random String    2    [NUMBERS]
-    ${Y}    Generate Random String    2    [NUMBERS]
+    ${X}    Generate Random String    1    [NUMBERS]
+    ${Y}    Generate Random String    1    [NUMBERS]
     Geo Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
     Click Element At Coordinates       xpath=//div[@id='map']/div/div[4]/div     ${X}  ${Y}
     Click Element    xpath=//button[@type='submit']
+    Page Should Contain     ${RANDOMFEATURENAME}
 
 # TODO
 # Export GeoJson
-#     Geo Json Export
+#     Geo Json Export  ${RANDOMPROJECTNAME}
+#     # Page Should Contain     
 
 # TODO
 # Import GeoJson
 #     Geo Json Import
+#     # Page Should Contain     
 
 [Teardown]   Run Keywords    Geo Delete Feature  ${RANDOMFEATURENAME}   ${ADMINURL}
 ...          AND             Geo Delete Featuretype  ${RANDOMFEATURETYPENAME}   ${ADMINURL}

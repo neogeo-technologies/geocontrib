@@ -50,6 +50,7 @@ geckodriver*
 log.html
 output.xml
 report.html
+my_tests_settings.py
 
 # Translations
 *.mo
