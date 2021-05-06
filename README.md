@@ -23,6 +23,7 @@ source geocontrib_venv/bin/activate
 # Actuellement, la branche par défaut du projet est develop
 # Ce sera celle qui sera active par défaut immédiatement après le clonage
 git clone https://github.com/neogeo-technologies/geocontrib.git
+cd geocontrib
 
 # Installer les dépendances
 pip install -r requirements.txt
@@ -32,7 +33,7 @@ django-admin startproject config .
 
 ### Édition des fichiers settings.py et url.py
 
-Copier le contenu du fichier /config_sample/settings.py dans /config/settings.py.
+Copier le contenu du fichier config_sample/settings.py dans /config/settings.py.
 
 Éditer les paramètres classiques de Django dans /config/settings.py :
 * SECRET_KEY https://docs.djangoproject.com/en/2.2/ref/settings/#secret-key
@@ -61,14 +62,14 @@ Copier le contenu du fichier /config_sample/settings.py dans /config/settings.py
 * DEFAULT_BASE_MAP : configuration du fond de carte par défaut
 * PROJECT_COPY_RELATED : configuration des modèles de projets
 
-Copier le contenu du fichier /config_sample/urls.py dans /config/urls.py
+Copier le contenu du fichier config_sample/urls.py dans config/urls.py
 
 ### Création des tables et ajout de données initiales dans la base de données
 
 ```shell
 python manage.py migrate
-python manage.py loaddata /geocontrib/data/perm.json
-python manage.py loaddata /geocontrib/data/flatpages.json
+python manage.py loaddata geocontrib/data/perm.json
+python manage.py loaddata geocontrib/data/flatpages.json
 ```
 
 Ne faites pas attention aux messages d'avertissement suivants :
@@ -84,9 +85,9 @@ du fichier settings.py.
 Par exemple, copier les images fournies dans les sources de l'application :
 ```shell
 mkdir media
-cp /geocontrib/static/geocontrib/img/default.png media/
-cp /geocontrib/static/geocontrib/img/logo.png media/
-cp /geocontrib/static/geocontrib/img/logo-neogeo*.png media/
+cp geocontrib/static/geocontrib/img/default.png media/
+cp geocontrib/static/geocontrib/img/logo.png media/
+cp geocontrib/static/geocontrib/img/logo-neogeo*.png media/
 ```
 
 ### Création d'un superutilisateur
@@ -136,7 +137,7 @@ python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e
 
 ## Génération du graphique du modèle
 
-Après avoir installé graphiz et les extensions django
+Après avoir installé graphiz et django-extensions
 
 ```
 ./manage.py graph_models --pygraphviz geocontrib --output docs/model.png
