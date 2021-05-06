@@ -189,7 +189,7 @@ class Event(models.Model):
         event_initiator = self.user
 
         if self.object_type == 'feature':
-            Feature = apps.get_model(model_name="geocontrib.Feature")
+            Feature = apps.get_model(app_label='geocontrib', model_name='Feature')
             feature = Feature.objects.get(feature_id=self.feature_id)
             project = feature.project
             if project.moderation:
@@ -201,7 +201,7 @@ class Event(models.Model):
                 new_status = feature_status.get('new_status', 'draft')
 
                 if status_has_changed and new_status == 'pending':
-                    Authorization = apps.get_model(model_name='geocontrib.Authorization')
+                    Authorization = apps.get_model(app_label='geocontrib', model_name='Authorization')
                     moderators__emails = Authorization.objects.filter(
                         project=project, level__rank__gte=3
                     ).exclude(
@@ -211,7 +211,10 @@ class Event(models.Model):
                     context = {
                         'feature': feature,
                         'event_initiator': event_initiator,
+                        'application_name': settings.APPLICATION_NAME,
+                        'application_abstract': settings.APPLICATION_ABSTRACT,
                     }
+                    logger.debug(moderators__emails)
                     try:
                         notif_moderators_pending_features(
                             emails=moderators__emails, context=context)

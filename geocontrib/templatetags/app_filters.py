@@ -1,18 +1,14 @@
 from django.template.defaulttags import register
 from django.forms.fields import CheckboxInput
 from django.forms.fields import DateInput
+from django.conf import settings
 from urllib.parse import urljoin
-from django.contrib.sites.models import Site
 
 import logging
 
 logger = logging.getLogger(__name__)
 
-try:
-    CURRENT_SITE_DOMAIN = Site.objects.get_current().domain
-except Exception:
-    CURRENT_SITE_DOMAIN = 'http://SETUP-URL-IN-ADMIN'
-    logger.warning('Sites not migrated yet. Please make sure you have Sites setup on Django Admin')
+BASE_URL = getattr(settings, 'BASE_URL', '')
 
 
 @register.filter
@@ -42,8 +38,6 @@ def get_identity(user_a, user_b):
 
 @register.filter
 def absurl(relative_url):
-    if isinstance(relative_url, str):
-        url = urljoin(CURRENT_SITE_DOMAIN, relative_url)
-    else:
-        url = str(relative_url)
-    return url
+    if not isinstance(relative_url, str):
+        relative_url = str(relative_url)
+    return urljoin(BASE_URL, relative_url)

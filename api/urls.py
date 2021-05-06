@@ -11,7 +11,7 @@ from api.views.base_map import GetFeatureInfo
 app_name = 'api'
 
 router = routers.DefaultRouter()
-router.register(r'projects', ProjectView, base_name='projects')
+router.register(r'projects', ProjectView, basename='projects')
 
 urlpatterns = [
     path(

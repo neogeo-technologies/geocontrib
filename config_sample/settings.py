@@ -237,3 +237,6 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = config('DATA_UPLOAD_MAX_NUMBER_FIELDS', default=
 
 # 9745 & 9645 don't create temp files with 0o000
 FILE_UPLOAD_PERMISSIONS = 0o644
+
+# 10683
+BASE_URL = config('BASE_URL', default='http://localhost:8000')
