@@ -26,7 +26,8 @@
 
   <form id="form-type-edit" action="" method="post" enctype="multipart/form-data" class="ui form">
     {% csrf_token %}
-    {% for error in form.non_field_errors %}{% endfor %}
+    <!-- {% for error in form.non_field_errors %}{% endfor %} -->
+    {{ form.non_field_errors }}
     <h1>Créer un nouveau type de signalement pour le projet "{{ project.title }}"</h1>
     <p>Ces champs par défaut existent pour tous les types de signalement: </p>
     <div class="two fields">

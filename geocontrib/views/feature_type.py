@@ -83,7 +83,6 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
         form = FeatureTypeModelForm(request.POST or None)
         project = self.get_object()
         formset = self.CustomFieldsFormSet(request.POST or None)
-
         if form.is_valid() and formset.is_valid():
             feature_type = form.save(commit=False)
             feature_type.project = project
