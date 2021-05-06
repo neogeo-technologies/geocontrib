@@ -73,8 +73,6 @@
     } else {
       baseMaps = baseMapsFromServer;
     }
-    console.log(JSON.parse(JSON.stringify(baseMaps[0].layers)));
-
     // Basemap selected by default: 
     // use the active one if exists (set in localstorage), otherwise the index 0 (first basemap in the list)
     let selectedBasemapIndex = mapOptions && mapOptions[project] && mapOptions[project]['current-basemap-index'] ?
@@ -225,7 +223,6 @@
           movedLayers = movedLayers.filter(function(x) {
             return x !== undefined;
           });
-          console.log(movedLayers);
           const eventOrder = new CustomEvent('change-layers-order', {
             detail: {
               layers: movedLayers
