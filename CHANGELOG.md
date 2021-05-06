@@ -6,25 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Unreleased
 
 ### Fixed
-- Redmine 10338 : can create a feature type that has no list of values custom field and colors associated to it
-- Redmine 10472 : moderators are notified on pending features
-- Redmine 10683 : send valid links in emails
-- Redmine 10571 : in the search map, layers can be moved if a layer is queryable
-- Redmine 10570 : in the search map, can query a layer if a URL prefix is in use
-- Redmine 10709 : improved the mail sent to the moderators
-- Redmine 10344 : in the search map, old users can see the dropdown to select the layer to query
-- Redmine 10683 : links in the email notifications now work
+- Redmine 10338: can create a feature type that has no list of values custom field and colors associated to it
+- Redmine 10472: moderators are notified on pending features
+- Redmine 10683: send valid links in emails
+- Redmine 10571: in the search map, layers can be moved if a layer is queryable
+- Redmine 10570: in the search map, can query a layer if a URL prefix is in use
+- Redmine 10709: improved the mail sent to the moderators
+- Redmine 10344: in the search map, old users can see the dropdown to select the layer to query
+- Redmine 10683: links in the email notifications now work
 - Security issues with Pillow and DRF
 
 ## [1.3.2] - 2021-02-23
 
 ### Changed
-- Redmine 10053 : Can change color of a feature against its custom field value
-- Redmine 10054 + 10266 : Can query properties of basemaps
+- Redmine 10053: can change color of a feature against its custom field value
+- Redmine 10054 + 10266: can query properties of basemaps
 - Added a scale on the maps
 
 ### Fixed
 - Renamed Collab to Geocontrib in some mails
+- Redmine 10574: custom characteritics' colors are now displayed
 
 ## [1.3.0 - 1.3.1] - 2021-02-23
 Never released
@@ -32,9 +33,9 @@ Never released
 ## [1.2.3] - 2021-02-11
 
 ### Fixed
-- Redmine 10209 fixed basemaps can't be saved
-- Redmine 10228 added project menu on feature details
-- Redmine 9962 highlight django errors
+- Redmine 10209: fixed basemaps can't be saved
+- Redmine 10228: added project menu on feature details
+- Redmine 9962: highlight django errors
 
 ## [1.2.2] - 2021-02-11
 
@@ -47,32 +48,32 @@ Never released
 
 ### Fixed
 - Docker, give default values for email configuration
-- Redmine 9834 use LDAP pagination
-- Redmine 9839 improve feature import time
-- Redmine 9846 FeatureLink cleanup
-- Redmine 9848 fix admin FeatureLink filters
-- Redmine 9905 can't give an empty basemap title
-- Redmine 9926 fix impossible to create 2 features
-- Redmine 9929 fix maps icons missing
-- Redmine 9985 fix PostgreSQL view creation of a feature when adding/removing custom fields
-- Redmine 9986 fix PostgreSQL view creation when no status selected
-- Redmine 10083 fix a empty feature link removes the geometry of a feature on save
-- Redmine 10105 fix project types don't copy feature types
-- Redmine 10142 improve performance when a feature type has many features
+- Redmine 9834: use LDAP pagination
+- Redmine 9839: improve feature import time
+- Redmine 9846: FeatureLink cleanup
+- Redmine 9848: fix admin FeatureLink filters
+- Redmine 9905: can't give an empty basemap title
+- Redmine 9926: fix impossible to create 2 features
+- Redmine 9929: fix maps icons missing
+- Redmine 9985: fix PostgreSQL view creation of a feature when adding/removing custom fields
+- Redmine 9986: fix PostgreSQL view creation when no status selected
+- Redmine 10083: fix a empty feature link removes the geometry of a feature on save
+- Redmine 10105: fix project types don't copy feature types
+- Redmine 10142: improve performance when a feature type has many features
 
 
 ## [1.2.0] - 2020-12-17
 
-This evolution need a migration (manage.py migrate)
+This evolution needs a migration (manage.py migrate)
 
 ### Changed
-- Redmine 9704: Allow the management of feature links in Django admin
-- Redmine 8551: Can import features files with extention "geojson" in addition to "json"
-- Redmine 9330: A feature type can be duplicated
-- Redmine 9329: Can turn a project into a project template and instantiate a project from a project model
-- Redmine 9544: Addition of Sortable JS library
-- Redmine 9507: Added help on authorized characters
-- Redmine 9331: Imports with identical geometry are considered to be duplicates
+- Redmine 9704: allows the management of feature links in Django admin
+- Redmine 8551: can import features files with extention "geojson" in addition to "json"
+- Redmine 9330: a feature type can be duplicated
+- Redmine 9329: can turn a project into a project template and instantiate a project from a project model
+- Redmine 9544: addition of Sortable JS library
+- Redmine 9507: added help on authorized characters
+- Redmine 9331: imports with identical geometry are considered to be duplicates
 - Django admin improvements
   - Projects list ordered by title
   - FeatureType list ordered by project, title
@@ -89,7 +90,7 @@ This evolution need a migration (manage.py migrate)
 - Redmine 9654: Creating a basemap without title doesn't crash
 - Redmine 9623: A connected user doesn't see achived features if he is not allowed
 - Redmine 9745: Geolocalised images are visible
-- Redmine 9619 : Fix bug for project creation from Django
+- Redmine 9619: Fix bug for project creation from Django
 - Redmine 9490: Fix bug when a custom field is duplicated
 - Redmine 9527: Show "0" instead of « None » in the project settings
 - Redmine 9526: Fix bug for view creation from Django
@@ -101,7 +102,7 @@ This evolution need a migration (manage.py migrate)
 
 ### Changed
 - Docker image can handle forms with 10000 parameters (or more via the `DATA_UPLOAD_MAX_NUMBER_FIELDS` environement variable).
-  This allows to handle more than 500 users in the projet
+  This allows to handle more than 500 users in the project
 
 ## [1.1.2] - 2020-10-30
 
