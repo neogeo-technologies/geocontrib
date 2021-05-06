@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [1.3.3] - 2021-05-06
+
 ### Fixed
 - Redmine 10338: can create a feature type that has no list of values custom field and colors associated to it
 - Redmine 10472: moderators are notified on pending features
