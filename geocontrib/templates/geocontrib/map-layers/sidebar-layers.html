@@ -73,7 +73,6 @@
     } else {
       baseMaps = baseMapsFromServer;
     }
-
     // Basemap selected by default: 
     // use the active one if exists (set in localstorage), otherwise the index 0 (first basemap in the list)
     let selectedBasemapIndex = mapOptions && mapOptions[project] && mapOptions[project]['current-basemap-index'] ?
@@ -147,7 +146,6 @@
         queryableLayerSelector.append(queryableLayersDropdown);
         layersContainer.append(queryableLayerSelector);
       }
-
       basemap.layers.forEach((layer, i) => {
 
         // Add options information to the layer object
@@ -211,19 +209,28 @@
         ghostClass: 'blue-background-class',
         dragClass: 'white-opacity-background-class',
         onEnd: (event) => {
-          baseMaps[selectedBasemapIndex].layers.splice(event.newIndex, 0, baseMaps[selectedBasemapIndex].layers.splice(event.oldIndex, 1)[0]);
+          
+          // Get the names of the current layers in order.
+          const currentLayersNamesInOrder = Array.from(document.getElementsByClassName('layer-item transition visible')).map(el => el.children[0].innerText);
+
+          // Create an array to put the layers in order.
+          let movedLayers = [];
+          for (const layerName of currentLayersNamesInOrder) {
+            movedLayers.push(baseMaps[selectedBasemapIndex].layers.filter(el => el.title === layerName)[0]);
+          }
+
           // Remove existing layers undefined
-          baseMaps[selectedBasemapIndex].layers = baseMaps[selectedBasemapIndex].layers.filter(function(x) {
+          movedLayers = movedLayers.filter(function(x) {
             return x !== undefined;
           });
           const eventOrder = new CustomEvent('change-layers-order', {
             detail: {
-              layers: baseMaps[selectedBasemapIndex].layers
+              layers: movedLayers
             }
           })
           document.dispatchEvent(eventOrder);
           // Save the basemaps options into the localstorage
-          setLocalstorageMapOptions(baseMaps) 
+          setLocalstorageMapOptions(baseMaps)
         }
       });
     });
