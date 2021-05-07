@@ -41,7 +41,7 @@ L'utilisation d'un environnement virtuel est recommandée
 
 ```shell
 # Installation des outils de test et du driver
-pip install -r src/docs/end-to-end/requirements.txt
+pip install -r docs/end-to-end/requirements.txt
 ```
 
 ## Configuration
