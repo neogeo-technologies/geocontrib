@@ -30,6 +30,7 @@ pip install -r requirements.txt
 
 # Création d'un projet Django
 django-admin startproject config .
+```
 
 ### Édition des fichiers settings.py et url.py
 
