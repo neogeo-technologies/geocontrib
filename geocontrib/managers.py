@@ -98,6 +98,7 @@ class FeatureLinkManager(models.Manager):
 
     def related(self, feature_id):
         queryset = self.get_queryset().filter(
-            Q(feature_from__feature_id=feature_id) | Q(feature_to__feature_id=feature_id)
+            Q(feature_from__feature_id=feature_id)
+            # Q(feature_from__feature_id=feature_id) | Q(feature_to__feature_id=feature_id)
         )
         return queryset
