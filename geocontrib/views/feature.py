@@ -279,6 +279,16 @@ class FeatureDetail(BaseMapContextMixin, UserPassesTestMixin, View):
         context['feature'] = feature
         context['feature_data'] = feature.custom_fields_as_list
         context['linked_features'] = serialized_link.data
+        
+        id = str(context['feature'].feature_id)
+        index = 99999
+        for idx, value in enumerate(context['linked_features']):
+            if value['feature_to']['feature_id'] == id:
+                index = idx
+                break
+        if index != 99999:
+            context['linked_features'].pop(index)
+        
         context['permissions'] = Authorization.all_permissions(user, project, feature)
         context['events'] = serialized_events.data
         context['attachments'] = Attachment.objects.filter(
