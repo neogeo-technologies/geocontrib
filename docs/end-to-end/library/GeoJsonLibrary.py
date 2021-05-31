@@ -19,14 +19,10 @@ import selenium
 from utils import get_driver
 
 
-def geo_json_export():
+def geo_json_export(projectname):
     get_driver().find_element_by_xpath("//img").click()
-    get_driver().find_element_by_link_text(
-        u"Pour test de création de signalement"
-    ).click()
-    get_driver().find_element_by_link_text(
-        u"Pour test de création de signalement"
-    ).click()
+    get_driver().find_element_by_link_text(projectname).click()
+    get_driver().find_element_by_link_text(projectname).click()
     get_driver().find_element_by_link_text("Exporter").click()
     get_driver().find_element_by_xpath("//div[3]/div/div").click()
 

@@ -1,8 +1,8 @@
 def get_variables():
     variables = {
-                "URL": "https://geocontrib.dev.neogeo.fr",
-                "ADMINURL": "https://geocontrib.dev.neogeo.fr/admin",
-                "SUPERUSERNAME": "CHANGE ME",
-                "SUPERUSERPASSWORD": "CHANGE ME",
+                "GEOCONTRIB_URL": "https://geocontrib.dev.neogeo.fr",
+                "ADMIN_URL": "https://geocontrib.dev.neogeo.fr/admin",
+                "SUPERUSERNAME": "test_premier_utilisateur",
+                "SUPERUSERPASSWORD": "NuchUFs2qfQWThT",
                 }
     return variables
