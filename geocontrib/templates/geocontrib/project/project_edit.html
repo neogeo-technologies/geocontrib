@@ -71,7 +71,7 @@
       <div class="field">
         <label for="{{ form.archive_feature.id_for_label }}">{{ form.archive_feature.label }}</label>
         <div class="ui right labeled input">
-          <input type="number" min="{{ form.archive_feature.field.min_value }}"
+          <input type="number" min="0"
           name="{{ form.archive_feature.html_name }}" id="{{ form.archive_feature.id_for_label }}"
           value="{{ form.archive_feature.value }}">
           <div class="ui label">jour(s)</div>
@@ -81,7 +81,7 @@
       <div class="field">
         <label for="{{ form.delete_feature.id_for_label }}">{{ form.delete_feature.label }}</label>
         <div class="ui right labeled input">
-          <input type="number" min="{{ form.delete_feature.field.min_value }}"
+          <input type="number" min="0"
           name="{{ form.delete_feature.html_name }}" id="{{ form.delete_feature.id_for_label }}"
           value="{{ form.delete_feature.value }}">
           <div class="ui label">jour(s)</div>
@@ -185,19 +185,6 @@
     }
     reader.readAsDataURL(this.files[0]);
   })
-
-  function setMinInput(id_input) {
-    $(id_input).attr({
-       "min" : 0
-    });
-  }
-
-  $(document).ready(function() {
-    let id_archive_feature = '#id_archive_feature';
-    setMinInput(id_archive_feature)
-    let id_delete_feature = '#id_delete_feature';
-    setMinInput(id_delete_feature)
-  });
 
 </script>
 {% endblock %}
