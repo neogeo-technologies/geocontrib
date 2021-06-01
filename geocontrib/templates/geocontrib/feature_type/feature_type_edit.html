@@ -207,7 +207,7 @@
     $(id_form).keypress(function(event){
       var key = event.which || event.keyCode;
     if (this.selectionStart === 0) {
-        if (key > 48 && key < 57) {
+        if (key >= 48 && key <= 57) {
           event.preventDefault();
         }
       }
