@@ -23,18 +23,7 @@ from utils import get_driver
 def geo_create_layer(admin_url, layer_title, layer_url, layer_description):
     get_driver().get(admin_url)
     get_driver().find_element_by_link_text("Couches").click()
-    # TODO: si le texte layer_title n'existe pas
-        # get_driver().find_element_by_xpath("//html/body/div/div[3]/div/ul/li/a").click()
-        # get_driver().find_element_by_id("id_title").click()
-        # get_driver().find_element_by_id("id_title").clear()
-        # get_driver().find_element_by_id("id_title").send_keys(layer_title)
-        # get_driver().find_element_by_id("id_service").click()
-        # get_driver().find_element_by_id("id_service").clear()
-        # get_driver().find_element_by_id("id_service").send_keys(layer_url)
-        # get_driver().find_element_by_id("id_options").click()
-        # get_driver().find_element_by_id("id_options").clear()
-        # get_driver().find_element_by_id("id_options").send_keys(layer_description)
-        # get_driver().find_element_by_name("_save").click()
+
 
 # TODO: au lieu de layer1, layer2, faire une liste avec une boucle for
 # TODO: remplacer (wms) et (tms) par des variables

@@ -64,6 +64,7 @@ Create Project with Random Projectname
 
 Create Feature Type with Random Featuretypename
     Geo Create Featuretype  ${RANDOMFEATURETYPENAME}
+    Geo Create Featuretype  ${RANDOMFEATURETYPENAME}#2
     # Page Should Contain     ${RANDOMFEATURETYPENAME}
 
 Create Feature #1 with Random Featurename on Random Coordinates
@@ -114,7 +115,7 @@ Edit Feature
 #     Page Should Contain        - signalement édité
 
 Edit Featuretype
-    Geo Edit Featuretype      ${RANDOMFEATURETYPENAME}      ${FEATURETYPEEDITION}
+    Geo Edit Featuretype      ${RANDOMFEATURETYPENAME}#2      ${FEATURETYPEEDITION}
     # Page Should Contain        - type édité
 
 # Export GeoJson
