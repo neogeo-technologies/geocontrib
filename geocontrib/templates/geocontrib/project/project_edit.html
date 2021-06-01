@@ -185,5 +185,19 @@
     }
     reader.readAsDataURL(this.files[0]);
   })
+
+  function setMinInput(id_input) {
+    $(id_input).attr({
+       "min" : 0
+    });
+  }
+
+  $(document).ready(function() {
+    let id_archive_feature = '#id_archive_feature';
+    setMinInput(id_archive_feature)
+    let id_delete_feature = '#id_delete_feature';
+    setMinInput(id_delete_feature)
+  });
+
 </script>
 {% endblock %}
