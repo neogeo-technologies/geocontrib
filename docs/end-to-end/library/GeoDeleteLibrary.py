@@ -14,8 +14,6 @@
 # under the License.
 
 
-from selenium.webdriver.support.ui import Select
-
 from utils import get_driver
 
 

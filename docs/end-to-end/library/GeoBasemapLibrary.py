@@ -14,7 +14,6 @@
 # under the License.
 
 
-import selenium
 from selenium.webdriver.support.ui import Select
 
 from utils import get_driver
@@ -24,7 +23,7 @@ from utils import get_driver
 def geo_create_layer(admin_url, layer_title, layer_url, layer_description):
     get_driver().get(admin_url)
     get_driver().find_element_by_link_text("Couches").click()
-    # si le texte layer_title n'existe pas
+    # TODO: si le texte layer_title n'existe pas
         # get_driver().find_element_by_xpath("//html/body/div/div[3]/div/ul/li/a").click()
         # get_driver().find_element_by_id("id_title").click()
         # get_driver().find_element_by_id("id_title").clear()
@@ -47,16 +46,22 @@ def geo_create_basemap(admin_url, basemapname, projectname, layer1_title, layer1
     get_driver().find_element_by_id("id_title").send_keys(basemapname)
     get_driver().find_element_by_id("id_project").click()
     Select(get_driver().find_element_by_id("id_project")).select_by_visible_text(projectname)
+
+
     get_driver().find_element_by_link_text(u"Ajouter un objet Liaison Fond-Couche supplémentaire").click()
     get_driver().find_element_by_id("id_contextlayer_set-0-layer").click()
     Select(get_driver().find_element_by_id("id_contextlayer_set-0-layer")).select_by_visible_text("{} - {} (wms)".format(layer1_title, layer1_url))
     get_driver().find_element_by_id("id_contextlayer_set-0-queryable").click()
+
+
     get_driver().find_element_by_link_text(u"Ajouter un objet Liaison Fond-Couche supplémentaire").click()
     get_driver().find_element_by_id("id_contextlayer_set-1-layer").click()
     Select(get_driver().find_element_by_id("id_contextlayer_set-1-layer")).select_by_visible_text("{} - {} (tms)".format(layer2_title, layer2_url))
     get_driver().find_element_by_id("id_contextlayer_set-1-queryable").click()
     get_driver().find_element_by_name("_save").click()    
 
+
 def geo_query_basemap():
     pass
+# TODO
 

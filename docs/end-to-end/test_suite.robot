@@ -8,15 +8,22 @@ Library  library/GeoSearchLibrary.py
 Library  library/GeoBasemapLibrary.py
 Library  library/GeoJsonLibrary.py
 Library  library/GeoDeleteLibrary.py
+Library  library/GeoEditLibrary.py
 
 Variables   library/tests_settings.py
 
 
 *** Variables ***
 
-${RANDOMPROJECTNAME}   ${{ "{}eme projet".format(random.randint(1, 1000)) }}
-${RANDOMFEATURETYPENAME}    ${{ "{}eme type".format(random.randint(1, 1000)) }}
-${RANDOMFEATURENAME}    ${{ "{}eme signalement".format(random.randint(1, 1000)) }}
+${SELSPEED}     0.1
+
+${RANDOMPROJECTNAME}   ${{ "{}eme projet".format(random.randint(1, 10000)) }}
+${RANDOMFEATURETYPENAME}    ${{ "{}eme type".format(random.randint(1, 10000)) }}
+${RANDOMFEATURENAME}    ${{ "{}eme signalement".format(random.randint(1, 10000)) }}
+
+${PROJECTEDITION}    - projet édité
+${FEATURETYPEEDITION}    - type édité
+${FEATUREEDITION}    - signalement édité
 
 ${LAYER1_TITLE}          PIGMA Occupation du sol
 ${LAYER1_URL}            https://www.pigma.org/geoserver/asp/wms?
@@ -39,8 +46,8 @@ ${LAYER2_DESCRIPTION}    {
 ...                         "attribution": "\u00a9 les contributeurs d\u2019OpenStreetMap"
 ...                      }
 
-${BASEMAPNAME1}          ${{ "{}eme fond cartographique".format(random.randint(1, 1000)) }}
-${BASEMAPNAME2}          ${{ "{}eme fond cartographique".format(random.randint(1, 1000)) }}
+${BASEMAPNAME1}          ${{ "{}eme fond cartographique".format(random.randint(1, 10000)) }}
+${BASEMAPNAME2}          ${{ "{}eme fond cartographique".format(random.randint(1, 10000)) }}
 
 *** Test Cases ***
 
@@ -49,74 +56,71 @@ ${BASEMAPNAME2}          ${{ "{}eme fond cartographique".format(random.randint(1
 
 Connect GeoContrib
     Geo Connect Superuser  ${SUPERUSERNAME}  ${SUPERUSERPASSWORD}
-    Frame Should Not Contain    Se connecter
+    # Frame Should Not Contain    Se connecter
 
 Create Project with Random Projectname
     Geo Create Project  ${RANDOMPROJECTNAME}
-    Page Should Contain     ${RANDOMPROJECTNAME}
+    # Page Should Contain     ${RANDOMPROJECTNAME}
 
 Create Feature Type with Random Featuretypename
     Geo Create Featuretype  ${RANDOMFEATURETYPENAME}
-    Page Should Contain     ${RANDOMFEATURETYPENAME}
+    # Page Should Contain     ${RANDOMFEATURETYPENAME}
 
-# Create Feature with Random Featurename
-#     ${X}    Generate Random String    1    [NUMBERS]
-#     ${Y}    Generate Random String    1    [NUMBERS]
-#     Geo Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
-#     Click Element At Coordinates       xpath=//div[@id='map']/div/div[4]/div     ${X}  ${Y}
-#     Click Element    xpath=//button[@type='submit']
-#     Page Should Contain     ${RANDOMFEATURENAME}
-
-# Search for drafts
-#     Geo Draft Search      ${RANDOMPROJECTNAME}
-#     Page Should Contain     ${RANDOMFEATURENAME}
-
-# # TODO
-# Create Layer
-#     Geo Create Layer      ${ADMIN_URL}      ${LAYER1_TITLE}       ${LAYER1_URL}     ${LAYER1_DESCRIPTION}            
-#     Geo Create Layer      ${ADMIN_URL}      ${LAYER2_TITLE}       ${LAYER2_URL}     ${LAYER2_DESCRIPTION}            
-#     Page Should Contain      ${LAYER1_TITLE}       ${LAYER2_URL}
-
-# # TODO
-# Create Basemap
-#     Geo Create Basemap    ${ADMIN_URL}        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}    ${LAYER1_TITLE}       ${LAYER1_URL}      ${LAYER2_TITLE}       ${LAYER2_URL}
-#     Geo Create Basemap    ${ADMIN_URL}        ${BASEMAPNAME2}      ${RANDOMPROJECTNAME}    ${LAYER1_TITLE}       ${LAYER1_URL}      ${LAYER2_TITLE}       ${LAYER2_URL}
-#     Page Should Contain        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}
-
-# TODO
-Create Feature with Random Featurename but on Queryable Coordinates
-    ${X}    
-    ${Y}    
+Create Feature #1 with Random Featurename on Random Coordinates
+    ${X}    Set Variable    ${{ random.randint(1, 50) }}
+    ${Y}    Set Variable    ${{ random.randint(1, 50) }}
     Geo Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
     Click Element At Coordinates       xpath=//div[@id='map']/div/div[4]/div     ${X}  ${Y}
     Click Element    xpath=//button[@type='submit']
-    Page Should Contain     ${RANDOMFEATURENAME}
+    # Page Should Contain     ${RANDOMFEATURENAME}
+
+Back to Project Page
+    Click Element    xpath=//html/body/header/div/div/div[1]
+    Click Element    xpath=//html/body/header/div/div/div[1]/div/a[1]
+
+Create Feature #2 with Random Featurename on Random Coordinates
+
+    ${X}    Set Variable    ${{ random.randint(1, 30) }}
+    ${Y}    Set Variable    ${{ random.randint(1, 30) }}
+    Geo Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
+    Click Element At Coordinates       xpath=//div[@id='map']/div/div[4]/div     ${X}  ${Y}
+    Click Element    xpath=//button[@type='submit']
+    # Page Should Contain     ${RANDOMFEATURENAME}
+
+Search for drafts
+    Geo Draft Search      ${RANDOMPROJECTNAME}
+    # Page Should Contain     ${RANDOMFEATURENAME}
+
+Create Layer
+    Geo Create Layer      ${ADMIN_URL}      ${LAYER1_TITLE}       ${LAYER1_URL}     ${LAYER1_DESCRIPTION}            
+    Geo Create Layer      ${ADMIN_URL}      ${LAYER2_TITLE}       ${LAYER2_URL}     ${LAYER2_DESCRIPTION}            
+    # Page Should Contain      ${LAYER1_TITLE}       ${LAYER2_URL}
+
+Create Basemap
+    Geo Create Basemap    ${ADMIN_URL}        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}    ${LAYER1_TITLE}       ${LAYER1_URL}      ${LAYER2_TITLE}       ${LAYER2_URL}
+    Geo Create Basemap    ${ADMIN_URL}        ${BASEMAPNAME2}      ${RANDOMPROJECTNAME}    ${LAYER1_TITLE}       ${LAYER1_URL}      ${LAYER2_TITLE}       ${LAYER2_URL}
+    # Page Should Contain        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}
 
 Query Basemap
     Geo Query Basemap
-#     Page Should Contain        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}
+    # Page Should Contain        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}
 
-# TODO
-# Edit Project
-#     Geo Edit Project
-#     Page Should Contain 
+Edit Project
+    Geo Edit Project      ${RANDOMPROJECTNAME}        ${PROJECTEDITION}
+    # Page Should Contain        - projet édité
 
-# TODO
-# Edit Featuretype
-#     Geo Edit Featuretype
-#     Page Should Contain 
+Edit Feature
+    Geo Edit Feature      ${RANDOMFEATURENAME}        ${FEATUREEDITION}
+#     Page Should Contain        - signalement édité
 
-# TODO
-# Edit Feature
-#     Geo Edit Feature
-#     Page Should Contain 
+Edit Featuretype
+    Geo Edit Featuretype      ${RANDOMFEATURETYPENAME}      ${FEATURETYPEEDITION}
+    # Page Should Contain        - type édité
 
-# TODO
 # Export GeoJson
-#     Geo Json Export  ${RANDOMPROJECTNAME}
+#     Geo Json Export  ${RANDOMPROJECTNAME}      ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
 #     # Page Should Contain     
 
-# TODO
 # Import GeoJson
 #     Geo Json Import
 #     # Page Should Contain     
