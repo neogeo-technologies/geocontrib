@@ -13,16 +13,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-
-import selenium
+import time
 
 from utils import get_driver
 
 
-def geo_json_export(projectname):
+def geo_json_export(projectname, featuretypename, featuretypeedition):
     get_driver().find_element_by_xpath("//img").click()
     get_driver().find_element_by_link_text(projectname).click()
-    get_driver().find_element_by_link_text(projectname).click()
+    get_driver().find_element_by_link_text("{}{}".format(featuretypename, featuretypeedition)).click()
     get_driver().find_element_by_link_text("Exporter").click()
     get_driver().find_element_by_xpath("//div[3]/div/div").click()
 
@@ -31,6 +30,7 @@ def geo_json_import():
     get_driver().find_element_by_xpath(
         "//form[@id='form-import-features']/div/label/span"
     ).click()
-    get_driver().find_element_by_id("json_file").clear()
-    get_driver().find_element_by_id("json_file").send_keys("export_projet.json")
+    get_driver().find_element_by_id("json_file").click()
+    time.sleep(1)
+    get_driver().send_keys("export_projet.json")
     get_driver().find_element_by_xpath("//button[@type='submit']").click()

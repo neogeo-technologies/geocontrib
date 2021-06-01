@@ -14,11 +14,6 @@
 # under the License.
 
 
-import time
-
-import selenium
-from selenium.webdriver import ActionChains
-
 from utils import get_driver
 
 

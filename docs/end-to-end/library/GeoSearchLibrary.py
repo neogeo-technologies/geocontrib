@@ -14,8 +14,6 @@
 # under the License.
 
 
-import selenium
-
 from utils import get_driver
 
 
