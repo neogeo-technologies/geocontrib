@@ -278,9 +278,28 @@
     $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
     $('.ui.dropdown').dropdown();
-
+      console.log('hola aqui')
     let event = new Event('add-field');
     document.dispatchEvent(event);
+    
+    let id_form_options = '#id_form-' + form_idx + '-options'
+    console.log(id_form_options)
+
+    $(id_form_options).on('keydown', function(e) {
+    if (e.which === 32) {
+    return false;
+    }  
+  });
+  })
+
+  $(document).ready(function () {
+    var form_idx = $('#id_form-TOTAL_FORMS').val();
+    for (var i=0; i <=form_idx;i++ ){
+    let id_form_options = '#id_form-' + i + '-options';
+    console.log(id_form_options)
+  
+    var res = id_form_options.replace(/^,|,$/g, '');
+    }
   })
 
 </script>
