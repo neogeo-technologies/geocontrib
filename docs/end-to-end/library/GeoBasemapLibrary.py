@@ -27,7 +27,7 @@ def geo_create_layer(admin_url, layer_title, layer_url, layer_description):
 
 # TODO: au lieu de layer1, layer2, faire une liste avec une boucle for
 # TODO: remplacer (wms) et (tms) par des variables
-def geo_create_basemap(admin_url, basemapname, projectname, layer1_title, layer1_url, layer2_title, layer2_url):
+def geo_create_basemap(admin_url, basemapname, projectname, layers):
     get_driver().get(admin_url)
     get_driver().find_element_by_link_text("Fonds cartographiques").click()
     get_driver().find_element_by_xpath("//html/body/div/div[3]/div/ul/li/a").click()
@@ -36,21 +36,23 @@ def geo_create_basemap(admin_url, basemapname, projectname, layer1_title, layer1
     get_driver().find_element_by_id("id_project").click()
     Select(get_driver().find_element_by_id("id_project")).select_by_visible_text(projectname)
 
-
-    get_driver().find_element_by_link_text(u"Ajouter un objet Liaison Fond-Couche supplémentaire").click()
-    get_driver().find_element_by_id("id_contextlayer_set-0-layer").click()
-    Select(get_driver().find_element_by_id("id_contextlayer_set-0-layer")).select_by_visible_text("{} - {} (wms)".format(layer1_title, layer1_url))
-    get_driver().find_element_by_id("id_contextlayer_set-0-queryable").click()
-
+    for i, layer in enumerate(layers):
+        get_driver().find_element_by_link_text(u"Ajouter un objet Liaison Fond-Couche supplémentaire").click()
+        get_driver().find_element_by_id("id_contextlayer_set-{}-layer".format(i)).click()
+        Select(get_driver().find_element_by_id("id_contextlayer_set-{}-layer".format(i)).select_by_visible_text("{} - {} ({})".format(layer.title, layer.url, layer.type))
+        get_driver().find_element_by_id("id_contextlayer_set-{}-queryable".format(i)).click()
 
     get_driver().find_element_by_link_text(u"Ajouter un objet Liaison Fond-Couche supplémentaire").click()
     get_driver().find_element_by_id("id_contextlayer_set-1-layer").click()
     Select(get_driver().find_element_by_id("id_contextlayer_set-1-layer")).select_by_visible_text("{} - {} (tms)".format(layer2_title, layer2_url))
     get_driver().find_element_by_id("id_contextlayer_set-1-queryable").click()
-    get_driver().find_element_by_name("_save").click()    
+
+    get_driver().find_element_by_name("_save").click()
 
 
-def geo_query_basemap():
-    pass
-# TODO
+def geo_query_basemap(url, projectname):
+    get_driver().get(url)
+    get_driver().find_element_by_link_text(projectname).click()
+    get_driver().find_element_by_css_selector("#map").click()
+    get_driver().find_element_by_id("Capa_1").click()
 
