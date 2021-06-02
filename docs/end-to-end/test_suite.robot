@@ -25,6 +25,8 @@ ${PROJECTEDITION}    - projet édité
 ${FEATURETYPEEDITION}    - type édité
 ${FEATUREEDITION}    - signalement édité
 
+${LAYER1}       1er attribut     2e attriut     3e attribut
+
 ${LAYER1_TITLE}          PIGMA Occupation du sol
 ${LAYER1_URL}            https://www.pigma.org/geoserver/asp/wms?
 
@@ -62,7 +64,7 @@ Create Project with Random Projectname
     Geo Create Project  ${RANDOMPROJECTNAME}
     # Page Should Contain     ${RANDOMPROJECTNAME}
 
-Create Feature Type with Random Featuretypename
+Create Feature Types with Random Featuretypename
     Geo Create Featuretype  ${RANDOMFEATURETYPENAME}
     Geo Create Featuretype  ${RANDOMFEATURETYPENAME}#2
     # Page Should Contain     ${RANDOMFEATURETYPENAME}
@@ -98,29 +100,29 @@ Create Layer
     # Page Should Contain      ${LAYER1_TITLE}       ${LAYER2_URL}
 
 Create Basemap
-    Geo Create Basemap    ${ADMIN_URL}        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}    ${LAYER1_TITLE}       ${LAYER1_URL}      ${LAYER2_TITLE}       ${LAYER2_URL}
+    Geo Create Basemap    ${ADMIN_URL}        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}    ${LAYERS}
     Geo Create Basemap    ${ADMIN_URL}        ${BASEMAPNAME2}      ${RANDOMPROJECTNAME}    ${LAYER1_TITLE}       ${LAYER1_URL}      ${LAYER2_TITLE}       ${LAYER2_URL}
     # Page Should Contain        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}
 
 Query Basemap
-    Geo Query Basemap
+    Geo Query Basemap   ${GEOCONTRIB _URL}      ${RANDOMPROJECTNAME}
     # Page Should Contain        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}
 
 Edit Project
     Geo Edit Project      ${RANDOMPROJECTNAME}        ${PROJECTEDITION}
-    # Page Should Contain        - projet édité
+    # Page Should Contain        ${PROJECTEDITION}
 
 Edit Feature
     Geo Edit Feature      ${RANDOMFEATURENAME}        ${FEATUREEDITION}
-#     Page Should Contain        - signalement édité
+#     Page Should Contain        ${FEATUREEDITION}
 
 Edit Featuretype
-    Geo Edit Featuretype      ${RANDOMFEATURETYPENAME}#2      ${FEATURETYPEEDITION}
-    # Page Should Contain        - type édité
+    Geo Edit Featuretype      ${RANDOMFEATURETYPENAME}      ${FEATURETYPEEDITION}
+    # Page Should Contain         ${FEATURETYPEEDITION}
 
-# Export GeoJson
-#     Geo Json Export  ${RANDOMPROJECTNAME}      ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
-#     # Page Should Contain     
+Export GeoJson
+    Geo Json Export  ${RANDOMPROJECTNAME}${PROJECTEDITION}      ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
+    # Page Should Contain     
 
 # Import GeoJson
 #     Geo Json Import
