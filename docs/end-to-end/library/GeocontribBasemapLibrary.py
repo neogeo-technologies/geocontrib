@@ -20,21 +20,21 @@ from utils import get_driver
 
 
 # TODO: condition if : si ça existe, ne pas le recréer
-def geo_create_layer(admin_url, layer_title, layer_url, layer_description):
+def geocontrib_create_layer(admin_url, layer_title, layer_url, layer_description):
     get_driver().get(admin_url)
     get_driver().find_element_by_link_text("Couches").click()
 
 
 # TODO: au lieu de layer1, layer2, faire une liste avec une boucle for
 # TODO: remplacer (wms) et (tms) par des variables
-def geo_create_basemap(admin_url, basemapname, projectname, layers):
+def geocontrib_create_basemap(admin_url, basemap_name, project_name, layers):
     get_driver().get(admin_url)
     get_driver().find_element_by_link_text("Fonds cartographiques").click()
     get_driver().find_element_by_xpath("//html/body/div/div[3]/div/ul/li/a").click()
     get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys(basemapname)
+    get_driver().find_element_by_id("id_title").send_keys(basemap_name)
     get_driver().find_element_by_id("id_project").click()
-    Select(get_driver().find_element_by_id("id_project")).select_by_visible_text(projectname)
+    Select(get_driver().find_element_by_id("id_project")).select_by_visible_text(project_name)
 
     for i, layer in enumerate(layers):
         get_driver().find_element_by_link_text(u"Ajouter un objet Liaison Fond-Couche supplémentaire").click()
@@ -50,9 +50,9 @@ def geo_create_basemap(admin_url, basemapname, projectname, layers):
     get_driver().find_element_by_name("_save").click()
 
 
-def geo_query_basemap(url, projectname):
+def geocontrib_query_basemap(url, project_name):
     get_driver().get(url)
-    get_driver().find_element_by_link_text(projectname).click()
+    get_driver().find_element_by_link_text(project_name).click()
     get_driver().find_element_by_css_selector("#map").click()
     get_driver().find_element_by_id("Capa_1").click()
 
