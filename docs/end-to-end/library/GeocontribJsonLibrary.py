@@ -18,15 +18,15 @@ import time
 from utils import get_driver
 
 
-def geo_json_export(projectname, featuretypename, featuretypeedition):
+def geocontrib_json_export(project_name, feature_type_name, added_text):
     get_driver().find_element_by_xpath("//img").click()
-    get_driver().find_element_by_link_text(projectname).click()
-    get_driver().find_element_by_link_text("{}{}".format(featuretypename, featuretypeedition)).click()
+    get_driver().find_element_by_link_text(project_name).click()
+    get_driver().find_element_by_link_text("{}{}".format(feature_type_name, added_text)).click()
     get_driver().find_element_by_link_text("Exporter").click()
     get_driver().find_element_by_xpath("//div[3]/div/div").click()
 
 
-def geo_json_import():
+def geocontrib_json_import():
     get_driver().find_element_by_xpath(
         "//form[@id='form-import-features']/div/label/span"
     ).click()

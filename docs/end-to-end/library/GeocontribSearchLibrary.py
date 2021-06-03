@@ -17,16 +17,10 @@
 from utils import get_driver
 
 
-def geo_connect_superuser(username, userpassword):
-
-    get_driver().find_element_by_link_text("Se Connecter").click()
-    get_driver().find_element_by_name("username").clear()
-    get_driver().find_element_by_name("username").send_keys(username)
-    get_driver().find_element_by_name("password").clear()
-    get_driver().find_element_by_name("password").send_keys(userpassword)
-    get_driver().find_element_by_xpath("//button[@type='submit']").click()
-
-
-def geo_disconnect():
-
-    get_driver().find_element_by_xpath("//i").click()
+def geocontrib_draft_search(project_name):
+    get_driver().find_element_by_link_text(u"GéoContrib").click()
+    get_driver().find_element_by_link_text(project_name).click()
+    get_driver().find_element_by_id("map").click()
+    get_driver().find_element_by_xpath("//div[2]/div/a[2]").click()
+    get_driver().find_element_by_xpath("//form[@id='form-filters']/div[2]/div/input[2]").click()
+    get_driver().find_element_by_xpath("//form[@id='form-filters']/div[2]/div/div[2]/div").click()
