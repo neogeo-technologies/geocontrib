@@ -25,7 +25,7 @@ def geocontrib_delete_project(project_name, admin_url):
     get_driver().find_element_by_xpath(u"//input[@value='Oui, je suis sûr']").click()
 
 
-def geocontrib_delete_featuretype(feature_type_name, admin_url):
+def geocontrib_delete_featuretype(admin_url, feature_type_name):
     get_driver().get(admin_url)
     get_driver().find_element_by_link_text("Types de signalements").click()
     get_driver().find_element_by_link_text(feature_type_name).click()
@@ -33,9 +33,17 @@ def geocontrib_delete_featuretype(feature_type_name, admin_url):
     get_driver().find_element_by_xpath(u"//input[@value='Oui, je suis sûr']").click()
 
 
-def geocontrib_delete_feature(feature_name, admin_url):
+def geocontrib_delete_feature(admin_url, feature_name):
     get_driver().get(admin_url)
     get_driver().find_element_by_link_text("Signalements").click()
     get_driver().find_element_by_link_text(feature_name).click()
+    get_driver().find_element_by_link_text("Supprimer").click()
+    get_driver().find_element_by_xpath(u"//input[@value='Oui, je suis sûr']").click()
+
+
+def geocontrib_delete_layer(admin_url, layer_title, layer_url,  layer_type):
+    get_driver().get(admin_url)
+    get_driver().find_element_by_link_text("Couches").click()
+    get_driver().find_element_by_link_text("{} - {} ({})".format(layer_title, layer_url,  layer_type.lower())).click()
     get_driver().find_element_by_link_text("Supprimer").click()
     get_driver().find_element_by_xpath(u"//input[@value='Oui, je suis sûr']").click()
