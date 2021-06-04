@@ -20,34 +20,43 @@ from utils import get_driver
 
 
 # TODO: condition if : si ça existe, ne pas le recréer
-def geocontrib_create_layer(admin_url, layer_title, layer_url, layer_description):
+def geocontrib_create_layer(admin_url, layer_title, layer_url, layer_type, layer_options):
     get_driver().get(admin_url)
     get_driver().find_element_by_link_text("Couches").click()
+    get_driver().find_element_by_xpath("//html/body/div/div[3]/div/ul/li/a").click()
+    get_driver().find_element_by_id("id_title").clear()
+    get_driver().find_element_by_id("id_title").send_keys(layer_title)
+    get_driver().find_element_by_id("id_service").clear()
+    get_driver().find_element_by_id("id_service").send_keys(layer_url)
+    get_driver().find_element_by_id("id_schema_type").click()
+    get_driver().find_element_by_id("id_schema_type").click()
+    Select(get_driver().find_element_by_id("id_schema_type")).select_by_visible_text(layer_type)
+    get_driver().find_element_by_xpath("//form[@id='layer_form']/div/fieldset/div[4]/div").click()
+    get_driver().find_element_by_id("id_options").clear()
+    get_driver().find_element_by_id("id_options").send_keys(layer_options)
+    get_driver().find_element_by_name("_save").click()
 
 
 # TODO: au lieu de layer1, layer2, faire une liste avec une boucle for
-# TODO: remplacer (wms) et (tms) par des variables
-def geocontrib_create_basemap(admin_url, basemap_name, project_name, layers):
-    get_driver().get(admin_url)
+def geocontrib_create_basemap(url, basemap_name, project_name, layer1_title, layer1_url, layer1_type, layer2_title, layer2_url, layer2_type):
+    get_driver().get(url)
+    get_driver().find_element_by_link_text(project_name).click()
+    get_driver().find_element_by_xpath("//div/div/div").click()
     get_driver().find_element_by_link_text("Fonds cartographiques").click()
-    get_driver().find_element_by_xpath("//html/body/div/div[3]/div/ul/li/a").click()
-    get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys(basemap_name)
-    get_driver().find_element_by_id("id_project").click()
-    Select(get_driver().find_element_by_id("id_project")).select_by_visible_text(project_name)
-
-    for i, layer in enumerate(layers):
-        get_driver().find_element_by_link_text(u"Ajouter un objet Liaison Fond-Couche supplémentaire").click()
-        get_driver().find_element_by_id("id_contextlayer_set-{}-layer".format(i)).click()
-        Select(get_driver().find_element_by_id("id_contextlayer_set-{}-layer".format(i)).select_by_visible_text("{} - {} ({})".format(layer.title, layer.url, layer.type))
-        get_driver().find_element_by_id("id_contextlayer_set-{}-queryable".format(i)).click()
-
-    get_driver().find_element_by_link_text(u"Ajouter un objet Liaison Fond-Couche supplémentaire").click()
-    get_driver().find_element_by_id("id_contextlayer_set-1-layer").click()
-    Select(get_driver().find_element_by_id("id_contextlayer_set-1-layer")).select_by_visible_text("{} - {} (tms)".format(layer2_title, layer2_url))
-    get_driver().find_element_by_id("id_contextlayer_set-1-queryable").click()
-
-    get_driver().find_element_by_name("_save").click()
+    get_driver().find_element_by_xpath("//form[@id='form-layers']/div/a/span").click()
+    get_driver().find_element_by_id("id_basemap_set-0-title").click()
+    get_driver().find_element_by_id("id_basemap_set-0-title").clear()
+    get_driver().find_element_by_id("id_basemap_set-0-title").send_keys(basemap_name)
+    get_driver().find_element_by_xpath("//form[@id='form-layers']/div[2]/div/div[2]/div[3]/a").click()
+    get_driver().find_element_by_id("id_contextlayer-basemap_set-0-contextlayer_set-0-layer").click()
+    get_driver().find_element_by_id("id_contextlayer-basemap_set-0-contextlayer_set-0-layer").click()
+    Select(get_driver().find_element_by_id("id_contextlayer-basemap_set-0-contextlayer_set-0-layer")).select_by_visible_text("{} - {} ({})".format(layer1_title, layer1_url, layer1_type.lower()))
+    get_driver().find_element_by_id("id_contextlayer-basemap_set-0-contextlayer_set-0-queryable").click()
+    get_driver().find_element_by_xpath("//form[@id='form-layers']/div[2]/div/div[2]/div[3]/a/span").click()
+    get_driver().find_element_by_id("id_contextlayer-basemap_set-0-contextlayer_set-1-layer").click()
+    Select(get_driver().find_element_by_id("id_contextlayer-basemap_set-0-contextlayer_set-1-layer")).select_by_visible_text("{} - {} ({})".format(layer2_title, layer2_url, layer2_type.lower()))
+    get_driver().find_element_by_id("id_contextlayer-basemap_set-0-contextlayer_set-1-queryable").click()
+    get_driver().find_element_by_xpath("//button[@type='submit']").click()
 
 
 def geocontrib_query_basemap(url, project_name):
