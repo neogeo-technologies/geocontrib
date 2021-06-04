@@ -13,12 +13,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import random
+
 
 def get_variables():
     variables = {
-                "X1":   "random.randint(1, 50)",
-                "Y1":   "random.randint(1, 50)",
-                "X2":   "random.randint(1, 50)",
-                "Y2":   "random.randint(1, 50)",
+                "X1":   random.randint(1, 50),
+                "Y1":   random.randint(1, 50),
+                "X2":   random.randint(1, 50),
+                "Y2":   random.randint(1, 50),
                 }
     return variables
