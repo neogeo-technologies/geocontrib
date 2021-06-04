@@ -9,6 +9,7 @@ Library  library/GeocontribBasemapLibrary.py
 Library  library/GeocontribJsonLibrary.py
 Library  library/GeocontribDeleteLibrary.py
 Library  library/GeocontribEditLibrary.py
+Library  library/GeocontribOnCoordinatesLibrary.py
 
 Variables   library/tests_settings.py
 
@@ -20,6 +21,12 @@ ${SELSPEED}     0.1
 ${RANDOMPROJECTNAME}   ${{ "projet - {}".format(datetime.datetime.now()) }}
 ${RANDOMFEATURETYPENAME}    ${{ "type - {}".format(datetime.datetime.now()) }}
 ${RANDOMFEATURENAME}    ${{ "signalement - {}".format(datetime.datetime.now()) }}
+
+${X1}    ${{ random.randint(1, 50) }}
+${Y1}    ${{ random.randint(1, 50) }}
+
+${X2}    ${{ random.randint(1, 50) }}
+${Y2}    ${{ random.randint(1, 50) }}
 
 ${PROJECTEDITION}    - projet édité
 ${FEATURETYPEEDITION}    - type édité
@@ -68,11 +75,9 @@ Create Feature Types with Random Featuretypename - Test 97
     # Page Should Contain     ${RANDOMFEATURETYPENAME}
 
 Create Feature #1 with Random Featurename on Random Coordinates - Test 117
-    ${X}    Set Variable    ${{ random.randint(1, 50) }}
-    ${Y}    Set Variable    ${{ random.randint(1, 50) }}
+
     Geocontrib Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
-    Click Element At Coordinates       xpath=//div[@id='map']/div/div[4]/div     ${X}  ${Y}
-    Click Element    xpath=//button[@type='submit']
+    Geocontrib Click At Coordinates     ${X1}  ${Y1}
     # Page Should Contain     ${RANDOMFEATURENAME}
 
 Back to Project Page
@@ -81,11 +86,8 @@ Back to Project Page
 
 Create Feature #2 with Random Featurename on Random Coordinates - Test 117
 
-    ${X}    Set Variable    ${{ random.randint(1, 30) }}
-    ${Y}    Set Variable    ${{ random.randint(1, 30) }}
     Geocontrib Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
-    Click Element At Coordinates       xpath=//div[@id='map']/div/div[4]/div     ${X}  ${Y}
-    Click Element    xpath=//button[@type='submit']
+    Geocontrib Click At Coordinates     ${X2}  ${Y2}
     # Page Should Contain     ${RANDOMFEATURENAME}
 
 Search for drafts - Test 168

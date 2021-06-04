@@ -13,9 +13,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from robot.libraries.BuiltIn import BuiltIn
+from selenium.webdriver.common.action_chains import ActionChains
+from utils import get_driver
 
 
-def get_driver():
-    sl = BuiltIn().get_library_instance("SeleniumLibrary")
-    return sl.driver
+def geocontrib_click_at_coordinates(pos_x, pos_y):
+    actions = ActionChains(get_driver())
+    my_map = get_driver().find_element_by_xpath("//html/body/main/div/div/form/div[3]/div/div/div[1]/div[4]/div")
+    actions.move_to_element_with_offset(my_map, pos_x, pos_y).click().perform()
+    get_driver().find_element_by_xpath("//button[@type='submit']").click()
