@@ -54,20 +54,20 @@ ${BASEMAPNAME}          ${{ "fond carto - {}".format(datetime.datetime.now()) }}
 ...                         AND     Maximize Browser Window
 ...                         AND     Set Selenium Speed              ${SELSPEED}
 
-Connect GeoContrib
+Connect GeoContrib - Test 4
     Geocontrib Connect Superuser  ${SUPERUSERNAME}  ${SUPERUSERPASSWORD}
     # Frame Should Not Contain    Se connecter
 
-Create Project with Random Projectname
+Create Project with Random Projectname - Tests 10, 17
     Geocontrib Create Project  ${RANDOMPROJECTNAME}
     # Page Should Contain     ${RANDOMPROJECTNAME}
 
-Create Feature Types with Random Featuretypename
+Create Feature Types with Random Featuretypename - Test 97
     Geocontrib Create Featuretype  ${RANDOMFEATURETYPENAME}
     Geocontrib Create Featuretype  ${RANDOMFEATURETYPENAME}#2
     # Page Should Contain     ${RANDOMFEATURETYPENAME}
 
-Create Feature #1 with Random Featurename on Random Coordinates
+Create Feature #1 with Random Featurename on Random Coordinates - Test 117
     ${X}    Set Variable    ${{ random.randint(1, 50) }}
     ${Y}    Set Variable    ${{ random.randint(1, 50) }}
     Geocontrib Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
@@ -79,7 +79,7 @@ Back to Project Page
     Click Element    xpath=//html/body/header/div/div/div[1]
     Click Element    xpath=//html/body/header/div/div/div[1]/div/a[1]
 
-Create Feature #2 with Random Featurename on Random Coordinates
+Create Feature #2 with Random Featurename on Random Coordinates - Test 117
 
     ${X}    Set Variable    ${{ random.randint(1, 30) }}
     ${Y}    Set Variable    ${{ random.randint(1, 30) }}
@@ -88,32 +88,32 @@ Create Feature #2 with Random Featurename on Random Coordinates
     Click Element    xpath=//button[@type='submit']
     # Page Should Contain     ${RANDOMFEATURENAME}
 
-Search for drafts
+Search for drafts - Test 168
     Geocontrib Draft Search      ${RANDOMPROJECTNAME}
     # Page Should Contain     ${RANDOMFEATURENAME}
 
-Create Layer
+Create Layer - ADMIN
     Geocontrib Create Layer      ${ADMIN_URL}      ${LAYER1_TITLE}       ${LAYER1_URL}     ${LAYER1_TYPE}     ${LAYER1_OPTIONS}            
     Geocontrib Create Layer      ${ADMIN_URL}      ${LAYER2_TITLE}       ${LAYER2_URL}     ${LAYER2_TYPE}     ${LAYER2_OPTIONS}            
     # Page Should Contain      ${LAYER1_TITLE}       ${LAYER2_URL}
 
-Create Basemap
+Create Basemap - Tests 78, 79, 88, 
     Geocontrib Create Basemap    ${GEOCONTRIB_URL}        ${BASEMAPNAME}      ${RANDOMPROJECTNAME}    ${LAYER1_TITLE}       ${LAYER1_URL}      ${LAYER1_TYPE}     ${LAYER2_TITLE}       ${LAYER2_URL}     ${LAYER2_TYPE}
     # Page Should Contain        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}
 
-Query Basemap
+Query Basemap - Test 89
     Geocontrib Query Basemap   ${GEOCONTRIB _URL}      ${RANDOMPROJECTNAME}
     # Page Should Contain        ${BASEMAPNAME1}      ${RANDOMPROJECTNAME}
 
-Edit Project
+Edit Project - Test NA
     Geocontrib Edit Project      ${GEOCONTRIB_URL}      ${RANDOMPROJECTNAME}        ${PROJECTEDITION}
     # Page Should Contain        ${PROJECTEDITION}
 
-Edit Feature
+Edit Feature - Test NA (D. Modification d'un projet)
     Geocontrib Edit Feature      ${RANDOMFEATURENAME}        ${FEATUREEDITION}
     # Page Should Contain        ${FEATUREEDITION}
 
-Edit Featuretype
+Edit Featuretype - Test NA
     Geocontrib Edit Featuretype      ${RANDOMFEATURETYPENAME}      ${FEATURETYPEEDITION}
     # Page Should Contain         ${FEATURETYPEEDITION}
 
@@ -125,8 +125,8 @@ Edit Featuretype
 #     Geocontrib Json Import
 #     # Page Should Contain     
 
-# [Teardown]   Run Keywords    Geocontrib Delete Feature  ${RANDOMFEATURENAME}   ${ADMINURL}
-# ...                            AND             Geocontrib Delete Featuretype  ${RANDOMFEATURETYPENAME}   ${ADMINURL}
-# ...                            AND             Geocontrib Delete Project  ${RANDOMPROJECTNAME}   ${ADMINURL}
-# ...                            AND             Sleep     3
-# ...                            AND             Close Browser
+# [Teardown]    Run Keywords                    Geocontrib Delete Feature  ${RANDOMFEATURENAME}   ${ADMINURL}
+# ...                           AND             Geocontrib Delete Featuretype  ${RANDOMFEATURETYPENAME}   ${ADMINURL}
+# ...                           AND             Geocontrib Delete Project  ${RANDOMPROJECTNAME}   ${ADMINURL}
+# ...                           AND             Sleep     3
+# ...                           AND             Close Browser
