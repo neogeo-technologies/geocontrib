@@ -12,54 +12,21 @@ Library  library/GeocontribEditLibrary.py
 Library  library/GeocontribOnCoordinatesLibrary.py
 
 Variables   library/tests_settings.py
+Variables   library/project_settings.py
+Variables   library/layers_settings.py
+Variables   library/coordinates_settings.py
 
 
 *** Variables ***
 
 ${SELSPEED}     0.1
 
-${RANDOMPROJECTNAME}   ${{ "projet - {}".format(datetime.datetime.now()) }}
-${RANDOMFEATURETYPENAME}    ${{ "type - {}".format(datetime.datetime.now()) }}
-${RANDOMFEATURENAME}    ${{ "signalement - {}".format(datetime.datetime.now()) }}
-
-${X1}    ${{ random.randint(1, 50) }}
-${Y1}    ${{ random.randint(1, 50) }}
-
-${X2}    ${{ random.randint(1, 50) }}
-${Y2}    ${{ random.randint(1, 50) }}
-
-${PROJECTEDITION}    - projet édité
-${FEATURETYPEEDITION}    - type édité
-${FEATUREEDITION}    - signalement édité
-
-${LAYER1_TITLE}          PIGMA Occupation du sol
-${LAYER1_URL}            https://www.pigma.org/geoserver/asp/wms?
-${LAYER1_TYPE}           WMS
-${LAYER1_OPTIONS}    {
-...                         \"format\": \"image/png\",
-...                         \"layers\": \"asp_rpg_2012_047\",
-...                         \"maxZoom\": 18,
-...                         \"minZoom\": 7,
-...                         \"opacity\": 0.8,
-...                         \"attribution\": \"PIGMA\",
-...                         \"transparent\": true
-...                      }
-
-${LAYER2_TITLE}          OpenStreetMap France
-${LAYER2_URL}            https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png
-${LAYER2_TYPE}           TMS
-${LAYER2_OPTIONS}    {
-...                         "maxZoom": 20,
-...                         "attribution": "\u00a9 les contributeurs d\u2019OpenStreetMap"
-...                      }
-
-${BASEMAPNAME}          ${{ "fond carto - {}".format(datetime.datetime.now()) }}
 
 *** Test Cases ***
 
-[Setup]     Run Keywords            Open Browser                    ${GEOCONTRIB _URL}
-...                         AND     Maximize Browser Window
-...                         AND     Set Selenium Speed              ${SELSPEED}
+[Setup]     Run Keywords    Open Browser                        ${GEOCONTRIB _URL}
+...         AND             Maximize Browser Window
+...         AND             Set Selenium Speed                  ${SELSPEED}
 
 Connect GeoContrib - Test 4
     Geocontrib Connect Superuser  ${SUPERUSERNAME}  ${SUPERUSERPASSWORD}

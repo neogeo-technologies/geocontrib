@@ -13,23 +13,17 @@ Variables   library/tests_settings.py
 
 ${SELSPEED}     0.1
 
-${RANDOMPROJECTNAME}   ${{ "projet - {}".format(datetime.datetime.now()) }}
-${RANDOMFEATURETYPENAME}    ${{ "type - {}".format(datetime.datetime.now()) }}
-${RANDOMFEATURENAME}    ${{ "signalement - {}".format(datetime.datetime.now()) }}
 
 *** Test Cases ***
 
-[Setup]     Run Keywords    Open Browser ${GEOCONTRIB _URL}
+[Setup]     Run Keywords    Open Browser                        ${GEOCONTRIB _URL}
 ...         AND             Maximize Browser Window
-...         AND             Set Selenium Speed ${SELSPEED}
-...         AND             Geocontrib Connect Superuser  ${SUPERUSERNAME}  ${SUPERUSERPASSWORD}
-...         AND             Geocontrib Create Project  ${RANDOMPROJECTNAME}
-...         AND             Geocontrib Create Featuretype  ${RANDOMFEATURETYPENAME}
-...         AND             ${X}    Set Variable    ${{ random.randint(1, 50) }}
-...         AND             ${Y}    Set Variable    ${{ random.randint(1, 50) }}
-...         AND             Geocontrib Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
-...         AND             Click Element At Coordinates       xpath=//div[@id='map']/div/div[4]/div     ${X}  ${Y}
-...         AND             Click Element    xpath=//button[@type='submit']
+...         AND             Set Selenium Speed                  ${SELSPEED}
+...         AND             Geocontrib Connect Superuser        ${SUPERUSERNAME}    ${SUPERUSERPASSWORD}
+...         AND             Geocontrib Create Project           ${RANDOMPROJECTNAME}
+...         AND             Geocontrib Create Featuretype       ${RANDOMFEATURETYPENAME}
+...         AND             Geocontrib Create Feature           ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
+...         AND             Geocontrib Click At Coordinates     ${X1}  ${Y1}
 
 Search for drafts
     Geocontrib Draft Search      ${RANDOMPROJECTNAME}

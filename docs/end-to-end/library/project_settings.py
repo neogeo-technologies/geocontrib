@@ -13,12 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import datetime
+
 
 def get_variables():
     variables = {
-                "GEOCONTRIB_URL": "https://geocontrib.dev.neogeo.fr",
-                "ADMIN_URL": "https://geocontrib.dev.neogeo.fr/admin",
-                "SUPERUSERNAME": "test_premier_utilisateur",
-                "SUPERUSERPASSWORD": "NuchUFs2qfQWThT",
+                "RANDOMPROJECTNAME":        "projet - {}".format(datetime.datetime.now()),
+                "RANDOMFEATURETYPENAME":    "type - {}".format(datetime.datetime.now()),
+                "RANDOMFEATURENAME":        "signalement - {}".format(datetime.datetime.now()),
+                "PROJECTEDITION":           " - projet édité",
+                "FEATURETYPEEDITION":       " - type édité",
+                "FEATUREEDITION":           " - signalement édité",
                 }
     return variables

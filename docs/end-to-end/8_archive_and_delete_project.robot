@@ -7,30 +7,25 @@ Library  library/GeoCreateLibrary.py
 Library  library/GeoDeleteLibrary.py
 
 Variables   library/tests_settings.py
+Variables   library/project_settings.py
+Variables   library/coordinates_settings.py
 
 
 *** Variables ***
 
 ${SELSPEED}     0.1
 
-${RANDOMPROJECTNAME}   ${{ "{}eme projet".format(random.randint(1, 10000)) }}
-${RANDOMFEATURETYPENAME}    ${{ "{}eme type".format(random.randint(1, 10000)) }}
-${RANDOMFEATURENAME}    ${{ "{}eme signalement".format(random.randint(1, 10000)) }}
-
 
 *** Test Cases ***
 
-[Setup]     Run Keywords    Open Browser ${GEOCONTRIB _URL}
+[Setup]     Run Keywords    Open Browser                        ${GEOCONTRIB _URL}
 ...         AND             Maximize Browser Window
-...         AND             Set Selenium Speed ${SELSPEED}
-...         AND             Geocontrib Connect Superuser  ${SUPERUSERNAME}  ${SUPERUSERPASSWORD}
-...         AND             Geocontrib Create Project  ${RANDOMPROJECTNAME}
-...         AND             Geocontrib Create Featuretype  ${RANDOMFEATURETYPENAME}
-...         AND             ${X}    Set Variable    ${{ random.randint(1, 50) }}
-...         AND             ${Y}    Set Variable    ${{ random.randint(1, 50) }}
-...         AND             Geocontrib Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
-...         AND             Click Element At Coordinates       xpath=//div[@id='map']/div/div[4]/div     ${X}  ${Y}
-...         AND             Click Element    xpath=//button[@type='submit']
+...         AND             Set Selenium Speed                  ${SELSPEED}
+...         AND             Geocontrib Connect Superuser        ${SUPERUSERNAME}    ${SUPERUSERPASSWORD}
+...         AND             Geocontrib Create Project           ${RANDOMPROJECTNAME}
+...         AND             Geocontrib Create Featuretype       ${RANDOMFEATURETYPENAME}
+...         AND             Geocontrib Click At Coordinates     ${X1}  ${Y1}
+...         AND             Geocontrib Create Feature           ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
 
 Delete Project
     Geocontrib Delete Project  ${RANDOMPROJECTNAME}   ${ADMINURL}

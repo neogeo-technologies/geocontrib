@@ -6,32 +6,29 @@ Library  library/GeoConnectLibrary.py
 Library  library/GeoCreateLibrary.py
 
 Variables   library/tests_settings.py
+Variables   library/project_settings.py
+Variables   library/coordinates_settings.py
 
 
 *** Variables ***
 
 ${SELSPEED}     0.1
 
-${RANDOMPROJECTNAME}   ${{ "projet - {}".format(datetime.datetime.now()) }}
-${RANDOMFEATURETYPENAME}    ${{ "type - {}".format(datetime.datetime.now()) }}
-${RANDOMFEATURENAME}    ${{ "signalement - {}".format(datetime.datetime.now()) }}
 
 *** Test Cases ***
 
-[Setup]     Run Keywords    Open Browser ${GEOCONTRIB _URL}
+[Setup]     Run Keywords    Open Browser                        ${GEOCONTRIB _URL}
 ...         AND             Maximize Browser Window
-...         AND             Set Selenium Speed ${SELSPEED}
-...         AND             Geocontrib Connect Superuser  ${SUPERUSERNAME}  ${SUPERUSERPASSWORD}
-...         AND             Geocontrib Create Project  ${RANDOMPROJECTNAME}
-...         AND             Geocontrib Create Featuretype  ${RANDOMFEATURETYPENAME}
-...         AND             Geocontrib Create Featuretype  ${RANDOMFEATURETYPENAME}#2
+...         AND             Set Selenium Speed                  ${SELSPEED}
+...         AND             Geocontrib Connect Superuser        ${SUPERUSERNAME}    ${SUPERUSERPASSWORD}
+...         AND             Geocontrib Create Project           ${RANDOMPROJECTNAME}
+...         AND             Geocontrib Create Featuretype       ${RANDOMFEATURETYPENAME}
+
+
 
 Create Feature #1 with Random Featurename on Random Coordinates
-    ${X}    Set Variable    ${{ random.randint(1, 50) }}
-    ${Y}    Set Variable    ${{ random.randint(1, 50) }}
     Geocontrib Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
-    Click Element At Coordinates       xpath=//div[@id='map']/div/div[4]/div     ${X}  ${Y}
-    Click Element    xpath=//button[@type='submit']
+    Geocontrib Click At Coordinates     ${X1}  ${Y1}
     # Page Should Contain     ${RANDOMFEATURENAME}
 
 Back to Project Page
@@ -40,11 +37,8 @@ Back to Project Page
 
 Create Feature #2 with Random Featurename on Random Coordinates
 
-    ${X}    Set Variable    ${{ random.randint(1, 30) }}
-    ${Y}    Set Variable    ${{ random.randint(1, 30) }}
     Geocontrib Create Feature  ${RANDOMFEATURETYPENAME}  ${RANDOMFEATURENAME}
-    Click Element At Coordinates       xpath=//div[@id='map']/div/div[4]/div     ${X}  ${Y}
-    Click Element    xpath=//button[@type='submit']
+    Geocontrib Click At Coordinates     ${X2}  ${Y2}
     # Page Should Contain     ${RANDOMFEATURENAME}
 
 # [Teardown]   Run Keywords     Close Browser

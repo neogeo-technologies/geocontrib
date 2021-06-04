@@ -14,9 +14,9 @@ ${SELSPEED}     0.1
 
 *** Test Cases ***
 
-[Setup]     Run Keywords    Open Browser ${GEOCONTRIB _URL}
+[Setup]     Run Keywords    Open Browser                        ${GEOCONTRIB _URL}
 ...         AND             Maximize Browser Window
-...         AND             Set Selenium Speed ${SELSPEED}
+...         AND             Set Selenium Speed                  ${SELSPEED}
 
 Connect GeoContrib
     Geocontrib Connect Superuser  ${SUPERUSERNAME}  ${SUPERUSERPASSWORD}
