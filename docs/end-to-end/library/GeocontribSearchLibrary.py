@@ -17,10 +17,18 @@
 from utils import get_driver
 
 
-def geocontrib_draft_search(project_name):
+def geocontrib_draft_search_list(project_name):
     get_driver().find_element_by_link_text(u"GéoContrib").click()
     get_driver().find_element_by_link_text(project_name).click()
     get_driver().find_element_by_id("map").click()
     get_driver().find_element_by_xpath("//div[2]/div/a[2]").click()
+    get_driver().find_element_by_xpath("//form[@id='form-filters']/div[2]/div/input[2]").click()
+    get_driver().find_element_by_xpath("//form[@id='form-filters']/div[2]/div/div[2]/div").click()
+
+
+def geocontrib_draft_search_map(project_name):
+    get_driver().find_element_by_link_text(u"GéoContrib").click()
+    get_driver().find_element_by_link_text(project_name).click()
+    get_driver().find_element_by_id("map").click()
     get_driver().find_element_by_xpath("//form[@id='form-filters']/div[2]/div/input[2]").click()
     get_driver().find_element_by_xpath("//form[@id='form-filters']/div[2]/div/div[2]/div").click()

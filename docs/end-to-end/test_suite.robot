@@ -58,7 +58,8 @@ Create Feature #2 with Random Featurename on Random Coordinates - Test 117
     # Page Should Contain     ${RANDOMFEATURENAME}
 
 Search for drafts - Test 168
-    Geocontrib Draft Search      ${RANDOMPROJECTNAME}
+    Geocontrib Draft Search List      ${RANDOMPROJECTNAME}
+    Geocontrib Draft Search Map       ${RANDOMPROJECTNAME}
     # Page Should Contain     ${RANDOMFEATURENAME}
 
 Create Layer - ADMIN
