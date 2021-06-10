@@ -253,6 +253,7 @@ class ProjectMapping(BaseMapContextMixin, UserPassesTestMixin, View):
 
         if formset.is_valid():
             formset.save()
+            messages.success(request, 'Enregistrement effectué.')
             return redirect('geocontrib:project_mapping', slug=project.slug)
         else:
             logger.debug(formset.errors)

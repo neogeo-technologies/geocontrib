@@ -109,7 +109,13 @@
       {% if messages %}
       <div class="row">
         <div class="fourteen wide column">
-          <div class="ui info message">
+          {% for message in messages %}
+            {% if message.tags == 'success'%}
+              <div class="ui positive message">
+            {% else %}
+              <div class="ui info message">
+            {% endif %}
+          {% endfor %}
             <div class="header">
               <i class="info circle icon"></i> Informations
             </div>
