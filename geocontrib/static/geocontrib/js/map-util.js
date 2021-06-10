@@ -131,6 +131,7 @@ const mapUtil = {
 		} = options;
 
 		map = L.map('map', {
+			maxZoom: 18,
 			zoomControl: false,
 		}).setView(
 			[
