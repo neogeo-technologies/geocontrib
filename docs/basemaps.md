@@ -18,8 +18,7 @@ Chacune de ces couches est décrite par :
 * des options : structure JSON directement interprétable par Leaflet (cf. 
 https://leafletjs.com/reference-1.6.0.html#tilelayer).
 
-Étant donné que la configuration d'une couche est très liée aux capacités de Leaflet et qu'elle ne bénéficie pas d'une 
-interface adaptée à des non-spécialistes, nous donnons ci-dessous quelques exemples de configuration.
+Étant donné que la configuration d'une couche est très liée aux capacités de Leaflet et qu'elle ne bénéficie pas d'une interface adaptée à des non-spécialistes, nous donnons ci-dessous quelques exemples de configuration.
 
 Seules les couches affichables dans la projection EPSG:3857 sont supportées.
 
@@ -97,17 +96,16 @@ une autre couche à d'autres échelles.
 Vous pouvez moduler l'opacité d'une couche à l'aide de l'option `opacity`.
 
 ## Fonds cartographiques
-Chaque projet dispose de sa propre configuration des fonds cartographiques. Cette fonction est accessible aux 
-administrateurs de chaque projet via le menu "Fonds cartographiques".
+Chaque projet dispose de sa propre configuration des fonds cartographiques. Cette fonction est accessible aux administrateurs de chaque projet via le menu "Fonds cartographiques".
 
-Un fond cartographique est une liste de couches ordonnées (couches décrites plus haut et mise à disposition des 
-administrateurs des projets par les administrateur de l'outil). Ces couches sont uniquement affichées sous forme 
-d'images dans les cartes. Elles ne peuvent pas être utilisées comme couches d'accrochage lors de la saisie 
-(aucune fonction d'accrochage n'existe dans l'application).
+Un fond cartographique est une liste de couches ordonnées (couches décrites plus haut et mise à disposition des administrateurs des projets par les administrateur de l'outil). Ces couches sont uniquement affichées sous forme d'images dans les cartes. Elles ne peuvent pas être utilisées comme couches d'accrochage lors de la saisie (aucune fonction d'accrochage n'existe dans l'application).
 
 L'ordre des couches et leur transparence peuvent être modifiés par les administrateurs du projet.
 
-Les fonds cartographiques sont mis à disposition des utilisateurs qui exploitent les outils cartographiques de 
-GéoContrib. Chacun d'eux peut activer le fond cartographique qui lui convient le mieux, voire modifier l'ordre des
-couches et leur transparence. Ces personnalisées sont enregistrées au niveau du navigateur web et n'ont pas d'impact 
-sur les autres utilisateurs de l'application.
+Les fonds cartographiques sont mis à disposition des utilisateurs qui exploitent les outils cartographiques de GéoContrib. Chacun d'eux peut activer le fond cartographique qui lui convient le mieux, voire modifier l'ordre des couches et leur transparence. Ces paramètres personnalisés sont enregistrées au niveau du navigateur web et n'ont pas d'impact sur les autres utilisateurs de l'application.
+
+### Couches requêtables
+
+Lors de la création / l'édition d'un fond cartographique, sous "Liaison fond-couche", il est possible de rendre une couche "requêtable" en cochant la case face à la couche correspondante.
+
+Depuis le site, lorsqu'une couche est requêtable, il est alors possible en la sélectionnant de consulter les données liées à certaines zones de cette couche.

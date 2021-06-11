@@ -160,7 +160,7 @@
     <!-- </div> -->
     <div class="ui divider"></div>
 
-    <button type="submit" class="ui teal icon button">
+    <button type="submit" class="ui teal icon button" onclick="return checkform()">
       <i class="white save icon"></i> Sauvegarder le type de signalement
     </button>
 
@@ -301,8 +301,38 @@
     let id_form = '#id_form-' + form_idx + '-name'
     prevent_start_with_number(id_form)
 
+    let id_form_options = '#id_form-' + form_idx + '-options';
+    addValidationOptions(id_form_options);
   })
+
+  function addValidationOptions(id_form_options){
+    $(id_form_options).on('keydown', function(e) {
+      if (e.which === 32) {
+        return false;
+      }  
+    });
+  }
   
+  var form_idx = $('#id_form-TOTAL_FORMS').val();
+  for (var i=0; i <=form_idx;i++ ){
+    let id_form_options = '#id_form-' + i + '-options';
+    addValidationOptions(id_form_options);
+  }
+
+  function checkform() {
+    let form_idx = $('#id_form-TOTAL_FORMS').val();
+    for (var i=0; i <= form_idx;i++ ){
+      let id_form_options = 'id_form-' + i + '-options';
+      let id_form_options_elem = document.getElementById(id_form_options);
+      if (typeof id_form_options_elem !== null && id_form_options_elem !== 'undefined'){
+          let id_form_options_val = document.getElementById(id_form_options);
+          if (id_form_options_val != undefined && id_form_options_val != null){
+            let new_id_form_options_val = document.getElementById(id_form_options).value.replace(/^,|,$/g, '');
+            document.getElementById(id_form_options).value = new_id_form_options_val;
+          }
+      }
+    }
+  }
 
 </script>
 

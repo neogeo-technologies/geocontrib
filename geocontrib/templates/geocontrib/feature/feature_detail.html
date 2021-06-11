@@ -365,7 +365,7 @@
     let layersToLoad = null;
     if (baseMaps && baseMaps.length > 0) {
       // Use active one if exists, otherwise index 0 (first basemap in the list)
-      const mapOptions = JSON.parse(localStorage.getItem('geocontrib-map-options'));
+      const mapOptions = JSON.parse(localStorage.getItem('geocontrib-map-options')) || {};
       const basemapIndex = mapOptions && mapOptions[project] && mapOptions[project]['current-basemap-index'] ?
                                   mapOptions[project]['current-basemap-index'] : 0;
       layersToLoad = baseMaps[basemapIndex].layers;

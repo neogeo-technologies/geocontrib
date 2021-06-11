@@ -39,8 +39,7 @@ Changements de statuts réalisables par un contributeur :
 auteur)
 * archivé -> publié (si le projet n'est pas modéré)
 * archivé -> brouillon
-* archivé -> en attente de publication (automatique si le projet est modéré et que le signalement a été édité par son 
-auteur)
+* archivé -> en attente de publication (automatique si le projet est modéré et que le signalement a été édité par son auteur)
 
 ### Modérateur
 

@@ -26,7 +26,8 @@
 
   <form id="form-type-edit" action="" method="post" enctype="multipart/form-data" class="ui form">
     {% csrf_token %}
-    {% for error in form.non_field_errors %}{% endfor %}
+    <!-- {% for error in form.non_field_errors %}{% endfor %} -->
+    {{ form.non_field_errors }}
     <h1>Créer un nouveau type de signalement pour le projet "{{ project.title }}"</h1>
     <p>Ces champs par défaut existent pour tous les types de signalement: </p>
     <div class="two fields">
@@ -162,7 +163,7 @@
 
     <div class="ui divider"></div>
 
-    <button type="submit" class="ui teal icon button">
+    <button type="submit" class="ui teal icon button" onclick="return checkform()">
       <i class="white save icon"></i> Créer le type de signalement
     </button>
 
@@ -181,7 +182,8 @@
 
   $(document).on('change', '.field-type', function () {
     var $options = $(this).parent().parent('.field').parent('.fields').children('.field-list-options')
-    if ($(this).val() === "list") {
+    if ($(this).val() 
+        "list") {
       $options.find('input').prop('required', true)
       $options.show()
     } else {
@@ -278,7 +280,6 @@
     $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
     $('.ui.dropdown').dropdown();
-
     let event = new Event('add-field');
     document.dispatchEvent(event);
 
@@ -292,9 +293,28 @@
     }
     });
 
+    let id_form_options = '#id_form-' + form_idx + '-options';
+    $(id_form_options).on('keydown', function(e) {
+      if (e.which === 32) {
+        return false;
+      }  
+    });
   })
 
- 
+  function checkform() {
+    let form_idx = $('#id_form-TOTAL_FORMS').val();
+    for (var i=0; i <= form_idx;i++ ){
+      let id_form_options = 'id_form-' + i + '-options';
+      let id_form_options_elem = document.getElementById(id_form_options);
+      if (typeof id_form_options_elem !== null && id_form_options_elem !== 'undefined'){
+          let id_form_options_val = document.getElementById(id_form_options);
+          if (id_form_options_val != undefined && id_form_options_val != null){
+            let new_id_form_options_val = document.getElementById(id_form_options).value.replace(/^,|,$/g, '');
+            document.getElementById(id_form_options).value = new_id_form_options_val;
+          }
+      }
+    }
+  }
 
 </script>
 

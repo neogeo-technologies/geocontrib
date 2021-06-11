@@ -45,6 +45,13 @@ coverage.xml
 *,cover
 .hypothesis/
 
+# Automated tests / RobotFramework
+geckodriver*
+log.html
+output.xml
+report.html
+docs/end-to-end/library/tests_settings.py
+
 # Translations
 *.mo
 *.pot
@@ -98,5 +105,8 @@ config/__init__.py
 
 # MacOS
 .DS_Store
+
+# vim
+*.sw[op]
 
 docker/docker-compose.override.yaml

@@ -14,7 +14,7 @@ GéoContrib est un outil libre de signalement contributif et collaboratif. Une v
 
 ```shell
 # Création d'un environnement virtuel Python
-python3.5 -m venv geocontrib_venv/
+python3 -m venv geocontrib_venv/
 
 # Activation de cet environnement
 source geocontrib_venv/bin/activate
@@ -22,22 +22,19 @@ source geocontrib_venv/bin/activate
 # Clonage du projet - récupération des sources
 # Actuellement, la branche par défaut du projet est develop
 # Ce sera celle qui sera active par défaut immédiatement après le clonage
-git clone https://github.com/neogeo-technologies/geocontrib.git src/
+git clone https://github.com/neogeo-technologies/geocontrib.git
+cd geocontrib
 
 # Installer les dépendances
-pip install -r src/requirements.txt
+pip install -r requirements.txt
 
 # Création d'un projet Django
 django-admin startproject config .
-
-# Création de liens symboliques pour que les sources soient visibles par Django
-ln -s src/geocontrib/ .
-ln -s src/api/ .
 ```
 
 ### Édition des fichiers settings.py et url.py
 
-Copier le contenu du fichier /src/config_sample/settings.py dans /config/settings.py.
+Copier le contenu du fichier config_sample/settings.py dans /config/settings.py.
 
 Éditer les paramètres classiques de Django dans /config/settings.py :
 * SECRET_KEY https://docs.djangoproject.com/en/2.2/ref/settings/#secret-key
@@ -66,14 +63,14 @@ Copier le contenu du fichier /src/config_sample/settings.py dans /config/setting
 * DEFAULT_BASE_MAP : configuration du fond de carte par défaut
 * PROJECT_COPY_RELATED : configuration des modèles de projets
 
-Copier le contenu du fichier /src/config_sample/urls.py dans /config/urls.py
+Copier le contenu du fichier config_sample/urls.py dans config/urls.py
 
 ### Création des tables et ajout de données initiales dans la base de données
 
 ```shell
 python manage.py migrate
-python manage.py loaddata src/geocontrib/data/perm.json
-python manage.py loaddata src/geocontrib/data/flatpages.json
+python manage.py loaddata geocontrib/data/perm.json
+python manage.py loaddata geocontrib/data/flatpages.json
 ```
 
 Ne faites pas attention aux messages d'avertissement suivants :
@@ -89,9 +86,9 @@ du fichier settings.py.
 Par exemple, copier les images fournies dans les sources de l'application :
 ```shell
 mkdir media
-cp src/geocontrib/static/geocontrib/img/default.png media/
-cp src/geocontrib/static/geocontrib/img/logo.png media/
-cp src/geocontrib/static/geocontrib/img/logo-neogeo*.png media/
+cp geocontrib/static/geocontrib/img/default.png media/
+cp geocontrib/static/geocontrib/img/logo.png media/
+cp geocontrib/static/geocontrib/img/logo-neogeo*.png media/
 ```
 
 ### Création d'un superutilisateur
@@ -141,8 +138,10 @@ python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e
 
 ## Génération du graphique du modèle
 
-Après avoir install graphiz et les django extensions
+Après avoir installé graphiz et django-extensions
 
-    ./manage.py graph_models --pygraphviz geocontrib --output docs/model.png
+```
+./manage.py graph_models --pygraphviz geocontrib --output docs/model.png
+````
 
 Le graphique est disponible ici ![docs/model.png](docs/model.png)

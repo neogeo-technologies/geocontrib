@@ -18,34 +18,33 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 	},
 
 	getFeatureInfo: function (evt) {
-		const queryableLayerSelected = document.getElementById(`queryable-layers-selector-${this.wmsParams.basemapId}`).getElementsByClassName('selected')[0].innerHTML;
-		if (queryableLayerSelected === this.wmsParams.title) {
-			// Make an AJAX request to the server and hope for the best
-			var params = this.getFeatureInfoUrl(evt.latlng);
-			var showResults = L.Util.bind(this.showGetFeatureInfo, this);
-			$.ajax({
-				url: `/api/proxy/`,
-				data: params,
-				dataType: "json",
-				success: function (data, status, xhr) {
-					var err = typeof data === 'object' ? null : data;
-					if (data.features || err) {
-						showResults(err, evt.latlng, data);
+		if (this.wmsParams.basemapId != undefined) {
+			const queryableLayerSelected = document.getElementById(`queryable-layers-selector-${this.wmsParams.basemapId}`).getElementsByClassName('selected')[0].innerHTML;
+			if (queryableLayerSelected === this.wmsParams.title) {
+				// Make an AJAX request to the server and hope for the best
+				var params = this.getFeatureInfoUrl(evt.latlng);
+				var showResults = L.Util.bind(this.showGetFeatureInfo, this);
+				$.ajax({
+					url: window.proxy_url,
+					data: params,
+					dataType: "json",
+					success: function (data, status, xhr) {
+						var err = typeof data === 'object' ? null : data;
+						if (data.features || err) {
+							showResults(err, evt.latlng, data);
+						}
+
 					}
-				},
-				error: function (xhr, status, error) {
-					if (!error) { error = 'Erreur lors du getFeatureInfo sur la carte' }
-					showResults(error, evt.latlng);
-				}
-			});
+				});
+			}
 		}
 	},
-	
+
 	getFeatureInfoUrl: function (latlng) {
 		// Construct a GetFeatureInfo request URL given a point
 		var point = this._map.latLngToContainerPoint(latlng, this._map.getZoom());
 		var size = this._map.getSize(),
-				
+
 				params = {
 					url: this._url,
 					request: 'GetFeatureInfo',
@@ -54,7 +53,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 					srs: 'EPSG:4326',
 					// styles: this.wmsParams.styles,
 					// transparent: this.wmsParams.transparent,
-					version: this.wmsParams.version,      
+					version: this.wmsParams.version,
 					// format: this.wmsParams.format,
 					bbox: this._map.getBounds().toBBoxString(),
 					height: size.y,
@@ -63,13 +62,13 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 					query_layers: this.wmsParams.layers,
 					info_format: 'application/json'
 				};
-		
+
 		params[params.version === '1.3.0' ? 'i' : 'x'] = Math.floor(point.x);
 		params[params.version === '1.3.0' ? 'j' : 'y'] = Math.floor(point.y);
-		
+
 		return params;
 	},
-	
+
 	showGetFeatureInfo: function (err, latlng, data) {
 
 		let content;
@@ -86,7 +85,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 					.setContent(content)
 					.openOn(this._map);
 		} else {
-		
+
 			// Otherwise show the content in a popup
 			let contentLines = [];
 			let contentTitle;
@@ -113,7 +112,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 });
 
 L.tileLayer.betterWms = function (url, options) {
-	return new L.TileLayer.BetterWMS(url, options);  
+	return new L.TileLayer.BetterWMS(url, options);
 };
 
 const mapUtil = {
@@ -159,29 +158,30 @@ const mapUtil = {
 	addLayers: function (layers, serviceMap, optionsMap) {
 		if (layers) {
 			layers.forEach((layer) => {
-				const options = layer.options;
-				if (options) {
-					options.opacity = layer.opacity;
+				if(layer){
+					const options = layer.options;
+					if (options) {
+						options.opacity = layer.opacity;
 
-					if (layer.schema_type === 'wms') {
-						let leafletLayer;
-						if (layer.queryable) {
-							options.title = layer.title;
-							leafletLayer = L.tileLayer
-								.betterWms(layer.service, options)
-								.addTo(map);
-						} else {
-							leafletLayer = L.tileLayer
-								.wms(layer.service, options)
-								.addTo(map);
+						if (layer.schema_type === 'wms') {
+							let leafletLayer;
+							if (layer.queryable) {
+								options.title = layer.title;
+								leafletLayer = L.tileLayer
+									.betterWms(layer.service, options)
+									.addTo(map);
+							} else {
+								leafletLayer = L.tileLayer
+									.wms(layer.service, options)
+									.addTo(map);
+							}
+							dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
+						} else if (layer.schema_type === 'tms') {
+							const leafletLayer = L.tileLayer(layer.service, options).addTo(map);
+							dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
 						}
-						dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
-					} else if (layer.schema_type === 'tms') {
-						const leafletLayer = L.tileLayer(layer.service, options).addTo(map);
-						dictLayersToLeaflet[layer.id] = leafletLayer._leaflet_id;
 					}
 				}
-			 
 			});
 		} else {
 			L.tileLayer(serviceMap, optionsMap).addTo(map);
@@ -210,6 +210,10 @@ const mapUtil = {
 	},
 
 	updateOrder(layers) {
+		// First remove existing layers undefined
+		layers = layers.filter(function(x) {
+			return x !== undefined;
+		});
 		// First remove existing layers
 		map.eachLayer((leafLetlayer) => {
 			layers.forEach((layerOptions) => {
