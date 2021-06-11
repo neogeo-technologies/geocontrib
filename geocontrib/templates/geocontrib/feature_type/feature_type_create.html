@@ -182,7 +182,8 @@
 
   $(document).on('change', '.field-type', function () {
     var $options = $(this).parent().parent('.field').parent('.fields').children('.field-list-options')
-    if ($(this).val() === "list") {
+    if ($(this).val() 
+        "list") {
       $options.find('input').prop('required', true)
       $options.show()
     } else {
@@ -281,6 +282,16 @@
     $('.ui.dropdown').dropdown();
     let event = new Event('add-field');
     document.dispatchEvent(event);
+
+    let id_form = '#id_form-' + form_idx + '-name'
+    $(id_form).keypress(function(event){
+      var key = event.which || event.keyCode;
+    if (this.selectionStart === 0) {
+        if (key >= 48 && key <= 57) {
+          event.preventDefault();
+        }
+    }
+    });
 
     let id_form_options = '#id_form-' + form_idx + '-options';
     $(id_form_options).on('keydown', function(e) {
