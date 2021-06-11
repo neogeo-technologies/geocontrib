@@ -34,9 +34,9 @@ django-admin startproject config .
 
 ### Édition des fichiers settings.py et url.py
 
-Copier le contenu du fichier config_sample/settings.py dans /config/settings.py.
+Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 
-Éditer les paramètres classiques de Django dans /config/settings.py :
+Éditer les paramètres classiques de Django dans config/settings.py :
 * SECRET_KEY https://docs.djangoproject.com/en/2.2/ref/settings/#secret-key
 * DEBUG https://docs.djangoproject.com/en/2.2/ref/settings/#debug
 * DATABASES https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -53,7 +53,7 @@ Copier le contenu du fichier config_sample/settings.py dans /config/settings.py.
 * DATA_UPLOAD_MAX_NUMBER_FIELDS https://docs.djangoproject.com/fr/2.2/ref/settings/#data-upload-max-number-fields
 * LOGIN_URL https://docs.djangoproject.com/fr/3.1/ref/settings/#login-url
 
-Éditer les paramètres spécifiques à l'outil dans /config/settings.py :
+Éditer les paramètres spécifiques à l'outil dans config/settings.py :
 * BASE_URL : URL du site, par exemple "https://geocontrib.deme.neogeo.fr"
 * DEFAULT_SENDING_FREQUENCY : fréquence d'envoi des notifications par email (never/instantly/daily/weekly)
 * APPLICATION_NAME : nom de l'application telle qu'elle apparaît dans l'IHM
