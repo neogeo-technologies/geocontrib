@@ -658,6 +658,7 @@ $(document).ready(function() {
   //              MAP             //
   // **************************** //
 
+  window.proxy_url = "{% url "api:proxy" %}";
   // Load into js variables the python context.
   const layers = JSON.parse(document.getElementById('layers').textContent);
   const features = JSON.parse(document.getElementById('features').textContent).features;

@@ -33,7 +33,11 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 						if (data.features || err) {
 							showResults(err, evt.latlng, data);
 						}
-
+					},
+					error: function (xhr, status, errorThrown) {
+						xhr.status;
+						xhr.responseText;
+						alert(status)
 					}
 				});
 			}
