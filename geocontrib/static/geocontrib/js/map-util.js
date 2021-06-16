@@ -37,7 +37,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 					error: function (xhr, status, errorThrown) {
 						xhr.status;
 						xhr.responseText;
-						alert(status)
+						console.log(status)
 					}
 				});
 			}
