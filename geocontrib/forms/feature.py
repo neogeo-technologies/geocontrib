@@ -48,7 +48,7 @@ class FeatureBaseForm(forms.ModelForm):
             initial = 'pending'
 
         if project.moderation and Authorization.has_permission(user, 'can_publish_feature', project):
-            choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] in ['draft', 'published', 'archived'])
+            choices = tuple(x for x in Feature.STATUS_CHOICES if x[0] in ['draft', 'pending', 'published', 'archived'])
             initial = 'draft'
 
         self.fields['status'] = forms.ChoiceField(
