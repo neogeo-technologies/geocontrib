@@ -13,9 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from robot.libraries.BuiltIn import BuiltIn
+import datetime
 
 
-def get_driver():
-    sl = BuiltIn().get_library_instance("SeleniumLibrary")
-    return sl.driver
+def get_variables():
+    variables = {
+                "RANDOMPROJECTNAME":        "projet - {}".format(datetime.datetime.now()),
+                "RANDOMFEATURETYPENAME":    "type - {}".format(datetime.datetime.now()),
+                "RANDOMFEATURENAME":        "signalement - {}".format(datetime.datetime.now()),
+                "PROJECTEDITION":           " - projet édité",
+                "FEATURETYPEEDITION":       " - type édité",
+                "FEATUREEDITION":           " - signalement édité",
+                }
+    return variables

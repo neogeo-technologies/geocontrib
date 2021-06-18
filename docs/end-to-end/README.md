@@ -1,6 +1,6 @@
 # Tests end-to-end
 
-Les tests end-to-end fournis permettent de vérifier les fonctionnalités principales de l'application GeoContrib.
+Les tests end-to-end fournis permettent de vérifier les fonctionnalités principales de l'application GeoContrib. Les numéros des fichiers .robot correspondent aux numéros des chapitres du plan de validation.
 
 
 ## Licence et auteurs

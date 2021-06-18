@@ -13,28 +13,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-
-import selenium
-
+from selenium.webdriver.common.action_chains import ActionChains
 from utils import get_driver
 
 
-def geo_json_export():
-    get_driver().find_element_by_xpath("//img").click()
-    get_driver().find_element_by_link_text(
-        u"Pour test de création de signalement"
-    ).click()
-    get_driver().find_element_by_link_text(
-        u"Pour test de création de signalement"
-    ).click()
-    get_driver().find_element_by_link_text("Exporter").click()
-    get_driver().find_element_by_xpath("//div[3]/div/div").click()
-
-
-def geo_json_import():
-    get_driver().find_element_by_xpath(
-        "//form[@id='form-import-features']/div/label/span"
-    ).click()
-    get_driver().find_element_by_id("json_file").clear()
-    get_driver().find_element_by_id("json_file").send_keys("export_projet.json")
+def geocontrib_click_at_coordinates(pos_x, pos_y):
+    actions = ActionChains(get_driver())
+    my_map = get_driver().find_element_by_xpath("//html/body/main/div/div/form/div[3]/div/div/div[1]/div[4]/div")
+    actions.move_to_element_with_offset(my_map, pos_x, pos_y).click().perform()
     get_driver().find_element_by_xpath("//button[@type='submit']").click()
