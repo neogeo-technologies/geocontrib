@@ -90,6 +90,10 @@ class Feature(models.Model):
             'slug': self.project.slug, 'feature_type_slug': self.feature_type.slug,
             'feature_id': self.feature_id})
 
+    def change_status(self, status):
+        self.status = status
+        self.save()
+
     @property
     def custom_fields_as_list(self):
         CustomField = apps.get_model(app_label='geocontrib', model_name="CustomField")
