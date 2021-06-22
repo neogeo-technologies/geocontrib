@@ -205,6 +205,14 @@
 
     <!-- Signalements liés -->
     <div class="ui horizontal divider">SIGNALEMENTS LIÉS</div>
+      <div class="ui hidden negative message error-liason" >
+        <i class="close icon"></i>
+        <div class="header">
+          Choisir un signalement lié
+        </div>
+        <p>Pourriez-vous choisir un signalement pour la nouvelle liaison ?
+        </p>
+      </div>
     {{ linked_formset.non_form_errors }}
     <div id="formsets-link">
       {{ linked_formset.management_form }}
@@ -269,7 +277,7 @@
 
     <div class="ui divider"></div>
 
-    <button type="submit" class="ui teal icon button">
+    <button type="submit" class="ui teal icon button" onClick="return check_form()" >
       <i class="white save icon"></i> Enregistrer les changements
     </button>
 
@@ -825,6 +833,41 @@ $(document).ready(function() {
     }).addTo(map);
     var marker;
 
+  $('.error-liason .close')
+  .on('click', function() {
+    $(this)
+      .closest('.message')
+      .transition('fade')
+    ;
+  });
 })
+
+function check_form(){
+  if (!empty_feature_to()){
+    return false;
+  }
+}
+
+function empty_feature_to() {
+  var form_idx = $('#formsets-link [name=linked-TOTAL_FORMS]').val();
+  console.log(form_idx)
+  for (let i=0; i < form_idx; i++){
+    let x;
+    try{
+      x = document.getElementById("id_linked-" + i + "-feature_to").value;
+      if (x == 'None') {
+          $('.error-liason').removeClass("hidden");
+          return false;
+      };
+    }
+    catch{
+      console.log('erreur id formsets');
+      return true;
+      // continue;
+    }
+    
+  }
+}
+
 </script>
 {% endblock %}

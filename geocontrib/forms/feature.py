@@ -168,3 +168,13 @@ class FeatureLinkForm(forms.ModelForm):
                 obj.title, obj.display_creator, obj.created_on.strftime("%d/%m/%Y %H:%M"))
         except Exception:
             logger.exception('No related features found')
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        # import pdb; pdb.set_trace()
+        if not cleaned_data.get('DELETE'):
+            if self._errors.get('feature_to'):
+                from django.forms.utils import ErrorList
+                errors = self._errors.setdefault("feature_to", ErrorList())
+                errors.pop()
+                errors.append(u"Le signalement lié n'est pas correcte.")
