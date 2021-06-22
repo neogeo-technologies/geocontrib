@@ -840,6 +840,15 @@ $(document).ready(function() {
       .transition('fade')
     ;
   });
+  
+  const errorlist = document.getElementsByClassName('errorlist');
+  $.each(errorlist, function(index, value ) {
+    // console.log('index ', index)
+    console.log('value ', value.previousSibling.nodeValue)
+    if (value.previousSibling.nodeValue == 'feature_to'){
+      value.previousSibling.nodeValue = 'Error de signalement'
+    }
+  });
 })
 
 function check_form(){

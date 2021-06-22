@@ -171,10 +171,10 @@ class FeatureLinkForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = self.cleaned_data
-        # import pdb; pdb.set_trace()
         if not cleaned_data.get('DELETE'):
             if self._errors.get('feature_to'):
                 from django.forms.utils import ErrorList
                 errors = self._errors.setdefault("feature_to", ErrorList())
-                errors.pop()
+                if len(errors)>0:
+                    errors.pop()
                 errors.append(u"Le signalement lié n'est pas correcte.")
