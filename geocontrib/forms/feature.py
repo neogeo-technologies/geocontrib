@@ -177,4 +177,4 @@ class FeatureLinkForm(forms.ModelForm):
                 errors = self._errors.setdefault("feature_to", ErrorList())
                 if len(errors)>0:
                     errors.pop()
-                errors.append(u"Le signalement lié n'est pas correcte.")
+                errors.append("Le signalement lié n'est pas correcte.")

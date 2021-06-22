@@ -843,8 +843,6 @@ $(document).ready(function() {
   
   const errorlist = document.getElementsByClassName('errorlist');
   $.each(errorlist, function(index, value ) {
-    // console.log('index ', index)
-    console.log('value ', value.previousSibling.nodeValue)
     if (value.previousSibling.nodeValue == 'feature_to'){
       value.previousSibling.nodeValue = 'Error de signalement'
     }
@@ -859,7 +857,6 @@ function check_form(){
 
 function empty_feature_to() {
   var form_idx = $('#formsets-link [name=linked-TOTAL_FORMS]').val();
-  console.log(form_idx)
   for (let i=0; i < form_idx; i++){
     let x;
     try{
@@ -872,10 +869,10 @@ function empty_feature_to() {
     catch{
       console.log('erreur id formsets');
       return true;
-      // continue;
     }
     
   }
+  return true;
 }
 
 </script>
