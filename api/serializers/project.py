@@ -10,10 +10,15 @@ from geocontrib.models import Project
 User = get_user_model()
 
 
-class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = (
+            'title',
+            'slug',
+            'created_on',
+            'updated_on'
+        )
 
 
 class ProjectDetailedSerializer(serializers.ModelSerializer):

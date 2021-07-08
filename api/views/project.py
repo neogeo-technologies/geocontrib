@@ -18,18 +18,23 @@ User = get_user_model()
 class ProjectView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
 
     queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
+    serializer_class = ProjectDetailedSerializer
     permission_classes = [
-        permissions.IsAuthenticated,
+        # permissions.IsAuthenticated,
+        permissions.AllowAny,
     ]
     http_method_names = ['get', 'delete']
 
     lookup_field = 'slug'
 
 
+
 class ProjectDetails(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectDetailedSerializer
+
+
+
 
 class Projects(APIView):
     queryset = Project.objects.all()
@@ -41,6 +46,7 @@ class Projects(APIView):
         data = { 'projects': projets }
 
         return Response(data=data, status=200)
+
 
 class ProjectDatas(APIView):
     queryset = Project.objects.all()
