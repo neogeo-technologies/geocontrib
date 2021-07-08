@@ -5,6 +5,7 @@ services:
 
   geocontrib:
     container_name: "geocontrib_django"
+    image: neogeo/geocontrib:tim
     build:
       context: ..
       dockerfile: Dockerfile
