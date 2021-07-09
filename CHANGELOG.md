@@ -8,12 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - Redmine 9634: Prevent user to select negative valides in "Délai avant archivage" and "Délai avant suppression"
+- Redmine 9803: Display feature status "En attente de publication" for admins and moderators
+- Redmine 10106: Improve error message when trying to create an feature link without destination feature
 - Redmine 10342: Prevents the name of field (of a feature type) to start by a number
 - Redmine 10348: Feature links, fix print two links printed per link.
 - Redmine 10667: Prevent user to add spaces before/after a choice in field of type list in the feature type definition
 - Redmine 11066: The basemaps requests now work when creating a feature.
 - Redmine 11067: Limit the zoom factor when the user have searched an addresse
 - Redmine 11080: Notify the user when the base maps of a project where recorded correctly
+- Redmine 11164: Fix feature list in django admin
+- Redmine 11119: Fix duplicates research when importing json features
 
 ## [1.3.3] - 2021-05-06
 
