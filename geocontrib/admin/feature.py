@@ -26,6 +26,7 @@ from geocontrib.models import FeatureType
 from geocontrib.models import FeatureLink
 from geocontrib.models import CustomField
 
+from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDropdownFilter, ChoiceDropdownFilter
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -168,10 +169,49 @@ class FeatureTypeAdmin(admin.ModelAdmin):
         return TemplateResponse(request, "admin/geocontrib/create_postrges_view_form.html", context)
 
 
+def to_draft(modeladmin, request, queryset):
+    for e in queryset:
+        e.change_status('draft')
+to_draft.short_description = "Changer status à Brouillon"
+
+def to_pending(modeladmin, request, queryset):
+    for e in queryset:
+        e.change_status('pending')
+to_pending.short_description = "Changer status à 'En attente de publication'"
+
+def to_published(modeladmin, request, queryset):
+    for e in queryset:
+        e.change_status('published')
+to_published.short_description = "Changer status à Publié"
+
+def to_archived(modeladmin, request, queryset):
+    for e in queryset:
+        e.change_status('archived')
+to_archived.short_description = "Changer status à Archivé"
+
+
 class FeatureAdmin(admin.ModelAdmin):
-    list_display = ('title', 'project', 'feature_type')
-    list_filter = ('project',)
+    actions = [to_draft, to_pending, to_published, to_archived]
+    list_display = ('title', 'project', 'get_feature_type', 'status', 'contributeur')
+    list_filter = (('project__slug',DropdownFilter),('feature_type__title',DropdownFilter),'status',('creator',RelatedDropdownFilter),)
     ordering = ('project', 'feature_type', 'title')
+    
+    def contributeur(self, obj):
+        contributeurs = Authorization.objects.filter(
+            level__rank=2, project=obj.feature_type.project.pk
+            ).values_list('user__username', flat=True)
+        list_contributeurs = [contributeur for contributeur in contributeurs] 
+        return list_contributeurs
+    contributeur.short_description = 'Contributeur'
+
+    def get_feature_type(self, obj):
+        res = "N/A"
+        try:
+            res = obj.feature_type.title
+        except Exception:
+            pass
+        return res
+    get_feature_type.short_description = 'Type de signalement'
 
 
 class FeatureLinkAdmin(admin.ModelAdmin):

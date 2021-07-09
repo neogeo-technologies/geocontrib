@@ -35,6 +35,7 @@ CORE_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'django.contrib.flatpages',
+    'django_admin_listfilter_dropdown',
 ]
 THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis', cast=Csv())
 OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
