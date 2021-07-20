@@ -14,6 +14,7 @@ from .misc import EventSerializer
 from .misc import StackedEventSerializer
 from .project import ProjectSerializer
 from .project import ProjectDetailedSerializer
+from .flat_pages import FlatPagesSerializer
 
 
 __all__ = [
@@ -35,4 +36,5 @@ __all__ = [
     StackedEventSerializer,
     ProjectSerializer,
     ProjectDetailedSerializer,
+    FlatPagesSerializer
 ]

@@ -24,7 +24,6 @@ class ProjectView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.Gene
         permissions.AllowAny,
     ]
     http_method_names = ['get', 'delete']
-
     lookup_field = 'slug'
 
 
@@ -48,7 +47,7 @@ class Projects(APIView):
         return Response(data=data, status=200)
 
 
-class ProjectDatas(APIView):
+class ProjectData(APIView):
     queryset = Project.objects.all()
     lookup_field = 'slug'
     http_method_names = ['get', ]
