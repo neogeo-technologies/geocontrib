@@ -12,5 +12,4 @@ class FlatPagesView(ListAPIView):
     ]
     serializer_class = FlatPagesSerializer
     http_method_names = ['get', ]
-    data = queryset
 
