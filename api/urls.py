@@ -1,7 +1,9 @@
 from django.urls import include, path
 from rest_framework import routers
 
+from django.contrib.auth import views as auth_views
 
+from geocontrib.views import MyAccount
 
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureSearch
@@ -13,6 +15,8 @@ from api.views.base_map import GetFeatureInfo
 from api.views.user import UserViewSet
 from api.views.login import LoginView
 from api.views.flat_pages import FlatPagesView
+from api.views.sso import SsoView
+from api.views.user import UserLevelProjectView
 
 
 app_name = 'api'
@@ -24,11 +28,20 @@ router.register(r'users', UserViewSet, basename='users')
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # Vues générales de navigation
-    path("login/", LoginView.as_view(), name="signin-view"),
+    path('connexion/', auth_views.LoginView.as_view(
+        template_name='geocontrib/registration/login.html'), name='login'),
+    path('deconnexion/', auth_views.LogoutView.as_view(
+        template_name='geocontrib/registration/login.html'), name='logout'),
+    path('mon-compte/', MyAccount.as_view(), name='my_account'),
+    path("login/", LoginView.as_view(), name="signin-view"), # //? utile ?
+
     path('aide/', FlatPagesView.as_view(), name='help'),
-    path('mentions/', FlatPagesView, {'url': '/mentions/'}, name='legal'),
+
+    path('sso/', SsoView.as_view(), name='sso'),
 
     # Vues de gestion et d'édition des données métiers
+    path('user_level_project/', UserLevelProjectView.as_view(), name='user_level_project'),
+
     path(
         'user/<slug:slug>',
         ProjectData.as_view(), name='user'),
