@@ -13,7 +13,8 @@ build testing docker image:
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR/docker --dockerfile $CI_PROJECT_DIR/docker/Dockerfile --destination neogeo/geocontrib:latest
+    - cat /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/Dockerfile --destination neogeo/geocontrib:latest
 
 build stable docker image:
   stage: build
@@ -27,7 +28,7 @@ build stable docker image:
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR/docker --dockerfile $CI_PROJECT_DIR/docker/Dockerfile --destination neogeo/geocontrib:stable
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/Dockerfile --destination neogeo/geocontrib:stable
 
 build tagged docker image:
   stage: build
@@ -41,5 +42,5 @@ build tagged docker image:
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR/docker --dockerfile $CI_PROJECT_DIR/docker/Dockerfile --destination neogeo/geocontrib:$CI_COMMIT_TAG
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/Dockerfile --destination neogeo/geocontrib:$CI_COMMIT_TAG
 
