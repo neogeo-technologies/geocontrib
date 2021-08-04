@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [1.3.4] - 2021-08-04
+
 ### Fixed
 
 - Redmine 9634: Prevent user to select negative valides in "Délai avant archivage" and "Délai avant suppression"
@@ -16,8 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 11066: The basemaps requests now work when creating a feature.
 - Redmine 11067: Limit the zoom factor when the user have searched an addresse
 - Redmine 11080: Notify the user when the base maps of a project where recorded correctly
-- Redmine 11164: Fix feature list in django admin
 - Redmine 11119: Fix duplicates research when importing json features
+- Redmine 11164: Fix feature list in django admin
 
 ## [1.3.3] - 2021-05-06
 
