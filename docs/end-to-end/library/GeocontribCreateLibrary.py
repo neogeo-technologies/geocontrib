@@ -14,19 +14,14 @@
 # under the License.
 
 
-import time
-
-import selenium
-from selenium.webdriver import ActionChains
-
 from utils import get_driver
 
 
-def geo_create_project(projectname):
+def geocontrib_create_project(project_name):
     get_driver().find_element_by_link_text(u"Créer un nouveau projet").click()
     get_driver().find_element_by_id("id_title").click()
     get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys(projectname)
+    get_driver().find_element_by_id("id_title").send_keys(project_name)
     get_driver().find_element_by_xpath(
         "//form[@id='form-project-edit']/div[5]/div[3]/div"
     ).click()
@@ -42,19 +37,19 @@ def geo_create_project(projectname):
     get_driver().find_element_by_xpath("//button[@type='submit']").click()
 
 
-def geo_create_featuretype(featuretypename):
+def geocontrib_create_featuretype(feature_type_name):
     get_driver().find_element_by_link_text(
         u"Créer un nouveau type de signalement"
     ).click()
     get_driver().find_element_by_id("id_title").click()
     get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys(featuretypename)
+    get_driver().find_element_by_id("id_title").send_keys(feature_type_name)
     get_driver().find_element_by_xpath("//button[@type='submit']").click()
 
 
-def geo_create_feature(featuretypename, featurename):
+def geocontrib_create_feature(feature_type_name, feature_name):
     get_driver().find_element_by_xpath("//div[2]/div/div/div/div/a[2]/i").click()
     get_driver().find_element_by_id("id_title").click()
     get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys(featurename)
+    get_driver().find_element_by_id("id_title").send_keys(feature_name)
     get_driver().find_element_by_link_text("Dessiner un point").click()

@@ -13,20 +13,24 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import time
 
 from utils import get_driver
 
 
-def geo_connect_superuser(username, userpassword):
+def geocontrib_json_export(project_name, feature_type_name, added_text):
+    get_driver().find_element_by_xpath("//img").click()
+    get_driver().find_element_by_link_text(project_name).click()
+    get_driver().find_element_by_link_text("{}{}".format(feature_type_name, added_text)).click()
+    get_driver().find_element_by_link_text("Exporter").click()
+    get_driver().find_element_by_xpath("//div[3]/div/div").click()
 
-    get_driver().find_element_by_link_text("Se Connecter").click()
-    get_driver().find_element_by_name("username").clear()
-    get_driver().find_element_by_name("username").send_keys(username)
-    get_driver().find_element_by_name("password").clear()
-    get_driver().find_element_by_name("password").send_keys(userpassword)
+
+def geocontrib_json_import():
+    get_driver().find_element_by_xpath(
+        "//form[@id='form-import-features']/div/label/span"
+    ).click()
+    get_driver().find_element_by_id("json_file").click()
+    time.sleep(1)
+    get_driver().send_keys("export_projet.json")
     get_driver().find_element_by_xpath("//button[@type='submit']").click()
-
-
-def geo_disconnect():
-
-    get_driver().find_element_by_xpath("//i").click()

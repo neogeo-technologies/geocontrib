@@ -13,9 +13,18 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from robot.libraries.BuiltIn import BuiltIn
+
+from utils import get_driver
 
 
-def get_driver():
-    sl = BuiltIn().get_library_instance("SeleniumLibrary")
-    return sl.driver
+def geocontrib_connect_superuser(username, password):
+    get_driver().find_element_by_link_text("Se Connecter").click()
+    get_driver().find_element_by_name("username").clear()
+    get_driver().find_element_by_name("username").send_keys(username)
+    get_driver().find_element_by_name("password").clear()
+    get_driver().find_element_by_name("password").send_keys(password)
+    get_driver().find_element_by_xpath("//button[@type='submit']").click()
+
+
+def geocontrib_disconnect():
+    get_driver().find_element_by_xpath("//i").click()

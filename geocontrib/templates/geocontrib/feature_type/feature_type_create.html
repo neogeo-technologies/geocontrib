@@ -163,7 +163,7 @@
 
     <div class="ui divider"></div>
 
-    <button type="submit" class="ui teal icon button">
+    <button type="submit" class="ui teal icon button" onclick="return checkform()">
       <i class="white save icon"></i> Créer le type de signalement
     </button>
 
@@ -279,10 +279,41 @@
     $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
 
     $('.ui.dropdown').dropdown();
-
     let event = new Event('add-field');
     document.dispatchEvent(event);
+
+    let id_form = '#id_form-' + form_idx + '-name'
+    $(id_form).keypress(function(event){
+      var key = event.which || event.keyCode;
+    if (this.selectionStart === 0) {
+        if (key >= 48 && key <= 57) {
+          event.preventDefault();
+        }
+    }
+    });
+
+    let id_form_options = '#id_form-' + form_idx + '-options';
+    $(id_form_options).on('keydown', function(e) {
+      if (e.which === 32) {
+        return false;
+      }  
+    });
   })
+
+  function checkform() {
+    let form_idx = $('#id_form-TOTAL_FORMS').val();
+    for (var i=0; i <= form_idx;i++ ){
+      let id_form_options = 'id_form-' + i + '-options';
+      let id_form_options_elem = document.getElementById(id_form_options);
+      if (typeof id_form_options_elem !== null && id_form_options_elem !== 'undefined'){
+          let id_form_options_val = document.getElementById(id_form_options);
+          if (id_form_options_val != undefined && id_form_options_val != null){
+            let new_id_form_options_val = document.getElementById(id_form_options).value.replace(/^,|,$/g, '');
+            document.getElementById(id_form_options).value = new_id_form_options_val;
+          }
+      }
+    }
+  }
 
 </script>
 

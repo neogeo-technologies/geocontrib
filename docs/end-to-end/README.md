@@ -1,6 +1,6 @@
 # Tests end-to-end
 
-Les tests end-to-end fournis permettent de vérifier les fonctionnalités principales de l'application GeoContrib.
+Les tests end-to-end fournis permettent de vérifier les fonctionnalités principales de l'application GeoContrib. Les numéros des fichiers .robot correspondent aux numéros des chapitres du plan de validation.
 
 
 ## Licence et auteurs
@@ -34,7 +34,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 ### Prérequis
 
-- Mozilla Firefox avec Geckodriver (https://pypi.org/project/geckodriver-autoinstaller/) ou navigateur Chromium avec ChromeDriver (https://pypi.org/project/chromedriver-py/)
+- Mozilla Firefox avec Geckodriver (https://github.com/mozilla/geckodriver) ou navigateur Chromium avec ChromeDriver (https://chromedriver.chromium.org/downloads)
 - Version de GeoContrib fournie
 
 L'utilisation d'un environnement virtuel est recommandée
@@ -46,11 +46,13 @@ pip install -r src/docs/end-to-end/requirements.txt
 
 ## Configuration
 
-### Variables à éditer dans test_suite.robot
+Copier le contenu du fichier .env_sample dans le fichier .env
 
-- ${URL}
-- ${SUPERUSERNAME}  Utilisateur avec droits d'administration, de super-utilisateur et de gestionnaire équipe
-- ${SUPERUSERPASSWORD} 
+### Variables à éditer dans .env
+
+- URL
+- SUPERUSERNAME  Utilisateur avec droits d'administration, de super-utilisateur et de gestionnaire équipe
+- SUPERUSERPASSWORD 
 
 
 ## Fonctionnalités testées

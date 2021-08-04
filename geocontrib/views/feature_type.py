@@ -298,7 +298,7 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
             )
             if title:
                 simili_features = Feature.objects.filter(
-                    Q(title=title, description=description) | Q(geom=current.geom)
+                    Q(title=title, description=description, feature_type=feature_type) | Q(geom=current.geom, feature_type=feature_type)
                 ).exclude(feature_id=current.feature_id)
 
                 if simili_features.count() > 0:
