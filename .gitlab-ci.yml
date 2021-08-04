@@ -19,7 +19,7 @@ build testing docker image:
 build stable docker image:
   stage: build
   only:
-    - stable
+    - master
   tags:
     - internal
   image:
