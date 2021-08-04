@@ -3,8 +3,8 @@ stages:
 
 build testing docker image:
   stage: build
-  only:
-    - develop
+  #only:
+  #  - develop
   tags:
     - internal
   image:
@@ -12,7 +12,7 @@ build testing docker image:
     entrypoint: [""]
   script:
     - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > /kaniko/.docker/config.json
+    - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"${DOCKER_AUTH}\"}}}" > /kaniko/.docker/config.json
     - cat /kaniko/.docker/config.json
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/docker/Dockerfile --destination neogeo/geocontrib:latest
 
