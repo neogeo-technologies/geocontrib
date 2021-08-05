@@ -182,8 +182,7 @@
 
   $(document).on('change', '.field-type', function () {
     var $options = $(this).parent().parent('.field').parent('.fields').children('.field-list-options')
-    if ($(this).val() 
-        "list") {
+    if ($(this).val("list")) {
       $options.find('input').prop('required', true)
       $options.show()
     } else {

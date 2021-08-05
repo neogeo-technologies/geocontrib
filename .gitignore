@@ -98,9 +98,8 @@ ENV/
 .pyc
 
 manage.py
-config/settings.py
-config/wsgi.py
-config/__init__.py
+config/
+media/
 /docker/nginx/conf.d/geocontrib.conf
 
 # MacOS

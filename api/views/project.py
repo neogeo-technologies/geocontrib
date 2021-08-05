@@ -24,9 +24,39 @@ class ProjectView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.Gene
         permissions.AllowAny,
     ]
     http_method_names = ['get', 'delete']
-
     lookup_field = 'slug'
 
+
+
+class ProjectDetails(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectDetailedSerializer
+
+
+
+
+class Projects(APIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectDetailedSerializer
+    http_method_names = ['get', ]
+
+    def get(self, request):
+        projets = Project.objects.all()
+        data = { 'projects': projets }
+
+        return Response(data=data, status=200)
+
+
+class ProjectData(APIView):
+    queryset = Project.objects.all()
+    lookup_field = 'slug'
+    http_method_names = ['get', ]
+
+    def get(self, request, slug):
+        projet = Project.objects.filter(slug=slug).values()
+        data = { 'project_data': list(projet) }
+
+        return Response(data=data, status=200)
 
 
 class ProjectDetails(viewsets.ModelViewSet):
