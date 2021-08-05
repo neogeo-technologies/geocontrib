@@ -72,6 +72,7 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'updated_on',
             'description',
             'moderation',
+            'is_project_type',
             'thumbnail',
             'creator',
             'access_level_pub_feature',

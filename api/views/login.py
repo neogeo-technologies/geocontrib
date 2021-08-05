@@ -1,6 +1,6 @@
 import logging
 
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class LoginView(views.APIView):
-
+    
     authentication_classes = [] # //? sert à quelque chose ?
 
     permission_classes = [
@@ -55,4 +55,19 @@ class UserInfoView(views.APIView):
             "detail": _(f"{user.username} session is enabled"),
             "user":  UserSerializer(user).data
         }
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+class LogoutView(views.APIView):
+#class SignoutView(views.APIView):
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+        #permissions.AllowAny,
+    ]
+
+    def get(self, request):
+        username = request.user.username
+        logout(request)
+        data = {"detail": _(f"{username} signed out")}
         return Response(data=data, status=status.HTTP_200_OK)
