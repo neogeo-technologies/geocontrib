@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class LoginView(views.APIView):
-    
+
     authentication_classes = [] # //? sert à quelque chose ?
 
     permission_classes = [

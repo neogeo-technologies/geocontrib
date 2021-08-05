@@ -25,7 +25,7 @@ from api.views.user import UserLevelProjectView
 app_name = 'api'
 
 router = routers.DefaultRouter()
-#router.register(r'projects', ProjectView, basename='projects')
+router.register(r'projects', ProjectView, basename='projects')
 router.register(r'projects2', ProjectDetails)
 router.register(r'users', UserViewSet, basename='users')
 
@@ -37,7 +37,7 @@ urlpatterns = [
     path('deconnexion/', auth_views.LogoutView.as_view(
         template_name='geocontrib/registration/login.html'), name='logout'),
     path('mon-compte/', MyAccount.as_view(), name='my_account'),
-    
+
     path("login/", LoginView.as_view(), name="signin-view"),
     path("user_info/", UserInfoView.as_view(), name="user-info"), 
     path("logout/", LogoutView.as_view(), name="signout-view"),

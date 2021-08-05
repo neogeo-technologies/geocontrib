@@ -1,6 +1,7 @@
 from django.db.models import F
 from django.contrib.auth import get_user_model
 
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import viewsets
@@ -19,8 +20,7 @@ User = get_user_model()
 class ProjectView(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
 
     queryset = Project.objects.all()
-    #serializer_class = ProjectDetailedSerializer
-    serializer_class = ProjectSerializer
+    serializer_class = ProjectDetailedSerializer
     permission_classes = [
         # permissions.IsAuthenticated,
         permissions.AllowAny,
@@ -31,8 +31,13 @@ class ProjectView(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.Destroy
 
 
 class ProjectDetails(viewsets.ModelViewSet):
+    lookup_field = 'slug'
     queryset = Project.objects.all()
     serializer_class = ProjectCreationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
 
 
 class ProjectData(APIView):
