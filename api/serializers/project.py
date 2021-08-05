@@ -5,6 +5,7 @@ from geocontrib.models import Authorization
 from geocontrib.models import Comment
 from geocontrib.models import Feature
 from geocontrib.models import Project
+from geocontrib.models import UserLevelPermission
 
 
 User = get_user_model()
@@ -84,4 +85,22 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'nb_comments',
             'nb_published_features_comments',
             'nb_contributors'
+        )
+
+class ProjectCreationSerializer(serializers.ModelSerializer):
+    access_level_pub_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
+    access_level_arch_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
+    class Meta:
+        model = Project
+        fields = (
+            'title',
+            'slug',
+            'description',
+            'moderation',
+            'is_project_type',
+            'creator',
+            'access_level_pub_feature',
+            'access_level_arch_feature',
+            'archive_feature',
+            'delete_feature',
         )

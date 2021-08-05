@@ -25,7 +25,7 @@ from api.views.user import UserLevelProjectView
 app_name = 'api'
 
 router = routers.DefaultRouter()
-router.register(r'projects', ProjectView, basename='projects')
+#router.register(r'projects', ProjectView, basename='projects')
 router.register(r'projects2', ProjectDetails)
 router.register(r'users', UserViewSet, basename='users')
 

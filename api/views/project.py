@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from api.serializers import ProjectSerializer
+from api.serializers.project import ProjectCreationSerializer
 from api.serializers import ProjectDetailedSerializer
 from geocontrib.models import Authorization
 from geocontrib.models import Project
@@ -15,36 +16,23 @@ from geocontrib.models import Project
 User = get_user_model()
 
 
-class ProjectView(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+class ProjectView(mixins.ListModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
 
     queryset = Project.objects.all()
-    serializer_class = ProjectDetailedSerializer
+    #serializer_class = ProjectDetailedSerializer
+    serializer_class = ProjectSerializer
     permission_classes = [
         # permissions.IsAuthenticated,
         permissions.AllowAny,
     ]
-    http_method_names = ['get', 'delete']
+    http_method_names = ['get', 'delete', 'post']
     lookup_field = 'slug'
 
 
 
 class ProjectDetails(viewsets.ModelViewSet):
     queryset = Project.objects.all()
-    serializer_class = ProjectDetailedSerializer
-
-
-
-
-class Projects(APIView):
-    queryset = Project.objects.all()
-    serializer_class = ProjectDetailedSerializer
-    http_method_names = ['get', ]
-
-    def get(self, request):
-        projets = Project.objects.all()
-        data = { 'projects': projets }
-
-        return Response(data=data, status=200)
+    serializer_class = ProjectCreationSerializer
 
 
 class ProjectData(APIView):
@@ -57,13 +45,6 @@ class ProjectData(APIView):
         data = { 'project_data': list(projet) }
 
         return Response(data=data, status=200)
-
-
-class ProjectDetails(viewsets.ModelViewSet):
-    queryset = Project.objects.all()
-    serializer_class = ProjectDetailedSerializer
-
-
 
 
 class Projects(APIView):
