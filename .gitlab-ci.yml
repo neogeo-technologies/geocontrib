@@ -56,10 +56,9 @@ sonarqube-check:
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
-  #only:
-  #  - develop
+  only:
+    - develop
   stage: Static analysis
   script:
     - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectName=$CI_PROJECT_NAME -Dsonar.projectVersion=$CI_COMMIT_BRANCH
   allow_failure: true
-  when: manual
