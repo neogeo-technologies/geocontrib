@@ -8,10 +8,9 @@ from geocontrib.views import MyAccount
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureSearch
 from api.views.project import ProjectView
+from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectAuthorization
 from api.views.project import ProjectData
-from api.views.project import ProjectDatas
-from api.views.project import ProjectDetails
 from api.views.base_map import GetFeatureInfo
 from api.views.user import UserViewSet
 from api.views.login import LoginView
@@ -26,7 +25,6 @@ app_name = 'api'
 
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectView, basename='projects')
-router.register(r'projects2', ProjectDetails)
 router.register(r'users', UserViewSet, basename='users')
 
 urlpatterns = [
@@ -54,8 +52,8 @@ urlpatterns = [
         'projet/<slug:slug>/project',
         ProjectData.as_view(), name='project-data'),
     path(
-        'projet/<slug:slug>/project',
-        ProjectDatas.as_view(), name='project-data'),
+        'project/<slug:slug>/thumbnail',
+        ProjectThumbnailView.as_view(), name='project-thumbnail'),
     path(
         'projet/<slug:slug>/utilisateurs',
         ProjectAuthorization.as_view(), name='project-authorization'),
@@ -65,7 +63,7 @@ urlpatterns = [
     path(
         'projet/<slug:slug>/signalement/recherche/',
         FeatureSearch.as_view(), name='feature-search'),
-    
+
     path(
         'proxy/',
         GetFeatureInfo.as_view(), name='proxy'),

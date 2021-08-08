@@ -90,6 +90,7 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
 class ProjectCreationSerializer(serializers.ModelSerializer):
     access_level_pub_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
     access_level_arch_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
+
     class Meta:
         model = Project
         fields = (
@@ -104,3 +105,9 @@ class ProjectCreationSerializer(serializers.ModelSerializer):
             'archive_feature',
             'delete_feature',
         )
+
+class ProjectThumbnailSerializer(serializers.Serializer):
+    thumbnail = serializers.FileField()
+
+
+
