@@ -13,7 +13,7 @@ build testing docker image:
   only:
     - develop
   tags:
-    - internal
+    - build
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -28,7 +28,7 @@ build stable docker image:
   only:
     - master
   tags:
-    - internal
+    - build
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -42,7 +42,7 @@ build tagged docker image:
   only:
     - tags
   tags:
-    - internal
+    - build
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
