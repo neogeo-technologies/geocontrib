@@ -144,4 +144,4 @@ Après avoir installé graphiz et django-extensions
 ./manage.py graph_models --pygraphviz geocontrib --output docs/model.png
 ````
 
-Le graphique est disponible ici ![docs/model.png](docs/model.png)
+Le graphique est disponible ici [docs/model.png](docs/model.png)
