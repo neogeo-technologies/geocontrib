@@ -114,6 +114,7 @@ USE_TZ = True
 
 # URL prefix
 URL_PREFIX = config('URL_PREFIX', default='')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Static and media files
 STATIC_URL = '/{}static/'.format(URL_PREFIX)
