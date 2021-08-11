@@ -98,10 +98,8 @@ ENV/
 .pyc
 
 manage.py
-config/settings.py
-config/wsgi.py
-config/__init__.py
-/docker/nginx/conf.d/geocontrib.conf
+config/
+docker/nginx/conf.d/geocontrib.conf
 
 # MacOS
 .DS_Store
@@ -109,4 +107,4 @@ config/__init__.py
 # vim
 *.sw[op]
 
-docker/docker-compose.override.yaml
+docker/docker-compose.override.*

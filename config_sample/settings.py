@@ -147,12 +147,12 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': config('LOG_LEVEL', default='DEBUG'),
+            'level': config('LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
         'plugin_georchestra': {
             'handlers': ['console'],
-            'level': config('LOG_LEVEL', default='DEBUG'),
+            'level': config('LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
     },
@@ -241,3 +241,12 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 
 # 10683
 BASE_URL = config('BASE_URL', default='http://localhost:8000')
+
+# CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
+cas_server_url = config('CAS_SERVER_URL')
+if cas_server_url:
+    CAS_SERVER_URL = cas_server_url
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'django_cas_ng.backends.CASBackend',
+    )
