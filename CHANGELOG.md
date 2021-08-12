@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [1.3.5] - 2021-08-11
+
+### Changed
+
+- Redmine 11377: Docker configuration can handle user management by a CAS server 
+
 ## [1.3.4] - 2021-08-04
 
 ### Fixed

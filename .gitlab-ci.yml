@@ -1,12 +1,19 @@
 stages:
   - build
+  - Static analysis
+
+variables:
+  SONAR_PROJECTKEY: "$CI_PROJECT_NAME"
+  SONAR_HOST_URL: "https://sonarqube.neogeo.fr"
+  GIT_DEPTH: 0
+
 
 build testing docker image:
   stage: build
   only:
     - develop
   tags:
-    - internal
+    - build
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -21,7 +28,7 @@ build stable docker image:
   only:
     - master
   tags:
-    - internal
+    - build
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -35,7 +42,7 @@ build tagged docker image:
   only:
     - tags
   tags:
-    - internal
+    - build
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -44,3 +51,14 @@ build tagged docker image:
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination neogeo/geocontrib:$CI_COMMIT_TAG
 
+
+sonarqube-check:
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  only:
+    - develop
+  stage: Static analysis
+  script:
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectName=$CI_PROJECT_NAME -Dsonar.projectVersion=$CI_COMMIT_BRANCH
+  allow_failure: true

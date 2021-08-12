@@ -7,3 +7,4 @@ psycopg2-binary==2.8.2
 python-decouple==3.3
 requests
 django-admin-list-filter-dropdown
+django-cas-ng
