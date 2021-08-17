@@ -1,7 +1,7 @@
 import json
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos.error import GEOSException
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -121,4 +121,9 @@ class GeoJSONProcessing:
             import_task.status = "finished"
             import_task.finished_on = timezone.now()
         import_task.infos = "/n".join(self.infos)
-        import_task.save()
+        import_task.save(update_fields=['status', 'started_on', 'finished_on', 'infos'])
+
+
+def geojson_processing(import_task):
+    process = GeoJSONProcessing()
+    process(import_task)
