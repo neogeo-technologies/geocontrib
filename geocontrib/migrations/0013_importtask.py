@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import geocontrib.models.task
-import geocontrib.utils.validators
 
 
 class Migration(migrations.Migration):
@@ -22,7 +21,7 @@ class Migration(migrations.Migration):
                 ('started_on', models.DateTimeField(blank=True, null=True, verbose_name='Date de démarrage')),
                 ('finished_on', models.DateTimeField(blank=True, null=True, verbose_name='Date de fin de traîtement')),
                 ('status', models.CharField(choices=[('pending', 'En attente'), ('processing', 'En cours'), ('finished', 'Terminé'), ('failed', 'Échoué')], default='pending', max_length=10, verbose_name="Status d'avancement")),
-                ('geojson_file', models.FileField(blank=True, null=True, upload_to=geocontrib.models.task.ImportTask.import_path, validators=[geocontrib.utils.validators.MimetypeValidator(mimetypes=('application/json',))], verbose_name='Fichier Importé')),
+                ('geojson_file', models.FileField(blank=True, null=True, upload_to=geocontrib.models.task.ImportTask.import_path, verbose_name='Fichier Importé')),
                 ('infos', models.TextField(blank=True)),
                 ('feature_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='geocontrib.FeatureType')),
                 ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='geocontrib.Project')),

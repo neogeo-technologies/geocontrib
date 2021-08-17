@@ -30,7 +30,7 @@ from geocontrib.models import FeatureType
 from geocontrib.models import FeatureLink
 from geocontrib.models import CustomField
 from geocontrib.models import ImportTask
-
+from geocontrib.tasks import task_geojson_processing
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -367,8 +367,21 @@ class FeatureLinkAdmin(admin.ModelAdmin):
         return actions
 
 
+class ImportTaskAdmin(admin.ModelAdmin):
+
+    actions = (
+        'import_geojson',
+    )
+
+    def import_geojson(self, request, queryset):
+        for import_task in queryset:
+            task_geojson_processing.apply_async(kwargs={'import_task_id': import_task.pk})
+        messages.info(request, 'Le traitement des données est en cours.')
+    import_geojson.short_description = "Appliquer les opérations d'import"
+
+
 admin.site.register(CustomField, CustomFieldAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(FeatureLink, FeatureLinkAdmin)
-admin.site.register(ImportTask)
+admin.site.register(ImportTask, ImportTaskAdmin)

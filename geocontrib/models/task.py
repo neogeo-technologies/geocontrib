@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.contrib.gis.db import models
 
-from geocontrib.utils.validators import validate_json
-
 
 class ImportTask(models.Model):
 
@@ -44,7 +42,6 @@ class ImportTask(models.Model):
     geojson_file = models.FileField(
         "Fichier Importé",
         upload_to=import_path,
-        validators=[validate_json, ],
         blank=True, null=True
     )
 
@@ -53,9 +50,3 @@ class ImportTask(models.Model):
     class Meta:
         verbose_name = "Tâche d'import"
         verbose_name_plural = "Tâches d'import"
-
-    def save(self, *args, **kwargs):
-        # geojson_file.validators n'est pas appelé lors du create()/save()
-        # ce full_clean() force la validation
-        self.full_clean()
-        super().save(*args, **kwargs)

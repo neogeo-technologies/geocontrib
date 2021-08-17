@@ -25,7 +25,7 @@ from geocontrib.models import FeatureType
 from geocontrib.models import ImportTask
 from geocontrib.models import Project
 from geocontrib.views.common import DECORATORS
-from geocontrib.tasks import create_features_from_geojson
+from geocontrib.tasks import task_geojson_processing
 
 
 @method_decorator(DECORATORS, name='dispatch')
@@ -314,7 +314,7 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
         except Exception:
             messages.error(request, "Erreur à l'import du fichier. ")
         else:
-            create_features_from_geojson.apply_async(kwargs={'import_task_id': import_task.pk})
+            task_geojson_processing.apply_async(kwargs={'import_task_id': import_task.pk})
             messages.info(request, "L'import du fichier réussi. Le traitement des données est en cours. ")
         return redirect('geocontrib:feature_type_detail', slug=slug, feature_type_slug=feature_type_slug)
 
