@@ -11,6 +11,8 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import path
 from django.template.loader import render_to_string
+from django_admin_listfilter_dropdown.filters import DropdownFilter
+from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 
 from geocontrib.admin.filters import FeatureTypeFilter
 from geocontrib.admin.filters import ProjectFilter
@@ -25,6 +27,7 @@ from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import FeatureLink
 from geocontrib.models import CustomField
+from geocontrib.models import ImportTask
 
 
 logger = logging.getLogger(__name__)
@@ -173,6 +176,23 @@ class FeatureAdmin(admin.ModelAdmin):
     list_filter = ('project',)
     ordering = ('project', 'feature_type', 'title')
 
+    def contributeur(self, obj):
+        contributeurs = Authorization.objects.filter(
+            level__rank=2, project=obj.feature_type.project.pk
+            ).values_list('user__username', flat=True)
+        list_contributeurs = [contributeur for contributeur in contributeurs]
+        return list_contributeurs
+    contributeur.short_description = 'Contributeur'
+
+    def get_feature_type(self, obj):
+        res = "N/A"
+        try:
+            res = obj.feature_type.title
+        except Exception:
+            pass
+        return res
+    get_feature_type.short_description = 'Type de signalement'
+
 
 class FeatureLinkAdmin(admin.ModelAdmin):
     list_filter = (
@@ -310,3 +330,4 @@ admin.site.register(CustomField, CustomFieldAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(FeatureLink, FeatureLinkAdmin)
+admin.site.register(ImportTask)

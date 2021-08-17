@@ -1,11 +1,7 @@
-import json
-
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos.error import GEOSException
-from django.db import IntegrityError, transaction
-from django.db.models import Q
 from django.forms import modelformset_factory
 from django.forms.models import model_to_dict
 from django.http import JsonResponse
@@ -25,10 +21,11 @@ from geocontrib.forms import FeatureTypeModelForm
 from geocontrib.models import Authorization
 from geocontrib.models import CustomField
 from geocontrib.models import Feature
-from geocontrib.models import FeatureLink
 from geocontrib.models import FeatureType
+from geocontrib.models import ImportTask
 from geocontrib.models import Project
 from geocontrib.views.common import DECORATORS
+from geocontrib.tasks import create_features_from_geojson
 
 
 @method_decorator(DECORATORS, name='dispatch')
@@ -257,44 +254,16 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
         project = feature_type.project
         return Authorization.has_permission(user, 'can_create_feature', project)
 
-    def get_geom(self, geom):
-
-        # Si geoJSON
-        if isinstance(geom, dict):
-            geom = str(geom)
+    def post(self, request, slug, feature_type_slug):
+        feature_type = self.get_object()
         try:
-            geom = GEOSGeometry(geom, srid=4326)
-        except (GEOSException, ValueError):
-            geom = None
-        return geom
-
-    def get_feature_data(self, feature_type, properties, field_names):
-
-        feature_data = {}
-        if hasattr(feature_type, 'customfield_set'):
-            for field in field_names:
-                feature_data[field] = properties.get(field)
-        return feature_data
-
-    def create_features(self, request, creator, data, feature_type):
-        new_features = data.get('features')
-        nb_features = len(new_features)
-        field_names = feature_type.customfield_set.values_list('name', flat=True)
-
-        for feature in new_features:
-            properties = feature.get('properties')
-            feature_data = self.get_feature_data(feature_type, properties, field_names)
-            title = properties.get('title')
-            description = properties.get('description')
-            current = Feature.objects.create(
-                title=title,
-                description=description,
-                status='draft',
-                creator=creator,
+            up_file = request.FILES['json_file']
+            import_task = ImportTask.objects.create(
+                created_on=timezone.now(),
                 project=feature_type.project,
                 feature_type=feature_type,
-                geom=self.get_geom(feature.get('geometry')),
-                feature_data=feature_data,
+                user=request.user,
+                geojson_file=up_file
             )
             if title:
                 simili_features = Feature.objects.filter(
@@ -343,16 +312,10 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
             up_file = request.FILES['json_file'].read()
             data = json.loads(up_file.decode('utf-8'))
         except Exception:
-            logger.exception('ImportFromGeoJSON.post')
             messages.error(request, "Erreur à l'import du fichier. ")
         else:
-            try:
-                with transaction.atomic():
-                    self.check_feature_type_slug(request, data, feature_type_slug)
-                    self.create_features(request, request.user, data, feature_type)
-            except IntegrityError:
-                messages.error(request, "Erreur lors de l'import d'un fichier GeoJSON. ")
-
+            create_features_from_geojson.apply_async(kwargs={'import_task_id': import_task.pk})
+            messages.info(request, "L'import du fichier réussi. Le traitement des données est en cours. ")
         return redirect('geocontrib:feature_type_detail', slug=slug, feature_type_slug=feature_type_slug)
 
 

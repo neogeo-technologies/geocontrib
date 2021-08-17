@@ -19,6 +19,7 @@ from api.views.login import UserInfoView
 from api.views.flat_pages import FlatPagesView
 from api.views.user import UserLevelProjectView
 
+from api.views.misc import ImportTaskSearch
 
 
 app_name = 'api'
@@ -26,6 +27,7 @@ app_name = 'api'
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectView, basename='projects')
 router.register(r'users', UserViewSet, basename='users')
+router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
