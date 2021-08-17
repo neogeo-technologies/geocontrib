@@ -251,3 +251,18 @@ if cas_server_url:
         'django.contrib.auth.backends.ModelBackend',
         'django_cas_ng.backends.CASBackend',
     )
+
+# CELERY/REDIS confs (#10665)
+REDIS_HOST = config('REDIS_HOST', default='localhost')
+
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379')
+
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://localhost:6379')
+
+CELERY_ACCEPT_CONTENT = config('CELERY_ACCEPT_CONTENT', default='application/json, ', cast=Csv())
+
+CELERY_TASK_SERIALIZER = config('CELERY_TASK_SERIALIZER', default='json')
+
+CELERY_RESULT_SERIALIZER = config('CELERY_RESULT_SERIALIZER', default='json')
+
+CACHE_SECOND = config('CACHE_SECOND', default=120, cast=int)

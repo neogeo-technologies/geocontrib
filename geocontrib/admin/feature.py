@@ -11,6 +11,8 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import path
 from django.template.loader import render_to_string
+from django_admin_listfilter_dropdown.filters import DropdownFilter
+from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 
 from geocontrib.admin.filters import FeatureTypeFilter
 from geocontrib.admin.filters import ProjectFilter
@@ -25,8 +27,8 @@ from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import FeatureLink
 from geocontrib.models import CustomField
+from geocontrib.models import ImportTask
 
-from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDropdownFilter, ChoiceDropdownFilter
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -195,12 +197,12 @@ class FeatureAdmin(admin.ModelAdmin):
     list_display = ('title', 'project', 'get_feature_type', 'status', 'contributeur')
     list_filter = (('project__slug',DropdownFilter),('feature_type__title',DropdownFilter),'status',('creator',RelatedDropdownFilter),)
     ordering = ('project', 'feature_type', 'title')
-    
+
     def contributeur(self, obj):
         contributeurs = Authorization.objects.filter(
             level__rank=2, project=obj.feature_type.project.pk
             ).values_list('user__username', flat=True)
-        list_contributeurs = [contributeur for contributeur in contributeurs] 
+        list_contributeurs = [contributeur for contributeur in contributeurs]
         return list_contributeurs
     contributeur.short_description = 'Contributeur'
 
@@ -350,3 +352,4 @@ admin.site.register(CustomField, CustomFieldAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(FeatureLink, FeatureLinkAdmin)
+admin.site.register(ImportTask)

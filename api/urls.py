@@ -6,12 +6,14 @@ from api.views.feature import FeatureSearch
 from api.views.project import ProjectView
 from api.views.project import ProjectAuthorization
 from api.views.base_map import GetFeatureInfo
+from api.views.misc import ImportTaskSearch
 
 
 app_name = 'api'
 
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectView, basename='projects')
+router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 
 urlpatterns = [
     path(

@@ -15,6 +15,7 @@ from .feature import Feature
 from .feature import FeatureLink
 from .feature import FeatureType
 from .feature import CustomField
+from .task import ImportTask
 
 __all__ = [
     User,
@@ -34,4 +35,5 @@ __all__ = [
     FeatureLink,
     FeatureType,
     CustomField,
+    ImportTask
 ]
