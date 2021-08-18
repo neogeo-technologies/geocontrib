@@ -265,52 +265,6 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
                 user=request.user,
                 geojson_file=up_file
             )
-            if title:
-                simili_features = Feature.objects.filter(
-                    Q(title=title, description=description) | Q(geom=current.geom)
-                ).exclude(feature_id=current.feature_id)
-
-                if simili_features.count() > 0:
-                    for row in simili_features:
-                        FeatureLink.objects.get_or_create(
-                            relation_type='doublon',
-                            feature_from=current,
-                            feature_to=row
-                        )
-        if nb_features > 0:
-            msg = "{nb} signalement(s) importé(s). ".format(nb=nb_features)
-            messages.info(request, msg)
-
-    def check_feature_type_slug(self, request, data, feature_type_slug):
-        features = data.get('features', [])
-        if len(features) == 0:
-            messages.error(
-                request,
-                "Aucun signalement n'est indiqué dans l'entrée 'features'. ")
-            raise IntegrityError
-
-        for feat in features:
-            feature_type_import = feat.get('properties', {}).get('feature_type')
-            if not feature_type_import:
-                messages.error(
-                    request,
-                    "Le type de signalement doit etre indiqué dans l'entrée 'feature_type' de chaque signalement. ")
-                raise IntegrityError
-
-            elif feature_type_import != feature_type_slug:
-                messages.error(
-                    request,
-                    "Le type de signalement ne correspond pas à celui en cours de création: '{dest}'. ".format(
-                        dest=feature_type_slug
-                    ))
-                raise IntegrityError
-
-    @transaction.atomic
-    def post(self, request, slug, feature_type_slug):
-        feature_type = self.get_object()
-        try:
-            up_file = request.FILES['json_file'].read()
-            data = json.loads(up_file.decode('utf-8'))
         except Exception:
             messages.error(request, "Erreur à l'import du fichier. ")
         else:

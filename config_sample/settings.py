@@ -239,19 +239,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = config('DATA_UPLOAD_MAX_NUMBER_FIELDS', default=
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 # 10683
-<<<<<<< HEAD
 BASE_URL = config('BASE_URL', default='http://localhost:8000')
-=======
-BASE_URL = config('BASE_URL', default='http://localhost:8000')
-
-# CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
-cas_server_url = config('CAS_SERVER_URL', default=None)
-if cas_server_url:
-    CAS_SERVER_URL = cas_server_url
-    AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.ModelBackend',
-        'django_cas_ng.backends.CASBackend',
-    )
 
 # CELERY/REDIS confs (#10665)
 REDIS_HOST = config('REDIS_HOST', default='localhost')
@@ -267,4 +255,3 @@ CELERY_TASK_SERIALIZER = config('CELERY_TASK_SERIALIZER', default='json')
 CELERY_RESULT_SERIALIZER = config('CELERY_RESULT_SERIALIZER', default='json')
 
 CACHE_SECOND = config('CACHE_SECOND', default=120, cast=int)
->>>>>>> d9ba6ed... init celery import geojson

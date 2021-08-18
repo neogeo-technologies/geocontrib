@@ -21,6 +21,7 @@ class ImportTaskSearch(
             queryset = queryset.filter(status__icontains=status)
         if feature_type_id:
             queryset = queryset.filter(feature_type__pk=feature_type_id)
+        queryset = queryset.order_by('-id')[:5]
         return queryset
 
     def get_queryset(self):

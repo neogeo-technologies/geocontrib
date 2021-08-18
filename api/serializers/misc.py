@@ -142,6 +142,24 @@ class StackedEventSerializer(serializers.ModelSerializer):
 
 class ImportTaskSerializer(serializers.ModelSerializer):
 
+    project_title = serializers.SerializerMethodField()
+    feature_type_title = serializers.SerializerMethodField()
+    geojson_file_name = serializers.SerializerMethodField()
+
+    
+    def get_project_title(self, obj):
+        return str(obj.project.slug)
+
+    def get_feature_type_title(self, obj):
+        return str(obj.feature_type.slug)
+
+    def get_geojson_file_name(self, obj):
+        try:
+            filename = str(obj.geojson_file.name.split('/')[-1])
+        except:
+            filename = 'example_error.file'
+        return filename
+
     class Meta:
         model = ImportTask
         fields = (
@@ -149,9 +167,12 @@ class ImportTaskSerializer(serializers.ModelSerializer):
             'started_on',
             'finished_on',
             'status',
-            'project',
-            'feature_type',
+            # 'project',
+            'project_title',
+            # 'feature_type',
+            'feature_type_title',
             'user',
             # 'geojson_file',
+            'geojson_file_name',
             'infos',
         )
