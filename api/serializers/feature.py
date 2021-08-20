@@ -58,7 +58,8 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
             'color',
             'colors_style',
             'project',
-            'customfield_set'
+            'customfield_set',
+            'is_editable',
         )
 
 
