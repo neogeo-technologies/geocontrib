@@ -41,6 +41,27 @@ class FeatureTypeSerializer(serializers.ModelSerializer):
         )
 
 
+class FeatureTypeListSerializer(serializers.ModelSerializer):
+
+    project = serializers.ReadOnlyField(source='project.slug')
+    customfield_set = CustomFieldSerializer(
+        many=True,
+        read_only=True
+        )
+
+    class Meta:
+        model = FeatureType
+        fields = (
+            'title',
+            'slug',
+            'geom_type',
+            'color',
+            'colors_style',
+            'project',
+            'customfield_set'
+        )
+
+
 class FeatureTypeColoredSerializer(serializers.ModelSerializer):
 
     class Meta:

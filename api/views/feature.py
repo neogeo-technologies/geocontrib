@@ -6,17 +6,38 @@ from django.contrib.gis.geos.error import GEOSException
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from rest_framework import permissions
 from rest_framework import views
+from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
 from api import logger
 from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureSearchSerializer
+from api.serializers import FeatureTypeListSerializer
 from geocontrib.models import Feature
+from geocontrib.models import FeatureType
 from geocontrib.models import Project
 
 
 User = get_user_model()
+
+
+class FeatureTypeView(viewsets.ModelViewSet):
+    """
+    Get all features and can create one
+    """
+    lookup_field = 'slug'
+    queryset = FeatureType.objects.all()
+    serializer_class = FeatureTypeListSerializer
+    
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
 
 
 class CustomPagination(LimitOffsetPagination):

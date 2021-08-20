@@ -3,6 +3,7 @@ from .base_map import BaseMapSerializer
 from .base_map import LayerSerializer
 from .feature import CustomFieldSerializer
 from .feature import FeatureTypeSerializer
+from .feature import FeatureTypeListSerializer
 from .feature import FeatureTypeColoredSerializer
 from .feature import FeatureGeoJSONSerializer
 from .feature import FeatureSearchSerializer
@@ -23,6 +24,7 @@ __all__ = [
     LayerSerializer,
     CustomFieldSerializer,
     FeatureTypeSerializer,
+    FeatureTypeListSerializer,
     FeatureTypeColoredSerializer,
     FeatureGeoJSONSerializer,
     FeatureSearchSerializer,

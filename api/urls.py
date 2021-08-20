@@ -7,9 +7,11 @@ from geocontrib.views import MyAccount
 
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureSearch
+from api.views.feature import FeatureTypeView
 from api.views.project import ProjectView
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectAuthorization
+# from api.views.project import ProjetImportFromGeoJSON
 from api.views.project import ProjectData
 from api.views.base_map import GetFeatureInfo
 from api.views.user import UserViewSet
@@ -18,7 +20,6 @@ from api.views.login import LogoutView
 from api.views.login import UserInfoView
 from api.views.flat_pages import FlatPagesView
 from api.views.user import UserLevelProjectView
-
 from api.views.misc import ImportTaskSearch
 
 
@@ -26,6 +27,7 @@ app_name = 'api'
 
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectView, basename='projects')
+router.register(r'feature-type', FeatureTypeView, basename='projects')
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 
