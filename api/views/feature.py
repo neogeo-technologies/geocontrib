@@ -3,19 +3,22 @@ import json
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Polygon
 from django.contrib.gis.geos.error import GEOSException
+from django.db.models import query
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from api import serializers
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import views
 from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
 
 from api import logger
 from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureSearchSerializer
 from api.serializers import FeatureTypeListSerializer
-from geocontrib.models import Feature
+from geocontrib.models import Feature, feature
 from geocontrib.models import FeatureType
 from geocontrib.models import Project
 
@@ -38,6 +41,25 @@ class FeatureTypeView(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
+
+    def get_object(self):
+        slug = self.kwargs.get('slug') or None
+        obj = get_object_or_404(FeatureType, slug=self.kwargs.get('slug'))
+        return obj
+
+
+class ProjectFeatureTypes(views.APIView):
+    queryset = Project.objects.all()
+    lookup_field = 'slug'
+    http_method_names = ['get', ]
+
+    def get(self, request, slug):
+        feature_types = FeatureType.objects.filter(project__slug=slug)
+        serializers = FeatureTypeListSerializer(feature_types, many=True)
+        data = {
+            'feature_types': serializers.data,
+        }
+        return Response(data, status=200)
 
 
 class CustomPagination(LimitOffsetPagination):

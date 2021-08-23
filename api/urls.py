@@ -11,6 +11,7 @@ from api.views.feature import FeatureTypeView
 from api.views.project import ProjectView
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectAuthorization
+from api.views.feature import ProjectFeatureTypes
 # from api.views.project import ProjetImportFromGeoJSON
 from api.views.project import ProjectData
 from api.views.base_map import GetFeatureInfo
@@ -61,6 +62,9 @@ urlpatterns = [
     path(
         'projet/<slug:slug>/utilisateurs',
         ProjectAuthorization.as_view(), name='project-authorization'),
+    path(
+        'projet/<slug:slug>/feature_types',
+        ProjectFeatureTypes.as_view(), name='project-authorization'),
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/export',
         ExportFeatureList.as_view(), name='project-export'),
