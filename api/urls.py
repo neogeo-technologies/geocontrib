@@ -8,10 +8,10 @@ from geocontrib.views import MyAccount
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureSearch
 from api.views.feature import FeatureTypeView
+from api.views.feature import ProjectFeatureTypes
 from api.views.project import ProjectView
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectAuthorization
-from api.views.feature import ProjectFeatureTypes
 # from api.views.project import ProjetImportFromGeoJSON
 from api.views.project import ProjectData
 from api.views.base_map import GetFeatureInfo
@@ -22,6 +22,7 @@ from api.views.login import UserInfoView
 from api.views.flat_pages import FlatPagesView
 from api.views.user import UserLevelProjectView
 from api.views.misc import ImportTaskSearch
+from api.views.misc import ProjectComments
 
 
 app_name = 'api'
@@ -64,7 +65,10 @@ urlpatterns = [
         ProjectAuthorization.as_view(), name='project-authorization'),
     path(
         'projet/<slug:slug>/feature_types',
-        ProjectFeatureTypes.as_view(), name='project-authorization'),
+        ProjectFeatureTypes.as_view(), name='project-feature-types'),
+    path(
+        'projet/<slug:slug>/comments',
+        ProjectComments.as_view(), name='project-comments'),
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/export',
         ExportFeatureList.as_view(), name='project-export'),

@@ -1,3 +1,4 @@
+from geocontrib.models.annotation import Attachment, Comment
 from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 from rest_framework import serializers
@@ -236,4 +237,33 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
         fields = (
             'relation_type',
             'feature_to',
+        )
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Comment
+        fields = (
+            'comment',
+        )
+
+
+class FeatureTypeAttachmentsSerializer(serializers.ModelSerializer):
+    
+    comment = CommentsSerializer()
+
+    class Meta:
+        model = Attachment
+        fields = (
+            'id',
+            'created_on',
+            'feature_id',
+            'author',
+            'project',
+            'title',
+            'info',
+            'object_type',
+            'attachment_file',
+            'comment'
         )
