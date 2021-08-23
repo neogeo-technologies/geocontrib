@@ -8,6 +8,7 @@ from geocontrib.views import MyAccount
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureSearch
 from api.views.feature import FeatureTypeView
+from api.views.feature import ProjectFeature
 from api.views.feature import ProjectFeatureTypes
 from api.views.project import ProjectView
 from api.views.project import ProjectThumbnailView
@@ -66,6 +67,9 @@ urlpatterns = [
     path(
         'projet/<slug:slug>/feature_types',
         ProjectFeatureTypes.as_view(), name='project-feature-types'),
+    path(
+        'projet/<slug:slug>/feature',
+        ProjectFeature.as_view(), name='project-feature'),
     path(
         'projet/<slug:slug>/comments',
         ProjectComments.as_view(), name='project-comments'),

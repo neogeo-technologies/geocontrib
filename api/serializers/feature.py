@@ -64,6 +64,28 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
         )
 
 
+class FeatureListSerializer(serializers.ModelSerializer):
+
+    project = serializers.ReadOnlyField(source='project.slug')
+    feature_type = FeatureTypeSerializer()
+
+    class Meta:
+        model = Feature
+        fields = (
+            'feature_id',
+            'title',
+            'description',
+            'status',
+            'created_on',
+            'updated_on',
+            'creator',
+            'project',
+            'feature_type',
+            'geom',
+            'feature_data',
+        )
+
+
 class FeatureTypeColoredSerializer(serializers.ModelSerializer):
 
     class Meta:
