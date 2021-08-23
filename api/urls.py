@@ -17,6 +17,7 @@ from api.views.project import ProjectAuthorization
 from api.views.project import ProjectData
 from api.views.base_map import GetFeatureInfo
 from api.views.user import UserViewSet
+from api.views.login import MyAccountView
 from api.views.login import LoginView
 from api.views.login import LogoutView
 from api.views.login import UserInfoView
@@ -44,7 +45,8 @@ urlpatterns = [
     path('mon-compte/', MyAccount.as_view(), name='my_account'),
 
     path("login/", LoginView.as_view(), name="signin-view"),
-    path("user_info/", UserInfoView.as_view(), name="user-info"), 
+    path("user_info/", UserInfoView.as_view(), name="user-info"),
+    path("my_account/", MyAccountView.as_view(), name="my-account"),
     path("logout/", LogoutView.as_view(), name="signout-view"),
 
     path('flat-pages/', FlatPagesView.as_view(), name='help'),
