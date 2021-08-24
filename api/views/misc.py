@@ -4,10 +4,16 @@ from rest_framework import viewsets
 from rest_framework import views
 from rest_framework.response import Response
 
+from django.shortcuts import get_object_or_404
+
 from api.serializers.misc import ImportTaskSerializer
+from api.serializers import CommentSerializer
 from api.serializers.feature import FeatureTypeAttachmentsSerializer
 from geocontrib.models.task import ImportTask
 from geocontrib.models import Attachment
+from geocontrib.models import Authorization
+from geocontrib.models import Comment
+from geocontrib.models import Feature
 from geocontrib.models import Project
 
 class ImportTaskSearch(
@@ -43,10 +49,30 @@ class ProjectComments(views.APIView):
     lookup_field = 'slug'
     http_method_names = ['get', ]
 
+    def get_object(self):
+        slug = self.kwargs.get('slug') or None
+        obj = get_object_or_404(Project, slug=self.kwargs.get('slug'))
+        return obj
+
     def get(self, request, slug):
-        attachments = Attachment.objects.filter(project__slug=slug)
-        serializers = FeatureTypeAttachmentsSerializer(attachments, many=True)
+        user = self.request.user
+        project = self.get_object()
+        permissions = Authorization.all_permissions(user, project)
+
+        # On filtre les signalements selon leur statut et l'utilisateur courant
+        features = Feature.handy.availables(
+            user=user,
+            project=project
+        ).order_by('-created_on')
+
+        # On filtre les commentaire selon les signalements visibles
+        last_comments = Comment.objects.filter(
+            project=project,
+            feature_id__in=[feat.feature_id for feat in features]
+        ).order_by('-created_on')[0:5]
+
+        serialized_comments = CommentSerializer(last_comments, many=True).data
         data = {
-            'attachments': serializers.data,
+            'last_comments': serialized_comments,
         }
         return Response(data, status=200)
