@@ -79,6 +79,7 @@ class FeatureListSerializer(serializers.ModelSerializer):
             'created_on',
             'updated_on',
             'creator',
+            'display_creator',
             'project',
             'feature_type',
             'geom',
