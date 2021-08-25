@@ -68,7 +68,6 @@ class FeatureListSerializer(serializers.ModelSerializer):
 
     project = serializers.ReadOnlyField(source='project.slug')
     feature_type = FeatureTypeSerializer()
-    created_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
 
     class Meta:
         model = Feature
@@ -80,7 +79,6 @@ class FeatureListSerializer(serializers.ModelSerializer):
             'created_on',
             'updated_on',
             'creator',
-            'display_creator',
             'project',
             'feature_type',
             'geom',
