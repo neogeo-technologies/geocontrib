@@ -3,11 +3,10 @@ import json
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Polygon
 from django.contrib.gis.geos.error import GEOSException
-from django.db.models import query
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from api import serializers
 from rest_framework import generics
+from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import views
 from rest_framework import viewsets
@@ -19,8 +18,7 @@ from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureSearchSerializer
 from api.serializers.feature import FeatureListSerializer
 from api.serializers import FeatureTypeListSerializer
-from api.serializers import FeatureTypeCreationSerializer
-from geocontrib.models import Feature, feature
+from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import Project
 
@@ -28,34 +26,22 @@ from geocontrib.models import Project
 User = get_user_model()
 
 
-class FeatureTypeView(viewsets.ModelViewSet):
-    """
-    Get all features and can create one
-    """
+class FeatureTypeView(
+            mixins.ListModelMixin,
+            mixins.RetrieveModelMixin,
+            mixins.CreateModelMixin,
+            mixins.UpdateModelMixin,
+            viewsets.GenericViewSet):
+
     lookup_field = 'slug'
+
     queryset = FeatureType.objects.all()
-    # serializer_class = FeatureTypeListSerializer
 
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return FeatureTypeListSerializer
-        if self.action == 'create':
-            return FeatureTypeCreationSerializer
+    serializer_class = FeatureTypeListSerializer
 
-    def get_permissions(self):
-        if self.action == 'list':
-            return [permissions.AllowAny()]
-        return [permissions.IsAuthenticated()]
-
-    def perform_create(self, serializer):
-        # TODO : CREATE SLUG = NEW ID + TITLE
-
-        serializer.save()
-
-    def get_object(self):
-        slug = self.kwargs.get('slug') or None
-        obj = get_object_or_404(FeatureType, slug=self.kwargs.get('slug'))
-        return obj
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
 
 
 class ProjectFeatureTypes(views.APIView):

@@ -7,10 +7,12 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from api import logger
 from api.serializers.misc import UserSerializer
+from geocontrib.models import Authorization
 from geocontrib.models import CustomField
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
 from geocontrib.models import FeatureType
+from geocontrib.models import Project
 
 
 User = get_user_model()
@@ -25,13 +27,15 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             'label',
             'name',
             'field_type',
+            'options',
         )
 
 
 class FeatureTypeSerializer(serializers.ModelSerializer):
 
+    project = serializers.ReadOnlyField(source='project.slug')
     customfield_set = CustomFieldSerializer(
-        many=True, read_only=True)
+        many=True)
 
     class Meta:
         model = FeatureType
@@ -40,16 +44,17 @@ class FeatureTypeSerializer(serializers.ModelSerializer):
             'slug',
             'geom_type',
             'customfield_set',
+            'project',
         )
 
 
 class FeatureTypeListSerializer(serializers.ModelSerializer):
 
-    project = serializers.ReadOnlyField(source='project.slug')
+    project = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Project.objects.all())
     customfield_set = CustomFieldSerializer(
-        many=True,
-        read_only=True
-        )
+        many=True, allow_null=True, required=False
+    )
 
     class Meta:
         model = FeatureType
@@ -63,6 +68,46 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
             'customfield_set',
             'is_editable',
         )
+        read_only_fields = [
+            'slug',
+        ]
+
+    def handle_related(self, instance, custom_fields):
+        if isinstance(custom_fields, list):
+            instance.customfield_set.all().delete()
+            for field in custom_fields:
+                CustomField.objects.create(feature_type=instance, **field)
+
+    def validate_project(self, obj):
+        user = self.context['request'].user
+        if not Authorization.has_permission(user, 'can_create_feature_type', obj):
+            raise serializers.ValidationError({
+                'error': "Vous ne pouvez pas éditer de type de signalement pour ce projet. "})
+        return obj
+
+    def create(self, validated_data):
+        customfield_set = validated_data.pop('customfield_set', None)
+        try:
+            feature_type = FeatureType.objects.create(**validated_data)
+            self.handle_related(feature_type, customfield_set)
+        except Exception as err:
+            raise serializers.ValidationError({'error': str(err)})
+        return feature_type
+
+    def update(self, instance, validated_data):
+        if not instance.is_editable:
+            raise serializers.ValidationError({
+                'error': "Vous ne pouvez pas éditer ce type de signalement. "})
+        customfield_set = validated_data.pop('customfield_set', None)
+        try:
+            for k, v in validated_data.items():
+                setattr(instance, k, v)
+            instance.save()
+            self.handle_related(instance, customfield_set)
+        except Exception as err:
+            raise serializers.ValidationError([str(err), ])
+        else:
+            return instance
 
 class FeatureTypeCreationSerializer(serializers.ModelSerializer):
 
@@ -89,7 +134,7 @@ class FeatureTypeCreationSerializer(serializers.ModelSerializer):
 class FeatureListSerializer(serializers.ModelSerializer):
 
     project = serializers.ReadOnlyField(source='project.slug')
-    feature_type = FeatureTypeSerializer()
+    feature_type = FeatureTypeSerializer(read_only=True)
 
     class Meta:
         model = Feature
@@ -295,7 +340,7 @@ class CommentsSerializer(serializers.ModelSerializer):
 
 
 class FeatureTypeAttachmentsSerializer(serializers.ModelSerializer):
-    
+
     comment = CommentsSerializer()
 
     class Meta:

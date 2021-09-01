@@ -62,17 +62,6 @@ class ProjectThumbnailView(APIView):
         return Response(data=ProjectDetailedSerializer(project).data,
                         status=200)
 
-class ProjectData(APIView):
-    queryset = Project.objects.all()
-    lookup_field = 'slug'
-    http_method_names = ['get', ]
-
-    def get(self, request, slug):
-        projet = Project.objects.filter(slug=slug).values()
-        data = { 'project_data': list(projet) }
-
-        return Response(data=data, status=200)
-
 
 class ProjectAuthorization(APIView):
     queryset = Project.objects.all()

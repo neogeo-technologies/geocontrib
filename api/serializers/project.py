@@ -57,7 +57,10 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
         return Comment.objects.filter(project=obj).count()
 
     def get_nb_published_features_comments(self, obj):
-        return Comment.objects.filter(project=obj, feature_id__in=self.get_published_features(obj)).count()
+        count = Comment.objects.filter(
+            project=obj, feature_id__in=self.get_published_features(obj)
+        ).count()
+        return count
 
     def get_nb_contributors(self, obj):
         return Authorization.objects.filter(project=obj).filter(
@@ -87,6 +90,7 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'nb_contributors'
         )
 
+
 class ProjectCreationSerializer(serializers.ModelSerializer):
     access_level_pub_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
     access_level_arch_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
@@ -106,8 +110,6 @@ class ProjectCreationSerializer(serializers.ModelSerializer):
             'delete_feature',
         )
 
+
 class ProjectThumbnailSerializer(serializers.Serializer):
     thumbnail = serializers.FileField()
-
-
-
