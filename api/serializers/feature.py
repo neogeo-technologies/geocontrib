@@ -1,3 +1,4 @@
+from geocontrib.models.project import Project
 from geocontrib.models.annotation import Attachment, Comment
 from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
@@ -45,6 +46,27 @@ class FeatureTypeSerializer(serializers.ModelSerializer):
 class FeatureTypeListSerializer(serializers.ModelSerializer):
 
     project = serializers.ReadOnlyField(source='project.slug')
+    customfield_set = CustomFieldSerializer(
+        many=True,
+        read_only=True
+        )
+
+    class Meta:
+        model = FeatureType
+        fields = (
+            'title',
+            'slug',
+            'geom_type',
+            'color',
+            'colors_style',
+            'project',
+            'customfield_set',
+            'is_editable',
+        )
+
+class FeatureTypeCreationSerializer(serializers.ModelSerializer):
+
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
     customfield_set = CustomFieldSerializer(
         many=True,
         read_only=True

@@ -19,6 +19,7 @@ from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureSearchSerializer
 from api.serializers.feature import FeatureListSerializer
 from api.serializers import FeatureTypeListSerializer
+from api.serializers import FeatureTypeCreationSerializer
 from geocontrib.models import Feature, feature
 from geocontrib.models import FeatureType
 from geocontrib.models import Project
@@ -33,15 +34,23 @@ class FeatureTypeView(viewsets.ModelViewSet):
     """
     lookup_field = 'slug'
     queryset = FeatureType.objects.all()
-    serializer_class = FeatureTypeListSerializer
-    
+    # serializer_class = FeatureTypeListSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return FeatureTypeListSerializer
+        if self.action == 'create':
+            return FeatureTypeCreationSerializer
+
     def get_permissions(self):
         if self.action == 'list':
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
 
     def perform_create(self, serializer):
-        serializer.save(creator=self.request.user)
+        # TODO : CREATE SLUG = NEW ID + TITLE
+
+        serializer.save()
 
     def get_object(self):
         slug = self.kwargs.get('slug') or None
