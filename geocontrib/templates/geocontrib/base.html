@@ -98,7 +98,7 @@
           <a class="item" href="{% url 'geocontrib:logout' %}"><i class="ui logout icon"></i></a>
           {% endif %}
           {% elif not SSO_SETTED %}
-          <a class="item" href="{% url 'geocontrib:login' %}">Se Connecter</a>
+          <a class="item" href="{% url LOGIN_URL %}">Se Connecter</a>
           {% endif %}
         </div>
       </div>

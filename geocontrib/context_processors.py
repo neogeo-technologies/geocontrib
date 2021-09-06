@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 def sso_setted(request):
     return request.META.get('HTTP_SEC_PROXY', 'false') == 'true'
 
+def login_url():
+    return "cas_ng_login" if hasattr(settings, "CAS_SERVER_URL") else "geocontrib:login"
+
 
 def custom_contexts(request):
     try:
@@ -31,5 +34,6 @@ def custom_contexts(request):
         'DEFAULT_MAP_VIEW': settings.DEFAULT_MAP_VIEW,
         'GEOCODER_PROVIDERS': settings.GEOCODER_PROVIDERS,
         'SELECTED_GEOCODER_PROVIDER': settings.SELECTED_GEOCODER.get('PROVIDER'),
-        'SSO_SETTED': sso_setted(request)
+        'SSO_SETTED': sso_setted(request),
+        'LOGIN_URL': login_url(),
     }

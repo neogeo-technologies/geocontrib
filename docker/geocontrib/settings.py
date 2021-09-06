@@ -35,6 +35,7 @@ CORE_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'django.contrib.flatpages',
+    'django_admin_listfilter_dropdown',
 ]
 THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis', cast=Csv())
 OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
@@ -113,6 +114,7 @@ USE_TZ = True
 
 # URL prefix
 URL_PREFIX = config('URL_PREFIX', default='')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Static and media files
 STATIC_URL = '/{}static/'.format(URL_PREFIX)
@@ -242,3 +244,12 @@ CELERY_TASK_SERIALIZER = config('CELERY_TASK_SERIALIZER', default='json')
 CELERY_RESULT_SERIALIZER = config('CELERY_RESULT_SERIALIZER', default='json')
 
 CACHE_SECOND = config('CACHE_SECOND', default=120, cast=int)
+
+# CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
+cas_server_url = config('CAS_SERVER_URL', None)
+if cas_server_url:
+    CAS_SERVER_URL = cas_server_url
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'django_cas_ng.backends.CASBackend',
+    )

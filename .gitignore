@@ -100,7 +100,7 @@ ENV/
 manage.py
 config/
 media/
-/docker/nginx/conf.d/geocontrib.conf
+docker/nginx/conf.d/geocontrib.conf
 
 # MacOS
 .DS_Store
@@ -108,4 +108,4 @@ media/
 # vim
 *.sw[op]
 
-docker/docker-compose.override.yaml
+docker/docker-compose.override.*

@@ -35,6 +35,8 @@ CORE_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'django.contrib.flatpages',
+    'django_admin_listfilter_dropdown',
+
 ]
 THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis', cast=Csv())
 OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
@@ -122,7 +124,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Extended properties
 AUTH_USER_MODEL = 'geocontrib.User'
-LOGIN_URL = 'geocontrib:login'
+LOGIN_URL = config("LOGIN_URL", default='geocontrib:login')
 LOGIN_REDIRECT_URL = 'geocontrib:index'
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
 
@@ -146,12 +148,12 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': config('LOG_LEVEL', default='DEBUG'),
+            'level': config('LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
         'plugin_georchestra': {
             'handlers': ['console'],
-            'level': config('LOG_LEVEL', default='DEBUG'),
+            'level': config('LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
     },
@@ -255,3 +257,12 @@ CELERY_TASK_SERIALIZER = config('CELERY_TASK_SERIALIZER', default='json')
 CELERY_RESULT_SERIALIZER = config('CELERY_RESULT_SERIALIZER', default='json')
 
 CACHE_SECOND = config('CACHE_SECOND', default=120, cast=int)
+
+# CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
+cas_server_url = config('CAS_SERVER_URL', default=None)
+if cas_server_url:
+    CAS_SERVER_URL = cas_server_url
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'django_cas_ng.backends.CASBackend',
+    )
