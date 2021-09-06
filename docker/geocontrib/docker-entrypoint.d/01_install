@@ -34,6 +34,7 @@ else
     fi
     cp src/docker/geocontrib/settings.py config/settings.py
     cp src/docker/geocontrib/urls.py config/urls.py
+    cp src/config_sample/celery.py src/config_sample/__init__.py config/
 
     # Attente du serveur postgres
     echo "Waiting for database..."

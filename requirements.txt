@@ -9,3 +9,4 @@ python-decouple==3.3
 python-magic==0.4.24
 redis==3.5.3
 requests
+django-admin-list-filter-dropdown
