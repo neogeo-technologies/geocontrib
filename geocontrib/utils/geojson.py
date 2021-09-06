@@ -85,17 +85,19 @@ class GeoJSONProcessing:
         for feat in features:
             feature_type_import = feat.get(
                 'properties', {}).get('feature_type')
-            if not feature_type_import:
-                self.infos.append(
-                    "Le type de signalement doit etre indiqué dans l'entrée 'feature_type' de chaque signalement. ")
-                raise GeoJSONProcessingFailed
+            # if not feature_type_import:
+            #     self.infos.append(
+            #         "Le type de signalement doit etre indiqué dans l'entrée 'feature_type' de chaque signalement. ")
+                # raise GeoJSONProcessingFailed
 
-            elif feature_type_import != feature_type_slug:
-                self.infos.append(
-                    "Le type de signalement ne correspond pas à celui en cours de création: '{dest}'. ".format(
-                        dest=feature_type_slug
-                    ))
-                raise GeoJSONProcessingFailed
+            # elif feature_type_import != feature_type_slug:
+
+            # if feature_type_import != feature_type_slug:
+            #     self.infos.append(
+            #         "Le type de signalement ne correspond pas à celui en cours de création: '{dest}'. ".format(
+            #             dest=feature_type_slug
+            #         ))
+            #     raise GeoJSONProcessingFailed
 
     def validate_data(self, geojson_file):
         try:

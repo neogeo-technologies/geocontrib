@@ -1,10 +1,13 @@
-import pdb
+
+
+from api.serializers import feature
 from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework import views
 from rest_framework.response import Response
 
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from api.serializers.misc import ImportTaskSerializer
 from api.serializers import CommentSerializer
@@ -14,9 +17,12 @@ from geocontrib.models import Attachment
 from geocontrib.models import Authorization
 from geocontrib.models import Comment
 from geocontrib.models import Feature
+from geocontrib.models import FeatureType
 from geocontrib.models import Project
+from geocontrib.tasks import task_geojson_processing
 
 class ImportTaskSearch(
+        mixins.CreateModelMixin,
         mixins.ListModelMixin,
         viewsets.GenericViewSet):
 
@@ -24,15 +30,37 @@ class ImportTaskSearch(
 
     serializer_class = ImportTaskSerializer
 
-    http_method_names = ['get', ]
+    http_method_names = ['get', 'post' ]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            up_file = request.FILES['json_file']
+            feature_type = FeatureType.objects.get(slug=request.query_params.get('feature_type_slug'))
+            import_task = ImportTask.objects.create(
+                created_on=timezone.now(),
+                project=feature_type.project,
+                feature_type=feature_type,
+                user=request.user,
+                geojson_file=up_file
+            )
+        except Exception:
+            return Response(
+                {'error': 'error'},
+                status=400,
+            )
+        else:
+            task_geojson_processing.apply_async(kwargs={'import_task_id': import_task.pk})
+        
+        return Response({'detail': "L'import du fichier réussi. Le traitement des données est en cours. "}, status=200)
+
 
     def filter_queryset(self, queryset):
         status = self.request.query_params.get('status')
-        feature_type_id = self.request.query_params.get('feature_type_id')
+        feature_type_slug = self.request.query_params.get('feature_type_slug')
         if status:
             queryset = queryset.filter(status__icontains=status)
-        if feature_type_id:
-            queryset = queryset.filter(feature_type__pk=feature_type_id)
+        if feature_type_slug:
+            queryset = queryset.filter(feature_type__slug=feature_type_slug)
         queryset = queryset.order_by('-id')[:5]
         return queryset
 
