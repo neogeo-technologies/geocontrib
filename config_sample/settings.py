@@ -243,6 +243,21 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # 10683
 BASE_URL = config('BASE_URL', default='http://localhost:8000')
 
+# CELERY/REDIS confs (#10665)
+REDIS_HOST = config('REDIS_HOST', default='localhost')
+
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=f'redis://{ REDIS_HOST }:6379')
+
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default=f'redis://{ REDIS_HOST }:6379')
+
+CELERY_ACCEPT_CONTENT = config('CELERY_ACCEPT_CONTENT', default='application/json', cast=Csv())
+
+CELERY_TASK_SERIALIZER = config('CELERY_TASK_SERIALIZER', default='json')
+
+CELERY_RESULT_SERIALIZER = config('CELERY_RESULT_SERIALIZER', default='json')
+
+CACHE_SECOND = config('CACHE_SECOND', default=120, cast=int)
+
 # CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
 cas_server_url = config('CAS_SERVER_URL', default=None)
 if cas_server_url:

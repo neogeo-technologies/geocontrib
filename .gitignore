@@ -99,6 +99,7 @@ ENV/
 
 manage.py
 config/
+media/
 docker/nginx/conf.d/geocontrib.conf
 
 # MacOS

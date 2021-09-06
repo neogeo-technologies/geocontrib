@@ -7,6 +7,7 @@ from geocontrib.models import Feature
 from geocontrib.models import Project
 from geocontrib.models import Event
 from geocontrib.models import StackedEvent
+from geocontrib.models import ImportTask
 
 
 User = get_user_model()
@@ -137,3 +138,41 @@ class StackedEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = StackedEvent
         fields = '__all__'
+
+
+class ImportTaskSerializer(serializers.ModelSerializer):
+
+    project_title = serializers.SerializerMethodField()
+    feature_type_title = serializers.SerializerMethodField()
+    geojson_file_name = serializers.SerializerMethodField()
+
+    
+    def get_project_title(self, obj):
+        return str(obj.project.slug)
+
+    def get_feature_type_title(self, obj):
+        return str(obj.feature_type.slug)
+
+    def get_geojson_file_name(self, obj):
+        try:
+            filename = str(obj.geojson_file.name.split('/')[-1])
+        except:
+            filename = 'example_error.file'
+        return filename
+
+    class Meta:
+        model = ImportTask
+        fields = (
+            'created_on',
+            'started_on',
+            'finished_on',
+            'status',
+            # 'project',
+            'project_title',
+            # 'feature_type',
+            'feature_type_title',
+            'user',
+            # 'geojson_file',
+            'geojson_file_name',
+            'infos',
+        )

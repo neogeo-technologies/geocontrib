@@ -470,7 +470,6 @@ class FeatureTypeModelForm(forms.ModelForm):
         fields = ('title', 'geom_type', 'color', 'colors_style')
 
 
-
 class ProjectModelForm(forms.ModelForm):
 
     title = forms.CharField(label='Titre', max_length=100)

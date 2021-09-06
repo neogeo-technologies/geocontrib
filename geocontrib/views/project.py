@@ -278,7 +278,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
         form=AuthorizationForm,
         formset=AuthorizationBaseFS,
         extra=0,
-        fields=('first_name', 'last_name', 'username', 'email', 'level'),
+        fields=('first_name', 'last_name', 'username', 'level'),
     )
 
     def test_func(self):
@@ -313,9 +313,7 @@ class ProjectMembers(SingleObjectMixin, UserPassesTestMixin, View):
         formset = self.AuthorizationFormSet(request.POST or None)
         authorised = Authorization.objects.filter(project=project)
         permissions = Authorization.all_permissions(user, project)
-
         if formset.is_valid():
-
             for data in formset.cleaned_data:
                 # id contient l'instance si existante
                 authorization = data.pop("id", None)

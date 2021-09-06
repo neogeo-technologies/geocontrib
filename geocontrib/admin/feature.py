@@ -4,13 +4,17 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.gis import admin
+from django.contrib.postgres.aggregates import StringAgg
 from django.db import connections
+from django.db.models import CharField, OuterRef, Subquery, F
 from django.forms import formset_factory
 from django.forms import modelformset_factory
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.urls import path
-from django.template.loader import render_to_string
+from django_admin_listfilter_dropdown.filters import DropdownFilter
+from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 
 from geocontrib.admin.filters import FeatureTypeFilter
 from geocontrib.admin.filters import ProjectFilter
@@ -25,8 +29,9 @@ from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import FeatureLink
 from geocontrib.models import CustomField
+from geocontrib.models import ImportTask
+from geocontrib.tasks import task_geojson_processing
 
-from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDropdownFilter, ChoiceDropdownFilter
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -191,9 +196,25 @@ to_archived.short_description = "Changer status à Archivé"
 
 
 class FeatureAdmin(admin.ModelAdmin):
-    actions = [to_draft, to_pending, to_published, to_archived]
-    list_display = ('title', 'project', 'get_feature_type', 'status', 'contributeur')
-    list_filter = (('project__slug',DropdownFilter),('feature_type__title',DropdownFilter),'status',('creator',RelatedDropdownFilter),)
+    list_display = (
+        'title',
+        'project',
+        'feature_type_title',
+        'status',
+        'contributeurs'
+    )
+    list_filter = (
+        ('project__slug', DropdownFilter),
+        ('feature_type__title', DropdownFilter),
+        'status',
+        ('creator', RelatedDropdownFilter),
+    )
+    actions = (
+        'to_draft',
+        'to_pending',
+        'to_published',
+        'to_archived'
+    )
     ordering = ('project', 'feature_type', 'title')
     
     def contributeur(self, obj):
@@ -212,6 +233,45 @@ class FeatureAdmin(admin.ModelAdmin):
             pass
         return res
     get_feature_type.short_description = 'Type de signalement'
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        contributeurs = Authorization.objects.filter(
+            project=OuterRef('project'), level__rank=2
+        ).values('project').annotate(
+            usernames=StringAgg('user__username', ', ')
+        ).values('usernames')
+
+        return queryset.annotate(
+            contributeurs=Subquery(contributeurs, output_field=CharField()),
+            feature_type_title=F('feature_type__title')
+        )
+
+    def feature_type_title(self, obj):
+        return obj.feature_type_title
+    feature_type_title.short_description = "Type de signalement"
+    feature_type_title.admin_order_field = 'feature_type__title'
+
+    def contributeurs(self, obj):
+        return obj.contributeurs
+    contributeurs.short_description = "Contributeurs"
+    contributeurs.admin_order_field = 'creator__username'
+
+    def to_draft(self, request, queryset):
+        queryset.update(status='draft')
+    to_draft.short_description = "Changer status à Brouillon"
+
+    def to_pending(self, request, queryset):
+        queryset.update(status='pending')
+    to_pending.short_description = "Changer status à 'En attente de publication'"
+
+    def to_published(self, request, queryset):
+        queryset.update(status='published')
+    to_published.short_description = "Changer status à Publié"
+
+    def to_archived(self, request, queryset):
+        queryset.update(status='archived')
+    to_archived.short_description = "Changer status à Archivé"
 
 
 class FeatureLinkAdmin(admin.ModelAdmin):
@@ -346,7 +406,21 @@ class FeatureLinkAdmin(admin.ModelAdmin):
         return actions
 
 
+class ImportTaskAdmin(admin.ModelAdmin):
+
+    actions = (
+        'import_geojson',
+    )
+
+    def import_geojson(self, request, queryset):
+        for import_task in queryset:
+            task_geojson_processing.apply_async(kwargs={'import_task_id': import_task.pk})
+        messages.info(request, 'Le traitement des données est en cours.')
+    import_geojson.short_description = "Appliquer les opérations d'import"
+
+
 admin.site.register(CustomField, CustomFieldAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(FeatureLink, FeatureLinkAdmin)
+admin.site.register(ImportTask, ImportTaskAdmin)
