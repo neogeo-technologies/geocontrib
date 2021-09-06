@@ -35,7 +35,7 @@ class ImportTaskSearch(
     def create(self, request, *args, **kwargs):
         try:
             up_file = request.FILES['json_file']
-            feature_type = FeatureType.objects.get(slug=request.query_params.get('feature_type_slug'))
+            feature_type = FeatureType.objects.get(slug=request.data.get('feature_type_slug'))
             import_task = ImportTask.objects.create(
                 created_on=timezone.now(),
                 project=feature_type.project,
