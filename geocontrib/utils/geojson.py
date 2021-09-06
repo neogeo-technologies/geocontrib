@@ -85,6 +85,8 @@ class GeoJSONProcessing:
         for feat in features:
             feature_type_import = feat.get(
                 'properties', {}).get('feature_type')
+
+            # FUNCTION DEACTIVATE 
             # if not feature_type_import:
             #     self.infos.append(
             #         "Le type de signalement doit etre indiqué dans l'entrée 'feature_type' de chaque signalement. ")
