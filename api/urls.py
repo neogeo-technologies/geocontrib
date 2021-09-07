@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework import routers
 
 from api.views.base_map import GetFeatureInfo
+from api.views.base_map import BaseMapViewset
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureSearch
 from api.views.feature import FeatureTypeView
@@ -28,6 +29,7 @@ router.register(r'projects', ProjectView, basename='projects')
 router.register(r'feature-types', FeatureTypeView, basename='feature-types')
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
+router.register(r'base-maps', BaseMapViewset, basename='base-maps')
 
 urlpatterns = [
     # Vues générales de navigation
