@@ -1,11 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from django.contrib.auth import views as auth_views
-
-from geocontrib.views import MyAccount
-
-# from api.views.project import ProjetImportFromGeoJSON
 from api.views.base_map import GetFeatureInfo
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureSearch
@@ -15,7 +10,6 @@ from api.views.feature import ProjectFeatureTypes
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
 from api.views.login import LogoutView
-from api.views.login import MyAccountView
 from api.views.login import UserInfoView
 from api.views.misc import ImportTaskSearch
 from api.views.misc import ProjectComments
@@ -35,17 +29,9 @@ router.register(r'users', UserViewSet, basename='users')
 router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 
 urlpatterns = [
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # Vues générales de navigation
-    path('connexion/', auth_views.LoginView.as_view(
-        template_name='geocontrib/registration/login.html'), name='login'),
-    path('deconnexion/', auth_views.LogoutView.as_view(
-        template_name='geocontrib/registration/login.html'), name='logout'),
-    path('mon-compte/', MyAccount.as_view(), name='my_account'),
-
     path("login/", LoginView.as_view(), name="signin-view"),
     path("user_info/", UserInfoView.as_view(), name="user-info"),
-    path("my_account/", MyAccountView.as_view(), name="my-account"),
     path("logout/", LogoutView.as_view(), name="signout-view"),
 
     path('flat-pages/', FlatPagesView.as_view(), name='help'),
