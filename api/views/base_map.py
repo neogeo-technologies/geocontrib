@@ -2,6 +2,12 @@ import requests
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import mixins
+from rest_framework import viewsets
+from rest_framework import permissions
+
+from api.serializers import BaseMapSerializer
+from geocontrib.models import BaseMap
 
 
 class GetFeatureInfo(APIView):
@@ -47,3 +53,29 @@ class GetFeatureInfo(APIView):
             data = "Les données sont inaccessibles"
         finally:
             return Response(data=data, status=code)
+
+
+class BaseMapViewset(
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.CreateModelMixin,
+        # mixins.UpdateModelMixin,
+        # mixins.DestroyModelMixin,
+        viewsets.GenericViewSet):
+
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    queryset = BaseMap.objects.all()
+
+    serializer_class = BaseMapSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        project_slug = self.request.query_params.get('project__slug')
+        if project_slug:
+            queryset = queryset.filter(project__slug=project_slug)
+
+        return queryset

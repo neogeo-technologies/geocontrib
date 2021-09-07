@@ -135,6 +135,7 @@ class FeatureListSerializer(serializers.ModelSerializer):
 
     project = serializers.ReadOnlyField(source='project.slug')
     feature_type = FeatureTypeSerializer(read_only=True)
+    feature_data = serializers.SerializerMethodField()
 
     class Meta:
         model = Feature
@@ -152,6 +153,13 @@ class FeatureListSerializer(serializers.ModelSerializer):
             'geom',
             'feature_data',
         )
+
+    def get_feature_data(self, obj):
+        try:
+            res = obj.custom_fields_as_list
+        except Exception:
+            res = []
+        return res
 
 
 class FeatureTypeColoredSerializer(serializers.ModelSerializer):
