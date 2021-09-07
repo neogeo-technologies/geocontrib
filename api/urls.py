@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import path
 from rest_framework import routers
 
 from api.views.base_map import GetFeatureInfo
@@ -17,6 +17,7 @@ from api.views.project import ProjectAuthorization
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
 from api.views.user import UserLevelProjectView
+from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
 
 
@@ -41,6 +42,10 @@ urlpatterns = [
         'user_level_project/',
         UserLevelProjectView.as_view(),
         name='user_level_project'),
+    path(
+        'user_permissions/',
+        UserPermissionsView.as_view(),
+        name='user_permissions'),
     path(
         'projects/<slug:slug>/thumbnail/',
         ProjectThumbnailView.as_view(), name='project-thumbnail'),

@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from api.serializers import UserSerializer
 from geocontrib.models import Authorization
+from geocontrib.models import Project
 from rest_framework.response import Response
 
 User = get_user_model()
@@ -31,3 +32,16 @@ class UserLevelProjectView(views.APIView):
             user_level_projects = {}
 
         return Response(data=user_level_projects, status=200)
+
+
+class UserPermissionsView(views.APIView):
+    permission_classes = [
+        permissions.AllowAny,
+    ]
+
+    def get(self, request):
+        data = {}
+        user = request.user
+        for project in Project.objects.all():
+            data[project.slug] = Authorization.all_permissions(user, project)
+        return Response(data=data, status=200)
