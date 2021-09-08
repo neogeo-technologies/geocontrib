@@ -3,6 +3,7 @@ from rest_framework import routers
 
 from api.views.base_map import GetFeatureInfo
 from api.views.base_map import BaseMapViewset
+from api.views.base_map import LayerViewset
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureSearch
 from api.views.feature import FeatureTypeView
@@ -30,46 +31,42 @@ router.register(r'feature-types', FeatureTypeView, basename='feature-types')
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 router.register(r'base-maps', BaseMapViewset, basename='base-maps')
+router.register(r'layers', LayerViewset, basename='base-maps')
 
 urlpatterns = [
     # Vues générales de navigation
     path("login/", LoginView.as_view(), name="signin-view"),
     path("user_info/", UserInfoView.as_view(), name="user-info"),
     path("logout/", LogoutView.as_view(), name="signout-view"),
-
     path('flat-pages/', FlatPagesView.as_view(), name='help'),
-
     # Vues de gestion et d'édition des données métiers
     path(
-        'user_level_project/',
-        UserLevelProjectView.as_view(),
-        name='user_level_project'),
+        'user-level-projects/',
+        UserLevelProjectView.as_view(), name='user-level-project'),
     path(
-        'user_permissions/',
-        UserPermissionsView.as_view(),
-        name='user_permissions'),
+        'user-permissions/',
+        UserPermissionsView.as_view(), name='user-permissions'),
     path(
-        'projet/<slug:slug>/thumbnail/',
+        'projects/<slug:slug>/thumbnail/',
         ProjectThumbnailView.as_view(), name='project-thumbnail'),
     path(
-        'projet/<slug:slug>/utilisateurs/',
+        'projects/<slug:slug>/utilisateurs/',
         ProjectAuthorization.as_view(), name='project-authorization'),
     path(
-        'projet/<slug:slug>/feature_types/',
+        'projects/<slug:slug>/feature-types/',
         ProjectFeatureTypes.as_view(), name='project-feature-types'),
     path(
-        'projet/<slug:slug>/feature/',
+        'projects/<slug:slug>/feature/',
         ProjectFeature.as_view(), name='project-feature'),
     path(
-        'projet/<slug:slug>/comments/',
+        'projects/<slug:slug>/comments/',
         ProjectComments.as_view(), name='project-comments'),
     path(
-        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/export',
+        'projects/<slug:slug>/feature-type/<slug:feature_type_slug>/export/',
         ExportFeatureList.as_view(), name='project-export'),
     path(
-        'projet/<slug:slug>/signalement/recherche/',
+        'projects/<slug:slug>/feature-search/',
         FeatureSearch.as_view(), name='feature-search'),
-
     path(
         'proxy/',
         GetFeatureInfo.as_view(), name='proxy'),

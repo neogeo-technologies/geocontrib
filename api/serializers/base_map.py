@@ -70,4 +70,10 @@ class LayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Layer
-        fields = '__all__'
+        fields = (
+            'id',
+            'title',
+            'service',
+            'schema_type',
+            'options',
+        )
