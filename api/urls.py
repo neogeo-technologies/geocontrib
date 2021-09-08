@@ -49,7 +49,7 @@ urlpatterns = [
         UserPermissionsView.as_view(),
         name='user_permissions'),
     path(
-        'projects/<slug:slug>/thumbnail/',
+        'projet/<slug:slug>/thumbnail/',
         ProjectThumbnailView.as_view(), name='project-thumbnail'),
     path(
         'projet/<slug:slug>/utilisateurs/',

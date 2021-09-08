@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from django.urls import reverse
 
 from geocontrib.models import Authorization
 from geocontrib.models import Comment
@@ -44,6 +45,8 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
     access_level_arch_feature = serializers.ReadOnlyField(
         source='access_level_arch_feature.get_user_type_id_display')
 
+    thumbnail = serializers.SerializerMethodField()
+
     def get_nb_features(self, obj):
         return Feature.objects.filter(project=obj).count()
 
@@ -66,6 +69,9 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
         return Authorization.objects.filter(project=obj).filter(
             level__rank__gt=1
         ).count()
+
+    def get_thumbnail(self, obj):
+        return reverse('api:project-thumbnail', kwargs={"slug": obj.slug})
 
     class Meta:
         model = Project
