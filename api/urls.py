@@ -9,6 +9,7 @@ from api.views.feature import FeatureSearch
 from api.views.feature import FeatureTypeView
 from api.views.feature import ProjectFeature
 from api.views.feature import ProjectFeatureTypes
+from api.views.feature import FeatureLinkView
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
 from api.views.login import LogoutView
@@ -35,9 +36,9 @@ router.register(r'layers', LayerViewset, basename='base-maps')
 
 urlpatterns = [
     # Vues générales de navigation
-    path("login/", LoginView.as_view(), name="signin-view"),
-    path("user_info/", UserInfoView.as_view(), name="user-info"),
-    path("logout/", LogoutView.as_view(), name="signout-view"),
+    path('login/', LoginView.as_view(), name='signin-view'),
+    path('user_info/', UserInfoView.as_view(), name='user-info'),
+    path('logout/', LogoutView.as_view(), name='signout-view'),
     path('flat-pages/', FlatPagesView.as_view(), name='help'),
     # Vues de gestion et d'édition des données métiers
     path(
@@ -68,9 +69,11 @@ urlpatterns = [
         'projects/<slug:slug>/feature-search/',
         FeatureSearch.as_view(), name='feature-search'),
     path(
+        'features/<uuid:feature_id>/feature-links/',
+        FeatureLinkView.as_view(), name='feature-link'),
+    path(
         'proxy/',
         GetFeatureInfo.as_view(), name='proxy'),
-
 ]
 
 

@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
 from django.urls import reverse
+from rest_framework import serializers
 
 from geocontrib.models import Authorization
 from geocontrib.models import Comment

@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from api import logger
 from geocontrib.models import BaseMap
 from geocontrib.models import ContextLayer
 from geocontrib.models import Layer

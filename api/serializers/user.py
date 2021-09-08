@@ -7,6 +7,7 @@ from geocontrib.models import UserLevelPermission
 
 User = get_user_model()
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -19,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_superuser'
         ]
 
+
 class UserLevelPermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserLevelPermission
@@ -29,8 +31,9 @@ class UserLevelPermissionSerializer(serializers.ModelSerializer):
 
 
 class AuthorizationSerializer(serializers.ModelSerializer):
-    
+
     project = serializers.ReadOnlyField(source='project.slug')
+
     level = UserLevelPermissionSerializer()
 
     class Meta:
