@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [1.3.6] - 2021-09-09
+
+### Fixed
+
+- Redmine 11613 : Docker CAS connection retrieves email
+
 ## [1.3.5] - 2021-08-11
 
 ### Changed
