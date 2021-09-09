@@ -1,3 +1,4 @@
+from django.templatetags.static import static
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import serializers
@@ -71,7 +72,12 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
         ).count()
 
     def get_thumbnail(self, obj):
-        return reverse('api:project-thumbnail', kwargs={"slug": obj.slug})
+        res = None
+        if hasattr(obj, 'thumbnail') and obj.thumbnail.name:
+            res = reverse('api:project-thumbnail', kwargs={"slug": obj.slug})
+        else:
+            res = static('geocontrib/img/default.png')
+        return res
 
     class Meta:
         model = Project
