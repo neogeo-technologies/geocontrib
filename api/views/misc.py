@@ -1,17 +1,19 @@
-
-
-from api.serializers import feature
-from rest_framework import mixins
-from rest_framework import viewsets
-from rest_framework import views
-from rest_framework.response import Response
+import json
 
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from rest_framework import mixins
+from rest_framework import viewsets
+from rest_framework import views
+from rest_framework import permissions
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, MultiPartParser
 
-from api.serializers.misc import ImportTaskSerializer
+from api.serializers import ImportTaskSerializer
 from api.serializers import CommentSerializer
-from api.serializers.feature import FeatureTypeAttachmentsSerializer
+from api.serializers import AttachmentSerializer
 from geocontrib.models.task import ImportTask
 from geocontrib.models import Attachment
 from geocontrib.models import Authorization
@@ -20,6 +22,7 @@ from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import Project
 from geocontrib.tasks import task_geojson_processing
+
 
 class ImportTaskSearch(
         mixins.CreateModelMixin,
@@ -30,7 +33,7 @@ class ImportTaskSearch(
 
     serializer_class = ImportTaskSerializer
 
-    http_method_names = ['get', 'post' ]
+    http_method_names = ['get', 'post']
 
     def create(self, request, *args, **kwargs):
         try:
@@ -50,9 +53,8 @@ class ImportTaskSearch(
             )
         else:
             task_geojson_processing.apply_async(kwargs={'import_task_id': import_task.pk})
-        
-        return Response({'detail': "L'import du fichier réussi. Le traitement des données est en cours. "}, status=200)
 
+        return Response({'detail': "L'import du fichier réussi. Le traitement des données est en cours. "}, status=200)
 
     def filter_queryset(self, queryset):
         status = self.request.query_params.get('status')
@@ -71,6 +73,7 @@ class ImportTaskSearch(
         queryset = queryset.select_related('project')
         # NB filter_queryset() bien appelé par ListModelMixin
         return queryset
+
 
 class ProjectComments(views.APIView):
     queryset = Project.objects.all()
@@ -104,3 +107,58 @@ class ProjectComments(views.APIView):
             'last_comments': serialized_comments,
         }
         return Response(data, status=200)
+
+
+class AttachmentView(viewsets.ViewSet):
+
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+
+    def get_object(self, feature_id, attachment_id):
+        return get_object_or_404(Attachment, id=attachment_id, feature_id=feature_id)
+
+    def list(self, request, feature_id):
+        feature = get_object_or_404(Feature, feature_id=feature_id)
+        attachments = Attachment.objects.filter(
+            feature_id=feature.feature_id, object_type='feature')
+        data = AttachmentSerializer(attachments, many=True).data
+        return Response(data, status=200)
+
+    def retrieve(self, request, feature_id, attachment_id):
+        instance = self.get_object(feature_id, attachment_id)
+        data = AttachmentSerializer(instance).data
+        return Response(data, status=200)
+
+    @action(detail=False, methods=['post'], parser_classes=(FormParser, MultiPartParser))
+    def create(self, request, feature_id):
+        feature = get_object_or_404(Feature, feature_id=feature_id)
+        try:
+            attachement_file = request.data['file']
+        except KeyError:
+            raise ValidationError({'file': 'file entry is missing in post data'})
+        try:
+            data = json.loads(request.data['data'])
+        except (KeyError, json.JSONDecodeError):
+            raise ValidationError({'data': 'data entry is missing or incorrect in post data'})
+        try:
+            comment = Comment.objects.filter(id=data.get('comment', None)).first()
+            instance = Attachment.objects.create(
+                attachment_file=attachement_file,
+                title=data.get('title'),
+                info=data.get('info'),
+                feature_id=feature_id,
+                project=feature.project,
+                object_type='feature',
+                comment=comment,
+                author=request.user
+            )
+        except Exception as err:
+            raise ValidationError({'error': f'attachment not created {err}'})
+        data = AttachmentSerializer(instance).data
+        return Response(data, status=200)
+
+    def destroy(self, request, feature_id, attachment_id):
+        instance = self.get_object(feature_id, attachment_id)
+        instance.delete()
+        return Response({}, status=204)
