@@ -231,7 +231,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 BASE_URL = config('BASE_URL', default='http://localhost:8000')
 
 # CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
-cas_server_url = config('CAS_SERVER_URL')
+cas_server_url = config('CAS_SERVER_URL', None)
 if cas_server_url:
     CAS_SERVER_URL = cas_server_url
     AUTHENTICATION_BACKENDS = (
