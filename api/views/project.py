@@ -65,7 +65,7 @@ class ProjectThumbnailView(APIView):
 
     def put(self, request, slug):
         project = get_object_or_404(Project, slug=slug)
-        file_obj = request.data['file']
+        file_obj = request.data.get('file')
         validate_image_file(file_obj)
         project.thumbnail = file_obj
         project.save(update_fields=['thumbnail', ])
