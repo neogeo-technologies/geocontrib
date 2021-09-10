@@ -11,16 +11,18 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
 
-from api.serializers import ImportTaskSerializer
-from api.serializers import CommentSerializer
 from api.serializers import AttachmentSerializer
-from geocontrib.models.task import ImportTask
+from api.serializers import CommentSerializer
+from api.serializers import EventSerializer
+from api.serializers import ImportTaskSerializer
 from geocontrib.models import Attachment
 from geocontrib.models import Authorization
 from geocontrib.models import Comment
+from geocontrib.models import Event
 from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import Project
+from geocontrib.models.task import ImportTask
 from geocontrib.tasks import task_geojson_processing
 
 
@@ -162,3 +164,16 @@ class AttachmentView(viewsets.ViewSet):
         instance = self.get_object(feature_id, attachment_id)
         instance.delete()
         return Response({}, status=204)
+
+
+class EventView(views.APIView):
+
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def get(self, request):
+        user = request.user
+        all_events = Event.objects.filter(user=user).order_by('-created_on')
+        data = EventSerializer(all_events, many=True).data
+        return Response(data, status=200)

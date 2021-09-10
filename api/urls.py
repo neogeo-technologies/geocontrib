@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from rest_framework import routers
 
 from api.views.base_map import GetFeatureInfo
@@ -15,6 +15,7 @@ from api.views.login import LoginView
 from api.views.login import LogoutView
 from api.views.login import UserInfoView
 from api.views.misc import AttachmentView
+from api.views.misc import EventView
 from api.views.misc import ImportTaskSearch
 from api.views.misc import ProjectComments
 from api.views.project import ProjectAuthorization
@@ -69,6 +70,9 @@ urlpatterns = [
     path(
         'projects/<slug:slug>/feature-search/',
         FeatureSearch.as_view(), name='feature-search'),
+    path(
+        'events/',
+        EventView.as_view(), name='events-list'),
     path(
         'features/<uuid:feature_id>/feature-links/',
         FeatureLinkView.as_view(), name='feature-link'),
