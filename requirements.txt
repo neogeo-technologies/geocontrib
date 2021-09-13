@@ -11,3 +11,4 @@ redis==3.5.3
 requests
 django-admin-list-filter-dropdown
 django-cas-ng
+django-celery-beat==2.2.1
