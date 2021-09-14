@@ -7,7 +7,7 @@ ENV LC_ALL="C.UTF-8"
 ENV LC_CTYPE="C.UTF-8"
 
 RUN apt-get update && \
-    apt-get install -y libproj-dev gdal-bin ldap-utils libpq-dev && \
+    apt-get install -y libproj-dev gdal-bin ldap-utils libpq-dev libmagic1 && \
     apt-get install -y --no-install-recommends netcat && \
     apt-get clean -y
 
