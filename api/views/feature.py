@@ -10,7 +10,6 @@ from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import views
 from rest_framework import viewsets
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from api import logger
@@ -19,7 +18,9 @@ from api.serializers import FeatureSearchSerializer
 from api.serializers.feature import FeatureListSerializer
 from api.serializers.feature import FeatureDetailedSerializer
 from api.serializers import FeatureTypeListSerializer
+from api.utils.paginations import CustomPagination
 from geocontrib.models import Feature
+from geocontrib.models import FeatureLink
 from geocontrib.models import FeatureType
 from geocontrib.models import Project
 
@@ -75,10 +76,6 @@ class ProjectFeature(views.APIView):
                 'features': serializers.data,
             }
         return Response(data, status=200)
-
-
-class CustomPagination(LimitOffsetPagination):
-    default_limit = 25
 
 
 class ExportFeatureList(views.APIView):
@@ -146,3 +143,15 @@ class FeatureSearch(generics.ListAPIView):
         queryset = queryset.select_related('project')
         # NB filter_queryset() bien appelé par ListModelMixin
         return queryset
+
+
+class FeatureLinkView(views.APIView):
+
+    http_method_names = ['get', ]
+
+    def get(self, request, feature_id):
+        linked_features = FeatureLink.objects.filter(
+            feature_from__feature_id=feature_id
+        )
+        data = FeatureLinkSerializer(linked_features, many=True).data
+        return Response(data, status=200)

@@ -7,7 +7,9 @@ from rest_framework import viewsets
 from rest_framework import permissions
 
 from api.serializers import BaseMapSerializer
+from api.serializers import LayerSerializer
 from geocontrib.models import BaseMap
+from geocontrib.models import Layer
 
 
 class GetFeatureInfo(APIView):
@@ -79,3 +81,16 @@ class BaseMapViewset(
             queryset = queryset.filter(project__slug=project_slug)
 
         return queryset
+
+
+class LayerViewset(
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet):
+
+    permission_classes = [
+        permissions.AllowAny,
+    ]
+
+    queryset = Layer.objects.all()
+
+    serializer_class = LayerSerializer

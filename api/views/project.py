@@ -1,15 +1,18 @@
-from django.db.models import F
 from django.contrib.auth import get_user_model
+from django.db.models import F
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
-
+from django.shortcuts import Http404
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers.project import ProjectCreationSerializer
 from api.serializers import ProjectDetailedSerializer
+from api.serializers.project import ProjectCreationSerializer
+from api.utils.permissions import ProjectThumbnailPermission
+from api.utils.validators import validate_image_file
 from geocontrib.models import Authorization
 from geocontrib.models import Project
 
@@ -42,25 +45,32 @@ class ProjectView(viewsets.ModelViewSet):
 
 
 class ProjectThumbnailView(APIView):
-    """
-    Update thumbnail of a project
-    """
-    lookup_field = 'slug'
-    queryset = Project.objects.all()
-    http_method_names = ['put',]
-    serializer = ProjectDetailedSerializer
 
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [
+        MultiPartParser,
+        FormParser
+    ]
+
+    permission_classes = [
+        ProjectThumbnailPermission,
+    ]
+
+    def get(self, request, slug):
+        project = get_object_or_404(Project, slug=slug)
+        try:
+            response = FileResponse(open(project.thumbnail.path, 'rb'))
+        except Exception:
+            raise Http404
+        return response
 
     def put(self, request, slug):
-        file_obj = request.data['file']
         project = get_object_or_404(Project, slug=slug)
-
+        file_obj = request.data.get('file')
+        validate_image_file(file_obj)
         project.thumbnail = file_obj
-        project.save()
-
-        return Response(data=ProjectDetailedSerializer(project).data,
-                        status=200)
+        project.save(update_fields=['thumbnail', ])
+        data = ProjectDetailedSerializer(project).data
+        return Response(data=data, status=200)
 
 
 class ProjectAuthorization(APIView):

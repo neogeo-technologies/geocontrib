@@ -24,6 +24,7 @@ from geocontrib.forms import HiddenDeleteBaseFormSet
 from geocontrib.forms import HiddenDeleteModelFormSet
 from geocontrib.forms import FeatureSelectFieldAdminForm
 from geocontrib.forms import AddPosgresViewAdminForm
+from geocontrib.models import Attachment
 from geocontrib.models import Authorization
 from geocontrib.models import Feature
 from geocontrib.models import FeatureType
@@ -216,12 +217,12 @@ class FeatureAdmin(admin.ModelAdmin):
         'to_archived'
     )
     ordering = ('project', 'feature_type', 'title')
-    
+
     def contributeur(self, obj):
         contributeurs = Authorization.objects.filter(
             level__rank=2, project=obj.feature_type.project.pk
             ).values_list('user__username', flat=True)
-        list_contributeurs = [contributeur for contributeur in contributeurs] 
+        list_contributeurs = [contributeur for contributeur in contributeurs]
         return list_contributeurs
     contributeur.short_description = 'Contributeur'
 
@@ -424,3 +425,4 @@ admin.site.register(Feature, FeatureAdmin)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(FeatureLink, FeatureLinkAdmin)
 admin.site.register(ImportTask, ImportTaskAdmin)
+admin.site.register(Attachment)

@@ -1,4 +1,6 @@
+from django.templatetags.static import static
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 from rest_framework import serializers
 
 from geocontrib.models import Authorization
@@ -44,6 +46,8 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
     access_level_arch_feature = serializers.ReadOnlyField(
         source='access_level_arch_feature.get_user_type_id_display')
 
+    thumbnail = serializers.SerializerMethodField()
+
     def get_nb_features(self, obj):
         return Feature.objects.filter(project=obj).count()
 
@@ -66,6 +70,14 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
         return Authorization.objects.filter(project=obj).filter(
             level__rank__gt=1
         ).count()
+
+    def get_thumbnail(self, obj):
+        res = None
+        if hasattr(obj, 'thumbnail') and obj.thumbnail.name:
+            res = reverse('api:project-thumbnail', kwargs={"slug": obj.slug})
+        else:
+            res = static('geocontrib/img/default.png')
+        return res
 
     class Meta:
         model = Project

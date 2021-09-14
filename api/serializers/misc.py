@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from api import logger
+from geocontrib.models import Attachment
 from geocontrib.models import Comment
 from geocontrib.models import Feature
 from geocontrib.models import Project
@@ -26,6 +27,29 @@ class UserSerializer(serializers.ModelSerializer):
             'full_name',
             'username'
         )
+
+
+class AttachmentSerializer(serializers.ModelSerializer):
+
+    created_on = serializers.DateTimeField(read_only=True)
+
+    display_author = serializers.ReadOnlyField()
+
+    attachment_file = serializers.FileField(read_only=True)
+
+    class Meta:
+        model = Attachment
+        fields = (
+            'id',
+            'title',
+            'info',
+            'attachment_file',
+            'extension',
+            # 'comment',
+            'created_on',
+            'display_author',
+        )
+        read_only_fields = fields
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -146,7 +170,6 @@ class ImportTaskSerializer(serializers.ModelSerializer):
     feature_type_title = serializers.SerializerMethodField()
     geojson_file_name = serializers.SerializerMethodField()
 
-    
     def get_project_title(self, obj):
         return str(obj.project.slug)
 
@@ -156,7 +179,7 @@ class ImportTaskSerializer(serializers.ModelSerializer):
     def get_geojson_file_name(self, obj):
         try:
             filename = str(obj.geojson_file.name.split('/')[-1])
-        except:
+        except Exception:
             filename = 'example_error.file'
         return filename
 

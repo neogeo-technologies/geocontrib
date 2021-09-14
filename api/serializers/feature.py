@@ -1,5 +1,3 @@
-from geocontrib.models.project import Project
-from geocontrib.models.annotation import Attachment, Comment
 from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 from rest_framework import serializers
@@ -7,7 +5,9 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from api import logger
 from api.serializers.misc import UserSerializer
+from geocontrib.models import Attachment
 from geocontrib.models import Authorization
+from geocontrib.models import Comment
 from geocontrib.models import CustomField
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
@@ -34,8 +34,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
 class FeatureTypeSerializer(serializers.ModelSerializer):
 
     project = serializers.ReadOnlyField(source='project.slug')
-    customfield_set = CustomFieldSerializer(
-        many=True)
+    customfield_set = CustomFieldSerializer(many=True)
 
     class Meta:
         model = FeatureType
@@ -108,27 +107,6 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError([str(err), ])
         else:
             return instance
-
-class FeatureTypeCreationSerializer(serializers.ModelSerializer):
-
-    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
-    customfield_set = CustomFieldSerializer(
-        many=True,
-        read_only=True
-        )
-
-    class Meta:
-        model = FeatureType
-        fields = (
-            'title',
-            'slug',
-            'geom_type',
-            'color',
-            'colors_style',
-            'project',
-            'customfield_set',
-            'is_editable',
-        )
 
 
 class FeatureListSerializer(serializers.ModelSerializer):

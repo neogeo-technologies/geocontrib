@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from api import logger
 from geocontrib.models import BaseMap
 from geocontrib.models import ContextLayer
 from geocontrib.models import Layer
@@ -70,4 +68,10 @@ class LayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Layer
-        fields = '__all__'
+        fields = (
+            'id',
+            'title',
+            'service',
+            'schema_type',
+            'options',
+        )
