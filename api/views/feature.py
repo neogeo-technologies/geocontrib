@@ -17,6 +17,7 @@ from api import logger
 from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureSearchSerializer
 from api.serializers.feature import FeatureListSerializer
+from api.serializers.feature import FeatureDetailedSerializer
 from api.serializers import FeatureTypeListSerializer
 from geocontrib.models import Feature
 from geocontrib.models import FeatureType
@@ -64,11 +65,15 @@ class ProjectFeature(views.APIView):
     http_method_names = ['get', ]
 
     def get(self, request, slug):
-        feature_types = Feature.objects.filter(project__slug=slug)
-        serializers = FeatureListSerializer(feature_types, many=True)
-        data = {
-            'features': serializers.data,
-        }
+        features = Feature.objects.filter(project__slug=slug)
+        format = request.query_params.get('output')
+        if format and format == 'geojson':
+            data = FeatureDetailedSerializer(features, many=True).data
+        else:
+            serializers = FeatureListSerializer(features, many=True)
+            data = {
+                'features': serializers.data,
+            }
         return Response(data, status=200)
 
 
