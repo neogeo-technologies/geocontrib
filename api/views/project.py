@@ -3,6 +3,7 @@ from django.db.models import F
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import Http404
+from django.conf import settings
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -66,7 +67,9 @@ class ProjectThumbnailView(APIView):
     def put(self, request, slug):
         project = get_object_or_404(Project, slug=slug)
         file_obj = request.data.get('file')
-        validate_image_file(file_obj)
+        # Pour ne pas bloqué l'install ideobfc:
+        if getattr(settings, 'MAGIC_IS_AVAILABLE', False):
+            validate_image_file(file_obj)
         project.thumbnail = file_obj
         project.save(update_fields=['thumbnail', ])
         data = ProjectDetailedSerializer(project).data

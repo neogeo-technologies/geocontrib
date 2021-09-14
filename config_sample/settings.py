@@ -266,3 +266,5 @@ if cas_server_url:
         'django.contrib.auth.backends.ModelBackend',
         'django_cas_ng.backends.CASBackend',
     )
+
+MAGIC_IS_AVAILABLE = config('MAGIC_IS_AVAILABLE', default=True, cast=bool)  # File image validation (@seb / install IdeoBFC)
