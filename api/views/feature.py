@@ -13,10 +13,11 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from api import logger
+from api.serializers import FeatureDetailedSerializer
 from api.serializers import FeatureGeoJSONSerializer
+from api.serializers import FeatureLinkSerializer
+from api.serializers import FeatureListSerializer
 from api.serializers import FeatureSearchSerializer
-from api.serializers.feature import FeatureListSerializer
-from api.serializers.feature import FeatureDetailedSerializer
 from api.serializers import FeatureTypeListSerializer
 from api.utils.paginations import CustomPagination
 from geocontrib.models import Feature
@@ -26,6 +27,35 @@ from geocontrib.models import Project
 
 
 User = get_user_model()
+
+
+class FeatureView(
+            mixins.ListModelMixin,
+            mixins.RetrieveModelMixin,
+            mixins.CreateModelMixin,
+            mixins.UpdateModelMixin,
+            mixins.DestroyModelMixin,
+            viewsets.GenericViewSet):
+
+    lookup_field = 'feature_id'
+
+    queryset = Feature.objects.all()
+
+    serializer_class = FeatureGeoJSONSerializer
+
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        feature_type_slug = self.request.query_params.get('feature_type__slug')
+        if feature_type_slug:
+            queryset = queryset.filter(feature_type__slug=feature_type_slug)
+        project_slug = self.request.query_params.get('project__slug')
+        if project_slug:
+            queryset = queryset.filter(project__slug=project_slug)
+        return queryset
 
 
 class FeatureTypeView(

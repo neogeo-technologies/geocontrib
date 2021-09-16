@@ -1,9 +1,10 @@
-from django.urls import path, re_path
+from django.urls import path
 from rest_framework import routers
 
 from api.views.base_map import GetFeatureInfo
 from api.views.base_map import BaseMapViewset
 from api.views.base_map import LayerViewset
+from api.views.feature import FeatureView
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureSearch
 from api.views.feature import FeatureTypeView
@@ -31,10 +32,11 @@ app_name = 'api'
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectView, basename='projects')
 router.register(r'feature-types', FeatureTypeView, basename='feature-types')
+router.register(r'features', FeatureView, basename='features')
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 router.register(r'base-maps', BaseMapViewset, basename='base-maps')
-router.register(r'layers', LayerViewset, basename='base-maps')
+router.register(r'layers', LayerViewset, basename='layers')
 
 urlpatterns = [
     # Vues générales de navigation
