@@ -154,7 +154,11 @@ class FeatureTypeColoredSerializer(serializers.ModelSerializer):
 
 class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
-    feature_type = serializers.SlugRelatedField(slug_field='slug', read_only=True)
+    feature_type = serializers.SlugRelatedField(
+        slug_field='slug', queryset=FeatureType.objects.all())
+
+    project = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Project.objects.all())
 
     class Meta:
         model = Feature
@@ -169,6 +173,13 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             'archived_on',
             'deletion_on',
             'feature_type',
+            'project',
+        )
+        read_only_fields = (
+            'created_on',
+            'updated_on',
+            'archived_on',
+            'deletion_on',
         )
 
     def get_properties(self, instance, fields):
@@ -179,6 +190,37 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             for key, value in instance.feature_data.items():
                 properties[key] = value
         return properties
+
+    def handle_custom_fields(self, validated_data):
+        # Hack: les champs extra n'etant pas serializé ou défini dans le modele
+        # FIXME: les champs ne sont donc pas validé mais récupérer direct
+        # depuis les données initial
+        custom_fields = validated_data.get(
+            'feature_type'
+        ).customfield_set.values_list('name', flat=True)
+        properties = self.initial_data.get('properties', {})
+        validated_data['feature_data'] = {
+            k: v for k, v in properties.items() if k in custom_fields
+        }
+        return validated_data
+
+    def create(self, validated_data):
+        validated_data = self.handle_custom_fields(validated_data)
+        try:
+            instance = Feature.objects.create(**validated_data)
+        except Exception as err:
+            raise serializers.ValidationError({'detail': str(err)})
+        return instance
+
+    def update(self, instance, validated_data):
+        validated_data = self.handle_custom_fields(validated_data)
+        try:
+            for k, v in validated_data.items():
+                setattr(instance, k, v)
+            instance.save()
+        except Exception as err:
+            raise serializers.ValidationError([str(err), ])
+        return instance
 
 
 class FeatureSearchSerializer(serializers.ModelSerializer):
