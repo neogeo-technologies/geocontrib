@@ -1,20 +1,23 @@
 import json
 
+from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from rest_framework import exceptions
 from rest_framework import mixins
-from rest_framework import viewsets
-from rest_framework import views
 from rest_framework import permissions
-from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
+from rest_framework import views
+from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.response import Response
 
 from api.serializers import AttachmentSerializer
 from api.serializers import CommentSerializer
 from api.serializers import EventSerializer
 from api.serializers import ImportTaskSerializer
+from geocontrib.exif import exif
 from geocontrib.models import Attachment
 from geocontrib.models import Authorization
 from geocontrib.models import Comment
@@ -177,3 +180,30 @@ class EventView(views.APIView):
         all_events = Event.objects.filter(user=user).order_by('-created_on')
         data = EventSerializer(all_events, many=True).data
         return Response(data, status=200)
+
+
+class ExifGeomReaderView(views.APIView):
+
+    def get_geom(self, geom):
+        # Si geoJSON
+        if isinstance(geom, dict):
+            geom = str(geom)
+        geom = GEOSGeometry(geom, srid=4326)
+        return geom
+
+    def post(self, request):
+        image_file = request.data.get('image_file')
+        if not image_file:
+            raise exceptions.ValidationError({
+                'error': "Aucun fichier à ajouter",
+            })
+        try:
+            data_geom_wkt = exif.get_image_geoloc_as_wkt(
+                image_file, with_alt=False, ewkt=False)
+            geom = self.get_geom(data_geom_wkt)
+        except Exception:
+            raise exceptions.ValidationError({
+                'error': "Erreur lors de la lecture des données GPS.",
+            })
+
+        return Response({'geom': geom.wkt}, status=200)

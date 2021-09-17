@@ -1,22 +1,23 @@
 from django.urls import path
 from rest_framework import routers
 
-from api.views.base_map import GetFeatureInfo
 from api.views.base_map import BaseMapViewset
+from api.views.base_map import GetFeatureInfo
 from api.views.base_map import LayerViewset
-from api.views.feature import FeatureView
 from api.views.feature import ExportFeatureList
+from api.views.feature import FeatureLinkView
 from api.views.feature import FeatureSearch
 from api.views.feature import FeatureTypeView
+from api.views.feature import FeatureView
 from api.views.feature import ProjectFeature
 from api.views.feature import ProjectFeatureTypes
-from api.views.feature import FeatureLinkView
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
 from api.views.login import LogoutView
 from api.views.login import UserInfoView
 from api.views.misc import AttachmentView
 from api.views.misc import EventView
+from api.views.misc import ExifGeomReaderView
 from api.views.misc import ImportTaskSearch
 from api.views.misc import ProjectComments
 from api.views.project import ProjectAuthorization
@@ -75,6 +76,9 @@ urlpatterns = [
     path(
         'events/',
         EventView.as_view(), name='events-list'),
+    path(
+        'exif-geom-reader/',
+        ExifGeomReaderView.as_view(), name='exif'),
     path(
         'features/<uuid:feature_id>/feature-links/',
         FeatureLinkView.as_view(), name='feature-link'),
