@@ -5,6 +5,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+- Redmine 10665: handle GeoJSON import in the background
+- Redmine 9671: Use attribute status when importing GeoJSON files
+- Redmine 9671: Exports all user available features, even when status is draft
+- Redmine 9701: Creates a Feature Type from an GeoJSON file
+- Redmine 9701: GeoJSON import : ignore the GeoJSON feature\_type
+- Redmine 9701: GeoJSON import : add some logs
+- Redmine 11085: Mode disconnected / New VueJS interface https://git.neogeo.fr/geocontrib/geocontrib-frontend
+- Redmine 11085: Verify the format of uploaded images
+- Redmine 11280: Added Attachement view in admin
+- Redmine 11338: Handle features removal with Celery Beats
+
+### Settings change
+
+- add 'django\_celery\_beat' to INSTALLED\_APPS
+- new MAGIC\_IS\_AVAILABLE (default: False) parameter to disable image file format.
+
+### Docker settings change
+
+- new MAGIC\_IS\_AVAILABLE (default: True) parameter to disable image file format.
+
+### Extra operations:
+
+- Database migration needed:
+
+    python manage.py migrate
+
+- To handle Celery Beat task management, load the following fixture:
+    
+    python manage.py loaddata geocontrib/data/geocontrib_beat.json
+
+    You can now disable crons for running management tasks
+
+
+
 ## [1.3.6] - 2021-09-09
 
 ### Fixed
