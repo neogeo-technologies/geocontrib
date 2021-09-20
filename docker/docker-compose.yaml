@@ -21,6 +21,10 @@ services:
     <<: *geocontrib
     command: src/docker/geocontrib/start_celery.sh
 
+  celery-beat:
+    <<: *geocontrib
+    command: src/docker/geocontrib/start_celery_beat.sh
+
   # ---------------------------------------------------------------- #
   nginx:
     build:
