@@ -63,6 +63,7 @@ class FeatureTypeView(
             mixins.RetrieveModelMixin,
             mixins.CreateModelMixin,
             mixins.UpdateModelMixin,
+            mixins.DestroyModelMixin,
             viewsets.GenericViewSet):
 
     lookup_field = 'slug'
