@@ -23,6 +23,7 @@ from api.views.misc import ProjectComments
 from api.views.project import ProjectAuthorization
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
+from api.views.project import ProjectSubscription
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
@@ -73,6 +74,9 @@ urlpatterns = [
     path(
         'projects/<slug:slug>/feature-search/',
         FeatureSearch.as_view(), name='feature-search'),
+    path(
+        'projects/<slug:slug>/subscription/',
+        ProjectSubscription.as_view(), name='project-subscription'),
     path(
         'events/',
         EventView.as_view(), name='events-list'),

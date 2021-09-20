@@ -160,6 +160,8 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
     project = serializers.SlugRelatedField(
         slug_field='slug', queryset=Project.objects.all())
 
+    display_creator = serializers.SerializerMethodField()
+
     class Meta:
         model = Feature
         geo_field = 'geom'
@@ -174,6 +176,7 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             'deletion_on',
             'feature_type',
             'project',
+            'display_creator',
         )
         read_only_fields = (
             'created_on',
@@ -203,6 +206,12 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             k: v for k, v in properties.items() if k in custom_fields
         }
         return validated_data
+
+    def get_display_creator(self, obj):
+        res = 'N/A'
+        if self.context['request'].user.is_authenticated:
+            res = obj.display_creator
+        return res
 
     def create(self, validated_data):
         validated_data = self.handle_custom_fields(validated_data)

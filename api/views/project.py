@@ -16,6 +16,7 @@ from api.utils.permissions import ProjectThumbnailPermission
 from api.utils.validators import validate_image_file
 from geocontrib.models import Authorization
 from geocontrib.models import Project
+from geocontrib.models import Subscription
 
 User = get_user_model()
 
@@ -104,4 +105,36 @@ class ProjectAuthorization(APIView):
             'members': list(members),
             'others': list(others),
         }
+        return Response(data=data, status=200)
+
+
+class ProjectSubscription(APIView):
+
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
+
+    def get(self, request, slug):
+        project = get_object_or_404(Project, slug=slug)
+        data = {'is_suscriber': Subscription.is_suscriber(request.user, project)}
+        return Response(data=data, status=200)
+
+    def put(self, request, slug):
+        project = get_object_or_404(Project, slug=slug)
+        is_suscriber = request.data.get('is_suscriber', None)
+        if is_suscriber is True:
+            obj, _created = Subscription.objects.get_or_create(
+                project=project,
+            )
+            obj.users.add(request.user)
+            obj.save()
+        if is_suscriber is False:
+            try:
+                obj = Subscription.objects.get(project=project)
+            except Subscription.DoesNotExist:
+                pass
+            else:
+                obj.users.remove(request.user)
+                obj.save()
+        data = {'is_suscriber': Subscription.is_suscriber(request.user, project)}
         return Response(data=data, status=200)
