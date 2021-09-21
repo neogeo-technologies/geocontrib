@@ -182,6 +182,8 @@ class FeatureType(models.Model):
 
     title = models.CharField("Titre", max_length=128)
 
+    title_optional = models.BooleanField("Titre optionnel", default=False)
+
     slug = models.SlugField("Slug", max_length=256, editable=False, null=True)
 
     geom_type = models.CharField(
