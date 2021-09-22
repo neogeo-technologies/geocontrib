@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
 from rest_framework import serializers
@@ -59,6 +61,7 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
         model = FeatureType
         fields = (
             'title',
+            'title_optional',
             'slug',
             'geom_type',
             'color',
@@ -213,8 +216,17 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             res = obj.display_creator
         return res
 
+    def handle_title(self, validated_data):
+        title = validated_data.get('title')
+        if not title or title == '':
+            uid = uuid4()
+            validated_data['title'] = str(uid)
+            validated_data['feature_id'] = uid
+        return validated_data
+
     def create(self, validated_data):
         validated_data = self.handle_custom_fields(validated_data)
+        validated_data = self.handle_title(validated_data)
         try:
             instance = Feature.objects.create(**validated_data)
         except Exception as err:
