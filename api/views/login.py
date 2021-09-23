@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 class LoginView(views.APIView):
 
-    authentication_classes = [] # //? sert à quelque chose ?
+    authentication_classes = []
 
     permission_classes = [
         permissions.AllowAny,
@@ -53,8 +53,6 @@ class LoginView(views.APIView):
             "user":  UserSerializer(user).data
         }
         return Response(data=data, status=status.HTTP_200_OK)
-
-# //todo : view pour retourner seuleument infos user
 
 class UserInfoView(views.APIView):
 
