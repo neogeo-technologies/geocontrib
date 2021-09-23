@@ -1,4 +1,5 @@
 import json
+from uuid import uuid4
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos.error import GEOSException
 from django.db import transaction
@@ -35,6 +36,18 @@ class GeoJSONProcessing:
                 feature_data[field] = properties.get(field)
         return feature_data
 
+    def handle_title(self, data):
+        title = data.get('title')
+        feature_id = data.get('id')
+        if not title or title == '':
+            title = feature_id
+            if not feature_id or feature_id == '':
+                uid = uuid4()
+                feature_id = str(uid)
+                title = feature_id
+
+        return title, feature_id
+
     @transaction.atomic
     def create_features(self, data, import_task):
         feature_type = import_task.feature_type
@@ -46,23 +59,22 @@ class GeoJSONProcessing:
             properties = feature.get('properties')
             feature_data = self.get_feature_data(
                 feature_type, properties, field_names)
-            title = properties.get('title')
-            feature_id = feature.get('id')
+            title, feature_id = self.handle_title(properties)
             description = properties.get('description')
             try:
                 current, _ = Feature.objects.update_or_create(
-                feature_id=feature_id,
-                defaults={ 
-                    'title': title,
-                    'description' : description,
-                    'status': 'draft',
-                    'creator': import_task.user,
-                    'project' : feature_type.project,
-                    'feature_type' : feature_type,
-                    'geom' : self.get_geom(feature.get('geometry')),
-                    'feature_data' : feature_data,
-                }
-            )
+                    feature_id=feature_id,
+                    defaults={ 
+                        'title': title,
+                        'description' : description,
+                        'status': 'draft',
+                        'creator': import_task.user,
+                        'project' : feature_type.project,
+                        'feature_type' : feature_type,
+                        'geom' : self.get_geom(feature.get('geometry')),
+                        'feature_data' : feature_data,
+                        }
+                )
             except Exception as er:
                 self.infos.append(
                     f"L'edition de feature a echoué {er}'. ")
