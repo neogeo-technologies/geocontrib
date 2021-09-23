@@ -83,7 +83,7 @@ class ProjectFeatureTypes(views.APIView):
     http_method_names = ['get', ]
 
     def get(self, request, slug):
-        feature_types = FeatureType.objects.filter(project__slug=slug)
+        feature_types = FeatureType.objects.filter(project__slug=slug).order_by("title")
         serializers = FeatureTypeListSerializer(feature_types, many=True)
         data = {
             'feature_types': serializers.data,
