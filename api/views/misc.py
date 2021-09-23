@@ -15,6 +15,7 @@ from rest_framework.response import Response
 
 from api.serializers import AttachmentSerializer
 from api.serializers import CommentSerializer
+from api.serializers import CommentDetailedSerializer
 from api.serializers import EventSerializer
 from api.serializers import ImportTaskSerializer
 from geocontrib.exif import exif
@@ -148,9 +149,10 @@ class AttachmentView(viewsets.ViewSet):
             raise ValidationError({'data': 'data entry is missing or incorrect in post data'})
         try:
             comment = Comment.objects.filter(id=data.get('comment', None)).first()
+            title = data.get('title', attachement_file.name)
             instance = Attachment.objects.create(
                 attachment_file=attachement_file,
-                title=data.get('title'),
+                title=title,
                 info=data.get('info'),
                 feature_id=feature_id,
                 project=feature.project,
@@ -165,6 +167,46 @@ class AttachmentView(viewsets.ViewSet):
 
     def destroy(self, request, feature_id, attachment_id):
         instance = self.get_object(feature_id, attachment_id)
+        instance.delete()
+        return Response({}, status=204)
+
+
+class CommentView(viewsets.ViewSet):
+
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+
+    def get_object(self, feature_id, comment_id):
+        return get_object_or_404(Comment, id=comment_id, feature_id=feature_id)
+
+    def list(self, request, feature_id):
+        feature = get_object_or_404(Feature, feature_id=feature_id)
+        comments = Comment.objects.filter(
+            feature_id=feature.feature_id)
+        data = CommentDetailedSerializer(comments, many=True).data
+        return Response(data, status=200)
+
+    @action(detail=False, methods=['post'])
+    def create(self, request, feature_id):
+        feature = get_object_or_404(Feature, feature_id=feature_id)
+        serializer = CommentDetailedSerializer(data=request.data, context={'feature': feature, 'user': request.user})
+        if serializer.is_valid():
+            serializer.save()
+            data = serializer.data
+            status = 200
+        else:
+            data = serializer.errors
+            status = 400
+        return Response(data, status=status)
+
+    def retrieve(self, request, feature_id, comment_id):
+        instance = self.get_object(feature_id, comment_id)
+        data = CommentDetailedSerializer(instance).data
+        return Response(data, status=200)
+
+    def destroy(self, request, feature_id, comment_id):
+        instance = self.get_object(feature_id, comment_id)
         instance.delete()
         return Response({}, status=204)
 
