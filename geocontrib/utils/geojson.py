@@ -61,17 +61,25 @@ class GeoJSONProcessing:
                 feature_type, properties, field_names)
             title, feature_id = self.handle_title(properties)
             description = properties.get('description')
-            current = Feature.objects.create(
-                feature_id=feature_id,
-                title=title,
-                description=description,
-                status='draft',
-                creator=import_task.user,
-                project=feature_type.project,
-                feature_type=feature_type,
-                geom=self.get_geom(feature.get('geometry')),
-                feature_data=feature_data,
-            )
+            try:
+                current, _ = Feature.objects.update_or_create(
+                    feature_id=feature_id,
+                    defaults={ 
+                        'title': title,
+                        'description' : description,
+                        'status': 'draft',
+                        'creator': import_task.user,
+                        'project' : feature_type.project,
+                        'feature_type' : feature_type,
+                        'geom' : self.get_geom(feature.get('geometry')),
+                        'feature_data' : feature_data,
+                        }
+                )
+            except Exception as er:
+                self.infos.append(
+                    f"L'edition de feature a echoué {er}'. ")
+                raise GeoJSONProcessingFailed
+
             if title:
                 simili_features = Feature.objects.filter(
                     Q(title=title, description=description, feature_type=feature_type) | Q(
