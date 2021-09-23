@@ -13,6 +13,7 @@ from .feature import FeatureTypeSerializer
 from .flat_pages import FlatPagesSerializer
 from .misc import AttachmentSerializer
 from .misc import CommentSerializer
+from .misc import CommentDetailedSerializer
 from .misc import EventSerializer
 from .misc import ImportTaskSerializer
 from .misc import StackedEventSerializer
@@ -40,6 +41,7 @@ __all__ = [
     'ImportTaskSerializer',
     'UserSerializer',
     'CommentSerializer',
+    'CommentDetailedSerializer',
     'EventSerializer',
     'StackedEventSerializer',
     'ProjectSerializer',

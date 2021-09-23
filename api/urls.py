@@ -16,6 +16,7 @@ from api.views.login import LoginView
 from api.views.login import LogoutView
 from api.views.login import UserInfoView
 from api.views.misc import AttachmentView
+from api.views.misc import CommentView
 from api.views.misc import EventView
 from api.views.misc import ExifGeomReaderView
 from api.views.misc import ImportTaskSearch
@@ -95,6 +96,12 @@ urlpatterns = [
     path(
         'features/<uuid:feature_id>/attachments/<uuid:attachment_id>/',
         AttachmentView.as_view(actions={'delete': 'destroy'}), name='attachments-destroy'),
+    path(
+        'features/<uuid:feature_id>/comments/',
+        CommentView.as_view(actions={'post': 'create', 'get': 'list'}), name='comments-list'),
+    path(
+        'features/<uuid:feature_id>/comments/<uuid:comment_id>/',
+        CommentView.as_view(actions={'get': 'retrieve', 'delete': 'destroy'}), name='comments-detail'),
     path(
         'proxy/',
         GetFeatureInfo.as_view(), name='proxy'),
