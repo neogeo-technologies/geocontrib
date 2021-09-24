@@ -95,6 +95,7 @@ class CommentDetailedSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f'Invalid Input. {err}')
         return instance
 
+
 class CommentSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
@@ -195,6 +196,37 @@ class EventSerializer(serializers.ModelSerializer):
             'related_comment',
             'related_feature',
             'project_url',
+        )
+
+
+class FeatureEventSerializer(serializers.ModelSerializer):
+
+    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+
+    display_user = serializers.ReadOnlyField()
+
+    related_comment = serializers.SerializerMethodField()
+
+    def get_related_comment(self, obj):
+        res = {}
+        if obj.object_type == 'comment':
+            try:
+                comment = Comment.objects.get(id=obj.comment_id)
+                res['comment'] = comment.comment
+                attachment = comment.attachment_set.first()
+                res['attachment'] = {'url': attachment.attachment_file.url, 'title': attachment.title}
+            except Exception:
+                pass
+        return res
+
+    class Meta:
+        model = Event
+        fields = (
+            'created_on',
+            'object_type',
+            'event_type',
+            'display_user',
+            'related_comment',
         )
 
 

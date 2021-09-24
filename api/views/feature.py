@@ -19,7 +19,9 @@ from api.serializers import FeatureLinkSerializer
 from api.serializers import FeatureListSerializer
 from api.serializers import FeatureSearchSerializer
 from api.serializers import FeatureTypeListSerializer
+from api.serializers import FeatureEventSerializer
 from api.utils.paginations import CustomPagination
+from geocontrib.models import Event
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
 from geocontrib.models import FeatureType
@@ -185,4 +187,16 @@ class FeatureLinkView(views.APIView):
             feature_from__feature_id=feature_id
         )
         data = FeatureLinkSerializer(linked_features, many=True).data
+        return Response(data, status=200)
+
+
+class FeatureEventView(views.APIView):
+
+    http_method_names = ['get', ]
+
+    def get(self, request, feature_id):
+        events = Event.objects.select_related('user').filter(
+            feature_id=feature_id
+        ).order_by('created_on')
+        data = FeatureEventSerializer(events, many=True).data
         return Response(data, status=200)

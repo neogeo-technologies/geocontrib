@@ -5,6 +5,7 @@ from api.views.base_map import BaseMapViewset
 from api.views.base_map import GetFeatureInfo
 from api.views.base_map import LayerViewset
 from api.views.feature import ExportFeatureList
+from api.views.feature import FeatureEventView
 from api.views.feature import FeatureLinkView
 from api.views.feature import FeatureSearch
 from api.views.feature import FeatureTypeView
@@ -22,9 +23,9 @@ from api.views.misc import ExifGeomReaderView
 from api.views.misc import ImportTaskSearch
 from api.views.misc import ProjectComments
 from api.views.project import ProjectAuthorization
+from api.views.project import ProjectSubscription
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
-from api.views.project import ProjectSubscription
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
@@ -87,6 +88,9 @@ urlpatterns = [
     path(
         'features/<uuid:feature_id>/feature-links/',
         FeatureLinkView.as_view(), name='feature-link'),
+    path(
+        'features/<uuid:feature_id>/events/',
+        FeatureEventView.as_view(), name='feature-events'),
     path(
         'features/<uuid:feature_id>/attachments/',
         AttachmentView.as_view(actions={'post': 'create', 'get': 'list'}), name='attachments-list'),
