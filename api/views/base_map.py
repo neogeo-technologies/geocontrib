@@ -61,8 +61,8 @@ class BaseMapViewset(
         mixins.ListModelMixin,
         mixins.RetrieveModelMixin,
         mixins.CreateModelMixin,
-        # mixins.UpdateModelMixin,
-        # mixins.DestroyModelMixin,
+        mixins.UpdateModelMixin,
+        mixins.DestroyModelMixin,
         viewsets.GenericViewSet):
 
     permission_classes = [

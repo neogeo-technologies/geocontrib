@@ -37,9 +37,6 @@ class BaseMapSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'layers', 'project')
 
     def context_layer_set(self, instance, context_layers):
-        # import pdb; pdb.set_trace()
-        # # if isinstance(context_layers, list):
-        # #     instance.contextlayer_set.all().delete()
         instance.layers.clear()
         for context_layer in context_layers:
             context_layer['base_map'] = instance
