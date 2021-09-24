@@ -1,8 +1,10 @@
 from django.templatetags.static import static
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.urls import reverse
 from rest_framework import serializers
 
+from geocontrib.choices import ALL_LEVELS
 from geocontrib.models import Authorization
 from geocontrib.models import Comment
 from geocontrib.models import Feature
@@ -21,6 +23,71 @@ class ProjectSerializer(serializers.ModelSerializer):
             'slug',
             'created_on',
             'updated_on'
+        )
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'first_name',
+            'last_name',
+            'username'
+        )
+
+    def to_internal_value(self, data):
+        return User.objects.get(id=data.get('id'))
+
+
+class LevelSerializer(serializers.ModelSerializer):
+
+    codename = serializers.ChoiceField(ALL_LEVELS, source='user_type_id')
+    display = serializers.CharField(source='get_user_type_id_display', read_only=True)
+
+    class Meta:
+        model = UserLevelPermission
+        fields = (
+            'display',
+            'codename',
+        )
+
+    def to_internal_value(self, data):
+        return UserLevelPermission.objects.get(user_type_id=data.get('codename'))
+
+
+class BaseProjectAuthorizationListSerializer(serializers.ListSerializer):
+
+    @transaction.atomic
+    def bulk_edit(self, project):
+        validated_data = self.validated_data
+        authorizations = [Authorization(project=project, **item) for item in validated_data]
+        if not any([row.level.user_type_id == 'admin' for row in authorizations]):
+            raise serializers.ValidationError({
+                'error': "Au moins un administrateur est requis par projet. "
+            })
+        project.authorization_set.all().delete()
+        try:
+            instances = Authorization.objects.bulk_create(authorizations)
+        except Exception as err:
+            raise serializers.ValidationError({
+                'error': f"Échec de l'édition des permissions: {err}"
+            })
+        return instances
+
+
+class ProjectAuthorizationSerializer(serializers.ModelSerializer):
+
+    user = UserSerializer()
+    level = LevelSerializer()
+
+    class Meta:
+        list_serializer_class = BaseProjectAuthorizationListSerializer
+        model = Authorization
+        fields = (
+            'user',
+            'level',
         )
 
 

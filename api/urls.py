@@ -22,7 +22,7 @@ from api.views.misc import EventView
 from api.views.misc import ExifGeomReaderView
 from api.views.misc import ImportTaskSearch
 from api.views.misc import ProjectComments
-from api.views.project import ProjectAuthorization
+from api.views.project import ProjectAuthorizationView
 from api.views.project import ProjectSubscription
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
@@ -59,8 +59,8 @@ urlpatterns = [
         'projects/<slug:slug>/thumbnail/',
         ProjectThumbnailView.as_view(), name='project-thumbnail'),
     path(
-        'projects/<slug:slug>/utilisateurs/',
-        ProjectAuthorization.as_view(), name='project-authorization'),
+        'projects/<slug:project__slug>/utilisateurs/',
+        ProjectAuthorizationView.as_view(), name='project-authorization'),
     path(
         'projects/<slug:slug>/feature-types/',
         ProjectFeatureTypes.as_view(), name='project-feature-types'),

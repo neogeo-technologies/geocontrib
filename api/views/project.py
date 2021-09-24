@@ -1,17 +1,18 @@
 from django.contrib.auth import get_user_model
-from django.db.models import F
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import Http404
 from django.conf import settings
 from rest_framework import permissions
 from rest_framework import viewsets
+from rest_framework import generics
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.serializers import ProjectDetailedSerializer
 from api.serializers.project import ProjectCreationSerializer
+from api.serializers.project import ProjectAuthorizationSerializer
 from api.utils.permissions import ProjectThumbnailPermission
 from api.utils.validators import validate_image_file
 from geocontrib.models import Authorization
@@ -77,35 +78,34 @@ class ProjectThumbnailView(APIView):
         return Response(data=data, status=200)
 
 
-class ProjectAuthorization(APIView):
-    queryset = Project.objects.all()
-    lookup_field = 'slug'
-    http_method_names = ['get', ]
+class ProjectAuthorizationView(generics.ListAPIView, generics.UpdateAPIView):
 
-    def get(self, request, slug):
+    queryset = Authorization.objects.select_related('user', 'level').all()
 
-        members = Authorization.objects.filter(project__slug=slug).annotate(
-            user_pk=F('user__pk'),
-            email=F('user__email'),
-            username=F('user__username'),
-            first_name=F('user__first_name'),
-            last_name=F('user__last_name'),
-        ).values(
-            'user_pk', 'email', 'username', 'first_name', 'last_name',
-        )
+    serializer_class = ProjectAuthorizationSerializer
 
-        others = User.objects.filter(
-            is_active=True
-        ).exclude(
-            pk__in=[mem.get('user_pk') for mem in members]
-        ).values(
-            'pk', 'email', 'username', 'first_name', 'last_name'
-        )
-        data = {
-            'members': list(members),
-            'others': list(others),
-        }
-        return Response(data=data, status=200)
+    lookup_field = 'project__slug'
+
+    def get_object(self, *args, **kwargs):
+        instance = get_object_or_404(Project, slug=self.kwargs.get('project__slug'))
+        return instance
+
+    def get_queryset(self, *args, **kwargs):
+        instance = self.get_object()
+        return self.queryset.filter(project=instance)
+
+    def put(self, request, *args, **kwargs):
+        data = request.data
+        serializer = ProjectAuthorizationSerializer(data=data, many=True)
+        if serializer.is_valid():
+            project = self.get_object()
+            serializer.bulk_edit(project)
+            data = serializer.data
+            status = 200
+        else:
+            data = serializer.errors
+            status = 400
+        return Response(data=data, status=status)
 
 
 class ProjectSubscription(APIView):
