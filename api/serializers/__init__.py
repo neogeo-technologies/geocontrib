@@ -18,6 +18,7 @@ from .misc import EventSerializer
 from .misc import ImportTaskSerializer
 from .misc import StackedEventSerializer
 from .misc import UserSerializer
+from .misc import FeatureEventSerializer
 from .project import ProjectDetailedSerializer
 from .project import ProjectSerializer
 
@@ -43,6 +44,7 @@ __all__ = [
     'CommentSerializer',
     'CommentDetailedSerializer',
     'EventSerializer',
+    'FeatureEventSerializer',
     'StackedEventSerializer',
     'ProjectSerializer',
     'ProjectDetailedSerializer',
