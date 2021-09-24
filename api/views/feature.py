@@ -102,7 +102,11 @@ class ProjectFeature(views.APIView):
         features = Feature.objects.filter(project__slug=slug)
         format = request.query_params.get('output')
         if format and format == 'geojson':
-            data = FeatureDetailedSerializer(features, many=True).data
+            data = FeatureDetailedSerializer(
+                features,
+                is_authenticated=request.user.is_authenticated,
+                many=True,
+            ).data
         else:
             serializers = FeatureListSerializer(features, many=True)
             data = {
