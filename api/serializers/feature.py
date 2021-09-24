@@ -225,6 +225,7 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
         return validated_data
 
     def create(self, validated_data):
+        validated_data['creator'] = self.context.get('request').user
         validated_data = self.handle_custom_fields(validated_data)
         validated_data = self.handle_title(validated_data)
         try:
