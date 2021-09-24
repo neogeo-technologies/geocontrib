@@ -362,6 +362,7 @@ class FeatureLinkSerializer(serializers.ModelSerializer):
             try:
                 feature = obj.feature_to
                 res = {
+                    'feature_type_slug': str(feature.feature_type.slug),
                     'feature_id': str(feature.feature_id),
                     'title': str(feature.title),
                     'feature_url': feature.get_view_url(),
