@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.shortcuts import reverse
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
@@ -350,33 +351,51 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
             })
 
 
-class FeatureLinkSerializer(serializers.ModelSerializer):
+class FeatureLinkListSerializer(serializers.ListSerializer):
 
-    feature_to = serializers.SerializerMethodField()
+    @transaction.atomic
+    def bulk_create(self, feature_from):
+        validated_data = self.validated_data
+        feat_links = [FeatureLink(**item) for item in validated_data]
+        feature_from.feature_from.all().delete()
+        feature_from.feature_from.set(feat_links, bulk=False)
 
-    relation_type = serializers.ReadOnlyField(source='get_relation_type_display')
 
-    def get_feature_to(self, obj):
-        res = {}
-        if obj.feature_to:
-            try:
-                feature = obj.feature_to
-                res = {
-                    'feature_type_slug': str(feature.feature_type.slug),
-                    'feature_id': str(feature.feature_id),
-                    'title': str(feature.title),
-                    'feature_url': feature.get_view_url(),
-                    'created_on': feature.created_on.strftime("%d/%m/%Y %H:%M"),
-                    'creator': feature.display_creator,
-                }
-            except Exception:
-                logger.exception('No related feature found')
-        return res
+class FeatureCompactSerializer(serializers.ModelSerializer):
+
+    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M")
+    url = serializers.ReadOnlyField(source='get_view_url')
 
     class Meta:
+        model = Feature
+        fields = (
+            'feature_id',
+            'title',
+            'display_creator',
+            'created_on',
+            'url',
+        )
+
+    def to_internal_value(self, data):
+        try:
+            instance = Feature.objects.get(feature_id=data.get('feature_id'))
+        except Exception:
+            raise serializers.ValidationError({"error": "Aucun signalement ne correspond. "})
+        return instance
+
+
+class FeatureLinkSerializer(serializers.ModelSerializer):
+
+    feature_to = FeatureCompactSerializer()
+
+    relation_type_display = serializers.ReadOnlyField(source='get_relation_type_display')
+
+    class Meta:
+        list_serializer_class = FeatureLinkListSerializer
         model = FeatureLink
         fields = (
             'relation_type',
+            'relation_type_display',
             'feature_to',
         )
 

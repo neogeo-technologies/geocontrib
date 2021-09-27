@@ -182,16 +182,34 @@ class FeatureSearch(generics.ListAPIView):
         return queryset
 
 
-class FeatureLinkView(views.APIView):
+class FeatureLinkView(generics.ListAPIView, generics.UpdateAPIView):
 
-    http_method_names = ['get', ]
+    parent_model = Feature
 
-    def get(self, request, feature_id):
-        linked_features = FeatureLink.objects.filter(
-            feature_from__feature_id=feature_id
-        )
-        data = FeatureLinkSerializer(linked_features, many=True).data
-        return Response(data, status=200)
+    queryset = FeatureLink.objects.all()
+
+    serializer_class = FeatureLinkSerializer
+
+    lookup_field = 'feature_id'
+
+    def get_object(self, *args, **kwargs):
+        lookup = {self.lookup_field: self.kwargs.get(self.lookup_field)}
+        instance = get_object_or_404(self.parent_model, **lookup)
+        return instance
+
+    def get_queryset(self, *args, **kwargs):
+        instance = self.get_object()
+        return self.queryset.select_related(
+            'feature_to', 'feature_from'
+        ).filter(feature_from=instance)
+
+    def put(self, request, *args, **kwargs):
+        feature_from = self.get_object()
+        serializer = FeatureLinkSerializer(feature_from, data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.bulk_create(feature_from)
+        data = FeatureLinkSerializer(self.get_queryset(), many=True).data
+        return Response(data)
 
 
 class FeatureEventView(views.APIView):
