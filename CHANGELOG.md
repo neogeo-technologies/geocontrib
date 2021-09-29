@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [2.1.0] - 2021-09-29
+
+- Redmine 11133 : Mise à jour de signalements lors de l'import
+- Redmine 11084 : Supprimer en masse des signalements
+- Redmine 11083 : Full responsive design
+
+## [2.0.0] - 2021-09-21
+
 - Redmine 10665: handle GeoJSON import in the background
 - Redmine 9671: Use attribute status when importing GeoJSON files
 - Redmine 9671: Exports all user available features, even when status is draft
