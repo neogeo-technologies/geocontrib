@@ -8,6 +8,7 @@ from geocontrib.models import Project
 from geocontrib.models import BaseMap
 from geocontrib.models import ContextLayer
 from geocontrib.models import Layer
+from geocontrib.models import Event
 
 
 logger = logging.getLogger(__name__)
@@ -46,4 +47,5 @@ class ProjectAdmin(admin.ModelAdmin):
 
 admin.site.register(BaseMap, BaseMapAdmin)
 admin.site.register(Layer)
+admin.site.register(Event)
 admin.site.register(Project, ProjectAdmin)

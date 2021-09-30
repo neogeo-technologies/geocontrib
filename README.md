@@ -2,6 +2,8 @@
 
 GéoContrib est un outil libre de signalement contributif et collaboratif. Une version de démonstration est accessible sur https://geocontrib.demo.neogeo.fr/.
 
+Depuis la version 2.0.0, l'interface web est dans une dépôt séparé : https://git.neogeo.fr/geocontrib/geocontrib-frontend
+
 ## Installation
 
 ### Prérequis
@@ -10,9 +12,13 @@ GéoContrib est un outil libre de signalement contributif et collaboratif. Une v
 * Instance de PostgreSQL/PostGIS avec une base de données dédiée à l'application 
 (cf. paramètre DATABASES du fichier settings.py)
 
+
 ### Création du projet Django et clone du repo
 
 ```shell
+# installation dépendances
+apt-get install -y libproj-dev gdal-bin ldap-utils libpq-dev libmagic1
+
 # Création d'un environnement virtuel Python
 python3 -m venv geocontrib_venv/
 
@@ -62,6 +68,7 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * FILE_MAX_SIZE : taille maximale des fichiers téléversés dans l'application
 * DEFAULT_BASE_MAP : configuration du fond de carte par défaut
 * PROJECT_COPY_RELATED : configuration des modèles de projets
+* MAGIC\_IS\_AVAILABLE (default: False) active la vérification des images téléversées.
 
 Copier le contenu du fichier config_sample/urls.py dans config/urls.py
 
@@ -71,6 +78,7 @@ Copier le contenu du fichier config_sample/urls.py dans config/urls.py
 python manage.py migrate
 python manage.py loaddata geocontrib/data/perm.json
 python manage.py loaddata geocontrib/data/flatpages.json
+python manage.py loaddata geocontrib/data/geocontrib_beat.json
 ```
 
 Ne faites pas attention aux messages d'avertissement suivants :
@@ -112,7 +120,21 @@ Se rendre dans l'interface d'administration Django et éditer le premier enregis
 
 ## Configuration des tâches périodiques
 
-Deux types de tâches requièrent d'invoquer une commande régulièrement (depuis un cron par exemple)
+Deux types de tâches requièrent d'invoquer une commande régulièrement (depuis celery-beat ou depuis un cron)
+
+### Tâches périodiques depuis celery
+
+Lancer le worker celery:
+
+    celery -A config worker
+
+Lancer le générateur d'évenements:
+
+    celery -A config beat
+
+Dans `/admin/django_celery_beat/periodictask`, saisissez des tâches avec leur periodicité.
+
+### Tâches périodiques depuis un cron
 
 L'envoi de mails de norifications, vous pouvez l'appeler toutes les minutes ou tous les jours selon vos préférences d'envoi
 ```shell
@@ -123,6 +145,8 @@ L'archivage et la suppression des signalements, à invoquer une fois par jour
 ```shell
 python manage.py data_cleansing
 ```
+
+
 
 
 ## Déploiement dans un environnement geOrchestra

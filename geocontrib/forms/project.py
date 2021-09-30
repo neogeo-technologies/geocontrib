@@ -35,8 +35,6 @@ class AuthorizationForm(forms.ModelForm):
 
     username = forms.CharField(label="Nom d'utilisateur")
 
-    email = forms.EmailField(label="Adresse email", required=False)
-
     level = forms.ModelChoiceField(
         label="Niveau d'autorisation",
         queryset=UserLevelPermission.objects.filter(rank__gte=1).order_by('rank'),
@@ -46,14 +44,12 @@ class AuthorizationForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
         if self.instance and hasattr(self.instance, 'user'):
-            self.fields['email'].initial = self.instance.user.email
             self.fields['first_name'].initial = self.instance.user.first_name
             self.fields['last_name'].initial = self.instance.user.last_name
             self.fields['level'].initial = self.instance.level
             self.fields['username'].initial = self.instance.user.username
             self.fields['first_name'].disabled = True
             self.fields['last_name'].disabled = True
-            self.fields['email'].disabled = True
             self.fields['username'].disabled = True
 
     class Meta:
@@ -62,7 +58,6 @@ class AuthorizationForm(forms.ModelForm):
             'first_name',
             'last_name',
             'username',
-            'email',
             'level',
         )
 

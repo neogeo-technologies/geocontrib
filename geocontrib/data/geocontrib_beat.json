@@ -1,0 +1,106 @@
+[{
+  "model": "django_celery_beat.intervalschedule",
+  "pk": 2,
+  "fields": {
+    "every": 1,
+    "period": "days"
+  }
+}, {
+  "model": "django_celery_beat.crontabschedule",
+  "pk": 1,
+  "fields": {
+    "minute": "0",
+    "hour": "4",
+    "day_of_week": "*",
+    "day_of_month": "*",
+    "month_of_year": "*",
+    "timezone": "UTC"
+  }
+}, {
+  "model": "django_celery_beat.periodictasks",
+  "pk": 1,
+  "fields": {
+    "last_update": "2021-09-10T15:00:09.302Z"
+  }
+}, {
+  "model": "django_celery_beat.periodictask",
+  "pk": 1,
+  "fields": {
+    "name": "celery.backend_cleanup",
+    "task": "celery.backend_cleanup",
+    "interval": null,
+    "crontab": 1,
+    "solar": null,
+    "clocked": null,
+    "args": "[]",
+    "kwargs": "{}",
+    "queue": null,
+    "exchange": null,
+    "routing_key": null,
+    "headers": "{}",
+    "priority": null,
+    "expires": null,
+    "expire_seconds": 43200,
+    "one_off": false,
+    "start_time": null,
+    "enabled": true,
+    "last_run_at": null,
+    "total_run_count": 0,
+    "date_changed": "2021-09-10T14:54:53.170Z",
+    "description": ""
+  }
+}, {
+  "model": "django_celery_beat.periodictask",
+  "pk": 3,
+  "fields": {
+    "name": "Geocontrib Data Cleansing",
+    "task": "geocontrib.tasks.task_data_cleansing",
+    "interval": 2,
+    "crontab": null,
+    "solar": null,
+    "clocked": null,
+    "args": "[]",
+    "kwargs": "{}",
+    "queue": null,
+    "exchange": null,
+    "routing_key": null,
+    "headers": "{}",
+    "priority": null,
+    "expires": null,
+    "expire_seconds": null,
+    "one_off": false,
+    "start_time": "2021-09-10T14:55:55Z",
+    "enabled": true,
+    "last_run_at": "2021-09-10T14:59:54.345Z",
+    "total_run_count": 42,
+    "date_changed": "2021-09-10T14:59:59.359Z",
+    "description": ""
+  }
+}, {
+  "model": "django_celery_beat.periodictask",
+  "pk": 4,
+  "fields": {
+    "name": "Geocontrib Notify Suscribers",
+    "task": "geocontrib.tasks.task_notify_subscribers",
+    "interval": 2,
+    "crontab": null,
+    "solar": null,
+    "clocked": null,
+    "args": "[]",
+    "kwargs": "{}",
+    "queue": null,
+    "exchange": null,
+    "routing_key": null,
+    "headers": "{}",
+    "priority": null,
+    "expires": null,
+    "expire_seconds": null,
+    "one_off": false,
+    "start_time": "2021-09-11T01:00:00Z",
+    "enabled": true,
+    "last_run_at": null,
+    "total_run_count": 0,
+    "date_changed": "2021-09-10T14:58:12.523Z",
+    "description": ""
+  }
+}]

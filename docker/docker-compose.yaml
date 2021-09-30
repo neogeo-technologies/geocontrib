@@ -3,35 +3,30 @@ version: "3.5"
 
 services:
 
-  geocontrib:
-    container_name: "geocontrib_django"
+  geocontrib: &geocontrib
+    image: neogeo/geocontrib
     build:
       context: ..
       dockerfile: Dockerfile
     env_file:
       - geocontrib/geocontrib-alone.env
-    ports:
-      - "5000:5000"
     volumes:
       - geocontrib_media:/home/apprunner/geocontrib_app/media
       - geocontrib_static:/home/apprunner/geocontrib_app/static
     depends_on:
-      - geocontrib-db
+      - postgres
+      - redis
+
+  celery:
+    <<: *geocontrib
+    command: src/docker/geocontrib/start_celery.sh
+
+  celery-beat:
+    <<: *geocontrib
+    command: src/docker/geocontrib/start_celery_beat.sh
 
   # ---------------------------------------------------------------- #
-  geocontrib-db:
-    container_name: "geocontrib_db"
-    image: mdillon/postgis:latest
-    environment:
-      - POSTGRES_USER=geocontrib
-      - POSTGRES_PASSWORD=geocontrib
-      - POSTGRES_DB=geocontrib
-    volumes:
-      - geocontrib_data:/var/lib/postgresql/data/
-
-  # ---------------------------------------------------------------- #
-  geocontrib-nginx:
-    container_name: "geocontrib_nginx"
+  nginx:
     build:
       context: nginx
     env_file:
@@ -43,6 +38,23 @@ services:
       - "8000:80"
     depends_on:
       - geocontrib
+
+  # ---------------------------------------------------------------- #
+  postgres:
+    image: mdillon/postgis:latest
+    environment:
+      - POSTGRES_USER=geocontrib
+      - POSTGRES_PASSWORD=geocontrib
+      - POSTGRES_DB=geocontrib
+    volumes:
+      - geocontrib_data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
 
 volumes:
   geocontrib_data:

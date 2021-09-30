@@ -73,22 +73,22 @@ def create_symetrical_relation(sender, instance, created, **kwargs):
             feature_to=instance.feature_from)
 
 
-@receiver(models.signals.post_delete, sender='geocontrib.FeatureLink')
-@disable_for_loaddata
-def delete_symetrical_relation(sender, instance, **kwargs):
-    related = []
-    if instance.relation_type in ['doublon', 'depend_de']:
-        recip = instance.relation_type
-    else:
-        recip = 'est_remplace_par' if (instance.relation_type == 'remplace') else 'remplace'
-    related = sender.objects.filter(
-        relation_type=recip,
-        feature_from=instance.feature_to,
-        feature_to=instance.feature_from
-    )
-    # Suppression des réciproques
-    for instance in related:
-        instance.delete()
+# @receiver(models.signals.post_delete, sender='geocontrib.FeatureLink')
+# @disable_for_loaddata
+# def delete_symetrical_relation(sender, instance, **kwargs):
+#     related = []
+#     if instance.relation_type in ['doublon', 'depend_de']:
+#         recip = instance.relation_type
+#     else:
+#         recip = 'est_remplace_par' if (instance.relation_type == 'remplace') else 'remplace'
+#     related = sender.objects.filter(
+#         relation_type=recip,
+#         feature_from=instance.feature_to,
+#         feature_to=instance.feature_from
+#     )
+#     # Suppression des réciproques
+#     for instance in related:
+#         instance.delete()
 
 
 @receiver(models.signals.pre_save, sender='geocontrib.Feature')

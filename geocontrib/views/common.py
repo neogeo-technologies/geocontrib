@@ -63,6 +63,7 @@ class BaseMapContextMixin(SingleObjectMixin):
                 context={'request': request},
                 many=True
             )
+            # import pdb; pdb.set_trace()
             context['serialized_features'] = serialized_features.data
             context['serialized_base_maps'] = serialized_base_maps.data
             context['serialized_layers'] = serialized_layers.data

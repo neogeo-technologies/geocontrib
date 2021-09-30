@@ -1,11 +1,10 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from api import logger
 from geocontrib.models import BaseMap
 from geocontrib.models import ContextLayer
 from geocontrib.models import Layer
+from geocontrib.models import Project
 
 
 User = get_user_model()
@@ -13,7 +12,11 @@ User = get_user_model()
 
 class ContextLayerSerializer(serializers.ModelSerializer):
 
-    id = serializers.IntegerField(source='layer.id', required=True)
+    id = serializers.PrimaryKeyRelatedField(
+        source='layer',
+        queryset=Layer.objects.all(),
+        # required=True
+    )
 
     title = serializers.ReadOnlyField(source='layer.title')
 
@@ -26,31 +29,31 @@ class BaseMapSerializer(serializers.ModelSerializer):
 
     layers = ContextLayerSerializer(source='contextlayer_set', many=True)
 
+    project = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Project.objects.all())
+
     class Meta:
         model = BaseMap
-        fields = ('id', 'title', 'layers')
+        fields = ('id', 'title', 'layers', 'project')
 
     def context_layer_set(self, instance, context_layers):
         instance.layers.clear()
         for context_layer in context_layers:
-            layer = context_layer.pop('layer')
-            layer = get_object_or_404(Layer, id=layer['id'])
-            ctx, created = ContextLayer.objects.update_or_create(
-                base_map=instance,
-                layer=layer,
-                defaults=context_layer
-            )
-            logger.debug(ctx)
+            context_layer['base_map'] = instance
+            ContextLayer.objects.create(**context_layer)
 
     def create(self, validated_data):
         context_layers = validated_data.pop('contextlayer_set', [])
-        instance = BaseMap.objects.create(**validated_data)
-        self.context_layer_set(instance, context_layers)
+        try:
+            instance = BaseMap.objects.create(**validated_data)
+            self.context_layer_set(instance, context_layers)
+        except Exception:
+            raise serializers.ValidationError('')
         return instance
 
     def update(self, instance, validated_data):
         context_layers = validated_data.pop('contextlayer_set', [])
-        instance.email = validated_data.get('title', instance.title)
+        instance.title = validated_data['title']
         self.context_layer_set(instance, context_layers)
         instance.save()
         return instance
@@ -62,4 +65,10 @@ class LayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Layer
-        fields = '__all__'
+        fields = (
+            'id',
+            'title',
+            'service',
+            'schema_type',
+            'options',
+        )
