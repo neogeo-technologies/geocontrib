@@ -36,9 +36,8 @@ CORE_APPS = [
     'django.contrib.gis',
     'django.contrib.flatpages',
     'django_admin_listfilter_dropdown',
-
 ]
-THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis', cast=Csv())
+THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis, django_celery_beat,', cast=Csv())
 OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
 SSO_PLUGIN = config('SSO_PLUGIN', default='', cast=Csv())
 INSTALLED_APPS = CORE_APPS + THIRD_PARTY_DJANGO_APPS + OUR_APPS + SSO_PLUGIN
@@ -115,6 +114,7 @@ USE_TZ = True
 
 # URL prefix
 URL_PREFIX = config('URL_PREFIX', default='')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Static and media files
 STATIC_URL = '/{}static/'.format(URL_PREFIX)

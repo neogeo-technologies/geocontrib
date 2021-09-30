@@ -186,6 +186,7 @@ FILE_MAX_SIZE = config('FILE_MAX_SIZE', default=10000000)
 
 SITE_ID = 1
 
+# Default basemap config (following leaflet syntax)
 DEFAULT_BASE_MAP = {
     'SERVICE': 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
     'OPTIONS': {
