@@ -24,7 +24,7 @@ def verify_or_create_json(filename, json_result):
 
 @pytest.mark.django_db
 @pytest.mark.freeze_time('2021-08-05')
-def test_projects_list(api_client):
+def test_feature_list(api_client):
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
     call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
 
@@ -55,3 +55,11 @@ def test_projects_list(api_client):
     result = api_client.get('/api/features/?feature_type__slug=1-dfsdfs')
     assert result.status_code == 200
     verify_or_create_json("api/tests/data/test_features_featuretype_admin.json", result.json())
+
+    # Ensure wrong project fails
+    result = api_client.get('/api/features/?project__slug=1-wrong')
+    assert result.status_code == 404
+
+    # Ensure wrong feature_type__slug fails
+    result = api_client.get('/api/features/?feature_type__slug=1-wrong')
+    assert result.status_code == 404

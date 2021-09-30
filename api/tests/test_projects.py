@@ -38,7 +38,7 @@ def test_projects_list(api_client):
         'access_level_pub_feature': 'Utilisateur anonyme',
         'archive_feature': None,
         'created_on': '05/08/2021',
-        'creator': 1,
+        'creator': 2,
         'delete_feature': None,
         'description': None,
         'is_project_type': False,
@@ -48,8 +48,8 @@ def test_projects_list(api_client):
         'nb_features': 0,
         'nb_published_features': 0,
         'nb_published_features_comments': 0,
-        'slug': '1-projet-1',
-        'thumbnail': 'http://testserver/media/default.png',
+        'slug': '2-projet-1',
+        'thumbnail': '/api/projects/2-projet-1/thumbnail/',
         'title': 'Projet 1',
         'updated_on': '05/08/2021'}]
 
@@ -80,12 +80,12 @@ def test_projects_post(api_client):
         'access_level_arch_feature': "anonymous",
         'access_level_pub_feature': "anonymous",
         'archive_feature': 1,
-        'creator': 3,
+        'creator': 4,
         'delete_feature': 2,
         'description': None,
         'is_project_type': False,
         'moderation': False,
-        'slug': '2-projet-2',
+        'slug': '3-projet-2',
         'title': 'Projet 2',
     }
 
@@ -114,7 +114,7 @@ def test_projects_thumbnail_put(api_client):
                                          fp.read(),
                                          content_type='multipart/form-data')
 
-    url = reverse('api:project-thumbnail', kwargs={"slug": "3-projet-3"})
+    url = reverse('api:project-thumbnail', kwargs={"slug": "4-projet-3"})
 
 
     result = api_client.put(url,
@@ -122,14 +122,13 @@ def test_projects_thumbnail_put(api_client):
     assert result.status_code == 200, result.content.decode()
     result_json = result.json()
     thumbnail = result_json.pop('thumbnail')
-    assert re.match(r'/media/user_4/filename_[a-zA-Z0-9]{7}.png',
-                    thumbnail)
+    assert "/api/projects/4-projet-3/thumbnail/" == thumbnail
     assert result_json == {
         'access_level_arch_feature': 'Utilisateur anonyme',
         'access_level_pub_feature': 'Utilisateur anonyme',
         'archive_feature': None,
         'created_on': '05/08/2021',
-        'creator': 4,
+        'creator': 5,
         'delete_feature': None,
         'description': None,
         'is_project_type': False,
@@ -139,7 +138,7 @@ def test_projects_thumbnail_put(api_client):
         'nb_features': 0,
         'nb_published_features': 0,
         'nb_published_features_comments': 0,
-        'slug': '3-projet-3',
+        'slug': '4-projet-3',
         'title': 'Projet 3',
         'updated_on': '05/08/2021',
     }
