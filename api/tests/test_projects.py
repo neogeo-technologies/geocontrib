@@ -1,5 +1,3 @@
-import re
-
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.urls import reverse
@@ -38,7 +36,7 @@ def test_projects_list(api_client):
         'access_level_pub_feature': 'Utilisateur anonyme',
         'archive_feature': None,
         'created_on': '05/08/2021',
-        'creator': 2,
+        'creator': user.pk,
         'delete_feature': None,
         'description': None,
         'is_project_type': False,
@@ -48,7 +46,7 @@ def test_projects_list(api_client):
         'nb_features': 0,
         'nb_published_features': 0,
         'nb_published_features_comments': 0,
-        'slug': '2-projet-1',
+        'slug': f'{p.pk}-projet-1',
         'thumbnail': '/api/projects/2-projet-1/thumbnail/',
         'title': 'Projet 1',
         'updated_on': '05/08/2021'}]
@@ -80,7 +78,7 @@ def test_projects_post(api_client):
         'access_level_arch_feature': "anonymous",
         'access_level_pub_feature': "anonymous",
         'archive_feature': 1,
-        'creator': 4,
+        'creator': user.pk,
         'delete_feature': 2,
         'description': None,
         'is_project_type': False,
@@ -122,13 +120,13 @@ def test_projects_thumbnail_put(api_client):
     assert result.status_code == 200, result.content.decode()
     result_json = result.json()
     thumbnail = result_json.pop('thumbnail')
-    assert "/api/projects/4-projet-3/thumbnail/" == thumbnail
+    assert thumbnail == "/api/projects/4-projet-3/thumbnail/"
     assert result_json == {
         'access_level_arch_feature': 'Utilisateur anonyme',
         'access_level_pub_feature': 'Utilisateur anonyme',
         'archive_feature': None,
         'created_on': '05/08/2021',
-        'creator': 5,
+        'creator': user.pk,
         'delete_feature': None,
         'description': None,
         'is_project_type': False,
