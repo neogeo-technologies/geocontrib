@@ -1,0 +1,1 @@
+{"detail": "superuser session is enabled", "user": {"username": "superuser", "is_active": true, "first_name": "", "last_name": "", "is_administrator": false, "is_superuser": true, "can_create_project": true, "email": ""}}

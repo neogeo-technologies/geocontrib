@@ -9,6 +9,15 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    can_create_project = serializers.SerializerMethodField()
+
+    def get_can_create_project(self, obj):
+        can_create_project = False
+        if obj.is_superuser or obj.is_administrator:
+            can_create_project = True
+        return can_create_project
+
+
     class Meta:
         model = User
         fields = [
@@ -18,6 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'is_administrator',
             'is_superuser',
+            'can_create_project',
             'email',
         ]
 
