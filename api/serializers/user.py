@@ -29,6 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_superuser',
             'can_create_project',
             'email',
+            'id',
         ]
 
 
