@@ -135,7 +135,7 @@ class ExportFeatureList(views.APIView):
         """
             Vue de téléchargement des signalements lié à un projet.
         """
-        project = Project.objects.get(project__slug=slug)
+        project = get_object_or_404(Project, slug=slug)
         features = Feature.handy.availables(request.user, project).filter( feature_type__slug=feature_type_slug)
         serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
         response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
