@@ -365,6 +365,7 @@ class FeatureCompactSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M")
     url = serializers.ReadOnlyField(source='get_view_url')
+    feature_type_slug = serializers.ReadOnlyField(source='feature_type.slug')
 
     class Meta:
         model = Feature
@@ -374,6 +375,7 @@ class FeatureCompactSerializer(serializers.ModelSerializer):
             'display_creator',
             'created_on',
             'url',
+            'feature_type_slug'
         )
 
     def to_internal_value(self, data):
