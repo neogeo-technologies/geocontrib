@@ -109,32 +109,48 @@ class GeoJSONProcessing:
             msg = "{nb} signalement(s) importé(s). ".format(nb=nb_features)
             self.infos.append(msg)
 
-    def check_feature_type_slug(self, data, import_task):
-        feature_type_slug = import_task.feature_type.slug
+    def check_feature_type(self, data, import_task):
+        feature_type = import_task.feature_type
+
         features = data.get('features', [])
         if len(features) == 0:
             self.infos.append(
                 "Aucun signalement n'est indiqué dans l'entrée 'features'. ")
             raise GeoJSONProcessingFailed
 
-        for feat in features:
-            feature_type_import = feat.get(
-                'properties', {}).get('feature_type')
+        for feature in features:
+            geom = feature.get('geometry')
+            if str(geom['type']).lower() != feature_type.geom_type:
+                self.infos.append(
+                    f"L'edition de feature a echoué. Le type de features sont différents. ")
+                raise GeoJSONProcessingFailed
 
-            # FUNCTION DEACTIVATE 
-            # if not feature_type_import:
-            #     self.infos.append(
-            #         "Le type de signalement doit etre indiqué dans l'entrée 'feature_type' de chaque signalement. ")
-                # raise GeoJSONProcessingFailed
+    # # FUNCTION DEACTIVATE 
+    # def check_feature_type_slug(self, data, import_task):
+    #     feature_type_slug = import_task.feature_type.slug
+    #     features = data.get('features', [])
+    #     if len(features) == 0:
+    #         self.infos.append(
+    #             "Aucun signalement n'est indiqué dans l'entrée 'features'. ")
+    #         raise GeoJSONProcessingFailed
 
-            # elif feature_type_import != feature_type_slug:
+    #     for feat in features:
+    #         feature_type_import = feat.get(
+    #             'properties', {}).get('feature_type')
 
-            # if feature_type_import != feature_type_slug:
-            #     self.infos.append(
-            #         "Le type de signalement ne correspond pas à celui en cours de création: '{dest}'. ".format(
-            #             dest=feature_type_slug
-            #         ))
-            #     raise GeoJSONProcessingFailed
+    #         if not feature_type_import:
+    #             self.infos.append(
+    #                 "Le type de signalement doit etre indiqué dans l'entrée 'feature_type' de chaque signalement. ")
+    #             raise GeoJSONProcessingFailed
+
+    #         elif feature_type_import != feature_type_slug:
+
+    #         if feature_type_import != feature_type_slug:
+    #             self.infos.append(
+    #                 "Le type de signalement ne correspond pas à celui en cours de création: '{dest}'. ".format(
+    #                     dest=feature_type_slug
+    #                 ))
+    #             raise GeoJSONProcessingFailed
 
     def validate_data(self, geojson_file):
         try:
@@ -152,7 +168,8 @@ class GeoJSONProcessing:
             import_task.status = "processing"
             import_task.started_on = timezone.now()
             data = self.validate_data(import_task.geojson_file)
-            self.check_feature_type_slug(data, import_task)
+            # self.check_feature_type_slug(data, import_task)
+            self.check_feature_type(data, import_task)
             self.create_features(data, import_task)
         except GeoJSONProcessingFailed:
             import_task.status = "failed"
