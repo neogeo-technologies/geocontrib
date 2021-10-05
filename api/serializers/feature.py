@@ -181,6 +181,7 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             'feature_type',
             'project',
             'display_creator',
+            'creator',
         )
         read_only_fields = (
             'created_on',
