@@ -220,8 +220,21 @@ class EventView(views.APIView):
     def get(self, request):
         user = request.user
         all_events = Event.objects.filter(user=user).order_by('-created_on')
-        data = EventSerializer(all_events, many=True).data
-        return Response(data, status=200)
+        serialized_events = EventSerializer(all_events[0:5], many=True)
+        feature_events = Event.objects.filter(
+            user=user, object_type='feature').order_by('-created_on')
+        serialized_feature_events = EventSerializer(feature_events[0:5], many=True)
+        comment_events = Event.objects.filter(
+            user=user, object_type='comment').order_by('-created_on')
+        serialized_comment_events = EventSerializer(comment_events[0:5], many=True)
+        import pdb; pdb.set_trace()
+        data = {
+            'events': serialized_events.data,
+            'features': serialized_feature_events.data,
+            'comments': serialized_comment_events.data
+        }
+
+        return Response(data=data, status=200)
 
 
 class ExifGeomReaderView(views.APIView):
