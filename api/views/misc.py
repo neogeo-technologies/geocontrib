@@ -227,13 +227,11 @@ class EventView(views.APIView):
         comment_events = Event.objects.filter(
             user=user, object_type='comment').order_by('-created_on')
         serialized_comment_events = EventSerializer(comment_events[0:5], many=True)
-        import pdb; pdb.set_trace()
         data = {
             'events': serialized_events.data,
             'features': serialized_feature_events.data,
             'comments': serialized_comment_events.data
         }
-
         return Response(data=data, status=200)
 
 
