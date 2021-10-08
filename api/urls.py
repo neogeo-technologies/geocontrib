@@ -96,10 +96,7 @@ urlpatterns = [
         AttachmentView.as_view(actions={'post': 'create', 'get': 'list'}), name='attachments-list'),
     path(
         'features/<uuid:feature_id>/attachments/<uuid:attachment_id>/',
-        AttachmentView.as_view(actions={'get': 'retrieve'}), name='attachments-retrieve'),
-    path(
-        'features/<uuid:feature_id>/attachments/<uuid:attachment_id>/',
-        AttachmentView.as_view(actions={'delete': 'destroy'}), name='attachments-destroy'),
+        AttachmentView.as_view(actions={'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='attachments-retrieve'),
     path(
         'features/<uuid:feature_id>/comments/',
         CommentView.as_view(actions={'post': 'create', 'get': 'list'}), name='comments-list'),
