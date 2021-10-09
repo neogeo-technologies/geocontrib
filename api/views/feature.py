@@ -10,6 +10,7 @@ from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import views
 from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from api import logger
@@ -51,12 +52,22 @@ class FeatureView(
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        feature_type_slug = self.request.query_params.get('feature_type__slug')
-        if feature_type_slug:
-            queryset = queryset.filter(feature_type__slug=feature_type_slug)
+
+
         project_slug = self.request.query_params.get('project__slug')
         if project_slug:
-            queryset = queryset.filter(project__slug=project_slug)
+            project = get_object_or_404(Project, slug=project_slug)
+            queryset = Feature.handy.availables(self.request.user, project)
+
+        feature_type_slug = self.request.query_params.get('feature_type__slug')
+        if feature_type_slug:
+            project = get_object_or_404(FeatureType, slug=feature_type_slug).project
+            queryset = Feature.handy.availables(self.request.user, project)
+            queryset = queryset.filter(feature_type__slug=feature_type_slug)
+
+        if not feature_type_slug and not project_slug:
+            raise ValidationError(detail="Must provide parameter project__slug or feature_type__slug")
+
         return queryset
 
 
@@ -99,7 +110,8 @@ class ProjectFeature(views.APIView):
     http_method_names = ['get', ]
 
     def get(self, request, slug):
-        features = Feature.objects.filter(project__slug=slug)
+        project = get_object_or_404(Project, slug=slug)
+        features = Feature.handy.availables(request.user, project)
         format = request.query_params.get('output')
         if format and format == 'geojson':
             data = FeatureDetailedSerializer(
@@ -123,8 +135,8 @@ class ExportFeatureList(views.APIView):
         """
             Vue de téléchargement des signalements lié à un projet.
         """
-        features = Feature.objects.filter(
-            status="published", project__slug=slug, feature_type__slug=feature_type_slug)
+        project = get_object_or_404(Project, slug=slug)
+        features = Feature.handy.availables(request.user, project).filter( feature_type__slug=feature_type_slug)
         serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
         response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
         response['Content-Disposition'] = 'attachment; filename=export_projet.json'
@@ -172,7 +184,6 @@ class FeatureSearch(generics.ListAPIView):
         slug = self.kwargs.get('slug')
         project = get_object_or_404(Project, slug=slug)
 
-        # queryset = self.queryset.filter(project=project)
         queryset = Feature.handy.availables(user=self.request.user, project=project)
 
         queryset = queryset.select_related('creator')

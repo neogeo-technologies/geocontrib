@@ -136,6 +136,38 @@ class AttachmentView(viewsets.ViewSet):
         data = AttachmentSerializer(instance).data
         return Response(data, status=200)
 
+    @action(detail=False, methods=['put'], parser_classes=(FormParser, MultiPartParser))
+    def update(self, request, feature_id, attachment_id):
+        fields = {}
+        attachment_file = {}
+        try:
+            attachment_file = request.data.get('file', None)
+        except KeyError:
+            raise ValidationError({'file': 'file entry is missing in post data'})
+        try:
+            data = json.loads(request.data['data'])
+        except (KeyError, json.JSONDecodeError):
+            raise ValidationError({'data': 'data entry is missing or incorrect in post data'})
+        for k, v in data.items():
+            fields[k] = v
+        if fields.get('comment', None):
+            fields['comment'] =  Comment.objects.filter(id=data.get('comment', None)).first()
+
+        instance = self.get_object(feature_id, attachment_id)
+
+        if attachment_file:
+            instance.attachment_file = attachment_file
+
+        fields['author'] = instance.author
+        try:
+            for k, v in fields.items():
+                setattr(instance, k, v)
+            instance.save()
+        except Exception as err:
+            raise ValidationError({'error': f'attachment not updated {err}'})
+        data = AttachmentSerializer(instance).data
+        return Response(data, status=200)
+
     @action(detail=False, methods=['post'], parser_classes=(FormParser, MultiPartParser))
     def create(self, request, feature_id):
         feature = get_object_or_404(Feature, feature_id=feature_id)
@@ -165,6 +197,7 @@ class AttachmentView(viewsets.ViewSet):
         data = AttachmentSerializer(instance).data
         return Response(data, status=200)
 
+    @action(detail=True, methods=['delete'])
     def destroy(self, request, feature_id, attachment_id):
         instance = self.get_object(feature_id, attachment_id)
         instance.delete()
@@ -220,8 +253,19 @@ class EventView(views.APIView):
     def get(self, request):
         user = request.user
         all_events = Event.objects.filter(user=user).order_by('-created_on')
-        data = EventSerializer(all_events, many=True).data
-        return Response(data, status=200)
+        serialized_events = EventSerializer(all_events[0:5], many=True)
+        feature_events = Event.objects.filter(
+            user=user, object_type='feature').order_by('-created_on')
+        serialized_feature_events = EventSerializer(feature_events[0:5], many=True)
+        comment_events = Event.objects.filter(
+            user=user, object_type='comment').order_by('-created_on')
+        serialized_comment_events = EventSerializer(comment_events[0:5], many=True)
+        data = {
+            'events': serialized_events.data,
+            'features': serialized_feature_events.data,
+            'comments': serialized_comment_events.data
+        }
+        return Response(data=data, status=200)
 
 
 class ExifGeomReaderView(views.APIView):

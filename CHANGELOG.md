@@ -5,13 +5,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [2.1.1] - 2021-10-09
+
+### Corrections
+
+- Beaucoup de bugs corrigés
+
+### Remarques
+
+Cette version a le BASE\_URL fixé à /geocontrib
+
 ## [2.1.0] - 2021-09-29
+
+### Changements
 
 - Redmine 11133 : Mise à jour de signalements lors de l'import
 - Redmine 11084 : Supprimer en masse des signalements
 - Redmine 11083 : Full responsive design
 
 ## [2.0.0] - 2021-09-21
+
+### Changements
 
 - Redmine 10665: handle GeoJSON import in the background
 - Redmine 9671: Use attribute status when importing GeoJSON files
