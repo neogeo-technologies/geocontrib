@@ -11,7 +11,7 @@ from .feature import FeatureTypeColoredSerializer
 from .feature import FeatureTypeListSerializer
 from .feature import FeatureTypeSerializer
 from .flat_pages import FlatPagesSerializer
-from .misc import AttachmentSerializer
+from .misc import FeatureAttachmentSerializer
 from .misc import CommentSerializer
 from .misc import CommentDetailedSerializer
 from .misc import EventSerializer
@@ -38,7 +38,7 @@ __all__ = [
     'FeatureListSerializer',
     'FeatureGeoJSONSerializer',
     'FeatureSearchSerializer',
-    'AttachmentSerializer',
+    'FeatureAttachmentSerializer',
     'ImportTaskSerializer',
     'UserSerializer',
     'CommentSerializer',

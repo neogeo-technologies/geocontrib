@@ -16,8 +16,10 @@ from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
 from api.views.login import LogoutView
 from api.views.login import UserInfoView
-from api.views.misc import AttachmentView
+from api.views.misc import FeatureAttachmentView
+from api.views.misc import FeatureAttachmentUploadView
 from api.views.misc import CommentView
+from api.views.misc import CommentAttachmentUploadView
 from api.views.misc import EventView
 from api.views.misc import ExifGeomReaderView
 from api.views.misc import ImportTaskSearch
@@ -91,18 +93,35 @@ urlpatterns = [
     path(
         'features/<uuid:feature_id>/events/',
         FeatureEventView.as_view(), name='feature-events'),
+
+
     path(
         'features/<uuid:feature_id>/attachments/',
-        AttachmentView.as_view(actions={'post': 'create', 'get': 'list'}), name='attachments-list'),
+        FeatureAttachmentView.as_view(),
+        name='feature-attachments-list'),
     path(
         'features/<uuid:feature_id>/attachments/<uuid:attachment_id>/',
-        AttachmentView.as_view(actions={'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='attachments-retrieve'),
+        FeatureAttachmentView.as_view(),
+        name='feature-attachments-retrieve'),
+    path(
+        'features/<uuid:feature_id>/attachments/<uuid:attachment_id>/upload-file/',
+        FeatureAttachmentUploadView.as_view(),
+        name='feature-attachments-upload-file'),
+
     path(
         'features/<uuid:feature_id>/comments/',
-        CommentView.as_view(actions={'post': 'create', 'get': 'list'}), name='comments-list'),
+        CommentView.as_view(),
+        name='comments-list'),
     path(
         'features/<uuid:feature_id>/comments/<uuid:comment_id>/',
-        CommentView.as_view(actions={'get': 'retrieve', 'delete': 'destroy'}), name='comments-detail'),
+        CommentView.as_view(),
+        name='comments-detail'),
+    path(
+        'features/<uuid:feature_id>/comments/<uuid:comment_id>/upload-file/',
+        CommentAttachmentUploadView.as_view(),
+        name='comments-upload-file'),
+
+
     path(
         'proxy/',
         GetFeatureInfo.as_view(), name='proxy'),
