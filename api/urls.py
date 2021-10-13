@@ -97,11 +97,11 @@ urlpatterns = [
 
     path(
         'features/<uuid:feature_id>/attachments/',
-        FeatureAttachmentView.as_view(),
+        FeatureAttachmentView.as_view(actions={'get': 'list', 'post': 'create'}),
         name='feature-attachments-list'),
     path(
         'features/<uuid:feature_id>/attachments/<uuid:attachment_id>/',
-        FeatureAttachmentView.as_view(),
+        FeatureAttachmentView.as_view(actions={'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}),
         name='feature-attachments-retrieve'),
     path(
         'features/<uuid:feature_id>/attachments/<uuid:attachment_id>/upload-file/',
@@ -110,11 +110,11 @@ urlpatterns = [
 
     path(
         'features/<uuid:feature_id>/comments/',
-        CommentView.as_view(),
+        CommentView.as_view(actions={'get': 'list', 'post': 'create'}),
         name='comments-list'),
     path(
         'features/<uuid:feature_id>/comments/<uuid:comment_id>/',
-        CommentView.as_view(),
+        CommentView.as_view(actions={'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}),
         name='comments-detail'),
     path(
         'features/<uuid:feature_id>/comments/<uuid:comment_id>/upload-file/',

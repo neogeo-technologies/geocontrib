@@ -117,12 +117,12 @@ class ProjectComments(views.APIView):
 
 
 class FeatureAttachmentView(
-        generics.ListAPIView,
-        generics.CreateAPIView,
-        generics.RetrieveAPIView,
-        generics.UpdateAPIView,
-        generics.DestroyAPIView,
-        generics.GenericAPIView
+        mixins.ListModelMixin,
+        mixins.CreateModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
+        mixins.DestroyModelMixin,
+        viewsets.GenericViewSet
         ):
 
     permission_classes = [
@@ -183,12 +183,12 @@ class FeatureAttachmentUploadView(views.APIView):
 
 
 class CommentView(
-        generics.ListAPIView,
-        generics.CreateAPIView,
-        generics.RetrieveAPIView,
-        generics.UpdateAPIView,
-        generics.DestroyAPIView,
-        generics.GenericAPIView
+        mixins.ListModelMixin,
+        mixins.CreateModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
+        mixins.DestroyModelMixin,
+        viewsets.GenericViewSet
         ):
 
     permission_classes = [
