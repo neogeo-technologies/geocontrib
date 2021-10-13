@@ -4,6 +4,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import exceptions
+from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import views
@@ -13,7 +14,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 
-from api.serializers import AttachmentSerializer
+from api.serializers import FeatureAttachmentSerializer
 from api.serializers import CommentSerializer
 from api.serializers import CommentDetailedSerializer
 from api.serializers import EventSerializer
@@ -115,133 +116,178 @@ class ProjectComments(views.APIView):
         return Response(data, status=200)
 
 
-class AttachmentView(viewsets.ViewSet):
+class FeatureAttachmentView(
+        generics.ListAPIView,
+        generics.CreateAPIView,
+        generics.RetrieveAPIView,
+        generics.UpdateAPIView,
+        generics.DestroyAPIView,
+        generics.GenericAPIView
+        ):
 
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
+    ]
+
+    queryset = Attachment.objects.filter(object_type='feature')
+
+    serializer_class = FeatureAttachmentSerializer
+
+    def get_object(self):
+        attachment_id = self.kwargs['attachment_id']
+        feature_id = self.kwargs['feature_id']
+        return get_object_or_404(
+            Attachment, id=attachment_id, feature_id=feature_id)
+
+    def get_queryset(self):
+        feature_id = self.kwargs['feature_id']
+        qs = super().get_queryset().filter(feature_id=feature_id)
+        return qs
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        feature_id = self.kwargs['feature_id']
+        feature = get_object_or_404(Feature, feature_id=feature_id)
+        context.update({'feature': feature})
+        return context
+
+
+class FeatureAttachmentUploadView(views.APIView):
+
+    permission_classes = [
+        permissions.IsAuthenticated,
     ]
 
     def get_object(self, feature_id, attachment_id):
-        return get_object_or_404(Attachment, id=attachment_id, feature_id=feature_id)
+        return get_object_or_404(
+            Attachment, id=attachment_id, feature_id=feature_id)
 
-    def list(self, request, feature_id):
-        feature = get_object_or_404(Feature, feature_id=feature_id)
-        attachments = Attachment.objects.filter(
-            feature_id=feature.feature_id, object_type='feature')
-        data = AttachmentSerializer(attachments, many=True).data
-        return Response(data, status=200)
+    def read_file(self, request):
+        _file = request.data.get('file')
+        if not _file:
+            raise exceptions.ValidationError({
+                'error': "File entry is missing",
+            })
+        return _file
 
-    def retrieve(self, request, feature_id, attachment_id):
+    def put(self, request, feature_id, attachment_id):
         instance = self.get_object(feature_id, attachment_id)
-        data = AttachmentSerializer(instance).data
-        return Response(data, status=200)
-
-    @action(detail=False, methods=['put'], parser_classes=(FormParser, MultiPartParser))
-    def update(self, request, feature_id, attachment_id):
-        fields = {}
-        attachment_file = {}
-        try:
-            attachment_file = request.data.get('file', None)
-        except KeyError:
-            raise ValidationError({'file': 'file entry is missing in post data'})
-        try:
-            data = json.loads(request.data['data'])
-        except (KeyError, json.JSONDecodeError):
-            raise ValidationError({'data': 'data entry is missing or incorrect in post data'})
-        for k, v in data.items():
-            fields[k] = v
-        if fields.get('comment', None):
-            fields['comment'] =  Comment.objects.filter(id=data.get('comment', None)).first()
-
-        instance = self.get_object(feature_id, attachment_id)
-
-        if attachment_file:
-            instance.attachment_file = attachment_file
-
-        fields['author'] = instance.author
-        try:
-            for k, v in fields.items():
-                setattr(instance, k, v)
-            instance.save()
-        except Exception as err:
-            raise ValidationError({'error': f'attachment not updated {err}'})
-        data = AttachmentSerializer(instance).data
-        return Response(data, status=200)
-
-    @action(detail=False, methods=['post'], parser_classes=(FormParser, MultiPartParser))
-    def create(self, request, feature_id):
-        feature = get_object_or_404(Feature, feature_id=feature_id)
-        try:
-            attachement_file = request.data['file']
-        except KeyError:
-            raise ValidationError({'file': 'file entry is missing in post data'})
-        try:
-            data = json.loads(request.data['data'])
-        except (KeyError, json.JSONDecodeError):
-            raise ValidationError({'data': 'data entry is missing or incorrect in post data'})
-        try:
-            comment = Comment.objects.filter(id=data.get('comment', None)).first()
-            title = data.get('title', attachement_file.name)
-            instance = Attachment.objects.create(
-                attachment_file=attachement_file,
-                title=title,
-                info=data.get('info'),
-                feature_id=feature_id,
-                project=feature.project,
-                object_type='feature',
-                comment=comment,
-                author=request.user
-            )
-        except Exception as err:
-            raise ValidationError({'error': f'attachment not created {err}'})
-        data = AttachmentSerializer(instance).data
-        return Response(data, status=200)
-
-    @action(detail=True, methods=['delete'])
-    def destroy(self, request, feature_id, attachment_id):
-        instance = self.get_object(feature_id, attachment_id)
-        instance.delete()
-        return Response({}, status=204)
+        attachment_file = self.read_file(request)
+        instance.attachment_file.save(
+            attachment_file.name, attachment_file, save=True)
+        data = FeatureAttachmentSerializer(
+            instance=instance,
+            context={'request': request}
+        ).data
+        return Response(data=data, status=200)
 
 
-class CommentView(viewsets.ViewSet):
+class CommentView(
+        generics.ListAPIView,
+        generics.CreateAPIView,
+        generics.RetrieveAPIView,
+        generics.UpdateAPIView,
+        generics.DestroyAPIView,
+        generics.GenericAPIView
+        ):
 
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
 
+    queryset = Comment.objects.all()
+
+    serializer_class = CommentDetailedSerializer
+
+    def get_object(self):
+        comment_id = self.kwargs['comment_id']
+        feature_id = self.kwargs['feature_id']
+        return get_object_or_404(
+            Comment, id=comment_id, feature_id=feature_id)
+
+    def get_queryset(self):
+        feature_id = self.kwargs['feature_id']
+        qs = super().get_queryset().filter(feature_id=feature_id)
+        return qs
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        feature_id = self.kwargs['feature_id']
+        feature = get_object_or_404(Feature, feature_id=feature_id)
+        context.update({'feature': feature})
+        return context
+
+
+class CommentAttachmentUploadView(views.APIView):
+    """
+        comment = Comment.objects.create(
+            feature_id=feature.feature_id,
+            feature_type_slug=feature.feature_type.slug,
+            author=user,
+            project=project,
+            comment=form.cleaned_data.get('comment')
+        )
+        up_file = form.cleaned_data.get('attachment_file')
+        title = form.cleaned_data.get('title')
+        info = form.cleaned_data.get('info')
+        if comment and up_file and title:
+            Attachment.objects.create(
+                feature_id=feature.feature_id,
+                author=user,
+                project=project,
+                comment=comment,
+                attachment_file=up_file,
+                title=title,
+                info=info,
+                object_type='comment'
+            )
+    """
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
     def get_object(self, feature_id, comment_id):
-        return get_object_or_404(Comment, id=comment_id, feature_id=feature_id)
+        return get_object_or_404(
+            Comment, id=comment_id, feature_id=feature_id)
 
-    def list(self, request, feature_id):
+    def read_file(self, request):
+        _file = request.data.get('file')
+        if not _file:
+            raise exceptions.ValidationError({
+                'error': "File entry is missing",
+            })
+        return _file
+
+    def read_title(self, request):
+        title = request.data.get('title')
+        if not title:
+            raise exceptions.ValidationError({
+                'error': "Field 'title' is missing",
+            })
+        return title
+
+    def put(self, request, feature_id, comment_id):
         feature = get_object_or_404(Feature, feature_id=feature_id)
-        comments = Comment.objects.filter(
-            feature_id=feature.feature_id)
-        data = CommentDetailedSerializer(comments, many=True).data
-        return Response(data, status=200)
-
-    @action(detail=False, methods=['post'])
-    def create(self, request, feature_id):
-        feature = get_object_or_404(Feature, feature_id=feature_id)
-        serializer = CommentDetailedSerializer(data=request.data, context={'feature': feature, 'user': request.user})
-        if serializer.is_valid():
-            serializer.save()
-            data = serializer.data
-            status = 200
-        else:
-            data = serializer.errors
-            status = 400
-        return Response(data, status=status)
-
-    def retrieve(self, request, feature_id, comment_id):
-        instance = self.get_object(feature_id, comment_id)
-        data = CommentDetailedSerializer(instance).data
-        return Response(data, status=200)
-
-    def destroy(self, request, feature_id, comment_id):
-        instance = self.get_object(feature_id, comment_id)
-        instance.delete()
-        return Response({}, status=204)
+        comment = self.get_object(feature_id, comment_id)
+        attachment_file = self.read_file(request)
+        attachment, create = Attachment.objects.update_or_create(
+            comment=comment,
+            defaults={
+                'project': feature.project,
+                'title': self.read_title(request),
+                'info': request.data.get('info', ''),
+                'feature_id': feature.feature_id,
+                'author': request.user,
+                'object_type': 'comment'
+            }
+        )
+        attachment.attachment_file.save(
+            attachment_file.name, attachment_file, save=True)
+        data = CommentDetailedSerializer(
+            instance=comment,
+            context={'request': request}
+        ).data
+        return Response(data=data, status=200)
 
 
 class EventView(views.APIView):

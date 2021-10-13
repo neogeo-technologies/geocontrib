@@ -29,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class AttachmentSerializer(serializers.ModelSerializer):
+class FeatureAttachmentSerializer(serializers.ModelSerializer):
 
     created_on = serializers.DateTimeField(read_only=True)
 
@@ -49,7 +49,33 @@ class AttachmentSerializer(serializers.ModelSerializer):
             'created_on',
             'display_author',
         )
-        read_only_fields = fields
+
+    def get_user(self):
+        request = self.context.get('request')
+        user = getattr(request, 'user')
+        return user
+
+    def create(self, validated_data):
+        feature = self.context.get('feature')
+        validated_data['feature_id'] = feature.feature_id
+        validated_data['project'] = feature.project
+        validated_data['author'] = self.get_user()
+        try:
+            instance = Attachment.objects.create(**validated_data)
+        except Exception as err:
+            raise serializers.ValidationError({'error': str(err)})
+        return instance
+
+    def update(self, instance, validated_data):
+        validated_data['author'] = self.get_user()
+        try:
+            for k, v in validated_data.items():
+                setattr(instance, k, v)
+            instance.save()
+        except Exception as err:
+            raise serializers.ValidationError({'error': str(err)})
+        else:
+            return instance
 
 
 class CommentDetailedSerializer(serializers.ModelSerializer):
@@ -76,18 +102,23 @@ class CommentDetailedSerializer(serializers.ModelSerializer):
         if attachment:
             res = {
                 'url': attachment.attachment_file.url,
-                'title': attachment.title,
                 'extension': attachment.extension,
+                'title': attachment.title,
+                'info': attachment.info,
             }
         return res
 
+    def get_user(self):
+        request = self.context.get('request')
+        user = getattr(request, 'user')
+        return user
+
     def create(self, validated_data):
         feature = self.context.get('feature')
-        user = self.context.get('user')
         validated_data['feature_type_slug'] = feature.feature_type.slug
         validated_data['feature_id'] = feature.feature_id
         validated_data['project'] = feature.project
-        validated_data['author'] = user
+        validated_data['author'] = self.get_user()
 
         try:
             instance = Comment.objects.create(**validated_data)
