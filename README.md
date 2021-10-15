@@ -38,6 +38,12 @@ pip install -r requirements.txt
 django-admin startproject config .
 ```
 
+### Installation de l'interface Web en VueJS
+
+L'interface Web intégrée à Django n'est plus maintenue depuis la 2.0, et sera retirée dans la 2.3
+
+Il faut utiliser cette interface à la place: https://git.neogeo.fr/geocontrib/geocontrib-frontend
+
 ### Édition des fichiers settings.py et url.py
 
 Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
