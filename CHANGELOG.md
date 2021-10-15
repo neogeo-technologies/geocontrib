@@ -5,6 +5,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [2.1.2] - 2021-10-15
+
+### Evolutions en BETA
+
+- Redmine 11913 Création d'un signalement en mode déconnecté
+
+### Corrections
+
+- Redmine 11770 Création de fonds cartographique sans titre : fonds créé, pas de message d'erreur
+- Redmine 12032 Import image géoréférencée - Mettre le formulaire dans une pop-up
+- Redmine 12024 Création type de signalement - Liste déroulante, expliquer comment faire
+- Redmine 12015 Ajout d'un commentaire - Refresh de la page et message, ne marche plus
+- Redmine 12014 Ajout d'une pièce jointe - Accepte les mauvais formats
+- Redmine 12012 Création type de signalement - Erreur nom dupliqué mais création quand même
+- Redmine 11994 Erreur de clé dupliqué sur le détail d'une feature
+- Redmine 11955 Création type de signalement - Nom du champs en double, erreur mais pas sur interface
+- Redmine 11954 Création type de signalement - Position du champ personnalisé ne fonctionne pas
+- Redmine 11953 Création type de signalement - Position du champ personnalisé, deux positions égales et pas d'erreur
+- Redmine 11952 Suppression d'un signalement - Erreur 400
+- Redmine 11951 Suppression d'un signalement - Permissions
+- Redmine 11949 Liste des signalements - Erreurs d'affichage
+- Redmine 11944 Container map non trouvé
+- Redmine 11943 Carte grise
+- Redmine 11932 Permissions - Contributeurs peuvent éditer le type de signalement
+- Redmine 11931 Membres - Chargement
+- Redmine 11927 Page du signalement - Formatage de la date / heure
+- Redmine 11926 Membres - Message de validation des changements
+- Redmine 11907 Création des fonds carto - Intervertir les couches par Drag and Drop
+- Redmine 11875 Ecriture et édition du statut d'un signalement - Permissions
+- Redmine 11982 faire marcher geocontrib sous une url http://localhost/geocontrib
+- Redmine 11850 Signalement doublon - Lien de redirection erroné
+- Redmine 11833 Création des fonds carto - Affichage multiple des couches disponibles
+- Redmine 11791 Erreur 400 à l'enregistrement de la modification d'un type de signalement
+- Redmine 11785 Page "Mon compte", corriger affichage des 3 cadres "Mes derniers... "
+- Redmine 12049 Ajout d'un commentaire - Empêcher l'ajout d'une pièce jointe corrompue
+- Redmine 12045 Abonnement à un projet - Un utilisateur non-connecté ne doit pas pouvoir s'abonner à un projet
+- Redmine 12044 Recherche de signalements - Enlever "en attente de publication" du menu déroulant Statut
+- Redmine 12028 Page du signalement - Affichage des champs booléens
+- Redmine 12027 Signalement par géolocalisation - Message d'erreur
+- Redmine 12013 Liste et carte - Ajout d'un signalement sans type de signalement créé
+- Redmine 12010 Edition d'un signalement - champs booléens remis à Fals
+- Redmine 11915 Création d'un signalement - Chargement
+
+
 ## [2.1.1] - 2021-10-09
 
 ### Corrections
