@@ -47,7 +47,11 @@ class Feature(models.Model):
 
     creator = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, verbose_name="Créateur",
-        on_delete=models.SET_NULL, null=True, blank=True)
+        on_delete=models.SET_NULL, related_name='features', null=True, blank=True)
+
+    last_editor = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL, verbose_name="Dernier éditeur",
+        on_delete=models.SET_NULL, related_name='edited_features', null=True, blank=True)
 
     project = models.ForeignKey("geocontrib.Project", on_delete=models.CASCADE)
 
@@ -72,6 +76,7 @@ class Feature(models.Model):
     def save(self, *args, **kwargs):
         if self._state.adding:
             self.created_on = timezone.now()
+            self.last_editor = self.creator
         self.updated_on = timezone.now()
         super().save(*args, **kwargs)
 
@@ -116,6 +121,13 @@ class Feature(models.Model):
         res = "Utilisateur supprimé"
         if self.creator:
             res = self.creator.get_full_name() or self.creator.username
+        return res
+
+    @property
+    def display_last_editor(self):
+        res = "Utilisateur supprimé"
+        if self.last_editor:
+            res = self.last_editor.get_full_name() or self.last_editor.username
         return res
 
     @cached_property
