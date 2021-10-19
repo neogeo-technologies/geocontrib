@@ -60,6 +60,7 @@ class FeatureAttachmentSerializer(serializers.ModelSerializer):
         validated_data['feature_id'] = feature.feature_id
         validated_data['project'] = feature.project
         validated_data['author'] = self.get_user()
+        validated_data['object_type'] = 'feature'
         try:
             instance = Attachment.objects.create(**validated_data)
         except Exception as err:

@@ -15,6 +15,7 @@ from api.serializers.project import ProjectCreationSerializer
 from api.serializers.project import ProjectAuthorizationSerializer
 from api.utils.permissions import ProjectThumbnailPermission
 from api.utils.validators import validate_image_file
+from api.utils.filters import AuthorizationLevelCodenameFilter
 from geocontrib.models import Authorization
 from geocontrib.models import Project
 from geocontrib.models import Subscription
@@ -85,6 +86,10 @@ class ProjectAuthorizationView(generics.ListAPIView, generics.UpdateAPIView):
     serializer_class = ProjectAuthorizationSerializer
 
     lookup_field = 'project__slug'
+
+    filter_backends = [
+        AuthorizationLevelCodenameFilter,
+    ]
 
     def get_object(self, *args, **kwargs):
         instance = get_object_or_404(Project, slug=self.kwargs.get('project__slug'))
