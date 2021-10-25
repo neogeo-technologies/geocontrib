@@ -10,6 +10,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 
+from rest_framework_mvt.managers import MVTManager
+
 from geocontrib.choices import TYPE_CHOICES
 from geocontrib.managers import AvailableFeaturesManager
 from geocontrib.managers import FeatureLinkManager
@@ -64,6 +66,8 @@ class Feature(models.Model):
     objects = models.Manager()
 
     handy = AvailableFeaturesManager()
+
+    vector_tiles = MVTManager()
 
     class Meta:
         verbose_name = "Signalement"
