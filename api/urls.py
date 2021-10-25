@@ -1,5 +1,7 @@
 from django.urls import path
 from rest_framework import routers
+from rest_framework_mvt.views import mvt_view_factory
+
 
 from api.views.base_map import BaseMapViewset
 from api.views.base_map import GetFeatureInfo
@@ -31,7 +33,7 @@ from api.views.project import ProjectView
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
-
+from geocontrib.models import Feature
 
 app_name = 'api'
 
@@ -121,6 +123,7 @@ urlpatterns = [
         CommentAttachmentUploadView.as_view(),
         name='comments-upload-file'),
 
+    path("features.mvt/", mvt_view_factory(Feature)),
 
     path(
         'proxy/',
