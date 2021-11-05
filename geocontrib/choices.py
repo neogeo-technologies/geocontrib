@@ -24,6 +24,7 @@ TYPE_CHOICES = (
 ANONYMOUS = 'anonymous'
 LOGGED_USER = 'logged_user'
 CONTRIBUTOR = 'contributor'
+SUPER_CONTRIBUTOR = 'super_contributor'
 MODERATOR = 'moderator'
 ADMIN = 'admin'
 
@@ -34,6 +35,7 @@ LOWER_LEVELS = (
 )
 
 EXTENDED_LEVELS = (
+    (SUPER_CONTRIBUTOR, 'Super Contributeur'),
     (MODERATOR, 'Modérateur'),
     (ADMIN, 'Administrateur projet'),
 )
