@@ -1,6 +1,5 @@
 from django.urls import path
 from rest_framework import routers
-from rest_framework_mvt.views import mvt_view_factory
 
 
 from api.views.base_map import BaseMapViewset
@@ -12,6 +11,7 @@ from api.views.feature import FeatureLinkView
 from api.views.feature import FeatureSearch
 from api.views.feature import FeatureTypeView
 from api.views.feature import FeatureView
+from api.views.feature import FeatureMVTView
 from api.views.feature import ProjectFeature
 from api.views.feature import ProjectFeatureTypes
 from api.views.flat_pages import FlatPagesView
@@ -123,7 +123,7 @@ urlpatterns = [
         CommentAttachmentUploadView.as_view(),
         name='comments-upload-file'),
 
-    path("features.mvt/", mvt_view_factory(Feature)),
+    path("features.mvt/", FeatureMVTView.as_view()),
 
     path(
         'proxy/',
