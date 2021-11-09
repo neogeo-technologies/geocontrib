@@ -75,4 +75,4 @@ class AuthorizationAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(Authorization, AuthorizationAdmin)
 admin.site.register(Subscription)
-admin.site.register(UserLevelPermission)
+# admin.site.register(UserLevelPermission)
