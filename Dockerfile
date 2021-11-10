@@ -7,16 +7,10 @@ ENV LC_ALL="C.UTF-8"
 ENV LC_CTYPE="C.UTF-8"
 
 RUN apt-get update && \
-    apt-get install -y libproj-dev gdal-bin ldap-utils libpq-dev libmagic1 && \
+    apt-get install -y --no-install-recommends libproj-dev gdal-bin ldap-utils libpq-dev libmagic1 git && \
     apt-get install -y --no-install-recommends netcat && \
-    apt-get clean -y
-
-#RUN echo deb http://deb.debian.org/debian testing main contrib non-free >> /etc/apt/sources.list && \
-#    apt-get update && \
-#    apt-get remove -y binutils && \
-#    apt-get autoremove -y && \
-#    apt-get purge -y --auto-remove && \
-#    rm -rf /var/lib/apt/lists/*
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN useradd -r -m apprunner
 USER apprunner
