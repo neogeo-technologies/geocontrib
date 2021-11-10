@@ -25,7 +25,7 @@ build testing docker image:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination neogeo/geocontrib:testing
     - echo Image docker neogeo/geocontrib:testing livrée
 
-build testing docker image:
+deploy testing docker image:
   stage: deploy
   only:
     - develop
