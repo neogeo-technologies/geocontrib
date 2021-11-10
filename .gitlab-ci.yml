@@ -31,6 +31,8 @@ build testing docker image:
     - develop
   tags:
     - build
+  image:
+    name: curlimages/curl
   script:
     - curl -X POST      -F token=$TRIGGER_TOKEN -F ref=main      https://git.neogeo.fr/api/v4/projects/226/trigger/pipeline
 
