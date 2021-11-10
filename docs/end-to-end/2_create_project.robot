@@ -2,9 +2,9 @@
 
 Library  String
 Library  SeleniumLibrary  75  5  run_on_failure=Nothing
-Library  library/GeoConnectLibrary.py
-Library  library/GeoCreateLibrary.py
-Library  library/GeoBasemapLibrary.py
+Library  library/GeocontribConnectLibrary.py
+Library  library/GeocontribCreateLibrary.py
+Library  library/GeocontribBasemapLibrary.py
 
 Variables   library/tests_settings.py
 Variables   library/project_settings.py
