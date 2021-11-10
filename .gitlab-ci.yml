@@ -1,6 +1,7 @@
 stages:
-  - build
   - Static analysis
+  - build
+  - deploy
 
 variables:
   SONAR_PROJECTKEY: "$CI_PROJECT_NAME"
@@ -24,6 +25,14 @@ build testing docker image:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination neogeo/geocontrib:testing
     - echo Image docker neogeo/geocontrib:testing livrée
 
+build testing docker image:
+  stage: deploy
+  only:
+    - develop
+  tags:
+    - build
+  script:
+    - curl -X POST      -F token=$TRIGGER_TOKEN -F ref=main      https://git.neogeo.fr/api/v4/projects/226/trigger/pipeline
 
 build stable docker image:
   stage: build
