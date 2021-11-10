@@ -63,14 +63,17 @@ class AvailableFeaturesManager(models.Manager):
             return queryset
 
         else:
-            queryset = queryset.exclude(
-                ~Q(creator=user), status='draft',
-            )
+            # A TESTER => REDMINE ISSUES 9784
+            # queryset = queryset.exclude(
+            #     ~Q(creator=user), status='draft',
+            # )
 
-            if project.moderation and user_rank < moderateur_rank:
-                queryset = queryset.exclude(
-                    ~Q(creator=user), status='pending',
-                )
+            # if project.moderation and user_rank < moderateur_rank:
+            #     # import pdb; pdb.set_trace()
+            #     queryset = queryset.exclude(
+            #         ~Q(creator=user), 
+            #         status='pending',
+            #     )
 
             if user_rank < project_arch_rank:
                 queryset = queryset.exclude(
