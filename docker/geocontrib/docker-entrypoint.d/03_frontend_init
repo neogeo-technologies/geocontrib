@@ -1,0 +1,18 @@
+#!/bin/bash
+echo "Step 04."
+cd $APP_PATH/
+marker_file="marker_file_step_04"
+
+if [ -f $marker_file ]; then
+    echo "$marker_file exists"
+else
+    echo "$marker_file does not exist"
+    echo "Setting up frontend"
+    cd src/docker/geocontrib/
+    bin/configure.py
+
+    sleep ${TIME_SLEEP:-1}
+   # echo "Ok" > $marker_file
+fi
+cd $APP_PATH/
+echo "$(basename $0) complete."

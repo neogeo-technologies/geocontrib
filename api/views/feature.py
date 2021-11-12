@@ -12,6 +12,7 @@ from rest_framework import views
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from rest_framework_mvt.views import BaseMVTView
 
 from api import logger
 from api.serializers import FeatureDetailedSerializer
@@ -33,11 +34,11 @@ User = get_user_model()
 
 
 class FeatureView(
-            mixins.ListModelMixin,
-            mixins.RetrieveModelMixin,
-            mixins.CreateModelMixin,
-            mixins.UpdateModelMixin,
-            mixins.DestroyModelMixin,
+#            mixins.ListModelMixin,
+#            mixins.RetrieveModelMixin,
+#            mixins.CreateModelMixin,
+#            mixins.UpdateModelMixin,
+#            mixins.DestroyModelMixin,
             viewsets.GenericViewSet):
 
     lookup_field = 'feature_id'
@@ -72,11 +73,11 @@ class FeatureView(
 
 
 class FeatureTypeView(
-            mixins.ListModelMixin,
-            mixins.RetrieveModelMixin,
-            mixins.CreateModelMixin,
-            mixins.UpdateModelMixin,
-            mixins.DestroyModelMixin,
+#            mixins.ListModelMixin,
+#            mixins.RetrieveModelMixin,
+#            mixins.CreateModelMixin,
+#            mixins.UpdateModelMixin,
+#            mixins.DestroyModelMixin,
             viewsets.GenericViewSet):
 
     lookup_field = 'slug'
@@ -118,6 +119,7 @@ class ProjectFeature(views.APIView):
                 features,
                 is_authenticated=request.user.is_authenticated,
                 many=True,
+                context={"request": request}
             ).data
         else:
             serializers = FeatureListSerializer(features, many=True)
@@ -233,3 +235,41 @@ class FeatureEventView(views.APIView):
         ).order_by('created_on')
         data = FeatureEventSerializer(events, many=True).data
         return Response(data, status=200)
+
+
+class FeatureMVTView(BaseMVTView):
+    model = Feature
+    geom_col = "geom"
+
+    def get(self, request, *args, **kwargs):
+
+        project_slug = self.request.query_params.get('project__slug')
+        project_id = self.request.query_params.get('project_id')
+        if project_slug or project_id:
+            qs_kwargs = dict()
+            if project_slug:
+                qs_kwargs["slug"] = project_slug
+
+            if project_id:
+                qs_kwargs["id"] = project_id
+
+            project = get_object_or_404(Project, **qs_kwargs)
+            queryset = Feature.handy.availables(self.request.user, project)
+
+        feature_type_slug = self.request.query_params.get('feature_type__slug')
+        featuretype_id = self.request.query_params.get('featuretype_id')
+        if feature_type_slug or featuretype_id:
+            project = get_object_or_404(FeatureType,
+                                        slug=feature_type_slug,
+                                        pk=featuretype_id).project
+            queryset = Feature.handy.availables(self.request.user, project)
+            queryset = queryset.filter(feature_type__slug=feature_type_slug, pk=featuretype_id)
+
+        if not any([feature_type_slug, project_slug, project_id, featuretype_id]):
+            raise ValidationError(detail="Must provide one of the parameters:"
+                                  "project_id, project__slug, featuretype_id or feature_type__slug")
+
+        if not request.GET._mutable:
+            request.GET._mutable = True
+        request.GET["pk__in"] = queryset.values_list("pk", flat=True)
+        return super().get( request, *args, **kwargs)

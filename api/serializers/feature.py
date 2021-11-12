@@ -166,6 +166,8 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
     display_creator = serializers.SerializerMethodField()
 
+    display_last_editor = serializers.SerializerMethodField()
+
     class Meta:
         model = Feature
         geo_field = 'geom'
@@ -181,6 +183,7 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             'feature_type',
             'project',
             'display_creator',
+            'display_last_editor',
             'creator',
         )
         read_only_fields = (
@@ -188,6 +191,7 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             'updated_on',
             'archived_on',
             'deletion_on',
+            'display_last_editor',
         )
 
     def get_properties(self, instance, fields):
@@ -218,6 +222,12 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             res = obj.display_creator
         return res
 
+    def get_display_last_editor(self, obj):
+        res = 'N/A'
+        if self.context['request'].user.is_authenticated:
+            res = obj.display_last_editor
+        return res
+
     def handle_title(self, validated_data):
         title = validated_data.get('title')
         if not title or title == '':
@@ -238,6 +248,7 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data = self.handle_custom_fields(validated_data)
+        validated_data['last_editor'] = self.context.get('request').user
         try:
             for k, v in validated_data.items():
                 setattr(instance, k, v)
@@ -282,6 +293,8 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
     status = serializers.SerializerMethodField()
 
     creator = serializers.SerializerMethodField()
+    
+    display_last_editor = serializers.SerializerMethodField()
 
     created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M")
 
@@ -298,6 +311,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
             'description',
             'status',
             'creator',
+            'display_last_editor',
             'created_on',
             'updated_on',
             'archived_on',
@@ -350,6 +364,12 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
                 'slug': obj.project.slug,
                 'feature_type_slug': obj.feature_type.slug
             })
+
+    def get_display_last_editor(self, obj):
+        res = 'N/A'
+        if self.context['request'].user.is_authenticated:
+            res = obj.display_last_editor
+        return res
 
 
 class FeatureLinkListSerializer(serializers.ListSerializer):

@@ -5,11 +5,59 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [2.2.0] - 2021-11-12
+
+### Evolutions
+
+- Redmine 12131 : Ajouter un endpoint API qui sort des signalements en MVT
+- Redmine 12084 : Filtrage des droits projets par niveau
+- Redmine 10911 : Revoir la page de gestion des membres d'un projet
+- Redmine 9753 : Rajouter une colonne avec dernier éditeur dans la liste des signalements
+
+
+### Evolutions en BETA
+
+- Redmine 11084 : Supprimer en masse des signalements
+- Redmine 12363 : Droits contributeur - Modification de signalement publié
+
+
+### Corrections
+
+- Redmine 12343 : Page inconnue - Corriger une faute
+- Redmine 12306 : Création et édition d'un type de signalement - Suppression de tous les champs personnalisés
+- Redmine 12249 : Liste et carte - Clic sur un signalement puis Clic sur son type de signalement : erreur
+- Redmine 12064 : Dropdown affiche mauvais champs
+- Redmine 12063 : Options invalides pour custom form
+- Redmine 12060 : Export des signalements publiés
+
+
+### Docker settings change
+
+- La configuration du front est desormais générer par le back : il faut la placer dans un volume docker partagé entre les deux containers:
+
+```yaml
+  geocontrib
+    volumes:
+      - geocontrib_config_front:/home/apprunner/geocontrib_app/config_front
+
+  front:
+    volumes:
+      - geocontrib_config_front:/opt/geocontrib/config/:ro
+
+```
+
+### Extra operations:
+
+- Database migration needed:
+
+    python manage.py migrate
+
 ## [2.1.2] - 2021-10-15
 
 ### Evolutions en BETA
 
 - Redmine 11913 Création d'un signalement en mode déconnecté
+- Redmine 12008 Passer la synchro LDAP en tâche celery.
 
 ### Corrections
 

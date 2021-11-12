@@ -1,1 +1,37 @@
-[{"model": "geocontrib.userlevelpermission", "pk": "admin", "fields": {"rank": 4}}, {"model": "geocontrib.userlevelpermission", "pk": "anonymous", "fields": {"rank": 0}}, {"model": "geocontrib.userlevelpermission", "pk": "contributor", "fields": {"rank": 2}}, {"model": "geocontrib.userlevelpermission", "pk": "logged_user", "fields": {"rank": 1}}, {"model": "geocontrib.userlevelpermission", "pk": "moderator", "fields": {"rank": 3}}]
+[{
+  "model": "geocontrib.userlevelpermission",
+  "pk": "anonymous",
+  "fields": {
+    "rank": 0
+  }
+}, {
+  "model": "geocontrib.userlevelpermission",
+  "pk": "logged_user",
+  "fields": {
+    "rank": 1
+  }
+}, {
+  "model": "geocontrib.userlevelpermission",
+  "pk": "contributor",
+  "fields": {
+    "rank": 2
+  }
+}, {
+  "model": "geocontrib.userlevelpermission",
+  "pk": "super_contributor",
+  "fields": {
+    "rank": 3
+  }
+}, {
+  "model": "geocontrib.userlevelpermission",
+  "pk": "moderator",
+  "fields": {
+    "rank": 4
+  }
+}, {
+  "model": "geocontrib.userlevelpermission",
+  "pk": "admin",
+  "fields": {
+    "rank": 5
+  }
+}]

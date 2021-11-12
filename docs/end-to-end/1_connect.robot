@@ -2,7 +2,7 @@
 
 Library  String
 Library  SeleniumLibrary  75  5  run_on_failure=Nothing
-Library  library/GeoConnectLibrary.py
+Library  library/GeocontribConnectLibrary.py
 
 Variables   library/tests_settings.py
 
