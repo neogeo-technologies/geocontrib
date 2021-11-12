@@ -21,10 +21,13 @@ ENV PATH=$HOME/.local/bin:$PATH
 ENV APP_PATH=$HOME/geocontrib_app
 
 # if WORKDIR only is set, then $APP_PATH will be owned by root :-/
-RUN mkdir $APP_PATH $APP_PATH/config $APP_PATH/media $APP_PATH/static
+RUN mkdir -p $APP_PATH/config_front $APP_PATH/config $APP_PATH/media $APP_PATH/static $APP_PATH/src/docker/geocontrib/&& \
+    chown -R apprunner $APP_PATH && \
+    ls -l $APP_PATH && \
+    ln -s $APP_PATH/config_front $APP_PATH/src/docker/geocontrib/config_front
 WORKDIR $APP_PATH
 
-VOLUME $APP_PATH/config $APP_PATH/media $APP_PATH/static
+VOLUME $APP_PATH/config_front $APP_PATH/config $APP_PATH/media $APP_PATH/static
 
 # Upgrade pip
 RUN pip install --user --upgrade pip
@@ -32,6 +35,11 @@ RUN pip install --user --upgrade pip
 COPY requirements.txt .
 RUN pip install --user -r requirements.txt gunicorn
 COPY --chown=apprunner . src/
+
+# Install front setup engine
+RUN pip install --user --upgrade pyyaml jinja2
+#RUN mv src/ docker/geocontrib
+
 
 EXPOSE 5000
 ENTRYPOINT ["src/docker/geocontrib/docker-entrypoint.sh"]

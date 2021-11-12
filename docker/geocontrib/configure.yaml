@@ -1,0 +1,19 @@
+---
+environments:
+  - config_front
+
+files:
+  - template: config.json.j2
+    destination: config.json
+
+# XXX_domain: DNS publique
+# XXX_host: nom/IP machine sur le reseau local
+variables:
+  VUE_APP_APPLICATION_NAME:
+    env_config_front: APPLICATION_NAME
+
+  VUE_APP_APPLICATION_ABSTRACT:
+    env_config_front: APPLICATION_ABSTRACT
+
+  VUE_APP_LOGO_PATH:
+    env_config_front: LOGO_PATH
