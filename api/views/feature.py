@@ -34,11 +34,11 @@ User = get_user_model()
 
 
 class FeatureView(
-#            mixins.ListModelMixin,
-#            mixins.RetrieveModelMixin,
-#            mixins.CreateModelMixin,
-#            mixins.UpdateModelMixin,
-#            mixins.DestroyModelMixin,
+            mixins.ListModelMixin,
+            mixins.RetrieveModelMixin,
+            mixins.CreateModelMixin,
+            mixins.UpdateModelMixin,
+            mixins.DestroyModelMixin,
             viewsets.GenericViewSet):
 
     lookup_field = 'feature_id'
@@ -73,11 +73,11 @@ class FeatureView(
 
 
 class FeatureTypeView(
-#            mixins.ListModelMixin,
-#            mixins.RetrieveModelMixin,
-#            mixins.CreateModelMixin,
-#            mixins.UpdateModelMixin,
-#            mixins.DestroyModelMixin,
+            mixins.ListModelMixin,
+            mixins.RetrieveModelMixin,
+            mixins.CreateModelMixin,
+            mixins.UpdateModelMixin,
+            mixins.DestroyModelMixin,
             viewsets.GenericViewSet):
 
     lookup_field = 'slug'
