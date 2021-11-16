@@ -24,6 +24,8 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost, 127.0.0.1, 0.0.0.0', cast=Csv())
 
+CSRF_TRUSTED_ORIGINS = list(set(ALLOWED_HOSTS) - set(['localhost', '127.0.0.1', '0.0.0.0']))
+
 # Application definition
 CORE_APPS = [
     'django.contrib.sites',
