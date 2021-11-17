@@ -133,7 +133,7 @@ def set_users_perms(sender, instance, created, **kwargs):
             Authorization.objects.create(
                 project=instance,
                 user=instance.creator,
-                level=UserLevelPermission.objects.get(rank=4)
+                level=UserLevelPermission.objects.get(rank=5)
             )
         except Exception:
             logger.exception('Trigger.set_users_perms')
