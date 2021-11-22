@@ -134,6 +134,23 @@ class ProjectFeaturePaginated(generics.ListAPIView):
     pagination_class = CustomPagination
     lookup_field = 'slug'
     http_method_names = ['get', ]
+    
+    
+    def filter_queryset(self, queryset):
+        """
+        Surchargeant ListModelMixin
+        """
+        status__value = self.request.query_params.get('status__value')
+        feature_type_slug = self.request.query_params.get('feature_type_slug')
+        title = self.request.query_params.get('title')
+
+        if status__value:
+            queryset = queryset.filter(status__icontains=status__value)
+        if feature_type_slug:
+            queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        return queryset
         
     def get_serializer_class(self):
         format = self.request.query_params.get('output')
