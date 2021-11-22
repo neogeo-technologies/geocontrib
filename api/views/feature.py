@@ -129,6 +129,31 @@ class ProjectFeature(views.APIView):
         return Response(data, status=200)
 
 
+class ProjectFeaturePaginated(generics.ListAPIView):
+    queryset = Project.objects.all()
+    pagination_class = CustomPagination
+    lookup_field = 'slug'
+    http_method_names = ['get', ]
+        
+    def get_serializer_class(self):
+        format = self.request.query_params.get('output')
+        if format and format == 'geojson':
+            return FeatureDetailedSerializer
+        return FeatureListSerializer
+        
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        project = get_object_or_404(Project, slug=slug)
+
+        queryset = Feature.handy.availables(user=self.request.user, project=project)
+
+        queryset = queryset.select_related('creator')
+        queryset = queryset.select_related('feature_type')
+        queryset = queryset.select_related('project')
+
+        return queryset
+
+
 class ExportFeatureList(views.APIView):
 
     http_method_names = ['get', ]
