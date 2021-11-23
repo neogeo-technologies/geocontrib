@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Q, When, Case, CharField, Value
 from django.apps import apps
-from geocontrib.choices import MODERATOR
+from geocontrib.choices import MODERATOR, SUPER_CONTRIBUTOR
 
 
 class AvailableFeaturesManager(models.Manager):
@@ -35,6 +35,7 @@ class AvailableFeaturesManager(models.Manager):
         project_arch_rank = project.access_level_arch_feature.rank
         project_pub_rank = project.access_level_pub_feature.rank
         moderateur_rank = UserLevelPermission.objects.get(user_type_id=MODERATOR).rank
+        supercontributeur_rank = UserLevelPermission.objects.get(user_type_id=SUPER_CONTRIBUTOR).rank
 
         #  - si is_project_super_contributor:
         # Dans le cas de projets non modérés, il peut modifier le statut
@@ -64,9 +65,10 @@ class AvailableFeaturesManager(models.Manager):
 
         else:
             # A TESTER => REDMINE ISSUES 9784
-            # queryset = queryset.exclude(
-            #     ~Q(creator=user), status='draft',
-            # )
+            if user_rank != supercontributeur_rank:
+                queryset = queryset.exclude(
+                    ~Q(creator=user), status='draft',
+                )
 
             # if project.moderation and user_rank < moderateur_rank:
             #     # import pdb; pdb.set_trace()
