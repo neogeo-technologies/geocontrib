@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
@@ -47,9 +48,120 @@ class ProjectView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
 
+class ProjectDuplicate(APIView):
+    
+    authentication_classes = []
+    http_method_names = ['post', ]
+
+    # lookup_field = 'slug'
+    # queryset = Project.objects.all()
+    serializer_class = ProjectCreationSerializer
+    
+    PROJECT_COPY_RELATED = getattr(settings, 'PROJECT_COPY_RELATED', {})
+    
+    def post(self, request, slug):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        #title = serializer.data['title']
+        #description = serializer.data['description']
+        #access_level_arch_feature = serializer.data['access_level_arch_feature']
+        #access_level_pub_feature = serializer.data['access_level_pub_feature']
+        #archive_feature = serializer.data['archive_feature']
+        #delete_feature = serializer.data['delete_feature']
+        #is_project_type = serializer.data['is_project_type']
+        #moderation = serializer.data['moderation']
+        
+        
+        if serializer.is_valid():
+            project_template = Project.objects.filter(slug=slug).first()
+            
+            #instance = form.save(commit=False)
+            instance = serializer
+            #self._set_thumbnail(instance, project_template)
+            #self._set_thumbnail(instance, form, project_template)
+            self._set_creator(instance)
+            instance.save()
+            self._duplicate_project_related_sets(instance, project_template)
+            self._duplicate_project_base_map(instance, project_template)
+            self._duplicate_project_authorization(instance, project_template)
+            
+            
+            self._duplicate_project_authorization
+            serializer.save()
+
+        print("TEEEEEEEEEEST !!!!!!!!!!!!!!!!!!!!!!")
+        #print(title)
+        #print(description)
+
+    def _duplicate_project_related_sets(self, instance, project_template):
+        copy_feature_types = self.PROJECT_COPY_RELATED.get('FEATURE_TYPE', False)
+        copy_features = self.PROJECT_COPY_RELATED.get('FEATURE', False)
+        if project_template and isinstance(project_template, Project) and copy_feature_types:
+            for feature_type in project_template.featuretype_set.all():
+                # Pour manipuler une copie immuable
+                legit_feature_type = FeatureType.objects.get(pk=feature_type.pk)
+                feature_type.pk = None
+                feature_type.project = instance
+                feature_type.save()
+                for custom_field in legit_feature_type.customfield_set.all():
+                    custom_field.pk = None
+                    custom_field.feature_type = feature_type
+                    custom_field.save()
+                if copy_features:
+                    for feature in legit_feature_type.feature_set.all():
+                        feature.pk = None
+                        feature.created_on = None
+                        feature.updated_on = None
+                        feature.creator = self.request.user
+                        feature.project = instance
+                        feature.feature_type = feature_type
+                        feature.save()
+
+    def _duplicate_project_base_map(self, instance, project_template):
+        copy_related = self.PROJECT_COPY_RELATED.get('BASE_MAP', False)
+        if project_template and isinstance(project_template, Project) and copy_related:
+            for base_map in project_template.basemap_set.all():
+                legit_base_map = BaseMap.objects.get(pk=base_map.pk)
+                base_map.pk = None
+                base_map.project = instance
+                base_map.save()
+                for ctx_layer in legit_base_map.contextlayer_set.all():
+                    ctx_layer.pk = None
+                    ctx_layer.base_map = base_map
+                    ctx_layer.save()
+
+    def _duplicate_project_authorization(self, instance, project_template):
+        """
+        Un signale est deja en place pour appliquer les permissions initiales
+        à la creation d'un projet:
+        - createur = rank 4
+        - autres = rank 1
+        Ici on ecrase ces permissions initiales avec celles du projet type parent
+        à l'exclusion de la permission relative au créateur de l'instance courante
+        """
+        copy_related = self.PROJECT_COPY_RELATED.get('AUTHORIZATION', False)
+        if project_template and isinstance(project_template, Project) and copy_related:
+            for auth in instance.authorization_set.exclude(user=instance.creator):
+                auth.level = Authorization.objects.get(
+                    user=auth.user, project=project_template).level
+                auth.save()
+
+    def _set_thumbnail(self, instance, form, project_template):
+        thumbnail = form.cleaned_data.get('thumbnail')
+        copy_related = self.PROJECT_COPY_RELATED.get('THUMBNAIL', False)
+        if not thumbnail and hasattr(project_template, 'thumbnail') and copy_related:
+            instance.thumbnail = project_template.thumbnail
+        return instance
+
+    def _set_creator(self, instance):
+        instance.creator = self.request.user
+        return instance
+
+
 
 class ProjectThumbnailView(APIView):
-
+    
     parser_classes = [
         MultiPartParser,
         FormParser
@@ -80,7 +192,7 @@ class ProjectThumbnailView(APIView):
 
 
 class ProjectAuthorizationView(generics.ListAPIView, generics.UpdateAPIView):
-
+    
     queryset = Authorization.objects.select_related('user', 'level').all()
 
     serializer_class = ProjectAuthorizationSerializer
