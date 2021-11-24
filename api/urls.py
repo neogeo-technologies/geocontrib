@@ -78,7 +78,7 @@ urlpatterns = [
         ProjectFeature.as_view(), name='project-feature'),
     path(
         'projects/<slug:slug>/feature-paginated/',
-        ProjectFeaturePaginated.as_view(), name='project-feature'),
+        ProjectFeaturePaginated.as_view(), name='project-feature-paginated'),
     path(
         'projects/<slug:slug>/comments/',
         ProjectComments.as_view(), name='project-comments'),
