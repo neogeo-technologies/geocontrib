@@ -129,6 +129,48 @@ class ProjectFeature(views.APIView):
         return Response(data, status=200)
 
 
+class ProjectFeaturePaginated(generics.ListAPIView):
+    queryset = Project.objects.all()
+    pagination_class = CustomPagination
+    lookup_field = 'slug'
+    http_method_names = ['get', ]
+    
+    
+    def filter_queryset(self, queryset):
+        """
+        Surchargeant ListModelMixin
+        """
+        status__value = self.request.query_params.get('status__value')
+        feature_type_slug = self.request.query_params.get('feature_type_slug')
+        title = self.request.query_params.get('title')
+
+        if status__value:
+            queryset = queryset.filter(status__icontains=status__value)
+        if feature_type_slug:
+            queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        return queryset
+        
+    def get_serializer_class(self):
+        format = self.request.query_params.get('output')
+        if format and format == 'geojson':
+            return FeatureDetailedSerializer
+        return FeatureListSerializer
+        
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        project = get_object_or_404(Project, slug=slug)
+
+        queryset = Feature.handy.availables(user=self.request.user, project=project)
+
+        queryset = queryset.select_related('creator')
+        queryset = queryset.select_related('feature_type')
+        queryset = queryset.select_related('project')
+
+        return queryset
+
+
 class ExportFeatureList(views.APIView):
 
     http_method_names = ['get', ]
