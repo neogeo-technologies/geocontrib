@@ -13,6 +13,7 @@ from api.views.feature import FeatureTypeView
 from api.views.feature import FeatureView
 from api.views.feature import FeatureMVTView
 from api.views.feature import ProjectFeature
+from api.views.feature import ProjectFeaturePaginated
 from api.views.feature import ProjectFeatureTypes
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
@@ -75,6 +76,9 @@ urlpatterns = [
     path(
         'projects/<slug:slug>/feature/',
         ProjectFeature.as_view(), name='project-feature'),
+    path(
+        'projects/<slug:slug>/feature-paginated/',
+        ProjectFeaturePaginated.as_view(), name='project-feature'),
     path(
         'projects/<slug:slug>/comments/',
         ProjectComments.as_view(), name='project-comments'),
