@@ -20,6 +20,9 @@ from api.utils.filters import AuthorizationLevelCodenameFilter
 from geocontrib.models import Authorization
 from geocontrib.models import Project
 from geocontrib.models import Subscription
+from geocontrib.models import FeatureType
+from geocontrib.models import BaseMap
+
 
 User = get_user_model()
 
@@ -49,15 +52,12 @@ class ProjectView(viewsets.ModelViewSet):
         serializer.save(creator=self.request.user)
 
 class ProjectDuplicate(APIView):
-    
-    authentication_classes = []
     http_method_names = ['post', ]
-
-    # lookup_field = 'slug'
-    # queryset = Project.objects.all()
     serializer_class = ProjectCreationSerializer
-    
+    PROJECT_COPY_RELATED ="TEST"
+    breakpoint()
     PROJECT_COPY_RELATED = getattr(settings, 'PROJECT_COPY_RELATED', {})
+    breakpoint()
     
     def post(self, request, slug):
         serializer = self.serializer_class(data=request.data)
@@ -72,27 +72,24 @@ class ProjectDuplicate(APIView):
         #is_project_type = serializer.data['is_project_type']
         #moderation = serializer.data['moderation']
         
-        
         if serializer.is_valid():
             project_template = Project.objects.filter(slug=slug).first()
-            
-            #instance = form.save(commit=False)
-            instance = serializer
-            #self._set_thumbnail(instance, project_template)
+            instance = serializer.save()
+            #breakpoint()
+            self._set_thumbnail(instance, serializer, project_template)
             #self._set_thumbnail(instance, form, project_template)
             self._set_creator(instance)
-            instance.save()
             self._duplicate_project_related_sets(instance, project_template)
             self._duplicate_project_base_map(instance, project_template)
             self._duplicate_project_authorization(instance, project_template)
-            
-            
-            self._duplicate_project_authorization
             serializer.save()
-
-        print("TEEEEEEEEEEST !!!!!!!!!!!!!!!!!!!!!!")
-        #print(title)
-        #print(description)
+            
+            data = serializer.data
+            status = 200
+        else:
+            data = serializer.errors
+            status = 400
+        return Response(data=data, status=status)
 
     def _duplicate_project_related_sets(self, instance, project_template):
         copy_feature_types = self.PROJECT_COPY_RELATED.get('FEATURE_TYPE', False)
@@ -142,13 +139,17 @@ class ProjectDuplicate(APIView):
         """
         copy_related = self.PROJECT_COPY_RELATED.get('AUTHORIZATION', False)
         if project_template and isinstance(project_template, Project) and copy_related:
-            for auth in instance.authorization_set.exclude(user=instance.creator):
+            for auth in instance.authorization_set.exclude(user=instance.creator): # //! empty query
                 auth.level = Authorization.objects.get(
                     user=auth.user, project=project_template).level
                 auth.save()
+        breakpoint()
 
     def _set_thumbnail(self, instance, form, project_template):
-        thumbnail = form.cleaned_data.get('thumbnail')
+        #breakpoint()
+        #thumbnail = project_template.thumbnail.name 
+        thumbnail = "otter17.jpg" # //! ne marche pas
+        #thumbnail = form.cleaned_data.get('thumbnail')# //! pas cleaned_data ni thumbnail
         copy_related = self.PROJECT_COPY_RELATED.get('THUMBNAIL', False)
         if not thumbnail and hasattr(project_template, 'thumbnail') and copy_related:
             instance.thumbnail = project_template.thumbnail

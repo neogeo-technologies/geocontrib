@@ -191,6 +191,7 @@ class ProjectCreate(CreateView):
 
     def _set_thumbnail(self, instance, form, project_template):
         thumbnail = form.cleaned_data.get('thumbnail')
+        print("thumbnail ::::::::::::::::::::::::::::::.", thumbnail)
         copy_related = self.PROJECT_COPY_RELATED.get('THUMBNAIL', False)
         if not thumbnail and hasattr(project_template, 'thumbnail') and copy_related:
             instance.thumbnail = project_template.thumbnail
@@ -203,6 +204,7 @@ class ProjectCreate(CreateView):
     def form_valid(self, form):
         slug = form.cleaned_data.get('create_from')
         project_template = Project.objects.filter(slug=slug).first()
+        print("project_template", project_template)
         instance = form.save(commit=False)
         self._set_thumbnail(instance, form, project_template)
         self._set_creator(instance)
