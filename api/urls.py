@@ -31,6 +31,7 @@ from api.views.project import ProjectAuthorizationView
 from api.views.project import ProjectSubscription
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
+from api.views.project import ProjectDuplicate
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
@@ -61,6 +62,9 @@ urlpatterns = [
         'user-permissions/',
         UserPermissionsView.as_view(), name='user-permissions'),
     path(
+        'projects/<slug:slug>/duplicate/',
+        ProjectDuplicate.as_view(), name='project-duplicate'),
+    path(
         'projects/<slug:slug>/thumbnail/',
         ProjectThumbnailView.as_view(), name='project-thumbnail'),
     path(
@@ -74,7 +78,7 @@ urlpatterns = [
         ProjectFeature.as_view(), name='project-feature'),
     path(
         'projects/<slug:slug>/feature-paginated/',
-        ProjectFeaturePaginated.as_view(), name='project-feature'),
+        ProjectFeaturePaginated.as_view(), name='project-feature-paginated'),
     path(
         'projects/<slug:slug>/comments/',
         ProjectComments.as_view(), name='project-comments'),
