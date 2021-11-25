@@ -82,7 +82,6 @@ class ProjectDuplicate(APIView):
 
     def _duplicate_project_related_sets(self, instance, project_template):
         copy_feature_types = self.PROJECT_COPY_RELATED.get('FEATURE_TYPE', False)
-        copy_features = self.PROJECT_COPY_RELATED.get('FEATURE', False)
         if project_template and isinstance(project_template, Project) and copy_feature_types:
             for feature_type in project_template.featuretype_set.all():
                 # Pour manipuler une copie immuable
@@ -94,15 +93,6 @@ class ProjectDuplicate(APIView):
                     custom_field.pk = None
                     custom_field.feature_type = feature_type
                     custom_field.save()
-                if copy_features:
-                    for feature in legit_feature_type.feature_set.all():
-                        feature.pk = None
-                        feature.created_on = None
-                        feature.updated_on = None
-                        feature.creator = self.request.user
-                        feature.project = instance
-                        feature.feature_type = feature_type
-                        feature.save()
 
     def _duplicate_project_base_map(self, instance, project_template):
         copy_related = self.PROJECT_COPY_RELATED.get('BASE_MAP', False)
