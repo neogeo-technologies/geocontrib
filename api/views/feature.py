@@ -54,7 +54,6 @@ class FeatureView(
     def get_queryset(self):
         queryset = super().get_queryset()
 
-
         project_slug = self.request.query_params.get('project__slug')
         if project_slug:
             project = get_object_or_404(Project, slug=project_slug)
@@ -67,7 +66,16 @@ class FeatureView(
             queryset = queryset.filter(feature_type__slug=feature_type_slug)
 
         if not feature_type_slug and not project_slug:
-            raise ValidationError(detail="Must provide parameter project__slug or feature_type__slug")
+            raise ValidationError(detail="Must provide parameter project__slug "
+                                         "or feature_type__slug")
+
+        title_contains = self.request.query_params.get('title__contains')
+        if title_contains:
+            queryset = queryset.filter(title__contains=title_contains)
+
+        title_icontains = self.request.query_params.get('title__icontains')
+        if title_icontains:
+            queryset = queryset.filter(title__icontains=title_icontains)
 
         return queryset
 
@@ -113,6 +121,20 @@ class ProjectFeature(views.APIView):
     def get(self, request, slug):
         project = get_object_or_404(Project, slug=slug)
         features = Feature.handy.availables(request.user, project)
+
+        title_contains = self.request.query_params.get('title__contains')
+        if title_contains:
+            features = features.filter(title__contains=title_contains)
+
+        title_icontains = self.request.query_params.get('title__icontains')
+        if title_icontains:
+            features = features.filter(title__icontains=title_icontains)
+
+
+        limit = self.request.query_params.get('limit')
+        if limit:
+            features = features[:int(limit)]
+
         format = request.query_params.get('output')
         if format and format == 'geojson':
             data = FeatureDetailedSerializer(

@@ -114,6 +114,10 @@ USE_I18N = True
 USE_L10N = config('USE_L10N', default=False, cast=bool)
 USE_TZ = True
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+}
+
 # URL prefix
 URL_PREFIX = config('URL_PREFIX', default='')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
