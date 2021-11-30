@@ -130,10 +130,14 @@ class ProjectFeature(views.APIView):
         if title_icontains:
             features = features.filter(title__icontains=title_icontains)
 
-
         limit = self.request.query_params.get('limit')
         if limit:
             features = features[:int(limit)]
+
+        _id = self.request.query_params.get('id')
+        if _id:
+            features = features.filter(pk=_id)
+
 
         format = request.query_params.get('output')
         if format and format == 'geojson':
