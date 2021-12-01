@@ -450,3 +450,10 @@ class FeatureTypeAttachmentsSerializer(serializers.ModelSerializer):
             'attachment_file',
             'comment'
         )
+
+
+class FeatureDetailedAuthenticatedSerializer(FeatureDetailedSerializer):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.is_authenticated = True
