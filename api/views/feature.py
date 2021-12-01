@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework_mvt.views import BaseMVTView
 
 from api import logger
+from api.serializers.feature import FeatureDetailedAuthenticatedSerializer
 from api.serializers import FeatureDetailedSerializer
 from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureLinkSerializer
@@ -181,6 +182,8 @@ class ProjectFeaturePaginated(generics.ListAPIView):
     def get_serializer_class(self):
         format = self.request.query_params.get('output')
         if format and format == 'geojson':
+            if self.request.user.is_authenticated:
+                return FeatureDetailedAuthenticatedSerializer
             return FeatureDetailedSerializer
         return FeatureListSerializer
         
