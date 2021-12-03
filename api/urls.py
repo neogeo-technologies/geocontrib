@@ -14,6 +14,7 @@ from api.views.feature import FeatureView
 from api.views.feature import FeatureMVTView
 from api.views.feature import ProjectFeature
 from api.views.feature import ProjectFeaturePaginated
+from api.views.feature import ProjectFeatureBbox
 from api.views.feature import ProjectFeatureTypes
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
@@ -35,7 +36,6 @@ from api.views.project import ProjectDuplicate
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
-from geocontrib.models import Feature
 
 app_name = 'api'
 
@@ -79,6 +79,9 @@ urlpatterns = [
     path(
         'projects/<slug:slug>/feature-paginated/',
         ProjectFeaturePaginated.as_view(), name='project-feature-paginated'),
+    path(
+        'projects/<slug:slug>/feature-bbox/',
+        ProjectFeatureBbox.as_view(), name='project-feature-bbox'),
     path(
         'projects/<slug:slug>/comments/',
         ProjectComments.as_view(), name='project-comments'),
