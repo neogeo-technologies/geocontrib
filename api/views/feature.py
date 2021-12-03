@@ -130,7 +130,7 @@ class ProjectFeature(views.APIView):
         title_icontains = self.request.query_params.get('title__icontains')
         if title_icontains:
             features = features.filter(title__icontains=title_icontains)
-
+        count = features.count()
         limit = self.request.query_params.get('limit')
         if limit:
             features = features[:int(limit)]
@@ -152,6 +152,7 @@ class ProjectFeature(views.APIView):
             serializers = FeatureListSerializer(features, many=True)
             data = {
                 'features': serializers.data,
+                'count': count
             }
         return Response(data, status=200)
 
