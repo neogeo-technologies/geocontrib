@@ -36,6 +36,7 @@ from api.views.project import ProjectDuplicate
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
+from api.views.user import UserLevelsPermission
 
 app_name = 'api'
 
@@ -47,6 +48,7 @@ router.register(r'users', UserViewSet, basename='users')
 router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 router.register(r'base-maps', BaseMapViewset, basename='base-maps')
 router.register(r'layers', LayerViewset, basename='layers')
+router.register(r'levels-permissions', UserLevelsPermission, basename='levels-permissions')
 
 urlpatterns = [
     # Vues générales de navigation

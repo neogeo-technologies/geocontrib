@@ -1,12 +1,15 @@
 from django.contrib.auth import get_user_model
+from rest_framework import mixins
 from rest_framework import views
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.response import Response
 
 from api.serializers import UserSerializer
+from api.serializers import UserLevelsPermissionSerializer
 from geocontrib.models import Authorization
 from geocontrib.models import Project
+from geocontrib.models import UserLevelPermission
 
 User = get_user_model()
 
@@ -46,3 +49,10 @@ class UserPermissionsView(views.APIView):
         for project in Project.objects.all():
             data[project.slug] = Authorization.all_permissions(user, project)
         return Response(data=data, status=200)
+
+class UserLevelsPermission(mixins.RetrieveModelMixin,
+                            mixins.ListModelMixin,
+                            viewsets.GenericViewSet):
+    
+    queryset = UserLevelPermission.objects.all()
+    serializer_class = UserLevelsPermissionSerializer
