@@ -162,11 +162,7 @@ class ProjectFeaturePaginated(generics.ListAPIView):
     pagination_class = CustomPagination
     lookup_field = 'slug'
     http_method_names = ['get', ]
-    filter_backends = [filters.OrderingFilter,]
-    ordering_fields = ['status', 'feature_type', 'title', 'updated_on', 'creator', 'display_last_editor',]
-    ordering = ['title', 'status',]
-    
-    
+
     def filter_queryset(self, queryset):
         """
         Surchargeant ListModelMixin
@@ -174,7 +170,6 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         status__value = self.request.query_params.get('status__value')
         feature_type_slug = self.request.query_params.get('feature_type_slug')
         title = self.request.query_params.get('title')
-        
 
         if status__value:
             queryset = queryset.filter(status__icontains=status__value)
@@ -191,17 +186,19 @@ class ProjectFeaturePaginated(generics.ListAPIView):
                 return FeatureDetailedAuthenticatedSerializer
             return FeatureDetailedSerializer
         return FeatureListSerializer
-        
+
     def get_queryset(self):
         slug = self.kwargs.get('slug')
         project = get_object_or_404(Project, slug=slug)
 
         queryset = Feature.handy.availables(user=self.request.user, project=project)
+        ordering = self.request.query_params.get('ordering')
+        if ordering:
+            queryset = queryset.order_by(ordering)
 
         queryset = queryset.select_related('creator')
         queryset = queryset.select_related('feature_type')
         queryset = queryset.select_related('project')
-
         return queryset
 
 
