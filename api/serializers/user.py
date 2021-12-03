@@ -57,3 +57,11 @@ class AuthorizationSerializer(serializers.ModelSerializer):
             'created_on',
             'updated_on',
         ]
+        
+class UserLevelsPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserLevelPermission
+        fields = [
+            'user_type_id',
+            'rank',
+        ]
