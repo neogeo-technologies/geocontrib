@@ -3,6 +3,7 @@ import json
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Polygon
 from django.contrib.gis.geos.error import GEOSException
+from django.contrib.gis.db.models import Extent
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
@@ -130,7 +131,7 @@ class ProjectFeature(views.APIView):
         title_icontains = self.request.query_params.get('title__icontains')
         if title_icontains:
             features = features.filter(title__icontains=title_icontains)
-
+        count = features.count()
         limit = self.request.query_params.get('limit')
         if limit:
             features = features[:int(limit)]
@@ -152,6 +153,7 @@ class ProjectFeature(views.APIView):
             serializers = FeatureListSerializer(features, many=True)
             data = {
                 'features': serializers.data,
+                'count': count
             }
         return Response(data, status=200)
 
@@ -196,9 +198,44 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         queryset = queryset.select_related('creator')
         queryset = queryset.select_related('feature_type')
         queryset = queryset.select_related('project')
-
         return queryset
 
+class ProjectFeatureBbox(generics.ListAPIView):
+    queryset = Project.objects.all()
+    lookup_field = 'slug'
+    http_method_names = ['get', ]
+
+
+    def filter_queryset(self, queryset):
+        """
+        Surchargeant ListModelMixin
+        """
+        status__value = self.request.query_params.get('status__value')
+        feature_type_slug = self.request.query_params.get('feature_type_slug')
+        title = self.request.query_params.get('title')
+
+        if status__value:
+            queryset = queryset.filter(status__icontains=status__value)
+        if feature_type_slug:
+            queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        return queryset
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        project = get_object_or_404(Project, slug=slug)
+
+        queryset = Feature.handy.availables(user=self.request.user, project=project)
+
+        queryset = queryset.select_related('creator')
+        queryset = queryset.select_related('feature_type')
+        queryset = queryset.select_related('project')
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset()).aggregate(Extent('geom'))
+        return Response(queryset['geom__extent'])
 
 class ExportFeatureList(views.APIView):
 
