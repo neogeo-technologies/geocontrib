@@ -234,8 +234,12 @@ class ProjectFeatureBbox(generics.ListAPIView):
         return queryset
 
     def list(self, request, *args, **kwargs):
+        bbox = None
         queryset = self.filter_queryset(self.get_queryset()).aggregate(Extent('geom'))
-        return Response(queryset['geom__extent'])
+        geom = queryset['geom__extent'];
+        if geom :
+            bbox = {'minLon': geom[0], 'minLat': geom[1], 'maxLon' : geom[2], 'maxLat': geom[3] }
+        return Response(bbox)
 
 class ExportFeatureList(views.APIView):
 
