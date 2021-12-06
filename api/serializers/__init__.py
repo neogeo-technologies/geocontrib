@@ -21,6 +21,7 @@ from .misc import UserSerializer
 from .misc import FeatureEventSerializer
 from .project import ProjectDetailedSerializer
 from .project import ProjectSerializer
+from .user import UserLevelsPermissionSerializer
 
 
 __all__ = [
@@ -41,6 +42,7 @@ __all__ = [
     'FeatureAttachmentSerializer',
     'ImportTaskSerializer',
     'UserSerializer',
+    'UserLevelsPermissionSerializer',
     'CommentSerializer',
     'CommentDetailedSerializer',
     'EventSerializer',

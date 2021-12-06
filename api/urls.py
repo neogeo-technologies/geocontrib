@@ -14,6 +14,7 @@ from api.views.feature import FeatureView
 from api.views.feature import FeatureMVTView
 from api.views.feature import ProjectFeature
 from api.views.feature import ProjectFeaturePaginated
+from api.views.feature import ProjectFeatureBbox
 from api.views.feature import ProjectFeatureTypes
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
@@ -35,7 +36,7 @@ from api.views.project import ProjectDuplicate
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
-from geocontrib.models import Feature
+from api.views.user import UserLevelsPermission
 
 app_name = 'api'
 
@@ -47,6 +48,7 @@ router.register(r'users', UserViewSet, basename='users')
 router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 router.register(r'base-maps', BaseMapViewset, basename='base-maps')
 router.register(r'layers', LayerViewset, basename='layers')
+router.register(r'levels-permissions', UserLevelsPermission, basename='levels-permissions')
 
 urlpatterns = [
     # Vues générales de navigation
@@ -79,6 +81,9 @@ urlpatterns = [
     path(
         'projects/<slug:slug>/feature-paginated/',
         ProjectFeaturePaginated.as_view(), name='project-feature-paginated'),
+    path(
+        'projects/<slug:slug>/feature-bbox/',
+        ProjectFeatureBbox.as_view(), name='project-feature-bbox'),
     path(
         'projects/<slug:slug>/comments/',
         ProjectComments.as_view(), name='project-comments'),
