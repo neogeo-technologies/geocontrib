@@ -131,6 +131,10 @@ class ProjectFeature(views.APIView):
         title_icontains = self.request.query_params.get('title__icontains')
         if title_icontains:
             features = features.filter(title__icontains=title_icontains)
+
+        feature_type__slug = self.request.query_params.get('feature_type__slug')
+        if feature_type__slug:
+            features = features.filter(feature_type__slug=feature_type__slug)
         count = features.count()
         limit = self.request.query_params.get('limit')
         if limit:
