@@ -123,7 +123,6 @@ class ProjectFeature(views.APIView):
     def get(self, request, slug):
         project = get_object_or_404(Project, slug=slug)
         features = Feature.handy.availables(request.user, project)
-
         title_contains = self.request.query_params.get('title__contains')
         if title_contains:
             features = features.filter(title__contains=title_contains)
@@ -136,6 +135,9 @@ class ProjectFeature(views.APIView):
         if feature_type__slug:
             features = features.filter(feature_type__slug=feature_type__slug)
         count = features.count()
+        ordering = self.request.query_params.get('ordering')
+        if ordering:
+            features = features.order_by(ordering)
         limit = self.request.query_params.get('limit')
         if limit:
             features = features[:int(limit)]
