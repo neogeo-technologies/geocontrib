@@ -76,13 +76,14 @@ class GeoJSONProcessing:
             try:
                 current, _ = Feature.objects.update_or_create(
                     feature_id=feature_id,
+                    project=feature_type.project,
                     defaults={
                         'title': title,
                         'description' : description,
                         # TODO fix status
                         'status': status,
                         'creator': import_task.user,
-                        'project' : feature_type.project,
+                        # 'project' : feature_type.project,
                         'feature_type' : feature_type,
                         'geom' : self.get_geom(feature.get('geometry')),
                         'feature_data' : feature_data,
