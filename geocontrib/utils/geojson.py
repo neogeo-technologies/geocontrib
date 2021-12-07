@@ -74,21 +74,25 @@ class GeoJSONProcessing:
                 status = "draft"
 
             try:
-                current, _ = Feature.objects.update_or_create(
-                    feature_id=feature_id,
-                    project=feature_type.project,
-                    defaults={
-                        'title': title,
-                        'description' : description,
-                        # TODO fix status
-                        'status': status,
-                        'creator': import_task.user,
-                        # 'project' : feature_type.project,
-                        'feature_type' : feature_type,
-                        'geom' : self.get_geom(feature.get('geometry')),
-                        'feature_data' : feature_data,
-                    }
-                )
+                feature_exist = Feature.objects.get(feature_id=feature_id)
+                if feature_exist:
+                    if feature_exist.project != feature_type.project:
+                        feature_id = None
+                    current, _ = Feature.objects.update_or_create(
+                        feature_id=feature_id,
+                        # project=feature_type.project,
+                        defaults={
+                            'title': title,
+                            'description' : description,
+                            # TODO fix status
+                            'status': status,
+                            'creator': import_task.user,
+                            'project' : feature_type.project,
+                            'feature_type' : feature_type,
+                            'geom' : self.get_geom(feature.get('geometry')),
+                            'feature_data' : feature_data,
+                        }
+                    )
             except Exception as er:
                 self.infos.append(
                     f"L'edition de feature a echoué {er}'. ")
