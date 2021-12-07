@@ -134,6 +134,10 @@ class ProjectFeature(views.APIView):
         feature_type__slug = self.request.query_params.get('feature_type__slug')
         if feature_type__slug:
             features = features.filter(feature_type__slug=feature_type__slug)
+
+        feature_id = self.request.query_params.get('feature_id')
+        if feature_id:
+            features = features.filter(feature_id=feature_id)
         count = features.count()
         ordering = self.request.query_params.get('ordering')
         if ordering:
