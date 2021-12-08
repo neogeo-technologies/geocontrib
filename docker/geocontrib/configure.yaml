@@ -20,3 +20,9 @@ variables:
 
   VUE_APP_APPLICATION_FAVICO:
     env_config_front: FAVICON_PATH
+
+  DISABLE_LOGIN_BUTTON:
+    env_config_front: DISABLE_LOGIN_BUTTON
+
+  VUE_APP_LOGIN_URL:
+    env_config_front: LOG_URL

@@ -1,13 +1,19 @@
 {
-    "BASE_URL":"/geocontrib/",
-    "DOMAIN":"/geocontrib/",
-    "VUE_APP_LOCALE":"fr-FR",
-    "VUE_APP_APPLICATION_NAME":"{{ VUE_APP_APPLICATION_NAME|default("GéoContrib") }}",
-    "VUE_APP_APPLICATION_ABSTRACT": "{{ VUE_APP_APPLICATION_ABSTRACT|default("Application de saisie d'informations géographiques contributive") }}",
-    "VUE_APP_LOGO_PATH":"{{ VUE_APP_LOGO_PATH|default("@/assets/img/logo-neogeo-circle.png") }}",
-    "VUE_APP_APPLICATION_FAVICO":"{{ VUE_APP_APPLICATION_FAVICO|default("@/assets/img/icons/favicon-32x32.png") }}",
-    "VUE_APP_DJANGO_BASE":"",
-    "VUE_APP_DJANGO_API_BASE":"/geocontrib/api/",
+    "BASE_URL": "/geocontrib/",
+    "DOMAIN": "/geocontrib/",
+    "VUE_APP_LOCALE": "fr-FR",
+    "VUE_APP_APPLICATION_NAME": "{{ VUE_APP_APPLICATION_NAME|default("GéoContrib", true) }}",
+    "VUE_APP_APPLICATION_ABSTRACT": "{{ VUE_APP_APPLICATION_ABSTRACT|default("Application de saisie d'informations géographiques contributive", true) }}",
+    "VUE_APP_LOGO_PATH": "{{ VUE_APP_LOGO_PATH|default("@/assets/img/logo-neogeo-circle.png", true) }}",
+    "VUE_APP_APPLICATION_FAVICO": "{{ VUE_APP_APPLICATION_FAVICO|default("@/assets/img/icons/favicon-32x32.png", true) }}",
+    "VUE_APP_DJANGO_BASE": "",
+    "VUE_APP_DJANGO_API_BASE": "/geocontrib/api/",
+
+    "VUE_APP_RELOAD_INTERVAL": 15000,
+
+    "VUE_APP_LOGIN_URL": {{ VUE_APP_LOGIN_URL|default('""', true) }},
+    "VUE_APP_DISABLE_LOGIN_BUTTON": {{ DISABLE_LOGIN_BUTTON|default('false', true) }},
+
     "DEFAULT_BASE_MAP":{
         "SERVICE": "https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
         "OPTIONS": {

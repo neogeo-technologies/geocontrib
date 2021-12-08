@@ -134,6 +134,20 @@ LOGIN_URL = config("LOGIN_URL", default='geocontrib:login')
 LOGIN_REDIRECT_URL = 'geocontrib:index'
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
 
+# CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
+cas_server_url = config('CAS_SERVER_URL', None)
+if cas_server_url:
+    CAS_SERVER_URL = cas_server_url
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'django_cas_ng.backends.CASBackend',
+    )
+
+# Configure frontend
+LOG_URL = config("LOG_URL", default=None)
+DISABLE_LOGIN_BUTTON = config("DISABLE_LOGIN_BUTTON", default=None)
+
+
 # Logging properties
 LOGGING = {
     'version': 1,
@@ -251,14 +265,5 @@ CELERY_TASK_SERIALIZER = config('CELERY_TASK_SERIALIZER', default='json')
 CELERY_RESULT_SERIALIZER = config('CELERY_RESULT_SERIALIZER', default='json')
 
 CACHE_SECOND = config('CACHE_SECOND', default=120, cast=int)
-
-# CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
-cas_server_url = config('CAS_SERVER_URL', None)
-if cas_server_url:
-    CAS_SERVER_URL = cas_server_url
-    AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.ModelBackend',
-        'django_cas_ng.backends.CASBackend',
-    )
 
 MAGIC_IS_AVAILABLE = config('MAGIC_IS_AVAILABLE', default=True, cast=bool)  # File image validation (@seb / install IdeoBFC)
