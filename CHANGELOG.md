@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
  - Redmine 11087 : Biblio de pictos - Signalements ponctuels
 
- ### Corrections
+### Corrections
 
 - Redmine 11332 : filtrage dans la page "liste et carte"
 - Redmine 11320 : Nombre de signalements sur la page "type de signalement"
