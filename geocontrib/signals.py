@@ -192,6 +192,11 @@ def create_event_on_project_creation(sender, instance, created, **kwargs):
         )
 
 
+def setUser(user):
+    user = user._wrapped if hasattr(user,'_wrapped') else user
+    return user
+
+
 @receiver(models.signals.post_save, sender='geocontrib.Feature')
 @disable_for_loaddata
 def create_event_on_feature_create_or_update(sender, instance, created, **kwargs):
@@ -219,11 +224,12 @@ def create_event_on_feature_create_or_update(sender, instance, created, **kwargs
         )
     else:
         if instance:
+            last_editor = setUser(instance.last_editor)
             Event.objects.create(
                 feature_id=instance.feature_id,
                 event_type='update',
                 object_type='feature',
-                user= instance.last_editor._wrapped,
+                user= last_editor,
                 project_slug=instance.project.slug,
                 feature_type_slug=instance.feature_type.slug,
                 data={
