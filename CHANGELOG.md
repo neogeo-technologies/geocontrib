@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [2.3.0] - 2021-12-08
+
+### Evolutions
+
+- Redmine 11784 : Faire un pagination sur les liste de features en se basant sur le back
+- Redmine 11081 : Amélioration des performances en cas de grand nombre de signalements
+- Redmine 9784 : Avoir un statut intermédiaire entre contributeur et modérateur : Super Contributeur
+
+### Evolution en BETA
+
+ - Redmine 11087 : Biblio de pictos - Signalements ponctuels
+
+ ### Corrections
+
+- Redmine 11332 : filtrage dans la page "liste et carte"
+- Redmine 11320 : Nombre de signalements sur la page "type de signalement"
+- Redmine 11264 : Ajout de la table Attachement dans Django
+
 ## [2.2.0] - 2021-11-12
 
 ### Evolutions
