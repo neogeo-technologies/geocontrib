@@ -74,8 +74,22 @@ class GeoJSONProcessing:
                 status = "draft"
 
             try:
+                try:
+                    feature_exist = Feature.objects.get(feature_id=feature_id)
+                except Feature.DoesNotExist:
+                    feature_exist = None
+                    # Le geojson peut venir avec un ancien ID. On reset l'ID ici aussi
+                    feature_id = None
+               
+                if feature_exist:
+                    if feature_exist.project != feature_type.project or feature_exist != feature_type:
+                        # Si l'ID qui vient du geojson de l'import existe, 
+                        # mais on souhaite créer le signalement dans un autre projet
+                        # On set l'ID à None
+                        feature_id = None
                 current, _ = Feature.objects.update_or_create(
                     feature_id=feature_id,
+                    # project=feature_type.project,
                     defaults={
                         'title': title,
                         'description' : description,
@@ -88,6 +102,7 @@ class GeoJSONProcessing:
                         'feature_data' : feature_data,
                     }
                 )
+                
             except Exception as er:
                 logger.exception(
                     f"L'edition de feature a echoué {er}'. ")
