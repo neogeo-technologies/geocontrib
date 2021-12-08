@@ -219,7 +219,6 @@ def create_event_on_feature_create_or_update(sender, instance, created, **kwargs
         )
     else:
         if instance:
-            import pdb; pdb.set_trace()
             Event.objects.create(
                 feature_id=instance.feature_id,
                 event_type='update',

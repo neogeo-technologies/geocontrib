@@ -89,6 +89,8 @@ class GeoJSONProcessing:
                     }
                 )
             except Exception as er:
+                logger.exception(
+                    f"L'edition de feature a echoué {er}'. ")
                 self.infos.append(
                     f"L'edition de feature a echoué {er}'. ")
                 raise GeoJSONProcessingFailed

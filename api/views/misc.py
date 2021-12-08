@@ -65,6 +65,9 @@ class ImportTaskSearch(
     def filter_queryset(self, queryset):
         status = self.request.query_params.get('status')
         feature_type_slug = self.request.query_params.get('feature_type_slug')
+        project_slug = self.request.query_params.get('project_slug')
+        if project_slug:
+            queryset = queryset.filter(project__slug=project_slug)
         if status:
             queryset = queryset.filter(status__icontains=status)
         if feature_type_slug:

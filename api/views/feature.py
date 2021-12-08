@@ -124,7 +124,6 @@ class ProjectFeature(views.APIView):
     def get(self, request, slug):
         project = get_object_or_404(Project, slug=slug)
         features = Feature.handy.availables(request.user, project)
-
         title_contains = self.request.query_params.get('title__contains')
         if title_contains:
             features = features.filter(title__contains=title_contains)
@@ -132,7 +131,18 @@ class ProjectFeature(views.APIView):
         title_icontains = self.request.query_params.get('title__icontains')
         if title_icontains:
             features = features.filter(title__icontains=title_icontains)
+
+        feature_type__slug = self.request.query_params.get('feature_type__slug')
+        if feature_type__slug:
+            features = features.filter(feature_type__slug=feature_type__slug)
+
+        feature_id = self.request.query_params.get('feature_id')
+        if feature_id:
+            features = features.filter(feature_id=feature_id)
         count = features.count()
+        ordering = self.request.query_params.get('ordering')
+        if ordering:
+            features = features.order_by(ordering)
         limit = self.request.query_params.get('limit')
         if limit:
             features = features[:int(limit)]
@@ -237,8 +247,12 @@ class ProjectFeatureBbox(generics.ListAPIView):
         return queryset
 
     def list(self, request, *args, **kwargs):
+        bbox = None
         queryset = self.filter_queryset(self.get_queryset()).aggregate(Extent('geom'))
-        return Response(queryset['geom__extent'])
+        geom = queryset['geom__extent'];
+        if geom :
+            bbox = {'minLon': geom[0], 'minLat': geom[1], 'maxLon' : geom[2], 'maxLat': geom[3] }
+        return Response(bbox)
 
 class ExportFeatureList(views.APIView):
 
