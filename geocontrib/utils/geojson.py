@@ -82,7 +82,7 @@ class GeoJSONProcessing:
                     feature_id = None
                
                 if feature_exist:
-                    if feature_exist.project != feature_type.project or feature_exist != feature_type:
+                    if feature_exist.project != feature_type.project or feature_exist.feature_type != feature_type:
                         # Si l'ID qui vient du geojson de l'import existe, 
                         # mais on souhaite créer le signalement dans un autre projet
                         # On set l'ID à None
