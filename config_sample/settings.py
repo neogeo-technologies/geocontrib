@@ -24,6 +24,8 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost, 127.0.0.1, 0.0.0.0', cast=Csv())
 
+CSRF_TRUSTED_ORIGINS = list(set(ALLOWED_HOSTS) - set(['localhost', '127.0.0.1', '0.0.0.0']))
+
 # Application definition
 CORE_APPS = [
     'django.contrib.sites',
@@ -112,6 +114,10 @@ USE_I18N = True
 USE_L10N = config('USE_L10N', default=False, cast=bool)
 USE_TZ = True
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+}
+
 # URL prefix
 URL_PREFIX = config('URL_PREFIX', default='')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -127,6 +133,20 @@ AUTH_USER_MODEL = 'geocontrib.User'
 LOGIN_URL = config("LOGIN_URL", default='geocontrib:login')
 LOGIN_REDIRECT_URL = 'geocontrib:index'
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
+
+# CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
+cas_server_url = config('CAS_SERVER_URL', None)
+if cas_server_url:
+    CAS_SERVER_URL = cas_server_url
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'django_cas_ng.backends.CASBackend',
+    )
+
+# Configure frontend
+LOG_URL = config("LOG_URL", default=None)
+DISABLE_LOGIN_BUTTON = config("DISABLE_LOGIN_BUTTON", default=None)
+
 
 # Logging properties
 LOGGING = {
@@ -257,14 +277,5 @@ CELERY_TASK_SERIALIZER = config('CELERY_TASK_SERIALIZER', default='json')
 CELERY_RESULT_SERIALIZER = config('CELERY_RESULT_SERIALIZER', default='json')
 
 CACHE_SECOND = config('CACHE_SECOND', default=120, cast=int)
-
-# CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
-cas_server_url = config('CAS_SERVER_URL', default=None)
-if cas_server_url:
-    CAS_SERVER_URL = cas_server_url
-    AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.ModelBackend',
-        'django_cas_ng.backends.CASBackend',
-    )
 
 MAGIC_IS_AVAILABLE = config('MAGIC_IS_AVAILABLE', default=True, cast=bool)  # File image validation (@seb / install IdeoBFC)

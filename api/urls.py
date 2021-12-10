@@ -13,6 +13,8 @@ from api.views.feature import FeatureTypeView
 from api.views.feature import FeatureView
 from api.views.feature import FeatureMVTView
 from api.views.feature import ProjectFeature
+from api.views.feature import ProjectFeaturePaginated
+from api.views.feature import ProjectFeatureBbox
 from api.views.feature import ProjectFeatureTypes
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
@@ -30,10 +32,11 @@ from api.views.project import ProjectAuthorizationView
 from api.views.project import ProjectSubscription
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
+from api.views.project import ProjectDuplicate
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
-from geocontrib.models import Feature
+from api.views.user import UserLevelsPermission
 
 app_name = 'api'
 
@@ -45,6 +48,7 @@ router.register(r'users', UserViewSet, basename='users')
 router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 router.register(r'base-maps', BaseMapViewset, basename='base-maps')
 router.register(r'layers', LayerViewset, basename='layers')
+router.register(r'levels-permissions', UserLevelsPermission, basename='levels-permissions')
 
 urlpatterns = [
     # Vues générales de navigation
@@ -60,6 +64,9 @@ urlpatterns = [
         'user-permissions/',
         UserPermissionsView.as_view(), name='user-permissions'),
     path(
+        'projects/<slug:slug>/duplicate/',
+        ProjectDuplicate.as_view(), name='project-duplicate'),
+    path(
         'projects/<slug:slug>/thumbnail/',
         ProjectThumbnailView.as_view(), name='project-thumbnail'),
     path(
@@ -71,6 +78,12 @@ urlpatterns = [
     path(
         'projects/<slug:slug>/feature/',
         ProjectFeature.as_view(), name='project-feature'),
+    path(
+        'projects/<slug:slug>/feature-paginated/',
+        ProjectFeaturePaginated.as_view(), name='project-feature-paginated'),
+    path(
+        'projects/<slug:slug>/feature-bbox/',
+        ProjectFeatureBbox.as_view(), name='project-feature-bbox'),
     path(
         'projects/<slug:slug>/comments/',
         ProjectComments.as_view(), name='project-comments'),

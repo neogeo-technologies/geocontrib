@@ -3,7 +3,7 @@ Django>=2.2.21,<2.3.0
 djangorestframework-gis==0.14
 djangorestframework>=3.11.2,<3.12.0
 # waiting https://github.com/corteva/djangorestframework-mvt/issues/10 to be merged
-git+https://github.com/neogeo-technologies/djangorestframework-mvt.git@f974b093845760b6b8ba6c7c285571b057c60abc#egg=djangorestframework-mvt
+git+https://github.com/neogeo-technologies/djangorestframework-mvt.git@138a09f092c04247f3f9dfc4546e5dad5d04ccc6#egg=djangorestframework-mvt
 #djangorestframework-mvt>=0.2.5,<0.3.0
 ldap3==2.6.1
 Pillow>=8.2.0,<8.3.0

@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Q, When, Case, CharField, Value
 from django.apps import apps
-from geocontrib.choices import MODERATOR
+from geocontrib.choices import MODERATOR, SUPER_CONTRIBUTOR
 
 
 class AvailableFeaturesManager(models.Manager):
@@ -18,6 +18,12 @@ class AvailableFeaturesManager(models.Manager):
         UserLevelPermission = apps.get_model(app_label='geocontrib', model_name='UserLevelPermission')
         queryset = self.get_queryset().filter(project=project)
 
+        user_rank = Authorization.get_rank(user, project)
+        project_arch_rank = project.access_level_arch_feature.rank
+        project_pub_rank = project.access_level_pub_feature.rank
+        moderateur_rank = UserLevelPermission.objects.get(user_type_id=MODERATOR).rank
+        supercontributeur_rank = UserLevelPermission.objects.get(user_type_id=SUPER_CONTRIBUTOR).rank
+
         # 0 - si utlisateur anonyme
         if not user.is_authenticated:
             if Authorization.has_permission(user, 'can_view_archived_feature', project):
@@ -27,16 +33,12 @@ class AvailableFeaturesManager(models.Manager):
             return queryset
 
         # 1 - si is_project_administrator on liste toutes les features
+        # sauf le modérateur, qui par exemple ne doit pas voir les brouillons des autres
         if Authorization.has_permission(user, 'is_project_administrator', project) \
-                or Authorization.has_permission(user, 'is_project_moderator', project):
+                and not user_rank == moderateur_rank:
             return queryset
-
-        user_rank = Authorization.get_rank(user, project)
-        project_arch_rank = project.access_level_arch_feature.rank
-        project_pub_rank = project.access_level_pub_feature.rank
-        moderateur_rank = UserLevelPermission.objects.get(user_type_id=MODERATOR).rank
-
-        #  - si is_project_super_contributor:
+        
+        # 2 - si is_project_super_contributor:
         # Dans le cas de projets non modérés, il peut modifier le statut
         # de tous les signalements qu'il peut voir
         # ("brouillons", "publiés" ; pour les "archivés" c'est en fonction des paramètres du projet)
@@ -46,9 +48,8 @@ class AvailableFeaturesManager(models.Manager):
         # ("brouillons", "publication en cours", "publiés" ; pour les "archivés" c'est en fonction des paramètres du projet)
         # vers les statuts de "brouillons", "publication en cours".
         if Authorization.has_permission(
-                user, 'is_project_super_contributeur', project):
-
-            if project.moderation and user_rank < moderateur_rank:
+                user, 'is_project_super_contributor', project):
+            if project.moderation and user_rank < supercontributeur_rank:
                 queryset = queryset.exclude(
                     ~Q(creator=user), status='pending',
                 )
@@ -61,19 +62,18 @@ class AvailableFeaturesManager(models.Manager):
                     ~Q(creator=user), status='published',
                 )
             return queryset
-
+        # 3 - si modérateur et utilsateur connecté ou anonyme
         else:
-            # A TESTER => REDMINE ISSUES 9784
-            # queryset = queryset.exclude(
-            #     ~Q(creator=user), status='draft',
-            # )
-
-            # if project.moderation and user_rank < moderateur_rank:
-            #     # import pdb; pdb.set_trace()
-            #     queryset = queryset.exclude(
-            #         ~Q(creator=user), 
-            #         status='pending',
-            #     )
+            # hide draft of other user user
+            queryset = queryset.exclude(
+                ~Q(creator=user), status='draft',
+            )
+            # hide pending of other user except for moderateur
+            if project.moderation and (user_rank < moderateur_rank):
+                queryset = queryset.exclude(
+                    ~Q(creator=user), 
+                    status='pending',
+                )
 
             if user_rank < project_arch_rank:
                 queryset = queryset.exclude(

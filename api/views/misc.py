@@ -9,7 +9,6 @@ from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import views
 from rest_framework import viewsets
-from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
@@ -66,6 +65,9 @@ class ImportTaskSearch(
     def filter_queryset(self, queryset):
         status = self.request.query_params.get('status')
         feature_type_slug = self.request.query_params.get('feature_type_slug')
+        project_slug = self.request.query_params.get('project_slug')
+        if project_slug:
+            queryset = queryset.filter(project__slug=project_slug)
         if status:
             queryset = queryset.filter(status__icontains=status)
         if feature_type_slug:

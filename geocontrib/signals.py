@@ -133,7 +133,7 @@ def set_users_perms(sender, instance, created, **kwargs):
             Authorization.objects.create(
                 project=instance,
                 user=instance.creator,
-                level=UserLevelPermission.objects.get(rank=4)
+                level=UserLevelPermission.objects.get(rank=5)
             )
         except Exception:
             logger.exception('Trigger.set_users_perms')
@@ -192,15 +192,20 @@ def create_event_on_project_creation(sender, instance, created, **kwargs):
         )
 
 
+def setUser(user):
+    user = user._wrapped if hasattr(user,'_wrapped') else user
+    return user
+
+
 @receiver(models.signals.post_save, sender='geocontrib.Feature')
 @disable_for_loaddata
-def create_event_on_feature_create(sender, instance, created, **kwargs):
+def create_event_on_feature_create_or_update(sender, instance, created, **kwargs):
     # Pour la modification d'un signalement l'évènement est generé parallelement
     # à l'update() afin de recupere l'utilisateur courant.
     # Le signalement peut etre en 'pending' dés la création
     # on force le has_changed pour event.ping_users()
+    Event = apps.get_model(app_label='geocontrib', model_name="Event")
     if created:
-        Event = apps.get_model(app_label='geocontrib', model_name="Event")
         Event.objects.create(
             feature_id=instance.feature_id,
             event_type='create',
@@ -217,6 +222,25 @@ def create_event_on_feature_create(sender, instance, created, **kwargs):
                 }
             }
         )
+    else:
+        if instance:
+            last_editor = setUser(instance.last_editor)
+            Event.objects.create(
+                feature_id=instance.feature_id,
+                event_type='update',
+                object_type='feature',
+                user= last_editor,
+                project_slug=instance.project.slug,
+                feature_type_slug=instance.feature_type.slug,
+                data={
+                    'extra': instance.feature_data,
+                    'feature_title': instance.title,
+                    'feature_status': {
+                        'has_changed': True,
+                        'new_status': instance.status
+                    }
+                }
+            )
 
 
 @receiver(models.signals.post_save, sender='geocontrib.Comment')

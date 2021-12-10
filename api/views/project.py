@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
@@ -19,6 +20,9 @@ from api.utils.filters import AuthorizationLevelCodenameFilter
 from geocontrib.models import Authorization
 from geocontrib.models import Project
 from geocontrib.models import Subscription
+from geocontrib.models import FeatureType
+from geocontrib.models import BaseMap
+
 
 User = get_user_model()
 
@@ -48,8 +52,88 @@ class ProjectView(viewsets.ModelViewSet):
         serializer.save(creator=self.request.user)
 
 
-class ProjectThumbnailView(APIView):
+class ProjectDuplicate(APIView):
+    http_method_names = ['post', ]
+    serializer_class = ProjectCreationSerializer
 
+    PROJECT_COPY_RELATED = getattr(settings, 'PROJECT_COPY_RELATED', {})
+
+    def post(self, request, slug):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if serializer.is_valid():
+            project_template = Project.objects.filter(slug=slug).first()
+            instance = serializer.save(creator=request.user)
+
+            self._set_thumbnail(instance, serializer, project_template)
+            self._set_creator(instance)
+            self._duplicate_project_related_sets(instance, project_template)
+            self._duplicate_project_base_map(instance, project_template)
+            self._duplicate_project_authorization(instance, project_template)
+            serializer.save()
+
+            data = serializer.data
+            status = 201
+        else:
+            data = serializer.errors
+            status = 400
+        return Response(data=data, status=status)
+
+    def _duplicate_project_related_sets(self, instance, project_template):
+        copy_feature_types = self.PROJECT_COPY_RELATED.get('FEATURE_TYPE', False)
+        if project_template and isinstance(project_template, Project) and copy_feature_types:
+            for feature_type in project_template.featuretype_set.all():
+                # Pour manipuler une copie immuable
+                legit_feature_type = FeatureType.objects.get(pk=feature_type.pk)
+                feature_type.pk = None
+                feature_type.project = instance
+                feature_type.save()
+                for custom_field in legit_feature_type.customfield_set.all():
+                    custom_field.pk = None
+                    custom_field.feature_type = feature_type
+                    custom_field.save()
+
+    def _duplicate_project_base_map(self, instance, project_template):
+        copy_related = self.PROJECT_COPY_RELATED.get('BASE_MAP', False)
+        if project_template and isinstance(project_template, Project) and copy_related:
+            for base_map in project_template.basemap_set.all():
+                legit_base_map = BaseMap.objects.get(pk=base_map.pk)
+                base_map.pk = None
+                base_map.project = instance
+                base_map.save()
+                for ctx_layer in legit_base_map.contextlayer_set.all():
+                    ctx_layer.pk = None
+                    ctx_layer.base_map = base_map
+                    ctx_layer.save()
+
+    def _duplicate_project_authorization(self, instance, project_template):
+        """
+        Un signale est deja en place pour appliquer les permissions initiales
+        à la creation d'un projet:
+        - createur = rank 4
+        - autres = rank 1
+        Ici on ecrase ces permissions initiales avec celles du projet type parent
+        à l'exclusion de la permission relative au créateur de l'instance courante
+        """
+        copy_related = self.PROJECT_COPY_RELATED.get('AUTHORIZATION', False)
+        if project_template and isinstance(project_template, Project) and copy_related:
+            for auth in instance.authorization_set.exclude(user=instance.creator):
+                auth.level = Authorization.objects.get(
+                    user=auth.user, project=project_template).level
+                auth.save()
+
+    def _set_thumbnail(self, instance, form, project_template):
+        copy_related = self.PROJECT_COPY_RELATED.get('THUMBNAIL', False)
+        if hasattr(project_template, 'thumbnail') and copy_related:
+            instance.thumbnail = project_template.thumbnail
+
+    def _set_creator(self, instance):
+        instance.creator = self.request.user
+        return instance
+
+
+class ProjectThumbnailView(APIView):
     parser_classes = [
         MultiPartParser,
         FormParser

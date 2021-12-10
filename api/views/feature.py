@@ -3,6 +3,7 @@ import json
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Polygon
 from django.contrib.gis.geos.error import GEOSException
+from django.contrib.gis.db.models import Extent
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
@@ -15,6 +16,7 @@ from rest_framework.response import Response
 from rest_framework_mvt.views import BaseMVTView
 
 from api import logger
+from api.serializers.feature import FeatureDetailedAuthenticatedSerializer
 from api.serializers import FeatureDetailedSerializer
 from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureLinkSerializer
@@ -34,11 +36,11 @@ User = get_user_model()
 
 
 class FeatureView(
-#            mixins.ListModelMixin,
-#            mixins.RetrieveModelMixin,
-#            mixins.CreateModelMixin,
-#            mixins.UpdateModelMixin,
-#            mixins.DestroyModelMixin,
+            mixins.ListModelMixin,
+            mixins.RetrieveModelMixin,
+            mixins.CreateModelMixin,
+            mixins.UpdateModelMixin,
+            mixins.DestroyModelMixin,
             viewsets.GenericViewSet):
 
     lookup_field = 'feature_id'
@@ -54,7 +56,6 @@ class FeatureView(
     def get_queryset(self):
         queryset = super().get_queryset()
 
-
         project_slug = self.request.query_params.get('project__slug')
         if project_slug:
             project = get_object_or_404(Project, slug=project_slug)
@@ -67,17 +68,26 @@ class FeatureView(
             queryset = queryset.filter(feature_type__slug=feature_type_slug)
 
         if not feature_type_slug and not project_slug:
-            raise ValidationError(detail="Must provide parameter project__slug or feature_type__slug")
+            raise ValidationError(detail="Must provide parameter project__slug "
+                                         "or feature_type__slug")
+
+        title_contains = self.request.query_params.get('title__contains')
+        if title_contains:
+            queryset = queryset.filter(title__contains=title_contains)
+
+        title_icontains = self.request.query_params.get('title__icontains')
+        if title_icontains:
+            queryset = queryset.filter(title__icontains=title_icontains)
 
         return queryset
 
 
 class FeatureTypeView(
-#            mixins.ListModelMixin,
-#            mixins.RetrieveModelMixin,
-#            mixins.CreateModelMixin,
-#            mixins.UpdateModelMixin,
-#            mixins.DestroyModelMixin,
+            mixins.ListModelMixin,
+            mixins.RetrieveModelMixin,
+            mixins.CreateModelMixin,
+            mixins.UpdateModelMixin,
+            mixins.DestroyModelMixin,
             viewsets.GenericViewSet):
 
     lookup_field = 'slug'
@@ -113,6 +123,34 @@ class ProjectFeature(views.APIView):
     def get(self, request, slug):
         project = get_object_or_404(Project, slug=slug)
         features = Feature.handy.availables(request.user, project)
+        title_contains = self.request.query_params.get('title__contains')
+        if title_contains:
+            features = features.filter(title__contains=title_contains)
+
+        title_icontains = self.request.query_params.get('title__icontains')
+        if title_icontains:
+            features = features.filter(title__icontains=title_icontains)
+
+        feature_type__slug = self.request.query_params.get('feature_type__slug')
+        if feature_type__slug:
+            features = features.filter(feature_type__slug=feature_type__slug)
+
+        feature_id = self.request.query_params.get('feature_id')
+        if feature_id:
+            features = features.filter(feature_id=feature_id)
+        count = features.count()
+        ordering = self.request.query_params.get('ordering')
+        if ordering:
+            features = features.order_by(ordering)
+        limit = self.request.query_params.get('limit')
+        if limit:
+            features = features[:int(limit)]
+
+        _id = self.request.query_params.get('id')
+        if _id:
+            features = features.filter(pk=_id)
+
+
         format = request.query_params.get('output')
         if format and format == 'geojson':
             data = FeatureDetailedSerializer(
@@ -125,9 +163,93 @@ class ProjectFeature(views.APIView):
             serializers = FeatureListSerializer(features, many=True)
             data = {
                 'features': serializers.data,
+                'count': count
             }
         return Response(data, status=200)
 
+
+class ProjectFeaturePaginated(generics.ListAPIView):
+    queryset = Project.objects.all()
+    pagination_class = CustomPagination
+    lookup_field = 'slug'
+    http_method_names = ['get', ]
+    
+    
+    def filter_queryset(self, queryset):
+        """
+        Surchargeant ListModelMixin
+        """
+        status__value = self.request.query_params.get('status__value')
+        feature_type_slug = self.request.query_params.get('feature_type_slug')
+        title = self.request.query_params.get('title')
+
+        if status__value:
+            queryset = queryset.filter(status__icontains=status__value)
+        if feature_type_slug:
+            queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        return queryset
+        
+    def get_serializer_class(self):
+        format = self.request.query_params.get('output')
+        if format and format == 'geojson':
+            if self.request.user.is_authenticated:
+                return FeatureDetailedAuthenticatedSerializer
+            return FeatureDetailedSerializer
+        return FeatureListSerializer
+        
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        project = get_object_or_404(Project, slug=slug)
+
+        queryset = Feature.handy.availables(user=self.request.user, project=project)
+
+        queryset = queryset.select_related('creator')
+        queryset = queryset.select_related('feature_type')
+        queryset = queryset.select_related('project')
+        return queryset
+
+class ProjectFeatureBbox(generics.ListAPIView):
+    queryset = Project.objects.all()
+    lookup_field = 'slug'
+    http_method_names = ['get', ]
+
+
+    def filter_queryset(self, queryset):
+        """
+        Surchargeant ListModelMixin
+        """
+        status__value = self.request.query_params.get('status__value')
+        feature_type_slug = self.request.query_params.get('feature_type_slug')
+        title = self.request.query_params.get('title')
+
+        if status__value:
+            queryset = queryset.filter(status__icontains=status__value)
+        if feature_type_slug:
+            queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        return queryset
+
+    def get_queryset(self):
+        slug = self.kwargs.get('slug')
+        project = get_object_or_404(Project, slug=slug)
+
+        queryset = Feature.handy.availables(user=self.request.user, project=project)
+
+        queryset = queryset.select_related('creator')
+        queryset = queryset.select_related('feature_type')
+        queryset = queryset.select_related('project')
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        bbox = None
+        queryset = self.filter_queryset(self.get_queryset()).aggregate(Extent('geom'))
+        geom = queryset['geom__extent'];
+        if geom :
+            bbox = {'minLon': geom[0], 'minLat': geom[1], 'maxLon' : geom[2], 'maxLat': geom[3] }
+        return Response(bbox)
 
 class ExportFeatureList(views.APIView):
 
