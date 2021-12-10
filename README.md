@@ -66,15 +66,19 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * LOGIN_URL https://docs.djangoproject.com/fr/3.1/ref/settings/#login-url
 
 Éditer les paramètres spécifiques à l'outil dans config/settings.py :
-* BASE_URL : URL du site, par exemple "https://geocontrib.deme.neogeo.fr"
-* DEFAULT_SENDING_FREQUENCY : fréquence d'envoi des notifications par email (never/instantly/daily/weekly)
-* APPLICATION_NAME : nom de l'application telle qu'elle apparaît dans l'IHM
-* APPLICATION_ABSTRACT : description de l'application en langage naturel
-* IMAGE_FORMAT : formats autorisés des fichiers téléversés dans l'application
-* FILE_MAX_SIZE : taille maximale des fichiers téléversés dans l'application
-* DEFAULT_BASE_MAP : configuration du fond de carte par défaut
-* PROJECT_COPY_RELATED : configuration des modèles de projets
-* MAGIC\_IS\_AVAILABLE (default: False) active la vérification des images téléversées.
+* BASE_URL : URL du site, par exemple "https://geocontrib.deme.neogeo.fr" ;
+* DEFAULT_SENDING_FREQUENCY : fréquence d'envoi des notifications par email (never/instantly/daily/weekly) ;
+* APPLICATION_NAME : nom de l'application telle qu'elle apparaît dans l'IHM ;
+* APPLICATION_ABSTRACT : description de l'application en langage naturel ;
+* IMAGE_FORMAT : formats autorisés des fichiers téléversés dans l'application ;
+* FILE_MAX_SIZE : taille maximale des fichiers téléversés dans l'application ;
+* DEFAULT_BASE_MAP : configuration du fond de carte par défaut ;
+* PROJECT_COPY_RELATED : configuration des modèles de projets ;
+* MAGIC\_IS\_AVAILABLE (default: False) active la vérification des images téléversées ;
+* LOGO_PATH : chemin vers le logo affiché en page d'accueil ;
+* FAVICON_PATH : chemin vers la favicon affichée dans l'onglet du navigateur ;
+* DISABLE_LOGIN_BUTTON : désactive le bouton de connexion (utile dans le cadre du SSO)
+* LOG_URL : URL de connexion externe (utile dans le cadre du SSO)
 
 Copier le contenu du fichier config_sample/urls.py dans config/urls.py
 
