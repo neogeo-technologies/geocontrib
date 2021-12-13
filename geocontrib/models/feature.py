@@ -210,6 +210,10 @@ class FeatureType(models.Model):
         verbose_name='Couleur', max_length=7, blank=True, null=True
     )
 
+    icon = models.CharField(
+        verbose_name='Icône', max_length=128, blank=True, null=True
+    )
+
     colors_style = JSONField(
         "Style Champs coloré", blank=True, null=True
     )

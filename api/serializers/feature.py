@@ -66,6 +66,7 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
             'slug',
             'geom_type',
             'color',
+            'icon',
             'colors_style',
             'project',
             'customfield_set',
