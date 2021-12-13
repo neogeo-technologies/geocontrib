@@ -11,7 +11,7 @@
 
     "VUE_APP_RELOAD_INTERVAL": 15000,
 
-    "VUE_APP_LOGIN_URL": {{ VUE_APP_LOGIN_URL|default('""', true) }},
+    "VUE_APP_LOGIN_URL": "{{ VUE_APP_LOGIN_URL|default('', true) }}",
     "VUE_APP_DISABLE_LOGIN_BUTTON": {{ DISABLE_LOGIN_BUTTON|default('false', true) }},
 
     "DEFAULT_BASE_MAP":{
