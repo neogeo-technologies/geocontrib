@@ -26,3 +26,6 @@ variables:
 
   VUE_APP_LOGIN_URL:
     env_config_front: LOG_URL
+
+  BASE_URL:
+    env_config_front: BASE_URL
