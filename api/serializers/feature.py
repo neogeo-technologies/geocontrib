@@ -17,6 +17,7 @@ from geocontrib.models import FeatureLink
 from geocontrib.models import FeatureType
 from geocontrib.models import Project
 
+# from deepdiff import DeepDiff
 
 User = get_user_model()
 
@@ -99,9 +100,25 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
         return feature_type
 
     def update(self, instance, validated_data):
+
+        # Look for symbology differences
+        comp_keys = ['color', 'icon', 'colors_style']
+        # is_symbology_edited = not all(DeepDiff(self.data.get(key), validated_data.get(key), ignore_order=True) for key in comp_keys)
+        is_symbology_edited = not all(self.data.get(key) == validated_data.get(key) for key in comp_keys)
+        print(is_symbology_edited)
+
         if not instance.is_editable:
-            raise serializers.ValidationError({
-                'error': "Vous ne pouvez pas éditer ce type de signalement. "})
+
+            if is_symbology_edited:
+                # Handle symbology edition
+                setattr(instance, 'color', validated_data.get('color'))
+                setattr(instance, 'icon', validated_data.get('icon'))
+                setattr(instance, 'colors_style', validated_data.get('colors_style'))
+
+            else:
+                raise serializers.ValidationError({
+                    'error': "Vous ne pouvez pas éditer ce type de signalement. "})
+
         customfield_set = validated_data.pop('customfield_set', None)
         try:
             for k, v in validated_data.items():
