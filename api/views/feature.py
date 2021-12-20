@@ -6,6 +6,7 @@ from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.db.models import Extent
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from rest_framework import filters
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import permissions
@@ -173,8 +174,7 @@ class ProjectFeaturePaginated(generics.ListAPIView):
     pagination_class = CustomPagination
     lookup_field = 'slug'
     http_method_names = ['get', ]
-    
-    
+
     def filter_queryset(self, queryset):
         """
         Surchargeant ListModelMixin
@@ -198,12 +198,15 @@ class ProjectFeaturePaginated(generics.ListAPIView):
                 return FeatureDetailedAuthenticatedSerializer
             return FeatureDetailedSerializer
         return FeatureListSerializer
-        
+
     def get_queryset(self):
         slug = self.kwargs.get('slug')
         project = get_object_or_404(Project, slug=slug)
 
         queryset = Feature.handy.availables(user=self.request.user, project=project)
+        ordering = self.request.query_params.get('ordering')
+        if ordering:
+            queryset = queryset.order_by(ordering)
 
         queryset = queryset.select_related('creator')
         queryset = queryset.select_related('feature_type')
