@@ -70,9 +70,11 @@ class AuthorizationAdmin(admin.ModelAdmin):
 
     def full_name(self, obj):
         return " ".join([obj.user.last_name, obj.user.first_name])
-
+    
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display=('project',)
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Authorization, AuthorizationAdmin)
-admin.site.register(Subscription)
+admin.site.register(Subscription, SubscriptionAdmin)
 # admin.site.register(UserLevelPermission)

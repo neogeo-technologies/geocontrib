@@ -419,10 +419,12 @@ class ImportTaskAdmin(admin.ModelAdmin):
         messages.info(request, 'Le traitement des données est en cours.')
     import_geojson.short_description = "Appliquer les opérations d'import"
 
-
+class AttachmentAdmin(admin.ModelAdmin):
+    list_display=('title', 'project')
+    
 admin.site.register(CustomField, CustomFieldAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(FeatureType, FeatureTypeAdmin)
 admin.site.register(FeatureLink, FeatureLinkAdmin)
 admin.site.register(ImportTask, ImportTaskAdmin)
-admin.site.register(Attachment)
+admin.site.register(Attachment, AttachmentAdmin)
