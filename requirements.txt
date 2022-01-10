@@ -1,6 +1,6 @@
 celery<5.2.0
-Django>=2.2.21,<2.3.0
-djangorestframework-gis==0.14
+Django==3.2
+djangorestframework-gis==0.18
 djangorestframework>=3.11.2,<3.12.0
 # waiting https://github.com/corteva/djangorestframework-mvt/issues/10 to be merged
 git+https://github.com/neogeo-technologies/djangorestframework-mvt.git@138a09f092c04247f3f9dfc4546e5dad5d04ccc6#egg=djangorestframework-mvt
