@@ -1,3 +1,4 @@
+from django.core import exceptions
 from rest_framework import filters
 
 
@@ -12,4 +13,39 @@ class AuthorizationLevelCodenameFilter(filters.BaseFilterBackend):
         if level__codename__not:
             values = [param.strip() for param in level__codename__not.split(',')]
             queryset = queryset.exclude(level__user_type_id__in=values)
+        return queryset
+
+class ProjectsModerationFilter(filters.BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        moderation = request.query_params.get('moderation')
+        if moderation:
+            if moderation == 'true':
+                queryset = queryset.filter(moderation=True)
+            if moderation == 'false':
+                queryset = queryset.filter(moderation=False)
+        return queryset
+
+class ProjectsAccessLevelFilter(filters.BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        access_level = request.query_params.get('access_level')
+        if access_level:
+            values = [param.strip() for param in access_level.split(',')]
+            try:
+                queryset = queryset.filter(access_level_pub_feature=values)
+            except exceptions.FieldError:
+                queryset = queryset.none()
+        return queryset
+
+class ProjectsUserAccessLevelFilter(filters.BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        user_access_level = request.query_params.get('user_access_level')
+        if user_access_level:
+            values = [param.strip() for param in user_access_level.split(',')]
+            try:
+                queryset = queryset.filter(access_level_pub_feature=values)
+            except exceptions.FieldError:
+                queryset = queryset.none()
         return queryset

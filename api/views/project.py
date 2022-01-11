@@ -1,9 +1,10 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import Http404
 from django.conf import settings
+from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework import generics
@@ -17,6 +18,10 @@ from api.serializers.project import ProjectAuthorizationSerializer
 from api.utils.permissions import ProjectThumbnailPermission
 from api.utils.validators import validate_image_file
 from api.utils.filters import AuthorizationLevelCodenameFilter
+from api.utils.filters import ProjectsModerationFilter
+from api.utils.filters import ProjectsAccessLevelFilter
+from api.utils.filters import ProjectsUserAccessLevelFilter
+from api.utils.paginations import SimplePagination
 from geocontrib.models import Authorization
 from geocontrib.models import Project
 from geocontrib.models import Subscription
@@ -32,7 +37,18 @@ class ProjectView(viewsets.ModelViewSet):
     Get all project and can create one
     """
     lookup_field = 'slug'
+    pagination_class = SimplePagination
     queryset = Project.objects.all()
+    filter_backends = [
+        filters.SearchFilter,
+        ProjectsModerationFilter,
+        ProjectsAccessLevelFilter,
+        ProjectsUserAccessLevelFilter
+    ]
+    search_fields = [
+        'slug',
+        'title',
+    ]
 
     def get_serializer_class(self):
         if self.action == 'list':
