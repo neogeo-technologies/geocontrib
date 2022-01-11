@@ -1,4 +1,3 @@
-from django.core import exceptions
 from rest_framework import filters
 
 
@@ -31,11 +30,7 @@ class ProjectsAccessLevelFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         access_level = request.query_params.get('access_level')
         if access_level:
-            values = [param.strip() for param in access_level.split(',')]
-            try:
-                queryset = queryset.filter(access_level_pub_feature=values)
-            except exceptions.FieldError:
-                queryset = queryset.none()
+            queryset = queryset.filter(access_level_pub_feature_id=access_level)
         return queryset
 
 class ProjectsUserAccessLevelFilter(filters.BaseFilterBackend):
@@ -43,9 +38,5 @@ class ProjectsUserAccessLevelFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         user_access_level = request.query_params.get('user_access_level')
         if user_access_level:
-            values = [param.strip() for param in user_access_level.split(',')]
-            try:
-                queryset = queryset.filter(access_level_pub_feature=values)
-            except exceptions.FieldError:
-                queryset = queryset.none()
+            queryset = queryset.filter(access_level_pub_feature_id=user_access_level)
         return queryset
