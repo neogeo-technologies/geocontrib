@@ -1,10 +1,10 @@
 # Geocodeur
 
-Un outil de géocodage est disponible sur les cartes interactive de l'application. 
+Un outil de géocodage est disponible sur les cartes interactive de l'application.
 
 ## Configuration
 
-Plusieurs fournisseurs de données peuvent être utilisés selon la configuration de l'application. 
+Plusieurs fournisseurs de données peuvent être utilisés selon la configuration de l'application.
 Exemple de configuration pour utiliser l'API Adresse de [geo.api.gouv](https://geo.api.gouv.fr/adresse) :
 
 ```
@@ -21,7 +21,7 @@ SELECTED_GEOCODER = {
 }
 ```
 
-Voici la liste des fournisseurs diposnibles, avec leur valeur à utiliser dans le fichier `settings.py` :
+Voici la liste des fournisseurs disponibles, avec leur valeur à utiliser dans le fichier `settings.py` :
 
 * API Adresse de [geo.api.gouv](https://geo.api.gouv.fr/adresse): `'addok'`
 * OSM [Nominatim](https://nominatim.org/release-docs/develop/api/Overview/): `'nominatim'`
@@ -36,3 +36,8 @@ https://github.com/perliedman/leaflet-control-geocoder
 
 Les adaptations de ce projet pour GéoContrib ont été déposées dans le dépôt suivant :
 https://github.com/neogeo-technologies/leaflet-control-geocoder
+
+
+---
+
+[Retour à l'accueil](<README.md>)
