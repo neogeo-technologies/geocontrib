@@ -3,8 +3,9 @@
 Autorisations attribuables par projet :
 * Utilisateur connecté (utilisateur authentifié)
 * Contributeur
+* SuperContributeur
 * Modérateur
-* Administrateur projet 
+* Administrateur projet
 
 Autorisations indépendantes des projets :
 * Super utilisateur
@@ -35,11 +36,16 @@ Changements de statuts réalisables par un contributeur :
 * brouillon -> archivé
 * publié -> archivé
 * publié -> brouillon
-* publié -> en attente de publication (automatique si le projet est modéré et que le signalement a été édité par son 
+* publié -> en attente de publication (automatique si le projet est modéré et que le signalement a été édité par son
 auteur)
 * archivé -> publié (si le projet n'est pas modéré)
 * archivé -> brouillon
 * archivé -> en attente de publication (automatique si le projet est modéré et que le signalement a été édité par son auteur)
+
+### Super Contributeur
+
+Un supercontributeur a les mêmes droits qu'un contributeur, mais il peut interagir avec les contributions des autres utilisateurs comme s'il s'agissait de ses propres contributions, sauf en ce qui concerne la suppression : il ne peut supprimer que les signalements dont il est l'auteur.
+
 
 ### Modérateur
 
@@ -47,9 +53,9 @@ Un modérateur a les droits d'un contributeur ainsi que des droits supplémentai
 Un utilisateur peut devenir modérateur d'un projet uniquement si le projet est modéré.
 
 Il peut :
-* Changer le statut des signalements, y compris pour ceux dont il n'est pas l'auteur
-* Modifier les attributs des signalements, y compris pour ceux dont il n'est pas l'auteur
-* Ajouter et supprimer des pièces jointes pour les signalements, y compris pour ceux dont il n'est pas l'auteur
+* Changer le statut des signalements, y compris pour ceux dont il n'est pas l'auteur si les signalements ne sont pas en brouillon ;
+* Modifier les attributs des signalements, y compris pour ceux dont il n'est pas l'auteur si les signalements ne sont pas en brouillon ;
+* Ajouter et supprimer des pièces jointes pour les signalements, y compris pour ceux dont il n'est pas l'auteur si les signalements ne sont pas en brouillon.
 
 Changements de statuts réalisables par un modérateur :
 * publié -> archivé
@@ -69,6 +75,7 @@ Il peut :
 * Ajouter un nouveau type de signalements au projet
 * Modifier les autorisations des utilisateurs du projet
 * Configurer les fonds cartographiques utilisés dans les cartes du projet
+* Supprimer tous les signalements
 
 
 ## Autorisations indépendantes des projets
@@ -87,7 +94,7 @@ Un super-utilisateur peut :
 Un gestionnaire métier peut :
 * Créer de nouveaux projets
 
-Le créateur d'un nouveau projet en devient automatiquement administrateur projet du projet en question. 
+Le créateur d'un nouveau projet en devient automatiquement administrateur projet du projet en question.
 
 
 ### Statut équipe
@@ -95,3 +102,6 @@ Le créateur d'un nouveau projet en devient automatiquement administrateur proje
 Un utilisateur avec le statut équipe peut se connecter à l'interface administrateur.
 Il accède aux fonctionnalités de l'interface selon les permissions qui lui ont été accordées.
 
+---
+
+[Retour à l'accueil](<README.md>)
