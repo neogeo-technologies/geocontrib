@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [2.3.2] - 2022-01-12
+
+### Evolutions
+
+- Redmine 12739 : Amélioration de tables Django
+- Redmine 11912 : Permettre la suppression d'un projet et/ou d'un type de signalement
+
+
+### Evolution en BETA
+
+ - Redmine 11087 : Biblio de pictos - Signalements ponctuels
+
+
+### Corrections
+
+- Redmine 12030 : Ajout d'un commentaire - Empêcher la création du commentaire si le commentaire est vide
+- Redmine 12559 : Page de connexion - Il est possible d'accéder à la page de connexion alors qu'on est connecté
+- Redmine 11992 : Faire marcher l'envoi de mail
+- Redmine 12702 : Liaison entre les signalement - Champ de sélection du signalement sensible à la casse
+- Redmine 12339 : Import de signalements - Ne pas autoriser l’import de signalements « en cours de publication » dans un projet non-modéré
+
+
+
 ## [2.3.1] - 2021-12-13
 
 ### Corrections
