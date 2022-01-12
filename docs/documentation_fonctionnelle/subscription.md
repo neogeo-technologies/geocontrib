@@ -12,8 +12,12 @@ La périodicité des emails dépend de la configuration utilisée à l'installat
 
 ## Gestion des abonnements dans le BO Django
 
-Dès lors qu'un utilisateur s'abonne a un projet, un "objet abonnement" (Subscription object) est ajouté dans la table des abonnements visible depuis Django, correspondant à la liste d'abonnées pour ce projet.
+Dès lors qu'un utilisateur s'abonne a un projet, un `objet abonnement` (Subscription object) est ajouté dans la table des abonnements visible depuis Django, correspondant à la liste d'abonnées pour ce projet.
 
 Pour chaque projet, il est possible de sélectionner / désélectionner les utilisateurs qui doivent bénéficier de l'abonnement au projet en éditant l'objet Abonnement correspondant.
 
 Pour désabonner tous les utilisateurs d'un projet, il suffit de supprimer l'objet Abonnement.
+
+---
+
+[Retour à l'accueil](<README.md>)

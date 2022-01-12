@@ -4,7 +4,7 @@
 
 Les administrateurs de projets (et utilisateurs avec droits supérieurs) ont la possibilité de créer un type de signalement à partir de la structure d'un fichier.
 
-Depuis la page d'accueil d'un projet, le bouton "Créer un type de signalements à partir d'un fichier GeoJSON" permet à l'utilisateur d'uploader un fichier stocké sur son poste local. Suite au chargement, la structure du fichier est lue et le modèle de données du type de signalement est proposé à l'utilisateur à travers le formulaire d'édition.
+Depuis la page d'accueil d'un projet, le bouton _"Créer un type de signalements à partir d'un fichier GeoJSON"_ permet à l'utilisateur d'uploader un fichier stocké sur son poste local. Suite au chargement, la structure du fichier est lue et le modèle de données du type de signalement est proposé à l'utilisateur à travers le formulaire d'édition.
 L'administrateur peut préciser la géométrie, le titre du type de signalement, et vérifier ou modifier chacun des champs personnalisés.
 
 En bas de page, il peut choisir :
@@ -39,3 +39,7 @@ Cette fonction permet d'exporter les signalements d'un type de signalements sous
 * L'export ne contient aucune information relative aux évènements et aux auteurs des signalements.
 * L'export ne contient aucune référence vers les pièces jointes.
 * L'export ne contient aucune information relative aux styles cartographiques des types de signalements.
+
+---
+
+[Retour à l'accueil](<README.md>)

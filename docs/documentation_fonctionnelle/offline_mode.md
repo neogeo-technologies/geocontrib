@@ -4,7 +4,9 @@ Le mode déconnecté est proposé dans l'application depuis sa version 2.0. Il p
 
 Lorsque la connexion est perdue, l'utilisateur peut continuer à naviguer dans l'application, à condition que du cache ait été généré au préalable.
 
-Toutes les fonctionnalités ne sont pas conservées lorsque l'on est déconnecté.
+Il peut saisir des signalements via les formulaires de création. A l'enregistrement, il est informé d'une erreur de connexion au serveur. Sur la page d'accueil, le nombre de modifications en attente est indiqué. Lorsque la connexion est rétablie, un bouton _"Envoyer au serveur"_ lui permet d'enregistrer ses nouveaux signalements.
+
+Toutes les fonctionnalités ne sont cependant pas conservées lorsque l'on est déconnecté.
 
 ### Fonctionnalités suspendues en mode offline
 
@@ -24,3 +26,7 @@ Toutes les fonctionnalités ne sont pas conservées lorsque l'on est déconnect�
 -   Créer un signalement à partir de sa localisation GPS
 -   Dessiner un signalement sur la carte
 -   Modifier un signalement existant
+
+---
+
+[Retour à l'accueil](<README.md>)

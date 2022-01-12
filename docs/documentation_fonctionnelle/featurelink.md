@@ -1,9 +1,9 @@
 # Liaisons entre signalements
 
 Il est possible de créer trois types de liaisons entre un signalement A et un signalement B :
-* "doublon"
-* "dépend de"
-* "remplace"
+* **"doublon"**
+* **"dépend de"**
+* **"remplace"**
 
 Pour chaque liaison, un adjectif inverse est défini :
 * Si la liaison "doublon de B" est affectée à A, la liaison "doublon de A" est affectée à B.
@@ -12,7 +12,7 @@ Pour chaque liaison, un adjectif inverse est défini :
 
 ## Ajout d'une liaison
 
-Pour ajouter une liaison depuis le formulaire d'édition d'un signalement, il faut cliquer sur le bouton "Ajouter une liaison" dans la rubrique "Signalements liés", et sélectionner un autre signalement appartenant au même type de signalement.
+Pour ajouter une liaison depuis le formulaire d'édition d'un signalement, il faut cliquer sur le bouton _"Ajouter une liaison"_ dans la rubrique _"Signalements liés"_, et sélectionner un autre signalement appartenant au même type de signalement.
 
 ## Ajout d'une liaison de type doublon suite à un import
 
@@ -20,4 +20,8 @@ Suite à un import de données par upload d'un fichier GeoJSON, si deux signalem
 
 ## Depuis l'interface d'administration de Django
 
-Dans l'interface d'administration, les super-utilisateurs peuvent rechercher, publier, supprimer et archiver des signalements liés sous le menu "Liaisons entre signalements".
+Dans l'interface d'administration, les super-utilisateurs peuvent rechercher, publier, supprimer et archiver des signalements liés sous le menu _"Liaisons entre signalements"_.
+
+---
+
+[Retour à l'accueil](<README.md>)

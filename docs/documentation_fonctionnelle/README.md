@@ -35,8 +35,8 @@ Un signalement est une information géolocalisée décrivant un objet géographi
 ### Type de signalements
 
 Un type de signalements correspond à une modélisation particulière (pour un contexte métier particulier) des signalements :
-* un type de géométrie donné : point, ligne ou polygone
-* des champs spécifiques déclarés par le créateur du type de signalements (ces champs s'ajoutent aux champs
+* **un type de géométrie** donné : point, ligne ou polygone
+* **des champs spécifiques** déclarés par le créateur du type de signalements (ces champs s'ajoutent aux champs
 obligatoires) que l'on retrouve pour tous les types de signalements, à savoir le titre, la description et le statut du signalement.
 
 Chaque type de signalements est également caractérisé par une couleur qui est utilisé pour la présentation des signalements sur les cartes. Les signalements de type ponctuel peuvent également être associés à un symbole particulier.
@@ -46,18 +46,16 @@ Le modèle de données d'un type de signalement peut être modifié tant qu'aucu
 ### Statut d'un signalement
 
 Chaque signalement possède un statut indiquant son état en terme de publication :
-* brouillon : signalement non publié. Permet au créateur du signalement d'éditer progressivement sur un signalement avant de le publier ou de demander sa publication ;
-* en attente de publication : statut d'un signalement dont l'auteur a demandé sa publication (uniquement si le projet est modéré) ;
-* publié : donne la visibilité la plus large possible au signalement ;
-* archivé : correspond à un signalement obsolète mais que l'on souhaite toutefois conserver en base.
+* **brouillon** : signalement non publié. Permet au créateur du signalement d'éditer progressivement sur un signalement avant de le publier ou de demander sa publication ;
+* **en attente de publication** : statut d'un signalement dont l'auteur a demandé sa publication (uniquement si le projet est modéré) ;
+* **publié** : donne la visibilité la plus large possible au signalement ;
+* **archivé** : correspond à un signalement obsolète mais que l'on souhaite toutefois conserver en base.
 
 La liste ci-dessus est donnée dans l'ordre logique du cycle de vie d'un signalement.
 
 ### Commentaire
 
-À l’image de ce qui existe sur les outils en ligne de gestion de tickets (Github et Redmine par exemple) chaque
-signalement peut être commenté par son auteur et par les autres usagers du projet afin de permettre l’amélioration de
-la base de données de manière collaborative. Chaque commentaire peut être accompagné de pièces jointes.
+À l’image de ce qui existe sur les outils en ligne de gestion de tickets (Github et Redmine par exemple) chaque signalement peut être commenté par son auteur et par les autres usagers du projet afin de permettre l’amélioration de la base de données de manière collaborative. Chaque commentaire peut être accompagné de pièces jointes.
 
 ### Pièce jointe
 
@@ -66,29 +64,29 @@ Il est possible d'associer un document numérique à un signalement ou à un com
 ### Évènements et notifications
 
 La modification d'un signalement, son changement de statut, l'ajout d'un commentaire sont enregistrés en base de données pour :
-* mettre à jour la liste des évènements qui apparaît dans la fiche du signalement dans la rubrique "Activité et commentaires" ;
+* mettre à jour la liste des évènements qui apparaît dans la fiche du signalement dans la rubrique _"Activité et commentaires"_ ;
 * envoyer des notifications par messages électroniques aux modérateurs, administrateurs ainsi que les autres utilisateurs qui se sont abonnés au projet.
 
 
 ## Architecture
 
-* Back-Office Django
+* **Back-Office Django**
 
 L'application est développée en Python à l'aide de la bibliothèque Django. Les administrateurs Django (super-utilisateurs) bénéficient d'une interface d'administration leur permettant de réaliser un certains nombre de tâche d'administration.
 
-* Base de données PostgreSQL/PostGIS
+* **Base de données PostgreSQL/PostGIS**
 
 L'application alimente une base de données PostgreSQL/PostGIS. Depuis le BO Django, les super-utilisateurs peuvent configurer des vues PostgreSQL relatives aux signalements créés dans chacun des projets.
 
 Cf. [Accès aux données PostgreSQL/PostGIS](external_access.md)
 
-* Interface web VueJS
+* **Interface web VueJS**
 
 Depuis la version 2.0 l'interface web utilise la bibliothèque VueJS. Cette bibliothèque permet aux utilisateurs d'utiliser l'application GeoContrib en 'mode déconnecté'.
 
 Cf. [Mode déconnecté](offline_mode.md)
 
-* Librairies cartographiques
+* **Librairies cartographiques**
 
 Les interfaces cartographiques de l'application utilisent la bibliothèque Leaflet. Par ailleurs, un outil de géocodage est disponible sur les cartes interactive de l'application.
 
@@ -102,9 +100,8 @@ Cf. [Géocodage](geocoder.md)
 La page d'accueil de l'application contient :
 * un bandeau horizontal avec :
   * le logo et le nom de l'application (cliquable pour revenir à la page d'accueil de l'application depuis n'importe quelle autre page),
-  * si aucun utilisateur n'est connecté : un bouton "Se connecter" permettant à l'utilisateur de
-  s'authentifier,
-  * si un utilisateur est connecté : le nom de l'utilisateur courant et un bouton de déconnexion. Un clic sur le nom de l'utilisateur renvoie vers sa page "Mon compte"
+  * si aucun utilisateur n'est connecté : un bouton _"Se connecter"_ permettant à l'utilisateur de s'authentifier,
+  * si un utilisateur est connecté : le nom de l'utilisateur courant et un bouton de déconnexion. Un clic sur le nom de l'utilisateur renvoie vers sa page _"Mon compte"_
 * un bouton de création d'un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs);
 * un bouton permettant d'accéder à la liste des modèles de projet pour créer un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs) - cf. [Projets modèles](project_template.md);
 * la liste des projets existants avec une courte description et quelques indicateurs. Un clic sur un projet renvoie vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un message d'erreur lui est présenté.
@@ -168,7 +165,7 @@ La page de description d'un type de signalement (accessible via la page d'accuei
 * Les derniers signalements créés pour ce type. Un clic sur un signalement renvoie vers la  page de consultation du signalement associé.
 
 Au-delà de ces informations, cette page propose également des actions spécifiques :
-* Voir tous les signalements : renvoie vers la page de consultation "Liste & Carte" des signalements du projet ;
+* Voir tous les signalements : renvoie vers la page de consultation _"Liste & Carte"_ des signalements du projet ;
 * Ajouter un signalement : création d'un signalement de ce type. Cette fonction n'est proposée que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
 * Import de signalement : création de signalements par l'import d'un fichier GeoJSON conforme au modèle de données spécifique du type de signalements. Cette fonction n'est active que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
 * Export des signalements : enregistrement des signalements du type de signalements courant sous la forme d'un fichier GeoJSON. Seuls les signalements que l'utilisateur courant a le droit de consulter sont exportés.
@@ -178,35 +175,36 @@ Cf. [Imports et exports de signalements](import_export.md).
 ### Page de consultation des signalements 'Liste & Carte'
 
 La page de consultation des signalements d'un projet propose 2 vues (par l'intermédiaire des pictogrammes en haut de la page) :
-* une vue cartographique :
+* **une vue cartographique** :
   * présentation de l'ensemble des signalement visibles de l'utilisateur (dépend de ses autorisations par rapport au projet).
   * possibilité de zoomer et de se déplacer dans la carte,
   * consultation des caractéristiques principales d'un signalement dans une petite infobulle à l'aide d'un simple clic,
   * dans cette info-bulle, le clic sur le titre renvoie vers la fiche détaillée du signalement,
   * toujours dans cette info-bulle, le clic sur le type de signalements renvoie vers la fiche détaillée du signalement.
-* une vue tabulaire paginée :
+
+* **une vue tabulaire paginée** :
   * tri par ordre chronologique inverse (les signalements les plus récents sont affichés en premier),
   * présentation des caractéristiques principales : statut (représenté par un pictogramme), type de signalements, titre, date de dernière modification, auteur du signalement et dernier éditeur,
   * case à cocher, permettant à l'utilisateur courant de sélectionner les signalements dont il est l'auteur (ou tous les signalements s'il est administrateur projet ou super-utilisateur). Un pictogramme en forme de poubelle permet alors à l'utilisateur de supprimer sa sélection en un clic.
   * le clic sur le titre renvoie vers la fiche détaillée du signalement,
   * le clic sur le type de signalements renvoie vers la fiche détaillée du signalement,
 
-Chacune d'entre elles propose un bloc "Filtres" permettant à l'utilisateur de réduire le nombre de signalements à ceux qu'il recherche :
+Chacune d'entre elles propose un bloc _"Filtres"_ permettant à l'utilisateur de réduire le nombre de signalements à ceux qu'il recherche :
 * filtre sur le type de signalements ;
 * filtre sur le statut des signalements ;
 * filtre textuel recherchant la chaîne de caractères saisie par l'utilisateur dans le titre des signalements.
 
 ### Formulaire de création / édition d'un signalement
 
-Les utilisateurs contributeurs ou de niveau supérieur peuvent ajouter des signalements depuis la page d'accueil, la page d'un type de signalements ou la page d'un signalement à l'aide du pictogramme "+" .
+Les utilisateurs contributeurs ou de niveau supérieur peuvent ajouter des signalements depuis la page d'accueil, la page d'un type de signalements ou la page d'un signalement à l'aide du pictogramme _"+"_ .
 
 Le formulaire d'édition permet à l'utilisateur de saisir un nom, un statut, une description ainsi que de renseigner l'ensemble des informations relatives aux champs personnalisés définis pour ce type de signalement.
 
 Pour tous les types de signalements, une interface cartographique permet de numériser le signalement. L'utilisateur bénéficie d'une fonction de recherche (cf.[Géocodage](geocoder.md)) et a la possibilité de jouer sur l'affichage des fonds de carte (cf. [Fonds cartographiques](basemaps.md)) configurés par l'administrateur du projet (ordre des couches, opacités, etc).
 
 Pour les signalements de type ponctuels, l'utilisateur peut également :
-* utiliser sa géolocalisation (en autorisant le navigateur à utiliser la localisation) et en cliquant sur le bouton "Positionner le signalement à partir de votre géolocalisation" ;
-* utiliser une photographie contenant des informations de localisation (tags EXIF associés à une photographie prise avec un appareil équipé d'un GPS) en cliquant sur le bouton "Importer une image géoréférencée".
+* utiliser sa géolocalisation (en autorisant le navigateur à utiliser la localisation) et en cliquant sur le bouton _"Positionner le signalement à partir de votre géolocalisation"_ ;
+* utiliser une photographie contenant des informations de localisation (tags EXIF associés à une photographie prise avec un appareil équipé d'un GPS) en cliquant sur le bouton _"Importer une image géoréférencée"_ .
 
 ### Page de consultation d'un signalement
 
@@ -251,6 +249,6 @@ d'autorisation.
 
 ### Pages statiques du bandeau du bas
 
-Le bandeau du bas propose deux pages statiques "Mentions légales" et "Aide", modifiables par les super-utilisateurs depuis l'interface administrateur Django.
+Le bandeau du bas propose deux pages statiques _"Mentions légales"_ et _"Aide"_, modifiables par les super-utilisateurs depuis l'interface administrateur Django.
 
 Cf. Plus de détail sur le module des [pages statiques](flatpages.md) et sur leur configuration.

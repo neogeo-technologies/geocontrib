@@ -95,7 +95,7 @@ L'opacité d'une couche peut être modulée à l'aide de l'option `opacity`.
 
 ## Fonds cartographiques
 
-Chaque projet dispose de sa propre configuration des fonds cartographiques. Cette fonction est accessible aux administrateurs de projet via le menu "Fonds cartographiques".
+Chaque projet dispose de sa propre configuration des fonds cartographiques. Cette fonction est accessible aux administrateurs de projet via le menu _"Fonds cartographiques"_.
 
 Un fond cartographique est une liste de couches ordonnées (couches décrites plus haut et mise à disposition des administrateurs des projets par les administrateurs de l'outil). Ces couches sont uniquement affichées sous forme d'images dans les cartes. Elles ne peuvent pas être utilisées comme couches d'accrochage lors de la saisie (aucune fonction d'accrochage n'existe dans l'application).
 
@@ -109,7 +109,7 @@ Lors de la création / l'édition d'un fond cartographique, il est possible de r
 
 Si cette case est cochée, la couche pourra être interrogée par les utilisateurs depuis les cartes du projet.
 
-Depuis la carte (visible dans l'onglet "Liste et carte" ou dans le formulaire d'ajout de signalement), l'utilisateur accède à la liste des fonds en cliquant sur l'icône des fonds (losanges empilés) située en haut à gauche.
+Depuis la carte (visible dans l'onglet _"Liste et carte"_ ou dans le formulaire d'ajout de signalement), l'utilisateur accède à la liste des fonds en cliquant sur l'icône des fonds (losanges empilés) située en haut à gauche.
 Au clic sur l’icône, la liste des fonds s'affiche sur la partie gauche de la carte.
 En haut de la liste, une liste de choix permet de sélectionner une des couches parmi les couches définies comme "requêtables".
 
@@ -118,3 +118,7 @@ Après avoir sélectionné une couche, au clic sur le fond de carte, une popup s
 ## Conditions nécessaires
 
 Pour que les couches soient requêtables, elles doivent être fournies par des serveurs cartographiques capables de délivrer le GetInfo au format application/json.
+
+---
+
+[Retour à l'accueil](<README.md>)

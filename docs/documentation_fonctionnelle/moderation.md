@@ -4,10 +4,10 @@ Dans le cas de projets modérés, les contributeurs ne peuvent pas publier direc
 
 ### Configuration du projet
 
-Pour qu'un projet soit modéré, l'administrateur de projet doit configurer le projet comme tel depuis la page d'édition du projet (Bouton "Modifier le projet" depuis la page d'accueil) en cochant la case "Modération" en bas de la page.
+Pour qu'un projet soit modéré, l'administrateur de projet doit configurer le projet comme tel depuis la page d'édition du projet (Bouton _"Modifier le projet"_ depuis la page d'accueil) en cochant la case _"Modération"_ en bas de la page.
 
 Si la modération est choisie, le rôle de "Modérateur" est alors disponible :
-* l'administrateur peut attribuer ce rôle aux utilisateurs du projet (depuis la page Membres) ;
+* l'administrateur peut attribuer ce rôle aux utilisateurs du projet (depuis la page _Membres_) ;
 * l'administrateur peut permettre aux utilisateurs ayant ce rôle de voir les signalements archivés (depuis la page d'accueil du projet)
 
 ### Workflow de publication d'un signalement
@@ -19,3 +19,7 @@ Si la modération est choisie, le rôle de "Modérateur" est alors disponible :
 * Publication du signalement par le(s) modérateur(s) ou administrateur(s) en enregistrant le statut _Publié_ . Cette action déclenche un envoi d'email immédiat au contributeur du signalement pour l'informer de la nouvelle publication.
 
 Si le contributeur souhaite modifier son signalement une fois qu'il est publié, il peut ouvrir le formulaire d'édition et enregistrer des modifications. Le statut du signalement repassera automatiquement au statut de brouillon.
+
+---
+
+[Retour à l'accueil](<README.md>)

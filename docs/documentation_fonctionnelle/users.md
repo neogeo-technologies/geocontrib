@@ -101,3 +101,7 @@ Le créateur d'un nouveau projet en devient automatiquement administrateur proje
 
 Un utilisateur avec le statut équipe peut se connecter à l'interface administrateur.
 Il accède aux fonctionnalités de l'interface selon les permissions qui lui ont été accordées.
+
+---
+
+[Retour à l'accueil](<README.md>)

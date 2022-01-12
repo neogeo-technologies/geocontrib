@@ -14,9 +14,13 @@
 **Publié**
 * Dans le cas de projet modéré, un signalement peut être basculé dans ce statut par un modérateur ou un administrateur du projet ;
 * Dans le cas d'un projet non modéré, un signalement peut être basculé dans ce statut par son auteur, un supercontributeur ou un administrateur ;
-* L'utilisateur courant peut avoir accès à un signalement publié si son niveau d'autorisation est au moins aussi haut que le paramètre du projet "Visibilité des signalements publiés".
+* L'utilisateur courant peut avoir accès à un signalement publié si son niveau d'autorisation est au moins aussi haut que le paramètre du projet _"Visibilité des signalements publiés"_.
 
 **Archivé**
 * Un signalement peut être basculé dans ce statut par son auteur, un modérateur ou un administrateur du projet (uniquement à partir de l’état publié) ;
 * Un signalement peut être également basculé dans ce statut de manière automatique par l’outil lui-même lorsque la date d’archivage automatique est dépassée
-* L'utilisateur courant peut avoir accès à un signalement archivé si son niveau d'autorisation est au moins aussi haut que le paramètre du projet "Visibilité des signalements archivés"
+* L'utilisateur courant peut avoir accès à un signalement archivé si son niveau d'autorisation est au moins aussi haut que le paramètre du projet _"Visibilité des signalements archivés"_.
+
+---
+
+[Retour à l'accueil](<README.md>)
