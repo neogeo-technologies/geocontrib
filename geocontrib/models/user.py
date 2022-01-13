@@ -101,6 +101,14 @@ class Authorization(models.Model):
         return levels
 
     @classmethod
+    def get_user_level_projects_ids(cls, user):
+        Project = apps.get_model(app_label='geocontrib', model_name="Project")
+        level_ids = {}
+        for project in Project.objects.all():
+            level_ids[project.slug] = cls.get_rank(user, project)
+        return level_ids
+
+    @classmethod
     def all_permissions(cls, user, project, feature=None):
         """
         0    ANONYMOUS = 'anonymous'

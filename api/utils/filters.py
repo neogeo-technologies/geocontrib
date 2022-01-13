@@ -1,4 +1,7 @@
+from logging import log
 from rest_framework import filters
+from geocontrib.models import Authorization, UserLevelPermission
+from django.db.models import Q
 
 
 class AuthorizationLevelCodenameFilter(filters.BaseFilterBackend):
@@ -36,7 +39,9 @@ class ProjectsAccessLevelFilter(filters.BaseFilterBackend):
 class ProjectsUserAccessLevelFilter(filters.BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
+        user_level_projects = Authorization.get_user_level_projects_ids(request.user)
         user_access_level = request.query_params.get('user_access_level')
         if user_access_level:
-            queryset = queryset.filter(access_level_pub_feature_id=user_access_level)
+            requested_user_access_level_projects = dict((k, v) for k, v in user_level_projects.items() if v == int(user_access_level))
+            queryset = queryset.filter(slug__in =requested_user_access_level_projects.keys())
         return queryset
