@@ -1,6 +1,6 @@
 from logging import log
 from rest_framework import filters
-from geocontrib.models import Authorization, UserLevelPermission
+from geocontrib.models import Authorization, UserLevelPermission, user
 from django.db.models import Q
 
 
@@ -44,4 +44,13 @@ class ProjectsUserAccessLevelFilter(filters.BaseFilterBackend):
         if user_access_level:
             requested_user_access_level_projects = dict((k, v) for k, v in user_level_projects.items() if v == int(user_access_level))
             queryset = queryset.filter(slug__in =requested_user_access_level_projects.keys())
+        return queryset
+
+class ProjectsUserAccessibleFilter(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        user_level_projects = Authorization.get_user_level_projects_ids(request.user)
+        if request.query_params.get('accessible'):
+            for i, c in enumerate(queryset):
+                if (c.access_level_pub_feature.rank > user_level_projects[c.slug]):
+                    queryset = queryset.exclude(slug=c.slug)
         return queryset
