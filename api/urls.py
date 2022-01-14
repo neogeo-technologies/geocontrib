@@ -16,6 +16,8 @@ from api.views.feature import ProjectFeature
 from api.views.feature import ProjectFeaturePaginated
 from api.views.feature import ProjectFeatureBbox
 from api.views.feature import ProjectFeatureTypes
+from api.views.feature import GetExternalGeojsonView
+from api.views.feature import GetIdgoCatalogView
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
 from api.views.login import LogoutView
@@ -137,6 +139,8 @@ urlpatterns = [
         name='comments-upload-file'),
 
     path("features.mvt/", FeatureMVTView.as_view()),
+    path("external-geojson/", GetExternalGeojsonView.as_view()),
+    path("idgo-catalog/", GetIdgoCatalogView.as_view()),
 
     path(
         'proxy/',

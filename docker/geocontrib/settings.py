@@ -267,3 +267,10 @@ CELERY_RESULT_SERIALIZER = config('CELERY_RESULT_SERIALIZER', default='json')
 CACHE_SECOND = config('CACHE_SECOND', default=120, cast=int)
 
 MAGIC_IS_AVAILABLE = config('MAGIC_IS_AVAILABLE', default=True, cast=bool)  # File image validation (@seb / install IdeoBFC)
+
+# Import features from datasud
+IDGO_URL = config('IDGO_URL', default='https://idgo.dev.neogeo.local/api/resources_vector_by_user/')
+MAPSERVER_URL = config('MAPSERVER_URL', default='https://mapserver.dev.neogeo.local/maps/neogeo-technologies')
+IDGO_VERIFY_CERTIFICATE = config('IDGO_VERIFY_CERTIFICATE', default=False)
+IDGO_LOGIN = config('IDGO_LOGIN', default='geocontrib')
+IDGO_PASSWORD = config('IDGO_PASSWORD', default='CHANGE_ME')

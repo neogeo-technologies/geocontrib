@@ -79,6 +79,11 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * FAVICON_PATH : chemin vers la favicon affichée dans l'onglet du navigateur ;
 * DISABLE_LOGIN_BUTTON : désactive le bouton de connexion (utile dans le cadre du SSO)
 * LOG_URL : URL de connexion externe (utile dans le cadre du SSO)
+* IDGO_URL = URL pour récupérer le catalogue DataSud ;
+* MAPSERVER_URL = URL pour récupérer le geojson d'une ressource du catalogue ;
+* IDGO_VERIFY_CERTIFICATE = permet de se connecter à datasud sans certificat, False en dév ;
+* IDGO_LOGIN = login pour accéder au catalogue idgo depuis geocontrib ;
+* IDGO_PASSWORD = mot de passe pour accéder au catalogue idgo depuis geocontrib ;
 
 Copier le contenu du fichier config_sample/urls.py dans config/urls.py
 
