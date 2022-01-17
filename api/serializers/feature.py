@@ -105,7 +105,6 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
         comp_keys = ['color', 'icon', 'colors_style']
         # is_symbology_edited = not all(DeepDiff(self.data.get(key), validated_data.get(key), ignore_order=True) for key in comp_keys)
         is_symbology_edited = not all(self.data.get(key) == validated_data.get(key) for key in comp_keys)
-        print(is_symbology_edited)
 
         if not instance.is_editable:
 
