@@ -1,5 +1,5 @@
 celery<5.2.0
-Django==3.2
+Django>=3.2.0,<3.3.0
 djangorestframework-gis==0.18
 djangorestframework>=3.11.2,<3.12.0
 # waiting https://github.com/corteva/djangorestframework-mvt/issues/10 to be merged
