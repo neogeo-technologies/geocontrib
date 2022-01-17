@@ -31,7 +31,7 @@ variables:
     env_config_front: BASE_URL
 
   VUE_APP_CATALOG_NAME:
-    env_config_front: VUE_APP_CATALOG_NAME
+    env_config_front: CATALOG_NAME
 
   VUE_APP_IDGO:
-    env_config_front: VUE_APP_IDGO
+    env_config_front: APP_IDGO
