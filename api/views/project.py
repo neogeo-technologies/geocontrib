@@ -39,7 +39,7 @@ class ProjectView(viewsets.ModelViewSet):
     """
     lookup_field = 'slug'
     pagination_class = SimplePagination
-    queryset = Project.objects.all()
+    queryset = Project.objects.all().order_by('-created_on')
     filter_backends = [
         filters.SearchFilter,
         ProjectsModerationFilter,
