@@ -9,6 +9,8 @@
     "VUE_APP_DJANGO_BASE": "{{ BASE_URL|default('') }}",
     "VUE_APP_DJANGO_API_BASE": "/geocontrib/api/",
 
+    "VUE_APP_CATALOG_NAME": "{{ CATALOG_NAME|default('IDGO', true) }}",
+    "VUE_APP_IDGO": {{ APP_IDGO|default('false', true) }},
     "VUE_APP_RELOAD_INTERVAL": 15000,
 
     "VUE_APP_LOGIN_URL": "{{ VUE_APP_LOGIN_URL|default('', true) }}",
