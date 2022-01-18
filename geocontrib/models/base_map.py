@@ -1,5 +1,5 @@
 from django.contrib.gis.db import models
-from django.contrib.postgres.fields import JSONField
+# from django.contrib.postgres.fields import JSONField
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from geocontrib.managers import LayerManager
@@ -68,7 +68,7 @@ class Layer(models.Model):
     schema_type = models.CharField(
         "Type de couche", choices=SCHEMAS, max_length=50, default="wms")
 
-    options = JSONField("Options", blank=True, null=True)
+    options = models.JSONField("Options", blank=True, null=True)
 
     objects = models.Manager()
 

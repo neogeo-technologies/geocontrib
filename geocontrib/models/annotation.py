@@ -4,7 +4,7 @@ import uuid
 from django.apps import apps
 from django.conf import settings
 from django.contrib.gis.db import models
-from django.contrib.postgres.fields import JSONField
+# from django.contrib.postgres.fields import JSONField
 from django.utils import timezone
 
 from geocontrib import logger
@@ -111,7 +111,7 @@ class Event(models.Model):
     event_type = models.CharField(
         "Type de l'évènement", choices=EVENT_TYPES, max_length=100)
 
-    data = JSONField(blank=True, null=True)
+    data = models.JSONField(blank=True, null=True)
 
     project_slug = models.SlugField(
         'Slug du projet', max_length=256)
