@@ -4,7 +4,6 @@ import uuid
 from django.apps import apps
 from django.conf import settings
 from django.contrib.gis.db import models
-# from django.contrib.postgres.fields import JSONField
 from django.utils import timezone
 
 from geocontrib import logger

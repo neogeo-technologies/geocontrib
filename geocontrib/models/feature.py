@@ -4,7 +4,6 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
-# from django.db.models.JSONField import JSONField
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import timezone
