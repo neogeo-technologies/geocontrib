@@ -85,6 +85,7 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * IDGO_LOGIN = login pour accéder au catalogue idgo depuis geocontrib ;
 * IDGO_PASSWORD = mot de passe pour accéder au catalogue idgo depuis geocontrib ;
 
+
 Copier le contenu du fichier config_sample/urls.py dans config/urls.py
 
 ### Création des tables et ajout de données initiales dans la base de données
