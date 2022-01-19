@@ -142,6 +142,7 @@ if cas_server_url:
         'django.contrib.auth.backends.ModelBackend',
         'django_cas_ng.backends.CASBackend',
     )
+    CAS_APPLY_ATTRIBUTES_TO_USER = True
 
 # Configure frontend
 LOG_URL = config("LOG_URL", default=None)
