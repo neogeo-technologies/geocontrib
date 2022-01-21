@@ -35,3 +35,9 @@ variables:
 
   VUE_APP_IDGO:
     env_config_front: IDGO
+
+  DEFAULT_BASE_MAP_SERVICE:
+    env_config_front: DEFAULT_BASE_MAP_SERVICE
+
+  DEFAULT_BASE_MAP_OPTIONS:
+    env_config_front: DEFAULT_BASE_MAP_OPTIONS
