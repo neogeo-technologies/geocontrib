@@ -202,8 +202,10 @@ class Event(models.Model):
 
                 if status_has_changed and new_status == 'pending':
                     Authorization = apps.get_model(app_label='geocontrib', model_name='Authorization')
+                    UserLevelPermission = apps.get_model(app_label='geocontrib', model_name='UserLevelPermission')
+                    moderateur_rank = UserLevelPermission.objects.get(user_type_id=MODERATOR).rank
                     moderators__emails = Authorization.objects.filter(
-                        project=project, level__rank__gte=2
+                        project=project, level__rank__gte=moderateur_rank
                     ).exclude(
                         user=event_initiator  # On exclue l'initiateur de l'evenement.
                     ).values_list('user__email', flat=True)
