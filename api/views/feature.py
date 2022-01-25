@@ -407,8 +407,7 @@ class GetIdgoCatalogView(views.APIView):
     def get(self, request):
         code = 404
         url = settings.IDGO_URL
-        #user = request.GET.get('user', '')
-        user = self.request.query_params.get('user')
+        user = request.query_params.get('user')
         if user:
             url += user
 
@@ -428,6 +427,9 @@ class GetExternalGeojsonView(views.APIView):
         code = 404
         payload = {}
         url = settings.MAPSERVER_URL
+        organization_slug = request.GET.get('organization_slug', '')
+        if organization_slug:
+            url += organization_slug
 
         payload["service"] = "WFS"
         payload["request"] = "GetFeature"
