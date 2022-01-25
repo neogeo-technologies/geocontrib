@@ -25,6 +25,7 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost, 127.0.0.1, 0.0.0.0', cast=Csv())
 
 CSRF_TRUSTED_ORIGINS = list(set(ALLOWED_HOSTS) - set(['localhost', '127.0.0.1', '0.0.0.0']))
+USE_X_FORWARDED_HOST = config('USE_X_FORWARDED_HOST', default=False, cast=bool)
 
 # Application definition
 CORE_APPS = [
@@ -142,6 +143,7 @@ if cas_server_url:
         'django.contrib.auth.backends.ModelBackend',
         'django_cas_ng.backends.CASBackend',
     )
+    CAS_APPLY_ATTRIBUTES_TO_USER = True
 
 # Configure frontend
 LOG_URL = config("LOG_URL", default=None)
