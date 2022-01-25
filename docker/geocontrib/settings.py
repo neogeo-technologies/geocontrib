@@ -25,6 +25,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost, 127.0.0.1, 0.0.0.0', cast=Csv())
 
 CSRF_TRUSTED_ORIGINS = list(set(ALLOWED_HOSTS) - set(['localhost', '127.0.0.1', '0.0.0.0']))
+USE_X_FORWARDED_HOST = config('USE_X_FORWARDED_HOST', default=False, cast=bool)
 
 # Application definition
 CORE_APPS = [
