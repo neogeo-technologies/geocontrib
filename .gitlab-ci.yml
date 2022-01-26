@@ -9,10 +9,10 @@ variables:
   GIT_DEPTH: 0
 
 
-build testing docker image:
+build testing-2.3.x docker image:
   stage: build
   only:
-    - develop
+    - 2.3.x
   tags:
     - build
   image:
@@ -22,8 +22,8 @@ build testing docker image:
     - mkdir -p /kaniko/.docker
     - export
     - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination neogeo/geocontrib:testing
-    - echo Image docker neogeo/geocontrib:testing livrée
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination neogeo/geocontrib:testing-2.3.x
+    - echo Image docker neogeo/geocontrib:testing-2.3.x livrée
 
 deploy testing docker image:
   stage: deploy
