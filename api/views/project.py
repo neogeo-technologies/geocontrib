@@ -11,6 +11,7 @@ from rest_framework import generics
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import mixins
 
 from api.serializers import ProjectDetailedSerializer
 from api.serializers.project import ProjectCreationSerializer
@@ -68,6 +69,21 @@ class ProjectView(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
+
+
+class ProjectTypesView(
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet):
+    """
+    Get all project-types
+    """
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+
+    queryset = Project.objects.filter(is_project_type=True).order_by('-created_on')
+
+    serializer_class = ProjectDetailedSerializer
 
 
 class ProjectDuplicate(APIView):

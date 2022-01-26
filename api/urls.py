@@ -34,6 +34,7 @@ from api.views.project import ProjectAuthorizationView
 from api.views.project import ProjectSubscription
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
+from api.views.project import ProjectTypesView
 from api.views.project import ProjectDuplicate
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
@@ -51,6 +52,7 @@ router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 router.register(r'base-maps', BaseMapViewset, basename='base-maps')
 router.register(r'layers', LayerViewset, basename='layers')
 router.register(r'levels-permissions', UserLevelsPermission, basename='levels-permissions')
+router.register(r'project-types', ProjectTypesView, basename='projects-types')
 
 urlpatterns = [
     # Vues générales de navigation
