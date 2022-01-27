@@ -16,6 +16,7 @@
     "VUE_APP_LOGIN_URL": "{{ VUE_APP_LOGIN_URL|default('', true) }}",
     "VUE_APP_DISABLE_LOGIN_BUTTON": {{ DISABLE_LOGIN_BUTTON|default('false', true) }},
 
+    "DEFAULT_BASE_MAP_SCHEMA_TYPE": "{{ DEFAULT_BASE_MAP_SCHEMA_TYPE|default('tms', true) }}",
     "DEFAULT_BASE_MAP_SERVICE": "{{ DEFAULT_BASE_MAP_SERVICE|default('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', true) }}",
     "DEFAULT_BASE_MAP_OPTIONS": {{ DEFAULT_BASE_MAP_OPTIONS|default('{ "attribution": "&copy; contributeurs d\'<a href=\'https://osm.org/copyright\'>OpenStreetMap</a>", "maxZoom": 20 }', true) }},
     "DEFAULT_MAP_VIEW" : {
