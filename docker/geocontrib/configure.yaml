@@ -29,3 +29,12 @@ variables:
 
   BASE_URL:
     env_config_front: BASE_URL
+
+  DEFAULT_BASE_MAP_SCHEMA_TYPE:
+    env_config_front: DEFAULT_BASE_MAP_SCHEMA_TYPE
+
+  DEFAULT_BASE_MAP_SERVICE:
+    env_config_front: DEFAULT_BASE_MAP_SERVICE
+
+  DEFAULT_BASE_MAP_OPTIONS:
+    env_config_front: DEFAULT_BASE_MAP_OPTIONS
