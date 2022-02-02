@@ -5,11 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
-## [2.3.X] - 
+## [2.3.3] - 2022-02-02
+
+### Evoltuions
+
+- Redmine 12846 : Rendre la variable DEFAULT_BASE_MAP configurable
 
 ### Corrections
 
 - Redmine 12917 : CAS : pas de recopie du mail dans Geocontrib quand l'utilisateur se connecte avec le CAS
+- Redmine 11892 : Affichage index - optimisation de l'affichage des niveaux d'autorisation
 
 ## [2.3.2] - 2022-01-12
 
