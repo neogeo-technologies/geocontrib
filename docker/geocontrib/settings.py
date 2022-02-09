@@ -25,6 +25,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost, 127.0.0.1, 0.0.0.0', cast=Csv())
 
 CSRF_TRUSTED_ORIGINS = list(set(ALLOWED_HOSTS) - set(['localhost', '127.0.0.1', '0.0.0.0']))
+USE_X_FORWARDED_HOST = config('USE_X_FORWARDED_HOST', default=False, cast=bool)
 
 # Application definition
 CORE_APPS = [
@@ -142,6 +143,7 @@ if cas_server_url:
         'django.contrib.auth.backends.ModelBackend',
         'django_cas_ng.backends.CASBackend',
     )
+    CAS_APPLY_ATTRIBUTES_TO_USER = True
 
 # Configure frontend
 LOG_URL = config("LOG_URL", default=None)
@@ -267,3 +269,10 @@ CELERY_RESULT_SERIALIZER = config('CELERY_RESULT_SERIALIZER', default='json')
 CACHE_SECOND = config('CACHE_SECOND', default=120, cast=int)
 
 MAGIC_IS_AVAILABLE = config('MAGIC_IS_AVAILABLE', default=True, cast=bool)  # File image validation (@seb / install IdeoBFC)
+
+# Import features from datasud
+IDGO_URL = config('IDGO_URL', default='https://idgo.dev.neogeo.local/api/resources_vector_by_user/')
+MAPSERVER_URL = config('MAPSERVER_URL', default='https://mapserver.dev.neogeo.local/maps/')
+IDGO_VERIFY_CERTIFICATE = config('IDGO_VERIFY_CERTIFICATE', default=False)
+IDGO_LOGIN = config('IDGO_LOGIN', default='geocontrib')
+IDGO_PASSWORD = config('IDGO_PASSWORD', default='CHANGE_ME')

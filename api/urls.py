@@ -16,6 +16,8 @@ from api.views.feature import ProjectFeature
 from api.views.feature import ProjectFeaturePaginated
 from api.views.feature import ProjectFeatureBbox
 from api.views.feature import ProjectFeatureTypes
+from api.views.feature import GetExternalGeojsonView
+from api.views.feature import GetIdgoCatalogView
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
 from api.views.login import LogoutView
@@ -32,6 +34,7 @@ from api.views.project import ProjectAuthorizationView
 from api.views.project import ProjectSubscription
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
+from api.views.project import ProjectTypesView
 from api.views.project import ProjectDuplicate
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
@@ -49,6 +52,7 @@ router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 router.register(r'base-maps', BaseMapViewset, basename='base-maps')
 router.register(r'layers', LayerViewset, basename='layers')
 router.register(r'levels-permissions', UserLevelsPermission, basename='levels-permissions')
+router.register(r'project-types', ProjectTypesView, basename='projects-types')
 
 urlpatterns = [
     # Vues générales de navigation
@@ -137,6 +141,8 @@ urlpatterns = [
         name='comments-upload-file'),
 
     path("features.mvt/", FeatureMVTView.as_view()),
+    path("external-geojson/", GetExternalGeojsonView.as_view()),
+    path("idgo-catalog/", GetIdgoCatalogView.as_view()),
 
     path(
         'proxy/',

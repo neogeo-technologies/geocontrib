@@ -67,6 +67,8 @@ class Project(models.Model):
     is_project_type = models.BooleanField(
         "Est un projet type", default=False, blank=True)
 
+    generate_share_link = models.BooleanField("Génération d'un lien de partage externe", default=False)
+
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"

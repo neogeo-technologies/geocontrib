@@ -4,7 +4,6 @@ import uuid
 from django.apps import apps
 from django.conf import settings
 from django.contrib.gis.db import models
-from django.contrib.postgres.fields import JSONField
 from django.utils import timezone
 
 from geocontrib import logger
@@ -13,6 +12,7 @@ from geocontrib.choices import EXTENDED_RELATED_MODELS
 from geocontrib.choices import EVENT_TYPES
 from geocontrib.choices import STATE_CHOICES
 from geocontrib.choices import FREQUENCY_CHOICES
+from geocontrib.choices import MODERATOR
 from geocontrib.emails import notif_moderators_pending_features
 from geocontrib.emails import notif_creator_published_feature
 
@@ -111,7 +111,7 @@ class Event(models.Model):
     event_type = models.CharField(
         "Type de l'évènement", choices=EVENT_TYPES, max_length=100)
 
-    data = JSONField(blank=True, null=True)
+    data = models.JSONField(blank=True, null=True)
 
     project_slug = models.SlugField(
         'Slug du projet', max_length=256)
@@ -202,8 +202,10 @@ class Event(models.Model):
 
                 if status_has_changed and new_status == 'pending':
                     Authorization = apps.get_model(app_label='geocontrib', model_name='Authorization')
+                    UserLevelPermission = apps.get_model(app_label='geocontrib', model_name='UserLevelPermission')
+                    moderateur_rank = UserLevelPermission.objects.get(user_type_id=MODERATOR).rank
                     moderators__emails = Authorization.objects.filter(
-                        project=project, level__rank__gte=2
+                        project=project, level__rank__gte=moderateur_rank
                     ).exclude(
                         user=event_initiator  # On exclue l'initiateur de l'evenement.
                     ).values_list('user__email', flat=True)

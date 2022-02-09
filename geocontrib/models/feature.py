@@ -4,7 +4,6 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
-from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import timezone
@@ -61,7 +60,7 @@ class Feature(models.Model):
 
     geom = models.GeometryField("Géométrie", srid=4326)
 
-    feature_data = JSONField(blank=True, null=True)
+    feature_data = models.JSONField(blank=True, null=True)
 
     objects = models.Manager()
 
@@ -214,7 +213,7 @@ class FeatureType(models.Model):
         verbose_name='Icône', max_length=128, blank=True, null=True
     )
 
-    colors_style = JSONField(
+    colors_style = models.JSONField(
         "Style Champs coloré", blank=True, null=True
     )
 

@@ -5,6 +5,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.0.0] - 2022-09-02
+
+### Evolutions
+
+- Redmine 12779 : URLs personnalisées pour le partage d'un projet en externe
+- Redmine 12379 : Page des projets - Affichage adapté à l'utilisateur, filtrages, pagination
+- Redmine 12378 : Import de données de IDGO (Plugin IDGO)
+- Redmine 11834 : Changement des status des signalements de façon multiple
+- Redmine 12720 : Passage à Django 3.2
+- Redmine 12841 : Symbologie - Création du formulaire de modification de la couleur de la symbo pour les linéaires et les surfaciques
+
+### Corrections
+
+- Redmine 12996 : Les statuts dans le tableau ne sont pas mis à jour suite à une modification en masse
+- Redmine 12997 : Les envois d'emails sont incomplets suite à une modification des statuts en masse
+
+## [2.3.3] - 2022-02-02
+
+### Evolutions
+
+- Redmine 12846 : Rendre la variable DEFAULT_BASE_MAP configurable
+
+### Corrections
+
+- Redmine 12917 : CAS : pas de recopie du mail dans Geocontrib quand l'utilisateur se connecte avec le CAS
+- Redmine 11892 : Affichage index - optimisation de l'affichage des niveaux d'autorisation
+
 ## [2.3.2] - 2022-01-12
 
 ### Evolutions

@@ -1,12 +1,13 @@
 import json
+import requests
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Polygon
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.db.models import Extent
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import filters
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import permissions
@@ -398,3 +399,53 @@ class FeatureMVTView(BaseMVTView):
             request.GET._mutable = True
         request.GET["pk__in"] = queryset.values_list("pk", flat=True)
         return super().get( request, *args, **kwargs)
+
+
+class GetIdgoCatalogView(views.APIView):
+    http_method_names = ['get', ]
+
+    def get(self, request):
+        code = 404
+        url = settings.IDGO_URL
+        user = request.query_params.get('user')
+        if user:
+            url += user
+
+        try:
+            response = requests.get(url, timeout=60, auth=(settings.IDGO_LOGIN, settings.IDGO_PASSWORD), verify=settings.IDGO_VERIFY_CERTIFICATE)
+            data = response.json()
+            code = response.status_code
+        except Exception:
+            data = "Les données sont inaccessibles"
+        finally:
+            return Response(data=data, status=code)
+
+class GetExternalGeojsonView(views.APIView):
+    http_method_names = ['get', ]
+
+    def get(self, request):
+        code = 404
+        payload = {}
+        url = settings.MAPSERVER_URL
+        organization_slug = request.GET.get('organization_slug', '')
+        if organization_slug:
+            url += organization_slug
+
+        payload["service"] = "WFS"
+        payload["request"] = "GetFeature"
+        payload["version"] = "2.0.0"
+        payload["outputFormat"] = "geojson"
+        typename = request.GET.get('typename', '')
+        if typename:
+            payload["typename"] = typename
+
+        try:
+            response = requests.get(url, params=payload, timeout=60, verify=settings.IDGO_VERIFY_CERTIFICATE)
+            data = response.json()
+            code = response.status_code
+            if code != 200 or not data.get('type', '') == 'FeatureCollection':
+                data = "Les données ne sont pas au format geoJSON"
+        except Exception:
+            data = "Les données sont inaccessibles"
+        finally:
+            return Response(data=data, status=code)
