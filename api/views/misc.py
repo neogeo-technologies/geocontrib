@@ -300,14 +300,25 @@ class EventView(views.APIView):
 
     def get(self, request):
         user = request.user
+        project_slug = request.GET.get('project_slug', '')
+        # notifications
         all_events = Event.objects.filter(user=user).order_by('-created_on')
+        if project_slug:
+            all_events = all_events.filter(project_slug=project_slug)
         serialized_events = EventSerializer(all_events[0:5], many=True)
+        # signalements
         feature_events = Event.objects.filter(
             user=user, object_type='feature').order_by('-created_on')
+        if project_slug:
+            feature_events = feature_events.filter(project_slug=project_slug)
         serialized_feature_events = EventSerializer(feature_events[0:5], many=True)
+        # commentaires
         comment_events = Event.objects.filter(
             user=user, object_type='comment').order_by('-created_on')
+        if project_slug:
+            comment_events = comment_events.filter(project_slug=project_slug)
         serialized_comment_events = EventSerializer(comment_events[0:5], many=True)
+
         data = {
             'events': serialized_events.data,
             'features': serialized_feature_events.data,
