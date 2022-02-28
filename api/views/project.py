@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import Http404
@@ -41,6 +42,7 @@ class ProjectView(viewsets.ModelViewSet):
     lookup_field = 'slug'
     pagination_class = SimplePagination
     queryset = Project.objects.all().order_by('-created_on')
+
     filter_backends = [
         filters.SearchFilter,
         ProjectsModerationFilter,
@@ -52,6 +54,17 @@ class ProjectView(viewsets.ModelViewSet):
         'slug',
         'title',
     ]
+
+    def filter_queryset(self, queryset):
+        myaccount = self.request.query_params.get('myaccount', None)
+        user = self.request.user
+        if myaccount and user :
+            project_authorized = Authorization.objects.filter(user=user
+            ).filter(
+                level__rank__gte=2
+            ).values_list('project__pk', flat=True)
+            queryset = queryset.filter(Q(pk__in=project_authorized) | Q(creator=user))
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'list':
