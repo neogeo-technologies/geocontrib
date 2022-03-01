@@ -135,6 +135,9 @@ class FeatureListSerializer(serializers.ModelSerializer):
     project = serializers.ReadOnlyField(source='project.slug')
     feature_type = FeatureTypeSerializer(read_only=True)
     feature_data = serializers.SerializerMethodField()
+    created_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M")
+    updated_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M")
+    archived_on = serializers.DateField(format="%d/%m/%Y")
 
     class Meta:
         model = Feature
@@ -151,6 +154,7 @@ class FeatureListSerializer(serializers.ModelSerializer):
             'feature_type',
             'geom',
             'feature_data',
+            'archived_on',
         )
 
     def get_feature_data(self, obj):
