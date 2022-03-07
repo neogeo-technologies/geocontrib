@@ -132,10 +132,10 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
 
 class FeatureListSerializer(serializers.ModelSerializer):
 
-    display_last_editor = serializers.SerializerMethodField()
     project = serializers.ReadOnlyField(source='project.slug')
     feature_type = FeatureTypeSerializer(read_only=True)
     feature_data = serializers.SerializerMethodField()
+    display_last_editor = serializers.SerializerMethodField()
 
     class Meta:
         model = Feature
@@ -165,7 +165,6 @@ class FeatureListSerializer(serializers.ModelSerializer):
 
     def get_display_last_editor(self, obj):
         res = 'N/A'
-        #breakpoint()
         if self.context['request'].user.is_authenticated:
             res = obj.display_last_editor
         return res
