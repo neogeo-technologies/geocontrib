@@ -14,7 +14,7 @@ Elle a été conçue pour fonctionner aussi bien sur du matériel sédentaire qu
 ### Projet
 
 Un projet constitue l'application de l’outil de signalement pour un contexte métier / un usage particulier.
-Chaque projet est destiné à une communauté d'utilisateurs particulières, de droits d'accès spécifiques et est articulé autour de types de projets qui lui sont propres.
+Chaque projet est destiné à une communauté d'utilisateurs particulière, de droits d'accès spécifiques et est articulé autour de types de projets qui lui sont propres.
 
 Le champ des applications possibles est vaste. Quelques exemples illustratifs :
 * publier les projets de travaux sur la voirie dans le cadre de l'article L49 du code des postes et des communications électroniques ;
@@ -30,7 +30,7 @@ Chaque projet possède des caractéristiques propres qui ont un impact sur les d
 
 ### Signalement
 
-Un signalement est une information géolocalisée décrivant un objet géographique porté à la connaissance des usagers d’un projet. Chaque signalement est attaché à un projet et un type de signalements particulier.
+Un signalement est une information géolocalisée décrivant un objet géographique porté à la connaissance des usagers d’un projet. Chaque signalement est attaché à un projet et un type de signalements particulier. Il peut s'agir d'un point, d'un linéaire ou d'une forme polygonale.
 
 ### Type de signalements
 
@@ -39,9 +39,13 @@ Un type de signalements correspond à une modélisation particulière (pour un c
 * **des champs spécifiques** déclarés par le créateur du type de signalements (ces champs s'ajoutent aux champs
 obligatoires) que l'on retrouve pour tous les types de signalements, à savoir le titre, la description et le statut du signalement.
 
-Chaque type de signalements est également caractérisé par une couleur qui est utilisé pour la présentation des signalements sur les cartes. Les signalements de type ponctuel peuvent également être associés à un symbole particulier.
+Chaque type de signalements est également caractérisé par une couleur qui est utilisé pour la présentation des signalements sur les cartes.
 
-Le modèle de données d'un type de signalement peut être modifié tant qu'aucun signalement n'y est associé.
+Lorsque le type de signalements est créé, il est possible de lui attribuer une symbologie colorée. Ainsi, on peut attribuer une couleur à tous les signalements appartenant à un type ou faire varier la couleur des signalement d'un même type selon les valeurs d'un champ personnalisé de type liste de valeurs.
+
+Cf. [Symbologie](symbology.md)
+
+Le modèle de données d'un type de signalements peut être modifié tant qu'aucun signalement n'y est associé. En revanche, il est possible pour l'administrateur de modifier la symbologie d'un type de signalements à tout moment.
 
 ### Statut d'un signalement
 
@@ -104,7 +108,7 @@ La page d'accueil de l'application contient :
   * si un utilisateur est connecté : le nom de l'utilisateur courant et un bouton de déconnexion. Un clic sur le nom de l'utilisateur renvoie vers sa page _"Mon compte"_
 * un bouton de création d'un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs);
 * un bouton permettant d'accéder à la liste des modèles de projet pour créer un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs) - cf. [Projets modèles](project_template.md);
-* la liste des projets existants avec une courte description et quelques indicateurs. Un clic sur un projet renvoie vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un message d'erreur lui est présenté.
+* la liste des projets existants avec une courte description et quelques indicateurs. Un clic sur un projet renvoie vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un message d'erreur lui est présenté. Cette liste peut être filtrée par niveau d'autorisation requis pour accéder au projet, par le niveau d'autorisation de l'utilisateur ou selon si le projet est modéré ou non. Il est aussi possible de faire une recherche par nom de projet. Une option permettant de rendre visible les projets auxquels l'utilisateur n'a pas accès est aussi possible selon la configuration de l'application (depuis la version 3.0.0).
 
 
 ### Menu d'un projet
@@ -138,6 +142,7 @@ La page d'accueil d'un projet contient les éléments suivants :
   * Visibilité des signalements publiés et archivés en fonction des autorisations des utilisateurs,
   * Modération du projet - cf. [Modération d'un projet](moderation.md),
   * Considération du projet comme modèle - cf. [Projets modèles](project_template.md).
+* Selon la configuration de l'application, l'administrateur a aussi la possibilité de copier un lien de partage du projet en externe. Ce lien permet de n'avoir accès qu'au projet partagé et non au reste de l'application GéoContrib. cf. [Projets partagés en externe](project_sharing.md).
 
 Au-delà de ces informations, cette page propose également des actions activées en fonction du rôle de l'utilisateur courant par rapport au projet :
 * un bouton d'édition des caractéristiques du projet en haut à droite (pour les administrateurs du projet) ;
