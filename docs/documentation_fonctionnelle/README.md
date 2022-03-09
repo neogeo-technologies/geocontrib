@@ -158,11 +158,11 @@ Au-delà de ces informations, cette page propose également des actions activée
 
 Les administrateurs d'un projet (et utilisateur de niveau de permission supérieur) ont la possibilité d'ajouter un type de signalement ou d'éditer un type de signalement (tant qu'aucun signalement n'est créé pour ce type).
 
-Le formulaire d'édition permet de choisir un titre pour le type de signalement, une géométrie, une couleur, et de définir les données métiers ou champs personnalisés - cf. [Champs personnalisés d'un type de signalement](custom_fields.md).
+Le formulaire d'édition permet de choisir un titre pour le type de signalement, une géométrie, et de définir les données métiers ou champs personnalisés - cf. [Champs personnalisés d'un type de signalement](custom_fields.md).
 
 ### Page d'un type de signalements
 
-La page de description d'un type de signalement (accessible via la page d'accueil de son projet) présente les informations suivantes :
+La page de description d'un type de signalements (accessible via la page d'accueil de son projet) présente les informations suivantes :
 * Les caractéristiques du type de signalements :
   * Son titre,
   * Son type de géométrie,
@@ -172,7 +172,8 @@ La page de description d'un type de signalement (accessible via la page d'accuei
 Au-delà de ces informations, cette page propose également des actions spécifiques :
 * Voir tous les signalements : renvoie vers la page de consultation _"Liste & Carte"_ des signalements du projet ;
 * Ajouter un signalement : création d'un signalement de ce type. Cette fonction n'est proposée que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
-* Import de signalement : création de signalements par l'import d'un fichier GeoJSON conforme au modèle de données spécifique du type de signalements. Cette fonction n'est active que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
+* Import de signalement via un GeoSJON: création de signalements par l'import d'un fichier GeoJSON conforme au modèle de données spécifique du type de signalements. Cette fonction n'est active que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
+* Import de signalement via IDGO : création de signalements par l'import de données issues d'une plateforme IDGO. Cette fonction n'est active que si une plateforme IDGO à été connectée à GéoContrib et uniquement pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
 * Export des signalements : enregistrement des signalements du type de signalements courant sous la forme d'un fichier GeoJSON. Seuls les signalements que l'utilisateur courant a le droit de consulter sont exportés.
 
 Cf. [Imports et exports de signalements](import_export.md).
@@ -190,7 +191,7 @@ La page de consultation des signalements d'un projet propose 2 vues (par l'inter
 * **une vue tabulaire paginée** :
   * tri par ordre chronologique inverse (les signalements les plus récents sont affichés en premier),
   * présentation des caractéristiques principales : statut (représenté par un pictogramme), type de signalements, titre, date de dernière modification, auteur du signalement et dernier éditeur,
-  * case à cocher, permettant à l'utilisateur courant de sélectionner les signalements dont il est l'auteur (ou tous les signalements s'il est administrateur projet ou super-utilisateur). Un pictogramme en forme de poubelle permet alors à l'utilisateur de supprimer sa sélection en un clic.
+  * case à cocher, permettant à l'utilisateur courant de sélectionner les signalements dont il est l'auteur (ou tous les signalements s'il est administrateur projet ou super-utilisateur). Il peut choisir entre deux actions (pictogrammes en tête de colonne) : mode suppression (les signalements sélectionnés seront supprimés) et mode édition du statut (le statut des signalements sélectionnés sera édité). Si le mode suppression est activé, l'utilisateur peut sélectionner les signalements qu'il souhaite supprimer et cliquer sur l'icône corbeille en haut à droite pour les effacer. Si le mode édition est activé, l'utilisateur peut sélectionner les signalements dont il souhaite modifier le statut, cliquer sur l'icône crayon en haut à droite et choisir le statut de destination des signalements choisis.
   * le clic sur le titre renvoie vers la fiche détaillée du signalement,
   * le clic sur le type de signalements renvoie vers la fiche détaillée du signalement,
 

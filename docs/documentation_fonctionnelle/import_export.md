@@ -1,8 +1,12 @@
 # Import et export de données
 
+GéoContrib permet de créer des signalements via un import de données depuis des sources extérieures mais aussi d'exporter des signalements vers un fichier.
+
 ## Création d'un type de signalement et import de données simultanés
 
-Les administrateurs de projets (et utilisateurs avec droits supérieurs) ont la possibilité de créer un type de signalement à partir de la structure d'un fichier.
+Les administrateurs de projets (et utilisateurs avec droits supérieurs) ont la possibilité de créer un type de signalement à partir de la structure de données existantes. Ainsi la structure est dupliquée sous la forme d'un type de signalements avec des champs personnalisés.
+
+### Via un fichier GeoJSON
 
 Depuis la page d'accueil d'un projet, le bouton _"Créer un type de signalements à partir d'un fichier GeoJSON"_ permet à l'utilisateur d'uploader un fichier stocké sur son poste local. Suite au chargement, la structure du fichier est lue et le modèle de données du type de signalement est proposé à l'utilisateur à travers le formulaire d'édition.
 L'administrateur peut préciser la géométrie, le titre du type de signalement, et vérifier ou modifier chacun des champs personnalisés.
@@ -11,15 +15,32 @@ En bas de page, il peut choisir :
 * de créer simplement le type de signalement,
 * de créer le type de signalement et d'importer les données du fichier.
 
-## Imports de données dans un type de signalements existant
+### Via une plateforme IDGO
 
-Cette fonction permet d'importer des signalements depuis un fichier GeoJSON dans un type de signalement existant. Elle est disponible depuis la page du type de signalement.
+Depuis la page d'accueil d'un projet, le bouton _"Créer un type de signalements à partir du catalogue IDGO"_ permet à l'utilisateur de choisir une ressource appartenant à l'organisation à laquelle il est rattaché dans IDGO. Il clique sur le bouton de lancement de l'import pour générer le type de signalement. Suite au chargement, la structure du fichier est lue et le modèle de données du type de signalement est proposé à l'utilisateur à travers le formulaire d'édition.
+L'administrateur peut préciser la géométrie, le titre du type de signalement, et vérifier ou modifier chacun des champs personnalisés.
+
+En bas de page, il peut choisir :
+* de créer simplement le type de signalement,
+* de créer le type de signalement et d'importer les données du fichier.
+
+## Import de données dans un type de signalements existant
+
+Cette fonction permet d'importer des signalements depuis des données extérieures à GéoContrib dans un type de signalement existant. Elle est disponible depuis la page du type de signalement.
 
 Seuls les utilisateurs qui peuvent créer des signalements (contributeurs et niveaux de droits supérieurs du projet) peuvent utiliser cette fonction.
 
-## Fonctionnement de l'import
+### Import d'un fichier GeoJSON
 
-* Import des signalements géré en tâche de fond : l'utilisateur peut poursuivre sa navigation même si l'import n'est pas terminé ;
+Si l'utilisateur souhaite charger un fichier GeoJSON dans un type de signalements existant, il doit dérouler le menu _"Importer des signalements"_ de la page du type de signalements. Il choisit ensuite le fichier de données qu'il souhaite importer dans son explorateur de fichiers et clique sur le bouton _"Lancer l'import"_. Les données sont importées dans le type de signalements.
+
+### Import depuis une plateforme IDGO
+
+Si l'utilisateur souhaite charger des données depuis IDGO dans un type de signalements existant, il doit dérouler le menu _"Importer des signalements"_ de la page du type de signalements. Il clique ensuite sur le bouton _"Importer des signalements à partir du catalogue IDGO"_ et est renvoyé vers un formulaire lui proposant de choisir une ressource appartenant à l'organisation à laquelle il est rattaché dans IDGO. Il peut valider son choix en cliquant sur le bouton _"Lancer l'import avec le fichier"_. Les données sont importées dans le type de signalements.
+
+## Informations concernant l'import
+
+* L'import des signalements est géré en tâche de fond : l'utilisateur peut poursuivre sa navigation même si l'import n'est pas terminé ;
 * Les enregistrements soupçonnés de former des doublons sont marqués automatiquement à l'aide du mécanisme de relation entre signalements. Les doublons sont identifiés par l'égalité de leur titre et de leur description, ou par l'égalité de leur géométrie) ;
 * Les enregistrements importés sont enregistrés avec le statut "brouillon", sauf s'ils ont un attributs "status" mentionnant leur état (brouillon : draft ; publication en cours : pending ; publié : published ; archivé : archived) ;
 * Lors d'un ré-import, si des signalements possèdent le même identifiant qu'un signalement existant, celui-ci est mis à jour avec les informations contenues dans le fichier.
