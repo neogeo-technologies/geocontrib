@@ -160,6 +160,8 @@ class Authorization(models.Model):
 
             if user_rank == Rank.ADMIN.value:
                 user_perms['can_publish_feature'] = True
+                user_perms['can_update_feature'] = True
+                user_perms['can_delete_feature'] = True
                 user_perms['can_update_project'] = True
                 user_perms['can_create_model'] = True
                 user_perms['can_create_feature_type'] = True
