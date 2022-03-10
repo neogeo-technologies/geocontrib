@@ -67,7 +67,7 @@ class ProjectView(viewsets.ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == 'list' or self.action == 'retrieve':
             return ProjectDetailedSerializer
         if self.action == 'create':
             return ProjectCreationSerializer
@@ -76,7 +76,7 @@ class ProjectView(viewsets.ModelViewSet):
         return ProjectDetailedSerializer
 
     def get_permissions(self):
-        if self.action == 'list':
+        if self.action == 'list' or self.action == 'retrieve':
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
 
