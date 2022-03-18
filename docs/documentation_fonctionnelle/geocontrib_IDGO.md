@@ -28,3 +28,7 @@ Dans le cadre d'une installation couplée avec une plateforme IDGO, les utilisat
 * Les ressources sont issues de datasets "publiés" (et non "privés")
 
 Le détail du fonctionnement de l'import est fourni ici : [Imports et exports de signalements](import_export.md).
+
+---
+
+[Retour à l'accueil](<README.md>)
