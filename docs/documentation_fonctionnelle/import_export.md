@@ -17,6 +17,8 @@ En bas de page, il peut choisir :
 
 ### Via une plateforme IDGO
 
+Cette fonctionnalité n'est disponible que pour les installations de GeoContrib couplée avec une plateforme IDGO.
+
 Depuis la page d'accueil d'un projet, le bouton _"Créer un type de signalements à partir du catalogue IDGO"_ permet à l'utilisateur de choisir une ressource appartenant à l'organisation à laquelle il est rattaché dans IDGO. Il clique sur le bouton de lancement de l'import pour générer le type de signalement. Suite au chargement, la structure du fichier est lue et le modèle de données du type de signalement est proposé à l'utilisateur à travers le formulaire d'édition.
 L'administrateur peut préciser la géométrie, le titre du type de signalement, et vérifier ou modifier chacun des champs personnalisés.
 
@@ -35,6 +37,8 @@ Seuls les utilisateurs qui peuvent créer des signalements (contributeurs et niv
 Si l'utilisateur souhaite charger un fichier GeoJSON dans un type de signalements existant, il doit dérouler le menu _"Importer des signalements"_ de la page du type de signalements. Il choisit ensuite le fichier de données qu'il souhaite importer dans son explorateur de fichiers et clique sur le bouton _"Lancer l'import"_. Les données sont importées dans le type de signalements.
 
 ### Import depuis une plateforme IDGO
+
+Cette fonctionnalité n'est disponible que pour les installations de GeoContrib couplée avec une plateforme IDGO.
 
 Si l'utilisateur souhaite charger des données depuis IDGO dans un type de signalements existant, il doit dérouler le menu _"Importer des signalements"_ de la page du type de signalements. Il clique ensuite sur le bouton _"Importer des signalements à partir du catalogue IDGO"_ et est renvoyé vers un formulaire lui proposant de choisir une ressource appartenant à l'organisation à laquelle il est rattaché dans IDGO. Il peut valider son choix en cliquant sur le bouton _"Lancer l'import avec le fichier"_. Les données sont importées dans le type de signalements.
 

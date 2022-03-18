@@ -11,6 +11,14 @@ Elle a été conçue pour fonctionner aussi bien sur du matériel sédentaire qu
 
 ## Notions importantes
 
+### Authentification
+
+GeoContrib possède sa propre base utilisateur, administrable depuis Django par la page "Utilisateurs" grâce à laquelle des utilisateurs peuvent être ajoutés.
+L'application GeoContrib peut être couplée avec une plateforme de données Georchestra ou IDGO. Dans ce cas, l'authentification des utilisateurs se fait depuis la plateforme de données, et non plus depuis GeoContrib.
+
+Pour plus de détail sur l'authentification des utilisateurs dans le cadre d'une installation GeoContrib / Georchestra : [GeoContrib et plateforme Georchestra](../../plugin_georchestra/README.md).
+Pour plus de détail sur l'authentification des utilisateurs dans le cadre d'une installation GeoContrib / Georchestra : [GeoContrib et plateforme IDGO](geocontrib_IDGO.md).
+
 ### Projet
 
 Un projet constitue l'application de l’outil de signalement pour un contexte métier / un usage particulier.
