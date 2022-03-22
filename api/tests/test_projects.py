@@ -12,8 +12,9 @@ from geocontrib.models.user import User
 @pytest.mark.freeze_time('2021-08-05')
 def test_projects_list(api_client):
     result = api_client.get('/api/projects/')
+
     assert result.status_code == 200
-    assert result.json() == []
+    assert result.json() == {'count': 0, 'next': None, 'previous': None, 'results': []}
 
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
 
@@ -31,26 +32,32 @@ def test_projects_list(api_client):
 
     result = api_client.get('/api/projects/')
     assert result.status_code == 200
-    assert result.json() == [{
-        'access_level_arch_feature': 'Utilisateur anonyme',
-        'access_level_pub_feature': 'Utilisateur anonyme',
-        'archive_feature': None,
-        'created_on': '05/08/2021',
-        'creator': user.pk,
-        'delete_feature': None,
-        'description': None,
-        'is_project_type': False,
-        'generate_share_link': False,
-        'moderation': False,
-        'nb_comments': 0,
-        'nb_contributors': 1,
-        'nb_features': 0,
-        'nb_published_features': 0,
-        'nb_published_features_comments': 0,
-        'slug': f'{p.pk}-projet-1',
-        'thumbnail': '/api/projects/2-projet-1/thumbnail/',
-        'title': 'Projet 1',
-        'updated_on': '05/08/2021'}]
+    assert result.json() == {
+        'count': 1, 
+        'next': None, 
+        'previous': None, 
+        'results': [{
+            'title': 'Projet 1', 
+            'slug': '2-projet-1', 
+            'created_on': '05/08/2021', 
+            'updated_on': '05/08/2021', 
+            'description': None, 
+            'moderation': False, 
+            'is_project_type': False, 
+            'generate_share_link': False, 
+            'thumbnail': '/api/projects/2-projet-1/thumbnail/', 
+            'creator': 2,
+            'access_level_pub_feature': 'Utilisateur anonyme',
+            'access_level_arch_feature': 'Utilisateur anonyme',
+            'archive_feature': None,
+            'delete_feature': None,
+            'nb_features': 0,
+            'nb_published_features': 0,
+            'nb_comments': 0,
+            'nb_published_features_comments': 0,
+            'nb_contributors': 1
+        }]
+    }
 
 
 @pytest.mark.freeze_time('2021-08-05')

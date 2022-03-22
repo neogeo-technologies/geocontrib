@@ -185,3 +185,9 @@ Après avoir installé graphiz et django-extensions
 ````
 
 Le graphique est disponible ici [docs/model.png](docs/model.png)
+
+
+## RUN TESTS
+
+export DJANGO_SETTINGS_MODULE=config.settings
+pytest
