@@ -49,7 +49,6 @@ def test_feature_list(api_client):
     # Ensure admin project => get all features
     result = api_client.get('/api/features/?project__slug=1-aze')
     assert result.status_code == 200
-    # breakpoint()
     verify_or_create_json("api/tests/data/test_features_project_admin.json", result.json())
 
     # Ensure admin feature type => get all published features of the feature type

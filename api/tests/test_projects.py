@@ -79,7 +79,6 @@ def test_projects_post(api_client):
     )
 
     api_client.force_authenticate(user=user)
-
     result = api_client.post('/api/projects/', project_json, format="json")
     assert result.status_code == 201, result.content.decode()
     assert result.json() == {
@@ -93,6 +92,7 @@ def test_projects_post(api_client):
         'moderation': False,
         'slug': '3-projet-2',
         'title': 'Projet 2',
+        'generate_share_link': False,
     }
 
 
@@ -113,9 +113,8 @@ def test_projects_thumbnail_put(api_client):
     p.save()
 
     api_client.force_authenticate(user=user)
-
     filename = 'filename.png'
-    with open("test/data/img/image.png", 'rb') as fp:
+    with open("api/tests/data/img/image.png", 'rb') as fp:
         simple_file = SimpleUploadedFile(filename,
                                          fp.read(),
                                          content_type='multipart/form-data')
