@@ -25,7 +25,7 @@ from geocontrib.models import FeatureType
 from geocontrib.models import ImportTask
 from geocontrib.models import Project
 from geocontrib.views.common import DECORATORS
-from geocontrib.tasks import task_geojson_processing
+from geocontrib.tasks import task_geojson_processing, task_csv_processing
 
 
 @method_decorator(DECORATORS, name='dispatch')
@@ -269,6 +269,36 @@ class ImportFromGeoJSON(SingleObjectMixin, UserPassesTestMixin, View):
             messages.error(request, "Erreur à l'import du fichier. ")
         else:
             task_geojson_processing.apply_async(kwargs={'import_task_id': import_task.pk})
+            messages.info(request, "L'import du fichier réussi. Le traitement des données est en cours. ")
+        return redirect('geocontrib:feature_type_detail', slug=slug, feature_type_slug=feature_type_slug)
+
+
+@method_decorator(DECORATORS, name='dispatch')
+class ImportFromCSV(SingleObjectMixin, UserPassesTestMixin, View):
+    queryset = FeatureType.objects.all()
+    slug_url_kwarg = 'feature_type_slug'
+
+    def test_func(self):
+        user = self.request.user
+        feature_type = self.get_object()
+        project = feature_type.project
+        return Authorization.has_permission(user, 'can_create_feature', project)
+
+    def post(self, request, slug, feature_type_slug):
+        feature_type = self.get_object()
+        try:
+            up_file = request.FILES['csv_file']
+            import_task = ImportTask.objects.create(
+                created_on=timezone.now(),
+                project=feature_type.project,
+                feature_type=feature_type,
+                user=request.user,
+                geojson_file=up_file
+            )
+        except Exception:
+            messages.error(request, "Erreur à l'import du fichier. ")
+        else:
+            task_csv_processing.apply_async(kwargs={'import_task_id': import_task.pk})
             messages.info(request, "L'import du fichier réussi. Le traitement des données est en cours. ")
         return redirect('geocontrib:feature_type_detail', slug=slug, feature_type_slug=feature_type_slug)
 
