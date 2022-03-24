@@ -11,7 +11,9 @@ from geocontrib.models.user import User
 @pytest.mark.django_db
 @pytest.mark.freeze_time('2021-08-05')
 def test_projects_list(api_client):
-    result = api_client.get('/api/projects/')
+    url = reverse('api:projects-list')
+    # result = api_client.get('/api/projects/')
+    result = api_client.get(url)
 
     assert result.status_code == 200
     assert result.json() == {'count': 0, 'next': None, 'previous': None, 'results': []}
@@ -30,7 +32,8 @@ def test_projects_list(api_client):
     )
     p.save()
 
-    result = api_client.get('/api/projects/')
+    # result = api_client.get('/api/projects/')
+    result = api_client.get(url)
     assert result.status_code == 200
     assert result.json() == {
         'count': 1, 
@@ -79,6 +82,10 @@ def test_projects_post(api_client):
     )
 
     api_client.force_authenticate(user=user)
+    # CHANGE ME TO REVERSE POST
+    # url = reverse('api:projects', kwargs=project_json)
+    # result = api_client.get(url)
+    
     result = api_client.post('/api/projects/', project_json, format="json")
     assert result.status_code == 201, result.content.decode()
     assert result.json() == {
