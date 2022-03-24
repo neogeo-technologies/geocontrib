@@ -10,11 +10,7 @@ from geocontrib.views import ProjectDetail
 from geocontrib.views import FeatureDetail
 from geocontrib.views import ProjectUpdate
 from geocontrib.views import ProjectMapping
-from geocontrib.views import FeatureTypeCreate
 from geocontrib.views import FeatureTypeDetail
-from geocontrib.views import FeatureTypeUpdate
-from geocontrib.views import ImportFromGeoJSON
-from geocontrib.views import ImportFromImage
 from geocontrib.views import ProjectCreate
 from geocontrib.views import CommentCreate
 from geocontrib.views import AttachmentCreate
@@ -56,20 +52,8 @@ urlpatterns = [
         'projet/<slug:slug>/abonnement/<str:action>/', SubscribingView.as_view(),
         name='subscription'),
 
-    path('projet/<slug:slug>/type-signalement/ajouter/',
-         FeatureTypeCreate.as_view(), name="feature_type_create"),
-
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/',
          FeatureTypeDetail.as_view(), name='feature_type_detail'),
-
-    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/editer',
-         FeatureTypeUpdate.as_view(), name='feature_type_update'),
-
-    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/importer-geojson/',
-         ImportFromGeoJSON.as_view(), name='import_from_geojson'),
-
-    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/importer-image/',
-         ImportFromImage.as_view(), name='import_from_image'),
 
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/',

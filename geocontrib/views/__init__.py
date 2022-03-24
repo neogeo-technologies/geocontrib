@@ -1,11 +1,7 @@
 from .annotation import AttachmentCreate
 from .annotation import CommentCreate
 from .feature import FeatureDetail
-from .feature_type import FeatureTypeCreate
 from .feature_type import FeatureTypeDetail
-from .feature_type import FeatureTypeUpdate
-from .feature_type import ImportFromGeoJSON
-from .feature_type import ImportFromImage
 from .project import ProjectDetail
 from .project import ProjectUpdate
 from .project import ProjectCreate
@@ -23,11 +19,7 @@ __all__ = [
     AttachmentCreate,
     CommentCreate,
     FeatureDetail,
-    FeatureTypeCreate,
     FeatureTypeDetail,
-    FeatureTypeUpdate,
-    ImportFromGeoJSON,
-    ImportFromImage,
     ProjectDetail,
     ProjectUpdate,
     ProjectCreate,
