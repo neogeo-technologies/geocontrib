@@ -7,13 +7,9 @@ from django.contrib.flatpages import views as flatpages_views
 from geocontrib.views import HomePageView
 from geocontrib.views import MyAccount
 from geocontrib.views import ProjectDetail
-from geocontrib.views import FeatureList
 from geocontrib.views import FeatureDetail
-from geocontrib.views import FeatureUpdate
-from geocontrib.views import FeatureDelete
 from geocontrib.views import ProjectUpdate
 from geocontrib.views import ProjectMapping
-from geocontrib.views import FeatureCreate
 from geocontrib.views import FeatureTypeCreate
 from geocontrib.views import FeatureTypeDetail
 from geocontrib.views import FeatureTypeUpdate
@@ -75,26 +71,10 @@ urlpatterns = [
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/importer-image/',
          ImportFromImage.as_view(), name='import_from_image'),
 
-    path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/ajouter/',
-         FeatureCreate.as_view(), name='feature_create'),
-
-    path('projet/<slug:slug>/signalement/lister/',
-         FeatureList.as_view(), name='feature_list'),
-
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/',
         FeatureDetail.as_view(),
         name='feature_detail'),
-
-    path(
-        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/editer/',
-        FeatureUpdate.as_view(),
-        name='feature_update'),
-
-    path(
-        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/supprimer/',
-        FeatureDelete.as_view(),
-        name='feature_delete'),
 
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/commentaire/ajouter/',

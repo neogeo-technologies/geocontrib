@@ -1,10 +1,6 @@
 from .annotation import AttachmentCreate
 from .annotation import CommentCreate
-from .feature import FeatureCreate
-from .feature import FeatureList
 from .feature import FeatureDetail
-from .feature import FeatureUpdate
-from .feature import FeatureDelete
 from .feature_type import FeatureTypeCreate
 from .feature_type import FeatureTypeDetail
 from .feature_type import FeatureTypeUpdate
@@ -26,11 +22,7 @@ __all__ = [
     MyAccount,
     AttachmentCreate,
     CommentCreate,
-    FeatureCreate,
-    FeatureList,
     FeatureDetail,
-    FeatureUpdate,
-    FeatureDelete,
     FeatureTypeCreate,
     FeatureTypeDetail,
     FeatureTypeUpdate,
