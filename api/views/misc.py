@@ -27,7 +27,7 @@ from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import Project
 from geocontrib.models.task import ImportTask
-from geocontrib.tasks import task_geojson_processing
+from geocontrib.tasks import task_geojson_processing, task_csv_processing
 
 
 class ImportTaskSearch(
@@ -43,22 +43,27 @@ class ImportTaskSearch(
 
     def create(self, request, *args, **kwargs):
         try:
-            up_file = request.FILES['json_file']
+            if request.FILES.get('json_file'):
+                up_file = request.FILES['json_file']
+                process = task_geojson_processing
+            if request.FILES.get('csv_file'):
+                up_file = request.FILES['csv_file']
+                process = task_csv_processing
             feature_type = FeatureType.objects.get(slug=request.data.get('feature_type_slug'))
             import_task = ImportTask.objects.create(
                 created_on=timezone.now(),
                 project=feature_type.project,
                 feature_type=feature_type,
                 user=request.user,
-                geojson_file=up_file
+                file=up_file
             )
-        except Exception:
+        except Exception as e:
             return Response(
                 {'error': 'error'},
                 status=400,
             )
         else:
-            task_geojson_processing.apply_async(kwargs={'import_task_id': import_task.pk})
+            process.apply_async(kwargs={'import_task_id': import_task.pk})
 
         return Response({'detail': "L'import du fichier réussi. Le traitement des données est en cours. "}, status=200)
 

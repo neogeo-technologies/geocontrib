@@ -39,7 +39,7 @@ class ImportTask(models.Model):
         verbose_name="Utilisateur",
         on_delete=models.SET_NULL, null=True, blank=True)
 
-    geojson_file = models.FileField(
+    file = models.FileField(
         "Fichier Importé",
         upload_to=import_path,
         blank=True, null=True

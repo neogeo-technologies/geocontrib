@@ -169,9 +169,9 @@ class GeoJSONProcessing:
     #                 ))
     #             raise GeoJSONProcessingFailed
 
-    def validate_data(self, geojson_file):
+    def validate_data(self, file):
         try:
-            up_file = geojson_file.read()
+            up_file = file.read()
             data = json.loads(up_file.decode('utf-8'))
         except Exception as err:
             self.infos.append(
@@ -184,7 +184,7 @@ class GeoJSONProcessing:
         try:
             import_task.status = "processing"
             import_task.started_on = timezone.now()
-            data = self.validate_data(import_task.geojson_file)
+            data = self.validate_data(import_task.file)
             # self.check_feature_type_slug(data, import_task)
             self.check_feature_type(data, import_task)
             self.create_features(data, import_task)
