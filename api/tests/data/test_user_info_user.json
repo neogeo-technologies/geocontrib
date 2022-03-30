@@ -1,1 +1,1 @@
-{"detail": "usertest session is enabled", "user": {"username": "usertest", "is_active": true, "first_name": "", "last_name": "", "is_administrator": false, "is_superuser": false, "can_create_project": false, "email": ""}}
+{"detail": "usertest session is enabled", "user": {"username": "usertest", "is_active": true, "first_name": "", "last_name": "", "is_administrator": false, "is_superuser": false, "can_create_project": false, "email": "", "id": 3}}

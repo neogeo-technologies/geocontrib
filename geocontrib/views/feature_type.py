@@ -12,9 +12,9 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic.detail import SingleObjectMixin
 
-from api.serializers import FeatureTypeSerializer
 from geocontrib import logger
 from geocontrib.exif import exif
+from api.serializers import FeatureTypeSerializer
 from geocontrib.forms import CustomFieldModelBaseFS
 from geocontrib.forms import CustomFieldModelForm
 from geocontrib.forms import FeatureTypeModelForm
