@@ -135,6 +135,7 @@ class FeatureListSerializer(serializers.ModelSerializer):
     project = serializers.ReadOnlyField(source='project.slug')
     feature_type = FeatureTypeSerializer(read_only=True)
     feature_data = serializers.SerializerMethodField()
+    display_last_editor = serializers.SerializerMethodField()
 
     class Meta:
         model = Feature
@@ -147,10 +148,12 @@ class FeatureListSerializer(serializers.ModelSerializer):
             'updated_on',
             'creator',
             'display_creator',
+            'display_last_editor',
             'project',
             'feature_type',
             'geom',
             'feature_data',
+            'archived_on',
         )
 
     def get_feature_data(self, obj):
@@ -160,9 +163,15 @@ class FeatureListSerializer(serializers.ModelSerializer):
             res = []
         return res
 
+    def get_display_last_editor(self, obj):
+        res = 'N/A'
+        if self.context['request'].user.is_authenticated:
+            res = obj.display_last_editor
+        return res
+
 
 class FeatureTypeColoredSerializer(serializers.ModelSerializer):
-
+    
     class Meta:
         model = FeatureType
         fields = (
@@ -174,7 +183,7 @@ class FeatureTypeColoredSerializer(serializers.ModelSerializer):
 
 
 class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
-
+    
     feature_type = serializers.SlugRelatedField(
         slug_field='slug', queryset=FeatureType.objects.all())
 

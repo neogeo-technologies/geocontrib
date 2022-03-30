@@ -159,13 +159,17 @@ class ProjectFeature(views.APIView):
                 features,
                 is_authenticated=request.user.is_authenticated,
                 many=True,
-                context={"request": request}
+                context={"request": request},
             ).data
         else:
-            serializers = FeatureListSerializer(features, many=True)
+            serializers = FeatureListSerializer(
+                features,
+                many=True,
+                context={"request": request},
+            )
             data = {
                 'features': serializers.data,
-                'count': count
+                'count': count,
             }
         return Response(data, status=200)
 
