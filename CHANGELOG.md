@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.0.2] - 2022-30-03
+
+### Corrections
+
+- Redmine 13361 : Responsive design - bouton de logout disparait de la barre de menu
+- Redmine 13321 : Mode déconnecté - Conserver le cache dans le navigateur après rafraichissement de la page
+- Redmine 13305 : Liaison entre les signalements - Erreur 400 à l'enregistrement
+- Redmine 13240 : Responsive design - Sur la vue liste, le sélecteur modifier/supprimer en masse ne s'affiche pas
+- Redmine 13238 : Responsive design - Affichage du clavier au clic sur la map dans la page Liste et Carte
+- Redmine 13226 : Page d'accueil - Si l'utilisateur est anonyme, il n'a plus accès aux projets dont la visibilité est à "anonyme"
+- Redmine 13183 : Page mon compte - récupérer les projets sans pagination et par utilisateur
+- Redmine 13084 : URLs personnalisées - rendre visible à nouveau les cadres de "mon compte" avec les infos du projet cloisonné
+
 ## [3.0.1] - 2022-17-02
 
 ### Corrections
