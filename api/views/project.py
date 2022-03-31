@@ -24,6 +24,7 @@ from api.utils.filters import ProjectsModerationFilter
 from api.utils.filters import ProjectsAccessLevelFilter
 from api.utils.filters import ProjectsUserAccessLevelFilter
 from api.utils.filters import ProjectsUserAccessibleFilter
+from api.utils.filters import ProjectsUserAccountFilter
 from api.utils.paginations import SimplePagination
 from geocontrib.models import Authorization
 from geocontrib.models import Project
@@ -48,23 +49,13 @@ class ProjectView(viewsets.ModelViewSet):
         ProjectsModerationFilter,
         ProjectsAccessLevelFilter,
         ProjectsUserAccessLevelFilter,
-        ProjectsUserAccessibleFilter
+        ProjectsUserAccessibleFilter,
+        ProjectsUserAccountFilter
     ]
     search_fields = [
         'slug',
         'title',
     ]
-
-    def filter_queryset(self, queryset):
-        myaccount = self.request.query_params.get('myaccount', None)
-        user = self.request.user
-        if myaccount and user :
-            project_authorized = Authorization.objects.filter(user=user
-            ).filter(
-                level__rank__gte=2
-            ).values_list('project__pk', flat=True)
-            queryset = queryset.filter(Q(pk__in=project_authorized) | Q(creator=user))
-        return queryset
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
