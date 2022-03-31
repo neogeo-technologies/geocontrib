@@ -3,7 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.3.5] - 2022-03-31
+
+#### Corrections
+
 ## Unreleased
+
+- Redmine 13277 : Mode déconnecté - L'envoi d'une modification de signalement ne fonctionne plus
+- Redmine 13263 : Mode déconnecté - Revoir la mise en cache automatique
 
 ## [2.3.4] - 2022-03-14
 
