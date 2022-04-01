@@ -276,6 +276,7 @@ class ImportTaskSerializer(serializers.ModelSerializer):
     project_title = serializers.SerializerMethodField()
     feature_type_title = serializers.SerializerMethodField()
     geojson_file_name = serializers.SerializerMethodField()
+    csv_file_name = serializers.SerializerMethodField()
 
     def get_project_title(self, obj):
         return str(obj.project.slug)
@@ -285,7 +286,14 @@ class ImportTaskSerializer(serializers.ModelSerializer):
 
     def get_geojson_file_name(self, obj):
         try:
-            filename = str(obj.geojson_file.name.split('/')[-1])
+            filename = str(obj.file.name.split('/')[-1])
+        except Exception:
+            filename = 'example_error.file'
+        return filename
+
+    def get_csv_file_name(self, obj):
+        try:
+            filename = str(obj.file.name.split('/')[-1])
         except Exception:
             filename = 'example_error.file'
         return filename
@@ -305,4 +313,5 @@ class ImportTaskSerializer(serializers.ModelSerializer):
             # 'geojson_file',
             'geojson_file_name',
             'infos',
+            'csv_file_name'
         )
