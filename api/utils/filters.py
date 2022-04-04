@@ -47,10 +47,25 @@ class ProjectsUserAccessLevelFilter(filters.BaseFilterBackend):
         return queryset
 
 class ProjectsUserAccessibleFilter(filters.BaseFilterBackend):
+
     def filter_queryset(self, request, queryset, view):
         user_level_projects = Authorization.get_user_level_projects_ids(request.user)
         if request.query_params.get('accessible'):
             for i, c in enumerate(queryset):
                 if (c.access_level_pub_feature.rank > user_level_projects[c.slug]):
                     queryset = queryset.exclude(slug=c.slug)
+        return queryset
+
+
+class ProjectsUserAccountFilter(filters.BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        myaccount = request.query_params.get('myaccount', None)
+        user = request.user
+        if myaccount and user :
+            project_authorized = Authorization.objects.filter(user=user
+            ).filter(
+                level__rank__gte=2
+            ).values_list('project__pk', flat=True)
+            queryset = queryset.filter(Q(pk__in=project_authorized) | Q(creator=user))
         return queryset
