@@ -82,11 +82,9 @@ def test_projects_post(api_client):
     )
 
     api_client.force_authenticate(user=user)
-    # CHANGE ME TO REVERSE POST
-    # url = reverse('api:projects', kwargs=project_json)
-    # result = api_client.get(url)
-    
-    result = api_client.post('/api/projects/', project_json, format="json")
+    url = reverse('api:projects-list')
+    result = api_client.post(url, project_json, format="json")
+
     assert result.status_code == 201, result.content.decode()
     assert result.json() == {
         'access_level_arch_feature': "anonymous",
