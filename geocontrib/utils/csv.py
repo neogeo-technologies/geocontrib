@@ -60,7 +60,10 @@ class CSVProcessing:
     @transaction.atomic
     def create_features(self, import_task):
         with open(import_task.file.path, 'r') as csvfile:
-            data = csv.DictReader(csvfile)
+            sniffer = csv.Sniffer()
+            dialect = sniffer.sniff(csvfile.read())
+            csvfile.seek(0)
+            data = csv.DictReader(csvfile, dialect=dialect)
             features = list(data)
             if len(features) == 0:
                 self.infos.append(
@@ -141,7 +144,9 @@ class CSVProcessing:
     def validate_data(self, file):
         try:
             with open(file.path, 'r') as csvfile:
-                data = csv.DictReader(csvfile)
+                sniffer = csv.Sniffer()
+                dialect = sniffer.sniff(csvfile)
+                data = csv.DictReader(csvfile, delimiter=dialect.delimiter)
         except Exception as err:
             logger.warn(type(err), err)
             self.infos.append(
