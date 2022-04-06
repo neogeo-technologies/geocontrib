@@ -81,6 +81,9 @@ class FeatureView(
         if title_icontains:
             queryset = queryset.filter(title__icontains=title_icontains)
 
+        ordering = self.request.query_params.get('ordering')
+        if ordering:
+            queryset = queryset.order_by(ordering)
         return queryset
 
 
