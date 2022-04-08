@@ -1,5 +1,8 @@
+from email import header
 import json
 import requests
+import csv
+import collections
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -21,6 +24,7 @@ from api import logger
 from api.serializers.feature import FeatureDetailedAuthenticatedSerializer
 from api.serializers import FeatureDetailedSerializer
 from api.serializers import FeatureGeoJSONSerializer
+from api.serializers import FeatureCSVSerializer
 from api.serializers import FeatureLinkSerializer
 from api.serializers import FeatureListSerializer
 from api.serializers import FeatureSearchSerializer
@@ -269,9 +273,30 @@ class ExportFeatureList(views.APIView):
         """
         project = get_object_or_404(Project, slug=slug)
         features = Feature.handy.availables(request.user, project).filter( feature_type__slug=feature_type_slug)
-        serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
-        response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
-        response['Content-Disposition'] = 'attachment; filename=export_projet.json'
+        format = request.GET.get('format_export')
+        if format == 'geojson':
+            serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
+            response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
+            response['Content-Disposition'] = 'attachment; filename=export_projet.json'
+        elif format == 'csv':
+            serializer = FeatureCSVSerializer(features, many=True, context={'request': request})
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename=export_projet.csv'
+            headers = [*serializer.data[0].keys()]
+            headers.remove('geom')
+            headers.remove('feature_data')
+            headers.append('lat')
+            headers.append('lon')
+            headers.extend(serializer.data[0]['feature_data'].keys())
+            writer = csv.DictWriter(response, fieldnames=headers)
+            writer.writeheader()
+            for row in serializer.data:
+                row['lon'] = row['geom']['coordinates'][0]
+                row['lat'] = row['geom']['coordinates'][1]
+                full_row = collections.OrderedDict(list(row.items()) + list(row['feature_data'].items()))
+                del full_row['geom']
+                del full_row['feature_data']
+                writer.writerow(full_row)
         return response
 
 

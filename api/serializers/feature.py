@@ -284,6 +284,101 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
         return instance
 
 
+class FeatureCSVSerializer(serializers.ModelSerializer):
+    
+    feature_type = serializers.SlugRelatedField(
+        slug_field='slug', queryset=FeatureType.objects.all())
+
+    project = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Project.objects.all())
+
+    display_creator = serializers.SerializerMethodField()
+
+    display_last_editor = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Feature
+        fields = (
+            'feature_id',
+            'title',
+            'description',
+            'status',
+            'created_on',
+            'updated_on',
+            'archived_on',
+            'deletion_on',
+            'feature_type',
+            'project',
+            'display_creator',
+            'display_last_editor',
+            'creator',
+            'geom',
+            'feature_data'
+        )
+        read_only_fields = (
+            'created_on',
+            'updated_on',
+            'archived_on',
+            'deletion_on',
+            'display_last_editor',
+        )
+
+    # def handle_custom_fields(self, validated_data, instance):
+    #     # Hack: les champs extra n'etant pas serializés ou définis dans le modèle
+    #     # FIXME: les champs ne sont donc pas validés mais récupérés direct
+    #     # depuis les données initiales
+    #     custom_fields = validated_data.get(
+    #         'feature_type'
+    #     ).customfield_set.values_list('name', flat=True)
+    #     if instance.feature_data:
+    #         for key, value in instance.feature_data:
+    #             if key in custom_fields:
+    #                 validated_data[key] = value
+
+    #     return validated_data
+
+    def get_display_creator(self, obj):
+        res = 'N/A'
+        if self.context['request'].user.is_authenticated:
+            res = obj.display_creator
+        return res
+
+    def get_display_last_editor(self, obj):
+        res = 'N/A'
+        if self.context['request'].user.is_authenticated:
+            res = obj.display_last_editor
+        return res
+
+    def handle_title(self, validated_data):
+        title = validated_data.get('title')
+        if not title or title == '':
+            uid = uuid4()
+            validated_data['title'] = str(uid)
+            validated_data['feature_id'] = uid
+        return validated_data
+
+    def create(self, validated_data):
+        try:
+            instance = Feature.objects.create(**validated_data)
+            validated_data['creator'] = self.context.get('request').user
+            # validated_data = self.handle_custom_fields(validated_data, instance)
+            validated_data = self.handle_title(validated_data)
+        except Exception as err:
+            raise serializers.ValidationError({'detail': str(err)})
+        return instance
+
+    def update(self, instance, validated_data):
+        # validated_data = self.handle_custom_fields(validated_data, instance)
+        validated_data['last_editor'] = self.context.get('request').user
+        try:
+            for k, v in validated_data.items():
+                setattr(instance, k, v)
+            instance.save()
+        except Exception as err:
+            raise serializers.ValidationError([str(err), ])
+        return instance
+
+
 class FeatureSearchSerializer(serializers.ModelSerializer):
     project_slug = serializers.ReadOnlyField(source='project.slug')
     feature_type_slug = serializers.ReadOnlyField(source='feature_type.slug')
