@@ -74,9 +74,9 @@ Si l'utilisateur souhaite charger des données depuis IDGO dans un type de signa
 
 ## Export d'un type de signalements
 
-Cette fonction permet d'exporter les signalements d'un type de signalements sous la forme d'un fichier GeoJSON.
+Cette fonction permet d'exporter les signalements d'un type de signalements sous la forme d'un fichier GeoJSON ou CSV.
 * Tout utilisateur pouvant naviguer dans le projet peut exporter les données
-* Seules les données que l'utilisateur courant a le droit de consulter figurent dans l'export GeoJSON. Le statut (brouillon, publié, en attente de publication, archive) est mentionné pour chaque signalement.
+* Seules les données que l'utilisateur courant a le droit de consulter figurent dans l'export GeoJSON ou CSV. Le statut (brouillon, publié, en attente de publication, archive) est mentionné pour chaque signalement.
 * L'export ne contient aucune information relative aux évènements et aux auteurs des signalements.
 * L'export ne contient aucune référence vers les pièces jointes.
 * L'export ne contient aucune information relative aux styles cartographiques des types de signalements.
