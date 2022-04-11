@@ -309,7 +309,6 @@ class ImportFromImage(SingleObjectMixin, UserPassesTestMixin, View):
     slug_url_kwarg = 'feature_type_slug'
 
     def test_func(self):
-        return True
         user = self.request.user
         feature_type = self.get_object()
         project = feature_type.project
