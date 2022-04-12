@@ -15,7 +15,6 @@ from geocontrib.models import Layer
 class GetFeatureInfo(APIView):
 
     http_method_names = ['get', ]
-
     def get(self, request):
         payload = {}
 
@@ -51,11 +50,9 @@ class GetFeatureInfo(APIView):
             code = response.status_code
             if code != 200 or not data.get('type', '') == 'FeatureCollection':
                 data = "Les données ne sont pas au format geoJSON"
-        except Exception:
-            data = "Les données sont inaccessibles"
-        finally:
             return Response(data=data, status=code)
-
+        except Exception:
+            return Response(data="Les données sont inaccessibles", status=404)
 
 class BaseMapViewset(
         mixins.ListModelMixin,

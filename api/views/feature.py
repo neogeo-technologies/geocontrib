@@ -437,7 +437,6 @@ class GetIdgoCatalogView(views.APIView):
     http_method_names = ['get', ]
 
     def get(self, request):
-        code = 404
         url = settings.IDGO_URL
         user = request.query_params.get('user')
         if user:
@@ -447,17 +446,15 @@ class GetIdgoCatalogView(views.APIView):
             response = requests.get(url, timeout=60, auth=(settings.IDGO_LOGIN, settings.IDGO_PASSWORD), verify=settings.IDGO_VERIFY_CERTIFICATE)
             data = response.json()
             code = response.status_code
+            return Response(data=data, status=code)
         except Exception as e:
             logger.exception("Les données sont inaccessibles %s", e)
-            data = "Les données sont inaccessibles"
-        finally:
-            return Response(data=data, status=code)
+            return Response(data="Les données sont inaccessibles", status=404)
 
 class GetExternalGeojsonView(views.APIView):
     http_method_names = ['get', ]
 
     def get(self, request):
-        code = 404
         payload = {}
         url = settings.MAPSERVER_URL
         organization_slug = request.GET.get('organization_slug', '')
@@ -478,8 +475,7 @@ class GetExternalGeojsonView(views.APIView):
             code = response.status_code
             if code != 200 or not data.get('type', '') == 'FeatureCollection':
                 data = "Les données ne sont pas au format geoJSON"
+            return Response(data=data, status=code)
         except Exception as e:
             logger.exception("Les données sont inaccessibles %s", e)
-            data = "Les données sont inaccessibles"
-        finally:
-            return Response(data=data, status=code)
+            return Response(data="Les données sont inaccessibles", status=404)

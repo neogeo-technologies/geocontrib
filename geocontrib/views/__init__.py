@@ -7,10 +7,10 @@ from .common import MyAccount
 
 
 __all__ = [
-    HomePageView,
-    MyAccount,
-    AttachmentCreate,
-    CommentCreate,
-    FeatureDetail,
-    FeatureTypeDetail,
+    'HomePageView',
+    'MyAccount',
+    'AttachmentCreate',
+    'CommentCreate',
+    'FeatureDetail',
+    'FeatureTypeDetail',
 ]

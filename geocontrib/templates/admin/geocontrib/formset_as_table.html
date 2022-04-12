@@ -13,10 +13,10 @@
       <thead>
         <tr>
           {% for field in form.visible_fields %}
-          <th>{{ field.label|capfirst }}</th>
+          <th scope="col">{{ field.label|capfirst }}</th>
           {% endfor %}
           {% if formset.can_delete %}
-          <th>Supprimer</th>
+          <th scope="col">Supprimer</th>
           {% endif %}
         </tr>
       </thead>
@@ -49,6 +49,17 @@
 
   <div class="{{ formset.prefix }}__hidden" style="display: none">
     <table>
+      {# ajout d'un header seulement pour éviter erreurs sonarqube #}
+      <thead>
+          <th scope="col" style="display: none;"></th>
+          {% if len(formset.empty_form.hidden_fields) > 0 %}
+          <th scope="col"></th>
+          {% endif %}
+          {% if formset.can_delete %}
+          <th scope="col">Supprimer</th>
+          {% endif %}
+        </tr>
+      </thead>
       <tbody id="{{ formset.prefix }}-EMPTY_TBODY">
         <tr id="{{ formset.prefix }}-__prefix__-ROW">
           {# On inclus le champs caché DELETE #}
