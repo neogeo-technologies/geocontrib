@@ -15,6 +15,22 @@ En bas de page, il peut choisir :
 * de créer simplement le type de signalement,
 * de créer le type de signalement et d'importer les données du fichier.
 
+### Via un fichier CSV
+Depuis la page d'accueil d'un projet, le bouton _"Créer un type de signalements à partir d'un fichier CSV"_ permet à l'utilisateur d'uploader un fichier stocké sur son poste local.
+*L'import CSV n'est disponible que pour les géométries POINT.*
+
+**Formatage du fichier**
+Le fichier importé doit respecter certaines règles de formatage:
+- Séparateurs:
+    - Virgules: dans ce cas, les valeurs de tout les champs ne peuvent contenir de virgules.
+    - Point-virgules: les valeurs des champs peuvent contenir des virgules.
+    - Aucun autre séparateur n'est supporté.
+- Champs de coordonnées:
+    - Le fichier doit obligatoirement contenir des champs de coordonnées sous la forme de 2 champs: "lon" et "lat"
+    - Les coordonnées doivent être au format WGS84 (EPSG 4326).
+
+Tout les champs ne correspondant pas au champs réservés à la construction d'un type de signalement seront listés en tant que champs personnalisés.
+
 ### Via une plateforme IDGO
 
 Cette fonctionnalité n'est disponible que pour les installations de GeoContrib couplée avec une plateforme IDGO.
@@ -58,9 +74,9 @@ Si l'utilisateur souhaite charger des données depuis IDGO dans un type de signa
 
 ## Export d'un type de signalements
 
-Cette fonction permet d'exporter les signalements d'un type de signalements sous la forme d'un fichier GeoJSON.
+Cette fonction permet d'exporter les signalements d'un type de signalements sous la forme d'un fichier GeoJSON ou CSV.
 * Tout utilisateur pouvant naviguer dans le projet peut exporter les données
-* Seules les données que l'utilisateur courant a le droit de consulter figurent dans l'export GeoJSON. Le statut (brouillon, publié, en attente de publication, archive) est mentionné pour chaque signalement.
+* Seules les données que l'utilisateur courant a le droit de consulter figurent dans l'export GeoJSON ou CSV. Le statut (brouillon, publié, en attente de publication, archive) est mentionné pour chaque signalement.
 * L'export ne contient aucune information relative aux évènements et aux auteurs des signalements.
 * L'export ne contient aucune référence vers les pièces jointes.
 * L'export ne contient aucune information relative aux styles cartographiques des types de signalements.
