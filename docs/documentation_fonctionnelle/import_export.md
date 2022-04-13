@@ -27,7 +27,7 @@ Le fichier importé doit respecter certaines règles de formatage:
     - Aucun autre séparateur n'est supporté.
 - Champs de coordonnées:
     - Le fichier doit obligatoirement contenir des champs de coordonnées sous la forme de 2 champs: "lon" et "lat"
-    - Les coordonnées doivent être des valeures décimales.
+    - Les coordonnées doivent être au format WGS84 (EPSG 4326).
 
 Tout les champs ne correspondant pas au champs réservés à la construction d'un type de signalement seront listés en tant que champs personnalisés.
 
