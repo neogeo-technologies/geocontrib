@@ -6,6 +6,7 @@ stages:
 variables:
   SONAR_PROJECTKEY: "$CI_PROJECT_NAME"
   SONAR_HOST_URL: "https://sonarqube.neogeo.fr"
+  SONAR_LOGIN: $SONAR_TOKEN
   GIT_DEPTH: 0
 
 
