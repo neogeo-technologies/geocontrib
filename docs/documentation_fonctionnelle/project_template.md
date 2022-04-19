@@ -19,4 +19,4 @@ Depuis le Back Office de Django, depuis les pages "projets", les super-utilisate
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)

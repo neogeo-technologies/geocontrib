@@ -104,4 +104,4 @@ Il accède aux fonctionnalités de l'interface selon les permissions qui lui ont
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)

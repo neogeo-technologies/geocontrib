@@ -39,4 +39,4 @@ Toutes les fonctionnalités ne sont cependant pas conservées lorsque l'on est d
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)

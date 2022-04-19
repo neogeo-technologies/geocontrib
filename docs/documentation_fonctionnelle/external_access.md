@@ -51,4 +51,4 @@ Une API pourrait à terme faciliter l'accès aux données à des outils tiers.
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)

@@ -1,14 +1,4 @@
-# Aide
-
-[[_TOC_]]
-
-## Présentation de l'outil
-
-GéoContrib est une application web destinée à éditer de manière collaborative une base de données sous la forme de contributions géolocalisées et de commentaires. En utilisant un système de commentaires, de notifications et de modération des contributions elle cherche à renforcer des communautés d'utilisateurs autour de projets de constitution ou de qualification de leurs bases de données géographiques.
-
-Elle a été conçue pour fonctionner aussi bien sur du matériel sédentaire que sur des terminaux mobiles (dans des navigateurs internet modernes).
-
-
+# Présentation de l'outil
 ## Notions importantes
 
 ### Authentification
@@ -25,6 +15,7 @@ Un projet constitue l'application de l’outil de signalement pour un contexte m
 Chaque projet est destiné à une communauté d'utilisateurs particulière, de droits d'accès spécifiques et est articulé autour de types de projets qui lui sont propres.
 
 Le champ des applications possibles est vaste. Quelques exemples illustratifs :
+
 * publier les projets de travaux sur la voirie dans le cadre de l'article L49 du code des postes et des communications électroniques ;
 * recette d'une base de données géographiques ;
 * création d'une base de données collaborative sur la localisation d'équipements ;
@@ -32,6 +23,7 @@ Le champ des applications possibles est vaste. Quelques exemples illustratifs :
 * recueil des besoins de mise à jour du PCRS (Plan de Corps de Rue Simplifié).
 
 Chaque projet possède des caractéristiques propres qui ont un impact sur les droits des utilisateurs :
+
 * chaque utilisateur peut posséder un rôle différent pour chaque projet : administrateur du projet, modérateur, super-contributeur, contributeur ou aucun rôle particulier ;
 * la visibilité des signalements publiés et archivés peut être modulée pour chaque projet ;
 * la modération peut activée/désactivée pour chaque projet.
