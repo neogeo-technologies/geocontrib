@@ -120,7 +120,7 @@ REST_FRAMEWORK = {
 }
 
 # URL prefix
-URL_PREFIX = config('URL_PREFIX', default='')
+URL_PREFIX = config('URL_PREFIX', default='geocontrib/')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Static and media files
@@ -170,12 +170,12 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': config('LOG_LEVEL', default='INFO'),
+            'level': config('LOG_LEVEL', default='WARN'),
             'propagate': True,
         },
         'plugin_georchestra': {
             'handlers': ['console'],
-            'level': config('LOG_LEVEL', default='INFO'),
+            'level': config('LOG_LEVEL', default='DEBUG'),
             'propagate': True,
         },
     },

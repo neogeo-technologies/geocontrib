@@ -36,19 +36,19 @@ def test_projects_list(api_client):
     result = api_client.get(url)
     assert result.status_code == 200
     assert result.json() == {
-        'count': 1, 
-        'next': None, 
-        'previous': None, 
+        'count': 1,
+        'next': None,
+        'previous': None,
         'results': [{
-            'title': 'Projet 1', 
-            'slug': '2-projet-1', 
-            'created_on': '05/08/2021', 
-            'updated_on': '05/08/2021', 
-            'description': None, 
-            'moderation': False, 
-            'is_project_type': False, 
-            'generate_share_link': False, 
-            'thumbnail': '/api/projects/2-projet-1/thumbnail/', 
+            'title': 'Projet 1',
+            'slug': '2-projet-1',
+            'created_on': '05/08/2021',
+            'updated_on': '05/08/2021',
+            'description': None,
+            'moderation': False,
+            'is_project_type': False,
+            'generate_share_link': False,
+            'thumbnail': reverse('api:project-thumbnail', args=["2-projet-1"]),
             'creator': 2,
             'access_level_pub_feature': 'Utilisateur anonyme',
             'access_level_arch_feature': 'Utilisateur anonyme',
@@ -132,7 +132,7 @@ def test_projects_thumbnail_put(api_client):
     assert result.status_code == 200, result.content.decode()
     result_json = result.json()
     thumbnail = result_json.pop('thumbnail')
-    assert thumbnail == "/api/projects/4-projet-3/thumbnail/"
+    assert thumbnail == url
     assert result_json == {
         'access_level_arch_feature': 'Utilisateur anonyme',
         'access_level_pub_feature': 'Utilisateur anonyme',

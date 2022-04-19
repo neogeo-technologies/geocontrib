@@ -1,4 +1,5 @@
 stages:
+  - test
   - Static analysis
   - build
   - deploy
@@ -8,6 +9,11 @@ variables:
   SONAR_HOST_URL: "https://sonarqube.neogeo.fr"
   SONAR_LOGIN: $SONAR_TOKEN
   GIT_DEPTH: 0
+  # Used to configure CI Test
+  POSTGRES_DB: geocontrib
+  POSTGRES_USER: geocontrib
+  POSTGRES_PASSWORD: geocontrib
+  POSTGRES_HOST_AUTH_METHOD: trust
 
 
 build testing docker image:
@@ -75,5 +81,30 @@ sonarqube-check:
   only:
     - develop
   stage: Static analysis
+  dependencies:
+    - test
   script:
     - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectName=$CI_PROJECT_NAME -Dsonar.projectVersion=$CI_COMMIT_BRANCH
+
+test:
+  stage: test
+  image: python:3.7
+  services:
+    - redis
+    - postgis/postgis
+  variables:
+    REDIS_HOST: "redis"
+    DB_HOST: "postgis-postgis"
+  before_script:
+    - apt update && apt install -y --no-install-recommends libproj-dev gdal-bin
+  script:
+    - pip install -r requirements-dev.txt -r requirements.txt
+    - django-admin startproject config .
+    - cp -r config_sample/* config/
+    - pytest --junitxml=xunit-reports/xunit-result-pytest.xml --cov-report xml:coverage-reports/coverage-pytest.xml --cov .
+  artifacts:
+    paths:
+    - coverage-reports/
+    - xunit-reports/
+    expire_in: 1 week
+

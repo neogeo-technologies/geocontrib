@@ -28,18 +28,19 @@ def test_feature_list(api_client):
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
     call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
 
+    features_url = reverse('api:features-list')
     # Ensure no parameters Fails
-    result = api_client.get('/api/features/')
+    result = api_client.get(features_url)
     assert result.status_code == 400
     assert result.json() == ["Must provide parameter project__slug or feature_type__slug"]
 
     # Ensure anonymous project => only get published features of the 2 feature types
-    result = api_client.get('/api/features/?project__slug=1-aze&ordering=created_on')
+    result = api_client.get(f'{ features_url }?project__slug=1-aze&ordering=created_on')
     assert result.status_code == 200
     verify_or_create_json("api/tests/data/test_features_project_anon.json", result.json())
 
     # Ensure anonymous feature type => only get published features of the feature type
-    result = api_client.get('/api/features/?feature_type__slug=1-dfsdfs')
+    result = api_client.get(f'{ features_url }?feature_type__slug=1-dfsdfs')
     assert result.status_code == 200
     verify_or_create_json("api/tests/data/test_features_featuretype_anon.json", result.json())
 
@@ -47,19 +48,19 @@ def test_feature_list(api_client):
     user = User.objects.get(username="admin")
     api_client.force_authenticate(user=user)
     # Ensure admin project => get all features
-    result = api_client.get('/api/features/?project__slug=1-aze&ordering=created_on')
+    result = api_client.get(f'{ features_url }?project__slug=1-aze&ordering=created_on')
     assert result.status_code == 200
     verify_or_create_json("api/tests/data/test_features_project_admin.json", result.json())
 
     # Ensure admin feature type => get all published features of the feature type
-    result = api_client.get('/api/features/?feature_type__slug=1-dfsdfs&ordering=created_on')
+    result = api_client.get(f'{ features_url }?feature_type__slug=1-dfsdfs&ordering=created_on')
     assert result.status_code == 200
     verify_or_create_json("api/tests/data/test_features_featuretype_admin.json", result.json())
 
     # Ensure wrong project fails
-    result = api_client.get('/api/features/?project__slug=1-wrong')
+    result = api_client.get(f'{ features_url }?project__slug=1-wrong')
     assert result.status_code == 404
 
     # Ensure wrong feature_type__slug fails
-    result = api_client.get('/api/features/?feature_type__slug=1-wrong')
+    result = api_client.get(f'{ features_url }?feature_type__slug=1-wrong')
     assert result.status_code == 404
