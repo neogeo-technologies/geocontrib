@@ -20,4 +20,4 @@ Pour désabonner tous les utilisateurs d'un projet, il suffit de supprimer l'obj
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)

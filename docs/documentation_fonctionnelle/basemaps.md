@@ -121,4 +121,4 @@ Pour que les couches soient requêtables, elles doivent être fournies par des s
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)

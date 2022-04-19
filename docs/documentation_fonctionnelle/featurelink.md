@@ -24,4 +24,4 @@ Dans l'interface d'administration, les super-utilisateurs peuvent rechercher, pu
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)

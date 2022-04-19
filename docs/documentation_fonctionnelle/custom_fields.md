@@ -39,4 +39,4 @@ Lors de la création du signalement, ce champ correspond à un texte sur plusieu
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)

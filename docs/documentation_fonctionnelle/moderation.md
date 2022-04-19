@@ -22,4 +22,4 @@ Si le contributeur souhaite modifier son signalement une fois qu'il est publié,
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)

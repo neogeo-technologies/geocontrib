@@ -31,4 +31,4 @@ Le détail du fonctionnement de l'import est fourni ici : [Imports et exports de
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)

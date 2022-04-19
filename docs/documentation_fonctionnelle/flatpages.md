@@ -18,4 +18,4 @@ Dans la partie avancée du formulaire, il est possible d'indiquer le nom d'un mo
 
 ---
 
-[Retour à l'accueil](<README.md>)
+[Retour à l'accueil](<index.md>)
