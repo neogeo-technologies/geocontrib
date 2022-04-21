@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [3.0.3] - 2022-21-04
 
+### Corrections
+
 - Redmine 13498 : Accueil GéoContrib - Les filtres ne fonctionnent plus
 - Redmine 13277 : Mode déconnecté - L'envoi d'une modification de signalement ne fonctionne plus
 - Redmine 13263 : Mode déconnecté - Revoir la mise en cache automatique
