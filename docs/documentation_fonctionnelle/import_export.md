@@ -52,6 +52,11 @@ Seuls les utilisateurs qui peuvent créer des signalements (contributeurs et niv
 
 Si l'utilisateur souhaite charger un fichier GeoJSON dans un type de signalements existant, il doit dérouler le menu _"Importer des signalements"_ de la page du type de signalements. Il choisit ensuite le fichier de données qu'il souhaite importer dans son explorateur de fichiers et clique sur le bouton _"Lancer l'import"_. Les données sont importées dans le type de signalements.
 
+
+### Import d'un fichier CSV
+
+Cf. [import GeoJSON](#import-dun-fichier-geojson), mais disponible uniquement pour les types de signalements de type POINT.
+
 ### Import depuis une plateforme IDGO
 
 Cette fonctionnalité n'est disponible que pour les installations de GeoContrib couplée avec une plateforme IDGO.
