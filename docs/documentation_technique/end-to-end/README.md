@@ -48,6 +48,8 @@ pip install -r src/docs/end-to-end/requirements.txt
 
 Copier le contenu du fichier .env_sample dans le fichier .env
 
+--> Ne semble plus nécessaire ? À vérifier...
+
 ### Variables à éditer dans .env
 
 - URL

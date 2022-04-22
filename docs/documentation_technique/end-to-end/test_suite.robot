@@ -28,10 +28,10 @@ ${SELSPEED}     0.1
 ...                 AND                     Maximize Browser Window
 ...                 AND                     Set Selenium Speed              ${SELSPEED}
 
-Connect GeoContrib - TEST 4
+Connect GeoContrib - TEST 5
     Current Frame Should Contain            Se Connecter
     Geocontrib Connect Superuser            ${SUPERUSERNAME}                ${SUPERUSERPASSWORD}
-    Current Frame Should Contain            ${SUPERUSERNAME}
+    Page Should Contain                     ${SUPERUSERDISPLAYNAME}
 
 Create Project with Random Projectname - TESTS 10, 17
     Page Should Not Contain                 ${RANDOMPROJECTNAME}

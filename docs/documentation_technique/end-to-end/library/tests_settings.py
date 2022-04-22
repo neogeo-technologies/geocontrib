@@ -20,5 +20,6 @@ def get_variables():
                 "ADMIN_URL": "https://geocontrib.dev.neogeo.fr/admin",
                 "SUPERUSERNAME": "test_premier_utilisateur",
                 "SUPERUSERPASSWORD": "NuchUFs2qfQWThT",
+                "SUPERUSERDISPLAYNAME": "Anne O'Neem"
                 }
     return variables
