@@ -1,17 +1,13 @@
-# Aide
-
-[[_TOC_]]
-
-## Présentation de l'outil
+# Présentation de l'outil
 
 GéoContrib est une application web destinée à éditer de manière collaborative une base de données sous la forme de contributions géolocalisées et de commentaires. En utilisant un système de commentaires, de notifications et de modération des contributions elle cherche à renforcer des communautés d'utilisateurs autour de projets de constitution ou de qualification de leurs bases de données géographiques.
 
 Elle a été conçue pour fonctionner aussi bien sur du matériel sédentaire que sur des terminaux mobiles (dans des navigateurs internet modernes).
 
 
-## Notions importantes
+# Notions importantes
 
-### Projet
+## Projet
 
 Un projet constitue l'application de l’outil de signalement pour un contexte métier / un usage particulier.
 Chaque projet est destiné à une communauté d'utilisateurs particulières, de droits d'accès spécifiques et est articulé autour de types de projets qui lui sont propres.
@@ -28,13 +24,14 @@ Chaque projet possède des caractéristiques propres qui ont un impact sur les d
 * la visibilité des signalements publiés et archivés peut être modulée pour chaque projet ;
 * la modération peut activée/désactivée pour chaque projet.
 
-### Signalement
+## Signalement
 
 Un signalement est une information géolocalisée décrivant un objet géographique porté à la connaissance des usagers d’un projet. Chaque signalement est attaché à un projet et un type de signalements particulier.
 
-### Type de signalements
+## Type de signalements
 
 Un type de signalements correspond à une modélisation particulière (pour un contexte métier particulier) des signalements :
+
 * **un type de géométrie** donné : point, ligne ou polygone
 * **des champs spécifiques** déclarés par le créateur du type de signalements (ces champs s'ajoutent aux champs
 obligatoires) que l'on retrouve pour tous les types de signalements, à savoir le titre, la description et le statut du signalement.
@@ -43,9 +40,10 @@ Chaque type de signalements est également caractérisé par une couleur qui est
 
 Le modèle de données d'un type de signalement peut être modifié tant qu'aucun signalement n'y est associé.
 
-### Statut d'un signalement
+## Statut d'un signalement
 
 Chaque signalement possède un statut indiquant son état en terme de publication :
+
 * **brouillon** : signalement non publié. Permet au créateur du signalement d'éditer progressivement sur un signalement avant de le publier ou de demander sa publication ;
 * **en attente de publication** : statut d'un signalement dont l'auteur a demandé sa publication (uniquement si le projet est modéré) ;
 * **publié** : donne la visibilité la plus large possible au signalement ;
@@ -53,22 +51,22 @@ Chaque signalement possède un statut indiquant son état en terme de publicatio
 
 La liste ci-dessus est donnée dans l'ordre logique du cycle de vie d'un signalement.
 
-### Commentaire
+## Commentaire
 
 À l’image de ce qui existe sur les outils en ligne de gestion de tickets (Github et Redmine par exemple) chaque signalement peut être commenté par son auteur et par les autres usagers du projet afin de permettre l’amélioration de la base de données de manière collaborative. Chaque commentaire peut être accompagné de pièces jointes.
 
-### Pièce jointe
+## Pièce jointe
 
 Il est possible d'associer un document numérique à un signalement ou à un commentaire. Typiquement, il pourra s'agir d'une photographie de terrain, d'une copie d'un arrêté ou tout document permettant de préciser les informations portées par le signalement. Dans certains cas, la géolocalisation présente dans une photographie (tags EXIF) peut être utilisée pour positionner le signalement.
 
-### Évènements et notifications
+## Évènements et notifications
 
 La modification d'un signalement, son changement de statut, l'ajout d'un commentaire sont enregistrés en base de données pour :
 * mettre à jour la liste des évènements qui apparaît dans la fiche du signalement dans la rubrique _"Activité et commentaires"_ ;
 * envoyer des notifications par messages électroniques aux modérateurs, administrateurs ainsi que les autres utilisateurs qui se sont abonnés au projet.
 
 
-## Architecture
+# Architecture
 
 * **Back-Office Django**
 
@@ -93,9 +91,9 @@ Les interfaces cartographiques de l'application utilisent la bibliothèque Leafl
 Cf. [Géocodage](geocoder.md)
 
 
-## Interface homme-machine de l'application
+# Interface homme-machine de l'application
 
-### Page d'accueil de l'application
+## Page d'accueil de l'application
 
 La page d'accueil de l'application contient :
 * un bandeau horizontal avec :
@@ -107,7 +105,7 @@ La page d'accueil de l'application contient :
 * la liste des projets existants avec une courte description et quelques indicateurs. Un clic sur un projet renvoie vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un message d'erreur lui est présenté.
 
 
-### Menu d'un projet
+## Menu d'un projet
 
 Lorsque l'utilisateur courant est entré dans un projet un menu supplémentaire apparaît dans le bandeau horizontal d'en-tête. Il donne accès aux principales sous-pages du projet :
 * Page d'accueil du projet ;
@@ -123,7 +121,7 @@ Sur la partie de droite, ce bandeau identifie également le niveau d'autorisatio
 * Modérateur : indique que l'utilisateur peut publier des signalements ;
 * Administrateur projet : indique que l'utilisateur peut administrer le projet, à savoir modifier les paramètres du projet, créer des nouveaux types de signalements, paramétrer les fonds cartographiques et administrer les niveaux d'autorisation des autres utilisateurs sur ce projet.
 
-### Page d'accueil d'un projet
+## Page d'accueil d'un projet
 
 La page d'accueil d'un projet contient les éléments suivants :
 * Un rappel des informations descriptives du projet dans la partie haute :
@@ -149,13 +147,13 @@ Au-delà de ces informations, cette page propose également des actions activée
 * un bouton de création d'un nouveau signalement en face de chaque type de signalements (pour les contributeurs du projet et niveau supérieur);
 * un bouton de modification de la symbologie, en face de chaque type de signalements ponctuels (pour les administrateurs du projet).
 
-### Formulaire de création / édition d'un type de signalements
+## Formulaire de création / édition d'un type de signalements
 
 Les administrateurs d'un projet (et utilisateur de niveau de permission supérieur) ont la possibilité d'ajouter un type de signalement ou d'éditer un type de signalement (tant qu'aucun signalement n'est créé pour ce type).
 
 Le formulaire d'édition permet de choisir un titre pour le type de signalement, une géométrie, une couleur, et de définir les données métiers ou champs personnalisés - cf. [Champs personnalisés d'un type de signalement](custom_fields.md).
 
-### Page d'un type de signalements
+## Page d'un type de signalements
 
 La page de description d'un type de signalement (accessible via la page d'accueil de son projet) présente les informations suivantes :
 * Les caractéristiques du type de signalements :
@@ -172,7 +170,7 @@ Au-delà de ces informations, cette page propose également des actions spécifi
 
 Cf. [Imports et exports de signalements](import_export.md).
 
-### Page de consultation des signalements 'Liste & Carte'
+## Page de consultation des signalements 'Liste & Carte'
 
 La page de consultation des signalements d'un projet propose 2 vues (par l'intermédiaire des pictogrammes en haut de la page) :
 * **une vue cartographique** :
@@ -194,7 +192,7 @@ Chacune d'entre elles propose un bloc _"Filtres"_ permettant à l'utilisateur de
 * filtre sur le statut des signalements ;
 * filtre textuel recherchant la chaîne de caractères saisie par l'utilisateur dans le titre des signalements.
 
-### Formulaire de création / édition d'un signalement
+## Formulaire de création / édition d'un signalement
 
 Les utilisateurs contributeurs ou de niveau supérieur peuvent ajouter des signalements depuis la page d'accueil, la page d'un type de signalements ou la page d'un signalement à l'aide du pictogramme _"+"_ .
 
@@ -206,7 +204,7 @@ Pour les signalements de type ponctuels, l'utilisateur peut également :
 * utiliser sa géolocalisation (en autorisant le navigateur à utiliser la localisation) et en cliquant sur le bouton _"Positionner le signalement à partir de votre géolocalisation"_ ;
 * utiliser une photographie contenant des informations de localisation (tags EXIF associés à une photographie prise avec un appareil équipé d'un GPS) en cliquant sur le bouton _"Importer une image géoréférencée"_ .
 
-### Page de consultation d'un signalement
+## Page de consultation d'un signalement
 
 La page de consultation d'un signalement présente les informations suivantes :
 * L'ensemble des attributs du signalement ;
@@ -222,7 +220,7 @@ Cette page propose également des actions activées en fonction des autorisation
 * Supprimer le signalement via un pictogramme en haut à droite de la page (uniquement pour son auteur, les administrateurs de projet ou super utilisateurs) ;
 * Ajouter un commentaire (uniquement pour les contributeurs et utilisateurs de niveau supérieur).
 
-### Page d'administration des fonds cartographiques
+## Page d'administration des fonds cartographiques
 
 La page d'administration des fonds cartographiques est un formulaire permettant aux administrateurs du projet de :
 * Déclarer l'ensemble des couches de données qui seront utilisées dans les différentes interfaces cartographiques du projet. Ces couches servent uniquement de fonds de carte afin d'aider à la localisation des signalements créés dans l'application.
@@ -232,7 +230,7 @@ La page d'administration des fonds cartographiques est un formulaire permettant 
 
 cf. [Fonds cartographiques](basemaps.md) pour des informations détaillées sur la configuration d'une couche.
 
-### Page d'administration des droits des utilisateurs
+## Page d'administration des droits des utilisateurs
 
 La page d'administration des droits des utilisateurs est un formulaire permettant de modifier le niveau
 d'autorisation de chaque utilisateur enregistré dans l'application, pour le projet courant.
@@ -247,7 +245,7 @@ d'autorisation de chaque utilisateur enregistré dans l'application, pour le pro
 cf. [Utilisateurs et autorisations](users.md) pour des informations détaillées sur ces différents niveaux
 d'autorisation.
 
-### Pages statiques du bandeau du bas
+## Pages statiques du bandeau du bas
 
 Le bandeau du bas propose deux pages statiques _"Mentions légales"_ et _"Aide"_, modifiables par les super-utilisateurs depuis l'interface administrateur Django.
 
