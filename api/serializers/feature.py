@@ -285,6 +285,8 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
 
 class FeatureCSVSerializer(serializers.ModelSerializer):
+
+    id = serializers.CharField(source="feature_id")
     
     feature_type = serializers.SlugRelatedField(
         slug_field='slug', queryset=FeatureType.objects.all())
@@ -299,7 +301,7 @@ class FeatureCSVSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feature
         fields = (
-            'feature_id',
+            'id',
             'title',
             'description',
             'status',

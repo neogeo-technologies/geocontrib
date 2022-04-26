@@ -78,7 +78,7 @@ class CSVProcessing:
                 feature_data = self.get_feature_data(
                     feature_type, feature, field_names)
                 feature_title = feature.get("title")
-                id = feature.get("feature_id")
+                id = feature.get("id")
                 title, feature_id = self.handle_title(feature_title, id)
                 description = feature.get('description')
                 status = feature.get('status', 'draft')
