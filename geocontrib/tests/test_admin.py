@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.management import call_command
 from django.contrib.admin.sites import AdminSite
 import pytest
@@ -7,6 +8,8 @@ from geocontrib.admin.project import ProjectAdmin
 from geocontrib.models import Feature
 from geocontrib.models import Project
 from geocontrib.models import User
+
+URL_PREFIX = settings.URL_PREFIX
 
 @pytest.mark.django_db
 def test_admin_project_viewsite(api_client):
@@ -23,7 +26,7 @@ def test_admin_project_viewsite(api_client):
 
     api_client.force_login(user=admin)
     res = api_client.get(url)
-    assert res.url == 'http://example.com/projet/1-aze/'
+    assert res.url == f'http://example.com/{ URL_PREFIX }projet/1-aze/'
 
 
 @pytest.mark.django_db
@@ -41,4 +44,4 @@ def test_admin_feature_viewsite(api_client):
 
     api_client.force_login(user=admin)
     res = api_client.get(url)
-    assert res.url == 'http://example.com/projet/1-aze/type-signalement/1-dfsdfs/signalement/71f9778a-fe84-4c2e-ab9b-4dba95d2aeee/editer/'
+    assert res.url == f'http://example.com/{ URL_PREFIX }projet/1-aze/type-signalement/1-dfsdfs/signalement/71f9778a-fe84-4c2e-ab9b-4dba95d2aeee/editer/'
