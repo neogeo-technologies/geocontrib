@@ -8,7 +8,7 @@ from geocontrib.models import Feature
 from geocontrib.models import Project
 from geocontrib.models import User
 
-@pytest.mark.django_db(reset_sequences=True)
+@pytest.mark.django_db
 def test_admin_project_viewsite(api_client):
     """
     Test les boutons admin "view in site" sur les projets
