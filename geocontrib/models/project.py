@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
-# from django.http import HttpResponseRedirect
-# from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 
@@ -86,5 +84,4 @@ class Project(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        # import pdb; pdb.set_trace()
         return reverse('geocontrib:project', kwargs={'slug': self.slug})
