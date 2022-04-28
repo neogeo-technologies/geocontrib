@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+# from django.http import HttpResponse
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -149,3 +151,38 @@ class MyAccount(View):
         context['title'] = "Mon compte"
 
         return render(request, 'geocontrib/my_account.html', context)
+
+def view404(request):
+    import pdb; pdb.set_trace()
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+from django.views.generic import TemplateView
+
+class NotFoundView(TemplateView):
+    template_name = "errors/404.html"
+    # import pdb; pdb.set_trace()
+    @classmethod
+    def get_rendered_view(cls):
+        as_view_fn = cls.as_view()
+
+        def view_fn(request):
+            response = as_view_fn(request)
+            # this is what was missing before
+            response.render()
+            return response
+
+        return view_fn
+
+
+def custom_page_not_found_view(request, exception):
+    return render(request, "errors/404.html", {})
+
+def custom_error_view(request, exception=None):
+    return render(request, "errors/500.html", {})
+
+def custom_permission_denied_view(request, exception=None):
+    return render(request, "errors/403.html", {})
+
+def custom_bad_request_view(request, exception=None):
+    return render(request, "errors/400.html", {})
