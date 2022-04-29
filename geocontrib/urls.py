@@ -7,8 +7,7 @@ from geocontrib.views import HomePageView
 from geocontrib.views import MyAccount
 from geocontrib.views import FeatureDetail
 from geocontrib.views import FeatureTypeDetail
-
-
+from geocontrib.views import view404
 
 app_name = 'geocontrib'
 
@@ -22,14 +21,23 @@ urlpatterns = [
         template_name='geocontrib/registration/login.html'), name='logout'),
     path('mon-compte/', MyAccount.as_view(), name='my_account'),
 
+
+    path('projet/<slug:slug>/', view404, name='project'),
+
     # Vues de gestion et d'édition des données métiers
     path('projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/',
          FeatureTypeDetail.as_view(), name='feature_type_detail'),
 
     path(
         'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/',
-        FeatureDetail.as_view(),
+        view404,
         name='feature_detail'),
+    path(
+        'projet/<slug:slug>/type-signalement/<slug:feature_type_slug>/signalement/<uuid:feature_id>/editer/',
+        view404,
+        name='feature_update'),
+
+
 ]
 
 if settings.DEBUG:

@@ -8,7 +8,7 @@ from geocontrib.models.user import UserLevelPermission
 from geocontrib.models.user import User
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(reset_sequences=True)
 @pytest.mark.freeze_time('2021-08-05')
 def test_projects_list(api_client):
     url = reverse('api:projects-list')
@@ -41,15 +41,15 @@ def test_projects_list(api_client):
         'previous': None,
         'results': [{
             'title': 'Projet 1',
-            'slug': '2-projet-1',
+            'slug': '1-projet-1',
             'created_on': '05/08/2021',
             'updated_on': '05/08/2021',
             'description': None,
             'moderation': False,
             'is_project_type': False,
             'generate_share_link': False,
-            'thumbnail': reverse('api:project-thumbnail', args=["2-projet-1"]),
-            'creator': 2,
+            'thumbnail': reverse('api:project-thumbnail', args=["1-projet-1"]),
+            'creator': 1,
             'access_level_pub_feature': 'Utilisateur anonyme',
             'access_level_arch_feature': 'Utilisateur anonyme',
             'archive_feature': None,
@@ -64,7 +64,7 @@ def test_projects_list(api_client):
 
 
 @pytest.mark.freeze_time('2021-08-05')
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
 def test_projects_post(api_client):
 
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
@@ -95,14 +95,14 @@ def test_projects_post(api_client):
         'description': None,
         'is_project_type': False,
         'moderation': False,
-        'slug': '3-projet-2',
+        'slug': '1-projet-2',
         'title': 'Projet 2',
         'generate_share_link': False,
     }
 
 
 @pytest.mark.freeze_time('2021-08-05')
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
 def test_projects_thumbnail_put(api_client):
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
 
@@ -124,7 +124,7 @@ def test_projects_thumbnail_put(api_client):
                                          fp.read(),
                                          content_type='multipart/form-data')
 
-    url = reverse('api:project-thumbnail', kwargs={"slug": "4-projet-3"})
+    url = reverse('api:project-thumbnail', kwargs={"slug": "1-projet-3"})
 
 
     result = api_client.put(url,
@@ -149,7 +149,7 @@ def test_projects_thumbnail_put(api_client):
         'nb_features': 0,
         'nb_published_features': 0,
         'nb_published_features_comments': 0,
-        'slug': '4-projet-3',
+        'slug': '1-projet-3',
         'title': 'Projet 3',
         'updated_on': '05/08/2021',
     }

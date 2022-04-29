@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -149,3 +150,6 @@ class MyAccount(View):
         context['title'] = "Mon compte"
 
         return render(request, 'geocontrib/my_account.html', context)
+
+def view404(request, *args, **kwargs):
+    return HttpResponseNotFound('<h1>Page not implemented in Geocontrib backend</h1>')
