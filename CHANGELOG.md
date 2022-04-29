@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [2.3.6] - 2022-04-29
+
+#### Corrections
+
+- Redmine 13775 : Liste et carte - Les fonds cartographiques se placent au dessus des signalements au clic sur un fond
+- Redmine 13748 : Nombre de caractères dans le nom du signalement
+- Redmine 13737 : L'ordre des fonds cartographiques est modifié à l'enregistrement
+
 ## [2.3.5] - 2022-03-31
 
 #### Corrections
