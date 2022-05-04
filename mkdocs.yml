@@ -10,10 +10,8 @@ nav:
     - documentation_fonctionnelle/moderation.md
     - documentation_fonctionnelle/basemaps.md
     - documentation_fonctionnelle/subscription.md
-    - documentation_fonctionnelle/project_sharing.md
   - Types de signalements:
     - documentation_fonctionnelle/custom_fields.md
-    - documentation_fonctionnelle/symbology.md
     - documentation_fonctionnelle/import_export.md
   - Signalements:
     - documentation_fonctionnelle/status.md
@@ -23,6 +21,5 @@ nav:
     - documentation_fonctionnelle/external_access.md
     - documentation_fonctionnelle/flatpages.md
     - documentation_fonctionnelle/geocoder.md
-    - documentation_fonctionnelle/geocontrib_IDGO.md
 
 theme: readthedocs
