@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.0.4] - 2022-05-04
+
+### Corrections
+
+- Redmine 13828 : Vue carte : la fermeture d'une popup renvoie sur la page d'accueil de l'application
+
+## [3.0.3] - 2022-21-04
+
+### Corrections
+
+- Redmine 13498 : Accueil GéoContrib - Les filtres ne fonctionnent plus
+- Redmine 13277 : Mode déconnecté - L'envoi d'une modification de signalement ne fonctionne plus
+- Redmine 13263 : Mode déconnecté - Revoir la mise en cache automatique
+
 ## [3.0.2] - 2022-30-03
 
 ### Corrections
@@ -40,6 +54,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Redmine 12996 : Les statuts dans le tableau ne sont pas mis à jour suite à une modification en masse
 - Redmine 12997 : Les envois d'emails sont incomplets suite à une modification des statuts en masse
+
+## [2.3.7] - 2022-05-04
+
+### Corrections
+
+- Redmine 13828 : Vue carte : la fermeture d'une popup renvoie sur la page d'accueil de l'application
+
+## [2.3.6] - 2022-04-29
+
+#### Corrections
+
+- Redmine 13775 : Liste et carte - Les fonds cartographiques se placent au dessus des signalements au clic sur un fond
+- Redmine 13748 : Nombre de caractères dans le nom du signalement
+- Redmine 13737 : L'ordre des fonds cartographiques est modifié à l'enregistrement
+
+## [2.3.5] - 2022-03-31
+
+#### Corrections
+
+- Redmine 13277 : Mode déconnecté - L'envoi d'une modification de signalement ne fonctionne plus
+- Redmine 13263 : Mode déconnecté - Revoir la mise en cache automatique
+
+## [2.3.4] - 2022-03-14
+
+#### Corrections
+
+- Redmine 13354 : Droit de l'adminstrateur d'un projet
+- Redmine 13296 : Vue liste : problème de rechargement du tableau suite à une suppression en masse
+- Redmine 13278 : Vue Liste & Carte - le message de l'info bulle de suppression n'est pas bon
+- Redmine 13260 : Accueil du projet - Création d'un bouton vers la page Liste et Carte
 
 ## [2.3.3] - 2022-02-02
 
