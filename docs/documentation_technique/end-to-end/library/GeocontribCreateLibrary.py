@@ -53,10 +53,9 @@ def geocontrib_create_featuretype(feature_type_name):
 
 def geocontrib_create_feature(feature_type_name, feature_name):
     # click on button to create new feature from the first feature type
-    get_driver().find_element_by_xpath(
-        "//html/body/div/div[2]/div[2]/div/div[4]/div[1]/div[1]/div/div[1]/div[3]/div/div/a[1]"
-    ).click()
+    get_driver().find_element_by_css_selector("[data-tooltip~=Ajouter]").click()
     get_driver().find_element_by_id("name").click()
     get_driver().find_element_by_id("name").clear()
     get_driver().find_element_by_id("name").send_keys(feature_name)
-    get_driver().find_element_by_link_text("Dessiner un point").click()
+    get_driver().find_element_by_css_selector("[title~=Dessiner]").click()
+    #get_driver().find_element_by_link_text("Dessiner un point").click()

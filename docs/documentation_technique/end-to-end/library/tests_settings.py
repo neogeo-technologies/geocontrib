@@ -13,13 +13,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from decouple import config
 
 def get_variables():
     variables = {
-                "GEOCONTRIB_URL": "https://geocontrib.dev.neogeo.fr",
-                "ADMIN_URL": "https://geocontrib.dev.neogeo.fr/admin",
-                "SUPERUSERNAME": "test_premier_utilisateur",
-                "SUPERUSERPASSWORD": "NuchUFs2qfQWThT",
-                "SUPERUSERDISPLAYNAME": "Anne O'Neem"
+                "GEOCONTRIB_URL": config('GEOCONTRIB_URL', default="http://localhost:8080/geocontrib"),
+                "ADMIN_URL": config('ADMIN_URL', default="http://localhost:8000/admin"),
+                "SUPERUSERNAME": config('SUPERUSERNAME', default="admin_robot"),
+                "SUPERUSERPASSWORD": config('SUPERUSERPASSWORD', default="roboto2022?"),
+                "SUPERUSERDISPLAYNAME": config('SUPERUSERDISPLAYNAME', default="Admin Robot")
                 }
     return variables
