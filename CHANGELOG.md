@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.0.4] - 2022-05-04
+
+### Corrections
+
+- Redmine 13828 : Vue carte : la fermeture d'une popup renvoie sur la page d'accueil de l'application
+
 ## [3.0.3] - 2022-21-04
 
 ### Corrections
