@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+- Redmine 13742 : Docker étendue des cartes de signalement configurables
+
+### Docker settings change
+
+- DEFAULT_MAP_VIEW_CENTER valeur par défaut : '[47.0, 1.0]'
+- DEFAULT_MAP_VIEW_ZOOM valeur par défault 4
+
+
 ## [3.0.4] - 2022-05-04
 
 ### Corrections
