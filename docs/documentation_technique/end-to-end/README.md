@@ -44,15 +44,22 @@ L'utilisation d'un environnement virtuel est recommandée
 pip install -r src/docs/end-to-end/requirements.txt
 ```
 
+Avoir créé un utilisateur ayant le statut de super-utilisateur, par défaut le nom d'utilisateur est 'admin_robot', le mot de passe 'roboto2022?' et le prénom et nom (nom d'affichage) est 'Admin Robot'
+Pour des questions de sécurité, l'utilisateur doit à supprimer à la fin des tests (cela n'est pas encore automatisé).
+
 ## Configuration
 
-Copier le contenu du fichier .env_sample dans le fichier .env
+Par défaut, les test sont confiqurés pour tester sur la version locale de geocontrib (localhost:8080), afin de tester les instances en ligne, il est possible de le configurer dans un fichier .env à placer à la racine du projet, s'il n'existe pas déjà.
 
-### Variables à éditer dans .env
+Copier le contenu du fichier 'env_sample' dans un fichier '.env', à la racine du projet.
 
-- URL
+### Variables pouvant être éditer dans .env
+
+- GEOCONTRIB_URL
+- ADMIN_URL
 - SUPERUSERNAME  Utilisateur avec droits d'administration, de super-utilisateur et de gestionnaire équipe
-- SUPERUSERPASSWORD 
+- SUPERUSERPASSWORD
+- SUPERUSERDISPLAYNAME
 
 
 ## Fonctionnalités testées

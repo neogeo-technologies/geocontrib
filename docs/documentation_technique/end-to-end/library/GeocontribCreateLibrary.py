@@ -19,37 +19,43 @@ from utils import get_driver
 
 def geocontrib_create_project(project_name):
     get_driver().find_element_by_link_text(u"Créer un nouveau projet").click()
-    get_driver().find_element_by_id("id_title").click()
-    get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys(project_name)
+    get_driver().find_element_by_id("title").click()
+    get_driver().find_element_by_id("title").clear()
+    get_driver().find_element_by_id("title").send_keys(project_name)
+    # click on dropdown "Visibilité des signalements publiés" to open it
     get_driver().find_element_by_xpath(
-        "//form[@id='form-project-edit']/div[5]/div[3]/div"
+        "//form[@id='form-project-edit']/div[5]/div/div"
     ).click()
+    # click on dropdown "Visibilité des signalements publiés" to select an option
     get_driver().find_element_by_xpath(
-        "//form[@id='form-project-edit']/div[5]/div[3]/div/div[2]/div"
+        "//form[@id='form-project-edit']/div[5]/div/div/div[2]/div"
     ).click()
+    # click on dropdown "Visibilité des signalements archivés" to open it
     get_driver().find_element_by_xpath(
-        "//form[@id='form-project-edit']/div[5]/div[4]/div"
+        "//form[@id='form-project-edit']/div[5]/div[2]/div"
     ).click()
+    # click on dropdown "Visibilité des signalements archivés" to select an option
     get_driver().find_element_by_xpath(
-        "//form[@id='form-project-edit']/div[5]/div[4]/div/div[2]/div"
+        "//form[@id='form-project-edit']/div[5]/div[2]/div/div[2]/div"
     ).click()
-    get_driver().find_element_by_xpath("//button[@type='submit']").click()
-
+    # submit the form
+    get_driver().find_element_by_xpath("//form[@id='form-project-edit']/button").click()
 
 def geocontrib_create_featuretype(feature_type_name):
     get_driver().find_element_by_link_text(
         u"Créer un nouveau type de signalement"
     ).click()
-    get_driver().find_element_by_id("id_title").click()
-    get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys(feature_type_name)
-    get_driver().find_element_by_xpath("//button[@type='submit']").click()
-
+    get_driver().find_element_by_id("title").click()
+    get_driver().find_element_by_id("title").clear()
+    get_driver().find_element_by_id("title").send_keys(feature_type_name)
+    # submit the form
+    get_driver().find_element_by_xpath("//form[@id='form-type-edit']/div[3]/button[2]").click()
 
 def geocontrib_create_feature(feature_type_name, feature_name):
-    get_driver().find_element_by_xpath("//div[2]/div/div/div/div/a[2]/i").click()
-    get_driver().find_element_by_id("id_title").click()
-    get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys(feature_name)
-    get_driver().find_element_by_link_text("Dessiner un point").click()
+    # click on button to create new feature from the first feature type
+    get_driver().find_element_by_css_selector("[data-tooltip~=Ajouter]").click()
+    get_driver().find_element_by_id("name").click()
+    get_driver().find_element_by_id("name").clear()
+    get_driver().find_element_by_id("name").send_keys(feature_name)
+    get_driver().find_element_by_css_selector("[title~=Dessiner]").click()
+    #get_driver().find_element_by_link_text("Dessiner un point").click()

@@ -28,6 +28,7 @@ def get_variables():
                 "LAYER2_TYPE":       "TMS",
                 "LAYER2_OPTIONS":    "{\n\"maxZoom\": 20,\n\"attribution\": \"\u00a9 les contributeurs d\u2019OpenStreetMap\"\n}",
 
-                "BASEMAPNAME":       "fond carto - {}".format(datetime.datetime.now()),
+                "BASEMAPNAME1":       "fond carto - {}".format(datetime.datetime.now()),
+                "BASEMAPNAME2":       "fond carto2 - {}".format(datetime.datetime.now()),
                 }
     return variables
