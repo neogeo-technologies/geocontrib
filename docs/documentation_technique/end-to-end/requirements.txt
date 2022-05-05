@@ -2,3 +2,4 @@ robotframework-seleniumlibrary >=5.1, <5.2
 selenium >= 3.141, <3.142
 robotframework >= 4.0, <4.1
 robotframework-pythonlibcore >= 2.2, <2.3
+python-decouple
