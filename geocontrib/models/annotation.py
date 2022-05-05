@@ -13,6 +13,7 @@ from geocontrib.choices import EXTENDED_RELATED_MODELS
 from geocontrib.choices import EVENT_TYPES
 from geocontrib.choices import STATE_CHOICES
 from geocontrib.choices import FREQUENCY_CHOICES
+from geocontrib.choices import MODERATOR
 from geocontrib.emails import notif_moderators_pending_features
 from geocontrib.emails import notif_creator_published_feature
 
@@ -216,7 +217,7 @@ class Event(models.Model):
                         'application_name': settings.APPLICATION_NAME,
                         'application_abstract': settings.APPLICATION_ABSTRACT,
                     }
-                    logger.debug(moderators__emails)
+                    logger.error(moderators__emails)
                     try:
                         notif_moderators_pending_features(
                             emails=moderators__emails, context=context)
