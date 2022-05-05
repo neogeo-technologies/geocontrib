@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+- Redmine 13781 : Contributeur et Super-contributeurs ne reçoivent plus les notifications de modération
 - Redmine 13742 : Docker étendue des cartes de signalement configurables
 
 ### Docker settings change
