@@ -51,7 +51,7 @@ Pour des questions de sécurité, l'utilisateur doit à supprimer à la fin des 
 
 Par défaut, les test sont confiqurés pour tester sur la version locale de geocontrib (localhost:8080), afin de tester les instances en ligne, il est possible de le configurer dans un fichier .env à placer à la racine du projet, s'il n'existe pas déjà.
 
-Copier le contenu du fichier .env_sample/.env dans le fichier .env
+Copier le contenu du fichier 'env_sample' dans un fichier '.env', à la racine du projet.
 
 ### Variables pouvant être éditer dans .env
 
