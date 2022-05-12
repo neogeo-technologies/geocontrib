@@ -30,12 +30,22 @@ from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import FeatureLink
 from geocontrib.models import CustomField
+from geocontrib.models import Comment
 from geocontrib.models import ImportTask
 from geocontrib.tasks import task_geojson_processing
 
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
+
+
+class CommentAdmin(admin.ModelAdmin):
+    # Ajouter date de création
+    list_display = ('feature_type_slug','created_on','comment','project_id',)
+    ordering = ('feature_type_slug','created_on','comment','project_id',)
+    def project_title(self, obj):
+        print(self, obj)
+        breakpoint()
 
 
 class CustomFieldAdmin(admin.ModelAdmin):
@@ -422,6 +432,7 @@ class ImportTaskAdmin(admin.ModelAdmin):
 class AttachmentAdmin(admin.ModelAdmin):
     list_display=('title', 'project')
     
+admin.site.register(Comment, CommentAdmin)
 admin.site.register(CustomField, CustomFieldAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(FeatureType, FeatureTypeAdmin)
