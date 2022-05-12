@@ -147,7 +147,7 @@ class ProjectDuplicate(APIView):
                     ctx_layer.save()
 
     def _duplicate_project_thumbnail(self, instance, project_template):
-        copy_related = self.PROJECT_COPY_RELATED.get('THUMBNAIL', False)
+        copy_related = self.PROJECT_COPY_RELATED.get('THUMBNAIL', True)
         if project_template and isinstance(project_template, Project) and copy_related:
             original_thumbnail = project_template.thumbnail # get original_thumbnail object
             new_thumbnail_name = original_thumbnail.name.split('/')[-1] # get only the file name
