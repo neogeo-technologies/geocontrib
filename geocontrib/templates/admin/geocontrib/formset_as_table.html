@@ -52,7 +52,7 @@
       {# ajout d'un header seulement pour éviter erreurs sonarqube #}
       <thead>
           <th scope="col" style="display: none;"></th>
-          {% if len(formset.empty_form.hidden_fields) > 0 %}
+          {% if formset.empty_form.hidden_fields|length > 0 %}
           <th scope="col"></th>
           {% endif %}
           {% if formset.can_delete %}
