@@ -63,7 +63,7 @@ class BaseMapViewset(
         viewsets.GenericViewSet):
 
     permission_classes = [
-        permissions.IsAuthenticated,
+        permissions.IsAuthenticatedOrReadOnly,
     ]
 
     queryset = BaseMap.objects.all()
