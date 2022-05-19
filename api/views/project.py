@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import Http404
@@ -66,8 +67,8 @@ class ProjectDuplicate(APIView):
             project_template = Project.objects.filter(slug=slug).first()
             instance = serializer.save(creator=request.user)
 
-            self._set_thumbnail(instance, serializer, project_template)
             self._set_creator(instance)
+            self._duplicate_project_thumbnail(instance, project_template)
             self._duplicate_project_related_sets(instance, project_template)
             self._duplicate_project_base_map(instance, project_template)
             self._duplicate_project_authorization(instance, project_template)
@@ -107,6 +108,17 @@ class ProjectDuplicate(APIView):
                     ctx_layer.base_map = base_map
                     ctx_layer.save()
 
+    def _duplicate_project_thumbnail(self, instance, project_template):
+        copy_related = self.PROJECT_COPY_RELATED.get('THUMBNAIL', True)
+        if project_template and isinstance(project_template, Project) and copy_related:
+            original_thumbnail = project_template.thumbnail # get original_thumbnail object
+            new_thumbnail_name = original_thumbnail.name.split('/')[-1] # get only the file name
+            new_thumbnail_file = original_thumbnail.file.read() # copy the file
+            new_file = ContentFile(new_thumbnail_file, new_thumbnail_name) # create an new object file
+            instance.thumbnail = new_file # add the thumbnail to the instance of the duplicated project
+            instance.save()
+
+
     def _duplicate_project_authorization(self, instance, project_template):
         """
         Un signale est deja en place pour appliquer les permissions initiales
@@ -123,10 +135,6 @@ class ProjectDuplicate(APIView):
                     user=auth.user, project=project_template).level
                 auth.save()
 
-    def _set_thumbnail(self, instance, form, project_template):
-        copy_related = self.PROJECT_COPY_RELATED.get('THUMBNAIL', False)
-        if hasattr(project_template, 'thumbnail') and copy_related:
-            instance.thumbnail = project_template.thumbnail
 
     def _set_creator(self, instance):
         instance.creator = self.request.user
