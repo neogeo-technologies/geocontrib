@@ -238,7 +238,7 @@ SELECTED_GEOCODER = {
 
 # Project duplication settings
 PROJECT_COPY_RELATED = {
-    'AUTHORIZATION': True,
+    'AUTHORIZATION': config('PROJECT_COPY_RELATED_AUTHORIZATION', default=True, cast=bool),
     'BASE_MAP': True,
     'FEATURE': False,
     'FEATURE_TYPE': True,
