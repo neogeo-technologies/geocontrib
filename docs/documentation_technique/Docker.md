@@ -51,6 +51,7 @@ L'image docker de base possèdes ces variables de configuration :
 * "LOG_URL", default=None
 * "MAGIC_IS_AVAILABLE", default=True, cast=bool)  # File image validation (@seb / install IdeoBFC
 * "MAPSERVER_URL", default="https://mapserver.dev.neogeo.local/maps/"
+* "PROJECT_COPY_RELATED_AUTHORIZATION", default=True
 * "OUR_APPS", default="geocontrib, api", cast=Csv()
 * "REDIS_HOST", default="redis"
 * "SECRET_KEY", default="SECRET_KEY"
