@@ -98,11 +98,12 @@ class ProjectDuplicate(APIView):
     PROJECT_COPY_RELATED = getattr(settings, 'PROJECT_COPY_RELATED', {})
 
     def post(self, request, slug):
+        project_template = get_object_or_404(Project, slug=slug)
+
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         if serializer.is_valid():
-            project_template = Project.objects.filter(slug=slug).first()
             instance = serializer.save(creator=request.user)
 
             self._set_creator(instance)

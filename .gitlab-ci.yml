@@ -101,6 +101,8 @@ test:
     - pip install -r requirements-dev.txt -r requirements.txt
     - django-admin startproject config .
     - cp -r config_sample/* config/
+    - ./manage.py check
+    - ./manage.py makemigrations --check
     - pytest --junitxml=xunit-reports/xunit-result-pytest.xml --cov-report xml:coverage-reports/coverage-pytest.xml --cov .
   artifacts:
     paths:

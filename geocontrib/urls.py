@@ -5,7 +5,6 @@ from django.contrib.auth import views as auth_views
 
 from geocontrib.views import HomePageView
 from geocontrib.views import MyAccount
-from geocontrib.views import FeatureDetail
 from geocontrib.views import FeatureTypeDetail
 from geocontrib.views import view404
 
