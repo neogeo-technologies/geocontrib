@@ -1,12 +1,28 @@
+import shutil
+import os
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.urls import reverse
+from django.conf import settings
 import pytest
 
 from geocontrib.models.project import Project
 from geocontrib.models.user import UserLevelPermission
 from geocontrib.models.user import User
 from conftest import verify_or_create_json
+
+@pytest.fixture
+def project_default_logo():
+    """
+    Vérifie qu'il existe un fichier media/default.png qui est utilisé comme logo des projets.
+    Si il n'existe pas, il le copie depuis le dossier static
+    """
+    logo_path = os.path.join(settings.MEDIA_ROOT, "default.png")
+    if not os.path.exists(logo_path):
+        if not os.path.exists(settings.MEDIA_ROOT):
+            os.mkdir(settings.MEDIA_ROOT)
+        shutil.copyfile("geocontrib/static/geocontrib/img/default.png", logo_path)
 
 
 @pytest.mark.django_db(reset_sequences=True)
@@ -170,6 +186,7 @@ def test_projects_thumbnail(api_client):
 
 @pytest.mark.django_db
 @pytest.mark.freeze_time('2021-08-05')
+@pytest.mark.usefixtures('project_default_logo')
 def test_project_duplicate(api_client):
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
     call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
