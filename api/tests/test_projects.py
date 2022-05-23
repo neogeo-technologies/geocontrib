@@ -6,13 +6,13 @@ import pytest
 from geocontrib.models.project import Project
 from geocontrib.models.user import UserLevelPermission
 from geocontrib.models.user import User
+from conftest import verify_or_create_json
 
 
 @pytest.mark.django_db(reset_sequences=True)
 @pytest.mark.freeze_time('2021-08-05')
 def test_projects_list(api_client):
     url = reverse('api:projects-list')
-    # result = api_client.get('/api/projects/')
     result = api_client.get(url)
 
     assert result.status_code == 200
@@ -24,15 +24,14 @@ def test_projects_list(api_client):
 
     anon_perm = UserLevelPermission.objects.get(pk="anonymous")
 
-    p = Project.objects.create(
+    project = Project.objects.create(
         title="Projet 1",
         access_level_pub_feature=anon_perm,
         access_level_arch_feature=anon_perm,
         creator=user,
     )
-    p.save()
+    project.save()
 
-    # result = api_client.get('/api/projects/')
     result = api_client.get(url)
     assert result.status_code == 200
     assert result.json() == {
@@ -103,25 +102,25 @@ def test_projects_post(api_client):
 
 @pytest.mark.freeze_time('2021-08-05')
 @pytest.mark.django_db(transaction=True, reset_sequences=True)
-def test_projects_thumbnail_put(api_client):
+def test_projects_thumbnail(api_client):
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
 
     user = User.objects.create(username="usertest", password="password", is_active=True)
     user.save()
     anon_perm = UserLevelPermission.objects.get(pk="anonymous")
-    p = Project.objects.create(
+    project = Project.objects.create(
         title="Projet 3",
         access_level_pub_feature=anon_perm,
         access_level_arch_feature=anon_perm,
         creator=user,
     )
-    p.save()
+    project.save()
 
     api_client.force_authenticate(user=user)
     filename = 'filename.png'
-    with open("api/tests/data/img/image.png", 'rb') as fp:
+    with open("api/tests/data/img/image.png", 'rb') as file:
         simple_file = SimpleUploadedFile(filename,
-                                         fp.read(),
+                                         file.read(),
                                          content_type='multipart/form-data')
 
     url = reverse('api:project-thumbnail', kwargs={"slug": "1-projet-3"})
@@ -154,6 +153,132 @@ def test_projects_thumbnail_put(api_client):
         'updated_on': '05/08/2021',
     }
 
+    # ensure can't POST
     result = api_client.post(url,
                             {'file':  simple_file})
     assert result.status_code == 405, result.content.decode()
+
+    # ensure can read
+    result = api_client.get(url)
+    assert result.status_code == 200
+    assert result.get('Content-Type') == 'image/png'
+    with open("api/tests/data/img/image.png", 'rb') as file:
+        # On ne compare que les 512 premiers octest du fichiers
+        # (ça suffit pour voir que c'est un PNG)
+        assert next(result.streaming_content)[:512] == file.read()[:512]
+
+
+@pytest.mark.django_db
+@pytest.mark.freeze_time('2021-08-05')
+def test_project_duplicate(api_client):
+    call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
+    call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
+
+    data = {
+        'access_level_arch_feature': 'moderator',
+        'access_level_pub_feature': 'anonymous',
+        'title': "AZE 2"
+    }
+
+    # anon call fails
+    url = reverse('api:project-duplicate', args=['1-aze'])
+    with pytest.raises(ValueError):
+        result = api_client.post(url, data)
+
+    user = User.objects.get(username="admin")
+    api_client.force_authenticate(user=user)
+
+    # Ensure no parameters Fails
+    result = api_client.post(url)
+    assert result.status_code == 400
+    assert result.json() == {
+        'access_level_arch_feature': ['Ce champ est obligatoire.'],
+        'access_level_pub_feature': ['Ce champ est obligatoire.'],
+        'title': ['Ce champ est obligatoire.'],
+    }
+
+    # ensure it works
+    result = api_client.post(url, data, format='json')
+    assert result.status_code == 201
+    verify_or_create_json('api/tests/data/test_feature_duplicate_create.json', result.json())
+
+    # non existing project fails
+    data['title'] = "AZE 3"
+    url = reverse('api:project-duplicate', args=['2-aze'])
+    result = api_client.post(url, data, format='json')
+    assert result.status_code == 404
+
+
+@pytest.mark.django_db
+@pytest.mark.freeze_time('2021-08-05')
+def test_project_authorization(api_client):
+    call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
+    call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
+
+    data = [
+        {
+            'level': {
+                'codename': 'admin'
+            },
+            'user': {
+                'id': 1
+            }
+        }
+    ]
+    url = reverse('api:project-authorization', args=['1-aze'])
+
+    # anon get call success
+    result = api_client.get(url)
+    assert result.status_code == 200
+    assert result.content.decode() == '[]'
+
+    user = User.objects.get(username="admin")
+    api_client.force_authenticate(user=user)
+
+    # admin get call success
+    result = api_client.get(url)
+    assert result.status_code == 200
+    assert result.content.decode() == '[]'
+
+    # Ensure no parameters Fails
+    result = api_client.put(url, [], format='json')
+    assert result.status_code == 400
+    assert result.json() == {'error': 'Au moins un administrateur est requis par projet. '}
+
+    # ensure it works
+    result = api_client.put(url, data, format='json')
+    assert result.status_code == 200
+    verify_or_create_json('api/tests/data/test_project_authorization_createjson', result.json())
+
+    # admin get call with data success
+    result = api_client.get(url)
+    assert result.status_code == 200
+    assert result.json() == [
+        {
+            "user":
+            {
+                "id":1,
+                "first_name":"",
+                "last_name":"",
+                "username":"admin"
+            },
+            "level":
+            {
+                "display":"Administrateur projet",
+                "codename":"admin"
+            }
+        }
+    ]
+
+    # non existing project fails
+    url = reverse('api:project-authorization', args=['2-aze'])
+    result = api_client.put(url, data, format='json')
+    assert result.status_code == 404
+
+    # anon put call fails
+    # TODO uncomment when #14023 is fixed
+    #api_client.logout()
+    #url = reverse('api:project-authorization', args=['1-aze'])
+    #result = api_client.put(url, data, format='json')
+    #assert result.status_code == 403
+    #assert result.json() == {'error': 'permission denied'}

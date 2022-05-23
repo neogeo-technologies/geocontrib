@@ -275,7 +275,7 @@ class ExportFeatureList(views.APIView):
             Vue de téléchargement des signalements lié à un projet.
         """
         project = get_object_or_404(Project, slug=slug)
-        features = Feature.handy.availables(request.user, project).filter( feature_type__slug=feature_type_slug)
+        features = Feature.handy.availables(request.user, project).filter( feature_type__slug=feature_type_slug).order_by("created_on")
         format = request.GET.get('format_export')
         if format == 'geojson':
             serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
@@ -290,13 +290,16 @@ class ExportFeatureList(views.APIView):
             headers.remove('feature_data')
             headers.append('lat')
             headers.append('lon')
-            headers.extend(serializer.data[0]['feature_data'].keys())
+            feature_data = serializer.data[0]['feature_data']
+            headers.extend(feature_data.keys() if feature_data else [])
             writer = csv.DictWriter(response, fieldnames=headers)
             writer.writeheader()
             for row in serializer.data:
                 row['lon'] = row['geom']['coordinates'][0]
                 row['lat'] = row['geom']['coordinates'][1]
-                full_row = collections.OrderedDict(list(row.items()) + list(row['feature_data'].items()))
+                data = row['feature_data'].items() if row['feature_data'] else []
+                full_row = collections.OrderedDict(list(row.items()) +
+                                                   list(data))
                 del full_row['geom']
                 del full_row['feature_data']
                 writer.writerow(full_row)
@@ -429,7 +432,7 @@ class FeatureMVTView(BaseMVTView):
 
         if not request.GET._mutable:
             request.GET._mutable = True
-        request.GET["pk__in"] = queryset.values_list("pk", flat=True)
+        request.GET["pk__in"] = queryset.order_by("created_on").values_list("pk", flat=True)
         return super().get( request, *args, **kwargs)
 
 

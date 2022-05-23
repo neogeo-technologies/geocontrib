@@ -1,0 +1,55 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "95336524-0825-4f37-a680-4cca7092713b",
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.099397,
+          45.033764
+        ]
+      },
+      "properties": {
+        "title": "publié",
+        "description": "",
+        "status": "published",
+        "created_on": "2021-08-05T02:00:00+02:00",
+        "updated_on": "2021-08-05T02:00:00+02:00",
+        "archived_on": null,
+        "deletion_on": null,
+        "feature_type": "1-dfsdfs",
+        "project": "1-aze",
+        "display_creator": "admin",
+        "display_last_editor": "admin",
+        "creator": 1
+      }
+    },
+    {
+      "id": "b7e65bf3-8288-4352-a3f5-75d146ffb867",
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.221315,
+          47.582285
+        ]
+      },
+      "properties": {
+        "title": "type 1 brouillon",
+        "description": "",
+        "status": "draft",
+        "created_on": "2021-08-05T02:00:00+02:00",
+        "updated_on": "2021-08-05T02:00:00+02:00",
+        "archived_on": null,
+        "deletion_on": null,
+        "feature_type": "1-dfsdfs",
+        "project": "1-aze",
+        "display_creator": "admin",
+        "display_last_editor": "admin",
+        "creator": 1
+      }
+    }
+  ]
+}

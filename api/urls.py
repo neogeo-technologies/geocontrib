@@ -140,7 +140,7 @@ urlpatterns = [
         CommentAttachmentUploadView.as_view(),
         name='comments-upload-file'),
 
-    path("features.mvt/", FeatureMVTView.as_view()),
+    path("features.mvt/", FeatureMVTView.as_view(), name="features-mvt"),
     path("external-geojson/", GetExternalGeojsonView.as_view()),
     path("idgo-catalog/", GetIdgoCatalogView.as_view()),
 
