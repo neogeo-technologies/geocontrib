@@ -24,7 +24,7 @@ ${SELSPEED}     0.1
 
 *** Test Cases ***
 
-[Setup]             Run Keywords            Open Browser                    ${GEOCONTRIB _URL}
+[Setup]             Run Keywords            Open Browser                    ${GEOCONTRIB _URL}      ${BROWSER_NAME}
 ...                 AND                     Maximize Browser Window
 ...                 AND                     Set Selenium Speed              ${SELSPEED}
 

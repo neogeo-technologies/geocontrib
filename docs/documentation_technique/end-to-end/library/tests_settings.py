@@ -17,6 +17,7 @@ from decouple import config
 
 def get_variables():
     variables = {
+                "BROWSER_NAME": config('BROWSER_NAME', default="Chrome"),
                 "GEOCONTRIB_URL": config('GEOCONTRIB_URL', default="http://localhost:8080/geocontrib"),
                 "ADMIN_URL": config('ADMIN_URL', default="http://localhost:8000/admin"),
                 "SUPERUSERNAME": config('SUPERUSERNAME', default="admin_robot"),
