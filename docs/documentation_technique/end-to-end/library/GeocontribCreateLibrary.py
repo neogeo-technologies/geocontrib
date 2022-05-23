@@ -49,7 +49,7 @@ def geocontrib_create_featuretype(feature_type_name):
     get_driver().find_element_by_id("title").clear()
     get_driver().find_element_by_id("title").send_keys(feature_type_name)
     # submit the form
-    get_driver().find_element_by_xpath("//form[@id='form-type-edit']/div[3]/button[2]").click()
+    get_driver().find_element_by_id("send-feature_type").click()
 
 def geocontrib_create_feature(feature_type_name, feature_name):
     # click on button to create new feature from the first feature type
