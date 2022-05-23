@@ -48,7 +48,7 @@ def geocontrib_search_project(project_name):
     get_driver().find_element_by_css_selector("#search-projects > input").send_keys(project_name + '\n')
 
 def geocontrib_click_on_project(project_name):
-    get_driver().find_element_by_link_text(project_name).click()
+    get_driver().find_element_by_partial_link_text(project_name).click()
     
 def geocontrib_delete_project():
     get_driver().find_element_by_id("delete-button").click()

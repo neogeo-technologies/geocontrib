@@ -60,6 +60,28 @@ Create Features with Random Featurename on Random Coordinates - TEST 117
     Geocontrib Click At Coordinates         ${X1}                           ${Y1}
     Page Should Contain                     ${RANDOMFEATURENAME}
 
+Edit Project with Random Projectname - TESTS 74, 
+    # Start from main page
+    Geocontrib Go To Main Page                  ${GEOCONTRIB_URL}
+    Wait Until Page Does Not Contain            En cours de chargement ... 
+    Geocontrib Search Project                   ${RANDOMPROJECTNAME}
+    Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
+    Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
+    Wait Until Page Does Not Contain            Projet en cours de chargement ... 
+    # Test 74 | enter modify mode
+    Geocontrib Edit Project                     ${RANDOMPROJECTNAME}        ${PROJECTEDITION}
+    Page Should Contain                         ${PROJECTEDITION}
+
+Edit Feature Types with Random Featuretypename - TEST 97
+    #Page Should Not Contain                 ${RANDOMFEATURETYPENAME}
+    Geocontrib Edit Featuretype             ${RANDOMFEATURETYPENAME}        ${FEATURETYPEEDITION}
+    # attendre le changement de page
+    Wait Until Location Does Not Contain    /type-signalement/ajouter
+    # attendre que le loader disparaissent ! NE MARCHE PAS
+    #Wait Until Page Does Not Contain         Récupération des types de signalements en cours... 
+    #Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}#2
+    Page Should Contain                     ${FEATURETYPEEDITION}
+
 ## TODO: à remplacer par get page
 #    Click Element       xpath=//html/body/header/div/div/div[1]
 #    Click Element       xpath=//html/body/header/div/div/div[1]/div/a[1]
@@ -96,17 +118,12 @@ Create Features with Random Featurename on Random Coordinates - TEST 117
 #     # Page Should Contain     
 
 [Teardown]
-    Geocontrib Go To Main Page                  ${GEOCONTRIB_URL}
-    Wait Until Page Does Not Contain            En cours de chargement ... 
-    Geocontrib Search Project                    ${RANDOMPROJECTNAME}
-    Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
-    Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
-    Wait Until Page Does Not Contain            Projet en cours de chargement ... 
-    Geocontrib Delete Project  
-    Run Keywords                                Sleep       3
+   Geocontrib Go To Main Page                  ${GEOCONTRIB_URL}
+   Wait Until Page Does Not Contain            En cours de chargement ... 
+   Geocontrib Search Project                   ${RANDOMPROJECTNAME}
+   Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
+   Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
+   Wait Until Page Does Not Contain            Projet en cours de chargement ... 
+   Geocontrib Delete Project  
+   Run Keywords                                Sleep       3
 ...                             AND             Close Browser
-# [Teardown]    Run Keywords                    Geocontrib Delete Feature  ${RANDOMFEATURENAME}   ${ADMINURL}
-# ...                           AND             Geocontrib Delete Featuretype  ${RANDOMFEATURETYPENAME}   ${ADMINURL}
-# ...                           AND             Geocontrib Delete Project  ${RANDOMPROJECTNAME}   ${ADMINURL}
-# ...                           AND             Sleep     3
-# ...                           AND             Close Browser

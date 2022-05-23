@@ -39,7 +39,7 @@ def geocontrib_create_project(project_name):
         "//form[@id='form-project-edit']/div[5]/div[2]/div/div[2]/div"
     ).click()
     # submit the form
-    get_driver().find_element_by_xpath("//form[@id='form-project-edit']/button").click()
+    get_driver().find_element_by_id("send-project").click()
 
 def geocontrib_create_featuretype(feature_type_name):
     get_driver().find_element_by_link_text(
@@ -48,6 +48,8 @@ def geocontrib_create_featuretype(feature_type_name):
     get_driver().find_element_by_id("title").click()
     get_driver().find_element_by_id("title").clear()
     get_driver().find_element_by_id("title").send_keys(feature_type_name)
+    # scroll down the page to avoid footer to get over submit button
+    get_driver().execute_script("window.scrollTo(0, document.body.scrollHeight);")
     # submit the form
     get_driver().find_element_by_id("send-feature_type").click()
 

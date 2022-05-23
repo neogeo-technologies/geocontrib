@@ -16,21 +16,45 @@
 from utils import get_driver
 
 
-def geocontrib_edit_project(url, project_name, project_edition):
-    get_driver().get(url)
-    get_driver().find_element_by_link_text(project_name).click()
-    get_driver().find_element_by_xpath("//h1/div/div/a[2]/i").click()
-    get_driver().find_element_by_id("id_title").click()
-    get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys("{}{}".format(project_name, project_edition))
+def geocontrib_edit_project(project_name, project_edition):
+    get_driver().find_element_by_class_name("button-hover-orange").click()
+    # modify title
+    get_driver().find_element_by_id("title").click()
+    get_driver().find_element_by_id("title").clear()
+    get_driver().find_element_by_id("title").send_keys("{}{}".format(project_name, project_edition))
+
+    # modify description
     get_driver().find_element_by_name("description").click()
     get_driver().find_element_by_name("description").clear()
     get_driver().find_element_by_name("description").send_keys(project_edition)
-    get_driver().find_element_by_xpath("//form[@id='form-project-edit']/div[5]/div[3]/div").click()
-    get_driver().find_element_by_xpath("//form[@id='form-project-edit']/div[5]/div[4]/div").click()
-    get_driver().find_element_by_xpath("//form[@id='form-project-edit']/div[5]/div[4]/div/div[2]/div[5]").click()
-    get_driver().find_element_by_id("id_moderation").click()
-    get_driver().find_element_by_xpath("//button[@type='submit']").click()
+
+    # click on dropdown "Visibilité des signalements publiés" to open it
+    get_driver().find_element_by_xpath(
+        "//form[@id='form-project-edit']/div[5]/div/div"
+    ).click()
+    # click on dropdown "Visibilité des signalements publiés" to select an option
+    get_driver().find_element_by_xpath(
+        "//form[@id='form-project-edit']/div[5]/div/div/div[2]/div[2]"
+    ).click()
+
+    # click on dropdown "Visibilité des signalements archivés" to open it
+    get_driver().find_element_by_xpath(
+        "//form[@id='form-project-edit']/div[5]/div[2]/div"
+    ).click()
+    # click on dropdown "Visibilité des signalements archivés" to select an option
+    get_driver().find_element_by_xpath(
+        "//form[@id='form-project-edit']/div[5]/div[2]/div/div[2]/div[2]"
+    ).click()
+
+    # toggle moderation
+    get_driver().find_element_by_css_selector("label[for=moderation]").click()
+    # toggle is_project_type
+    get_driver().find_element_by_css_selector("label[for=is_project_type]").click()
+    # toggle generate_share_link
+    get_driver().find_element_by_css_selector("label[for=generate_share_link]").click()
+
+    # submit the form
+    get_driver().find_element_by_id("send-project").click()
 
 
 def geocontrib_edit_featuretype(featuretypename, added_text):
