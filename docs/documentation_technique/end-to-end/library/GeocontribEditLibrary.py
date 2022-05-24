@@ -19,9 +19,10 @@ from utils import get_driver
 def geocontrib_edit_project(project_name, project_edition):
     get_driver().find_element_by_class_name("button-hover-orange").click()
     # modify title
-    get_driver().find_element_by_id("title").click()
-    get_driver().find_element_by_id("title").clear()
-    get_driver().find_element_by_id("title").send_keys("{}{}".format(project_name, project_edition))
+    title_input_elt = get_driver().find_element_by_id("title")
+    title_input_elt.click()
+    title_input_elt.clear()
+    title_input_elt.send_keys("{}{}".format(project_name, project_edition))
 
     # modify description
     get_driver().find_element_by_name("description").click()
@@ -58,25 +59,35 @@ def geocontrib_edit_project(project_name, project_edition):
 
 
 def geocontrib_edit_featuretype(featuretypename, added_text):
-    get_driver().find_element_by_xpath("//html/body/header/div/div/div[1]").click()
-    get_driver().find_element_by_xpath("//html/body/header/div/div/div[1]/div/a[1]").click()
-    get_driver().find_element_by_link_text(featuretypename).click()
-    get_driver().find_element_by_xpath("//html/body/header/div/div/div[1]").click()
-    get_driver().find_element_by_xpath("//html/body/header/div/div/div[1]/div/a[1]").click()
-    get_driver().find_element_by_xpath("//html/body/main/div/div[2]/div[1]/div/div/div/a[4]").click()
-    get_driver().find_element_by_id("id_title").click()
-    get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys("{}{}".format(featuretypename, added_text))
-    get_driver().find_element_by_xpath("//html/body/main/div/div/form/button[2]").click()
+    # got to first feature type edition page    
+    get_driver().find_element_by_css_selector("a[data-tooltip*='Éditer le type de signalement']").click()
+    # modify feature type title
+    title_input_elt = get_driver().find_element_by_id("title")
+    title_input_elt.click()
+    title_input_elt.clear()
+    title_input_elt.send_keys("{}{}".format(featuretypename, added_text))
+    # todo: add an option to change geometry when we can test more than points
+    optionnal_title_input_elt = get_driver().find_element_by_id("title_optional")
+    optionnal_title_input_elt.click
+    # submit the form
+    get_driver().find_element_by_id("send-feature_type").click()
 
 
 def geocontrib_edit_feature(feature_name, added_text):
-    get_driver().find_element_by_link_text(feature_name).click()
-    get_driver().find_element_by_xpath("//h1/div/div/a[2]/i").click()
-    get_driver().find_element_by_id("id_title").click()
-    get_driver().find_element_by_id("id_title").clear()
-    get_driver().find_element_by_id("id_title").send_keys("{}{}".format(feature_name, added_text))
-    get_driver().find_element_by_name("description").click()
-    get_driver().find_element_by_name("description").clear()
-    get_driver().find_element_by_name("description").send_keys(added_text)
-    get_driver().find_element_by_xpath("//button[@type='submit']").click()
+    # go to edition page
+    get_driver().find_element_by_css_selector("a[href*=editer]").click()
+    # modify the name
+    name_input_elt = get_driver().find_element_by_id("name")
+    name_input_elt.click()
+    name_input_elt.clear()
+    name_input_elt.send_keys("{}{}".format(feature_name, added_text))
+    # modify description
+    description_input_elt = get_driver().find_element_by_name("description")
+    description_input_elt.click()
+    description_input_elt.clear()
+    description_input_elt.send_keys(added_text)
+    # modify status
+    ## open the status dropdown
+    get_driver().find_element_by_css_selector("#form-feature-edit div.required:nth-child(2)>div[id*='dropdown']").click()
+    ## select second status option
+    get_driver().find_element_by_css_selector("#form-feature-edit div.required:nth-child(2)>div[id*='dropdown'] div.menu > div.item:nth-child(2)").click()

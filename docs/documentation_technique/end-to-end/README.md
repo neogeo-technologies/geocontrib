@@ -65,16 +65,21 @@ Copier le contenu du fichier 'env_sample' dans un fichier '.env', à la racine d
 ## Fonctionnalités testées
 
 ### Connexion
-
     - avec un compte superuser
     - déconnexion
 
 ### Création d'objets
-
     - projet
     - type de signalement
     - signalement
 
+### Édition d'objets
+    - projet
+    - type de signalement
+    - signalement
+
+## À améliorer
+Vérifier que les modifications ont bien été appliquées, pour l'instant est vérifié seulement si la page contient un texte spécifique.
 
 ## Lancement des tests
 
@@ -88,3 +93,4 @@ robot test_suite.robot
 - Enregistrement de scenarios de tests avec l'extension Katalon Recorder sur Chromium (documentation disponible sur https://docs.katalon.com/katalon-recorder/docs/overview.html)
 - Structure des tests avec RobotFramework (documentation disponible sur https://robotframework.org/)
 - Création des bibliothèques en Python
+

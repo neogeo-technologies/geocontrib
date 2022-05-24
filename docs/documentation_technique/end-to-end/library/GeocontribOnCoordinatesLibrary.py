@@ -18,6 +18,10 @@ from utils import get_driver
 
 
 def geocontrib_click_at_coordinates(pos_x, pos_y, browser):
+    # switch to drawing on map mode
+    get_driver().find_element_by_css_selector("[title~=Dessiner]").click()
+    # set the point is difficult, but putting the point anyweher in canvas works
+    get_driver().find_element_by_css_selector("canvas").click()
     # if browser == "Chrome":
     # in chrome, web driver implementation calculates from top left
         # actions = ActionChains(get_driver())
@@ -29,14 +33,13 @@ def geocontrib_click_at_coordinates(pos_x, pos_y, browser):
         #get_driver().find_element_by_css_selector("canvas").click()
         # scroll down the page to avoid footer to get over submit button
 
-    get_driver().find_element_by_css_selector("canvas").click()
+
+def geocontrib_click_save_changes():
     # scroll the page to reveal the button
     get_driver().execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    get_driver().implicitly_wait(10) # seconds
-    # validate form, could be moved somewher less specific
+    get_driver().implicitly_wait(1) # seconds
     # try twice to increase the chances that the button would be clickable
     try :
         get_driver().find_element_by_css_selector("form#form-feature-edit.ui.form button.ui.teal.icon.button").click()
     except :
         get_driver().find_element_by_css_selector("form#form-feature-edit.ui.form button.ui.teal.icon.button").click()
-    
