@@ -48,8 +48,6 @@ def geocontrib_create_featuretype(feature_type_name):
     get_driver().find_element_by_id("title").click()
     get_driver().find_element_by_id("title").clear()
     get_driver().find_element_by_id("title").send_keys(feature_type_name)
-    # scroll down the page to avoid footer to get over submit button
-    get_driver().execute_script("window.scrollTo(0, document.body.scrollHeight);")
     # submit the form
     get_driver().find_element_by_id("send-feature_type").click()
 
@@ -60,4 +58,3 @@ def geocontrib_create_feature(feature_type_name, feature_name):
     get_driver().find_element_by_id("name").clear()
     get_driver().find_element_by_id("name").send_keys(feature_name)
     get_driver().find_element_by_css_selector("[title~=Dessiner]").click()
-    #get_driver().find_element_by_link_text("Dessiner un point").click()

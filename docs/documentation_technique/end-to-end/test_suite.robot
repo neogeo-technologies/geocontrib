@@ -57,17 +57,12 @@ Create Feature Types with Random Featuretypename - TEST 97
 Create Features with Random Featurename on Random Coordinates - TEST 117
     Page Should Not Contain                 ${RANDOMFEATURENAME}
     Geocontrib Create Feature               ${RANDOMFEATURETYPENAME}        ${RANDOMFEATURENAME}
-    Geocontrib Click At Coordinates         ${X1}                           ${Y1}
+    Geocontrib Click At Coordinates         ${X1}                           ${Y1}                       ${BROWSER_NAME}
     Page Should Contain                     ${RANDOMFEATURENAME}
 
 Edit Project with Random Projectname - TESTS 74, 
     # Start from main page
-    Geocontrib Go To Main Page                  ${GEOCONTRIB_URL}
-    Wait Until Page Does Not Contain            En cours de chargement ... 
-    Geocontrib Search Project                   ${RANDOMPROJECTNAME}
-    Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
-    Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
-    Wait Until Page Does Not Contain            Projet en cours de chargement ... 
+    From Main Page To Project Page
     # Test 74 | enter modify mode
     Geocontrib Edit Project                     ${RANDOMPROJECTNAME}        ${PROJECTEDITION}
     Page Should Contain                         ${PROJECTEDITION}
@@ -118,12 +113,17 @@ Edit Feature Types with Random Featuretypename - TEST 97
 #     # Page Should Contain     
 
 [Teardown]
-   Geocontrib Go To Main Page                  ${GEOCONTRIB_URL}
-   Wait Until Page Does Not Contain            En cours de chargement ... 
-   Geocontrib Search Project                   ${RANDOMPROJECTNAME}
-   Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
-   Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
-   Wait Until Page Does Not Contain            Projet en cours de chargement ... 
-   Geocontrib Delete Project  
-   Run Keywords                                Sleep       3
+    From Main Page To Project Page
+    Geocontrib Delete Project  
+    Run Keywords                                Sleep       3
 ...                             AND             Close Browser
+
+
+*** Keywords ***
+From Main Page To Project Page
+    Geocontrib Go To Main Page                  ${GEOCONTRIB_URL}
+    Wait Until Page Does Not Contain            En cours de chargement ... 
+    Geocontrib Search Project                   ${RANDOMPROJECTNAME}
+    Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
+    Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
+    Wait Until Page Does Not Contain            Projet en cours de chargement ... 
