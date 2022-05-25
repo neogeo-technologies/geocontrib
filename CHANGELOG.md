@@ -23,6 +23,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 13788 : Création d'un projet depuis un modèle - Erreur à la création du projet
 
 
+## [3.0.5] - 2022-05-25
+
+### Corrections
+
+- Redmine 13910 : Pièce jointe - Image géolocalisée ne s'enregistre pas en pièce jointe
+- Redmine 13902 : Importer une image géoréférencée - Améliorer l'ergonomie
+- Redmine 13848 : Si on n'est pas connecté, on ne vois pas les fonds de plan customisés
+- Redmine 13844 : Gestionnaire métier ne peux pas créer un signalement
+- Redmine 13833 : Modèle de projet : Image du projet modèle disparaît lors de la suppression d'un projet issu de ce modèle (sur version 3.0.3)
+
 ## [3.0.4] - 2022-05-04
 
 ### Corrections
@@ -72,6 +82,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Redmine 12996 : Les statuts dans le tableau ne sont pas mis à jour suite à une modification en masse
 - Redmine 12997 : Les envois d'emails sont incomplets suite à une modification des statuts en masse
+
+## [2.3.8] - 2022-05-25
+
+### Evolution
+
+- Redmine 13742 : Docker étendue des cartes de signalement configurables
+
+### Corrections
+
+- Redmine 13934 : L'ordre des couches de la légende est inversé
+- Redmine 13910 : Pièce jointe - Image géolocalisée ne s'enregistre pas en pièce jointe
+- Redmine 13902 : Importer une image géoréférencée - Améliorer l'ergonomie
+- Redmine 13848 : Si on n'est pas connecté, on ne vois pas les fonds de plan customisés
+- Redmine 13844 : Gestionnaire métier ne peux pas créer un signalement
+- Redmine 13833 : Modèle de projet : Image du projet modèle disparaît lors de la suppression d'un projet issu de ce modèle (sur version 3.0.3)
+- Redmine 13788 : Création d'un projet depuis un modèle - Erreur à la création du projet
+- Redmine 13781 : Contributeur et Super-contributeurs ne reçoivent plus les notifications de modération
+
+### Docker settings change
+
+- DEFAULT_MAP_VIEW_CENTER valeur par défaut : '[47.0, 1.0]'
+- DEFAULT_MAP_VIEW_ZOOM valeur par défault 4
 
 ## [2.3.7] - 2022-05-04
 
