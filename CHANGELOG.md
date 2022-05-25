@@ -5,18 +5,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
-- Redmine 13781 : Contributeur et Super-contributeurs ne reçoivent plus les notifications de modération
+
+
+## [2.3.8] - 2022-05-25
+
+### Evolution
+
 - Redmine 13742 : Docker étendue des cartes de signalement configurables
+
+### Corrections
+
+- Redmine 13934 : L'ordre des couches de la légende est inversé
+- Redmine 13910 : Pièce jointe - Image géolocalisée ne s'enregistre pas en pièce jointe
+- Redmine 13902 : Importer une image géoréférencée - Améliorer l'ergonomie
+- Redmine 13848 : Si on n'est pas connecté, on ne vois pas les fonds de plan customisés
+- Redmine 13844 : Gestionnaire métier ne peux pas créer un signalement
+- Redmine 13833 : Modèle de projet : Image du projet modèle disparaît lors de la suppression d'un projet issu de ce modèle (sur version 3.0.3)
+- Redmine 13788 : Création d'un projet depuis un modèle - Erreur à la création du projet
+- Redmine 13781 : Contributeur et Super-contributeurs ne reçoivent plus les notifications de modération
 
 ### Docker settings change
 
 - DEFAULT_MAP_VIEW_CENTER valeur par défaut : '[47.0, 1.0]'
 - DEFAULT_MAP_VIEW_ZOOM valeur par défault 4
- 
+
+
+## [2.3.7] - 2022-05-04
+
+### Corrections
+
+- Redmine 13828 : Vue carte : la fermeture d'une popup renvoie sur la page d'accueil de l'application
+
 
 ## [2.3.6] - 2022-04-29
 
-#### Corrections
+### Corrections
 
 - Redmine 13775 : Liste et carte - Les fonds cartographiques se placent au dessus des signalements au clic sur un fond
 - Redmine 13748 : Nombre de caractères dans le nom du signalement
@@ -24,14 +47,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2.3.5] - 2022-03-31
 
-#### Corrections
+### Corrections
 
 - Redmine 13277 : Mode déconnecté - L'envoi d'une modification de signalement ne fonctionne plus
 - Redmine 13263 : Mode déconnecté - Revoir la mise en cache automatique
 
 ## [2.3.4] - 2022-03-14
 
-#### Corrections
+### Corrections
 
 - Redmine 13354 : Droit de l'adminstrateur d'un projet
 - Redmine 13296 : Vue liste : problème de rechargement du tableau suite à une suppression en masse
