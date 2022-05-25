@@ -12,6 +12,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - DEFAULT_MAP_VIEW_CENTER valeur par défaut : '[47.0, 1.0]'
 - DEFAULT_MAP_VIEW_ZOOM valeur par défault 4
 
+### Corrections
+
+- Redmine 13934 : L'ordre des couches de la légende est inversé
+- Redmine 13910 : Pièce jointe - Image géolocalisée ne s'enregistre pas en pièce jointe
+- Redmine 13902 : Importer une image géoréférencée - Améliorer l'ergonomie
+- Redmine 13848 : Si on n'est pas connecté, on ne vois pas les fonds de plan customisés
+- Redmine 13844 : Gestionnaire métier ne peux pas créer un signalement
+- Redmine 13833 : Modèle de projet : Image du projet modèle disparaît lors de la suppression d'un projet issu de ce modèle (sur version 3.0.3)
+- Redmine 13788 : Création d'un projet depuis un modèle - Erreur à la création du projet
+
 
 ## [3.0.4] - 2022-05-04
 
