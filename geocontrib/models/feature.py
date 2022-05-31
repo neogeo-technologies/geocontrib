@@ -213,6 +213,10 @@ class FeatureType(models.Model):
         verbose_name='Icône', max_length=128, blank=True, null=True
     )
 
+    opacity = models.CharField(
+        verbose_name='Opacité', max_length=4, blank=True, null=True
+    )
+
     colors_style = models.JSONField(
         "Style Champs coloré", blank=True, null=True
     )
