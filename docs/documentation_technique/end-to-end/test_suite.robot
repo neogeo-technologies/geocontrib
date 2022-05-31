@@ -24,7 +24,7 @@ ${SELSPEED}     0.1
 
 *** Test Cases ***
 
-[Setup]             Run Keywords            Open Browser                    ${GEOCONTRIB _URL}
+[Setup]             Run Keywords            Open Browser                    ${GEOCONTRIB _URL}      ${BROWSER_NAME}
 ...                 AND                     Maximize Browser Window
 ...                 AND                     Set Selenium Speed              ${SELSPEED}
 
@@ -41,10 +41,29 @@ Create Project with Random Projectname - TESTS 10, 17
     # attendre le changement de page
     Wait Until Location Does Not Contain    /creer-projet
     Page Should Contain                     ${RANDOMPROJECTNAME}
+    # Vérifier que le projet est modéré (à améliorer)
+    Page Should Contain                     Oui
+    # Vérifier que la visibilité est à Utilisateur anonyme (à améliorer, ne vérifie pas les 2 visibilités)
+    Page Should Contain                     Utilisateur anonyme
+    # Vérifier que le signalement a une description (à améliorer: utilisé une variable)
+    Page Should Contain                     Exemple de description
     # Le test ci-dessus ne permet pas de vérifier que le projet a été créé, car la page de création contient le nom du projet,
     # si la validation du formulaire plante, le test reste en suspend et ne déclenche pas d'erreur, il faudrait vérifier qu'il n'y a pas de message d'erreur peut-être
 
-Create Feature Types with Random Featuretypename - TEST 97
+Edit Project with Random Projectname - TESTS 74, ...
+    # Start from main page
+    From Main Page To Project Page
+    # Test 74 | enter modify mode
+    Geocontrib Edit Project                 ${RANDOMPROJECTNAME}        ${PROJECTEDITION}
+    Page Should Contain                     ${PROJECTEDITION}
+    # Vérifier que le projet est modéré (à améliorer)
+    Page Should Contain                     Non
+    # Vérifier que la visibilité est à Utilisateur anonyme (à améliorer, ne vérifie pas les 2 visibilités)
+    Page Should Contain                     Utilisateur connecté
+    # Vérifier que le signalement a une description (à améliorer: ajouter une variable spécifique à la description)
+    Page Should Contain                     ${PROJECTEDITION}
+
+Create Feature Type with Random Featuretypename - TEST 97
     Page Should Not Contain                 ${RANDOMFEATURETYPENAME}
     Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}
     # attendre le changement de page
@@ -54,21 +73,34 @@ Create Feature Types with Random Featuretypename - TEST 97
     #Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}#2
     Page Should Contain                     ${RANDOMFEATURETYPENAME}
 
-Create Features with Random Featurename on Random Coordinates - TEST 117
+Edit Feature Type - TEST n°?
+    Page Should Contain                     ${RANDOMFEATURETYPENAME}
+    Geocontrib Edit Featuretype             ${RANDOMFEATURETYPENAME}        ${FEATURETYPEEDITION}
+    # attendre le changement de page
+    Wait Until Location Does Not Contain    /type-signalement/ajouter
+    Page Should Contain                     ${FEATURETYPEEDITION}
+
+Create Feature with Random Featurename on Random Coordinates - TEST 117
     Page Should Not Contain                 ${RANDOMFEATURENAME}
     Geocontrib Create Feature               ${RANDOMFEATURETYPENAME}        ${RANDOMFEATURENAME}
-    Geocontrib Click At Coordinates         ${X1}                           ${Y1}
+    Geocontrib Click At Coordinates         ${X1}                           ${Y1}                       ${BROWSER_NAME}
+    Geocontrib Click Save Changes
     Page Should Contain                     ${RANDOMFEATURENAME}
+    # Vérifier que le signalement a une description (à améliorer: utilisé une variable)
+    Page Should Contain                     Exemple de description
 
-## TODO: à remplacer par get page
-#    Click Element       xpath=//html/body/header/div/div/div[1]
-#    Click Element       xpath=//html/body/header/div/div/div[1]/div/a[1]
-#
-#    Page Should Not Contain                 ${RANDOMFEATURENAME}#2
-#    Geocontrib Create Feature               ${RANDOMFEATURETYPENAME}        ${RANDOMFEATURENAME}#2
-#    Geocontrib Click At Coordinates         ${X2}                           ${Y2}
-#    Page Should Contain                     ${RANDOMFEATURENAME}#2
-#
+Edit Feature - TEST n°?
+    # depuis la page de détail du signalement juste créé
+    Page Should Contain                     ${RANDOMFEATURENAME}
+    Geocontrib Edit Feature                 ${RANDOMFEATURETYPENAME}        ${FEATUREEDITION}
+    Geocontrib Click Save Changes
+    Page Should Contain                     ${FEATUREEDITION}
+    # Vérifier que le signalement a le statut 'publié (à améliorer)
+    Page Should Contain                     Publié
+    # Vérifier que le signalement a une description (à améliorer)
+    #Page Should Contain                     ${FEATUREEDITION}
+
+
 #Search for drafts - TEST 168
 #    Geocontrib Draft Search Map             ${RANDOMPROJECTNAME}
 #    Geocontrib Draft Search List            ${RANDOMPROJECTNAME}
@@ -83,10 +115,6 @@ Create Features with Random Featurename on Random Coordinates - TEST 117
 #    Geocontrib Create Basemap               ${GEOCONTRIB_URL}       ${BASEMAPNAME}          ${RANDOMPROJECTNAME}    ${LAYER1_TITLE}         ${LAYER1_URL}           ${LAYER1_TYPE}           ${LAYER2_TITLE}           ${LAYER2_URL}           ${LAYER2_TYPE}
 #    # Page Should Contain                     ${BASEMAPNAME}
 #
-#Edit Featuretype - TEST NA
-#    Geocontrib Edit Featuretype             ${RANDOMFEATURETYPENAME}      ${FEATURETYPEEDITION}
-#    Page Should Contain                     ${FEATURETYPEEDITION}
-#
 # Export GeoJson
 #     Geocontrib Json Export                  ${RANDOMPROJECTNAME}${PROJECTEDITION}      ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
 #     # Page Should Contain     
@@ -96,17 +124,17 @@ Create Features with Random Featurename on Random Coordinates - TEST 117
 #     # Page Should Contain     
 
 [Teardown]
-    Geocontrib Go To Main Page                  ${GEOCONTRIB_URL}
-    Wait Until Page Does Not Contain            En cours de chargement ... 
-    Geocontrib Search Project                    ${RANDOMPROJECTNAME}
-    Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
-    Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
-    Wait Until Page Does Not Contain            Projet en cours de chargement ... 
+    From Main Page To Project Page
     Geocontrib Delete Project  
     Run Keywords                                Sleep       3
 ...                             AND             Close Browser
-# [Teardown]    Run Keywords                    Geocontrib Delete Feature  ${RANDOMFEATURENAME}   ${ADMINURL}
-# ...                           AND             Geocontrib Delete Featuretype  ${RANDOMFEATURETYPENAME}   ${ADMINURL}
-# ...                           AND             Geocontrib Delete Project  ${RANDOMPROJECTNAME}   ${ADMINURL}
-# ...                           AND             Sleep     3
-# ...                           AND             Close Browser
+
+
+*** Keywords ***
+From Main Page To Project Page
+    Geocontrib Go To Main Page                  ${GEOCONTRIB_URL}
+    Wait Until Page Does Not Contain            En cours de chargement ... 
+    Geocontrib Search Project                   ${RANDOMPROJECTNAME}
+    Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
+    Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
+    Wait Until Page Does Not Contain            Projet en cours de chargement ... 

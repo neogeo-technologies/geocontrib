@@ -16,17 +16,30 @@
 #from selenium.webdriver.common.action_chains import ActionChains
 from utils import get_driver
 
-#browser = driver.get("https://gojs.net/latest/samples/panelLayout.html");
 
-
-def geocontrib_click_at_coordinates(pos_x, pos_y):
-    # in chrome, web driver implementation calculates from top left
-    # in firefox web driver implementation start at canvas center
-    # thus not using random values until we can detect
-    #actions = ActionChains(get_driver())
-    # my_map = get_driver().find_element_by_css_selector("canvas")
-    # actions.move_to_element_with_offset(my_map, 0, 0).click().perform()
-    # actions.move_to_element_with_offset(my_map, pos_x, pos_y).click().perform()
-
+def geocontrib_click_at_coordinates(pos_x, pos_y, browser):
+    # switch to drawing on map mode
+    get_driver().find_element_by_css_selector("[title~=Dessiner]").click()
+    # set the point is difficult, but putting the point anyweher in canvas works
     get_driver().find_element_by_css_selector("canvas").click()
-    get_driver().find_element_by_css_selector("form#form-feature-edit.ui.form button.ui.teal.icon.button").click()
+    # if browser == "Chrome":
+    # in chrome, web driver implementation calculates from top left
+        # actions = ActionChains(get_driver())
+        # my_map = get_driver().find_element_by_css_selector("canvas")
+        # actions.move_to_element_with_offset(my_map, pos_x, pos_y).click().perform()
+    # else :
+    # in firefox web driver implementation start at canvas center
+        # to use random values should be reversed or adapted, to be tested...
+        #get_driver().find_element_by_css_selector("canvas").click()
+        # scroll down the page to avoid footer to get over submit button
+
+
+def geocontrib_click_save_changes():
+    # scroll the page to reveal the button
+    get_driver().execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    get_driver().implicitly_wait(1) # seconds
+    # try twice to increase the chances that the button would be clickable
+    try :
+        get_driver().find_element_by_css_selector("form#form-feature-edit.ui.form button.ui.teal.icon.button").click()
+    except :
+        get_driver().find_element_by_css_selector("form#form-feature-edit.ui.form button.ui.teal.icon.button").click()
