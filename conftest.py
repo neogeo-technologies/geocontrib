@@ -47,7 +47,7 @@ def verify_or_create_json(filename, json_result, hook=None, sorter=None):
                 sorter(json_result)
                 sorter(json_expected)
 
-            assert json_expected == json_result
+            assert json_result == json_expected
     else:
         with path.open("w", encoding='utf-8') as file:
             json.dump(json_result, file)
