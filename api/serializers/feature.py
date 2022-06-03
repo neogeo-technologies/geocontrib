@@ -68,6 +68,7 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
             'geom_type',
             'color',
             'icon',
+            'opacity',
             'colors_style',
             'project',
             'customfield_set',
@@ -102,7 +103,7 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
 
         # Look for symbology differences
-        comp_keys = ['color', 'icon', 'colors_style']
+        comp_keys = ['color', 'icon', 'opacity', 'colors_style']
         # is_symbology_edited = not all(DeepDiff(self.data.get(key), validated_data.get(key), ignore_order=True) for key in comp_keys)
         is_symbology_edited = not all(self.data.get(key) == validated_data.get(key) for key in comp_keys)
 
@@ -112,6 +113,7 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
                 # Handle symbology edition
                 setattr(instance, 'color', validated_data.get('color'))
                 setattr(instance, 'icon', validated_data.get('icon'))
+                setattr(instance, 'opacity', validated_data.get('opacity'))
                 setattr(instance, 'colors_style', validated_data.get('colors_style'))
 
             else:
