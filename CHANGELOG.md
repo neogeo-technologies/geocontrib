@@ -5,12 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.1.0] - 2022-06-08
+
+### Evolutions
+
+- Redmine 13365 : Import et export - Format CSV pour les ponctuels
+- Redmine 13322 : Migration vers OpenLayers
+- Redmine 12384 : Supprimer les templates DJANGO
+- Redmine 11860 : Page du signalement - affichage du type de signalement
+- Redmine 9400 : Déplacer les cadres dans "Mon compte"
+- Redmine 13600 : Mise en place de tests automatiques
 - Redmine 13742 : Docker étendue des cartes de signalement configurables
-
-### Docker settings change
-
-- DEFAULT_MAP_VIEW_CENTER valeur par défaut : '[47.0, 1.0]'
-- DEFAULT_MAP_VIEW_ZOOM valeur par défault 4
 
 ### Corrections
 
@@ -21,6 +26,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 13844 : Gestionnaire métier ne peux pas créer un signalement
 - Redmine 13833 : Modèle de projet : Image du projet modèle disparaît lors de la suppression d'un projet issu de ce modèle (sur version 3.0.3)
 - Redmine 13788 : Création d'un projet depuis un modèle - Erreur à la création du projet
+- Redmine 13948 : Edition d'un type de signalement - Impossible de modifier les champs personnalisés
+- Redmine 13916 : Admin Django - La création de vues postgreSQL ne fonctionne plus
+- Redmine 13799 : Liste et carte - Rechargement de l'appli au clic sur un signalement sur la carte
+- Redmine 13789 : Cartes - A la création ou l'édition d'un signalement, il est possible de modifier les autres signalements
+- Redmine 13695 : Page d'accueil projet - Rétablir le bouton "Voir tous les signalements"
+- Redmine 13359 : Supression / Archivage auto - Désactiver la fonctionnalité
+- Redmine 13696 : Page d'accueil projet - Erreur a la supression d'un type de signalement
+
+### Docker settings change
+
+- DEFAULT_MAP_VIEW_CENTER valeur par défaut : '[47.0, 1.0]'
+- DEFAULT_MAP_VIEW_ZOOM valeur par défault 4
 
 
 ## [3.0.5] - 2022-05-25
