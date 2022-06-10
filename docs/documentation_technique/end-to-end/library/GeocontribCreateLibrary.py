@@ -58,7 +58,7 @@ def geocontrib_create_project(project_name):
     # submit the form
     get_driver().find_element_by_id("send-project").click()
 
-def geocontrib_create_featuretype(feature_type_name):
+def geocontrib_create_featuretype(feature_type_name, geometryType):
     get_driver().find_element_by_link_text(
         u"Créer un nouveau type de signalement"
     ).click()
@@ -66,6 +66,10 @@ def geocontrib_create_featuretype(feature_type_name):
     get_driver().find_element_by_id("title").click()
     get_driver().find_element_by_id("title").clear()
     get_driver().find_element_by_id("title").send_keys(feature_type_name)
+    # select a geometry type
+    get_driver().find_element_by_id("geometry-type").click()
+    get_driver().find_element_by_id(geometryType).click()
+
     # submit the form
     get_driver().find_element_by_id("send-feature_type").click()
 

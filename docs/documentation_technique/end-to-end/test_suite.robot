@@ -34,6 +34,7 @@ Connect GeoContrib - TEST 7
     Page Should Contain                     ${SUPERUSERDISPLAYNAME}
 
 Create Project with Random Projectname - TESTS 10, 17
+    Find Project
     #correspond au test 10, mais pas le 17
     Page Should Not Contain                 ${RANDOMPROJECTNAME}
     Geocontrib Create Project               ${RANDOMPROJECTNAME}
@@ -52,7 +53,8 @@ Create Project with Random Projectname - TESTS 10, 17
 
 Edit Project with Random Projectname - TESTS 74, ...
     # Start from main page
-    From Main Page To Project Page
+    Find Project
+    Go To Project Page
     # Test 74 | enter modify mode
     Geocontrib Edit Project                 ${RANDOMPROJECTNAME}        ${PROJECTEDITION}
     Page Should Contain                     ${PROJECTEDITION}
@@ -65,7 +67,7 @@ Edit Project with Random Projectname - TESTS 74, ...
 
 Create Feature Type with Random Featuretypename - TEST 97
     Page Should Not Contain                 ${RANDOMFEATURETYPENAME}
-    Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}
+    Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}        Point
     # attendre le changement de page
     Wait Until Location Does Not Contain    /type-signalement/ajouter
     # attendre que le loader disparaissent ! NE MARCHE PAS
@@ -100,6 +102,27 @@ Edit Feature - TEST n°?
     # Vérifier que le signalement a une description (à améliorer)
     #Page Should Contain                     ${FEATUREEDITION}
 
+Create Feature Type with Random Featuretypename With Geometry Type Polygone
+    # Start from main page
+    Find Project
+    Go To Project Page
+
+    Page Should Not Contain                 ${RANDOMFEATURETYPENAME}-Polygone
+    Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}-Polygone    Polygone
+    # attendre le changement de page
+    Wait Until Location Does Not Contain    /type-signalement/ajouter
+    Page Should Contain                     ${RANDOMFEATURETYPENAME}-Polygone
+
+Edit Feature Type Symbology     # doesn't work since vue doesn't see the value change of color input
+    # Start from main page
+    Find Project
+    Go To Project Page
+
+    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Wait Until Page Contains                    Couleur
+    Geocontrib Edit Featuretype Symbology       ${RANDOMFEATURETYPENAME}        ${SYMBOLOGYCOLORCODE}   ${SYMBOLOGYOPACITY}
+
+
 
 #Search for drafts - TEST 168
 #    Geocontrib Draft Search Map             ${RANDOMPROJECTNAME}
@@ -124,17 +147,20 @@ Edit Feature - TEST n°?
 #     # Page Should Contain     
 
 [Teardown]
-    From Main Page To Project Page
+    Find Project
+    Go To Project Page
     Geocontrib Delete Project  
     Run Keywords                                Sleep       3
 ...                             AND             Close Browser
 
 
 *** Keywords ***
-From Main Page To Project Page
+Find Project
     Geocontrib Go To Main Page                  ${GEOCONTRIB_URL}
     Wait Until Page Does Not Contain            En cours de chargement ... 
     Geocontrib Search Project                   ${RANDOMPROJECTNAME}
     Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
+
+Go To Project Page
     Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
     Wait Until Page Does Not Contain            Projet en cours de chargement ... 

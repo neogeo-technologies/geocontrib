@@ -18,11 +18,13 @@ import datetime
 
 def get_variables():
     variables = {
-                "RANDOMPROJECTNAME":        "projet - {}".format(datetime.datetime.now()),
-                "RANDOMFEATURETYPENAME":    "type - {}".format(datetime.datetime.now()),
-                "RANDOMFEATURENAME":        "signalement - {}".format(datetime.datetime.now()),
+                "RANDOMPROJECTNAME":        "Tests automatisés",#"projet - {}".format(datetime.datetime.now()),
+                "RANDOMFEATURETYPENAME":    "TypeAuto", #"type - {}".format(datetime.datetime.now()),
+                "RANDOMFEATURENAME":        "SignalementAuto",#"signalement - {}".format(datetime.datetime.now()),
                 "PROJECTEDITION":           " - projet édité",
                 "FEATURETYPEEDITION":       " - type édité",
                 "FEATUREEDITION":           " - signalement édité",
+                "SYMBOLOGYCOLORCODE":       "#FF0000",
+                "SYMBOLOGYOPACITY":         "0.3",
                 }
     return variables

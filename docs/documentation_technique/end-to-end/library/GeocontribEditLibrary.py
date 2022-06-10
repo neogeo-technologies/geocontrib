@@ -91,3 +91,22 @@ def geocontrib_edit_feature(feature_name, added_text):
     get_driver().find_element_by_css_selector("#form-feature-edit div.required:nth-child(2)>div[id*='dropdown']").click()
     ## select second status option
     get_driver().find_element_by_css_selector("#form-feature-edit div.required:nth-child(2)>div[id*='dropdown'] div.menu > div.item:nth-child(2)").click()
+
+def geocontrib_access_featuretype_symbology(featureTypeName):
+    # got to first feature type edition page
+    get_driver().find_element_by_css_selector(
+        "#" + featureTypeName + " " + "a[data-tooltip*='Éditer la symbologie du type de signalement']"
+    ).click()
+
+def geocontrib_edit_featuretype_symbology(featuretypename, colorcode, opacity):
+    color_input_elt = get_driver().find_element_by_id("couleur")
+    color_input_elt.click()
+    color_input_elt.clear()
+    color_input_elt.send_keys(colorcode)
+    # edit default symbology color
+    opacity_input_elt = get_driver().find_element_by_id("opacity")
+    opacity_input_elt.click()
+    opacity_input_elt.clear()
+    opacity_input_elt.send_keys(opacity)
+    # valider le formulaire
+    get_driver().find_element_by_id("save-symbology").click()
