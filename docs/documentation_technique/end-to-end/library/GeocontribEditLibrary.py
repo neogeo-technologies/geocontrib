@@ -12,7 +12,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+import time
+from selenium.webdriver.common.action_chains import ActionChains
 from utils import get_driver
 
 
@@ -100,13 +101,17 @@ def geocontrib_access_featuretype_symbology(featureTypeName):
 
 def geocontrib_edit_featuretype_symbology(featuretypename, colorcode, opacity):
     color_input_elt = get_driver().find_element_by_id("couleur")
-    color_input_elt.click()
-    color_input_elt.clear()
+    # because color selector is an os tool, we can't interact with, thus we send the value directly to the input
     color_input_elt.send_keys(colorcode)
+    # for Vue to detect the change and update the value, we need to dispatch an event
+    get_driver().execute_script("document.getElementById('couleur').dispatchEvent(new Event('change'))")
     # edit default symbology color
     opacity_input_elt = get_driver().find_element_by_id("opacity")
-    opacity_input_elt.click()
-    opacity_input_elt.clear()
     opacity_input_elt.send_keys(opacity)
+    opacity_input_elt.value = opacity
+    # same as above, dispatching an event to be recorded by Vue # ? but doesn't work here, cannot find why
+    get_driver().execute_script("document.getElementById('opacity').dispatchEvent(new Event('input'))")
+    get_driver().implicitly_wait(1) # seconds
+
     # valider le formulaire
     get_driver().find_element_by_id("save-symbology").click()
