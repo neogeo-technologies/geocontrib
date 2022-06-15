@@ -12,8 +12,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import time
-from selenium.webdriver.common.action_chains import ActionChains
+
 from utils import get_driver
 
 
@@ -60,18 +59,20 @@ def geocontrib_edit_project(project_name, project_edition):
 
 
 def geocontrib_edit_featuretype(featuretypename, added_text):
+    driver = get_driver()
     # got to first feature type edition page    
-    get_driver().find_element_by_css_selector("a[data-tooltip*='Éditer le type de signalement']").click()
+    driver.find_element_by_css_selector("a[data-tooltip*='Éditer le type de signalement']").click()
     # modify feature type title
-    title_input_elt = get_driver().find_element_by_id("title")
+    title_input_elt = driver.find_element_by_id("title")
     title_input_elt.click()
     title_input_elt.clear()
     title_input_elt.send_keys("{}{}".format(featuretypename, added_text))
     # todo: add an option to change geometry when we can test more than points
-    optionnal_title_input_elt = get_driver().find_element_by_id("title_optional")
+    optionnal_title_input_elt = driver.find_element_by_id("title_optional")
     optionnal_title_input_elt.click
     # submit the form
-    get_driver().find_element_by_id("send-feature_type").click()
+    driver.execute_script("document.getElementById('send-feature_type').scrollIntoView('alignToTop');")
+    driver.find_element_by_id("send-feature_type").click()
 
 
 def geocontrib_edit_feature(feature_name, added_text):
@@ -99,19 +100,19 @@ def geocontrib_access_featuretype_symbology(featureTypeName):
         "#" + featureTypeName + " " + "a[data-tooltip*='Éditer la symbologie du type de signalement']"
     ).click()
 
-def geocontrib_edit_featuretype_symbology(featuretypename, colorcode, opacity):
-    color_input_elt = get_driver().find_element_by_id("couleur")
+def geocontrib_edit_featuretype_default_symbology(colorcode, opacity):
+    color_input_elt = get_driver().find_element_by_css_selector(".default #couleur")
     # because color selector is an os tool, we can't interact with, thus we send the value directly to the input
     color_input_elt.send_keys(colorcode)
     # for Vue to detect the change and update the value, we need to dispatch an event
-    get_driver().execute_script("document.getElementById('couleur').dispatchEvent(new Event('change'))")
+    get_driver().execute_script("document.querySelector('.default #couleur').dispatchEvent(new Event('change'));")
     # edit default symbology color
-    opacity_input_elt = get_driver().find_element_by_id("opacity")
-    opacity_input_elt.send_keys(opacity)
-    opacity_input_elt.value = opacity
-    # same as above, dispatching an event to be recorded by Vue # ? but doesn't work here, cannot find why
-    get_driver().execute_script("document.getElementById('opacity').dispatchEvent(new Event('input'))")
-    get_driver().implicitly_wait(1) # seconds
+    #opacity_input_elt = get_driver().find_element_by_id("opacity")
+    #opacity_input_elt.send_keys(opacity) # doesn't work
+    get_driver().execute_script("document.querySelector('.default #opacity').value = " + opacity + ";")
+    # same as above, dispatching an event to be recorded by Vue
+    get_driver().execute_script("document.querySelector('.default #opacity').dispatchEvent(new Event('input'));")
+    get_driver().implicitly_wait(10) # seconds
 
     # valider le formulaire
     get_driver().find_element_by_id("save-symbology").click()

@@ -113,38 +113,26 @@ Create Feature Type with Random Featuretypename With Geometry Type Polygone
     Wait Until Location Does Not Contain    /type-signalement/ajouter
     Page Should Contain                     ${RANDOMFEATURETYPENAME}-Polygone
 
-Edit Feature Type Symbology     # doesn't work since vue doesn't see the value change of color input
+Edit Feature Type Default Symbology     # doesn't work since vue doesn't see the value change of color input
     # Start from main page
     Find Project
     Go To Project Page
 
+    Geocontrib Access Featuretype Symbology             ${RANDOMFEATURETYPENAME}-Polygone
+    Wait Until Page Contains                            Couleur
+    Geocontrib Edit Featuretype Default Symbology       ${SYMBOLOGYCOLORCODE}   ${SYMBOLOGYOPACITY}
+
+Assess Feature Type Default Symbology
+    # Start from main page
+    Find Project
+    Go To Project Page
     Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
-    Geocontrib Edit Featuretype Symbology       ${RANDOMFEATURETYPENAME}        ${SYMBOLOGYCOLORCODE}   ${SYMBOLOGYOPACITY}
+    # * Validate color value 
+    Element Attribute Value Should Be      css:div.default #couleur         value        ${SYMBOLOGYCOLORCODE}
+    # * Validate opacity value
+    Element Attribute Value Should Be      css:div.default #opacity         value        ${SYMBOLOGYOPACITY}
 
-
-
-#Search for drafts - TEST 168
-#    Geocontrib Draft Search Map             ${RANDOMPROJECTNAME}
-#    Geocontrib Draft Search List            ${RANDOMPROJECTNAME}
-#    Page Should Contain                     ${RANDOMFEATURENAME}
-#
-#Create Layer - ADMIN
-#    Geocontrib Create Layer                 ${ADMIN_URL}            ${LAYER1_TITLE}         ${LAYER1_URL}           ${LAYER1_TYPE}          ${LAYER1_OPTIONS}            
-#    Geocontrib Create Layer                 ${ADMIN_URL}            ${LAYER2_TITLE}         ${LAYER2_URL}           ${LAYER2_TYPE}          ${LAYER2_OPTIONS}            
-#    Page Should Contain                     ${LAYER1_TITLE}         ${LAYER2_URL}
-#
-#Create Basemap - TESTS 78, 79, 88, 
-#    Geocontrib Create Basemap               ${GEOCONTRIB_URL}       ${BASEMAPNAME}          ${RANDOMPROJECTNAME}    ${LAYER1_TITLE}         ${LAYER1_URL}           ${LAYER1_TYPE}           ${LAYER2_TITLE}           ${LAYER2_URL}           ${LAYER2_TYPE}
-#    # Page Should Contain                     ${BASEMAPNAME}
-#
-# Export GeoJson
-#     Geocontrib Json Export                  ${RANDOMPROJECTNAME}${PROJECTEDITION}      ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
-#     # Page Should Contain     
-
-# Import GeoJson
-#     Geocontrib Json Import
-#     # Page Should Contain     
 
 [Teardown]
     Find Project

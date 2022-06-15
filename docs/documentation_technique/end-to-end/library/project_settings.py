@@ -24,7 +24,7 @@ def get_variables():
                 "PROJECTEDITION":           " - projet édité",
                 "FEATURETYPEEDITION":       " - type édité",
                 "FEATUREEDITION":           " - signalement édité",
-                "SYMBOLOGYCOLORCODE":       "#FF0000",
-                "SYMBOLOGYOPACITY":         "0.3",
+                "SYMBOLOGYCOLORCODE":       "#ff0000",
+                "SYMBOLOGYOPACITY":         "0.31",
                 }
     return variables
