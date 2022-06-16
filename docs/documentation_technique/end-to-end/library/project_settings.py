@@ -24,7 +24,13 @@ def get_variables():
                 "PROJECTEDITION":           " - projet édité",
                 "FEATURETYPEEDITION":       " - type édité",
                 "FEATUREEDITION":           " - signalement édité",
-                "SYMBOLOGYCOLORCODE":       "#ff0000",
-                "SYMBOLOGYOPACITY":         "0.31",
+                "SYMBOLCOLORCODE":          "#a24ae3",
+                "SYMBOLOPACITY":            "0.31",
+                "SYMBONAMELIST":            "list",
+                "SYMBONAMECHAR":            "char",
+                "SYMBONAMEBOOL":            "boolean",
+                "SYMBOPTIONLIST":           ["option-1", "option-2"],
+                "SYMBOPTIONCOLORLIST":      ["#84e26d", "#f38e25"],
+                "SYMBOPTIONOPACITYLIST":    ["0.15", "0.69"],
                 }
     return variables

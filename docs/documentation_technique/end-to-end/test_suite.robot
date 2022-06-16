@@ -64,10 +64,13 @@ Edit Project with Random Projectname - TESTS 74, ...
     Page Should Contain                     Utilisateur connecté
     # Vérifier que le signalement a une description (à améliorer: ajouter une variable spécifique à la description)
     Page Should Contain                     ${PROJECTEDITION}
-
 Create Feature Type with Random Featuretypename - TEST 97
+    # Start from main page
+    Find Project
+    Go To Project Page
     Page Should Not Contain                 ${RANDOMFEATURETYPENAME}
     Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}        Point
+    Click Button                            send-feature_type
     # attendre le changement de page
     Wait Until Location Does Not Contain    /type-signalement/ajouter
     # attendre que le loader disparaissent ! NE MARCHE PAS
@@ -109,29 +112,69 @@ Create Feature Type with Random Featuretypename With Geometry Type Polygone
 
     Page Should Not Contain                 ${RANDOMFEATURETYPENAME}-Polygone
     Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}-Polygone    Polygone
+    Geocontrib Add Custom Fields            ${SYMBONAMELIST}    ${SYMBONAMECHAR}    ${SYMBONAMEBOOL}    ${SYMBOPTIONLIST}
+    Click Button                            send-feature_type
     # attendre le changement de page
     Wait Until Location Does Not Contain    /type-signalement/ajouter
     Page Should Contain                     ${RANDOMFEATURETYPENAME}-Polygone
 
-Edit Feature Type Default Symbology     # doesn't work since vue doesn't see the value change of color input
+Edit Feature Type Default Symbology
     # Start from main page
     Find Project
     Go To Project Page
 
-    Geocontrib Access Featuretype Symbology             ${RANDOMFEATURETYPENAME}-Polygone
-    Wait Until Page Contains                            Couleur
-    Geocontrib Edit Featuretype Default Symbology       ${SYMBOLOGYCOLORCODE}   ${SYMBOLOGYOPACITY}
-
-Assess Feature Type Default Symbology
-    # Start from main page
-    Find Project
-    Go To Project Page
     Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
-    # * Validate color value 
-    Element Attribute Value Should Be      css:div.default #couleur         value        ${SYMBOLOGYCOLORCODE}
-    # * Validate opacity value
-    Element Attribute Value Should Be      css:div.default #opacity         value        ${SYMBOLOGYOPACITY}
+    Geocontrib Edit Featuretype Symbology       ${SYMBOLCOLORCODE}   ${SYMBOLOPACITY}   .default
+    Click Button                                save-symbology
+    # attendre le changement de page
+    Wait Until Location Does Not Contain        /symbologie
+    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Wait Until Page Contains                    Couleur
+    #*Validate color value 
+    Element Attribute Value Should Be           css:div.default #couleur         value        ${SYMBOLCOLORCODE}
+    #*Validate opacity value
+    Element Attribute Value Should Be           css:div.default #opacity         value        ${SYMBOLOPACITY}
+
+
+Edit Custom Field Symbology For List
+    # Start from main page
+    Find Project
+    Go To Project Page
+
+    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Wait Until Page Contains                    Couleur
+    #*Edit type list
+    Geocontrib Edit Custom Field Symbology      ${SYMBOPTIONCOLORLIST}   ${SYMBOPTIONOPACITYLIST}  ${SYMBONAMELIST}  ${SYMBOPTIONLIST}
+    Click Button                                save-symbology
+    # attendre le changement de page
+    Wait Until Location Does Not Contain        /symbologie
+    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Wait Until Page Contains                    Couleur
+    Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[0]} #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
+    Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[0]} #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
+    Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[1]} #opacity         value        ${SYMBOPTIONOPACITYLIST[1]}
+    Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[1]} #opacity         value        ${SYMBOPTIONOPACITYLIST[1]}
+
+#Edit Custom Field Symbology For Character Chain
+#    # Start from main page
+#    Find Project
+#    Go To Project Page
+#
+#    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+#    Wait Until Page Contains                    Couleur
+#    #*Edit type list
+#    Geocontrib Edit Custom Field Symbology      ${SYMBOPTIONCOLORLIST}   ${SYMBOPTIONOPACITYLIST}  ${SYMBONAMECHAR}  ${NONE}
+#    Click Button                                save-symbology
+#    # attendre le changement de page
+#    #Wait Until Location Does Not Contain        /symbologie
+#    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+#    Wait Until Page Contains                    Couleur
+#    Element Attribute Value Should Be           css:div[id="Vide"] #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
+#    Element Attribute Value Should Be           css:div[id="Vide"] #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
+#! not working: selector with space in ID apparently
+#    Element Attribute Value Should Be           css:div[id="Non Vide"] #opacity         value        ${SYMBOPTIONOPACITYLIST[1]}
+#    Element Attribute Value Should Be           css:div[id="Non Vide"] #opacity         value        ${SYMBOPTIONOPACITYLIST[1]}
 
 
 [Teardown]
