@@ -13,7 +13,7 @@
         "project": "1-aze",
         "customfield_set": [],
         "is_editable": false,
-        "opacity": 0.5
+        "opacity": "0.5"
     },
     {
         "title": "type 2",
@@ -29,6 +29,6 @@
         "project": "1-aze",
         "customfield_set": [],
         "is_editable": false,
-        "opacity": 0.5
+        "opacity": "0.5"
     }
 ]
