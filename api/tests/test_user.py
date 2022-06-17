@@ -16,7 +16,7 @@ def verify_or_create_json(filename, json_result):
     if path.exists():
         with path.open() as fp:
             json_expected = json.load(fp)
-            assert json_expected == json_result
+            assert json_result == json_expected
     else:
         with path.open("w") as fp:
             json.dump(json_result, fp)

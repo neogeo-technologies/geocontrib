@@ -287,6 +287,7 @@ def test_feature_types_list(api_client):
         'title_optional': False,
         'geom_type': "point",
         'color': "#000000",
+        'opacity': "0.5",
         'project': '1-aze',
         'customfield_set': None
     }

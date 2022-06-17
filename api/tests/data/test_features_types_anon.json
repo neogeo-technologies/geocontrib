@@ -1,1 +1,34 @@
-[{"title": "dfsdfs", "title_optional": false, "slug": "1-dfsdfs", "geom_type": "point", "color": "#000000", "icon": null, "colors_style": {"colors": {}, "custom_field_name": ""}, "project": "1-aze", "customfield_set": [], "is_editable": false}, {"title": "type 2", "title_optional": false, "slug": "2-type-2", "geom_type": "linestring", "color": "#ff0000", "icon": null, "colors_style": {"colors": {}, "custom_field_name": ""}, "project": "1-aze", "customfield_set": [], "is_editable": false}]
+[
+    {
+        "title": "dfsdfs",
+        "title_optional": false,
+        "slug": "1-dfsdfs",
+        "geom_type": "point",
+        "color": "#000000",
+        "icon": null,
+        "colors_style": {
+            "colors": {},
+            "custom_field_name": ""
+        },
+        "project": "1-aze",
+        "customfield_set": [],
+        "is_editable": false,
+        "opacity": "0.5"
+    },
+    {
+        "title": "type 2",
+        "title_optional": false,
+        "slug": "2-type-2",
+        "geom_type": "linestring",
+        "color": "#ff0000",
+        "icon": null,
+        "colors_style": {
+            "colors": {},
+            "custom_field_name": ""
+        },
+        "project": "1-aze",
+        "customfield_set": [],
+        "is_editable": false,
+        "opacity": "0.5"
+    }
+]

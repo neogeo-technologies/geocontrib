@@ -58,16 +58,80 @@ def geocontrib_create_project(project_name):
     # submit the form
     get_driver().find_element_by_id("send-project").click()
 
-def geocontrib_create_featuretype(feature_type_name):
-    get_driver().find_element_by_link_text(
+#def add_custom_field(custom_field_name, custom_field_type, list_options):
+#    driver = get_driver()
+#    add_field_btn = driver.find_element_by_id("add-field")
+#    # scroll the page to reveal the button
+#    driver.execute_script("document.getElementById('add-field').scrollIntoView('alignToTop');")
+#    add_field_btn.click()
+#    # scroll the page to reveal the button after the new element was added to the page
+#    driver.execute_script("document.getElementById('send-feature_type').scrollIntoView('alignToTop');")
+#    # add the label & name
+#    driver.find_element_by_css_selector("#custom_form-1 #label").send_keys(custom_field_name)
+#    driver.find_element_by_css_selector("#custom_form-1 #name").send_keys(custom_field_name)
+#    # select the type
+#    driver.find_element_by_css_selector("#custom_form-1 #field_type > .dropdown").click()
+#    driver.find_element_by_css_selector("#custom_form-1 #field_type > .dropdown [id='" + custom_field_type + "']").click()
+#    # for a list add options list
+#    if list_options:
+#        driver.find_element_by_css_selector("#custom_form-0 #options").send_keys(list_options)
+
+
+def geocontrib_create_featuretype(feature_type_name, geometry_type):
+    driver = get_driver()
+    driver.find_element_by_link_text(
         u"Créer un nouveau type de signalement"
     ).click()
     # fill the feature type title
-    get_driver().find_element_by_id("title").click()
-    get_driver().find_element_by_id("title").clear()
-    get_driver().find_element_by_id("title").send_keys(feature_type_name)
+    title_el = driver.find_element_by_id("title")
+    title_el.click()
+    #title_el.clear()
+    title_el.send_keys(feature_type_name)
+    # select a geometry type
+    driver.find_element_by_id("geometry-type").click()
+    driver.find_element_by_id(geometry_type).click()
+
+def geocontrib_add_custom_fields(list_name, char_name, bool_name, list_options):
+    driver = get_driver()
+    # fill custom field with a list
+    #add_custom_field(list_name, "Liste de valeurs", list_options);
+    #add_custom_field(char_name, "Chaîne de caractères", list_options);
+    #add_custom_field(list_name, "Booléen", list_options);
+
+    add_field_btn = driver.find_element_by_id("add-field")
+    # add custom field for list
+    add_field_btn.click()
+    driver.find_element_by_css_selector("#custom_form-0 #label").send_keys(list_name)
+    driver.find_element_by_css_selector("#custom_form-0 #name").send_keys(list_name)
+    driver.find_element_by_css_selector("#custom_form-0 #field_type > .dropdown").click()
+    driver.find_element_by_css_selector("#custom_form-0 #field_type > .dropdown [id='Liste de valeurs']").click()
+    driver.find_element_by_css_selector("#custom_form-0 #options").send_keys(",".join(list_options))
+
+    ## add custom field for characters
+    ### scroll the page to reveal the button
+    driver.execute_script("document.getElementById('add-field').scrollIntoView('alignToTop');")
+    add_field_btn.click()
+    ### scroll the page to reveal the button after the new element was added to the page
+    driver.execute_script("document.getElementById('send-feature_type').scrollIntoView('alignToTop');")
+    driver.find_element_by_css_selector("#custom_form-1 #label").send_keys(char_name)
+    driver.find_element_by_css_selector("#custom_form-1 #name").send_keys(char_name)
+    driver.find_element_by_css_selector("#custom_form-1 #field_type > .dropdown").click()
+    driver.find_element_by_css_selector("#custom_form-1 #field_type > .dropdown [id='Chaîne de caractères']").click()
+
+    ## add custom field with a boolean
+    driver.execute_script("document.getElementById('add-field').scrollIntoView('alignToTop');")
+    add_field_btn.click()
+    ### scroll the page to reveal the button after the new element was added to the page
+    driver.execute_script("document.getElementById('send-feature_type').scrollIntoView('alignToTop');")
+    driver.find_element_by_css_selector("#custom_form-2 #label").send_keys(bool_name)
+    driver.find_element_by_css_selector("#custom_form-2 #name").send_keys(bool_name)
+    driver.find_element_by_css_selector("#custom_form-2 #field_type > .dropdown").click()
+    driver.find_element_by_css_selector("#custom_form-2 #field_type > .dropdown [id='Booléen']").click()
+
+    ## scroll the page to reveal the button
+    driver.execute_script("document.getElementById('send-feature_type').scrollIntoView('alignToTop');")
     # submit the form
-    get_driver().find_element_by_id("send-feature_type").click()
+    #get_driver().find_element_by_id("send-feature_type").click()
 
 def geocontrib_create_feature(feature_type_name, feature_name):
     # click on button to create new feature from the first feature type
