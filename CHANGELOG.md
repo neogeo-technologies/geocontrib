@@ -39,6 +39,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - DEFAULT_MAP_VIEW_CENTER valeur par défaut : '[47.0, 1.0]'
 - DEFAULT_MAP_VIEW_ZOOM valeur par défault 4
 
+## [3.0.6] - 2022-06-17
+
+### Correction
+
+- Redmine 14159 : Liste et carte - Impossible cliquer sur les signalements s'ils sont filtrées et paginées
 
 ## [3.0.5] - 2022-05-25
 
