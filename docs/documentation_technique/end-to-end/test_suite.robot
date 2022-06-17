@@ -152,29 +152,48 @@ Edit Custom Field Symbology For List
     Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
     Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[0]} #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
-    Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[0]} #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
-    Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[1]} #opacity         value        ${SYMBOPTIONOPACITYLIST[1]}
+    Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[0]} #opacity         value        ${SYMBOPTIONOPACITYLIST[0]}
+    Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[1]} #couleur         value        ${SYMBOPTIONCOLORLIST[1]}
     Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[1]} #opacity         value        ${SYMBOPTIONOPACITYLIST[1]}
 
-#Edit Custom Field Symbology For Character Chain
-#    # Start from main page
-#    Find Project
-#    Go To Project Page
-#
-#    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
-#    Wait Until Page Contains                    Couleur
-#    #*Edit type list
-#    Geocontrib Edit Custom Field Symbology      ${SYMBOPTIONCOLORLIST}   ${SYMBOPTIONOPACITYLIST}  ${SYMBONAMECHAR}  ${NONE}
-#    Click Button                                save-symbology
-#    # attendre le changement de page
-#    #Wait Until Location Does Not Contain        /symbologie
-#    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
-#    Wait Until Page Contains                    Couleur
-#    Element Attribute Value Should Be           css:div[id="Vide"] #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
-#    Element Attribute Value Should Be           css:div[id="Vide"] #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
-#! not working: selector with space in ID apparently
-#    Element Attribute Value Should Be           css:div[id="Non Vide"] #opacity         value        ${SYMBOPTIONOPACITYLIST[1]}
-#    Element Attribute Value Should Be           css:div[id="Non Vide"] #opacity         value        ${SYMBOPTIONOPACITYLIST[1]}
+Edit Custom Field Symbology For Character Chain
+    # Start from main page
+    Find Project
+    Go To Project Page
+
+    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Wait Until Page Contains                    Couleur
+    #*Edit type list
+    Geocontrib Edit Custom Field Symbology      ${SYMBOPTIONCOLORLIST}   ${SYMBOPTIONOPACITYLIST}  ${SYMBONAMECHAR}  ${NONE}
+    Click Button                                save-symbology
+    # attendre le changement de page
+    Wait Until Location Does Not Contain        /symbologie
+    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Wait Until Page Contains                    Couleur
+    Element Attribute Value Should Be           css:div[id="Vide"] #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
+    Element Attribute Value Should Be           css:div[id="Vide"] #opacity         value        ${SYMBOPTIONOPACITYLIST[0]}
+    #* selector with space in ID doesn't work 
+    Element Attribute Value Should Be           css:div[id^="Non"] #couleur         value        ${SYMBOPTIONCOLORLIST[1]}
+    Element Attribute Value Should Be           css:div[id^="Non"] #opacity         value        ${SYMBOPTIONOPACITYLIST[1]}
+
+Edit Custom Field Symbology For Boolean
+    # Start from main page
+    Find Project
+    Go To Project Page
+
+    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Wait Until Page Contains                    Couleur
+    #*Edit type list
+    Geocontrib Edit Custom Field Symbology      ${SYMBOPTIONCOLORLIST}   ${SYMBOPTIONOPACITYLIST}  ${SYMBONAMEBOOL}  ${NONE}
+    Click Button                                save-symbology
+    # attendre le changement de page
+    Wait Until Location Does Not Contain        /symbologie
+    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Wait Until Page Contains                    Couleur
+    Element Attribute Value Should Be           css:div[id="Décoché"] #couleur      value       ${SYMBOPTIONCOLORLIST[0]}
+    Element Attribute Value Should Be           css:div[id="Décoché"] #opacity      value       ${SYMBOPTIONOPACITYLIST[0]}
+    Element Attribute Value Should Be           css:div[id="Coché"] #couleur        value       ${SYMBOPTIONCOLORLIST[1]}
+    Element Attribute Value Should Be           css:div[id="Coché"] #opacity        value       ${SYMBOPTIONOPACITYLIST[1]}
 
 
 [Teardown]

@@ -128,15 +128,15 @@ def geocontrib_edit_custom_field_symbology(colors, opacities, custom_field_name,
     form_selector_1 = ''
     form_selector_2 = ''
     if list_options:
-        form_selector_1 = list_options[0]
-        form_selector_2 = list_options[1]
+        form_selector_1 = "div[id='{}']".format(list_options[0])
+        form_selector_2 = "div[id='{}']".format(list_options[1])
     elif custom_field_name == "char":
-        form_selector_1 = "Vide"
-        form_selector_2 = "Non vide"
+        form_selector_1 = "div[id='Vide']"
+        form_selector_2 = "div[id^='Non']" 
     elif custom_field_name == "boolean":
-        form_selector_1 = "Décoché"
-        form_selector_2 = "Coché"
+        form_selector_1 = "div[id='Décoché']"
+        form_selector_2 = "div[id='Coché']"
     #*edit first field
-    geocontrib_edit_featuretype_symbology(colors[0], opacities[0], "div[id='{}']".format(form_selector_1))
+    geocontrib_edit_featuretype_symbology(colors[0], opacities[0], form_selector_1)
     #*edit second field
-    geocontrib_edit_featuretype_symbology(colors[1], opacities[1], "div[id='{}']".format(form_selector_2))
+    geocontrib_edit_featuretype_symbology(colors[1], opacities[1], form_selector_2)
