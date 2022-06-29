@@ -133,15 +133,17 @@ def geocontrib_add_custom_fields(list_name, char_name, bool_name, list_options):
     # submit the form
     #get_driver().find_element_by_id("send-feature_type").click()
 
-def geocontrib_create_feature(feature_type_name, feature_name):
-    # click on button to create new feature from the first feature type
-    get_driver().find_element_by_css_selector("[data-tooltip~=Ajouter]").click()
+def geocontrib_create_feature(feature_name, feature_type_name, added_text):
+    driver = get_driver()
+    
+    selector = "div[id='{}{}'] a[data-tooltip~=Ajouter]".format(feature_type_name, added_text)
+    driver.find_element_by_css_selector(selector).click()
     # fill the name
-    get_driver().find_element_by_id("name").click()
-    get_driver().find_element_by_id("name").clear()
-    get_driver().find_element_by_id("name").send_keys(feature_name)
+    driver.find_element_by_id("name").click()
+    driver.find_element_by_id("name").clear()
+    driver.find_element_by_id("name").send_keys(feature_name)
     # add description
-    description_input_elt = get_driver().find_element_by_name("description")
+    description_input_elt = driver.find_element_by_name("description")
     description_input_elt.click()
     description_input_elt.clear()
     description_input_elt.send_keys("Exemple de description")
