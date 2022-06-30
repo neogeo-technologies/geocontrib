@@ -10,6 +10,7 @@ Library  library/GeocontribJsonLibrary.py
 Library  library/GeocontribDeleteLibrary.py
 Library  library/GeocontribEditLibrary.py
 Library  library/GeocontribOnCoordinatesLibrary.py
+Library  library/GeocontribBrowseLibrary.py
 
 Variables   library/tests_settings.py
 Variables   library/project_settings.py
@@ -64,6 +65,7 @@ Edit Project with Random Projectname - TESTS 74, ...
     Page Should Contain                     Utilisateur connecté
     # Vérifier que le signalement a une description (à améliorer: ajouter une variable spécifique à la description)
     Page Should Contain                     ${PROJECTEDITION}
+
 Create Feature Type with Random Featuretypename - TEST 97
     # Start from main page
     Find Project
@@ -87,9 +89,10 @@ Edit Feature Type - TEST n°?
 
 Create Feature with Random Featurename on Random Coordinates - TEST 117
     Page Should Not Contain                 ${RANDOMFEATURENAME}
-    Geocontrib Create Feature               ${RANDOMFEATURETYPENAME}        ${RANDOMFEATURENAME}
-    Geocontrib Click At Coordinates         ${X1}                           ${Y1}                       ${BROWSER_NAME}
-    Geocontrib Click Save Changes
+    Create Feature                          ${RANDOMFEATURENAME}       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
+    #Geocontrib Create Feature               ${RANDOMFEATURENAME}       ${RANDOMFEATURETYPENAME}    ${FEATURETYPEEDITION}
+    #Geocontrib Click At Coordinates         ${X1}                      ${Y1}                       ${BROWSER_NAME}
+    #Geocontrib Click Save Changes
     Page Should Contain                     ${RANDOMFEATURENAME}
     # Vérifier que le signalement a une description (à améliorer: utilisé une variable)
     Page Should Contain                     Exemple de description
@@ -97,7 +100,7 @@ Create Feature with Random Featurename on Random Coordinates - TEST 117
 Edit Feature - TEST n°?
     # depuis la page de détail du signalement juste créé
     Page Should Contain                     ${RANDOMFEATURENAME}
-    Geocontrib Edit Feature                 ${RANDOMFEATURETYPENAME}        ${FEATUREEDITION}
+    Geocontrib Edit Feature                 ${RANDOMFEATURENAME}        ${FEATUREEDITION}
     Geocontrib Click Save Changes
     Page Should Contain                     ${FEATUREEDITION}
     # Vérifier que le signalement a le statut 'publié (à améliorer)
@@ -195,6 +198,30 @@ Edit Custom Field Symbology For Boolean
     Element Attribute Value Should Be           css:div[id="Coché"] #couleur        value       ${SYMBOPTIONCOLORLIST[1]}
     Element Attribute Value Should Be           css:div[id="Coché"] #opacity        value       ${SYMBOPTIONOPACITYLIST[1]}
 
+Browse Features Filtered
+    #Create som features to navigate
+    #Start from main page
+    Find Project
+    Go To Project Page
+    Create Feature      ${RANDOMFEATURENAME}-2       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
+    # Start from main page
+    Find Project
+    Go To Project Page
+    Create Feature      ${RANDOMFEATURENAME}-3       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
+
+    # Start from main page
+    Find Project
+    Go To Project Page
+    # go to list and click on first feature containing name
+    Geocontrib Browse Feature List         ${RANDOMFEATURENAME}        ${RANDOMFEATURETYPENAME}     ${FEATURETYPEEDITION}
+    Page Should Contain                    ${RANDOMFEATURENAME}-3
+    Element should have class              css:button[id="previous-feature"]        disabled
+    Click Button                           next-feature
+    Page Should Contain                    ${RANDOMFEATURENAME}-2
+    Click Button                           next-feature
+    Page Should Contain                    ${RANDOMFEATURENAME}${FEATUREEDITION}
+    Element should have class              css:button[id="next-feature"]            disabled
+    
 
 [Teardown]
     Find Project
@@ -214,3 +241,13 @@ Find Project
 Go To Project Page
     Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
     Wait Until Page Does Not Contain            Projet en cours de chargement ... 
+
+Create Feature
+    [Arguments]         ${FEATURENAME}      ${FEATURETYPENAME}      ${FEATURETYPEEDITION}
+    Geocontrib Create Feature               ${FEATURENAME}          ${FEATURETYPENAME}      ${FEATURETYPEEDITION}
+    Geocontrib Click At Coordinates         ${X1}       ${Y1}       ${BROWSER_NAME}
+    Geocontrib Click Save Changes
+
+Element should have class
+    [Arguments]  ${element}  ${className}
+    Wait until page contains element  ${element}.${className}
