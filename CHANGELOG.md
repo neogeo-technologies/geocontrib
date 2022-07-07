@@ -5,7 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [2.3.9] - 2022-07-07
 
+### Corrections
+
+- Redmine 14268 : Administration des fonds cartographiques - Duplication des couches quand on les intervertit
+- Redmine 14234 : Liste et carte - Erreur couches requêtables avec plusieurs fonds
 
 ## [2.3.8] - 2022-05-25
 
