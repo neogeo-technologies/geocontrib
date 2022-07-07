@@ -105,6 +105,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 12996 : Les statuts dans le tableau ne sont pas mis à jour suite à une modification en masse
 - Redmine 12997 : Les envois d'emails sont incomplets suite à une modification des statuts en masse
 
+## [2.3.9] - 2022-07-07
+
+### Corrections
+
+- Redmine 14268 : Administration des fonds cartographiques - Duplication des couches quand on les intervertit
+- Redmine 14234 : Liste et carte - Erreur couches requêtables avec plusieurs fonds
+
 ## [2.3.8] - 2022-05-25
 
 ### Evolution
