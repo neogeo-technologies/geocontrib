@@ -1,1 +1,76 @@
-[{"model": "geocontrib.featuretype", "pk": 1, "fields": {"title": "dfsdfs", "title_optional": false, "slug": "1-dfsdfs", "geom_type": "point", "color": "#000000", "colors_style": {"colors": {}, "custom_field_name": ""}, "project": 1}}, {"model": "geocontrib.featuretype", "pk": 2, "fields": {"title": "type 2", "title_optional": false, "slug": "2-type-2", "geom_type": "linestring", "color": "#ff0000", "colors_style": {"colors": {}, "custom_field_name": ""}, "project": 1}}, {"model": "geocontrib.user", "pk": 1, "fields": {"password": "pbkdf2_sha256$150000$LelqcpRmmZC6$tH5REhf1sCGt9NelG4s7VbD2YGybtJWgzuISRMGdsCU=", "last_login": "2021-09-30T10:58:10.170Z", "is_superuser": true, "username": "admin", "first_name": "", "last_name": "", "email": "", "is_staff": true, "is_active": true, "date_joined": "2021-09-30T10:56:42.144Z", "is_administrator": false, "groups": [], "user_permissions": []}}, {"model": "geocontrib.project", "pk": 1, "fields": {"title": "aze", "slug": "1-aze", "created_on": "2021-09-30T11:12:46.540Z", "updated_on": "2021-09-30T11:12:46.548Z", "description": "", "moderation": false, "thumbnail": "default.png", "creator": 1, "access_level_pub_feature": "anonymous", "access_level_arch_feature": "anonymous", "archive_feature": 0, "delete_feature": 0, "ldap_project_contrib_groups": null, "ldap_project_admin_groups": null, "is_project_type": false, "generate_share_link": false}}]
+[
+    {
+        "model": "geocontrib.featuretype",
+        "pk": 1,
+        "fields": {
+            "title": "dfsdfs",
+            "title_optional": false,
+            "slug": "1-dfsdfs",
+            "geom_type": "point",
+            "color": "#000000",
+            "colors_style": {
+                "colors": {},
+                "custom_field_name": ""
+            },
+            "project": 1
+        }
+    },
+    {
+        "model": "geocontrib.featuretype",
+        "pk": 2,
+        "fields": {
+            "title": "type 2",
+            "title_optional": false,
+            "slug": "2-type-2",
+            "geom_type": "linestring",
+            "color": "#ff0000",
+            "colors_style": {
+                "colors": {},
+                "custom_field_name": ""
+            },
+            "project": 1
+        }
+    },
+    {
+        "model": "geocontrib.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$150000$LelqcpRmmZC6$tH5REhf1sCGt9NelG4s7VbD2YGybtJWgzuISRMGdsCU=",
+            "last_login": "2021-09-30T10:58:10.170Z",
+            "is_superuser": true,
+            "username": "admin",
+            "first_name": "",
+            "last_name": "",
+            "email": "",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2021-09-30T10:56:42.144Z",
+            "is_administrator": false,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "geocontrib.project",
+        "pk": 1,
+        "fields": {
+            "title": "aze",
+            "slug": "1-aze",
+            "created_on": "2021-09-30T11:12:46.540Z",
+            "updated_on": "2021-09-30T11:12:46.548Z",
+            "description": "",
+            "moderation": false,
+            "thumbnail": "default.png",
+            "creator": 1,
+            "access_level_pub_feature": "anonymous",
+            "access_level_arch_feature": "anonymous",
+            "archive_feature": 0,
+            "delete_feature": 0,
+            "ldap_project_contrib_groups": null,
+            "ldap_project_admin_groups": null,
+            "is_project_type": false,
+            "generate_share_link": false,
+            "fast_edition_mode": false
+        }
+    }
+]

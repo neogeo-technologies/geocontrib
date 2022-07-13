@@ -69,6 +69,8 @@ class Project(models.Model):
 
     generate_share_link = models.BooleanField("Génération d'un lien de partage externe", default=False)
 
+    fast_edition_mode = models.BooleanField("Mode d'édition rapide de signalements", default=False)
+
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"

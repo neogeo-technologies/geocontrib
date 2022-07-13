@@ -71,7 +71,8 @@
             "ldap_project_contrib_groups": null,
             "ldap_project_admin_groups": null,
             "is_project_type": false,
-            "generate_share_link": false
+            "generate_share_link": false,
+            "fast_edition_mode": false
         }
     },
     {

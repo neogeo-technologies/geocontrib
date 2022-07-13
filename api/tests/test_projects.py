@@ -63,6 +63,7 @@ def test_projects_list(api_client):
             'moderation': False,
             'is_project_type': False,
             'generate_share_link': False,
+            'fast_edition_mode': False,
             'thumbnail': reverse('api:project-thumbnail', args=["1-projet-1"]),
             'creator': 1,
             'access_level_pub_feature': 'Utilisateur anonyme',
@@ -113,6 +114,7 @@ def test_projects_post(api_client):
         'slug': '1-projet-2',
         'title': 'Projet 2',
         'generate_share_link': False,
+        'fast_edition_mode': False,
     }
 
 
@@ -158,6 +160,7 @@ def test_projects_thumbnail(api_client):
         'description': None,
         'is_project_type': False,
         'generate_share_link': False,
+        'fast_edition_mode': False,
         'moderation': False,
         'nb_comments': 0,
         'nb_contributors': 1,
