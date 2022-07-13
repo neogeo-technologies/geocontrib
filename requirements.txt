@@ -1,4 +1,4 @@
-celery<5.2.0
+celery<5.3.0
 Django>=3.2.0,<3.3.0
 djangorestframework-gis==0.18
 djangorestframework>=3.11.2,<3.12.0
@@ -6,7 +6,7 @@ djangorestframework>=3.11.2,<3.12.0
 git+https://github.com/neogeo-technologies/djangorestframework-mvt.git@138a09f092c04247f3f9dfc4546e5dad5d04ccc6#egg=djangorestframework-mvt
 #djangorestframework-mvt>=0.2.5,<0.3.0
 ldap3==2.6.1
-Pillow>=8.2.0,<8.3.0
+Pillow<9.2.0
 psycopg2-binary==2.8.2
 python-decouple==3.3
 python-magic==0.4.24
