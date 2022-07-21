@@ -68,6 +68,7 @@
             "access_level_arch_feature": "anonymous",
             "archive_feature": 0,
             "delete_feature": 0,
+            "map_max_zoom_level": 22,
             "ldap_project_contrib_groups": null,
             "ldap_project_admin_groups": null,
             "is_project_type": false,
