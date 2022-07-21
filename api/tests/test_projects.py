@@ -160,6 +160,7 @@ def test_projects_thumbnail(api_client):
         'created_on': '05/08/2021',
         'creator': user.pk,
         'delete_feature': None,
+        'map_max_zoom_level': 22,
         'description': None,
         'is_project_type': False,
         'generate_share_link': False,
