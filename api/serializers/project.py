@@ -164,6 +164,7 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'access_level_arch_feature',
             'archive_feature',
             'delete_feature',
+            'map_max_zoom_level',
             'nb_features',
             'nb_published_features',
             'nb_comments',
@@ -191,6 +192,7 @@ class ProjectCreationSerializer(serializers.ModelSerializer):
             'access_level_arch_feature',
             'archive_feature',
             'delete_feature',
+            'map_max_zoom_level',
         )
 
 

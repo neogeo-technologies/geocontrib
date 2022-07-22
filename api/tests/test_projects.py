@@ -70,6 +70,7 @@ def test_projects_list(api_client):
             'access_level_arch_feature': 'Utilisateur anonyme',
             'archive_feature': None,
             'delete_feature': None,
+            'map_max_zoom_level': 22,
             'nb_features': 0,
             'nb_published_features': 0,
             'nb_comments': 0,
@@ -95,6 +96,7 @@ def test_projects_post(api_client):
         access_level_arch_feature="anonymous",
         archive_feature=1,
         delete_feature=2,
+        map_max_zoom_level=20,
     )
 
     api_client.force_authenticate(user=user)
@@ -108,6 +110,7 @@ def test_projects_post(api_client):
         'archive_feature': 1,
         'creator': user.pk,
         'delete_feature': 2,
+        'map_max_zoom_level': 20,
         'description': None,
         'is_project_type': False,
         'moderation': False,
@@ -157,6 +160,7 @@ def test_projects_thumbnail(api_client):
         'created_on': '05/08/2021',
         'creator': user.pk,
         'delete_feature': None,
+        'map_max_zoom_level': 22,
         'description': None,
         'is_project_type': False,
         'generate_share_link': False,

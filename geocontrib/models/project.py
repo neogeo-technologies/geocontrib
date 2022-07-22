@@ -56,6 +56,9 @@ class Project(models.Model):
     delete_feature = models.PositiveIntegerField(
         "Délai avant suppression", blank=True, null=True)
 
+    map_max_zoom_level = models.PositiveIntegerField(
+        "Niveau de zoom maximum de la carte", default=22)
+
     ldap_project_contrib_groups = ArrayField(
         verbose_name="Groupes LDAP des contributeurs et modérateurs",
         base_field=models.CharField(max_length=256), blank=True, null=True)
