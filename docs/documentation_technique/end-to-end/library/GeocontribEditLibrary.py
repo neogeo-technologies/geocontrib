@@ -140,3 +140,13 @@ def geocontrib_edit_custom_field_symbology(colors, opacities, custom_field_name,
     geocontrib_edit_featuretype_symbology(colors[0], opacities[0], form_selector_1)
     #*edit second field
     geocontrib_edit_featuretype_symbology(colors[1], opacities[1], form_selector_2)
+
+def geocontrib_activate_fast_edition_for_project():
+    driver = get_driver()
+    driver.find_element_by_class_name("button-hover-orange").click()
+    # check the input if not already selected
+    fast_edit_checkbox = driver.find_element_by_css_selector("label[for=fast_edition_mode]")
+    if fast_edit_checkbox.is_selected() == False:
+        fast_edit_checkbox.click()
+    # submit the form
+    driver.find_element_by_id("send-project").click()
