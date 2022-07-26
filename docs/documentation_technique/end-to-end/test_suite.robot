@@ -98,7 +98,16 @@ Create Feature with Random Featurename on Random Coordinates - TEST 117
     Page Should Contain                     Exemple de description
 
 Edit Feature - TEST n°?
-    # depuis la page de détail du signalement juste créé
+    # départ depuis la page de détail du signalement juste créé
+    # fermer le message d'info si présent pour pouvoir cliquer sur le bouton d'édition
+    TRY
+        Click Element                       css:i.close.icon
+    EXCEPT    AS    ${err}
+        Log    Error occurred: ${err}
+    ELSE
+        Log    No error occurred!
+    END
+    Wait Until Element Is Visible           css:a[href*=editer]
     Page Should Contain                     ${RANDOMFEATURENAME}
     Geocontrib Edit Feature                 ${RANDOMFEATURENAME}        ${FEATUREEDITION}
     Geocontrib Click Save Changes
@@ -221,12 +230,20 @@ Browse Features Filtered
     Click Button                           next-feature
     Page Should Contain                    ${RANDOMFEATURENAME}${FEATUREEDITION}
     Element should have class              css:button[id="next-feature"]            disabled
-    
+
+Fast Edit Feature
+    #Start from main page
+    Find Project
+    Go To Project Page
+
+    Geocontrib Activate Fast Edition For Project
+
+
 
 [Teardown]
     Find Project
     Go To Project Page
-    Geocontrib Delete Project  
+    Geocontrib Delete Project
     Run Keywords                                Sleep       3
 ...                             AND             Close Browser
 
