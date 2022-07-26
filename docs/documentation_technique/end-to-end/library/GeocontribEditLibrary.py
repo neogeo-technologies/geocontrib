@@ -145,8 +145,20 @@ def geocontrib_activate_fast_edition_for_project():
     driver = get_driver()
     driver.find_element_by_class_name("button-hover-orange").click()
     # check the input if not already selected
-    fast_edit_checkbox = driver.find_element_by_css_selector("label[for=fast_edition_mode]")
-    if fast_edit_checkbox.is_selected() == False:
-        fast_edit_checkbox.click()
+    if driver.find_element_by_id("fast_edition_mode").is_selected() == False:
+        driver.find_element_by_css_selector("label[for=fast_edition_mode]").click() #click on label to toggle checkbox
     # submit the form
     driver.find_element_by_id("send-project").click()
+
+def geocontrib_fast_edit_feature_detail(name, description, added_text):
+    driver = get_driver()
+    driver.find_element_by_id("feature_detail_title_input").clear()
+    driver.find_element_by_id("feature_detail_title_input").send_keys("{}{}".format(name, added_text))
+    driver.find_element_by_name("description").clear()
+    driver.find_element_by_name("description").send_keys(description)
+    #*open the dropdown for status
+    driver.find_element_by_css_selector("#status > .dropdown").click()
+    #*select the field
+    driver.find_element_by_id("Archivé").click()
+
+    driver.find_element_by_id("save-fast-edit").click()

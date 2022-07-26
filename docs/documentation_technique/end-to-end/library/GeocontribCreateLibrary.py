@@ -135,7 +135,7 @@ def geocontrib_add_custom_fields(list_name, char_name, bool_name, list_options):
 
 def geocontrib_create_feature(feature_name, feature_type_name, added_text):
     driver = get_driver()
-    
+
     selector = "div[id='{}{}'] a[data-tooltip~=Ajouter]".format(feature_type_name, added_text)
     driver.find_element_by_css_selector(selector).click()
     # fill the name
@@ -147,3 +147,15 @@ def geocontrib_create_feature(feature_name, feature_type_name, added_text):
     description_input_elt.click()
     description_input_elt.clear()
     description_input_elt.send_keys("Exemple de description")
+
+def geocontrib_fill_custom_fields(list_name, char_name, list_option):
+    driver = get_driver()
+    # fill list field
+    driver.find_element_by_css_selector("#{} > .dropdown".format(list_name)).click()
+    driver.find_element_by_css_selector("#{} > .dropdown [id='{}']".format(list_name, list_option)).click()
+    # fill char field
+    char_input_elt = driver.find_element_by_name("char")
+    char_input_elt.click()
+    char_input_elt.send_keys(char_name)
+    # fill boolean field
+    driver.find_element_by_css_selector("label[for=boolean]").click()
