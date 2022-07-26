@@ -302,3 +302,34 @@ class CustomField(models.Model):
 
         if self.field_type == 'list' and len(self.options) == 0:
             raise ValidationError("La liste d'options ne peut être vide. ")
+
+
+class PreRecordedValues(models.Model):
+
+    name = models.CharField(
+        "Nom",
+        max_length=128,
+        null=True,
+        blank=True
+    )
+
+    values = models.JSONField(
+        "Liste de valeurs pré-enregistrées",
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        verbose_name = "Valeur pré-enregistrée"
+        verbose_name_plural = "Valeurs pré-enregistrées"
+
+    def __str__(self):
+        return "{} - {}".format(self.name, self.values)
+
+    def clean(self):
+        if type(self.values) == 'list' and \
+            len(self.values) == 0:
+            raise ValidationError("""
+                La liste de valeurs pré-enregistrées doit etre 
+                une liste et ne peut être vide.
+                """)

@@ -30,11 +30,13 @@ from api.serializers import FeatureListSerializer
 from api.serializers import FeatureSearchSerializer
 from api.serializers import FeatureTypeListSerializer
 from api.serializers import FeatureEventSerializer
+from api.serializers import PreRecordedValuesSerializer
 from api.utils.paginations import CustomPagination
 from geocontrib.models import Event
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
 from geocontrib.models import FeatureType
+from geocontrib.models import PreRecordedValues
 from geocontrib.models import Project
 
 
@@ -482,3 +484,34 @@ class GetExternalGeojsonView(views.APIView):
         except Exception as e:
             logger.exception("Les données sont inaccessibles %s", e)
             return Response(data="Les données sont inaccessibles", status=404)
+
+
+class PreRecordedValuesView(
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet
+        ):
+    queryset = PreRecordedValues.objects.all()
+
+    lookup_field = 'name'
+
+    serializer_class = PreRecordedValuesSerializer
+
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name = self.kwargs.get('name')
+        if name:
+            queryset = PreRecordedValues.objects.filter(
+                name=name)
+
+        pattern = self.request.query_params.get('pattern')
+        if pattern:
+            breakpoint()
+            queryset = queryset.filter(values__icontains=pattern)
+
+
+        return queryset
