@@ -266,8 +266,6 @@ CELERY_TASK_SERIALIZER = config('CELERY_TASK_SERIALIZER', default='json')
 
 CELERY_RESULT_SERIALIZER = config('CELERY_RESULT_SERIALIZER', default='json')
 
-CACHE_SECOND = config('CACHE_SECOND', default=120, cast=int)
-
 MAGIC_IS_AVAILABLE = config('MAGIC_IS_AVAILABLE', default=True, cast=bool)  # File image validation (@seb / install IdeoBFC)
 
 # Import features from datasud
