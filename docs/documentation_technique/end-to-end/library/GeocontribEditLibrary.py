@@ -54,6 +54,8 @@ def geocontrib_edit_project(project_name, project_edition):
     driver.find_element_by_css_selector("label[for=is_project_type]").click()
     # toggle generate_share_link
     driver.find_element_by_css_selector("label[for=generate_share_link]").click()
+    # toggle fast_edition
+    driver.find_element_by_css_selector("label[for=fast_edition_mode]").click()
 
     # submit the form
     driver.find_element_by_id("send-project").click()
@@ -140,3 +142,38 @@ def geocontrib_edit_custom_field_symbology(colors, opacities, custom_field_name,
     geocontrib_edit_featuretype_symbology(colors[0], opacities[0], form_selector_1)
     #*edit second field
     geocontrib_edit_featuretype_symbology(colors[1], opacities[1], form_selector_2)
+
+def geocontrib_activate_fast_edition_for_project():
+    driver = get_driver()
+    driver.find_element_by_class_name("button-hover-orange").click()
+    # check the input if not already selected
+    if driver.find_element_by_id("fast_edition_mode").is_selected() == False:
+        driver.find_element_by_css_selector("label[for=fast_edition_mode]").click() #click on label to toggle checkbox
+    # submit the form
+    driver.find_element_by_id("send-project").click()
+
+def geocontrib_fast_edit_feature_detail(name, description, added_text):
+    driver = get_driver()
+    driver.find_element_by_id("feature_detail_title_input").clear()
+    driver.find_element_by_id("feature_detail_title_input").send_keys("{}{}".format(name, added_text))
+    driver.find_element_by_name("description").clear()
+    driver.find_element_by_name("description").send_keys(description)
+    #*open the dropdown for status
+    driver.find_element_by_css_selector("#status > .dropdown").click()
+    #*select the field
+    driver.find_element_by_id("Archivé").click()
+
+def geocontrib_fast_edit_custom_fields(list_name, char_name, list_option):
+    driver = get_driver()
+    # scroll the page to reveal the button
+    driver.execute_script("document.getElementById('{}').scrollIntoView('alignToTop');".format(list_name))
+    # fill list field
+    driver.find_element_by_css_selector("#{} .dropdown".format(list_name)).click()
+    driver.find_element_by_css_selector("#{} .dropdown [id='{}']".format(list_name, list_option)).click()
+    # fill char field
+    char_input_elt = driver.find_element_by_name("char")
+    char_input_elt.click()
+    char_input_elt.clear()
+    char_input_elt.send_keys(char_name)
+    # fill boolean field
+    driver.find_element_by_name("boolean").click()

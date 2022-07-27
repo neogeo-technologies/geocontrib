@@ -32,5 +32,7 @@ def get_variables():
                 "SYMBOPTIONLIST":           ["option-1", "option-2"],
                 "SYMBOPTIONCOLORLIST":      ["#84e26d", "#f38e25"],
                 "SYMBOPTIONOPACITYLIST":    ["0.15", "0.69"],
+                "FASTFEATURENAME":          "FastFeature",
+                "FASTFEATUREDESCRIPTION":   "FastDescription",
                 }
     return variables
