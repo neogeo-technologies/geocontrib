@@ -19,6 +19,7 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_mvt.views import BaseMVTView
+from rest_framework.views import APIView
 
 from api import logger
 from api.serializers.feature import FeatureDetailedAuthenticatedSerializer
@@ -32,6 +33,7 @@ from api.serializers import FeatureTypeListSerializer
 from api.serializers import FeatureEventSerializer
 from api.serializers import PreRecordedValuesSerializer
 from api.utils.paginations import CustomPagination
+from api.db_layer_utils import get_values_pre_enregistrés
 from geocontrib.models import Event
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
@@ -487,31 +489,21 @@ class GetExternalGeojsonView(views.APIView):
 
 
 class PreRecordedValuesView(
-        mixins.ListModelMixin,
-        mixins.RetrieveModelMixin,
-        viewsets.GenericViewSet
+        APIView
         ):
     queryset = PreRecordedValues.objects.all()
-
-    lookup_field = 'name'
-
-    serializer_class = PreRecordedValuesSerializer
 
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
+    def get(self, request, name):
+        from django.http import JsonResponse
+        response = []
         name = self.kwargs.get('name')
-        if name:
-            queryset = PreRecordedValues.objects.filter(
-                name=name)
-
         pattern = self.request.query_params.get('pattern')
-        if pattern:
-            breakpoint()
-            queryset = queryset.filter(values__icontains=pattern)
-
-
-        return queryset
+        if name and pattern:
+            data = get_values_pre_enregistrés(name, pattern)
+            for da in data:
+                response.append(da['values'])
+        return JsonResponse(response, safe=False, status=200)
