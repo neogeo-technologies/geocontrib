@@ -18,45 +18,48 @@ from utils import get_driver
 
 
 def geocontrib_create_project(project_name):
-    get_driver().find_element_by_link_text(u"Créer un nouveau projet").click()
+    driver = get_driver()
+    driver.find_element_by_link_text(u"Créer un nouveau projet").click()
     # fill the project title
-    title_input_elt = get_driver().find_element_by_id("title")
+    title_input_elt = driver.find_element_by_id("title")
     title_input_elt.click()
     title_input_elt.clear()
     title_input_elt.send_keys(project_name)
 
     # add description
-    get_driver().find_element_by_name("description").click()
-    get_driver().find_element_by_name("description").clear()
-    get_driver().find_element_by_name("description").send_keys("Exemple de description")
+    driver.find_element_by_name("description").click()
+    driver.find_element_by_name("description").clear()
+    driver.find_element_by_name("description").send_keys("Exemple de description")
     
     # click on dropdown "Visibilité des signalements publiés" to open it
-    get_driver().find_element_by_xpath(
+    driver.find_element_by_xpath(
         "//form[@id='form-project-edit']/div[5]/div/div"
     ).click()
     # click on dropdown "Visibilité des signalements publiés" to select an option
-    get_driver().find_element_by_xpath(
+    driver.find_element_by_xpath(
         "//form[@id='form-project-edit']/div[5]/div/div/div[2]/div"
     ).click()
     # click on dropdown "Visibilité des signalements archivés" to open it
-    get_driver().find_element_by_xpath(
+    driver.find_element_by_xpath(
         "//form[@id='form-project-edit']/div[5]/div[2]/div"
     ).click()
     # click on dropdown "Visibilité des signalements archivés" to select an option
-    get_driver().find_element_by_xpath(
+    driver.find_element_by_xpath(
         "//form[@id='form-project-edit']/div[5]/div[2]/div/div[2]/div"
     ).click()
 
 
     # toggle moderation
-    get_driver().find_element_by_css_selector("label[for=moderation]").click()
+    driver.find_element_by_css_selector("label[for=moderation]").click()
     # toggle is_project_type
-    get_driver().find_element_by_css_selector("label[for=is_project_type]").click()
+    driver.find_element_by_css_selector("label[for=is_project_type]").click()
     # toggle generate_share_link
-    get_driver().find_element_by_css_selector("label[for=generate_share_link]").click()
+    driver.find_element_by_css_selector("label[for=generate_share_link]").click()
+    # toggle fast_edition
+    driver.find_element_by_css_selector("label[for=fast_edition_mode]").click()
 
     # submit the form
-    get_driver().find_element_by_id("send-project").click()
+    driver.find_element_by_id("send-project").click()
 
 #def add_custom_field(custom_field_name, custom_field_type, list_options):
 #    driver = get_driver()
@@ -130,8 +133,6 @@ def geocontrib_add_custom_fields(list_name, char_name, bool_name, list_options):
 
     ## scroll the page to reveal the button
     driver.execute_script("document.getElementById('send-feature_type').scrollIntoView('alignToTop');")
-    # submit the form
-    #get_driver().find_element_by_id("send-feature_type").click()
 
 def geocontrib_create_feature(feature_name, feature_type_name, added_text):
     driver = get_driver()
@@ -148,14 +149,3 @@ def geocontrib_create_feature(feature_name, feature_type_name, added_text):
     description_input_elt.clear()
     description_input_elt.send_keys("Exemple de description")
 
-def geocontrib_fill_custom_fields(list_name, char_name, list_option):
-    driver = get_driver()
-    # fill list field
-    driver.find_element_by_css_selector("#{} > .dropdown".format(list_name)).click()
-    driver.find_element_by_css_selector("#{} > .dropdown [id='{}']".format(list_name, list_option)).click()
-    # fill char field
-    char_input_elt = driver.find_element_by_name("char")
-    char_input_elt.click()
-    char_input_elt.send_keys(char_name)
-    # fill boolean field
-    driver.find_element_by_css_selector("label[for=boolean]").click()
