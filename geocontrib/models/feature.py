@@ -193,6 +193,9 @@ class FeatureType(models.Model):
         ("linestring", "Ligne"),
         ("point", "Point"),
         ("polygon", "Polygone"),
+        ("multipolygon", "Multipolygone"),
+        ("multipoint", "Multipoint"),
+        ("multilinestring", "Multilinestring"),
     )
 
     title = models.CharField("Titre", max_length=128)
