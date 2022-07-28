@@ -7,7 +7,30 @@
   "icon": null,
   "colors_style": null,
   "project": "1-aze",
-  "customfield_set": [],
+  "customfield_set": [
+      {
+        "field_type": "list",
+        "label": "SA",
+        "name": "ZA",
+        "options": [
+            "12",
+            "125"
+        ],
+        "position": 0,
+        "is_mandatory": true
+      },
+      {
+        "field_type": "list",
+        "label": "SA1",
+        "name": "ZA2",
+        "options": [
+            "13",
+            "123"
+        ],
+        "position": 0,
+        "is_mandatory": false
+      }
+    ],
   "is_editable": true,
   "opacity": "0.5"
 }
