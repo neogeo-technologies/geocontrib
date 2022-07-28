@@ -115,7 +115,7 @@ def test_import_multilinestring_post(api_client):
                                          content_type='multipart/form-data')
     result = api_client.post(url,
                             {
-                                "feature_type_slug": "1-dfsdfs",
+                                "feature_type_slug": "3-type-multilinestring",
                                 "json_file": simple_file,
                             })
     assert result.status_code == 200
@@ -150,9 +150,7 @@ def test_import_multilinestring_post(api_client):
 
     def ignore_imported_id(expected, result):
         result['features'][0].pop('id')
-        result['features'][1].pop('id')
         expected['features'][0].pop('id')
-        expected['features'][1].pop('id')
 
     verify_or_create_json("api/tests/data/test_import_imported_multinestring.json",
                           result.json(),
