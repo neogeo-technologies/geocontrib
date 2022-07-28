@@ -190,5 +190,23 @@
             "geom": "SRID=4326;LINESTRING (0.549733 48.547271, 4.638241 45.122778)",
             "feature_data": null
         }
+    },
+    {
+        "model": "geocontrib.feature",
+        "pk": "b81fdc88-fedf-4075-977f-b92e564cd4d8",
+        "fields": {
+            "title": "type 3 multilinestring",
+            "description": "",
+            "status": "draft",
+            "created_on": "2021-09-30T12:43:51.074Z",
+            "updated_on": "2021-09-30T12:43:51.074Z",
+            "archived_on": null,
+            "deletion_on": null,
+            "creator": 1,
+            "project": 1,
+            "feature_type": 2,
+            "geom": "SRID=4326;MULTILINESTRING ((347465.963841 6291105.409479, 347470.730749 6291074.01899, 347470.134116 6291063.247433, 347450.586946 6291047.042766, 347412.359035 6291077.252445, 347409.372152 6291101.624821))",
+            "feature_data": null
+        }
     }
 ]
