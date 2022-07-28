@@ -32,6 +32,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             'name',
             'field_type',
             'options',
+            'is_mandatory'
         )
 
 

@@ -34,6 +34,32 @@
         }
     },
     {
+        "model": "geocontrib.customfield",
+        "pk": 1,
+        "fields": {
+            "label": "Etatés",
+            "name": "etat",
+            "position": 0,
+            "field_type": "list",
+            "feature_type": 1,
+            "options": "[\"jolie\", \"pas jolie\"]",
+            "is_mandatory": false
+        }
+    },
+    {
+        "model": "geocontrib.customfield",
+        "pk": 2,
+        "fields": {
+            "label": "tree",
+            "name": "Arbol",
+            "position": 0,
+            "field_type": "boolean",
+            "feature_type": 2,
+            "options": "[]",
+            "is_mandatory": true
+        }
+    },
+    {
         "model": "geocontrib.user",
         "pk": 1,
         "fields": {
