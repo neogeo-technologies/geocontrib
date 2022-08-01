@@ -13,7 +13,6 @@ L'image docker de base possèdes ces variables de configuration :
 * "APPLICATION_ABSTRACT"
 * "APPLICATION_NAME", default="GéoContrib"
 * "BASE_URL", default="http://localhost:8000"
-* "CACHE_SECOND", default=120, cast=int
 * "CAS_SERVER_URL", None
 * "CELERY_ACCEPT_CONTENT", default="application/json", cast=Csv()
 * "CELERY_BROKER_URL", default=f"redis://{ REDIS_HOST }:6379"

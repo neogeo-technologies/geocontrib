@@ -287,6 +287,11 @@ class CustomField(models.Model):
     options = ArrayField(
         base_field=models.CharField(max_length=256), null=True, blank=True)
 
+    is_mandatory = models.BooleanField(
+        "Obligatoire",
+        default=False
+        )
+
     # interface = models.ForeignKey(
     #     "geocontrib.CustomFieldInterface", on_delete=models.CASCADE, null=True, blank=True)
 
