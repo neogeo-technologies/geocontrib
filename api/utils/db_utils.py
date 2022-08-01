@@ -1,5 +1,4 @@
 from django.db import connections
-from sqlalchemy import text
 
 
 def list_fetch_all(cursor):
