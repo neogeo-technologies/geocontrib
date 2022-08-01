@@ -10,6 +10,7 @@ from django.contrib.gis.geos import Polygon
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.db.models import Extent
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework import mixins
@@ -498,12 +499,16 @@ class PreRecordedValuesView(
     ]
 
     def get(self, request, name):
-        from django.http import JsonResponse
-        response = []
-        name = self.kwargs.get('name')
-        pattern = self.request.query_params.get('pattern')
-        if name and pattern:
+        response=[]
+        name = self.kwargs.get('name', None)
+        pattern = self.request.query_params.get('pattern', None)
+        if (name and pattern):
             data = get_values_pre_enregistrés(name, pattern)
             for da in data:
                 response.append(da['values'])
-        return JsonResponse(response, safe=False, status=200)
+            status = 200
+        else:
+            response = "Must provide parameter name or pattern."
+            status = 400
+
+        return JsonResponse(response, safe=False, status=status)

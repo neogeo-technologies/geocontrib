@@ -52,7 +52,6 @@ router.register(r'users', UserViewSet, basename='users')
 router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 router.register(r'base-maps', BaseMapViewset, basename='base-maps')
 router.register(r'layers', LayerViewset, basename='layers')
-# router.register(r'list-value', PreRecordedValuesView, basename='list-value')
 router.register(r'levels-permissions', UserLevelsPermission, basename='levels-permissions')
 router.register(r'project-types', ProjectTypesView, basename='projects-types')
 
