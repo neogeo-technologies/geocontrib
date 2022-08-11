@@ -236,18 +236,6 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
         # Hack: les champs extra n'etant pas serializé ou défini dans le modele
         # FIXME: les champs ne sont donc pas validé mais récupérer direct
         # depuis les données initial
-        # OLD VERSION
-        # custom_fields = validated_data.get(
-        #     'feature_type'
-        # ).customfield_set.values_list(
-        #     'name',
-        #     # 'field_type',
-        #     flat=True
-        #     )
-        # validated_data['feature_data'] = {
-        #     k: v for k, v in properties.items() if k in custom_fields
-        # }
-
         custom_fields = {}
         [custom_fields.update({i.name: i.field_type}) for i in validated_data.get('feature_type').customfield_set.all()]
         properties = self.initial_data.get('properties', {})
