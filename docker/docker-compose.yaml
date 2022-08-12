@@ -4,7 +4,7 @@ version: "3.5"
 services:
 
   geocontrib: &geocontrib
-    image: neogeo/geocontrib:${testing}
+    image: neogeo/geocontrib:${DOCKER_TAG:-testing}
     build:
       context: ..
       dockerfile: Dockerfile
