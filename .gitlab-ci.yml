@@ -21,15 +21,14 @@ build testing docker image:
   only:
     - develop
   tags:
-    - build
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
+    - build_docker
+  variables:
+    DOCKER_TAG: testing
   script:
-    - mkdir -p /kaniko/.docker
-    - export
-    - echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$DOCKER_AUTH\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination neogeo/geocontrib:testing
+    - cat $DOCKER_LOGIN | docker login --username $DOCKER_LOGIN --password-stdin
+    - cd docker
+    - docker-compose build geocontrib
+    - docker-compose push geocontrib
     - echo Image docker neogeo/geocontrib:testing livrée
 
 deploy testing docker image:
