@@ -25,7 +25,7 @@ build testing docker image:
   variables:
     DOCKER_TAG: testing
   script:
-    - cat $DOCKER_LOGIN | docker login --username $DOCKER_LOGIN --password-stdin
+    - cat $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
     - cd docker
     - docker-compose build geocontrib
     - docker-compose push geocontrib
