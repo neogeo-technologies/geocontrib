@@ -5,6 +5,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.2.0] - 2022-08-17
+
+### Evolutions
+
+- Redmine 14074 : Personnalisation du niveau de zoom maximum de la carte par projet
+- Redmine 14072 : Mode édition rapide des signalements
+- Redmine 14071 : Pouvoir parcourir l'ensemble des signalements à partir de la page de détail d'un signalement
+- Redmine 14051 : Changer la couleur en fonction de l'état d'une case à cocher
+- Redmine 14048 : Changer la couleur en fonction de l'état d'une chaine de caractères : vide et renseigné
+- Redmine 13983 : Pouvoir définir une couleur sans remplissage pour les polygones
+
+### Corrections
+
+- Redmine 14570 : Import dans un type existant - Les types nombre entier, nombre décimal et date créent un bug à l'import
+- Redmine 14567 : Création d'un signalement - Les labels des champs personnalisés ne s'affichent pas
+- Redmine 14479 : Page membres - message de confirmation arrive tard
+- Redmine 14463 : Responsive - débordement import fichier
+- Redmine 14462 : Bouton filtres mal placé et flêche inconsistante
+- Redmine 14461 : Responsive - Filtre écrasés sur page des projets
+- Redmine 14460 : Responsive - les grands titres débordent et en édition rapide champ très petit
+- Redmine 14458 : Responsive - description projet mal disposée
+- Redmine 14454 : Responsive - espace vide sur liste signalement
+- Redmine 14451 : Déconnecté - détection offline trop lente
+- Redmine 14450 : Édition type de signalement - ordre par position pas respecté
+- Redmine 14416 : Ajout de commentaire ne fonctionne plus
+
 ## [3.1.0] - 2022-06-08
 
 ### Evolutions
