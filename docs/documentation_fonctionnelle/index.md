@@ -200,11 +200,13 @@ Chacune d'entre elles propose un bloc _"Filtres"_ permettant à l'utilisateur de
 * filtre sur le statut des signalements ;
 * filtre textuel recherchant la chaîne de caractères saisie par l'utilisateur dans le titre des signalements.
 
+Il est désormais possible de parcourir les signalements de la liste obtenue en filtrant et triant la table de la vue liste. - Cf. [Partage d'un projet en externe](project_sharing.md)
+
 ### Formulaire de création / édition d'un signalement
 
 Les utilisateurs contributeurs ou de niveau supérieur peuvent ajouter des signalements depuis la page d'accueil, la page d'un type de signalements ou la page d'un signalement à l'aide du pictogramme _"+"_ .
 
-Le formulaire d'édition permet à l'utilisateur de saisir un nom, un statut, une description ainsi que de renseigner l'ensemble des informations relatives aux champs personnalisés définis pour ce type de signalement.
+Le formulaire d'édition permet à l'utilisateur de saisir un nom, un statut, une description ainsi que de renseigner l'ensemble des informations relatives aux champs personnalisés définis pour ce type de signalement. - Cf. [Edition d'un signalement et mode édition rapide](feature_editing.md)
 
 Pour tous les types de signalements, une interface cartographique permet de numériser le signalement. L'utilisateur bénéficie d'une fonction de recherche (cf.[Géocodage](geocoder.md)) et a la possibilité de jouer sur l'affichage des fonds de carte (cf. [Fonds cartographiques](basemaps.md)) configurés par l'administrateur du projet (ordre des couches, opacités, etc).
 
