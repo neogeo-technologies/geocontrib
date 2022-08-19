@@ -13,3 +13,7 @@ Lorsque l'administrateur crée un projet, il a la possibilité de cocher la case
 Ainsi, si le paramètre de partage externe du projet est activé, l'administrateur (uniquement) a à sa disposition un bouton sur la page d'accueil du projet qui lui permet de copier le lien de partage externe du projet dans son presse-papier. Il peut alors le partager pour donner un accès à GéoContrib restreint à ce projet.
 
 (Accessible à partir de la version 3.0.0)
+
+---
+
+[Retour à l'accueil](<index.md>)
