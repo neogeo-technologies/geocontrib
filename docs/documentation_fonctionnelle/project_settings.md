@@ -25,8 +25,11 @@ Les paramètres avancés sont constitués de cases à cocher. Si la case est coc
 * Modération : si ce paramètre est activé, le projet devient modéré - Cf. [Modération des projets](moderation.md)
 * Est un projet type : si ce paramètre est activé, le projet sera ajouté aux modèles - Cf. [Modèle de projet](project_template.md)
 * Génération d'un lien de partage externe : si ce paramètre est activé, un lien sera acessible à l'administrateur du projet qui lui permettra de partager le projet de façon isolée - Cf. [Partage d'un projet en externe](project_sharing.md)
-* Mode d'édition rapide des signalements ; si ce paramètre est activé, 
+* Mode d'édition rapide des signalements ; si ce paramètre est activé, les contributeurs et niveaux supérieurs pourront accéder à un mode d'édition rapide qui permet de modifier un signalement directement sur sa page de détail - Cf. [Edition des signalements - Mode d'édition rapide](feature_editing.md)
 
+## Niveau de zoom maximum de la carte
+
+Une règle permet à l'administrateur de sélectionner le niveau de zoom maximum de la carte. C'est-à-dire que si le niveau de zoom est réglé à 17, les utilisateurs ne pourront pas zoomer au delà du niveau 17 et ainsi créer des signalements de forme moins détaillée. Si l'administrateur ne souhaite pas personnaliser ce paramètre, il peut laisser le niveau de zoom par défaut (22) qui est le niveau le plus élévé possible.
 
 ---
 
