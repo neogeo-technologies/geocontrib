@@ -1,4 +1,14 @@
-# Présentation de l'outil
+# Documentation de GéoContrib
+
+## GéoContrib : outil de constitution de bases de données collaboratives
+
+GéoContrib est une application web qui permet à ses utilisateurs de construire ou d'enrichir des bases de données géographiques de façon collaborative. Un système de commentaire permet aux communautés de contributeurs d'interagir sur la donnée et des modérateurs peuvent être choisis pour gérer les contributions.
+L'application est conçue pour être utiliser tant sur du matériel sédentiares que sur des terminaux mobiles via le navigateur de son appareil.
+
+Crée en 2019 par Neogeo Technologies sous l'impulsion de la région des Hauts des France, l'application GéoContrib se veut être un outil simple et accessible à tous, géomaticien ou non. 
+
+Les usages de GéoContrib sont très larges. En effet, l'application peut être utilisée à des fins de création d'une base de données collaborative sur un thème métier spécifique avec un aspect de localisation comme par exemple des relevés de qualité de l'air, de température, etc. ... 
+
 ## Notions importantes
 
 ### Authentification
