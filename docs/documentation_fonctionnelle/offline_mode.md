@@ -2,7 +2,15 @@
 
 Le mode déconnecté est proposé dans l'application depuis sa version 2.0. Il permet d'utiliser l'application lors de déplacements de terrain, et de prolonger la saisie et l'enregistrement de signalements y compris dans des zones non couvertes par les données mobiles.
 
-Lorsque la connexion est perdue, l'utilisateur peut continuer à naviguer dans l'application, à condition que du cache ait été généré au préalable.
+Lorsque la connexion est perdue, l'utilisateur peut continuer à naviguer dans l'application, à condition que les pages consultées aient aient été mises en cache au préalable.
+
+## Basculer en mode déconnecté
+
+Dès lors que l'utilisateur de GéoCOntrib perd sa connexion à internet, le mode déconnecté est automatiquement activé. L'utilisateur en est averti par l'apparition d'une icône de réseau barré. De la même manière, si le réseau est détecté à nouveau par l'appareil, GéoCOntrib basculera en mode connecté et cela est visible par le biais de la disparition de l'icône de réseau barré.
+
+## Fonctionnalités en mode déconnecté
+
+Le mode déconnecté est essentiellement dédié à la contribution en cas de perte de réseau. Ainsi, seuls les outils de contribution et d'édition des signalements seront acessibles entièrement. En effet, la consultation des signalement est possible mais uniquement pour les signalements déjà mis en cache et l'administration des projets et de l'application dans sa globalité ne sont pas disponibles en mode déconnecté.
 
 ### Création de signalements
 
