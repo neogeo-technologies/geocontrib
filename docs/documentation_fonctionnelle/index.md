@@ -7,7 +7,7 @@ L'application est conçue pour être utiliser tant sur du matériel sédentiares
 
 Crée en 2019 par Neogeo Technologies sous l'impulsion de la région des Hauts des France, l'application GéoContrib se veut être un outil simple et accessible à tous, géomaticien ou non. 
 
-Les usages de GéoContrib sont très larges. En effet, l'application peut être utilisée à des fins de création d'une base de données collaborative sur un thème métier spécifique avec un aspect de localisation comme par exemple des relevés de qualité de l'air, de température, etc. ... 
+Les usages de GéoContrib sont très multiples. En effet, l'application peut être utilisée à des fins de création d'une base de données collaborative sur un thème métier spécifique avec un aspect de localisation comme par exemple des relevés de qualité de l'air, de température, etc. ... Les commentaires peut aussi être utilisés pour récueillir des avis sur des projets d'aménagement. Enfin, un usage fréquent de GéoCOntrib est pour la qualification de bases de données telles que l'occupation du sol.
 
 ## Notions importantes
 
