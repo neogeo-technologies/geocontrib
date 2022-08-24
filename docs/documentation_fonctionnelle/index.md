@@ -41,7 +41,7 @@ obligatoires) que l'on retrouve pour tous les types de signalements, à savoir l
 
 Chaque type de signalements est également caractérisé par une couleur qui est utilisé pour la présentation des signalements sur les cartes.
 
-Lorsque le type de signalements est créé, il est possible de lui attribuer une symbologie colorée. Ainsi, on peut attribuer une couleur à tous les signalements appartenant à un type ou faire varier la couleur des signalement d'un même type selon les valeurs d'un champ personnalisé de type liste de valeurs.
+Lorsque le type de signalements est créé, il est possible de lui attribuer une symbologie colorée en cliquant sur l'icône en forme de pinceau sur l'accueil du projet. Ainsi, on peut attribuer une couleur à tous les signalements appartenant à un type ou faire varier la couleur des signalement d'un même type selon les valeurs d'un champ personnalisé de type liste de valeurs.
 
 Cf. [Symbologie](symbology.md)
 
