@@ -119,11 +119,11 @@ La page d'accueil de l'application contient :
   * si aucun utilisateur n'est connecté : un bouton _"Se connecter"_ permettant à l'utilisateur de s'authentifier,
   * si un utilisateur est connecté : le nom de l'utilisateur courant et un bouton de déconnexion. Un clic sur le nom de l'utilisateur renvoie vers sa page _"Mon compte"_
 * un bouton de création d'un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs) cf. [Configuration d'un projet](project_settings.md). Il est aussi possible de créer un projet à partir de modèles. cf. [Projets modèles](project_template.md);
-* la liste des projets existants avec une courte description et quelques indicateurs. Un clic sur un projet renvoie vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un message d'erreur lui est présenté. Cette liste peut être filtrée par niveau d'autorisation requis pour accéder au projet, par le niveau d'autorisation de l'utilisateur pour le projet ou selon si le projet est modéré ou non. Il est aussi possible de faire une recherche par nom de projet. Une option permettant de rendre visible les projets auxquels l'utilisateur n'a pas accès est aussi possible selon la configuration de l'application (depuis la version 3.0.0).
+* la liste des projets existants avec un extrait de la description et quelques indicateurs. Un clic sur un projet renvoie vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un message d'erreur lui est présenté. Cette liste peut être filtrée par niveau d'autorisation requis pour accéder au projet, par le niveau d'autorisation de l'utilisateur pour le projet ou selon si le projet est modéré ou non. Il est aussi possible de faire une recherche par nom de projet. Une option permettant de rendre visible les projets auxquels l'utilisateur n'a pas accès est aussi possible selon la configuration de l'application (depuis la version 3.0.0).
 
 ### Menu d'un projet
 
-Lorsque l'utilisateur courant est entré dans un projet un menu supplémentaire apparaît dans le bandeau horizontal d'en-tête. Il donne accès aux principales sous-pages du projet :
+Lorsque l'utilisateur courant est entré dans un projet un menu supplémentaire apparaît dans le bandeau horizontal d'en-tête. Il donne accès aux principales pages du projet :
 * Page d'accueil du projet ;
 * Page de consultation des signalements sous forme d'une carte ou d'une liste ;
 * Page d'administration des fonds cartographiques (uniquement pour les administrateurs du projet et les super-utilisateurs) ;
@@ -144,25 +144,30 @@ La page d'accueil d'un projet contient les éléments suivants :
   * Titre,
   * Description,
   * Illustration,
-* La liste des types de signalements du projet. Un pictogramme indique le type de géométrie de chaque type de signalement. Un clic sur un type de signalements renvoie vers sa page de description ;
+* La liste des types de signalements du projet. Un pictogramme indique le type de géométrie de chaque type de signalement. Un clic sur un type de signalements renvoie vers sa page de description.
 * Une cartographie des signalements existants (uniquement ceux que l'utilisateur courant est habilité à consulter). Un clic sur cette carte renvoie vers la page de consultation des signalements sous forme de carte ou de liste ;
 * Les derniers signalements et commentaires du projet. Un clic sur un signalement ou un commentaire renvoie vers la page de consultation du signalement associé ;
 * Les caractéristiques techniques du projet dans la partie basse :
-  * Délais d'archivage et de suppression automatiques des signalements,
   * Visibilité des signalements publiés et archivés en fonction des autorisations des utilisateurs,
   * Modération du projet - cf. [Modération d'un projet](moderation.md),
-  * Considération du projet comme modèle - cf. [Projets modèles](project_template.md).
 * Selon la configuration de l'application, l'administrateur a aussi la possibilité de copier un lien de partage du projet en externe. Ce lien permet de n'avoir accès qu'au projet partagé et non au reste de l'application GéoContrib. cf. [Projets partagés en externe](project_sharing.md).
 
 Au-delà de ces informations, cette page propose également des actions activées en fonction du rôle de l'utilisateur courant par rapport au projet :
-* un bouton d'édition des caractéristiques du projet en haut à droite (pour les administrateurs du projet) ;
+
+Pour les contributeurs du projet et niveau supérieur :
+* un bouton de création d'un nouveau signalement en face de chaque type de signalements ;
+
+Pour les administrateurs de projet :
+* un bouton d'édition des caractéristiques du projet en haut à droite ;
 * un bouton d'abonnement aux évènement du projet en haut à droite (pour les utilisateurs connectés ayant accès au projet) - cf. [Abonnements](subscription.md);
-* des boutons de création d'un nouveau type de signalements, (pour les administrateurs du projet) :
+* des boutons de création d'un nouveau type de signalements :
   * un bouton pour dupliquer un type de signalement existant, situé en face de chaque type déjà créé ;
   * un bouton pour créer un nouveau type de signalement manuellement depuis un formulaire de création, sous la liste des types existants ;
   * un bouton pour créer un nouveau type de signalement depuis un fichier GeoJSON téléchargé, sous la liste des types existants ;
-* un bouton de création d'un nouveau signalement en face de chaque type de signalements (pour les contributeurs du projet et niveau supérieur);
-* un bouton de modification de la symbologie, en face de chaque type de signalements ponctuels (pour les administrateurs du projet).
+* un bouton de modification de la symbologie, en face de chaque type de signalements ponctuels (pour les administrateurs du projet)- cf. [Editer la symbologie d'un type de signalement](symbology.md) ;
+* un bouton permettant de supprimer le type de signalement ;
+* un bouton permettant de modifier le type de signalement. Lorsque le type de signalement contient au moins un signalement, cette fonction n'est plus accessible. En effet, modifier la structure du type est impossible sans modifier la structure des signalement déjà présents.
+
 
 ### Formulaire de création / édition d'un type de signalements
 
@@ -177,16 +182,16 @@ La page de description d'un type de signalements (accessible via la page d'accue
   * Son titre,
   * Son type de géométrie,
   * Les champs personnalisés du type de signalement.
-* Les derniers signalements créés pour ce type. Un clic sur un signalement renvoie vers la  page de consultation du signalement associé.
+* Les derniers signalements créés pour ce type. Un clic sur un signalement renvoie vers la page de consultation du signalement associé.
 
 Au-delà de ces informations, cette page propose également des actions spécifiques :
 * Voir tous les signalements : renvoie vers la page de consultation _"Liste & Carte"_ des signalements du projet ;
 * Ajouter un signalement : création d'un signalement de ce type. Cette fonction n'est proposée que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
-* Import de signalement via un GeoSJON: création de signalements par l'import d'un fichier GeoJSON conforme au modèle de données spécifique du type de signalements. Cette fonction n'est active que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
+* Import de signalement via un GeoSJON ou un CSV : création de signalements par l'import d'un fichier GeoJSON ou CSV conforme au modèle de données spécifique du type de signalements. Cette fonction n'est active que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
 * Import de signalement via IDGO : création de signalements par l'import de données issues d'une plateforme IDGO. Cette fonction n'est active que si une plateforme IDGO à été connectée à GéoContrib et uniquement pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
 * Export des signalements : enregistrement des signalements du type de signalements courant sous la forme d'un fichier GeoJSON. Seuls les signalements que l'utilisateur courant a le droit de consulter sont exportés.
 
-Cf. [Imports et exports de signalements](import_export.md).
+ Cf. [Imports et exports de signalements](import_export.md).
 
 ### Page de consultation des signalements 'Liste & Carte'
 

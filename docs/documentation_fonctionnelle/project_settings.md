@@ -16,7 +16,7 @@ L'administrateur peut définir deux niveaux de visibilité de son projet :
 
 * Visibilité des signalements archivés : le niveau d'utilisateur choisi sera le niveau minimum pour voir les signalements ayant le statut "Archivé". On peut ainsi restreindre de façon différente l'accès aux signalements publiés et aux signalements archivés. Les utilisateurs qui n'ont pas accès aux signalements archivés auront quand même accès au projet et aux signalements publiés. L'administrateur a le choix entre : utilisateur anonyme, utilisateur connecté, contributeur et administrateur.
 
-Il est important de noter que les super-utilisateurs auront accès à tous les signalements de tous les projets quel que soit leur statut.
+Il est important de noter que les super-utilisateurs auront accès à tous les signalements de tous les projets quel que soit leur rôle dans le projet.
 
 ## Paramètres avancés
 
