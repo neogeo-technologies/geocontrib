@@ -2,27 +2,29 @@
 
 ## GéoContrib : outil de constitution de bases de données collaboratives
 
-GéoContrib est une application web qui permet à ses utilisateurs de construire ou d'enrichir des bases de données géographiques de façon collaborative. Un système de commentaire permet aux communautés de contributeurs d'interagir sur la donnée et des modérateurs peuvent être choisis pour gérer les contributions.
-L'application est conçue pour être utiliser tant sur du matériel sédentiares que sur des terminaux mobiles via le navigateur de son appareil.
+GéoContrib est une application web qui permet à ses utilisateurs de construire ou d'enrichir des bases de données géographiques de façon collaborative. Un système de commentaires permet aux communautés de contributeurs d'interagir sur la donnée et des modérateurs peuvent être choisis pour gérer les contributions.
+L'application est conçue pour être utilisée tant sur du matériel sédentaire que sur des terminaux mobiles via le navigateur de son appareil.
 
 Crée en 2019 par Neogeo Technologies sous l'impulsion de la région des Hauts des France, l'application GéoContrib se veut être un outil simple et accessible à tous, géomaticien ou non. 
 
-Les usages de GéoContrib sont très multiples. En effet, l'application peut être utilisée à des fins de création d'une base de données collaborative sur un thème métier spécifique avec un aspect de localisation comme par exemple des relevés de qualité de l'air, de température, etc. ... Les commentaires peut aussi être utilisés pour récueillir des avis sur des projets d'aménagement. Enfin, un usage fréquent de GéoCOntrib est pour la qualification de bases de données telles que l'occupation du sol.
+Les usages de GéoContrib sont très multiples. En effet, l'application peut être utilisée à des fins de création d'une base de données collaborative sur un thème métier spécifique avec un aspect de localisation comme par exemple des relevés de qualité de l'air, de température, etc. ... Les commentaires peuvent aussi être utilisés pour récueillir des avis sur des projets d'aménagement. Enfin, un usage fréquent de GéoContrib est la qualification de bases de données telles que l'occupation du sol.
 
 ## Notions importantes
 
+Afin de pouvoir utiliser au mieux GéoContrib, certaines notions sont importante à comprendre.
+
 ### Authentification
 
-GeoContrib possède sa propre base utilisateur, administrable depuis Django par la page "Utilisateurs" grâce à laquelle des utilisateurs peuvent être ajoutés.
+GeoContrib possède sa propre base utilisateurs, administrable depuis Django par la page "Utilisateurs" grâce à laquelle des utilisateurs peuvent être ajoutés.
 L'application GeoContrib peut être couplée avec une plateforme de données Georchestra ou IDGO. Dans ce cas, l'authentification des utilisateurs se fait depuis la plateforme de données, et non plus depuis GeoContrib.
 
-Pour plus de détail sur l'authentification des utilisateurs dans le cadre d'une installation GeoContrib / Georchestra : [GeoContrib et plateforme Georchestra](../../plugin_georchestra/README.md).
-Pour plus de détail sur l'authentification des utilisateurs dans le cadre d'une installation GeoContrib / Georchestra : [GeoContrib et plateforme IDGO](geocontrib_IDGO.md).
+Pour plus de détails sur l'authentification des utilisateurs dans le cadre d'une installation GeoContrib / Georchestra : [GeoContrib et plateforme Georchestra](../../plugin_georchestra/README.md).
+Pour plus de détails sur l'authentification des utilisateurs dans le cadre d'une installation GeoContrib / IDGO : [GeoContrib et plateforme IDGO](geocontrib_IDGO.md).
 
 ### Projet
 
 Un projet constitue l'application de l’outil de signalement pour un contexte métier / un usage particulier.
-Chaque projet est destiné à une communauté d'utilisateurs particulière, de droits d'accès spécifiques et est articulé autour de types de projets qui lui sont propres.
+Chaque projet est destiné à une communauté d'utilisateurs particulière, a des droits d'accès spécifiques et est articulé autour de types de signalements qui lui sont propres.
 
 Le champ des applications possibles est vaste. Quelques exemples illustratifs :
 
@@ -41,26 +43,24 @@ Chaque projet possède des caractéristiques propres qui ont un impact sur les d
 ### Signalement
 
 Un signalement est une information géolocalisée décrivant un objet géographique porté à la connaissance des usagers d’un projet. Chaque signalement est attaché à un projet et un type de signalements particulier. Il peut s'agir d'un point, d'un linéaire ou d'une forme polygonale.
+Les contributeurs créent des signalements pour collaborer dans un projet.
 
 ### Type de signalements
 
-Un type de signalements correspond à une modélisation particulière (pour un contexte métier particulier) des signalements :
+Un type de signalements correspond à une modélisation particulière (pour un contexte métier particulier) de signalements :
+* **un nom**
 * **un type de géométrie** donné : point, ligne ou polygone
-* **des champs spécifiques** déclarés par le créateur du type de signalements (ces champs s'ajoutent aux champs
-obligatoires) que l'on retrouve pour tous les types de signalements, à savoir le titre, la description et le statut du signalement.
+* **des champs personnalisés** déclarés par le créateur du type de signalements (ces champs s'ajoutent aux champs
+obligatoires) que l'on retrouve pour tous les types de signalements, à savoir le titre, la description et le statut du signalement. Les champs personnalisés peuvent être de type : booléen, décimal, entier, chaîne de caractères, liste de valeurs, texte multiligne ou date.
 
-Chaque type de signalements est également caractérisé par une couleur qui est utilisé pour la présentation des signalements sur les cartes.
-
-Lorsque le type de signalements est créé, il est possible de lui attribuer une symbologie colorée en cliquant sur l'icône en forme de pinceau sur l'accueil du projet. Ainsi, on peut attribuer une couleur à tous les signalements appartenant à un type ou faire varier la couleur des signalement d'un même type selon les valeurs d'un champ personnalisé de type liste de valeurs.
-
-Cf. [Symbologie](symbology.md)
+Lorsque le type de signalements est créé, il est possible de lui attribuer une symbologie colorée en cliquant sur l'icône en forme de pinceau sur l'accueil du projet. Ainsi, on peut attribuer une couleur à tous les signalements appartenant à un type ou faire varier la couleur des signalement d'un même type selon les valeurs d'un champ personnalisé de type liste de valeurs. Cf. [Symbologie](symbology.md)
 
 Le modèle de données d'un type de signalements peut être modifié tant qu'aucun signalement n'y est associé. En revanche, il est possible pour l'administrateur de modifier la symbologie d'un type de signalements à tout moment.
 
 ### Statut d'un signalement
 
 Chaque signalement possède un statut indiquant son état en terme de publication :
-* **brouillon** : signalement non publié. Permet au créateur du signalement d'éditer progressivement sur un signalement avant de le publier ou de demander sa publication ;
+* **brouillon** : signalement non publié. Permet au créateur du signalement d'éditer progressivement un signalement avant de le publier ou de demander sa publication à un modérateur ;
 * **en attente de publication** : statut d'un signalement dont l'auteur a demandé sa publication (uniquement si le projet est modéré) ;
 * **publié** : donne la visibilité la plus large possible au signalement ;
 * **archivé** : correspond à un signalement obsolète mais que l'on souhaite toutefois conserver en base.
@@ -69,11 +69,11 @@ La liste ci-dessus est donnée dans l'ordre logique du cycle de vie d'un signale
 
 ### Commentaire
 
-À l’image de ce qui existe sur les outils en ligne de gestion de tickets (Github et Redmine par exemple) chaque signalement peut être commenté par son auteur et par les autres usagers du projet afin de permettre l’amélioration de la base de données de manière collaborative. Chaque commentaire peut être accompagné de pièces jointes.
+À l’image de ce qui existe sur les outils en ligne de gestion de tickets (Github et Redmine par exemple) chaque signalement peut être commenté par son auteur et par les autres usagers du projet afin de permettre l’amélioration de la base de données de manière collaborative. Chaque commentaire peut être accompagné de pièces jointes (les formats acceptés sont : PDF, PNG et JPEG). 
 
 ### Pièce jointe
 
-Il est possible d'associer un document numérique à un signalement ou à un commentaire. Typiquement, il pourra s'agir d'une photographie de terrain, d'une copie d'un arrêté ou tout document permettant de préciser les informations portées par le signalement. Dans certains cas, la géolocalisation présente dans une photographie (tags EXIF) peut être utilisée pour positionner le signalement.
+Il est possible d'associer un document numérique à un signalement ou à un commentaire (les formats acceptés sont : PDF, PNG et JPEG). Typiquement, il pourra s'agir d'une photographie de terrain, d'une copie d'un arrêté ou tout document permettant de préciser les informations portées par le signalement. Dans certains cas, la géolocalisation présente dans une photographie (tags EXIF) peut être utilisée pour positionner le signalement.
 
 ### Évènements et notifications
 
@@ -107,7 +107,9 @@ Les interfaces cartographiques de l'application utilisent la bibliothèque Leafl
 Cf. [Géocodage](geocoder.md)
 
 
-## Interface homme-machine de l'application
+## Interface homme-machine de l'application : parcours utilisateur
+
+L'interface homme machine de l'application GéomContrib se veut être simple et accessible. Ici sont développées les différentes vues et les fonctionnalités qui les constituent.
 
 ### Page d'accueil de l'application
 
@@ -116,10 +118,8 @@ La page d'accueil de l'application contient :
   * le logo et le nom de l'application (cliquable pour revenir à la page d'accueil de l'application depuis n'importe quelle autre page),
   * si aucun utilisateur n'est connecté : un bouton _"Se connecter"_ permettant à l'utilisateur de s'authentifier,
   * si un utilisateur est connecté : le nom de l'utilisateur courant et un bouton de déconnexion. Un clic sur le nom de l'utilisateur renvoie vers sa page _"Mon compte"_
-* un bouton de création d'un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs);
-* un bouton permettant d'accéder à la liste des modèles de projet pour créer un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs)-cf. [Configuration d'un projet](project_settings.md). Il est aussi possible de créer un projet à partir de modèles. cf. [Projets modèles](project_template.md);
-* la liste des projets existants avec une courte description et quelques indicateurs. Un clic sur un projet renvoie vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un message d'erreur lui est présenté. Cette liste peut être filtrée par niveau d'autorisation requis pour accéder au projet, par le niveau d'autorisation de l'utilisateur ou selon si le projet est modéré ou non. Il est aussi possible de faire une recherche par nom de projet. Une option permettant de rendre visible les projets auxquels l'utilisateur n'a pas accès est aussi possible selon la configuration de l'application (depuis la version 3.0.0).
-
+* un bouton de création d'un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs) cf. [Configuration d'un projet](project_settings.md). Il est aussi possible de créer un projet à partir de modèles. cf. [Projets modèles](project_template.md);
+* la liste des projets existants avec une courte description et quelques indicateurs. Un clic sur un projet renvoie vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un message d'erreur lui est présenté. Cette liste peut être filtrée par niveau d'autorisation requis pour accéder au projet, par le niveau d'autorisation de l'utilisateur pour le projet ou selon si le projet est modéré ou non. Il est aussi possible de faire une recherche par nom de projet. Une option permettant de rendre visible les projets auxquels l'utilisateur n'a pas accès est aussi possible selon la configuration de l'application (depuis la version 3.0.0).
 
 ### Menu d'un projet
 
