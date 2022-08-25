@@ -10,11 +10,11 @@ Dès lors que l'utilisateur de GéoCOntrib perd sa connexion à internet, le mod
 
 ## Fonctionnalités en mode déconnecté
 
-Le mode déconnecté est essentiellement dédié à la contribution en cas de perte de réseau. Ainsi, seuls les outils de contribution et d'édition des signalements seront acessibles entièrement. En effet, la consultation des signalement est possible mais uniquement pour les signalements déjà mis en cache et l'administration des projets et de l'application dans sa globalité ne sont pas disponibles en mode déconnecté.
+Le mode déconnecté est essentiellement dédié à la contribution en cas de perte de réseau. Ainsi, seuls les outils de contribution et d'édition des signalements seront acessibles entièrement. En effet, la consultation des signalements est possible mais uniquement pour les signalements déjà mis en cache et l'administration des projets et de l'application dans sa globalité ne sont pas disponibles en mode déconnecté.
 
-### Création de signalements
+### Création et édition de signalements
 
-Le contributeur peut saisir des signalements via les formulaires de création. A l'enregistrement, il est informé d'une erreur de connexion au serveur. Sur la page d'accueil, le nombre de modifications en attente est indiqué. Lorsque la connexion est rétablie, un bouton _"Envoyer au serveur"_ lui permet d'enregistrer ses nouveaux signalements.
+Le contributeur peut saisir des signalements via les formulaires de création et éditer les signalements (ayant été mis en cache au préalable) en mode déconnecté. A l'enregistrement, il est informé d'une erreur de connexion au serveur. Sur la page d'accueil, le nombre de modifications en attente d'être envoyées au serveur est indiqué. Lorsque la connexion est rétablie, un bouton _"Envoyer au serveur"_ lui permet d'enregistrer ses nouveaux signalements.
 
 ### Mise en cache des fonds cartographiques
 
@@ -32,18 +32,6 @@ Toutes les fonctionnalités ne sont cependant pas conservées lorsque l'on est d
 * Exporter les données d’un type de signalement ;
 * Importer un json dans un type de signalement ;
 * Modifier l'ordre des couches et des fonds cartographiques dans les vues Carte.
-
-### Fonctionnalités maintenues (si mise en cache)
-
--   Naviguer dans le site et les diverses pages du projet
-    -   Page d’accueil
-    -   Page Liste & Carte
-    -   Filtre possible sur la page Liste & Carte
-    -   Page d’un type de signalement
-    -   Page d’un signalement
--   Créer un signalement à partir de sa localisation GPS
--   Dessiner un signalement sur la carte
--   Modifier un signalement existant
 
 ---
 
