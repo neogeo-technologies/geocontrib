@@ -24,25 +24,17 @@ Seules les couches affichables dans la projection EPSG:3857 sont supportées.
 ### Exemples de configuration de couches WMS
 
 **Couche WMS au format PNG :**
-```Titre : Ortho 2013 Picardie
+```Titre : Orthophotographie régionale 2018
 Type de couche : WMS
-Service : https://www.geopicardie.fr/geoserver/ows
+Service : https://www.geo2france.fr/geoserver/geo2france/ows
 Options : {
-    "attribution": "R\u00e9gion Hauts-de-France",
-    "layers": "geopicardie:picardie_ortho_ign_2013_vis",
-    "format": "image/png",
-    "transparent": true}
-```
-
-**Couche WMS au format JPEG avec transparence :**
-```Titre : Scan25
-Type de couche : WMS
-Service : https://www.geopicardie.fr/geoserver/ows
-Options : {
-    "attribution": "IGN",
-    "layers": "geopicardie:picardie_scan25",
-    "format": "image/jpeg",
-    "transparent": true}
+            "format": "image/png", 
+            "layers": "ortho_regionale_2018_rvb", 
+            "maxZoom": 18, "minZoom": 16, 
+            "opacity": 0.8, 
+            "attribution": "Géo2France", 
+            "transparent": true
+            }
 ```
 
 ### Exemples de configuration de couches TMS
@@ -78,14 +70,14 @@ Options : {
     "maxZoom": 20}
 ```
 
-### Options de Leaflet
+### Options de OpenLayers
 
 **minZoom et maxZoom :**
 `minZoom` et `maxZoom` permettent de définir la plage d'échelles pour laquelle la couche en question est visible.
 Il s'agit de nombres entiers qui se référèrent aux niveaux de zoom utilisés par GoogleMaps.
 Les plus petits nombres correspondent aux échelles cartographiques les plus petites (niveau mondial, international)
 alors que les plus grands correspondent aux échelles cartographiques les plus grandes (niveau urbain).
-cf. https://leafletjs.com/examples/zoom-levels/
+cf. https://openlayers.org/en/latest/examples/layer-zoom-limits.html
 
 Ces paramètres peuvent être utilisés avec plusieurs couches pour rendre visible une couche à certaines échelles et une autre couche à d'autres échelles.
 
@@ -103,7 +95,7 @@ L'ordre des couches et leur transparence peuvent être modifiés par les adminis
 
 Les fonds cartographiques sont mis à disposition des utilisateurs qui exploitent les outils cartographiques de GéoContrib. Chacun d'eux peut activer le fond cartographique qui lui convient le mieux, voire modifier l'ordre des couches et leur transparence. Ces paramètres personnalisés sont enregistrées au niveau du navigateur web et n'ont pas d'impact sur les autres utilisateurs de l'application.
 
-### Couches requêtables
+## Couches requêtables
 
 Lors de la création / l'édition d'un fond cartographique, il est possible de rendre une couche "requêtable" en cochant la case à cocher correspondante.
 
@@ -115,7 +107,7 @@ En haut de la liste, une liste de choix permet de sélectionner une des couches 
 
 Après avoir sélectionné une couche, au clic sur le fond de carte, une popup s'affiche permettant la lecture des données attributaires associées à la couche du fond cartographique.
 
-## Conditions nécessaires
+### Conditions nécessaires
 
 Pour que les couches soient requêtables, elles doivent être fournies par des serveurs cartographiques capables de délivrer le GetInfo au format application/json.
 

@@ -197,7 +197,7 @@ Au-delà de ces informations, cette page propose également des actions spécifi
 
 La page de consultation des signalements d'un projet propose 2 vues (par l'intermédiaire des pictogrammes en haut de la page) :
 * **une vue cartographique** :
-  * présentation de l'ensemble des signalement visibles de l'utilisateur (dépend de ses autorisations par rapport au projet).
+  * présentation de l'ensemble des signalements visibles de l'utilisateur (dépend de ses autorisations par rapport au projet).
   * possibilité de zoomer et de se déplacer dans la carte,
   * consultation des caractéristiques principales d'un signalement dans une petite infobulle à l'aide d'un simple clic,
   * dans cette info-bulle, le clic sur le titre renvoie vers la fiche détaillée du signalement,
@@ -215,26 +215,25 @@ Chacune d'entre elles propose un bloc _"Filtres"_ permettant à l'utilisateur de
 * filtre sur le statut des signalements ;
 * filtre textuel recherchant la chaîne de caractères saisie par l'utilisateur dans le titre des signalements.
 
-Il est désormais possible de parcourir les signalements de la liste obtenue en filtrant et triant la table de la vue liste. - Cf. [Partage d'un projet en externe](project_sharing.md)
+Il est désormais possible de parcourir les signalements de la liste obtenue en filtrant et triant la table de la vue liste. - Cf. [Parcourir une liste de signalements](browse_through_list_of_features.md)
 
 ### Formulaire de création / édition d'un signalement
 
-Les utilisateurs contributeurs ou de niveau supérieur peuvent ajouter des signalements depuis la page d'accueil, la page d'un type de signalements ou la page d'un signalement à l'aide du pictogramme _"+"_ .
+Les contributeurs ou de niveau supérieur peuvent ajouter des signalements depuis la page d'accueil, la page d'un type de signalements ou la page d'un signalement à l'aide du pictogramme _"+"_ .
 
 Le formulaire d'édition permet à l'utilisateur de saisir un nom, un statut, une description ainsi que de renseigner l'ensemble des informations relatives aux champs personnalisés définis pour ce type de signalement. - Cf. [Edition d'un signalement et mode édition rapide](feature_editing.md)
 
-Pour tous les types de signalements, une interface cartographique permet de numériser le signalement. L'utilisateur bénéficie d'une fonction de recherche (cf.[Géocodage](geocoder.md)) et a la possibilité de jouer sur l'affichage des fonds de carte (cf. [Fonds cartographiques](basemaps.md)) configurés par l'administrateur du projet (ordre des couches, opacités, etc).
+Pour tous les types de signalements, une interface cartographique permet de localiser le signalement. L'utilisateur bénéficie d'une fonction de recherche par adresse (cf.[Géocodage](geocoder.md)) et a la possibilité de jouer sur l'affichage des fonds de carte (cf. [Fonds cartographiques](basemaps.md)) configurés par l'administrateur du projet (ordre des couches, opacités, etc).
 
-Pour les signalements de type ponctuels, l'utilisateur peut également :
+Pour localiser un signalements de type ponctuel, l'utilisateur peut également :
 * utiliser sa géolocalisation (en autorisant le navigateur à utiliser la localisation) et en cliquant sur le bouton _"Positionner le signalement à partir de votre géolocalisation"_ ;
-* utiliser une photographie contenant des informations de localisation (tags EXIF associés à une photographie prise avec un appareil équipé d'un GPS) en cliquant sur le bouton _"Importer une image géoréférencée"_ .
+* utiliser une photographie contenant des informations de localisation (tags EXIF associés à une photographie prise avec un appareil équipé d'un GPS) en cliquant sur le bouton _"Importer une image géoréférencée"_ . L'image sera automatiquement ajoutée en pièce jointe.
 
 ### Page de consultation d'un signalement
 
 La page de consultation d'un signalement présente les informations suivantes :
 * L'ensemble des attributs du signalement ;
 * Le statut de publication du signalement (cf. [Statuts des signalements](status.md) pour des informations détaillées sur les différents statuts) ;
-* Les dates d'archivage et de suppression automatiques (si de tels délais ont été configurés au niveau du projet) ;
 * la localisation sur une carte ;
 * Les liaisons avec d'autres signalements (cf. [Liaisons entre signalements](featurelink.md) pour des informations détaillées sur ces liaisons) ;
 * Les pièces jointes du signalement ;
@@ -245,11 +244,11 @@ Cette page propose également des actions activées en fonction des autorisation
 * Supprimer le signalement via un pictogramme en haut à droite de la page (uniquement pour son auteur, les administrateurs de projet ou super utilisateurs) ;
 * Ajouter un commentaire (uniquement pour les contributeurs et utilisateurs de niveau supérieur).
 
+
 ### Page d'administration des fonds cartographiques
 
 La page d'administration des fonds cartographiques est un formulaire permettant aux administrateurs du projet de :
 * Déclarer l'ensemble des couches de données qui seront utilisées dans les différentes interfaces cartographiques du projet. Ces couches servent uniquement de fonds de carte afin d'aider à la localisation des signalements créés dans l'application.
-* Ces couches peuvent être de deux types : WMS ou TMS ;
 * Elles peuvent être réordonnées à l'aide du champ `Position` ;
 * Si aucune couche n'est configurée, une couche configurée par défaut au niveau de l'application est alors affichée dans les interfaces cartographiques.
 
