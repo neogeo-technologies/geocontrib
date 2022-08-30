@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+
+## [3.2.0] - 2022-08-30
+
+### Evolutions
+
+- Redmine 13577 : Mode déconnecté - Empêcher d'ajouter des commentaires en mode déconnecté
+- Redmine 13575 : Mode déconnecté - Désactiver les filtres dans la page liste et carte
+- Redmine 13572 : Mode déconnecté - Marquer que les informations de la page « type de signalement » n'ont pas été chargées si non mise en cache
+- Redmine 13571 : Mode déconnecté - Empêcher la localisation d'un signalement via une photo géolocalisée
+- Redmine 13569 : Mode déconnecté - Empêcher l'ajout d'une pièce jointe dans un signalement
+- Redmine 13568 : Mode déconnecté - Afficher une icône qui indique à l'utilisateur qu'il est en mode déconnecté
+
+### Corrections
+
+- Redmine 14586 : Création d'un type de signalement à partir d'un GeoJSON ou d'un CSV - Les nombres entiers et décimaux ne sont pas détectés
+
+
 ## [3.2.0] - 2022-08-17
 
 ### Evolutions
