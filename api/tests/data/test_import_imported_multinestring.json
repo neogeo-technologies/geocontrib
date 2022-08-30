@@ -1,0 +1,54 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "a0359faa-1ee6-4e02-b585-4249a67397c2",
+            "type": "Feature",
+            "geometry": {
+                "type": "MultiLineString",
+                "coordinates": [
+                    [
+                        [
+                            347465.963841,
+                            6291105.409479
+                        ],
+                        [
+                            347470.730749,
+                            6291074.01899
+                        ],
+                        [
+                            347470.134116,
+                            6291063.247433
+                        ],
+                        [
+                            347450.586946,
+                            6291047.042766
+                        ],
+                        [
+                            347412.359035,
+                            6291077.252445
+                        ],
+                        [
+                            347409.372152,
+                            6291101.624821
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "title": "type 3 multilinestring",
+                "description": "",
+                "status": "draft",
+                "created_on": "2021-08-05T02:00:00+02:00",
+                "updated_on": "2021-08-05T02:00:00+02:00",
+                "archived_on": null,
+                "deletion_on": null,
+                "feature_type": "3-type-multilinestring",
+                "project": "1-aze",
+                "display_creator": "admin",
+                "display_last_editor": "admin",
+                "creator": 1
+            }
+        }
+    ]
+}
