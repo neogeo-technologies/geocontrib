@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+
+## [3.2.0] - 2022-08-30
+
+### Evolutions
+
+- Redmine 13577 : Mode déconnecté - Empêcher d'ajouter des commentaires en mode déconnecté
+- Redmine 13575 : Mode déconnecté - Désactiver les filtres dans la page liste et carte
+- Redmine 13572 : Mode déconnecté - Marquer que les informations de la page « type de signalement » n'ont pas été chargées si non mise en cache
+- Redmine 13571 : Mode déconnecté - Empêcher la localisation d'un signalement via une photo géolocalisée
+- Redmine 13569 : Mode déconnecté - Empêcher l'ajout d'une pièce jointe dans un signalement
+- Redmine 13568 : Mode déconnecté - Afficher une icône qui indique à l'utilisateur qu'il est en mode déconnecté
+
+### Corrections
+
+- Redmine 14586 : Création d'un type de signalement à partir d'un GeoJSON ou d'un CSV - Les nombres entiers et décimaux ne sont pas détectés
+
+
+## [3.2.0] - 2022-08-17
+
+### Evolutions
+
+- Redmine 14074 : Personnalisation du niveau de zoom maximum de la carte par projet
+- Redmine 14072 : Mode édition rapide des signalements
+- Redmine 14071 : Pouvoir parcourir l'ensemble des signalements à partir de la page de détail d'un signalement
+- Redmine 14051 : Changer la couleur en fonction de l'état d'une case à cocher
+- Redmine 14048 : Changer la couleur en fonction de l'état d'une chaine de caractères : vide et renseigné
+- Redmine 13983 : Pouvoir définir une couleur sans remplissage pour les polygones
+
+### Corrections
+
+- Redmine 14570 : Import dans un type existant - Les types nombre entier, nombre décimal et date créent un bug à l'import
+- Redmine 14567 : Création d'un signalement - Les labels des champs personnalisés ne s'affichent pas
+- Redmine 14479 : Page membres - message de confirmation arrive tard
+- Redmine 14463 : Responsive - débordement import fichier
+- Redmine 14462 : Bouton filtres mal placé et flêche inconsistante
+- Redmine 14461 : Responsive - Filtre écrasés sur page des projets
+- Redmine 14460 : Responsive - les grands titres débordent et en édition rapide champ très petit
+- Redmine 14458 : Responsive - description projet mal disposée
+- Redmine 14454 : Responsive - espace vide sur liste signalement
+- Redmine 14451 : Déconnecté - détection offline trop lente
+- Redmine 14450 : Édition type de signalement - ordre par position pas respecté
+- Redmine 14416 : Ajout de commentaire ne fonctionne plus
+
 ## [3.1.0] - 2022-06-08
 
 ### Evolutions

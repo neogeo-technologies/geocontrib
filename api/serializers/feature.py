@@ -237,13 +237,28 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
         # Hack: les champs extra n'etant pas serializé ou défini dans le modele
         # FIXME: les champs ne sont donc pas validé mais récupérer direct
         # depuis les données initial
-        custom_fields = validated_data.get(
-            'feature_type'
-        ).customfield_set.values_list('name', flat=True)
+        custom_fields = {}
+        [custom_fields.update({i.name: i.field_type}) for i in validated_data.get('feature_type').customfield_set.all()]
         properties = self.initial_data.get('properties', {})
-        validated_data['feature_data'] = {
-            k: v for k, v in properties.items() if k in custom_fields
-        }
+        res = {}
+        # Tous les champs que pouvant etre nuls
+        fields=[
+            "char",
+            "boolean",
+            "char",
+            "date",
+            "list",
+            "integer",
+            "decimal",
+            "text"
+            ]
+        for k, v in properties.items():
+            if k in custom_fields.keys():
+                if custom_fields[k] in fields and v == '':
+                    v= None
+                res.update({k: v})
+        validated_data['feature_data'] = res
+        
         return validated_data
 
     def get_display_creator(self, obj):

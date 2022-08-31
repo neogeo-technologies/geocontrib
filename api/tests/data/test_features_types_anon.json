@@ -51,5 +51,21 @@
             }
         ],
         "is_editable": false
+    },
+    {
+        "title": "type multilinestring",
+        "title_optional": false,
+        "slug": "3-type-multilinestring",
+        "geom_type": "multilinestring",
+        "color": "#ff0000",
+        "icon": null,
+        "opacity": "0.5",
+        "colors_style": {
+            "colors": {},
+            "custom_field_name": ""
+        },
+        "project": "1-aze",
+        "customfield_set": [],
+        "is_editable": true
     }
 ]

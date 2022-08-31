@@ -2,7 +2,7 @@
 
 ## Authentification des utilisateurs
 
-Dans le cadre d'une installation GeoContrib couplée à une plateforme de données IDGO, le système d'authentification de GeoContrib utilise le CAS d'IDGO.
+Dans le cadre d'une installation de GeoContrib couplée à une plateforme de données IDGO, le système d'authentification de GeoContrib utilise le CAS d'IDGO.
 
 Les utilisateurs doivent avoir un compte dans la plateforme de données IDGO. Une fois connecté dans IDGO, à leur première connexion sur l'application GéoContrib, les utilisateurs sont ajoutés dans la base utilisateurs de GéoContrib.
 
@@ -12,9 +12,9 @@ Les informations récupérées sont les suivantes :
 * Prénom
 * Email
 
-Par défaut, les utilisateurs sont ajoutés dans la base utilisateurs de GeoContrib avec le statut "Actif". Aucune autre permission ne leur est accordé. S'ils doivent évoluer vers des statuts de "Gestionnaire métier" ou de "Super Utilisateur" il faut qu'un autre super utilisateur leur accorde ces nouveaux droits.
+Par défaut, les utilisateurs sont ajoutés dans la base utilisateurs de GeoContrib avec le statut "Actif". Aucune autre permission ne leur est accordée. S'ils doivent évoluer vers des statuts de "Gestionnaire métier" ou de "Super Utilisateur" il faut qu'un autre super utilisateur leur accorde ces nouveaux droits.
 
-Une fois leur compte créé dans la base utilisateur, il est désormais possible de leur accorder des rôles de connexion à chacun des projets. Depuis le site, dans la page Membre du projet, les utilisateurs inscrits peuvent se voir attribuer les rôles particuliers de Contributeur, Supercontributeur, Modérateur ou Administrateur projet. Sinon, ils auront par défaut le rôle Utilisateur connecté.
+Une fois leur compte créé dans la base utilisateur, il est désormais possible de leur accorder des rôles de connexion pour chacun des projets. Depuis le site, dans la page Membres du projet, les utilisateurs inscrits peuvent se voir attribuer les rôles particuliers de Contributeur, Supercontributeur, Modérateur ou Administrateur projet. Sinon, ils auront par défaut le rôle Utilisateur connecté.
 
 
 ## Import de données

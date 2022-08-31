@@ -1,9 +1,8 @@
 # Utilisateurs et autorisations
 
 Autorisations attribuables par projet :
-* Utilisateur connecté (utilisateur authentifié)
 * Contributeur
-* SuperContributeur
+* Super Contributeur
 * Modérateur
 * Administrateur projet
 
@@ -19,6 +18,7 @@ Autorisations indépendantes des projets :
 
 Un utilisateur connecté qui peut avoir accès à un projet peut :
 * S'abonner aux notifications du projet
+* Voir les signalements publiés du projet
 
 ### Contributeur
 
@@ -44,7 +44,7 @@ auteur)
 
 ### Super Contributeur
 
-Un supercontributeur a les mêmes droits qu'un contributeur, mais il peut interagir avec les contributions des autres utilisateurs comme s'il s'agissait de ses propres contributions, sauf en ce qui concerne la suppression : il ne peut supprimer que les signalements dont il est l'auteur.
+Un supercontributeur a les mêmes droits qu'un contributeur, mais il peut interagir avec les contributions des autres utilisateurs comme s'il s'agissait de ses propres contributions, sauf en ce qui concerne la suppression : il ne peut supprimer que les signalements dont il est l'auteur. Le super-contributeur n'a toutefois pas la possibilité d'archiver les signalements.
 
 
 ### Modérateur
@@ -62,6 +62,7 @@ Changements de statuts réalisables par un modérateur :
 * publié -> brouillon
 * publié -> en attente de publication
 * en attente de publication -> publié
+* en attente de publication -> brouillon
 * archivé -> publié
 * archivé -> brouillon
 * archivé -> en attente de publication
@@ -76,6 +77,7 @@ Il peut :
 * Modifier les autorisations des utilisateurs du projet
 * Configurer les fonds cartographiques utilisés dans les cartes du projet
 * Supprimer tous les signalements
+* Editer tous les signalements et changer leurs statuts sans restriction.
 
 
 ## Autorisations indépendantes des projets

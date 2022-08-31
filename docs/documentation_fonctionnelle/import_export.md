@@ -22,7 +22,7 @@ Depuis la page d'accueil d'un projet, le bouton _"Créer un type de signalements
 **Formatage du fichier**
 Le fichier importé doit respecter certaines règles de formatage:
 - Séparateurs:
-    - Virgules: dans ce cas, les valeurs de tout les champs ne peuvent contenir de virgules.
+    - Virgules: dans ce cas, les valeurs de tous les champs ne peuvent pas contenir de virgules.
     - Point-virgules: les valeurs des champs peuvent contenir des virgules.
     - Aucun autre séparateur n'est supporté.
 - Champs de coordonnées:
@@ -33,7 +33,7 @@ Tout les champs ne correspondant pas au champs réservés à la construction d'u
 
 ### Via une plateforme IDGO
 
-Cette fonctionnalité n'est disponible que pour les installations de GeoContrib couplée avec une plateforme IDGO.
+Cette fonctionnalité n'est disponible que pour les installations de GeoContrib couplées avec une plateforme IDGO.
 
 Depuis la page d'accueil d'un projet, le bouton _"Créer un type de signalements à partir du catalogue IDGO"_ permet à l'utilisateur de choisir une ressource appartenant à l'organisation à laquelle il est rattaché dans IDGO. Il clique sur le bouton de lancement de l'import pour générer le type de signalement. Suite au chargement, la structure du fichier est lue et le modèle de données du type de signalement est proposé à l'utilisateur à travers le formulaire d'édition.
 L'administrateur peut préciser la géométrie, le titre du type de signalement, et vérifier ou modifier chacun des champs personnalisés.
@@ -51,11 +51,24 @@ Seuls les utilisateurs qui peuvent créer des signalements (contributeurs et niv
 ### Import d'un fichier GeoJSON
 
 Si l'utilisateur souhaite charger un fichier GeoJSON dans un type de signalements existant, il doit dérouler le menu _"Importer des signalements"_ de la page du type de signalements. Il choisit ensuite le fichier de données qu'il souhaite importer dans son explorateur de fichiers et clique sur le bouton _"Lancer l'import"_. Les données sont importées dans le type de signalements.
+Les champs du fichier importé qui correspondent à des champs du type de signalement dans lequel les signalements sont importés seront remplis. Dans le cas contraire où un champ du fichier importé ne correspond à aucun des champs du type de signalements,ces informations ne seront pas importées avec les signalements.
 
 
 ### Import d'un fichier CSV
 
-Cf. [import GeoJSON](#import-dun-fichier-geojson), mais disponible uniquement pour les types de signalements de type POINT.
+De la même manière que pour l'import d'un fichier GeoJSON, il est possible d'importer des signalements depuis un fichier CSV dans un type de signalements existant mais cela n'est disponible que pour les types de signalements de type POINT.
+
+**Formatage du fichier**
+Le fichier importé doit respecter certaines règles de formatage:
+- Séparateurs:
+    - Virgules: dans ce cas, les valeurs de tous les champs ne peuvent pas contenir de virgules.
+    - Point-virgules: les valeurs des champs peuvent contenir des virgules.
+    - Aucun autre séparateur n'est supporté.
+- Champs de coordonnées:
+    - Le fichier doit obligatoirement contenir des champs de coordonnées sous la forme de 2 champs: "lon" et "lat"
+    - Les coordonnées doivent être au format WGS84 (EPSG 4326).
+
+Les champs du fichier importé qui correspondent à des champs du type de signalement dans lequel les signalements sont importés seront remplis. Dans le cas contraire où un champ du fichier importé ne correspond à aucun des champs du type de signalements,ces informations ne seront pas importées avec les signalements.
 
 ### Import depuis une plateforme IDGO
 
@@ -67,7 +80,7 @@ Si l'utilisateur souhaite charger des données depuis IDGO dans un type de signa
 
 * L'import des signalements est géré en tâche de fond : l'utilisateur peut poursuivre sa navigation même si l'import n'est pas terminé ;
 * Les enregistrements soupçonnés de former des doublons sont marqués automatiquement à l'aide du mécanisme de relation entre signalements. Les doublons sont identifiés par l'égalité de leur titre et de leur description, ou par l'égalité de leur géométrie) ;
-* Les enregistrements importés sont enregistrés avec le statut "brouillon", sauf s'ils ont un attributs "status" mentionnant leur état (brouillon : draft ; publication en cours : pending ; publié : published ; archivé : archived) ;
+* Les enregistrements importés sont enregistrés avec le statut "brouillon", sauf s'ils ont un attribut "status" mentionnant leur état (brouillon : draft ; publication en cours : pending ; publié : published ; archivé : archived) ;
 * Lors d'un ré-import, si des signalements possèdent le même identifiant qu'un signalement existant, celui-ci est mis à jour avec les informations contenues dans le fichier.
 
 **Contraintes** :
@@ -79,7 +92,7 @@ Si l'utilisateur souhaite charger des données depuis IDGO dans un type de signa
 
 ## Export d'un type de signalements
 
-Cette fonction permet d'exporter les signalements d'un type de signalements sous la forme d'un fichier GeoJSON ou CSV.
+Cette fonction permet d'exporter les signalements d'un type de signalements sous la forme d'un fichier GeoJSON ou CSV (pour les géométries de type ponctuel).
 * Tout utilisateur pouvant naviguer dans le projet peut exporter les données
 * Seules les données que l'utilisateur courant a le droit de consulter figurent dans l'export GeoJSON ou CSV. Le statut (brouillon, publié, en attente de publication, archive) est mentionné pour chaque signalement.
 * L'export ne contient aucune information relative aux évènements et aux auteurs des signalements.

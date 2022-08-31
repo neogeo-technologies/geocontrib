@@ -1,18 +1,30 @@
-# Présentation de l'outil
+# Documentation de GéoContrib
+
+## GéoContrib : outil de constitution de bases de données collaboratives
+
+GéoContrib est une application web qui permet à ses utilisateurs de construire ou d'enrichir des bases de données géographiques de façon collaborative. Un système de commentaires permet aux communautés de contributeurs d'interagir sur la donnée et des modérateurs peuvent être choisis pour gérer les contributions.
+L'application est conçue pour être utilisée tant sur du matériel sédentaire que sur des terminaux mobiles via le navigateur de son appareil.
+
+Crée en 2019 par Neogeo Technologies sous l'impulsion de la région des Hauts des France, l'application GéoContrib se veut être un outil simple et accessible à tous, géomaticien ou non. 
+
+Les usages de GéoContrib sont très multiples. En effet, l'application peut être utilisée à des fins de création d'une base de données collaborative sur un thème métier spécifique avec un aspect de localisation comme par exemple des relevés de qualité de l'air, de température, etc. ... Les commentaires peuvent aussi être utilisés pour récueillir des avis sur des projets d'aménagement. Enfin, un usage fréquent de GéoContrib est la qualification de bases de données telles que l'occupation du sol.
+
 ## Notions importantes
+
+Afin de pouvoir utiliser au mieux GéoContrib, certaines notions sont importante à comprendre.
 
 ### Authentification
 
-GeoContrib possède sa propre base utilisateur, administrable depuis Django par la page "Utilisateurs" grâce à laquelle des utilisateurs peuvent être ajoutés.
+GeoContrib possède sa propre base utilisateurs, administrable depuis Django par la page "Utilisateurs" grâce à laquelle des utilisateurs peuvent être ajoutés.
 L'application GeoContrib peut être couplée avec une plateforme de données Georchestra ou IDGO. Dans ce cas, l'authentification des utilisateurs se fait depuis la plateforme de données, et non plus depuis GeoContrib.
 
-Pour plus de détail sur l'authentification des utilisateurs dans le cadre d'une installation GeoContrib / Georchestra : [GeoContrib et plateforme Georchestra](../../plugin_georchestra/README.md).
-Pour plus de détail sur l'authentification des utilisateurs dans le cadre d'une installation GeoContrib / Georchestra : [GeoContrib et plateforme IDGO](geocontrib_IDGO.md).
+Pour plus de détails sur l'authentification des utilisateurs dans le cadre d'une installation GeoContrib / Georchestra : [GeoContrib et plateforme Georchestra](../../plugin_georchestra/README.md).
+Pour plus de détails sur l'authentification des utilisateurs dans le cadre d'une installation GeoContrib / IDGO : [GeoContrib et plateforme IDGO](geocontrib_IDGO.md).
 
 ### Projet
 
 Un projet constitue l'application de l’outil de signalement pour un contexte métier / un usage particulier.
-Chaque projet est destiné à une communauté d'utilisateurs particulière, de droits d'accès spécifiques et est articulé autour de types de projets qui lui sont propres.
+Chaque projet est destiné à une communauté d'utilisateurs particulière, a des droits d'accès spécifiques et est articulé autour de types de signalements qui lui sont propres.
 
 Le champ des applications possibles est vaste. Quelques exemples illustratifs :
 
@@ -31,26 +43,24 @@ Chaque projet possède des caractéristiques propres qui ont un impact sur les d
 ### Signalement
 
 Un signalement est une information géolocalisée décrivant un objet géographique porté à la connaissance des usagers d’un projet. Chaque signalement est attaché à un projet et un type de signalements particulier. Il peut s'agir d'un point, d'un linéaire ou d'une forme polygonale.
+Les contributeurs créent des signalements pour collaborer dans un projet.
 
 ### Type de signalements
 
-Un type de signalements correspond à une modélisation particulière (pour un contexte métier particulier) des signalements :
+Un type de signalements correspond à une modélisation particulière (pour un contexte métier particulier) de signalements :
+* **un nom**
 * **un type de géométrie** donné : point, ligne ou polygone
-* **des champs spécifiques** déclarés par le créateur du type de signalements (ces champs s'ajoutent aux champs
-obligatoires) que l'on retrouve pour tous les types de signalements, à savoir le titre, la description et le statut du signalement.
+* **des champs personnalisés** déclarés par le créateur du type de signalements (ces champs s'ajoutent aux champs
+obligatoires) que l'on retrouve pour tous les types de signalements, à savoir le titre, la description et le statut du signalement. Les champs personnalisés peuvent être de type : booléen, décimal, entier, chaîne de caractères, liste de valeurs, texte multiligne ou date.
 
-Chaque type de signalements est également caractérisé par une couleur qui est utilisé pour la présentation des signalements sur les cartes.
-
-Lorsque le type de signalements est créé, il est possible de lui attribuer une symbologie colorée. Ainsi, on peut attribuer une couleur à tous les signalements appartenant à un type ou faire varier la couleur des signalement d'un même type selon les valeurs d'un champ personnalisé de type liste de valeurs.
-
-Cf. [Symbologie](symbology.md)
+Lorsque le type de signalements est créé, il est possible de lui attribuer une symbologie colorée en cliquant sur l'icône en forme de pinceau sur l'accueil du projet. Ainsi, on peut attribuer une couleur à tous les signalements appartenant à un type ou faire varier la couleur des signalement d'un même type selon les valeurs d'un champ personnalisé de type liste de valeurs. Cf. [Symbologie](symbology.md)
 
 Le modèle de données d'un type de signalements peut être modifié tant qu'aucun signalement n'y est associé. En revanche, il est possible pour l'administrateur de modifier la symbologie d'un type de signalements à tout moment.
 
 ### Statut d'un signalement
 
 Chaque signalement possède un statut indiquant son état en terme de publication :
-* **brouillon** : signalement non publié. Permet au créateur du signalement d'éditer progressivement sur un signalement avant de le publier ou de demander sa publication ;
+* **brouillon** : signalement non publié. Permet au créateur du signalement d'éditer progressivement un signalement avant de le publier ou de demander sa publication à un modérateur ;
 * **en attente de publication** : statut d'un signalement dont l'auteur a demandé sa publication (uniquement si le projet est modéré) ;
 * **publié** : donne la visibilité la plus large possible au signalement ;
 * **archivé** : correspond à un signalement obsolète mais que l'on souhaite toutefois conserver en base.
@@ -59,11 +69,11 @@ La liste ci-dessus est donnée dans l'ordre logique du cycle de vie d'un signale
 
 ### Commentaire
 
-À l’image de ce qui existe sur les outils en ligne de gestion de tickets (Github et Redmine par exemple) chaque signalement peut être commenté par son auteur et par les autres usagers du projet afin de permettre l’amélioration de la base de données de manière collaborative. Chaque commentaire peut être accompagné de pièces jointes.
+À l’image de ce qui existe sur les outils en ligne de gestion de tickets (Github et Redmine par exemple) chaque signalement peut être commenté par son auteur et par les autres usagers du projet afin de permettre l’amélioration de la base de données de manière collaborative. Chaque commentaire peut être accompagné de pièces jointes (les formats acceptés sont : PDF, PNG et JPEG). 
 
 ### Pièce jointe
 
-Il est possible d'associer un document numérique à un signalement ou à un commentaire. Typiquement, il pourra s'agir d'une photographie de terrain, d'une copie d'un arrêté ou tout document permettant de préciser les informations portées par le signalement. Dans certains cas, la géolocalisation présente dans une photographie (tags EXIF) peut être utilisée pour positionner le signalement.
+Il est possible d'associer un document numérique à un signalement ou à un commentaire (les formats acceptés sont : PDF, PNG et JPEG). Typiquement, il pourra s'agir d'une photographie de terrain, d'une copie d'un arrêté ou tout document permettant de préciser les informations portées par le signalement. Dans certains cas, la géolocalisation présente dans une photographie (tags EXIF) peut être utilisée pour positionner le signalement.
 
 ### Évènements et notifications
 
@@ -97,7 +107,9 @@ Les interfaces cartographiques de l'application utilisent la bibliothèque Leafl
 Cf. [Géocodage](geocoder.md)
 
 
-## Interface homme-machine de l'application
+## Interface homme-machine de l'application : parcours utilisateur
+
+L'interface homme machine de l'application GéomContrib se veut être simple et accessible. Ici sont développées les différentes vues et les fonctionnalités qui les constituent.
 
 ### Page d'accueil de l'application
 
@@ -106,14 +118,12 @@ La page d'accueil de l'application contient :
   * le logo et le nom de l'application (cliquable pour revenir à la page d'accueil de l'application depuis n'importe quelle autre page),
   * si aucun utilisateur n'est connecté : un bouton _"Se connecter"_ permettant à l'utilisateur de s'authentifier,
   * si un utilisateur est connecté : le nom de l'utilisateur courant et un bouton de déconnexion. Un clic sur le nom de l'utilisateur renvoie vers sa page _"Mon compte"_
-* un bouton de création d'un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs);
-* un bouton permettant d'accéder à la liste des modèles de projet pour créer un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs) - cf. [Projets modèles](project_template.md);
-* la liste des projets existants avec une courte description et quelques indicateurs. Un clic sur un projet renvoie vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un message d'erreur lui est présenté. Cette liste peut être filtrée par niveau d'autorisation requis pour accéder au projet, par le niveau d'autorisation de l'utilisateur ou selon si le projet est modéré ou non. Il est aussi possible de faire une recherche par nom de projet. Une option permettant de rendre visible les projets auxquels l'utilisateur n'a pas accès est aussi possible selon la configuration de l'application (depuis la version 3.0.0).
-
+* un bouton de création d'un nouveau projet (présent uniquement pour les utilisateurs ayant le rôle de Gestionnaire métier ou les super-utilisateurs) cf. [Configuration d'un projet](project_settings.md). Il est aussi possible de créer un projet à partir de modèles. cf. [Projets modèles](project_template.md);
+* la liste des projets existants avec un extrait de la description et quelques indicateurs. Un clic sur un projet renvoie vers la page d'accueil de ce projet si l'utilisateur courant est habilité à le consulter. Dans le cas contraire un message d'erreur lui est présenté. Cette liste peut être filtrée par niveau d'autorisation requis pour accéder au projet, par le niveau d'autorisation de l'utilisateur pour le projet ou selon si le projet est modéré ou non. Il est aussi possible de faire une recherche par nom de projet. Une option permettant de rendre visible les projets auxquels l'utilisateur n'a pas accès est aussi possible selon la configuration de l'application (depuis la version 3.0.0).
 
 ### Menu d'un projet
 
-Lorsque l'utilisateur courant est entré dans un projet un menu supplémentaire apparaît dans le bandeau horizontal d'en-tête. Il donne accès aux principales sous-pages du projet :
+Lorsque l'utilisateur courant est entré dans un projet un menu supplémentaire apparaît dans le bandeau horizontal d'en-tête. Il donne accès aux principales pages du projet :
 * Page d'accueil du projet ;
 * Page de consultation des signalements sous forme d'une carte ou d'une liste ;
 * Page d'administration des fonds cartographiques (uniquement pour les administrateurs du projet et les super-utilisateurs) ;
@@ -134,25 +144,30 @@ La page d'accueil d'un projet contient les éléments suivants :
   * Titre,
   * Description,
   * Illustration,
-* La liste des types de signalements du projet. Un pictogramme indique le type de géométrie de chaque type de signalement. Un clic sur un type de signalements renvoie vers sa page de description ;
+* La liste des types de signalements du projet. Un pictogramme indique le type de géométrie de chaque type de signalement. Un clic sur un type de signalements renvoie vers sa page de description.
 * Une cartographie des signalements existants (uniquement ceux que l'utilisateur courant est habilité à consulter). Un clic sur cette carte renvoie vers la page de consultation des signalements sous forme de carte ou de liste ;
 * Les derniers signalements et commentaires du projet. Un clic sur un signalement ou un commentaire renvoie vers la page de consultation du signalement associé ;
 * Les caractéristiques techniques du projet dans la partie basse :
-  * Délais d'archivage et de suppression automatiques des signalements,
   * Visibilité des signalements publiés et archivés en fonction des autorisations des utilisateurs,
   * Modération du projet - cf. [Modération d'un projet](moderation.md),
-  * Considération du projet comme modèle - cf. [Projets modèles](project_template.md).
 * Selon la configuration de l'application, l'administrateur a aussi la possibilité de copier un lien de partage du projet en externe. Ce lien permet de n'avoir accès qu'au projet partagé et non au reste de l'application GéoContrib. cf. [Projets partagés en externe](project_sharing.md).
 
 Au-delà de ces informations, cette page propose également des actions activées en fonction du rôle de l'utilisateur courant par rapport au projet :
-* un bouton d'édition des caractéristiques du projet en haut à droite (pour les administrateurs du projet) ;
+
+Pour les contributeurs du projet et niveau supérieur :
+* un bouton de création d'un nouveau signalement en face de chaque type de signalements ;
+
+Pour les administrateurs de projet :
+* un bouton d'édition des caractéristiques du projet en haut à droite ;
 * un bouton d'abonnement aux évènement du projet en haut à droite (pour les utilisateurs connectés ayant accès au projet) - cf. [Abonnements](subscription.md);
-* des boutons de création d'un nouveau type de signalements, (pour les administrateurs du projet) :
+* des boutons de création d'un nouveau type de signalements :
   * un bouton pour dupliquer un type de signalement existant, situé en face de chaque type déjà créé ;
   * un bouton pour créer un nouveau type de signalement manuellement depuis un formulaire de création, sous la liste des types existants ;
   * un bouton pour créer un nouveau type de signalement depuis un fichier GeoJSON téléchargé, sous la liste des types existants ;
-* un bouton de création d'un nouveau signalement en face de chaque type de signalements (pour les contributeurs du projet et niveau supérieur);
-* un bouton de modification de la symbologie, en face de chaque type de signalements ponctuels (pour les administrateurs du projet).
+* un bouton de modification de la symbologie, en face de chaque type de signalements ponctuels (pour les administrateurs du projet)- cf. [Editer la symbologie d'un type de signalement](symbology.md) ;
+* un bouton permettant de supprimer le type de signalement ;
+* un bouton permettant de modifier le type de signalement. Lorsque le type de signalement contient au moins un signalement, cette fonction n'est plus accessible. En effet, modifier la structure du type est impossible sans modifier la structure des signalement déjà présents.
+
 
 ### Formulaire de création / édition d'un type de signalements
 
@@ -167,22 +182,22 @@ La page de description d'un type de signalements (accessible via la page d'accue
   * Son titre,
   * Son type de géométrie,
   * Les champs personnalisés du type de signalement.
-* Les derniers signalements créés pour ce type. Un clic sur un signalement renvoie vers la  page de consultation du signalement associé.
+* Les derniers signalements créés pour ce type. Un clic sur un signalement renvoie vers la page de consultation du signalement associé.
 
 Au-delà de ces informations, cette page propose également des actions spécifiques :
 * Voir tous les signalements : renvoie vers la page de consultation _"Liste & Carte"_ des signalements du projet ;
 * Ajouter un signalement : création d'un signalement de ce type. Cette fonction n'est proposée que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
-* Import de signalement via un GeoSJON: création de signalements par l'import d'un fichier GeoJSON conforme au modèle de données spécifique du type de signalements. Cette fonction n'est active que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
+* Import de signalement via un GeoSJON ou un CSV : création de signalements par l'import d'un fichier GeoJSON ou CSV conforme au modèle de données spécifique du type de signalements. Cette fonction n'est active que pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
 * Import de signalement via IDGO : création de signalements par l'import de données issues d'une plateforme IDGO. Cette fonction n'est active que si une plateforme IDGO à été connectée à GéoContrib et uniquement pour les contributeurs et les utilisateurs avec un niveau d'autorisation supérieur ;
 * Export des signalements : enregistrement des signalements du type de signalements courant sous la forme d'un fichier GeoJSON. Seuls les signalements que l'utilisateur courant a le droit de consulter sont exportés.
 
-Cf. [Imports et exports de signalements](import_export.md).
+ Cf. [Imports et exports de signalements](import_export.md).
 
 ### Page de consultation des signalements 'Liste & Carte'
 
 La page de consultation des signalements d'un projet propose 2 vues (par l'intermédiaire des pictogrammes en haut de la page) :
 * **une vue cartographique** :
-  * présentation de l'ensemble des signalement visibles de l'utilisateur (dépend de ses autorisations par rapport au projet).
+  * présentation de l'ensemble des signalements visibles de l'utilisateur (dépend de ses autorisations par rapport au projet).
   * possibilité de zoomer et de se déplacer dans la carte,
   * consultation des caractéristiques principales d'un signalement dans une petite infobulle à l'aide d'un simple clic,
   * dans cette info-bulle, le clic sur le titre renvoie vers la fiche détaillée du signalement,
@@ -200,24 +215,25 @@ Chacune d'entre elles propose un bloc _"Filtres"_ permettant à l'utilisateur de
 * filtre sur le statut des signalements ;
 * filtre textuel recherchant la chaîne de caractères saisie par l'utilisateur dans le titre des signalements.
 
+Il est désormais possible de parcourir les signalements de la liste obtenue en filtrant et triant la table de la vue liste. - Cf. [Parcourir une liste de signalements](browse_through_list_of_features.md)
+
 ### Formulaire de création / édition d'un signalement
 
-Les utilisateurs contributeurs ou de niveau supérieur peuvent ajouter des signalements depuis la page d'accueil, la page d'un type de signalements ou la page d'un signalement à l'aide du pictogramme _"+"_ .
+Les contributeurs ou de niveau supérieur peuvent ajouter des signalements depuis la page d'accueil, la page d'un type de signalements ou la page d'un signalement à l'aide du pictogramme _"+"_ .
 
-Le formulaire d'édition permet à l'utilisateur de saisir un nom, un statut, une description ainsi que de renseigner l'ensemble des informations relatives aux champs personnalisés définis pour ce type de signalement.
+Le formulaire d'édition permet à l'utilisateur de saisir un nom, un statut, une description ainsi que de renseigner l'ensemble des informations relatives aux champs personnalisés définis pour ce type de signalement. - Cf. [Edition d'un signalement et mode édition rapide](feature_editing.md)
 
-Pour tous les types de signalements, une interface cartographique permet de numériser le signalement. L'utilisateur bénéficie d'une fonction de recherche (cf.[Géocodage](geocoder.md)) et a la possibilité de jouer sur l'affichage des fonds de carte (cf. [Fonds cartographiques](basemaps.md)) configurés par l'administrateur du projet (ordre des couches, opacités, etc).
+Pour tous les types de signalements, une interface cartographique permet de localiser le signalement. L'utilisateur bénéficie d'une fonction de recherche par adresse (cf.[Géocodage](geocoder.md)) et a la possibilité de jouer sur l'affichage des fonds de carte (cf. [Fonds cartographiques](basemaps.md)) configurés par l'administrateur du projet (ordre des couches, opacités, etc).
 
-Pour les signalements de type ponctuels, l'utilisateur peut également :
+Pour localiser un signalements de type ponctuel, l'utilisateur peut également :
 * utiliser sa géolocalisation (en autorisant le navigateur à utiliser la localisation) et en cliquant sur le bouton _"Positionner le signalement à partir de votre géolocalisation"_ ;
-* utiliser une photographie contenant des informations de localisation (tags EXIF associés à une photographie prise avec un appareil équipé d'un GPS) en cliquant sur le bouton _"Importer une image géoréférencée"_ .
+* utiliser une photographie contenant des informations de localisation (tags EXIF associés à une photographie prise avec un appareil équipé d'un GPS) en cliquant sur le bouton _"Importer une image géoréférencée"_ . L'image sera automatiquement ajoutée en pièce jointe.
 
 ### Page de consultation d'un signalement
 
 La page de consultation d'un signalement présente les informations suivantes :
 * L'ensemble des attributs du signalement ;
 * Le statut de publication du signalement (cf. [Statuts des signalements](status.md) pour des informations détaillées sur les différents statuts) ;
-* Les dates d'archivage et de suppression automatiques (si de tels délais ont été configurés au niveau du projet) ;
 * la localisation sur une carte ;
 * Les liaisons avec d'autres signalements (cf. [Liaisons entre signalements](featurelink.md) pour des informations détaillées sur ces liaisons) ;
 * Les pièces jointes du signalement ;
@@ -228,11 +244,11 @@ Cette page propose également des actions activées en fonction des autorisation
 * Supprimer le signalement via un pictogramme en haut à droite de la page (uniquement pour son auteur, les administrateurs de projet ou super utilisateurs) ;
 * Ajouter un commentaire (uniquement pour les contributeurs et utilisateurs de niveau supérieur).
 
+
 ### Page d'administration des fonds cartographiques
 
 La page d'administration des fonds cartographiques est un formulaire permettant aux administrateurs du projet de :
 * Déclarer l'ensemble des couches de données qui seront utilisées dans les différentes interfaces cartographiques du projet. Ces couches servent uniquement de fonds de carte afin d'aider à la localisation des signalements créés dans l'application.
-* Ces couches peuvent être de deux types : WMS ou TMS ;
 * Elles peuvent être réordonnées à l'aide du champ `Position` ;
 * Si aucune couche n'est configurée, une couche configurée par défaut au niveau de l'application est alors affichée dans les interfaces cartographiques.
 

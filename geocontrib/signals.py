@@ -290,9 +290,21 @@ def notify_or_stack_events(sender, instance, created, **kwargs):
     if created and instance.project_slug and settings.DEFAULT_SENDING_FREQUENCY != 'never':
         # On empile les evenements pour notifier les abonnés, en fonction de la fréquence d'envoi
         StackedEvent = apps.get_model(app_label='geocontrib', model_name="StackedEvent")
-        stack, _ = StackedEvent.objects.get_or_create(
-            sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending',
-            project_slug=instance.project_slug)
+        try:
+            stack, _ = StackedEvent.objects.get_or_create(
+                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending',
+                project_slug=instance.project_slug)
+        except Exception as e:
+            logger.exception(e)
+            logger.warning("Several StackedEvent exists with sending_frequency='%s',"
+                           " state='pending', project_slug='%s', remove one",
+                           settings.DEFAULT_SENDING_FREQUENCY,
+                           instance.project_slug)
+            stack = StackedEvent.objects.filter(
+                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY,
+                state='pending',
+                project_slug=instance.project_slug).first()
+
         stack.events.add(instance)
         stack.save()
 

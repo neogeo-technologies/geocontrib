@@ -32,6 +32,23 @@
         }
     },
     {
+        "model": "geocontrib.featuretype",
+        "pk": 3,
+        "fields": {
+            "title": "type multilinestring",
+            "title_optional": false,
+            "slug": "3-type-multilinestring",
+            "geom_type": "multilinestring",
+            "color": "#ff0000",
+            "colors_style": {
+                "colors": {},
+                "custom_field_name": ""
+            },
+            "project": 1,
+            "opacity": 0.5
+        }
+    },
+    {
         "model": "geocontrib.user",
         "pk": 1,
         "fields": {
