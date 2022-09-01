@@ -34,7 +34,7 @@ from api.serializers import FeatureTypeListSerializer
 from api.serializers import FeatureEventSerializer
 from api.serializers import PreRecordedValuesSerializer
 from api.utils.paginations import CustomPagination
-from api.db_layer_utils import get_values_pre_enregistrés
+from api.db_layer_utils import get_pre_recorded_values
 from geocontrib.models import Event
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
@@ -503,7 +503,7 @@ class PreRecordedValuesView(
         name = self.kwargs.get('name', None)
         pattern = self.request.query_params.get('pattern', None)
         if (name and pattern):
-            data = get_values_pre_enregistrés(name, pattern)
+            data = get_pre_recorded_values(name, pattern)
             for da in data:
                 response.append(da['values'])
             status = 200
