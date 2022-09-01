@@ -26,12 +26,13 @@ from geocontrib.forms import FeatureSelectFieldAdminForm
 from geocontrib.forms import AddPosgresViewAdminForm
 from geocontrib.models import Attachment
 from geocontrib.models import Authorization
-from geocontrib.models import Feature
-from geocontrib.models import FeatureType
-from geocontrib.models import FeatureLink
-from geocontrib.models import CustomField
 from geocontrib.models import Comment
+from geocontrib.models import CustomField
+from geocontrib.models import Feature
+from geocontrib.models import FeatureLink
+from geocontrib.models import FeatureType
 from geocontrib.models import ImportTask
+from geocontrib.models import PreRecordedValues
 from geocontrib.tasks import task_geojson_processing
 
 
@@ -437,3 +438,4 @@ admin.site.register(FeatureLink, FeatureLinkAdmin)
 admin.site.register(ImportTask, ImportTaskAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
 admin.site.register(Comment, CommentAdmin)
+admin.site.register(PreRecordedValues)

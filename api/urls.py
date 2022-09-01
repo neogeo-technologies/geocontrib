@@ -12,12 +12,13 @@ from api.views.feature import FeatureSearch
 from api.views.feature import FeatureTypeView
 from api.views.feature import FeatureView
 from api.views.feature import FeatureMVTView
-from api.views.feature import ProjectFeature
-from api.views.feature import ProjectFeaturePaginated
-from api.views.feature import ProjectFeatureBbox
-from api.views.feature import ProjectFeatureTypes
 from api.views.feature import GetExternalGeojsonView
 from api.views.feature import GetIdgoCatalogView
+from api.views.feature import PreRecordedValuesView
+from api.views.feature import ProjectFeature
+from api.views.feature import ProjectFeatureBbox
+from api.views.feature import ProjectFeaturePaginated
+from api.views.feature import ProjectFeatureTypes
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
 from api.views.login import LogoutView
@@ -147,6 +148,10 @@ urlpatterns = [
     path(
         'proxy/',
         GetFeatureInfo.as_view(), name='proxy'),
+
+    path(
+        'list-values/<str:name>/',
+        PreRecordedValuesView.as_view(), name='list-values'),
 ]
 
 

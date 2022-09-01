@@ -1,7 +1,3 @@
-from .user import User
-from .user import UserLevelPermission
-from .user import Authorization
-from .project import Project
 from .annotation import AnnotationAbstract
 from .annotation import Attachment
 from .annotation import Comment
@@ -15,25 +11,31 @@ from .feature import Feature
 from .feature import FeatureLink
 from .feature import FeatureType
 from .feature import CustomField
+from .feature import PreRecordedValues
+from .project import Project
 from .task import ImportTask
+from .user import User
+from .user import UserLevelPermission
+from .user import Authorization
 
 __all__ = [
-    'User',
-    'UserLevelPermission',
-    'Authorization',
-    'Project',
     'AnnotationAbstract',
     'Attachment',
-    'Comment',
-    'Event',
-    'Subscription',
-    'StackedEvent',
+    'Authorization',
     'BaseMap',
     'ContextLayer',
-    'Layer',
+    'Comment',
+    'CustomField',
+    'Event',
     'Feature',
     'FeatureLink',
     'FeatureType',
-    'CustomField',
     'ImportTask',
+    'Layer',
+    'PreRecordedValues',
+    'Project',
+    'Subscription',
+    'StackedEvent',
+    'User',
+    'UserLevelPermission',
 ]

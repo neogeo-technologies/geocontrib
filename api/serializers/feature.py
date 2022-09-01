@@ -15,6 +15,7 @@ from geocontrib.models import CustomField
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
 from geocontrib.models import FeatureType
+from geocontrib.models import PreRecordedValues
 from geocontrib.models import Project
 
 # from deepdiff import DeepDiff
@@ -598,3 +599,13 @@ class FeatureDetailedAuthenticatedSerializer(FeatureDetailedSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.is_authenticated = True
+
+
+class PreRecordedValuesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PreRecordedValues
+        fields = (
+            'name',
+            'values',
+        )

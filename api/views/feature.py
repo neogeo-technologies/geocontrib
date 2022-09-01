@@ -10,6 +10,7 @@ from django.contrib.gis.geos import Polygon
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.db.models import Extent
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework import mixins
@@ -19,6 +20,7 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_mvt.views import BaseMVTView
+from rest_framework.views import APIView
 
 from api import logger
 from api.serializers.feature import FeatureDetailedAuthenticatedSerializer
@@ -30,11 +32,14 @@ from api.serializers import FeatureListSerializer
 from api.serializers import FeatureSearchSerializer
 from api.serializers import FeatureTypeListSerializer
 from api.serializers import FeatureEventSerializer
+from api.serializers import PreRecordedValuesSerializer
 from api.utils.paginations import CustomPagination
+from api.db_layer_utils import get_pre_recorded_values
 from geocontrib.models import Event
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
 from geocontrib.models import FeatureType
+from geocontrib.models import PreRecordedValues
 from geocontrib.models import Project
 
 
@@ -482,3 +487,28 @@ class GetExternalGeojsonView(views.APIView):
         except Exception as e:
             logger.exception("Les données sont inaccessibles %s", e)
             return Response(data="Les données sont inaccessibles", status=404)
+
+
+class PreRecordedValuesView(
+        APIView
+        ):
+    queryset = PreRecordedValues.objects.all()
+
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+
+    def get(self, request, name):
+        response=[]
+        name = self.kwargs.get('name', None)
+        pattern = self.request.query_params.get('pattern', None)
+        if (name and pattern):
+            data = get_pre_recorded_values(name, pattern)
+            for da in data:
+                response.append(da['values'])
+            status = 200
+        else:
+            response = "Must provide parameter name or pattern."
+            status = 400
+
+        return JsonResponse(response, safe=False, status=status)

@@ -11,6 +11,7 @@ from .feature import FeatureSearchSerializer
 from .feature import FeatureTypeColoredSerializer
 from .feature import FeatureTypeListSerializer
 from .feature import FeatureTypeSerializer
+from .feature import PreRecordedValuesSerializer
 from .flat_pages import FlatPagesSerializer
 from .misc import FeatureAttachmentSerializer
 from .misc import CommentSerializer
@@ -26,31 +27,30 @@ from .user import UserLevelsPermissionSerializer
 
 
 __all__ = [
-    'ContextLayerSerializer',
     'BaseMapSerializer',
-    'LayerSerializer',
+    'ContextLayerSerializer',
+    'CommentSerializer',
+    'CommentDetailedSerializer',
     'CustomFieldSerializer',
+    'EventSerializer',
+    'LayerSerializer',
+    'FeatureAttachmentSerializer',
+    'FeatureCSVSerializer',
+    'FeatureDetailedSerializer',
+    'FeatureEventSerializer',
+    'FeatureGeoJSONSerializer',
+    'FeatureLinkSerializer',
+    'FeatureListSerializer',
+    'FeatureSearchSerializer',
     'FeatureTypeSerializer',
     'FeatureTypeListSerializer',
     'FeatureTypeColoredSerializer',
-    'FeatureGeoJSONSerializer',
-    'FeatureCSVSerializer',
-    'FeatureSearchSerializer',
-    'FeatureDetailedSerializer',
-    'FeatureLinkSerializer',
-    'FeatureListSerializer',
-    'FeatureGeoJSONSerializer',
-    'FeatureSearchSerializer',
-    'FeatureAttachmentSerializer',
+    'FlatPagesSerializer',
     'ImportTaskSerializer',
-    'UserSerializer',
-    'UserLevelsPermissionSerializer',
-    'CommentSerializer',
-    'CommentDetailedSerializer',
-    'EventSerializer',
-    'FeatureEventSerializer',
-    'StackedEventSerializer',
+    'PreRecordedValuesSerializer',
     'ProjectSerializer',
     'ProjectDetailedSerializer',
-    'FlatPagesSerializer',
+    'StackedEventSerializer',
+    'UserSerializer',
+    'UserLevelsPermissionSerializer',
 ]
