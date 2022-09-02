@@ -6,7 +6,26 @@ from conftest import verify_or_create_json
 
 
 @pytest.mark.django_db
-def test_feature_list(api_client):
+def test_list_prerecorded_values_list(api_client):
+    prv_url = reverse('api:list-values')
+    result = api_client.get(prv_url)
+    assert result.status_code == 200
+
+    verify_or_create_json("api/tests/data/test_pre_recorded_values_list_empty.json",
+                          result.json(),
+                         )
+
+    call_command("loaddata", "api/tests/data/test_pre_recorded_values.json", verbosity=0)
+
+    result = api_client.get(prv_url)
+    assert result.status_code == 200
+
+    verify_or_create_json("api/tests/data/test_pre_recorded_values_list_1_element.json",
+                          result.json(),
+                         )
+
+@pytest.mark.django_db
+def test_get_prerecorded_values_list(api_client):
     call_command("loaddata", "api/tests/data/test_pre_recorded_values.json", verbosity=0)
     prv_url = reverse('api:list-values', args=["Toulouse Metropole"])
     # Ensure no parameters Fails
