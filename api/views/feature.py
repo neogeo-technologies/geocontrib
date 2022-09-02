@@ -498,7 +498,6 @@ class PreRecordedValuesView(APIView):
 
     def get(self, request, name=None):
         response=[]
-        #name = self.kwargs.get('name', None)
         if name:
             pattern = self.request.query_params.get('pattern', None)
             if (name and pattern):
