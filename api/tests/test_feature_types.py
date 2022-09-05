@@ -49,6 +49,7 @@ def test_feature_types_list(api_client):
             "label": "villes",
             "name": "Villes",
             "position": 3,
+            "options": ["liste de villes"],
             'is_mandatory': True,
         },
     ]

@@ -29,7 +29,9 @@
       "is_mandatory": true,
       "label": "villes",
       "name": "Villes",
-      "options": null,
+      "options": [
+        "liste de villes"
+      ],
       "position": 3
     }
   ],
