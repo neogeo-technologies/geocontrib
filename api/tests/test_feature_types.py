@@ -41,9 +41,16 @@ def test_feature_types_list(api_client):
                 "13",
                 "123"
             ],
-            "position": 0,
+            "position": 1,
             "is_mandatory": False
-        }
+        },
+        {
+            "field_type": "pre_recorded_list",
+            "label": "villes",
+            "name": "Villes",
+            "position": 3,
+            'is_mandatory': True,
+        },
     ]
 
     data = {

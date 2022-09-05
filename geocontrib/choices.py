@@ -12,7 +12,7 @@ TYPE_CHOICES = (
     ("char", "Chaîne de caractères"),
     ("date", "Date"),
     ("list", "Liste de valeurs"),
-    ("list_pre_enr", "Liste de valeurs pré-enregistrées"),
+    ("pre_recorded_list", "Liste de valeurs pré-enregistrées"),
     ("integer", "Nombre entier"),
     ("decimal", "Nombre décimal"),
     ("text", "Texte multiligne"),

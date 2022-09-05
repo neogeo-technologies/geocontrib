@@ -1,36 +1,44 @@
 {
-  "title": "New feature type",
-  "title_optional": false,
-  "slug": "4-new-feature-type",
-  "geom_type": "point",
   "color": "#000000",
-  "icon": null,
   "colors_style": null,
-  "project": "1-aze",
   "customfield_set": [
-      {
-        "field_type": "list",
-        "label": "SA",
-        "name": "ZA",
-        "options": [
-            "12",
-            "125"
-        ],
-        "position": 0,
-        "is_mandatory": true
-      },
-      {
-        "field_type": "list",
-        "label": "SA1",
-        "name": "ZA2",
-        "options": [
-            "13",
-            "123"
-        ],
-        "position": 0,
-        "is_mandatory": false
-      }
-    ],
+    {
+      "field_type": "list",
+      "is_mandatory": true,
+      "label": "SA",
+      "name": "ZA",
+      "options": [
+        "12",
+        "125"
+      ],
+      "position": 0
+    },
+    {
+      "field_type": "list",
+      "is_mandatory": false,
+      "label": "SA1",
+      "name": "ZA2",
+      "options": [
+        "13",
+        "123"
+      ],
+      "position": 1
+    },
+    {
+      "field_type": "pre_recorded_list",
+      "is_mandatory": true,
+      "label": "villes",
+      "name": "Villes",
+      "options": null,
+      "position": 3
+    }
+  ],
+  "geom_type": "point",
+  "icon": null,
   "is_editable": true,
-  "opacity": "0.5"
+  "opacity": "0.5",
+  "project": "1-aze",
+  "slug": "4-new-feature-type",
+  "title": "New feature type",
+  "title_optional": false
 }
