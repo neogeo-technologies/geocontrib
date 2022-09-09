@@ -53,12 +53,19 @@ Create Project with Random Projectname - TESTS 10, 17
     # Le test ci-dessus ne permet pas de vérifier que le projet a été créé, car la page de création contient le nom du projet,
     # si la validation du formulaire plante, le test reste en suspend et ne déclenche pas d'erreur, il faudrait vérifier qu'il n'y a pas de message d'erreur peut-être
 
+
 Edit Project with Random Projectname - TESTS 74, ...
     # Start from main page
     Find Project
     Go To Project Page
-    # Test 74 | enter modify mode
-    Geocontrib Edit Project                 ${RANDOMPROJECTNAME}        ${PROJECTEDITION}
+    # enter modify mode
+    Click Element                            id:edit-project
+    Geocontrib Edit Project Title           ${RANDOMPROJECTNAME}       ${PROJECTEDITION}
+    Geocontrib Edit Project Description     ${PROJECTEDITION}
+    Geocontrib Edit Project Visibilities
+    Geocontrib Edit Project Options
+    # submit the form
+    Click Button                            id:send-project
     Page Should Contain                     ${PROJECTEDITION}
     # Vérifier que le projet est modéré (à améliorer)
     Page Should Contain                     Non
@@ -66,6 +73,26 @@ Edit Project with Random Projectname - TESTS 74, ...
     Page Should Contain                     Utilisateur connecté
     # Vérifier que le signalement a une description (à améliorer: ajouter une variable spécifique à la description)
     Page Should Contain                     ${PROJECTEDITION}
+
+
+Edit Project with Markdown Description
+    # Start from main page
+    Find Project
+    Go To Project Page
+    # enter modify mode
+    Click Element                            id:edit-project
+    Geocontrib Edit Project Description     ${MARKDOWNDESCRIPTION}
+    # check that markdown description preview render the titles h1 & h2 on project edit page
+    Page Should Contain Element             css:#preview>h1
+    Page Should Contain Element             css:#preview>h2
+    # submit the form
+    Click Button                            id:send-project
+    # check that markdown description preview render the titles h1 & h2 on project details page
+    Wait Until Page Does Not Contain        Projet en cours de chargement ...
+    Page Should Contain Element             css:#preview>h1
+    Page Should Contain Element             css:#preview>h2
+    # todo: check other pages where a preview is displayed
+
 
 Create Feature Type with Random Featuretypename - TEST 97
     # Start from main page

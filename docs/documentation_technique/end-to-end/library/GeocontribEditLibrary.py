@@ -15,20 +15,23 @@
 
 from utils import get_driver
 
-
-def geocontrib_edit_project(project_name, project_edition):
+def geocontrib_edit_project_title(project_name, project_edition):
     driver = get_driver()
-    driver.find_element_by_class_name("button-hover-orange").click()
     # modify title
     title_input_elt = driver.find_element_by_id("title")
     title_input_elt.click()
     title_input_elt.clear()
     title_input_elt.send_keys("{}{}".format(project_name, project_edition))
 
+def geocontrib_edit_project_description(project_edition):
+    driver = get_driver()
     # modify description
     driver.find_element_by_name("description").click()
     driver.find_element_by_name("description").clear()
     driver.find_element_by_name("description").send_keys(project_edition)
+
+def geocontrib_edit_project_visibilities():
+    driver = get_driver()
 
     # click on dropdown "Visibilité des signalements publiés" to open it
     driver.find_element_by_xpath(
@@ -48,6 +51,8 @@ def geocontrib_edit_project(project_name, project_edition):
         "//form[@id='form-project-edit']/div[5]/div[2]/div/div[2]/div[2]"
     ).click()
 
+def geocontrib_edit_project_options():
+    driver = get_driver()
     # toggle moderation
     driver.find_element_by_css_selector("label[for=moderation]").click()
     # toggle is_project_type
@@ -56,10 +61,6 @@ def geocontrib_edit_project(project_name, project_edition):
     driver.find_element_by_css_selector("label[for=generate_share_link]").click()
     # toggle fast_edition
     driver.find_element_by_css_selector("label[for=fast_edition_mode]").click()
-
-    # submit the form
-    driver.find_element_by_id("send-project").click()
-
 
 def geocontrib_edit_featuretype(featuretypename, added_text):
     driver = get_driver()
