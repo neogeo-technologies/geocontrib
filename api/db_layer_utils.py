@@ -20,11 +20,12 @@ def get_pre_recorded_values(name, pattern=''):
             )
     if pattern:
         sql+="""
-             WHERE values like '{pattern}%%'
+             WHERE lower(values) like lower('{pattern}%%')
         """.format(
             pattern=pattern)
 
     sql += " LIMIT 10;"
+
     return fetch_raw_data('default', sql)
 
 
