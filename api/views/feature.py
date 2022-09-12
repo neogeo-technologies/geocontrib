@@ -501,14 +501,16 @@ class PreRecordedValuesView(
     def get(self, request, name):
         response=[]
         name = self.kwargs.get('name', None)
-        pattern = self.request.query_params.get('pattern', None)
-        if (name and pattern):
-            data = get_values_pre_enregistrés(name, pattern)
-            for da in data:
-                response.append(da['values'])
-            status = 200
+        pattern = self.request.query_params.get('pattern', '')
+
+        if name:
+            values = get_values_pre_enregistrés(name, pattern)
         else:
-            response = "Must provide parameter name or pattern."
+            response = "Must provide parameter name."
             status = 400
 
+        for value in values or []:
+            response.append(value['values'])
+        response.sort()
+        status = 200
         return JsonResponse(response, safe=False, status=status)
