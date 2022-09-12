@@ -35,5 +35,6 @@ def get_variables():
                 "SYMBOPTIONOPACITYLIST":    ["0.15", "0.69"],
                 "FASTFEATURENAME":          "FastFeature",
                 "FASTFEATUREDESCRIPTION":   "FastDescription",
+                "MULTIGEOMFILENAME":        "multipoint",
                 }
     return variables

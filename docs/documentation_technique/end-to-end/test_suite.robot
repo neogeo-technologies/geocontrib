@@ -277,6 +277,30 @@ Fast Edit Feature
     Textfield Value Should Be               css:#${SYMBONAMECHAR} input     ${SYMBONAMECHAR}
     Checkbox Should Be Selected             css:#${SYMBONAMEBOOL} input
 
+Import Multi Geometry Feature
+    # Start from main page
+    Find Project
+    Go To Project Page
+    # Upload JSON file with multigeomtry feature
+    Click Element                               css:.nouveau-type-signalement
+    Geocontrib Import Multi Geom File           ${MULTIGEOMFILENAME}
+    Click Button                                css:#button-import>button
+    Execute JavaScript                          document.getElementById('send-feature_type').scrollIntoView('alignToTop');
+    Click Button                                id:send-feature_type
+    # Check if feature type has been created
+    Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
+    Element Should Contain                      id:feature_type-list        ${MULTIGEOMFILENAME}
+    # Upload features from feature type page
+    Click Element                               css:#${MULTIGEOMFILENAME} a.feature-type-title
+    Click Element                               id:toggle-show-import
+    Geocontrib Import Multi Geom File           ${MULTIGEOMFILENAME}
+    Click Element                               id:start-import
+    # Wait the import to finish
+    Wait Until Page Contains Element            id:table-imports
+    Wait Until Page Does Not Contain Element    css:.orange.icon.sync
+    # Check if element has been imported successfully
+    Page Should Contain Element                 css:#table-imports .green.check.circle.outline.icon
+
 [Teardown]
     Find Project
     Go To Project Page
