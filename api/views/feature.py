@@ -489,16 +489,14 @@ class GetExternalGeojsonView(views.APIView):
             return Response(data="Les données sont inaccessibles", status=404)
 
 
-class PreRecordedValuesView(
-        APIView
-        ):
+class PreRecordedValuesView(APIView):
     queryset = PreRecordedValues.objects.all()
 
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
 
-    def get(self, request, name):
+    def get(self, request, name=None):
         response=[]
         name = self.kwargs.get('name', None)
         pattern = self.request.query_params.get('pattern', '')
