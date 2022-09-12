@@ -1,7 +1,7 @@
 from api.utils.db_utils import fetch_raw_data
 
 
-def get_pre_recorded_values(name, pattern):
+def get_pre_recorded_values(name, pattern=''):
     """
         Fonction recuperant les valeurs pré
         enregistrées.
@@ -14,12 +14,17 @@ def get_pre_recorded_values(name, pattern):
                     as values
                 FROM   geocontrib_prerecordedvalues
                 WHERE  name = '{name}'
-            )
-            SELECT values from NewScores where values like '{pattern}%%'
-            LIMIT 10;
+            ) SELECT values from NewScores
             """.format(
-              name=name,
-              pattern=pattern)
+                name=name,
+            )
+    if pattern:
+        sql+="""
+             WHERE values like '{pattern}%%'
+        """.format(
+            pattern=pattern)
+
+    sql += " LIMIT 10;"
     return fetch_raw_data('default', sql)
 
 
