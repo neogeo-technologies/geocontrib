@@ -1,7 +1,7 @@
 from api.utils.db_utils import fetch_raw_data
 
 
-def get_values_pre_enregistrés(name, pattern=''):
+def get_pre_recorded_values(name, pattern=''):
     """
         Fonction recuperant les valeurs pré
         enregistrées.
