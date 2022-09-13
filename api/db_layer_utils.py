@@ -24,7 +24,7 @@ def get_pre_recorded_values(name, pattern=''):
         """.format(
             pattern=pattern)
 
-    sql += " LIMIT 10;"
+    sql += "ORDER BY values LIMIT 10;"
 
     return fetch_raw_data('default', sql)
 
