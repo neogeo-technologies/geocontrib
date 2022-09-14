@@ -430,7 +430,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ('feature_type_slug', 'created_on', 'comment', 'project',)
     ordering = ('feature_type_slug', 'created_on', 'comment', 'project',)
 
-    
+
 admin.site.register(CustomField, CustomFieldAdmin)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(FeatureType, FeatureTypeAdmin)

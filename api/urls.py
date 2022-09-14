@@ -150,8 +150,11 @@ urlpatterns = [
         GetFeatureInfo.as_view(), name='proxy'),
 
     path(
-        'list-values/<str:name>/',
-        PreRecordedValuesView.as_view(), name='list-values'),
+        'prerecorded-list-values/',
+        PreRecordedValuesView.as_view(), name='prerecorded-list-values'),
+    path(
+        'prerecorded-list-values/<str:name>/',
+        PreRecordedValuesView.as_view(), name='prerecorded-list-values'),
 ]
 
 

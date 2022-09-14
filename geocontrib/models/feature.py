@@ -332,7 +332,7 @@ class PreRecordedValues(models.Model):
         verbose_name_plural = "Valeurs pré-enregistrées"
 
     def __str__(self):
-        return "{} - {}".format(self.name, self.values)
+        return self.name
 
     def clean(self):
         if type(self.values) == 'list' and \
