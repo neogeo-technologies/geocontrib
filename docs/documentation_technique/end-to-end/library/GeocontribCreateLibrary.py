@@ -15,6 +15,7 @@
 
 
 from utils import get_driver
+import sys, os
 
 
 def geocontrib_create_project(project_name):
@@ -48,7 +49,6 @@ def geocontrib_create_project(project_name):
         "//form[@id='form-project-edit']/div[5]/div[2]/div/div[2]/div"
     ).click()
 
-
     # toggle moderation
     driver.find_element_by_css_selector("label[for=moderation]").click()
     # toggle is_project_type
@@ -60,25 +60,6 @@ def geocontrib_create_project(project_name):
 
     # submit the form
     driver.find_element_by_id("send-project").click()
-
-#def add_custom_field(custom_field_name, custom_field_type, list_options):
-#    driver = get_driver()
-#    add_field_btn = driver.find_element_by_id("add-field")
-#    # scroll the page to reveal the button
-#    driver.execute_script("document.getElementById('add-field').scrollIntoView('alignToTop');")
-#    add_field_btn.click()
-#    # scroll the page to reveal the button after the new element was added to the page
-#    driver.execute_script("document.getElementById('send-feature_type').scrollIntoView('alignToTop');")
-#    # add the label & name
-#    driver.find_element_by_css_selector("#custom_form-1 #label").send_keys(custom_field_name)
-#    driver.find_element_by_css_selector("#custom_form-1 #name").send_keys(custom_field_name)
-#    # select the type
-#    driver.find_element_by_css_selector("#custom_form-1 #field_type > .dropdown").click()
-#    driver.find_element_by_css_selector("#custom_form-1 #field_type > .dropdown [id='" + custom_field_type + "']").click()
-#    # for a list add options list
-#    if list_options:
-#        driver.find_element_by_css_selector("#custom_form-0 #options").send_keys(list_options)
-
 
 def geocontrib_create_featuretype(feature_type_name, geometry_type):
     driver = get_driver()
@@ -96,11 +77,6 @@ def geocontrib_create_featuretype(feature_type_name, geometry_type):
 
 def geocontrib_add_custom_fields(list_name, char_name, bool_name, list_options):
     driver = get_driver()
-    # fill custom field with a list
-    #add_custom_field(list_name, "Liste de valeurs", list_options);
-    #add_custom_field(char_name, "Chaîne de caractères", list_options);
-    #add_custom_field(list_name, "Booléen", list_options);
-
     add_field_btn = driver.find_element_by_id("add-field")
     # add custom field for list
     add_field_btn.click()
@@ -109,7 +85,6 @@ def geocontrib_add_custom_fields(list_name, char_name, bool_name, list_options):
     driver.find_element_by_css_selector("#custom_form-0 #field_type > .dropdown").click()
     driver.find_element_by_css_selector("#custom_form-0 #field_type > .dropdown [id='Liste de valeurs']").click()
     driver.find_element_by_css_selector("#custom_form-0 #options").send_keys(",".join(list_options))
-
     ## add custom field for characters
     ### scroll the page to reveal the button
     driver.execute_script("document.getElementById('add-field').scrollIntoView('alignToTop');")
@@ -120,7 +95,6 @@ def geocontrib_add_custom_fields(list_name, char_name, bool_name, list_options):
     driver.find_element_by_css_selector("#custom_form-1 #name").send_keys(char_name)
     driver.find_element_by_css_selector("#custom_form-1 #field_type > .dropdown").click()
     driver.find_element_by_css_selector("#custom_form-1 #field_type > .dropdown [id='Chaîne de caractères']").click()
-
     ## add custom field with a boolean
     driver.execute_script("document.getElementById('add-field').scrollIntoView('alignToTop');")
     add_field_btn.click()
@@ -136,7 +110,6 @@ def geocontrib_add_custom_fields(list_name, char_name, bool_name, list_options):
 
 def geocontrib_create_feature(feature_name, feature_type_name, added_text):
     driver = get_driver()
-
     selector = "div[id='{}{}'] a[data-tooltip~=Ajouter]".format(feature_type_name, added_text)
     driver.find_element_by_css_selector(selector).click()
     # fill the name
@@ -149,3 +122,10 @@ def geocontrib_create_feature(feature_name, feature_type_name, added_text):
     description_input_elt.clear()
     description_input_elt.send_keys("Exemple de description")
 
+def geocontrib_import_multi_geom_file(multiGeomFileName):
+    driver = get_driver()
+    # get the absolute path from relative path name
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+    jsonFileAbsolutePath = os.path.join(os.path.sep, ROOT_DIR, "files/" + multiGeomFileName + ".json")
+    # Fill hidden file input with file location
+    driver.find_element_by_id("json_file").send_keys(jsonFileAbsolutePath);

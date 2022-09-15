@@ -22,6 +22,7 @@ def get_variables():
                 "RANDOMFEATURETYPENAME":    "TypeAuto", #"type - {}".format(datetime.datetime.now()),
                 "RANDOMFEATURENAME":        "SignalementAuto",#"signalement - {}".format(datetime.datetime.now()),
                 "PROJECTEDITION":           "-projet édité",
+                "MARKDOWNDESCRIPTION":      "# Description en h1\n## Description en h2",
                 "FEATURETYPEEDITION":       "-type édité",
                 "FEATUREEDITION":           "-signalement édité",
                 "SYMBOLCOLORCODE":          "#a24ae3",
@@ -34,5 +35,6 @@ def get_variables():
                 "SYMBOPTIONOPACITYLIST":    ["0.15", "0.69"],
                 "FASTFEATURENAME":          "FastFeature",
                 "FASTFEATUREDESCRIPTION":   "FastDescription",
+                "MULTIGEOMFILENAME":        "multipoint",
                 }
     return variables

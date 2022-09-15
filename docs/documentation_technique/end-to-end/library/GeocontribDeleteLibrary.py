@@ -23,7 +23,9 @@ def geocontrib_go_to_main_page(geocontrib_url):
 
 def geocontrib_search_project(project_name):
     # Click/focus on input field
-    get_driver().find_element_by_css_selector("div.title:nth-child(1)").click()
+    menuFilter = get_driver().find_element_by_css_selector(".ui.menu.filters")
+    if 'hidden' in menuFilter.get_attribute('class').split():
+        get_driver().find_element_by_id("filters").click()
     # Fill the input with project name and send return ('\n')
     get_driver().find_element_by_css_selector("#search-projects > input").send_keys(project_name + '\n')
 

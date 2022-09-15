@@ -31,6 +31,7 @@ ${SELSPEED}     0.1
 ...                 AND                     Set Selenium Speed              ${SELSPEED}
 
 Connect GeoContrib - TEST 7
+    Wait Until Page Does Not Contain        En cours de chargement ...
     Current Frame Should Contain            Se Connecter
     Geocontrib Connect Superuser            ${SUPERUSERNAME}                ${SUPERUSERPASSWORD}
     Page Should Contain                     ${SUPERUSERDISPLAYNAME}
@@ -53,12 +54,19 @@ Create Project with Random Projectname - TESTS 10, 17
     # Le test ci-dessus ne permet pas de vérifier que le projet a été créé, car la page de création contient le nom du projet,
     # si la validation du formulaire plante, le test reste en suspend et ne déclenche pas d'erreur, il faudrait vérifier qu'il n'y a pas de message d'erreur peut-être
 
+
 Edit Project with Random Projectname - TESTS 74, ...
     # Start from main page
     Find Project
     Go To Project Page
-    # Test 74 | enter modify mode
-    Geocontrib Edit Project                 ${RANDOMPROJECTNAME}        ${PROJECTEDITION}
+    # enter modify mode
+    Click Element                            id:edit-project
+    Geocontrib Edit Project Title           ${RANDOMPROJECTNAME}       ${PROJECTEDITION}
+    Geocontrib Edit Project Description     ${PROJECTEDITION}
+    Geocontrib Edit Project Visibilities
+    Geocontrib Edit Project Options
+    # submit the form
+    Click Button                            id:send-project
     Page Should Contain                     ${PROJECTEDITION}
     # Vérifier que le projet est modéré (à améliorer)
     Page Should Contain                     Non
@@ -67,12 +75,33 @@ Edit Project with Random Projectname - TESTS 74, ...
     # Vérifier que le signalement a une description (à améliorer: ajouter une variable spécifique à la description)
     Page Should Contain                     ${PROJECTEDITION}
 
+
+Edit Project with Markdown Description
+    # Start from main page
+    Find Project
+    Go To Project Page
+    # enter modify mode
+    Click Element                            id:edit-project
+    Geocontrib Edit Project Description     ${MARKDOWNDESCRIPTION}
+    # check that markdown description preview render the titles h1 & h2 on project edit page
+    Page Should Contain Element             css:#preview>h1
+    Page Should Contain Element             css:#preview>h2
+    # submit the form
+    Click Button                            id:send-project
+    # check that markdown description preview render the titles h1 & h2 on project details page
+    Wait Until Page Does Not Contain        Projet en cours de chargement ...
+    Page Should Contain Element             css:#preview>h1
+    Page Should Contain Element             css:#preview>h2
+    # todo: check other pages where a preview is displayed
+
+
 Create Feature Type with Random Featuretypename - TEST 97
     # Start from main page
     Find Project
     Go To Project Page
     Page Should Not Contain                 ${RANDOMFEATURETYPENAME}
     Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}        Point
+    Geocontrib Add Custom Fields            ${SYMBONAMELIST}    ${SYMBONAMECHAR}    ${SYMBONAMEBOOL}    ${SYMBOPTIONLIST}
     Click Button                            send-feature_type
     # attendre le changement de page
     Wait Until Location Does Not Contain    /type-signalement/ajouter
@@ -249,6 +278,75 @@ Fast Edit Feature
     Element Should Contain                  css:#${SYMBONAMELIST} .default.text > div     ${SYMBOPTIONLIST[0]}
     Textfield Value Should Be               css:#${SYMBONAMECHAR} input     ${SYMBONAMECHAR}
     Checkbox Should Be Selected             css:#${SYMBONAMEBOOL} input
+
+Import Multi Geometry Feature
+    # Start from main page
+    Find Project
+    Go To Project Page
+    # Upload JSON file with multigeomtry feature
+    Click Element                               css:.nouveau-type-signalement
+    Geocontrib Import Multi Geom File           ${MULTIGEOMFILENAME}
+    Click Button                                css:#button-import>button
+    Execute JavaScript                          document.getElementById('send-feature_type').scrollIntoView('alignToTop');
+    Click Button                                id:send-feature_type
+    # Check if feature type has been created
+    Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
+    Element Should Contain                      id:feature_type-list        ${MULTIGEOMFILENAME}
+    # Upload features from feature type page
+    Click Element                               css:#${MULTIGEOMFILENAME} a.feature-type-title
+    Click Element                               id:toggle-show-import
+    Geocontrib Import Multi Geom File           ${MULTIGEOMFILENAME}
+    Click Element                               id:start-import
+    # Wait the import to finish
+    Wait Until Page Contains Element            id:table-imports
+    Wait Until Page Does Not Contain Element    css:.orange.icon.sync
+    # Check if element has been imported successfully
+    Page Should Contain Element                 css:#table-imports .green.check.circle.outline.icon
+
+Multiple Feature Edition Of Attributes Within The Same Feature Type
+    # Start from main page
+    Find Project
+    Go To Project Page
+    Click Link                                  features-list
+    Click Link                                  show-list
+    # Select the multiple attributes edition mode
+    Click Element                               id:edit-attributes
+    # Check if selecting a feature disables checkbox of features from other types
+    Click Element                               css:#form-filters #type > .dropdown
+    Click Element                               id:${RANDOMFEATURETYPENAME}${FEATURETYPEEDITION}
+    Wait Until Page Does Not Contain            Récupération des signalements en cours...
+    # Select all features in this feature type
+    ${tableCheckboxes}      Get WebElements     css:#table-features > tbody > tr > td > .checkbox > input
+    FOR    ${featureCheckbox}    IN    @{tableCheckboxes}
+        Select Checkbox                         ${featureCheckbox}
+    END
+    # Check if other feature types checkboxes are disabled
+    # Close the feature type filter
+    Click Element                               css:#form-filters #type > .dropdown > .icon.clear
+    Click Element                               css:#form-filters #type > .dropdown
+    # Filter with another feature type
+    Click Element                               css:#form-filters #type > .dropdown
+    Click Element                               id:${MULTIGEOMFILENAME}
+    Wait Until Page Does Not Contain            Récupération des signalements en cours...
+    # Check the class is disabled
+    ${checkboxClass}        Get Element Attribute       css:#table-features > tbody > tr > td > .checkbox       class
+    Should Contain          ${checkboxClass}    disabled
+    # Edit one attribute of features
+    Click Element                               edit-button
+    Select Checkbox                             ${SYMBONAMEBOOL}
+    Click Button                                save-changes
+    # Go back to features list
+    Wait Until Page Does Not Contain            Récupération des signalements en cours...
+    Discard Info message
+    Click Link                                  show-list
+    # Check that changes had taken effect
+    # Filter edited feature type features
+    Click Element                               css:#form-filters #type > .dropdown
+    Click Element                               id:${RANDOMFEATURETYPENAME}${FEATURETYPEEDITION}
+    # Open first created feature
+    Click Link                                  ${RANDOMFEATURENAME}${FEATUREEDITION}
+    Wait Until Page Does Not Contain            Recherche du signalement
+    Checkbox Should Be Selected                 ${SYMBONAMEBOOL}
 
 [Teardown]
     Find Project
