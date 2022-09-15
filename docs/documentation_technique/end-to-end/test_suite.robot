@@ -337,6 +337,7 @@ Multiple Feature Edition Of Attributes Within The Same Feature Type
     Click Button                                save-changes
     # Go back to features list
     Wait Until Page Does Not Contain            Récupération des signalements en cours...
+    Discard Info message
     Click Link                                  show-list
     # Check that changes had taken effect
     # Filter edited feature type features
