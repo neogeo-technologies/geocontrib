@@ -5,7 +5,7 @@
 GéoContrib est une application web qui permet à ses utilisateurs de construire ou d'enrichir des bases de données géographiques de façon collaborative. Un système de commentaires permet aux communautés de contributeurs d'interagir sur la donnée et des modérateurs peuvent être choisis pour gérer les contributions.
 L'application est conçue pour être utilisée tant sur du matériel sédentaire que sur des terminaux mobiles via le navigateur de son appareil.
 
-Crée en 2019 par Neogeo Technologies sous l'impulsion de la région des Hauts des France, l'application GéoContrib se veut être un outil simple et accessible à tous, géomaticien ou non. 
+Créée en 2019 par Neogeo Technologies sous l'impulsion de la région des Hauts des France, l'application GéoContrib se veut être un outil simple et accessible à tous, géomaticien ou non. 
 
 Les usages de GéoContrib sont très multiples. En effet, l'application peut être utilisée à des fins de création d'une base de données collaborative sur un thème métier spécifique avec un aspect de localisation comme par exemple des relevés de qualité de l'air, de température, etc. ... Les commentaires peuvent aussi être utilisés pour récueillir des avis sur des projets d'aménagement. Enfin, un usage fréquent de GéoContrib est la qualification de bases de données telles que l'occupation du sol.
 
@@ -51,7 +51,7 @@ Un type de signalements correspond à une modélisation particulière (pour un c
 * **un nom**
 * **un type de géométrie** donné : point, ligne ou polygone
 * **des champs personnalisés** déclarés par le créateur du type de signalements (ces champs s'ajoutent aux champs
-obligatoires) que l'on retrouve pour tous les types de signalements, à savoir le titre, la description et le statut du signalement. Les champs personnalisés peuvent être de type : booléen, décimal, entier, chaîne de caractères, liste de valeurs, texte multiligne ou date.
+obligatoires) que l'on retrouve pour tous les types de signalements, à savoir le titre, la description et le statut du signalement. Les champs personnalisés peuvent être de type : booléen, décimal, entier, chaîne de caractères, liste de valeurs, liste de valeurs pré-enregistrées (Cf. [Liste de valeurs pré-enregistrées](list_of_saved_values.md)), texte multiligne ou date. L'administrateur a la possibilité de rendre obligatoire la saisie des champs personnalisés pour les contributeurs via une case à cocher.
 
 Lorsque le type de signalements est créé, il est possible de lui attribuer une symbologie colorée en cliquant sur l'icône en forme de pinceau sur l'accueil du projet. Ainsi, on peut attribuer une couleur à tous les signalements appartenant à un type ou faire varier la couleur des signalement d'un même type selon les valeurs d'un champ personnalisé de type liste de valeurs. Cf. [Symbologie](symbology.md)
 
@@ -215,19 +215,45 @@ Chacune d'entre elles propose un bloc _"Filtres"_ permettant à l'utilisateur de
 * filtre sur le statut des signalements ;
 * filtre textuel recherchant la chaîne de caractères saisie par l'utilisateur dans le titre des signalements.
 
+**Outils de gestion des signalements**
+
+* Ajout d'un signalement : Depuis cette page, le contributeur peut ajouter un signalement au projet en cliquant sur le bouton représentant un "+". Lui sera ensuite proposé le type de signalement auquel son signalement sera ajouté.
+ 
+A l'aide des cases à cocher permettant de sélectionner les signalements dans la vue liste, plusieurs modes sont disponibles pour effectuer des action sur plusieurs signalements en même temps.
+
+* Edition du statut en masse : l'utilisateur peut modifier le statut de plusieurs signalements. Pour cela, il choisit le mode de sélection "Edition de statut" au dessus du tableau et sélectionne les signalements souhaités. Ensuite, il clique sur le bouton représentant un crayon en haut à droite de la page et choisit le statut à appliquer aux signalements choisis.
+
+* Edition d'attributs en masse : l'utilisateur peut modifier les attributs de plusieurs signalements pouvu qu'ils soient du même type. Pour cela, il sélectionne le mode de sélection "Edition d'attribut" et choisit les signalement pour lesquels il souhaite changer les valeurs des attributs. Lorsqu'il a choisi un premier signalement, il ne pourra plus sélectionner de signalement d'un type différent de celui déjà sélectionné. Lorsque la sélection des signalements est faite, le contributeur doit cliquer sur le bouton représentant un crayon pour en modifier les attributs. Un formulaire sera ensuite affiché à l'utilisateur qui lui permettra de modifier les valeurs des champs personnalisés. A la validation du fomulaire, les valeurs des champs modifiés seront écrasées et remplacées.
+
+* Suppression de signalements en masse : l'utilisateur peut supprimer plusieurs signalements en même temps en choisissant le mode de sélection "Supression de signalement". Il peut alors sélectionner les signalements qu'il souhaite supprimer et cliquer sur le bouton représentant unee corbeille en haut à droite de l'écran. Une pop-up de validation s'affiche pour demander la confirmation de la supression.
+
+Pour ces trois derniers outils, la sélection est possible dans la mesure où le contributeur a le droit d'éditer le signalement). Si le signalement n'est pas sélectionnable, c'est que l'utilisateur n'a pas le droit de le modifier.
+
 Il est désormais possible de parcourir les signalements de la liste obtenue en filtrant et triant la table de la vue liste. - Cf. [Parcourir une liste de signalements](browse_through_list_of_features.md)
+
+
 
 ### Formulaire de création / édition d'un signalement
 
 Les contributeurs ou de niveau supérieur peuvent ajouter des signalements depuis la page d'accueil, la page d'un type de signalements ou la page d'un signalement à l'aide du pictogramme _"+"_ .
 
-Le formulaire d'édition permet à l'utilisateur de saisir un nom, un statut, une description ainsi que de renseigner l'ensemble des informations relatives aux champs personnalisés définis pour ce type de signalement. - Cf. [Edition d'un signalement et mode édition rapide](feature_editing.md)
+Le formulaire de création / édition permet à l'utilisateur de saisir un nom, un statut, une description ainsi que de renseigner l'ensemble des informations relatives aux champs personnalisés définis pour ce type de signalement. - Cf. [Edition d'un signalement et mode édition rapide](feature_editing.md)
 
 Pour tous les types de signalements, une interface cartographique permet de localiser le signalement. L'utilisateur bénéficie d'une fonction de recherche par adresse (cf.[Géocodage](geocoder.md)) et a la possibilité de jouer sur l'affichage des fonds de carte (cf. [Fonds cartographiques](basemaps.md)) configurés par l'administrateur du projet (ordre des couches, opacités, etc).
 
 Pour localiser un signalements de type ponctuel, l'utilisateur peut également :
 * utiliser sa géolocalisation (en autorisant le navigateur à utiliser la localisation) et en cliquant sur le bouton _"Positionner le signalement à partir de votre géolocalisation"_ ;
 * utiliser une photographie contenant des informations de localisation (tags EXIF associés à une photographie prise avec un appareil équipé d'un GPS) en cliquant sur le bouton _"Importer une image géoréférencée"_ . L'image sera automatiquement ajoutée en pièce jointe.
+
+Guide d'utilisation des outils de cartographie :
+
+* Pour créer une géométrie, il faut activer l'outil "Dessiner un polygone" (ou un point ou une ligne) qui est représenté par un bouton avec un polygone (ou un point ou une ligne) à droite de la carte. Lorsqu'il est actif, l'outil permet au contributeur de dessiner sa géométrie sur la carte. Dans le cas d'une ligne ou d'un polygone, l'utilisateur place les points qui constiueront les angles de sa géométrie puis, lorsqu'il a terminé de la dessiner, il peut double-cliquer sur le dernier point placé pour terminer son tracé.
+
+* Lorsqu'il a dessiné la géométrie, le bouton "Editer un polygone" (ou un point ou une ligne) apparaît à droite de la carte. Il s'agit d'un bouton représentant un crayon et une feuille. Ce bouton permet d'activer le mode d'édition de la géométrie. Lorsque ce mode est activé, le contributeur peut attrapper les points constituant le pourtour de la géométrie pour en modifier leur placement. 
+
+* Afin de supprimer la géométrie tracée, l'utilisateur peut activer le mode "Suppression du polygone (ou du point ou de la ligne) en cliquant sur le bouton à droite représentant une corbeille. Si ce mode est activé, l'utilisateur peut cliquer sur la géometrie et une pop-up lui demandera s'il souhaite effectivement supprimer la géométrie sélectionnée.
+
+* Depuis la version 4.0.0, il est possible d'accrocher une géométrie à une autre afin de respecter des règles de topolgie et être le plus précis possible dans son tracé. Pour activer le mode d'accrochage de la géométrie, l'utilisateur doit cliquer sur le bouron "Activer l'accrochage aux points" et sa souris sera automatiquement placé sur la géométrie la plus proche de son pointeur pour tracer une géométrie contigüe à une autre.
 
 ### Page de consultation d'un signalement
 

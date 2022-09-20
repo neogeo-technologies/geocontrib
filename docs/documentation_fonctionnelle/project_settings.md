@@ -5,7 +5,7 @@ Les super-utilisateurs et les gestionnaires métier peuvent accéder à l'outil 
 ## Paramètres de base
 
 * Titre : titre du projet tel qu'il apparaîtra aux utilisateurs.
-* Description : description permettant de détailler l'objectif, la thématique etc. du projet.
+* Description : description permettant de détailler l'objectif, la thématique etc. du projet. Depuis la version 4.0.0, l'administrateur du projet peut rédiger une description mise en forme en format Markdown afin d'y ajouter des liens cliquables et une mise en page spécifique.
 * Illustration du projet : l'administrateur peut choisir une image en cliquant sur "Sélectionner une image". Cette image apparaitra pour tous les utilisateurs.
 
 ## Visibilité

@@ -2,9 +2,16 @@
 
 GéoContrib permet de créer des signalements via un import de données depuis des sources extérieures mais aussi d'exporter des signalements vers un fichier.
 
+## Types de géométries acceptées
+
+L'import et l'export de géométries simple est possible dans GéoContrib (point, linestring, polygon). Lorsque des géométries simples ont été importées, elle peuvent être modifiées géométriquement et attributairement. 
+
+A partir de la version 4.0.0, l'import et l'export de géométries multiples est possible mais il n'est pas possible d'en modifier la géométrie. En effet, seuls les attributs peuvent être mis à jour. Il ne sera pas possible de 
+
 ## Création d'un type de signalement et import de données simultanés
 
 Les administrateurs de projets (et utilisateurs avec droits supérieurs) ont la possibilité de créer un type de signalement à partir de la structure de données existantes. Ainsi la structure est dupliquée sous la forme d'un type de signalements avec des champs personnalisés.
+
 
 ### Via un fichier GeoJSON
 
