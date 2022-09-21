@@ -300,9 +300,60 @@ def test_project_authorization(api_client):
     assert result.status_code == 404
 
     # anon put call fails
-    # TODO uncomment when #14023 is fixed
     api_client.logout()
     url = reverse('api:project-authorization', args=['1-aze'])
     result = api_client.put(url, data, format='json')
     assert result.status_code == 403
     assert result.json() == {'detail': "Informations d'authentification non fournies."}
+
+    # super user get call with data success
+    user = User.objects.create(username="SuperUser", password="password", is_superuser=True)
+    user.save() # create super user
+    api_client.force_authenticate(user=user) # login
+    result = api_client.put(url, data, format='json') # send request
+    assert result.status_code == 200
+    assert result.json() == [
+        {
+            "user":
+            {
+                "id":1,
+                "first_name":"",
+                "last_name":"",
+                "username":"admin"
+            },
+            "level":
+            {
+                "display":"Administrateur projet",
+                "codename":"admin"
+            }
+        }
+    ]
+    # gestionnaire metier ? or administrator get call with data success
+    #user = User.objects.create(username="GestionnaireMetier", password="password", is_administrator=True)
+    #user.save() # create super user
+    #api_client.force_authenticate(user=user) # login
+    #result = api_client.put(url, data, format='json') # send request
+    #assert result.status_code == 200
+    #assert result.json() == [
+    #    {
+    #        "user":
+    #        {
+    #            "id":1,
+    #            "first_name":"",
+    #            "last_name":"",
+    #            "username":"admin"
+    #        },
+    #        "level":
+    #        {
+    #            "display":"Administrateur projet",
+    #            "codename":"admin"
+    #        }
+    #    }
+    #]
+#
+    ## anon put call fails
+    #api_client.logout()
+    #url = reverse('api:project-authorization', args=['1-aze'])
+    #result = api_client.put(url, data, format='json')
+    #assert result.status_code == 403
+    #assert result.json() == {'detail': "Informations d'authentification non fournies."}

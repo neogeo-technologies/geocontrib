@@ -224,7 +224,6 @@ class ProjectAuthorizationView(generics.ListAPIView, generics.UpdateAPIView):
         ProjectPermission,
     ]
 
-
     def get_object(self, *args, **kwargs):
         instance = get_object_or_404(Project, slug=self.kwargs.get('project__slug'))
         return instance
