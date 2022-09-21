@@ -6,6 +6,7 @@ nav:
   - Utilisateurs:
     - documentation_fonctionnelle/users.md
   - Projets:
+    - documentation_fonctionnelle/project_settings.md
     - documentation_fonctionnelle/project_template.md
     - documentation_fonctionnelle/moderation.md
     - documentation_fonctionnelle/basemaps.md
@@ -15,12 +16,15 @@ nav:
     - documentation_fonctionnelle/custom_fields.md
     - documentation_fonctionnelle/symbology.md
     - documentation_fonctionnelle/import_export.md
+    - documentation_fonctionnelle/list_of_saved_values.md
   - Signalements:
     - documentation_fonctionnelle/status.md
+    - documentation_fonctionnelle/feature_editing.md
     - documentation_fonctionnelle/featurelink.md
   - Fonctionnalités:
     - documentation_fonctionnelle/offline_mode.md
     - documentation_fonctionnelle/external_access.md
+    - documentation_fonctionnelle/browse_through_list_of_features.md
     - documentation_fonctionnelle/flatpages.md
     - documentation_fonctionnelle/geocoder.md
     - documentation_fonctionnelle/geocontrib_IDGO.md
