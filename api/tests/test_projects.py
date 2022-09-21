@@ -301,8 +301,8 @@ def test_project_authorization(api_client):
 
     # anon put call fails
     # TODO uncomment when #14023 is fixed
-    #api_client.logout()
-    #url = reverse('api:project-authorization', args=['1-aze'])
-    #result = api_client.put(url, data, format='json')
-    #assert result.status_code == 403
-    #assert result.json() == {'error': 'permission denied'}
+    api_client.logout()
+    url = reverse('api:project-authorization', args=['1-aze'])
+    result = api_client.put(url, data, format='json')
+    assert result.status_code == 403
+    assert result.json() == {'detail': "Informations d'authentification non fournies."}

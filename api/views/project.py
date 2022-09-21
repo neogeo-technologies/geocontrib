@@ -18,7 +18,7 @@ from rest_framework import mixins
 from api.serializers import ProjectDetailedSerializer
 from api.serializers.project import ProjectCreationSerializer
 from api.serializers.project import ProjectAuthorizationSerializer
-from api.utils.permissions import ProjectThumbnailPermission
+from api.utils.permissions import ProjectPermission
 from api.utils.validators import validate_image_file
 from api.utils.filters import AuthorizationLevelCodenameFilter
 from api.utils.filters import ProjectsModerationFilter
@@ -185,7 +185,7 @@ class ProjectThumbnailView(APIView):
     ]
 
     permission_classes = [
-        ProjectThumbnailPermission,
+        ProjectPermission,
     ]
 
     def get(self, request, slug):
@@ -220,6 +220,11 @@ class ProjectAuthorizationView(generics.ListAPIView, generics.UpdateAPIView):
         AuthorizationLevelCodenameFilter,
     ]
 
+    permission_classes = [
+        ProjectPermission,
+    ]
+
+
     def get_object(self, *args, **kwargs):
         instance = get_object_or_404(Project, slug=self.kwargs.get('project__slug'))
         return instance
@@ -229,6 +234,8 @@ class ProjectAuthorizationView(generics.ListAPIView, generics.UpdateAPIView):
         return self.queryset.filter(project=instance)
 
     def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.check_object_permissions(self.request, instance)
         data = request.data
         serializer = ProjectAuthorizationSerializer(data=data, many=True)
         if serializer.is_valid():
