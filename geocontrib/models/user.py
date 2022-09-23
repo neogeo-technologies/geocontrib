@@ -135,7 +135,7 @@ class Authorization(models.Model):
             'is_project_administrator': False,
         }
 
-        if user.is_superuser:
+        if user.is_authenticated and (user.is_superuser or user.is_administrator):
             for k in user_perms.keys():
                 user_perms[k] = True
             return user_perms
