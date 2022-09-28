@@ -294,15 +294,165 @@ def test_project_authorization(api_client):
         }
     ]
 
-    # non existing project fails
+    # non existing project should fail
     url = reverse('api:project-authorization', args=['2-aze'])
     result = api_client.put(url, data, format='json')
     assert result.status_code == 404
 
-    # anon put call fails
-    # TODO uncomment when #14023 is fixed
-    #api_client.logout()
-    #url = reverse('api:project-authorization', args=['1-aze'])
-    #result = api_client.put(url, data, format='json')
-    #assert result.status_code == 403
-    #assert result.json() == {'error': 'permission denied'}
+    # anon put call should fail
+    api_client.logout()
+    url = reverse('api:project-authorization', args=['1-aze'])
+    result = api_client.put(url, data, format='json')
+    assert result.status_code == 403
+    assert result.json() == {'detail': "Informations d'authentification non fournies."}
+
+    # super user put call should return with data success
+    user = User.objects.create(username="SuperUser", password="password", is_superuser=True)
+    user.save() # create super user
+    api_client.force_authenticate(user=user) # login
+    result = api_client.put(url, data, format='json') # send request
+    assert result.status_code == 200
+    assert result.json() == [
+        {
+            "user":
+            {
+                "id":1,
+                "first_name":"",
+                "last_name":"",
+                "username":"admin"
+            },
+            "level":
+            {
+                "display":"Administrateur projet",
+                "codename":"admin"
+            }
+        }
+    ]
+    # gestionnaire metier (or django app administrator) put call should return with data success
+    user = User.objects.create(username="GestionnaireMetier", password="password", is_administrator=True)
+    user.save() # create super user
+    api_client.force_authenticate(user=user) # login
+    result = api_client.put(url, data, format='json') # send request
+    assert result.status_code == 200
+    assert result.json() == [
+        {
+            "user":
+            {
+                "id":1,
+                "first_name":"",
+                "last_name":"",
+                "username":"admin"
+            },
+            "level":
+            {
+                "display":"Administrateur projet",
+                "codename":"admin"
+            }
+        }
+    ]
+
+    # test with roles depending on project
+    # first create new users
+    user = User.objects.create(username="ProjectAdministrator", password="password")
+    user.save()
+    user = User.objects.create(username="Contributor", password="password")
+    user.save()
+    user = User.objects.create(username="Moderator", password="password")
+    user.save()
+    user = User.objects.create(username="SuperContributor", password="password")
+    user.save()
+
+    # then give them role by admin
+    user = User.objects.get(username="admin")
+    api_client.force_authenticate(user=user)
+
+    dataProjAdmin = [
+        {
+            'level': {
+                'codename': 'admin'
+            },
+            'user': {
+                'id': User.objects.get(username="ProjectAdministrator").id
+            }
+        }
+    ]
+    api_client.put(url, dataProjAdmin, format='json')
+
+    dataContrib = [
+        {
+            'level': {
+                'codename': 'contributor'
+            },
+            'user': {
+                'id': User.objects.get(username="Contributor").id
+            }
+        }
+    ]
+    api_client.put(url, dataContrib, format='json')
+
+    dataModerat = [
+        {
+            'level': {
+                'codename': 'moderator'
+            },
+            'user': {
+                'id': User.objects.get(username="Moderator").id
+            }
+        }
+    ]
+    api_client.put(url, dataModerat, format='json')
+
+    dataSuperContr = [
+        {
+            'level': {
+                'codename': 'super_contributor'
+            },
+            'user': {
+                'id': User.objects.get(username="SuperContributor").id
+            }
+        }
+    ]
+    api_client.put(url, dataSuperContr, format='json')
+
+    # Project administrator put call should return with data success
+    user = User.objects.get(username="ProjectAdministrator")
+    api_client.force_authenticate(user=user)
+    result = api_client.put(url, data, format='json') # send request
+    assert result.status_code == 200
+    assert result.json() == [
+        {
+            "user":
+            {
+                "id":1,
+                "first_name":"",
+                "last_name":"",
+                "username":"admin"
+            },
+            "level":
+            {
+                "display":"Administrateur projet",
+                "codename":"admin"
+            }
+        }
+    ]
+
+    # Contributor put call should fail
+    user = User.objects.get(username="Contributor")
+    api_client.force_authenticate(user=user)
+    result = api_client.put(url, data, format='json')
+    assert result.status_code == 403
+    assert result.json() == {'detail': "Vous n'avez pas la permission d'effectuer cette action."}
+
+    # Moderator put call should fail
+    user = User.objects.get(username="Moderator")
+    api_client.force_authenticate(user=user)
+    result = api_client.put(url, data, format='json')
+    assert result.status_code == 403
+    assert result.json() == {'detail': "Vous n'avez pas la permission d'effectuer cette action."}
+
+    # SuperContributor put call should fail
+    user = User.objects.get(username="SuperContributor")
+    api_client.force_authenticate(user=user)
+    result = api_client.put(url, data, format='json')
+    assert result.status_code == 403
+    assert result.json() == {'detail': "Vous n'avez pas la permission d'effectuer cette action."}
