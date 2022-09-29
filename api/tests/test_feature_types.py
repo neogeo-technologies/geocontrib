@@ -76,12 +76,47 @@ def test_feature_types_list(api_client):
     features_url = reverse('api:feature-types-detail', args=['4-new-feature-type'])
     result = api_client.put(features_url, data, format="json")
     assert result.status_code == 200
-    # TODO ne marche pas, PUT retourne le vielle objet, pas le nouveau... mais il est bien inscrit en base
+    # TODO REDMINE 14854 ne marche pas, PUT retourne le vielle objet, pas le nouveau... mais il est bien inscrit en base
     #verify_or_create_json("api/tests/data/test_features_types_edit.json", result.json())
 
-    features_url = reverse('api:feature-types-detail', args=['4-new-feature-type'])
     result = api_client.get(features_url)
     assert result.status_code == 200
     verify_or_create_json("api/tests/data/test_features_types_edit.json", result.json())
 
     # TODO ajouter test sur les customfields (ou les ajouter dans ces test
+
+
+    # S'assure qu'on peut remonter beaucoup d'options
+    for i in range(256):
+        base = "1234567890" + str(i)
+        customfield[0]['options'].append(base)
+
+    result = api_client.put(features_url, data, format="json")
+    assert result.status_code == 200
+    # TODO REDMINE 14854 ne marche pas, PUT retourne le vielle objet, pas le nouveau... mais il est bien inscrit en base
+    #verify_or_create_json("api/tests/data/test_features_types_edit.json", result.json())
+
+    result = api_client.get(features_url)
+    assert result.status_code == 200
+    verify_or_create_json("api/tests/data/test_features_types_edit_many_options.json", result.json())
+
+
+    # S'assure qu'une option est limité à 256 caractères
+    base = "1234567890" * 25
+    customfield[0]['options'] = [12, 125, base]
+
+    result = api_client.put(features_url, data, format="json")
+    assert result.status_code == 200
+    # TODO REDMINE 14854 ne marche pas, PUT retourne le vielle objet, pas le nouveau... mais il est bien inscrit en base
+    #verify_or_create_json("api/tests/data/test_features_types_edit.json", result.json())
+
+    result = api_client.get(features_url)
+    assert result.status_code == 200
+    verify_or_create_json("api/tests/data/test_features_types_edit_long_options.json", result.json())
+
+    # S'assure qu'une option est limité à 256 caractères (260 caractères => plante)
+    base = "1234567890" * 26
+    customfield[0]['options'].append(base)
+
+    result = api_client.put(features_url, data, format="json")
+    assert result.status_code == 400
