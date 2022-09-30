@@ -6,6 +6,7 @@ from rest_framework.test import APIClient
 
 import pytest
 
+
 @pytest.fixture(scope='session')
 def celery_config():
     return {
@@ -13,9 +14,11 @@ def celery_config():
         'result_backend': f'redis://{ settings.REDIS_HOST }'
     }
 
+
 @pytest.fixture
 def api_client():
     return APIClient()
+
 
 @pytest.fixture(scope='session')
 def celery_worker_parameters():
@@ -34,6 +37,7 @@ def celery_worker_parameters():
         # here is the ping task: `from celery.contrib.testing.tasks import ping`
         'perform_ping_check': False,
     }
+
 
 def verify_or_create_json(filename, json_result, hook=None, sorter=None):
 
