@@ -1,9 +1,13 @@
 from celery import shared_task
+from celery.exceptions import SoftTimeLimitExceeded
+
+from geocontrib import __version__
 
 from geocontrib.models import ImportTask
 from geocontrib.utils.geojson import geojson_processing
 from geocontrib.utils.csv import csv_processing
 from django.core.management import call_command
+
 
 
 @shared_task()
@@ -31,3 +35,11 @@ def task_data_cleansing():
 @shared_task()
 def task_notify_subscribers():
     call_command('notify_subscribers')
+
+
+@shared_task(soft_time_limit=2)
+def get_geocontrib_version():
+    try:
+        return __version__
+    except SoftTimeLimitExceeded:
+        return 'Timeout'

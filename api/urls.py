@@ -41,6 +41,7 @@ from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
 from api.views.user import UserLevelsPermission
+from api.views import version
 
 app_name = 'api'
 
@@ -57,6 +58,7 @@ router.register(r'project-types', ProjectTypesView, basename='projects-types')
 
 urlpatterns = [
     # Vues générales de navigation
+    path('version', version, name='version'),
     path('login/', LoginView.as_view(), name='signin-view'),
     path('user_info/', UserInfoView.as_view(), name='user-info'),
     path('logout/', LogoutView.as_view(), name='signout-view'),

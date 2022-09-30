@@ -66,6 +66,8 @@ build tagged docker image:
   variables:
     DOCKER_TAG: $CI_COMMIT_TAG
   script:
+    # Don't build tag id package.json as wrong version
+    - grep "__version__ = '$CI_COMMIT_TAG'" geocontrib/__init__.py
     - cat $DOCKER_PASSWORD | docker login --username $DOCKER_LOGIN --password-stdin
     - cd docker
     - docker-compose build geocontrib
