@@ -1,3 +1,5 @@
+# bug dans nouvelles version de importlib-metadata
+importlib-metadata<5.0
 celery<5.3.0
 Django>=3.2.0,<3.3.0
 djangorestframework-gis==0.18
