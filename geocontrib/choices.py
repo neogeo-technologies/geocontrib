@@ -13,6 +13,7 @@ TYPE_CHOICES = (
     ("date", "Date"),
     ("list", "Liste de valeurs"),
     ("pre_recorded_list", "Liste de valeurs pré-enregistrées"),
+    ("multi_choices_list", "Liste à choix multiples"),
     ("integer", "Nombre entier"),
     ("decimal", "Nombre décimal"),
     ("text", "Texte multiligne"),
