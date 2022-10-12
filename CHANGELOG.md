@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.2.1] - 2022-10-12
+
+### Corrections
+
+- Redmine 14894 : Edition de la géométrie - Amélioration ergonomie
+- Redmine 14884 : Création d'un type par import GeoJSON - Le nom du type et les attributs ne sont pas récupérés
+- Redmine 14871 : Mode édition rapide - Mise à jour de la symbologie instantanée
+- Redmine 14758 : Pagination de la liste des projets en page d'accueil
+- Redmine 14686 : Type de signalement - Le champ "Options" d'une liste de valeurs est limité à 256 caractères
+- Redmine 14023 : Un utilisateur anonyme peut affecter des droits dans un projet via l'API
 
 ## [3.2.0] - 2022-08-30
 
