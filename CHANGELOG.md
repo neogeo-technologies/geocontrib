@@ -5,7 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
-## [3.2.1] - 2022-10-12
+## [4.0.0] - 2022-10-12
+
+### Evolutions
+
+- Redmine 14606 : Mise à jour psycopg2 en 2.9
+- Redmine 14427 : Listes de valeurs pré-enregistrées et auto-complétion à la saisie d'un signalement
+- Redmine 14383 : Permettre la visualisation, l'import et l'export de géométries-multiples 
+- Redmine 14360 : Modification des informations attributaires de plusieurs signalements issus du même type
+- Redmine 14359 : Snap sur les objets existants à la création / édition d'un signalement
+- Redmine 14358 : Permettre la rédaction en Markdown de la description d'un projet et limiter l'affichage sur l'accueil
+- Redmine 14347 : Pouvoir rendre obligatoire la saisie des signalements
+- Redmine 14000 : Ajouter un endpoint API avec le numéro de version de Geocontrib et de celery
+- Redmine 12748 : Améliorer l'abonnement ou le désabonnement à un projet
+
+## [3.3.1] - 2022-10-12
 
 ### Corrections
 
@@ -16,7 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 14686 : Type de signalement - Le champ "Options" d'une liste de valeurs est limité à 256 caractères
 - Redmine 14023 : Un utilisateur anonyme peut affecter des droits dans un projet via l'API
 
-## [3.2.0] - 2022-08-30
+## [3.3.0] - 2022-08-30
 
 ### Evolutions
 
