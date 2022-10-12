@@ -348,6 +348,47 @@ Multiple Feature Edition Of Attributes Within The Same Feature Type
     Wait Until Page Does Not Contain            Recherche du signalement
     Checkbox Should Be Selected                 ${SYMBONAMEBOOL}
 
+Create Feature Type & Feature with Multiple Choices List CustomField
+    # Start from main page
+    Find Project
+    Go To Project Page
+    ## FEATURE TYPE ##
+    Page Should Not Contain                     ${MULTICHOICEFEATURETYPENAME}-multiChoices
+    Geocontrib Create Featuretype               ${MULTICHOICEFEATURETYPENAME}-multiChoices        Point
+    Geocontrib Add MultiChoices CustomField     ${MULTICHOICESLISTNAME}             ${MULTICHOICESLISTOPTIONS}
+    Click Button                                send-feature_type
+    # attendre le changement de page
+    Wait Until Location Does Not Contain        /type-signalement/ajouter
+    # attendre que le loader disparaissent ! NE MARCHE PAS
+    #Wait Until Page Does Not Contain         Récupération des types de signalements en cours... 
+    Page Should Contain                         ${MULTICHOICEFEATURETYPENAME}-multiChoices
+    ## FEATURE ##
+    Page Should Not Contain                     ${MULTICHOICEFEATURENAME}
+    Create Feature                              ${MULTICHOICEFEATURENAME}           ${MULTICHOICEFEATURETYPENAME}       -multiChoices
+    # Vérifier que le signalement a été créé avec les champ personalisés liste à choix multiples
+    Wait Until Location Does Not Contain        /signalement/ajouter
+    Discard Info message
+    FOR    ${choice}    IN    @{MULTICHOICESLISTOPTIONS}
+        Element should contain      id:${MULTICHOICESLISTNAME}      ${choice}
+    END
+    # edit feature
+    Click Link                                  css:a[href*=editer]
+    # select some choices
+    Wait Until Location contains                /editer
+    Select Checkbox                             ${MULTICHOICESLISTOPTIONS[0]}
+    Select Checkbox                             ${MULTICHOICESLISTOPTIONS[2]}
+    Select Checkbox                             ${MULTICHOICESLISTOPTIONS[4]}
+    # save
+    Click Button                                id:save-changes
+    # check that changes had been written
+    Wait Until Location Does Not Contain        /editer
+    Checkbox Should Be Selected                 ${MULTICHOICESLISTOPTIONS[0]}
+    Checkbox Should Be Selected                 ${MULTICHOICESLISTOPTIONS[2]}
+    Checkbox Should Be Selected                 ${MULTICHOICESLISTOPTIONS[4]}
+
+
+
+
 [Teardown]
     Find Project
     Go To Project Page

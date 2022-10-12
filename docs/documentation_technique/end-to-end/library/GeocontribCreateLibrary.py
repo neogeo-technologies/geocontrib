@@ -75,6 +75,20 @@ def geocontrib_create_featuretype(feature_type_name, geometry_type):
     driver.find_element_by_id("geometry-type").click()
     driver.find_element_by_id(geometry_type).click()
 
+def geocontrib_add_multiChoices_custom_field(list_name, list_options):
+    driver = get_driver()
+    add_field_btn = driver.find_element_by_id("add-field")
+    # add custom field
+    add_field_btn.click()
+    driver.find_element_by_css_selector("#custom_form-0 #label").send_keys(list_name)
+    driver.find_element_by_css_selector("#custom_form-0 #name").send_keys(list_name)
+    driver.find_element_by_css_selector("#custom_form-0 #field_type > .dropdown").click()
+    driver.find_element_by_css_selector("#custom_form-0 #field_type > .dropdown [id='Liste à choix multiples']").click()
+    driver.find_element_by_css_selector("#custom_form-0 #options").send_keys(",".join(list_options))
+
+    ## scroll the page to reveal the button
+    driver.execute_script("document.getElementById('send-feature_type').scrollIntoView('alignToTop');")
+
 def geocontrib_add_custom_fields(list_name, char_name, bool_name, list_options):
     driver = get_driver()
     add_field_btn = driver.find_element_by_id("add-field")
