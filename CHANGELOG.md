@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
-## [3.2.1] - 2022-10-12
+## [3.3.1] - 2022-10-12
 
 ### Corrections
 
@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 14686 : Type de signalement - Le champ "Options" d'une liste de valeurs est limité à 256 caractères
 - Redmine 14023 : Un utilisateur anonyme peut affecter des droits dans un projet via l'API
 
-## [3.2.0] - 2022-08-30
+## [3.3.0] - 2022-08-30
 
 ### Evolutions
 
