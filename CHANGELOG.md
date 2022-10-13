@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [4.1.0] - 2022-10-13
+
+### Evolution
+
+- Redmine 14895 : Ajouter un champ "Liste à choix multiples" dans les champs personnalisés
+
 ## [4.0.0] - 2022-10-12
 
 ### Evolutions
