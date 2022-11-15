@@ -256,7 +256,8 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
                 if custom_fields[k] in fields and v == '':
                     v= None
                 res.update({k: v})
-        validated_data['feature_data'] = res
+        if res:
+            validated_data['feature_data'] = res
         
         return validated_data
 
