@@ -272,7 +272,7 @@ class FeatureType(models.Model):
 
 
 class CustomField(models.Model):
-    label = models.CharField("Label", max_length=128, null=True, blank=True)
+    label = models.CharField("Label", max_length=256, null=True, blank=True)
 
     name = models.CharField("Nom", max_length=128, null=True, blank=True)
 
