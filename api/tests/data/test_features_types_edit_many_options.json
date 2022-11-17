@@ -1,19 +1,12 @@
 {
-  "title": "New feature type edited",
-  "title_optional": false,
-  "slug": "4-new-feature-type",
-  "geom_type": "point",
   "color": "#000000",
-  "icon": null,
-  "opacity": "0.5",
   "colors_style": null,
-  "project": "1-aze",
   "customfield_set": [
     {
-      "position": 0,
-      "label": "SA",
-      "name": "ZA",
       "field_type": "list",
+      "is_mandatory": true,
+      "label": "SA0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789",
+      "name": "ZA",
       "options": [
         "12",
         "125",
@@ -274,29 +267,36 @@
         "1234567890254",
         "1234567890255"
       ],
-      "is_mandatory": true
+      "position": 0
     },
     {
-      "position": 1,
+      "field_type": "list",
+      "is_mandatory": false,
       "label": "SA1",
       "name": "ZA2",
-      "field_type": "list",
       "options": [
         "13",
         "123"
       ],
-      "is_mandatory": false
+      "position": 1
     },
     {
-      "position": 3,
+      "field_type": "pre_recorded_list",
+      "is_mandatory": true,
       "label": "villes",
       "name": "Villes",
-      "field_type": "pre_recorded_list",
       "options": [
         "liste de villes"
       ],
-      "is_mandatory": true
+      "position": 3
     }
   ],
-  "is_editable": true
+  "geom_type": "point",
+  "icon": null,
+  "is_editable": true,
+  "opacity": "0.5",
+  "project": "1-aze",
+  "slug": "4-new-feature-type",
+  "title": "New feature type edited",
+  "title_optional": false
 }

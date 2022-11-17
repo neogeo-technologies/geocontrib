@@ -21,10 +21,11 @@ def test_feature_types_list(api_client):
 
     user = User.objects.get(username="admin")
     api_client.force_authenticate(user=user)
+    str_250_char = "".join(map(str, list(range(10)) * 25))
     customfield =[
         {
             "field_type": "list",
-            "label": "SA",
+            "label": "SA" + str_250_char,
             "name": "ZA",
             "options": [
                 "12",
