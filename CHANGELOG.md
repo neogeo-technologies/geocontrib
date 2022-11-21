@@ -7,9 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [4.1.1] - 2022-11-21
 
-### Correction
+### Corrections
 
 - Redmine 15118 : Création d'un signalement - Affichage incomplet des titres des champs personnalisés au-delà d’un certain nombre de caractères
+- Redmine 15116 : Edition des statuts en masse des signalements - Suppression des infos attributaires
+- Redmine 15115 : Accueil projet - Affichage des commentaires incohérent
+- Redmine 15106 : Création d'un type de signalements - Ordre des champs personnalisés incorrect
 
 ## [4.1.0] - 2022-10-13
 
