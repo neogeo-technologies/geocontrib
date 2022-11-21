@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [3.3.2] - 2022-11-21
+
+### Corrections
+
+- Redmine 15116 : Edition des statuts en masse des signalements - Suppression des infos attributaires
+- Redmine 15115 : Accueil projet - Affichage des commentaires incohérent
+- Redmine 15106 : Création d'un type de signalements - Ordre des champs personnalisés incorrect
+
 ## [3.3.1] - 2022-10-12
 
 ### Corrections
