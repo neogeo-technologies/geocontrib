@@ -23,7 +23,7 @@
         "center": {{ DEFAULT_MAP_VIEW_CENTER|default('[47.0, 1.0]', true) }},
         "zoom": {{ DEFAULT_MAP_VIEW_ZOOM|default('4', true) }}
     },
-    "MAP_PREVIEW_CENTER" : [46.56397874834413, 3.3283550153590995],
+    "MAP_PREVIEW_CENTER" : {{ MAP_PREVIEW_CENTER|default([46.56397874834413, 3.3283550153590995], true) }},
     "GEOCODER_PROVIDERS" : {
         "ADDOK": "addok",
         "NOMINATIM": "nominatim",

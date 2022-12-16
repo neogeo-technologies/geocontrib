@@ -71,13 +71,13 @@ Variables utilisées pour configurer le frontend:
 * DISABLE_LOGIN_BUTTON
 * LOG_URL
 * BASE_URL
-* CATALOG_NAME
-* IDGO
-* DEFAULT_BASE_MAP_SCHEMA_TYPE
-* DEFAULT_BASE_MAP_SERVICE
-* DEFAULT_BASE_MAP_OPTIONS
-* DEFAULT_MAP_VIEW_CENTER
-* DEFAULT_MAP_VIEW_ZOOM
-* MAP_PREVIEW_CENTER
+* CATALOG_NAME                  # name of the catalog to import features from
+* IDGO                          # boolean to display import features from catalog buttons
+* DEFAULT_BASE_MAP_SCHEMA_TYPE  # type of basemap used by default (like TMS or WMS)
+* DEFAULT_BASE_MAP_SERVICE      # service providing the default basemap
+* DEFAULT_BASE_MAP_OPTIONS      # default basemap options, contains maxZoom and attribution
+* DEFAULT_MAP_VIEW_CENTER       # center setting at maps loading
+* DEFAULT_MAP_VIEW_ZOOM         # zoom setting at maps loading
+* MAP_PREVIEW_CENTER            # center of the map preview displayed when setting project max scale
 * DISPLAY_FORBIDDEN_PROJECTS
 * DISPLAY_FORBIDDEN_PROJECTS_DEFAULT
