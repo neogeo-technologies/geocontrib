@@ -51,6 +51,9 @@ variables:
   DEFAULT_MAP_VIEW_ZOOM:
     env_config_front: DEFAULT_MAP_VIEW_ZOOM
 
+  MAP_PREVIEW_CENTER:
+    env_config_front: MAP_PREVIEW_CENTER
+
   DISPLAY_FORBIDDEN_PROJECTS:
     env_config_front: DISPLAY_FORBIDDEN_PROJECTS
   
