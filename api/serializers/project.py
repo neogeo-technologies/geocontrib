@@ -169,7 +169,9 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'nb_published_features',
             'nb_comments',
             'nb_published_features_comments',
-            'nb_contributors'
+            'nb_contributors',
+            'feature_browsing_default_filter',
+            'feature_browsing_default_sort',
         )
 
 

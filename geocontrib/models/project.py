@@ -74,6 +74,18 @@ class Project(models.Model):
 
     fast_edition_mode = models.BooleanField("Mode d'édition rapide de signalements", default=False)
 
+    feature_browsing_default_filter = models.CharField(
+        verbose_name="Filtre par défaut du parcours du signalement",
+        max_length=20,
+        blank=True,
+        default=""
+    )
+    feature_browsing_default_sort = models.CharField(
+        verbose_name="Tri par défaut du parcours du signalement",
+        max_length=20,
+        default="created_on"
+    )
+
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"
