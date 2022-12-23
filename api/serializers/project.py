@@ -195,6 +195,8 @@ class ProjectCreationSerializer(serializers.ModelSerializer):
             'archive_feature',
             'delete_feature',
             'map_max_zoom_level',
+            'feature_browsing_default_filter',
+            'feature_browsing_default_sort',
         )
 
 
