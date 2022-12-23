@@ -88,7 +88,9 @@
             "ldap_project_admin_groups": null,
             "is_project_type": false,
             "generate_share_link": false,
-            "fast_edition_mode": false
+            "fast_edition_mode": false,
+            "feature_browsing_default_filter": "",
+            "feature_browsing_default_sort": "created_on"
         }
     }
 ]
