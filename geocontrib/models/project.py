@@ -83,7 +83,7 @@ class Project(models.Model):
     feature_browsing_default_sort = models.CharField(
         verbose_name="Tri par défaut du parcours du signalement",
         max_length=20,
-        default="created_on"
+        default="-created_on"
     )
 
     class Meta:

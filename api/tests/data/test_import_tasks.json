@@ -90,7 +90,7 @@
             "generate_share_link": false,
             "fast_edition_mode": false,
             "feature_browsing_default_filter": "",
-            "feature_browsing_default_sort": "created_on"
+            "feature_browsing_default_sort": "-created_on"
         }
     }
 ]

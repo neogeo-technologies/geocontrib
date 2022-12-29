@@ -121,7 +121,7 @@ def test_projects_post(api_client):
         'generate_share_link': False,
         'fast_edition_mode': False,
         'feature_browsing_default_filter': '',
-        'feature_browsing_default_sort': 'created_on',
+        'feature_browsing_default_sort': '-created_on',
     }
 
 
@@ -171,7 +171,7 @@ def test_projects_thumbnail(api_client):
         'fast_edition_mode': False,
         'moderation': False,
         'feature_browsing_default_filter': '',
-        'feature_browsing_default_sort': 'created_on',
+        'feature_browsing_default_sort': '-created_on',
         'nb_comments': 0,
         'nb_contributors': 1,
         'nb_features': 0,
