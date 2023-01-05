@@ -337,3 +337,19 @@ def test_feature_event(api_client):
     result = api_client.get(features_url)
     assert result.status_code == 200
     verify_or_create_json("api/tests/data/test_feature_events_empty.json", result.json())
+
+
+@pytest.mark.django_db
+@pytest.mark.freeze_time('2021-08-05')
+def test_featurepositioninlist(api_client):
+    call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
+    call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
+
+    user = User.objects.get(username="admin")
+    api_client.force_authenticate(user=user)
+    # Test : get feature position of a project authenticated
+    feature_position_url = reverse('api:project-feature-position-in-list', args=["1-aze", "75540f8e-0f4d-4317-9818-cc1219a5df8c"])
+    data = { 'ordering': '-created_on'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 1

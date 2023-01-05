@@ -18,6 +18,7 @@ from api.views.feature import PreRecordedValuesView
 from api.views.feature import ProjectFeature
 from api.views.feature import ProjectFeatureBbox
 from api.views.feature import ProjectFeaturePaginated
+from api.views.feature import ProjectFeaturePositionInList
 from api.views.feature import ProjectFeatureTypes
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
@@ -103,6 +104,9 @@ urlpatterns = [
     path(
         'projects/<slug:slug>/subscription/',
         ProjectSubscription.as_view(), name='project-subscription'),
+    path(
+        'projects/<slug:slug>/feature/<uuid:feature_id>/position-in-list',
+        ProjectFeaturePositionInList.as_view(), name='project-feature-position-in-list'),
     path(
         'events/',
         EventView.as_view(), name='events-list'),

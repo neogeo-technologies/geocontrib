@@ -230,6 +230,29 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         queryset = queryset.select_related('project')
         return queryset
 
+class ProjectFeaturePositionInList(views.APIView):
+
+    http_method_names = ['get', ]
+
+    def get(self, request, slug, feature_id):
+        """
+            Vue de récupération de la position d'un signalement dans une liste ordonnée selon un tri et des filtres
+        """
+        project = get_object_or_404(Project, slug=slug)
+        ordering = request.GET.get('ordering')
+        #filters = request.GET.get('filters')
+        queryset = Feature.handy.availables(request.user, project).order_by("created_on")
+        instance = queryset.filter(feature_id=feature_id)
+        position = (*queryset,).index(instance[0])
+        
+        if position >= 0:
+            data = position
+            status = 200
+        else:
+            data = 'Feature position not found'
+            status = 404
+        return Response(data=data, status=status)
+
 class ProjectFeatureBbox(generics.ListAPIView):
     queryset = Project.objects.all()
     lookup_field = 'slug'
