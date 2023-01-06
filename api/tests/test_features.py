@@ -349,7 +349,43 @@ def test_featurepositioninlist(api_client):
     api_client.force_authenticate(user=user)
     # Test : get feature position of a project authenticated
     feature_position_url = reverse('api:project-feature-position-in-list', args=["1-aze", "75540f8e-0f4d-4317-9818-cc1219a5df8c"])
-    data = { 'ordering': '-created_on'}
+    # with default sort (first created)
+    data = { 'ordering': 'created_on'}
     result = api_client.get(feature_position_url, data)
     assert result.status_code == 200
     assert result.data == 1
+    # with sort last created
+    data = { 'ordering': '-created_on'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 3
+    # with sort last modified
+    data = { 'ordering': '-updated_on'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 4
+    # with sort last created and first feature type
+    data = { 'ordering': '-created_on', 'feature_type_slug': '1-dfsdfs'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 0
+    # with sort last modified and first feature type
+    data = { 'ordering': '-updated_on', 'feature_type_slug': '1-dfsdfs'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 1
+    # with sort last created and third feature type that doesn't have feature
+    data = { 'ordering': '-created_on', 'feature_type_slug': '3-type-multilinestring'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 404
+    # with sort last modified, first feature type and status published
+    data = { 'ordering': '-updated_on', 'feature_type_slug': '1-dfsdfs', 'status': 'published'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 0
+    # with sort last created, second feature type and status published and another feature_id
+    feature_position_url = reverse('api:project-feature-position-in-list', args=["1-aze", "7e29a761-6683-4baf-ae8b-9ce14557f053"])
+    data = { 'ordering': '-created_on', 'status': 'published', 'title': 'type 2 publi\u00e9'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 0
