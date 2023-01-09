@@ -105,7 +105,7 @@ urlpatterns = [
         'projects/<slug:slug>/subscription/',
         ProjectSubscription.as_view(), name='project-subscription'),
     path(
-        'projects/<slug:slug>/feature/<uuid:feature_id>/position-in-list',
+        'projects/<slug:slug>/feature/<uuid:feature_id>/position-in-list/',
         ProjectFeaturePositionInList.as_view(), name='project-feature-position-in-list'),
     path(
         'events/',
