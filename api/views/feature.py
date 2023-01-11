@@ -240,7 +240,7 @@ class ProjectFeaturePositionInList(views.APIView):
         """
         project = get_object_or_404(Project, slug=slug)
         # Ordering :
-        ordering = request.GET.get('ordering')
+        ordering = request.GET.get('ordering') or '-created_on'
         queryset = Feature.handy.availables(request.user, project).order_by(ordering)
         # Filters :
         feature_type_slug = request.GET.get('feature_type_slug')
