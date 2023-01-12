@@ -387,6 +387,57 @@ Create Feature Type & Feature with Multiple Choices List CustomField
     Checkbox Should Be Selected                 ${MULTICHOICESLISTOPTIONS[4]}
 
 
+Browse Features At click On Feature Of Project Detail Page
+    ## Project page: last features
+    # Start from main page
+    Find Project
+    Go To Project Page
+    Click Link                          ${FASTFEATURENAME}${FEATURETYPEEDITION}
+    Wait Until Location contains        /signalement-filtre
+    Wait Until Page Does Not Contain    Recherche du signalement
+    # check that the title in input field correspond to selected feature
+    Textfield Should Contain            feature_detail_title_input    ${FASTFEATURENAME}${FEATURETYPEEDITION}
+    Element Should Contain              class:fast_browsing           désactivé
+    Element Should Contain              class:fast_browsing           par date de création
+
+
+Edit Project Default Feature Browsing Filter and Sort
+    # Start from main page
+    Find Project
+    Go To Project Page
+    Click Element                           id:edit-project
+    Wait Until Page Contains                Configuration du parcours de signalement
+    # Change values for default filter and sort
+    Click Element                           css:#feature_browsing_filter > .dropdown
+    Click Element                           id:Type de signalement
+    Click Element                           css:#feature_browsing_sort > .dropdown
+    Click Element                           id:Date de modification
+    Click Button                            id:send-project
+    # Check that new values were stored and are retrieved when going back on project edit page
+    Click Element                           id:edit-project
+    Element Text Should Be                  css:#feature_browsing_filter > .dropdown > .default.text > div             Type de signalement
+    Element Text Should Be                  css:#feature_browsing_sort > .dropdown > .default.text > div               Date de modification
+
+Browse Features At click On Feature Of Feature Type Detail                    
+    # Start from main page
+    Find Project
+    Go To Project Page
+    Click Link                          ${RANDOMFEATURETYPENAME}${FEATURETYPEEDITION}
+    Wait Until Location contains        /type-signalement/
+    #Wait Until Page Does Not Contain    Récupération des signalements en cours
+    Click Link                          ${RANDOMFEATURENAME}-3
+    # check that the title in input field correspond to selected feature
+    Textfield Should Contain            feature_detail_title_input    ${RANDOMFEATURENAME}-3
+    Element Should Contain              css:.fast_browsing > div > div:first-of-type > span            par date de modification
+    Element Should Contain              css:.fast_browsing > div > div:last-of-type > span             par type de signalement
+
+
+#Browse Features At click On Feature On Map # TODO: IF POSSIBLE...
+    ## Project page: feature on map
+
+
+#Browse Features Filtered with order and sort changed # ? IS NECESSARY... ?
+
 
 
 [Teardown]
