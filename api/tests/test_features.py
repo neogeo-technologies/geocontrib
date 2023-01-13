@@ -337,3 +337,55 @@ def test_feature_event(api_client):
     result = api_client.get(features_url)
     assert result.status_code == 200
     verify_or_create_json("api/tests/data/test_feature_events_empty.json", result.json())
+
+
+@pytest.mark.django_db
+@pytest.mark.freeze_time('2021-08-05')
+def test_featurepositioninlist(api_client):
+    call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
+    call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
+
+    user = User.objects.get(username="admin")
+    api_client.force_authenticate(user=user)
+    # Test : get feature position of a project authenticated
+    feature_position_url = reverse('api:project-feature-position-in-list', args=["1-aze", "75540f8e-0f4d-4317-9818-cc1219a5df8c"])
+    # with default sort (first created)
+    data = { 'ordering': 'created_on'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 1
+    # with sort last created
+    data = { 'ordering': '-created_on'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 3
+    # with sort last modified
+    data = { 'ordering': '-updated_on'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 4
+    # with sort last created and first feature type
+    data = { 'ordering': '-created_on', 'feature_type_slug': '1-dfsdfs'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 0
+    # with sort last modified and first feature type
+    data = { 'ordering': '-updated_on', 'feature_type_slug': '1-dfsdfs'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 1
+    # with sort last created and third feature type that doesn't have feature
+    data = { 'ordering': '-created_on', 'feature_type_slug': '3-type-multilinestring'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 404
+    # with sort last modified, first feature type and status published
+    data = { 'ordering': '-updated_on', 'feature_type_slug': '1-dfsdfs', 'status': 'published'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 0
+    # with sort last created, second feature type and status published and another feature_id
+    feature_position_url = reverse('api:project-feature-position-in-list', args=["1-aze", "7e29a761-6683-4baf-ae8b-9ce14557f053"])
+    data = { 'ordering': '-created_on', 'status': 'published', 'title': 'type 2 publi\u00e9'}
+    result = api_client.get(feature_position_url, data)
+    assert result.status_code == 200
+    assert result.data == 0

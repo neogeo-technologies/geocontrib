@@ -230,6 +230,38 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         queryset = queryset.select_related('project')
         return queryset
 
+class ProjectFeaturePositionInList(views.APIView):
+
+    http_method_names = ['get', ]
+
+    def get(self, request, slug, feature_id):
+        """
+            Vue de récupération de la position d'un signalement dans une liste ordonnée selon un tri et des filtres
+        """
+        project = get_object_or_404(Project, slug=slug)
+        # Ordering :
+        ordering = request.GET.get('ordering') or '-created_on'
+        queryset = Feature.handy.availables(request.user, project).order_by(ordering)
+        # Filters :
+        feature_type_slug = request.GET.get('feature_type_slug')
+        status__value = request.GET.get('status')
+        title = request.GET.get('title')
+        if feature_type_slug:
+            queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
+        if status__value:
+            queryset = queryset.filter(status__icontains=status__value)
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        # Position :
+        try:
+            instance = queryset.filter(feature_id=feature_id).first()
+            position = (*queryset,).index(instance)
+            return Response(data=position, status=200)
+
+        except Exception as e:
+            logger.exception("Les données sont inaccessibles %s", e)
+            return Response(data="Les données sont inaccessibles", status=404)
+
 class ProjectFeatureBbox(generics.ListAPIView):
     queryset = Project.objects.all()
     lookup_field = 'slug'
