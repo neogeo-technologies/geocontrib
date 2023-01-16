@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [4.2.0] - 2023-01-16
+
+### Evolutions
+
+- Redmine 15534 : Amélioration du parcours de signalements - Activer le parcours de signalements sur tous les clics sur un signalement + affichage du tri et du filtre courants
+- Redmine 15526 : Amélioration du parcours de signalements - Ajouter une configuration du tri et du filtre par défaut à la création / édition d'un projet
+- Redmine 15399 : Paramétrage projet - Amélioration de l'ergonomie du choix de l'échelle max
+
+### Correction
+
+- Redmine 15393 : Opacité symbologie du signalement
+
 ## [4.1.1] - 2022-11-21
 
 ### Corrections
