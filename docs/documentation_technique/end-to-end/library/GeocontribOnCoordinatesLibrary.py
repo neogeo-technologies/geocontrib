@@ -13,22 +13,22 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-#from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.action_chains import ActionChains
 from utils import get_driver
 
 
 def geocontrib_click_at_coordinates(pos_x, pos_y, browser):
-    # switch to drawing on map mode
-    get_driver().find_element_by_css_selector("[title~=Dessiner]").click()
-    # set the point is difficult, but putting the point anyweher in canvas works
-    get_driver().find_element_by_css_selector("canvas").click()
-    # if browser == "Chrome":
+    # set the point is difficult, but putting the point anywhere in canvas works
+    # get_driver().find_element_by_css_selector("canvas").click()
+
+    #if browser == "Chrome":
     # in chrome, web driver implementation calculates from top left
-        # actions = ActionChains(get_driver())
-        # my_map = get_driver().find_element_by_css_selector("canvas")
-        # actions.move_to_element_with_offset(my_map, pos_x, pos_y).click().perform()
-    # else :
-    # in firefox web driver implementation start at canvas center
+    actions = ActionChains(get_driver())
+    my_map = get_driver().find_element_by_css_selector("canvas")
+    actions.move_to_element_with_offset(my_map, pos_x, pos_y).click().perform()
+        #actions.move_to_element_with_offset(my_map, 480, 450).click().perform()
+
+    #else :
+    #in firefox web driver implementation start at canvas center
         # to use random values should be reversed or adapted, to be tested...
         #get_driver().find_element_by_css_selector("canvas").click()
-        # scroll down the page to avoid footer to get over submit button

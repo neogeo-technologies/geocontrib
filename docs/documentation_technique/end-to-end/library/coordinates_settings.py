@@ -18,9 +18,15 @@ import random
 
 def get_variables():
     variables = {
-                "X1":   random.randint(1, 50),
-                "Y1":   random.randint(1, 50),
-                "X2":   random.randint(1, 50),
-                "Y2":   random.randint(1, 50),
+                "X0":   random.randint(300, 400),
+                "Y0":   random.randint(200, 400),
+                "X1":   random.randint(300, 400),
+                "Y1":   random.randint(200, 400),
+                "X2":   random.randint(300, 400),
+                "Y2":   random.randint(200, 400),
+                "X3":   random.randint(300, 400),
+                "Y3":   random.randint(200, 400),
+                "X4":   random.randint(300, 400),
+                "Y4":   random.randint(200, 400),
                 }
     return variables

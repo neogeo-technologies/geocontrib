@@ -27,7 +27,8 @@ ${SELSPEED}     0.1
 *** Test Cases ***
 
 [Setup]             Run Keywords            Open Browser                    ${GEOCONTRIB _URL}      ${BROWSER_NAME}
-...                 AND                     Maximize Browser Window
+...                 AND                     Set Window Size                 1024    768
+#...                 AND                     Maximize Browser Window
 ...                 AND                     Set Selenium Speed              ${SELSPEED}
 
 Connect GeoContrib - TEST 7
@@ -118,7 +119,7 @@ Edit Feature Type - TEST n°?
 
 Create Feature with Random Featurename on Random Coordinates - TEST 117
     Page Should Not Contain                 ${RANDOMFEATURENAME}
-    Create Feature                          ${RANDOMFEATURENAME}       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
+    Create Feature                          ${RANDOMFEATURENAME}       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X0}   ${Y0}
     # Vérifier que le signalement a été créé
     Page Should Contain                     ${RANDOMFEATURENAME}
     # Vérifier que le signalement a une description (à améliorer: utilisé une variable)
@@ -234,11 +235,11 @@ Browse Features Filtered
     Find Project
     Go To Project Page
     #Create some features to navigate through
-    Create Feature      ${RANDOMFEATURENAME}-2       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
+    Create Feature      ${RANDOMFEATURENAME}-2       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X1}   ${Y1}
     # Start from main page
     Find Project
     Go To Project Page
-    Create Feature      ${RANDOMFEATURENAME}-3       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
+    Create Feature      ${RANDOMFEATURENAME}-3       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X2}   ${Y2}
     # Start from main page
     Find Project
     Go To Project Page
@@ -263,9 +264,7 @@ Fast Edit Feature
     Geocontrib Add Custom Fields            ${SYMBONAMELIST}        ${SYMBONAMECHAR}    ${SYMBONAMEBOOL}    ${SYMBOPTIONLIST}
     Click Button                            send-feature_type
     # create a feature
-    Geocontrib Create Feature               ${FASTFEATURENAME}      ${RANDOMFEATURETYPENAME}-FastEdition       ${EMPTY}
-    Geocontrib Click At Coordinates         ${X1}       ${Y1}       ${BROWSER_NAME}
-    Geocontrib Click Save Changes
+    Create Feature               ${FASTFEATURENAME}      ${RANDOMFEATURETYPENAME}-FastEdition       ${EMPTY}       ${X3}   ${Y4}
     Discard Info message
     # Edit feature in feature details page
     Geocontrib Fast Edit Feature Detail     ${FASTFEATURENAME}      ${FASTFEATUREDESCRIPTION}       ${FEATURETYPEEDITION}
@@ -364,7 +363,7 @@ Create Feature Type & Feature with Multiple Choices List CustomField
     Page Should Contain                         ${MULTICHOICEFEATURETYPENAME}-multiChoices
     ## FEATURE ##
     Page Should Not Contain                     ${MULTICHOICEFEATURENAME}
-    Create Feature                              ${MULTICHOICEFEATURENAME}           ${MULTICHOICEFEATURETYPENAME}       -multiChoices
+    Create Feature                              ${MULTICHOICEFEATURENAME}           ${MULTICHOICEFEATURETYPENAME}       -multiChoices      ${X4}   ${Y4}
     # Vérifier que le signalement a été créé avec les champ personalisés liste à choix multiples
     Wait Until Location Does Not Contain        /signalement/ajouter
     Discard Info message
@@ -432,19 +431,24 @@ Browse Features At click On Feature Of Feature Type Detail
     Element Should Contain              css:.fast_browsing > div > div:last-of-type > span             par type de signalement
 
 
-#Browse Features At click On Feature On Map # TODO: IF POSSIBLE...
+Browse Features At click On Feature On Map # TODO: IF POSSIBLE...
     ## Project page: feature on map
+    # Start from main page
+    Find Project
+    Go To Project Page
+    Geocontrib Click At Coordinates            ${275}         ${200}         ${BROWSER_NAME}
+    Click Link                                  goToFeatureDetail
+    
 
-
-#Browse Features Filtered with order and sort changed # ? IS NECESSARY... ?
+Browse Features Filtered with order and sort changed # ? IS NECESSARY... ?
 
 
 
 [Teardown]
-    Find Project
-    Go To Project Page
-    Geocontrib Delete Project
-    Run Keywords                                Sleep       3
+   Find Project
+   Go To Project Page
+   Geocontrib Delete Project
+   Run Keywords                                Sleep       3
 ...                             AND             Close Browser
 
 
@@ -460,9 +464,13 @@ Go To Project Page
     Wait Until Page Does Not Contain            Projet en cours de chargement ... 
 
 Create Feature
-    [Arguments]         ${FEATURENAME}      ${FEATURETYPENAME}      ${FEATURETYPEEDITION}
+    [Arguments]         ${FEATURENAME}      ${FEATURETYPENAME}      ${FEATURETYPEEDITION}   ${X}    ${Y}
     Geocontrib Create Feature               ${FEATURENAME}          ${FEATURETYPENAME}      ${FEATURETYPEEDITION}
-    Geocontrib Click At Coordinates         ${X1}       ${Y1}       ${BROWSER_NAME}
+    # switch to drawing on map mode
+    Click Element                           css:[title~=Dessiner]
+    # set the point is difficult, but putting the point anywhere in canvas works
+    Geocontrib Scroll To                    canvas
+    Geocontrib Click At Coordinates         ${X}       ${Y}       ${BROWSER_NAME}
     Geocontrib Click Save Changes
 
 Element should have class
