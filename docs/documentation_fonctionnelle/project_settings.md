@@ -26,10 +26,11 @@ Les paramètres avancés sont constitués de cases à cocher. Si la case est coc
 * Est un projet type : si ce paramètre est activé, le projet sera ajouté aux modèles - Cf. [Modèle de projet](project_template.md)
 * Génération d'un lien de partage externe : si ce paramètre est activé, un lien sera acessible à l'administrateur du projet qui lui permettra de partager le projet de façon isolée - Cf. [Partage d'un projet en externe](project_sharing.md)
 * Mode d'édition rapide des signalements ; si ce paramètre est activé, les contributeurs et niveaux supérieurs pourront accéder à un mode d'édition rapide qui permet de modifier un signalement directement sur sa page de détail - Cf. [Edition des signalements - Mode d'édition rapide](feature_editing.md)
+* Configuration du parcours de signalements : ce paramètre permet de choisir le filtre et le tri par défaut du parcours de signalements. La liste déroulante du filtre comporte deux options : "désactivé" (aucun filtre n'est appliqué) et "Type de signalement" (la liste sera filtrée selon le type de signalement du signalement sur lequel a cliqué l'utilisateur). La liste déroulante du tri comporte deux options : "Date de modification" (tri pat date de dernière modification) et "Date de création" - Cf. [Parcourir une liste de signalements](browse_through_list_of_features.md)
 
 ## Niveau de zoom maximum de la carte
 
-Une règle permet à l'administrateur de sélectionner le niveau de zoom maximum de la carte. C'est-à-dire que si le niveau de zoom est réglé à 17, les utilisateurs ne pourront pas zoomer au delà du niveau 17 et ainsi créer des signalements de forme moins détaillée. Si l'administrateur ne souhaite pas personnaliser ce paramètre, il peut laisser le niveau de zoom par défaut (22) qui est le niveau le plus élévé possible.
+Une règle permet à l'administrateur de sélectionner le niveau de zoom maximum de la carte. C'est-à-dire que si le niveau de zoom est réglé à 1: 250 000, les utilisateurs ne pourront pas zoomer au delà de 1:250 000 et ainsi créer des signalements de forme moins détaillée. Si l'administrateur ne souhaite pas personnaliser ce paramètre, il peut laisser le niveau de zoom par défaut (1:150) qui est le niveau le plus élévé possible.
 
 ---
 

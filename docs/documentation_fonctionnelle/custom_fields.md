@@ -19,6 +19,14 @@ Lors de la création du signalement, la valeur à entrer dans ce champ est de fo
 
 Lors de la création du champ personnalisé, il faut indiquer les valeurs en les séparant par une virgule. Au moment de créer un signalement, ce champ est une liste déroulante avec un choix possible entre les valeurs renseignées.
 
+## Liste de valeurs pré-enregsitrées
+
+La liste de valeurs pré-enregistrées est un type de champ personnalisé qui permet à un administrateur de projet de proposer une liste de valeurs importée via un fichier JSON à ses contributeurs.  - cf. [Liste de valeurs pré-enregistrées](list_of_saved_values.md)
+
+## Liste à choix multiples
+
+La liste de valeurs à hcoix multiples est une liste semblable à la liste de valeurs mais celle-ci permet à l'utilisateur de choisir plusieurs valeurs.
+
 ## Nombre entier
 
 Lors de la création du signalement, ce champ correspond à un compteur d'entiers relatifs.
