@@ -50,7 +50,7 @@ Create Project with Random Projectname - TESTS 10, 17
     Page Should Contain                     Oui
     # Vérifier que la visibilité est à Utilisateur anonyme (à améliorer, ne vérifie pas les 2 visibilités)
     Page Should Contain                     Utilisateur anonyme
-    # Vérifier que le signalement a une description (à améliorer: utilisé une variable)
+    # Vérifier que le signalement a une description (à améliorer: utiliser une variable)
     Page Should Contain                     Exemple de description
     # Le test ci-dessus ne permet pas de vérifier que le projet a été créé, car la page de création contient le nom du projet,
     # si la validation du formulaire plante, le test reste en suspend et ne déclenche pas d'erreur, il faudrait vérifier qu'il n'y a pas de message d'erreur peut-être
@@ -414,6 +414,7 @@ Edit Project Default Feature Browsing Filter and Sort
     Click Button                            id:send-project
     # Check that new values were stored and are retrieved when going back on project edit page
     Click Element                           id:edit-project
+    # Check that default filters had been changed since previous test
     Element Text Should Be                  css:#feature_browsing_filter > .dropdown > .default.text > div             Type de signalement
     Element Text Should Be                  css:#feature_browsing_sort > .dropdown > .default.text > div               Date de modification
 
@@ -436,13 +437,15 @@ Browse Features At click On Feature On Map # TODO: IF POSSIBLE...
     # Start from main page
     Find Project
     Go To Project Page
-    Geocontrib Click At Coordinates            ${275}         ${200}         ${BROWSER_NAME}
-    Click Link                                  goToFeatureDetail
-    
-
-Browse Features Filtered with order and sort changed # ? IS NECESSARY... ?
-
-
+    Geocontrib Click At Coordinates     ${250}         ${240}         ${BROWSER_NAME}
+    Wait Until Page Contains Element    id:goToFeatureDetail
+    Click Link                          id:goToFeatureDetail
+    Wait Until Page Does Not Contain    Recherche du signalement
+    # check that the title in input field correspond to selected feature
+    Textfield Should Contain            feature_detail_title_input    ${IMPORTED_FEATURE_NAME}
+    Wait Until Location contains        /signalement-filtre
+    Element Should Contain              css:.fast_browsing > div > div:last-of-type > span             par type de signalement
+    Element Should Contain              css:.fast_browsing > div > div:first-of-type > span            par date de modification
 
 [Teardown]
    Find Project
