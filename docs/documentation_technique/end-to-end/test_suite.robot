@@ -27,7 +27,8 @@ ${SELSPEED}     0.1
 *** Test Cases ***
 
 [Setup]             Run Keywords            Open Browser                    ${GEOCONTRIB _URL}      ${BROWSER_NAME}
-...                 AND                     Maximize Browser Window
+...                 AND                     Set Window Size                 1024    768
+#...                 AND                     Maximize Browser Window
 ...                 AND                     Set Selenium Speed              ${SELSPEED}
 
 Connect GeoContrib - TEST 7
@@ -49,7 +50,7 @@ Create Project with Random Projectname - TESTS 10, 17
     Page Should Contain                     Oui
     # Vérifier que la visibilité est à Utilisateur anonyme (à améliorer, ne vérifie pas les 2 visibilités)
     Page Should Contain                     Utilisateur anonyme
-    # Vérifier que le signalement a une description (à améliorer: utilisé une variable)
+    # Vérifier que le signalement a une description (à améliorer: utiliser une variable)
     Page Should Contain                     Exemple de description
     # Le test ci-dessus ne permet pas de vérifier que le projet a été créé, car la page de création contient le nom du projet,
     # si la validation du formulaire plante, le test reste en suspend et ne déclenche pas d'erreur, il faudrait vérifier qu'il n'y a pas de message d'erreur peut-être
@@ -118,7 +119,7 @@ Edit Feature Type - TEST n°?
 
 Create Feature with Random Featurename on Random Coordinates - TEST 117
     Page Should Not Contain                 ${RANDOMFEATURENAME}
-    Create Feature                          ${RANDOMFEATURENAME}       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
+    Create Feature                          ${RANDOMFEATURENAME}       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X0}   ${Y0}
     # Vérifier que le signalement a été créé
     Page Should Contain                     ${RANDOMFEATURENAME}
     # Vérifier que le signalement a une description (à améliorer: utilisé une variable)
@@ -234,11 +235,11 @@ Browse Features Filtered
     Find Project
     Go To Project Page
     #Create some features to navigate through
-    Create Feature      ${RANDOMFEATURENAME}-2       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
+    Create Feature      ${RANDOMFEATURENAME}-2       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X1}   ${Y1}
     # Start from main page
     Find Project
     Go To Project Page
-    Create Feature      ${RANDOMFEATURENAME}-3       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}
+    Create Feature      ${RANDOMFEATURENAME}-3       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X2}   ${Y2}
     # Start from main page
     Find Project
     Go To Project Page
@@ -263,9 +264,7 @@ Fast Edit Feature
     Geocontrib Add Custom Fields            ${SYMBONAMELIST}        ${SYMBONAMECHAR}    ${SYMBONAMEBOOL}    ${SYMBOPTIONLIST}
     Click Button                            send-feature_type
     # create a feature
-    Geocontrib Create Feature               ${FASTFEATURENAME}      ${RANDOMFEATURETYPENAME}-FastEdition       ${EMPTY}
-    Geocontrib Click At Coordinates         ${X1}       ${Y1}       ${BROWSER_NAME}
-    Geocontrib Click Save Changes
+    Create Feature               ${FASTFEATURENAME}      ${RANDOMFEATURETYPENAME}-FastEdition       ${EMPTY}       ${X3}   ${Y4}
     Discard Info message
     # Edit feature in feature details page
     Geocontrib Fast Edit Feature Detail     ${FASTFEATURENAME}      ${FASTFEATUREDESCRIPTION}       ${FEATURETYPEEDITION}
@@ -364,7 +363,7 @@ Create Feature Type & Feature with Multiple Choices List CustomField
     Page Should Contain                         ${MULTICHOICEFEATURETYPENAME}-multiChoices
     ## FEATURE ##
     Page Should Not Contain                     ${MULTICHOICEFEATURENAME}
-    Create Feature                              ${MULTICHOICEFEATURENAME}           ${MULTICHOICEFEATURETYPENAME}       -multiChoices
+    Create Feature                              ${MULTICHOICEFEATURENAME}           ${MULTICHOICEFEATURETYPENAME}       -multiChoices      ${X4}   ${Y4}
     # Vérifier que le signalement a été créé avec les champ personalisés liste à choix multiples
     Wait Until Location Does Not Contain        /signalement/ajouter
     Discard Info message
@@ -387,13 +386,72 @@ Create Feature Type & Feature with Multiple Choices List CustomField
     Checkbox Should Be Selected                 ${MULTICHOICESLISTOPTIONS[4]}
 
 
-
-
-[Teardown]
+Browse Features At click On Feature Of Project Detail Page
+    ## Project page: last features
+    # Start from main page
     Find Project
     Go To Project Page
-    Geocontrib Delete Project
-    Run Keywords                                Sleep       3
+    Click Link                          ${FASTFEATURENAME}${FEATURETYPEEDITION}
+    Wait Until Location contains        /signalement-filtre
+    Wait Until Page Does Not Contain    Recherche du signalement
+    # check that the title in input field correspond to selected feature
+    Textfield Should Contain            feature_detail_title_input    ${FASTFEATURENAME}${FEATURETYPEEDITION}
+    Element Should Contain              class:fast_browsing           désactivé
+    Element Should Contain              class:fast_browsing           par date de création
+
+
+Edit Project Default Feature Browsing Filter and Sort
+    # Start from main page
+    Find Project
+    Go To Project Page
+    Click Element                           id:edit-project
+    Wait Until Page Contains                Configuration du parcours de signalement
+    # Change values for default filter and sort
+    Click Element                           css:#feature_browsing_filter > .dropdown
+    Click Element                           id:Type de signalement
+    Click Element                           css:#feature_browsing_sort > .dropdown
+    Click Element                           id:Date de modification
+    Click Button                            id:send-project
+    # Check that new values were stored and are retrieved when going back on project edit page
+    Click Element                           id:edit-project
+    # Check that default filters had been changed since previous test
+    Element Text Should Be                  css:#feature_browsing_filter > .dropdown > .default.text > div             Type de signalement
+    Element Text Should Be                  css:#feature_browsing_sort > .dropdown > .default.text > div               Date de modification
+
+Browse Features At click On Feature Of Feature Type Detail                    
+    # Start from main page
+    Find Project
+    Go To Project Page
+    Click Link                          ${RANDOMFEATURETYPENAME}${FEATURETYPEEDITION}
+    Wait Until Location contains        /type-signalement/
+    #Wait Until Page Does Not Contain    Récupération des signalements en cours
+    Click Link                          ${RANDOMFEATURENAME}-3
+    # check that the title in input field correspond to selected feature
+    Textfield Should Contain            feature_detail_title_input    ${RANDOMFEATURENAME}-3
+    Element Should Contain              css:.fast_browsing > div > div:first-of-type > span            par date de modification
+    Element Should Contain              css:.fast_browsing > div > div:last-of-type > span             par type de signalement
+
+
+Browse Features At click On Feature On Map # TODO: IF POSSIBLE...
+    ## Project page: feature on map
+    # Start from main page
+    Find Project
+    Go To Project Page
+    Geocontrib Click At Coordinates     ${250}         ${240}         ${BROWSER_NAME}
+    Wait Until Page Contains Element    id:goToFeatureDetail
+    Click Link                          id:goToFeatureDetail
+    Wait Until Page Does Not Contain    Recherche du signalement
+    # check that the title in input field correspond to selected feature
+    Textfield Should Contain            feature_detail_title_input    ${IMPORTED_FEATURE_NAME}
+    Wait Until Location contains        /signalement-filtre
+    Element Should Contain              css:.fast_browsing > div > div:last-of-type > span             par type de signalement
+    Element Should Contain              css:.fast_browsing > div > div:first-of-type > span            par date de modification
+
+[Teardown]
+   Find Project
+   Go To Project Page
+   Geocontrib Delete Project
+   Run Keywords                                Sleep       3
 ...                             AND             Close Browser
 
 
@@ -409,9 +467,13 @@ Go To Project Page
     Wait Until Page Does Not Contain            Projet en cours de chargement ... 
 
 Create Feature
-    [Arguments]         ${FEATURENAME}      ${FEATURETYPENAME}      ${FEATURETYPEEDITION}
+    [Arguments]         ${FEATURENAME}      ${FEATURETYPENAME}      ${FEATURETYPEEDITION}   ${X}    ${Y}
     Geocontrib Create Feature               ${FEATURENAME}          ${FEATURETYPENAME}      ${FEATURETYPEEDITION}
-    Geocontrib Click At Coordinates         ${X1}       ${Y1}       ${BROWSER_NAME}
+    # switch to drawing on map mode
+    Click Element                           css:[title~=Dessiner]
+    # set the point is difficult, but putting the point anywhere in canvas works
+    Geocontrib Scroll To                    canvas
+    Geocontrib Click At Coordinates         ${X}       ${Y}       ${BROWSER_NAME}
     Geocontrib Click Save Changes
 
 Element should have class

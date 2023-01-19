@@ -16,10 +16,15 @@
 from utils import get_driver
 
 
+def geocontrib_scroll_to(selector):
+    # scroll to align bottom of the element aligned with page bottom
+    get_driver().execute_script("document.querySelector('{}')".format(selector) + ".scrollIntoView({'block': 'end'});")
+    get_driver().implicitly_wait(1) # seconds
+
 def geocontrib_click_save_changes():
     # scroll the page to reveal the button
     get_driver().execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    get_driver().implicitly_wait(1) # seconds
+    #get_driver().implicitly_wait(1) # seconds
     # try twice to increase the chances that the button would be clickable
     try :
         get_driver().find_element_by_css_selector("form#form-feature-edit.ui.form button.ui.teal.icon.button").click()

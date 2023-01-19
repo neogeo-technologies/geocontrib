@@ -18,9 +18,15 @@ import random
 
 def get_variables():
     variables = {
-                "X1":   random.randint(1, 50),
-                "Y1":   random.randint(1, 50),
-                "X2":   random.randint(1, 50),
-                "Y2":   random.randint(1, 50),
+                "X0":   150, #this position keeps the map bbox coordinates fixed 
+                "Y0":   50, #to be able to click on feature on the map, if changed previous tests might fail
+                "X1":   random.randint(500, 700),
+                "Y1":   random.randint(100, 200),
+                "X2":   random.randint(500, 700),
+                "Y2":   random.randint(100, 200),
+                "X3":   random.randint(500, 700),
+                "Y3":   random.randint(100, 200),
+                "X4":   random.randint(500, 700),
+                "Y4":   random.randint(100, 200),
                 }
     return variables
