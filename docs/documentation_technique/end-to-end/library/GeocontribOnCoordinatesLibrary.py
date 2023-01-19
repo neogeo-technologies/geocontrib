@@ -18,17 +18,12 @@ from utils import get_driver
 
 
 def geocontrib_click_at_coordinates(pos_x, pos_y, browser):
-    # set the point is difficult, but putting the point anywhere in canvas works
-    # get_driver().find_element_by_css_selector("canvas").click()
-
-    #if browser == "Chrome":
+    if browser == "Chrome":
     # in chrome, web driver implementation calculates from top left
-    actions = ActionChains(get_driver())
-    my_map = get_driver().find_element_by_css_selector("canvas")
-    actions.move_to_element_with_offset(my_map, pos_x, pos_y).click().perform()
-        #actions.move_to_element_with_offset(my_map, 480, 450).click().perform()
-
-    #else :
+        actions = ActionChains(get_driver())
+        my_map = get_driver().find_element_by_css_selector("canvas")
+        actions.move_to_element_with_offset(my_map, pos_x, pos_y).click().perform()
+    else :
     #in firefox web driver implementation start at canvas center
         # to use random values should be reversed or adapted, to be tested...
-        #get_driver().find_element_by_css_selector("canvas").click()
+        get_driver().find_element_by_css_selector("canvas").click()
