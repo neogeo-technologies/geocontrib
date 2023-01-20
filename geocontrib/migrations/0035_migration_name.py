@@ -2,7 +2,7 @@
 
 from django.db import migrations
 
-def sync_project_feature_browsing_default_sort(apps, elidible=True):
+def sync_project_feature_browsing_default_sort(apps, elidable=True):
     Project = apps.get_model("geocontrib", "Project")
     all_projects = Project.objects.all()
     for project in all_projects:
