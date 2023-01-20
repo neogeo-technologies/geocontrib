@@ -2,16 +2,13 @@
 
 from django.db import migrations
 
-def sync_project_feature_browsing_default_sort(apps):
+def sync_project_feature_browsing_default_sort(apps, elidible=True):
     Project = apps.get_model("geocontrib", "Project")
     all_projects = Project.objects.all()
     for project in all_projects:
         if project.feature_browsing_default_sort == 'created_on':
             project.feature_browsing_default_sort = '-created_on'
             project.save()
-
-def sync_new_db(apps, schema_editor, elidible=True):
-    sync_project_feature_browsing_default_sort(apps)
 
 
 
@@ -22,5 +19,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(sync_new_db, elidable=True),
+        migrations.RunPython(sync_project_feature_browsing_default_sort, elidable=True),
     ]
