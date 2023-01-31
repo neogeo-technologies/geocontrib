@@ -20,7 +20,7 @@ def get_pre_recorded_values(name, pattern=''):
             )
     if pattern:
         sql+="""
-             WHERE lower(values) like lower('{pattern}%%')
+             WHERE lower(values) like lower('%%{pattern}%%')
         """.format(
             pattern=pattern)
 
