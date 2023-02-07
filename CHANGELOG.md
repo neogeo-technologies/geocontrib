@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [4.2.1] - 2023-02-07
+
+### Evolutions
+
+- Redmine 15851 : Liste de valeurs pré-enregistrées - Pouvoir rechercher des caractères à l'intérieur de la chaîne
+- Redmine 15805 : Parcours de signalements - Activer le parcours après la création et l'édition d'un signalement
+
+### Corrections
+
+- Redmine 15806 : Mini map détail de signalement - Les fonds apparaissent de façon aléatoire
+- Redmine 15889 : Edition d'un signalement - Redirection vers la page de détail ne fonctionne plus
+- Redmine 15794 : Modification des attributs en masse - Copie de tous les attributs si le champ est laissé vide
+- Redmine 15793 : Edition d'un projet - Affichage incorrect des informations du projet
+
 ## [4.2.0] - 2023-01-16
 
 ### Evolutions
