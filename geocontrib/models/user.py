@@ -1,3 +1,4 @@
+import uuid
 from enum import Enum, unique
 
 from django.apps import apps
@@ -23,6 +24,13 @@ class User(AbstractUser):
 
     is_administrator = models.BooleanField(
         verbose_name="Est gestionnaire-métier", default=False)
+    
+    token = models.UUIDField(
+        'uuid',
+        unique=True,
+        default=uuid.uuid4,
+        editable=False
+    )
 
 
 class UserLevelPermission(models.Model):

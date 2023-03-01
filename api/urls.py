@@ -38,6 +38,7 @@ from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
 from api.views.project import ProjectTypesView
 from api.views.project import ProjectDuplicate
+from api.views.user import TokenView
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
@@ -161,6 +162,11 @@ urlpatterns = [
     path(
         'prerecorded-list-values/<str:name>/',
         PreRecordedValuesView.as_view(), name='prerecorded-list-values'),
+
+    path(
+        'get-token/',
+        TokenView.as_view(), name='get-token'
+    )
 ]
 
 

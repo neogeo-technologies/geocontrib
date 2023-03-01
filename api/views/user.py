@@ -1,3 +1,6 @@
+import logging
+import uuid
+
 from django.contrib.auth import get_user_model
 from rest_framework import mixins
 from rest_framework import views
@@ -13,7 +16,31 @@ from geocontrib.models import UserLevelPermission
 
 User = get_user_model()
 
+class TokenView(views.APIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
 
+    def get(self, request):
+        user = request.user
+        if user:
+            token = request.user.token
+            if not token:
+                user.token = uuid.uuid4()
+                user.save()
+        else:
+            logging.error(
+                """
+                    Impossible de générer le token car l'utilisateur
+                    n'est pas connecté
+                """
+            )
+            return Response(
+                "Bad request : USER is missing",
+                status=400
+            )
+        return Response(data=token, status=200)
+    
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
