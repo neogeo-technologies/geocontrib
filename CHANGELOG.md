@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [4.2.2] - 2023-03-03
+
+### Correction
+
+- Redmine 16287 : Liste de valeurs pré-enregistrées - La valeur ne s'affiche pas après l'avoir sélectionnée
+
 ## [4.2.1] - 2023-02-07
 
 ### Evolutions
