@@ -91,7 +91,18 @@ class TestToken(unittest.TestCase):
             username="usertest",
             token=self.token_mock.return_value
         )
+        # SET LOGIN WITH USER
         self.client.force_authenticate(user=user)
+        result = self.client.get(url)
+        assert result.status_code == 200
+        verify_or_create_json("api/tests/data/test_user_token_user.json", result.json())
+        token = result.json()
+        
+        # RESET SELF CLIENT
+        self.client.force_authenticate(user=None)
+
+        # SET LOGIN USER WITH TOKEN
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + token)
         result = self.client.get(url)
         assert result.status_code == 200
         verify_or_create_json("api/tests/data/test_user_token_user.json", result.json())
