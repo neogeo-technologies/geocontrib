@@ -56,6 +56,7 @@ class ProjectView(viewsets.ModelViewSet):
     search_fields = [
         'slug',
         'title',
+        'is_project_type'
     ]
 
     def get_serializer_class(self):
