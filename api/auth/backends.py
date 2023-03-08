@@ -37,9 +37,7 @@ class TokenAuthentication(BaseAuthentication):
         return user
     
     def authenticate(self, request):
-
         header = get_authorization_header(request)
-        
         if header is None:
             return None
 
