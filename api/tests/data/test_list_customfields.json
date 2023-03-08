@@ -1,1 +1,38 @@
-[["boolean", "Bool\u00e9en"], ["char", "Cha\u00eene de caract\u00e8res"], ["date", "Date"], ["list", "Liste de valeurs"], ["pre_recorded_list", "Liste de valeurs pr\u00e9-enregistr\u00e9es"], ["multi_choices_list", "Liste \u00e0 choix multiples"], ["integer", "Nombre entier"], ["decimal", "Nombre d\u00e9cimal"], ["text", "Texte multiligne"]]
+[
+    {
+        "type": "boolean",
+        "label": "Bool\u00e9en"
+    },
+    {
+        "type": "char",
+        "label": "Cha\u00eene de caract\u00e8res"
+    },
+    {
+        "type": "date",
+        "label": "Date"
+    },
+    {
+        "type": "list",
+        "label": "Liste de valeurs"
+    },
+    {
+        "type": "pre_recorded_list",
+        "label": "Liste de valeurs pr\u00e9-enregistr\u00e9es"
+    },
+    {
+        "type": "multi_choices_list",
+        "label": "Liste \u00e0 choix multiples"
+    },
+    {
+        "type": "integer",
+        "label": "Nombre entier"
+    },
+    {
+        "type": "decimal",
+        "label": "Nombre d\u00e9cimal"
+    },
+    {
+        "type": "text",
+        "label": "Texte multiligne"
+    }
+]

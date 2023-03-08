@@ -552,5 +552,13 @@ class CustomFields(APIView):
     ]
 
     def get(self, request):
+        type_choices = [] 
         status = 200
-        return JsonResponse(TYPE_CHOICES, safe=False, status=status)
+        for x, y in TYPE_CHOICES:
+            type_choices.append(
+                {
+                "type": x,
+                "label":y
+                }
+            )
+        return JsonResponse(type_choices, safe=False, status=status)
