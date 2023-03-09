@@ -55,9 +55,11 @@ router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
 router.register(r'base-maps', BaseMapViewset, basename='base-maps')
 router.register(r'layers', LayerViewset, basename='layers')
 router.register(r'levels-permissions', UserLevelsPermission, basename='levels-permissions')
-router.register(r'project-types', ProjectTypesView, basename='projects-types')
-# deprecated
 router.register(r'feature-types', FeatureTypeView, basename='feature-types')
+
+# deprecated
+router.register(r'project-types', ProjectTypesView, basename='projects-types')
+
 
 urlpatterns = [
     # Vues générales de navigation
