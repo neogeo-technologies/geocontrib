@@ -121,3 +121,10 @@ def test_feature_types_list(api_client):
 
     result = api_client.put(features_url, data, format="json")
     assert result.status_code == 400
+
+def test_custom_fields_list(api_client):
+    cf_url = reverse('api:customfields')
+    result = api_client.get(cf_url)
+    assert result.status_code == 200
+    verify_or_create_json("api/tests/data/test_list_customfields.json", result.json())
+

@@ -35,6 +35,7 @@ from api.serializers import FeatureEventSerializer
 from api.serializers import PreRecordedValuesSerializer
 from api.utils.paginations import CustomPagination
 from api.db_layer_utils import get_pre_recorded_values
+from geocontrib.choices import TYPE_CHOICES
 from geocontrib.models import Event
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
@@ -543,3 +544,21 @@ class PreRecordedValuesView(APIView):
             response = list(PreRecordedValues.objects.values("name"))
         status = 200
         return JsonResponse(response, safe=False, status=status)
+
+
+class CustomFields(APIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+
+    def get(self, request):
+        type_choices = [] 
+        status = 200
+        for x, y in TYPE_CHOICES:
+            type_choices.append(
+                {
+                "type": x,
+                "label":y
+                }
+            )
+        return JsonResponse(type_choices, safe=False, status=status)

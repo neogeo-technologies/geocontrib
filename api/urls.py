@@ -5,6 +5,7 @@ from rest_framework import routers
 from api.views.base_map import BaseMapViewset
 from api.views.base_map import GetFeatureInfo
 from api.views.base_map import LayerViewset
+from api.views.feature import CustomFields
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureEventView
 from api.views.feature import FeatureLinkView
@@ -166,6 +167,10 @@ urlpatterns = [
     path(
         'get-token/',
         TokenView.as_view(), name='get-token'
+    ),
+    path(
+        'customfields/',
+        CustomFields.as_view(), name='customfields'
     )
 ]
 
