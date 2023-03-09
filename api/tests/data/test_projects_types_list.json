@@ -1,0 +1,27 @@
+[
+    {
+        "title": "Projet 2",
+        "slug": "2-projet-2",
+        "created_on": "05/08/2021",
+        "updated_on": "05/08/2021",
+        "description": null,
+        "moderation": false,
+        "is_project_type": true,
+        "generate_share_link": false,
+        "fast_edition_mode": false,
+        "thumbnail": "/geocontrib/api/projects/2-projet-2/thumbnail/",
+        "creator": 1,
+        "access_level_pub_feature": "Utilisateur anonyme",
+        "access_level_arch_feature": "Utilisateur anonyme",
+        "archive_feature": null,
+        "delete_feature": null,
+        "map_max_zoom_level": 22,
+        "nb_features": 0,
+        "nb_published_features": 0,
+        "nb_comments": 0,
+        "nb_published_features_comments": 0,
+        "nb_contributors": 1,
+        "feature_browsing_default_filter": "",
+        "feature_browsing_default_sort": "-created_on"
+    }
+]

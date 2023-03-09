@@ -68,3 +68,14 @@ class ProjectsUserAccountFilter(filters.BaseFilterBackend):
             ).values_list('project__pk', flat=True)
             queryset = queryset.filter(Q(pk__in=project_authorized) | Q(creator=user))
         return queryset
+
+class ProjectsTypeFilter(filters.BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        is_project_type = request.query_params.get('is_project_type')
+        if is_project_type:
+            if is_project_type == 'true':
+                queryset = queryset.filter(is_project_type=True)
+            if is_project_type == 'false':
+                queryset = queryset.filter(is_project_type=False)
+        return queryset

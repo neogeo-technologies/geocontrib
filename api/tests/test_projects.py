@@ -81,6 +81,27 @@ def test_projects_list(api_client):
         }]
     }
 
+    Project.objects.create(
+        title="Projet 2",
+        access_level_pub_feature=anon_perm,
+        access_level_arch_feature=anon_perm,
+        creator=user,
+        is_project_type=True
+    )
+
+    # OLD ENDPOINT API
+    url = reverse('api:projects-types-list')
+    result = api_client.get(url)
+    assert result.status_code == 200
+    verify_or_create_json('api/tests/data/test_projects_types_list.json', result.json())
+
+    # NEW ENDPOINT API
+    url = reverse('api:projects-list') + "?is_project_type=true"
+    result = api_client.get(url)
+    assert result.status_code == 200
+    verify_or_create_json('api/tests/data/test_projects_types_list.json', result.json()['results'])
+
+
 
 @pytest.mark.freeze_time('2021-08-05')
 @pytest.mark.django_db(transaction=True, reset_sequences=True)
