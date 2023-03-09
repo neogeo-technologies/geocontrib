@@ -122,6 +122,24 @@ def test_feature_types_list(api_client):
     result = api_client.put(features_url, data, format="json")
     assert result.status_code == 400
 
+    project_slug = data['project']
+    # DEPRECATED ENDPOINT API
+    features_types_url = reverse('api:project-feature-types', args=[project_slug])
+    result = api_client.get(features_types_url)
+    assert result.status_code == 200
+    verify_or_create_json(
+        "api/tests/data/test_features_types_project_slug.json",
+        result.json()['feature_types']
+    )
+
+    # NEW ENDPOINT API
+    
+    features_url = reverse('api:feature-types-list')
+    url = features_url + '?projejct__slug=' + project_slug
+    result = api_client.get(url)
+    assert result.status_code == 200
+    verify_or_create_json("api/tests/data/test_features_types_project_slug.json", result.json())
+
 def test_custom_fields_list(api_client):
     cf_url = reverse('api:customfields')
     result = api_client.get(cf_url)

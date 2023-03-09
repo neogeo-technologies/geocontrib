@@ -89,7 +89,7 @@ def test_projects_list(api_client):
         is_project_type=True
     )
 
-    # OLD ENDPOINT API
+    # DEPRECATED ENDPOINT API
     url = reverse('api:projects-types-list')
     result = api_client.get(url)
     assert result.status_code == 200

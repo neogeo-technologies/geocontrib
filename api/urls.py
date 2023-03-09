@@ -86,15 +86,6 @@ urlpatterns = [
         'projects/<slug:project__slug>/utilisateurs/',
         ProjectAuthorizationView.as_view(), name='project-authorization'),
     path(
-        'projects/<slug:slug>/feature-types/',
-        ProjectFeatureTypes.as_view(), name='project-feature-types'),
-    path(
-        'projects/<slug:slug>/feature/',
-        ProjectFeature.as_view(), name='project-feature'),
-    path(
-        'projects/<slug:slug>/feature-paginated/',
-        ProjectFeaturePaginated.as_view(), name='project-feature-paginated'),
-    path(
         'projects/<slug:slug>/feature-bbox/',
         ProjectFeatureBbox.as_view(), name='project-feature-bbox'),
     path(
@@ -174,7 +165,18 @@ urlpatterns = [
     path(
         'customfields/',
         CustomFields.as_view(), name='customfields'
-    )
+    ),
+
+    # deprecated
+    path(
+        'projects/<slug:slug>/feature-types/',
+        ProjectFeatureTypes.as_view(), name='project-feature-types'),
+    path(
+        'projects/<slug:slug>/feature/',
+        ProjectFeature.as_view(), name='project-feature'),
+    path(
+        'projects/<slug:slug>/feature-paginated/',
+        ProjectFeaturePaginated.as_view(), name='project-feature-paginated'),
 ]
 
 

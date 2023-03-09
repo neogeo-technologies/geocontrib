@@ -33,6 +33,7 @@ from api.serializers import FeatureSearchSerializer
 from api.serializers import FeatureTypeListSerializer
 from api.serializers import FeatureEventSerializer
 from api.serializers import PreRecordedValuesSerializer
+from api.utils.filters import FeatureTypeFilter
 from api.utils.paginations import CustomPagination
 from api.db_layer_utils import get_pre_recorded_values
 from geocontrib.choices import TYPE_CHOICES
@@ -98,12 +99,13 @@ class FeatureView(
 
 
 class FeatureTypeView(
-            mixins.ListModelMixin,
-            mixins.RetrieveModelMixin,
-            mixins.CreateModelMixin,
-            mixins.UpdateModelMixin,
-            mixins.DestroyModelMixin,
-            viewsets.GenericViewSet):
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.CreateModelMixin,
+        mixins.UpdateModelMixin,
+        mixins.DestroyModelMixin,
+        viewsets.GenericViewSet
+    ):
 
     lookup_field = 'slug'
 
@@ -114,7 +116,9 @@ class FeatureTypeView(
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
-
+    filter_backends = [
+        FeatureTypeFilter
+    ]
 
 class ProjectFeatureTypes(views.APIView):
     queryset = Project.objects.all()
