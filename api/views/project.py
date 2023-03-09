@@ -23,6 +23,7 @@ from api.utils.validators import validate_image_file
 from api.utils.filters import AuthorizationLevelCodenameFilter
 from api.utils.filters import ProjectsModerationFilter
 from api.utils.filters import ProjectsAccessLevelFilter
+from api.utils.filters import ProjectsTypeFilter
 from api.utils.filters import ProjectsUserAccessLevelFilter
 from api.utils.filters import ProjectsUserAccessibleFilter
 from api.utils.filters import ProjectsUserAccountFilter
@@ -47,6 +48,7 @@ class ProjectView(viewsets.ModelViewSet):
 
     filter_backends = [
         filters.SearchFilter,
+        ProjectsTypeFilter,
         ProjectsModerationFilter,
         ProjectsAccessLevelFilter,
         ProjectsUserAccessLevelFilter,
@@ -56,7 +58,6 @@ class ProjectView(viewsets.ModelViewSet):
     search_fields = [
         'slug',
         'title',
-        'is_project_type'
     ]
 
     def get_serializer_class(self):
