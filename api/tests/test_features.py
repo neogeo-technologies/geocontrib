@@ -143,13 +143,34 @@ def sort_simple_features_by_title(data):
     """
     data["features"] = sorted(data.get("features", {}),  key=lambda d: d.get('title'))
 
+def sort_simple_features_geojson_by_title(data):
+    """
+    sort geojson by title
+    """
+    features = data.get("features", {})
+    # breakpoint()
+    data["features"] = sorted(features,  key=lambda d: d.get('properties')['title'])
+    # breakpoint()
+    # data["features"] = sorted(features,  key=lambda k: breakpoint() ("properties" not in k, k.get("properties", {}).get('title', '')))
+
+    # data["features"] = sorted(features,  key=lambda k: breakpoint() ("properties" not in k, k.get("properties", {'title':''}).get('title', '')))
+
+    # key=lambda d: d.get('properties')['title'])
+    # key=lambda k: ("properties" not in k, k.get("properties", None)['title']))
+    # key=lambda k: ("myKey" not in k, k.get("myKey", None)))
+
 @pytest.mark.django_db
 @pytest.mark.freeze_time('2021-08-05')
 def test_projectfeature(api_client):
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
     call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
+
+    # ************************* #
+    format = 'list'
+    # DEPRECATED ENDPOINT API
     # Test : get features of a project
-    features_url = reverse('api:project-feature', args=["1-aze"])
+    project_slug = "1-aze"
+    features_url = reverse('api:project-feature', args=[project_slug])
     result = api_client.get(f'{ features_url }')
     assert result.status_code == 200
 
@@ -157,6 +178,54 @@ def test_projectfeature(api_client):
                           result.json(),
                           sorter=sort_simple_features_by_title
                          )
+    # NEW ENDPOINT API
+    features_url = reverse('api:features-list')
+    url = features_url + '?project__slug=' + project_slug + "&output=" + format
+    result = api_client.get(url)
+    assert result.status_code == 200
+    verify_or_create_json(
+        "api/tests/data/test_projectfeature_anon.json",
+        result.json(),
+        sorter=sort_simple_features_by_title
+    )
+
+    # ************************* #
+    format = 'geojson'
+    # DEPRECATED ENDPOINT API
+    features_url = reverse('api:project-feature', args=[project_slug])
+    url = features_url  + '?output=' + format
+    result = api_client.get(url)
+    assert result.status_code == 200
+
+    verify_or_create_json(
+        "api/tests/data/test_projectfeature_anon_geojson.json",
+        result.json(),
+        sorter=sort_simple_features_geojson_by_title
+    )
+
+    # NEW ENDPOINT API
+    features_url = reverse('api:features-list')
+    url = features_url + '?project__slug=' + project_slug + "&output=" + format
+    
+    result = api_client.get(url)
+    assert result.status_code == 200
+    verify_or_create_json(
+        "api/tests/data/test_projectfeature_anon_geojson.json",
+        result.json(),
+        sorter=sort_simple_features_geojson_by_title
+    )
+
+    # VIEW AFFECTED BY TICKET 14474
+    features_url = reverse('api:features-list')
+    url = features_url + '?project__slug=' + project_slug
+
+    result = api_client.get(url)
+    assert result.status_code == 200
+    verify_or_create_json(
+        "api/tests/data/test_projectfeature_anon_FeatureGeoJSONSerializer.json",
+        result.json(),
+        sorter=sort_simple_features_geojson_by_title
+    )
 
 def sort_paginated_features_by_title(data):
     """

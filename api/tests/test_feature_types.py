@@ -133,9 +133,8 @@ def test_feature_types_list(api_client):
     )
 
     # NEW ENDPOINT API
-    
     features_url = reverse('api:feature-types-list')
-    url = features_url + '?projejct__slug=' + project_slug
+    url = features_url + '?project__slug=' + project_slug
     result = api_client.get(url)
     assert result.status_code == 200
     verify_or_create_json("api/tests/data/test_features_types_project_slug.json", result.json())

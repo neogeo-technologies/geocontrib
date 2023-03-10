@@ -49,12 +49,13 @@ User = get_user_model()
 
 
 class FeatureView(
-            mixins.ListModelMixin,
-            mixins.RetrieveModelMixin,
-            mixins.CreateModelMixin,
-            mixins.UpdateModelMixin,
-            mixins.DestroyModelMixin,
-            viewsets.GenericViewSet):
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.CreateModelMixin,
+        mixins.UpdateModelMixin,
+        mixins.DestroyModelMixin,
+        viewsets.GenericViewSet
+    ):
 
     lookup_field = 'feature_id'
 
@@ -95,7 +96,43 @@ class FeatureView(
         ordering = self.request.query_params.get('ordering')
         if ordering:
             queryset = queryset.order_by(ordering)
+        limit = self.request.query_params.get('limit')
+        if limit:
+            features = features[:int(limit)]
+
+        _id = self.request.query_params.get('id')
+        if _id:
+            features = features.filter(pk=_id)
         return queryset
+    
+    def list(self, request):
+        queryset = self.get_queryset()
+        count = queryset.count()
+        format = self.request.query_params.get('output')
+        if format and format == 'geojson':
+            queryset = FeatureDetailedSerializer(
+                queryset,
+                is_authenticated=self.request.user.is_authenticated,
+                many=True,
+                context={"request": self.request},
+            ).data
+        elif format and format == 'list':
+            serializers = FeatureListSerializer(
+                queryset,
+                many=True,
+                context={"request": self.request},
+            )
+            queryset = {
+                'features': serializers.data,
+                'count': count,
+            }
+        else:
+            queryset = FeatureGeoJSONSerializer(
+                queryset,
+                many=True,
+                context={'request': request}
+            ).data
+        return Response(queryset)
 
 
 class FeatureTypeView(
