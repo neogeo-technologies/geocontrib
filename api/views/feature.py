@@ -67,6 +67,8 @@ class FeatureView(
         permissions.IsAuthenticatedOrReadOnly
     ]
 
+    # pagination_class = CustomPagination
+
     def get_queryset(self):
         queryset = super().get_queryset()
 
@@ -98,19 +100,20 @@ class FeatureView(
             queryset = queryset.order_by(ordering)
         limit = self.request.query_params.get('limit')
         if limit:
-            features = features[:int(limit)]
-
+            queryset = queryset[:int(limit)]
         _id = self.request.query_params.get('id')
         if _id:
-            features = features.filter(pk=_id)
+            queryset = queryset.filter(pk=_id)
+
         return queryset
-    
+
     def list(self, request):
+        response = {}
         queryset = self.get_queryset()
         count = queryset.count()
         format = self.request.query_params.get('output')
         if format and format == 'geojson':
-            queryset = FeatureDetailedSerializer(
+            response = FeatureDetailedSerializer(
                 queryset,
                 is_authenticated=self.request.user.is_authenticated,
                 many=True,
@@ -122,17 +125,18 @@ class FeatureView(
                 many=True,
                 context={"request": self.request},
             )
-            queryset = {
+            response = {
                 'features': serializers.data,
                 'count': count,
             }
         else:
-            queryset = FeatureGeoJSONSerializer(
+            response = FeatureGeoJSONSerializer(
                 queryset,
                 many=True,
                 context={'request': request}
             ).data
-        return Response(queryset)
+
+        return Response(response)
 
 
 class FeatureTypeView(
