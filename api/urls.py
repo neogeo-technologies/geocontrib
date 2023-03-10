@@ -104,6 +104,9 @@ urlpatterns = [
         'projects/<slug:slug>/feature/<uuid:feature_id>/position-in-list/',
         ProjectFeaturePositionInList.as_view(), name='project-feature-position-in-list'),
     path(
+        'projects/<slug:slug>/feature-paginated/',
+        ProjectFeaturePaginated.as_view(), name='project-feature-paginated'),
+    path(
         'events/',
         EventView.as_view(), name='events-list'),
     path(
@@ -173,10 +176,7 @@ urlpatterns = [
         ProjectFeatureTypes.as_view(), name='project-feature-types'),
     path(
         'projects/<slug:slug>/feature/',
-        ProjectFeature.as_view(), name='project-feature'),
-    path(
-        'projects/<slug:slug>/feature-paginated/',
-        ProjectFeaturePaginated.as_view(), name='project-feature-paginated'),
+        ProjectFeature.as_view(), name='project-feature')
 ]
 
 

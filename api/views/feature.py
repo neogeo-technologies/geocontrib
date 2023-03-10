@@ -1,4 +1,3 @@
-from email import header
 import json
 import requests
 import csv
@@ -32,7 +31,6 @@ from api.serializers import FeatureListSerializer
 from api.serializers import FeatureSearchSerializer
 from api.serializers import FeatureTypeListSerializer
 from api.serializers import FeatureEventSerializer
-from api.serializers import PreRecordedValuesSerializer
 from api.utils.filters import FeatureTypeFilter
 from api.utils.paginations import CustomPagination
 from api.db_layer_utils import get_pre_recorded_values
@@ -66,8 +64,6 @@ class FeatureView(
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
-
-    # pagination_class = CustomPagination
 
     def get_queryset(self):
         queryset = super().get_queryset()
