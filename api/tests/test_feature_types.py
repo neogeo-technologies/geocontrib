@@ -13,7 +13,7 @@ def test_feature_types_list(api_client):
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
     call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
 
-    features_url = reverse('api:feature-types-list')
+    features_url = reverse('api:feature-types-deprecated-list')
     # Ensure available even when not logged in
     result = api_client.get(features_url)
     assert result.status_code == 200
@@ -74,7 +74,7 @@ def test_feature_types_list(api_client):
     data['title'] = "New feature type edited"
 
     # Test Can edit feature type
-    features_url = reverse('api:feature-types-detail', args=['4-new-feature-type'])
+    features_url = reverse('api:feature-types-deprecated-detail', args=['4-new-feature-type'])
     result = api_client.put(features_url, data, format="json")
     assert result.status_code == 200
     # TODO REDMINE 14854 ne marche pas, PUT retourne le vielle objet, pas le nouveau... mais il est bien inscrit en base
@@ -133,7 +133,7 @@ def test_feature_types_list(api_client):
     )
 
     # NEW ENDPOINT API
-    features_url = reverse('api:feature-types-list')
+    features_url = reverse('api:feature-types-deprecated-list')
     url = features_url + '?project__slug=' + project_slug
     result = api_client.get(url)
     assert result.status_code == 200

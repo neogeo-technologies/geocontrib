@@ -5,22 +5,32 @@ from rest_framework import routers
 from api.views.base_map import BaseMapViewset
 from api.views.base_map import GetFeatureInfo
 from api.views.base_map import LayerViewset
+# deprecated
+from api.views.deprecated.base_map_deprecated import BaseMapViewsetDeprecated
+from api.views.deprecated.base_map_deprecated import LayerViewsetDeprecated
+from api.views.deprecated.feature_deprecated import FeatureViewDeprecated
+from api.views.deprecated.feature_deprecated import FeatureTypeViewDeprecated
+from api.views.deprecated.feature_deprecated import ProjectFeatureDeprecated
+from api.views.deprecated.feature_deprecated import ProjectFeatureTypesDeprecated
+from api.views.deprecated.misc_deprecated import ImportTaskSearchDeprecated
+from api.views.deprecated.project_deprecated import ProjectViewDeprecated
+from api.views.deprecated.project_deprecated import ProjectTypesViewDeprecated
+from api.views.deprecated.user_deprecated import UserLevelsPermissionDeprecated
+from api.views.deprecated.user_deprecated import UserViewSetDeprecated
+
 from api.views.feature import CustomFields
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureEventView
 from api.views.feature import FeatureLinkView
 from api.views.feature import FeatureSearch
-from api.views.feature import FeatureTypeView
 from api.views.feature import FeatureView
 from api.views.feature import FeatureMVTView
 from api.views.feature import GetExternalGeojsonView
 from api.views.feature import GetIdgoCatalogView
 from api.views.feature import PreRecordedValuesView
-from api.views.feature import ProjectFeature
 from api.views.feature import ProjectFeatureBbox
 from api.views.feature import ProjectFeaturePaginated
 from api.views.feature import ProjectFeaturePositionInList
-from api.views.feature import ProjectFeatureTypes
 from api.views.flat_pages import FlatPagesView
 from api.views.login import LoginView
 from api.views.login import LogoutView
@@ -49,17 +59,24 @@ from api.views import version
 app_name = 'api'
 
 router = routers.DefaultRouter()
-router.register(r'projects', ProjectView, basename='projects')
-router.register(r'features', FeatureView, basename='features')
-router.register(r'users', UserViewSet, basename='users')
-router.register(r'import-tasks', ImportTaskSearch, basename='importtask')
-router.register(r'base-maps', BaseMapViewset, basename='base-maps')
-router.register(r'layers', LayerViewset, basename='layers')
-router.register(r'levels-permissions', UserLevelsPermission, basename='levels-permissions')
-router.register(r'feature-types', FeatureTypeView, basename='feature-types')
+router.register(r'v2/projects', ProjectView, basename='projects')
+router.register(r'v2/features', FeatureView, basename='features')
+router.register(r'v2/users', UserViewSet, basename='users')
+router.register(r'v2/import-tasks', ImportTaskSearch, basename='importtask')
+router.register(r'v2/base-maps', BaseMapViewset, basename='base-maps')
+router.register(r'v2/layers', LayerViewset, basename='layers')
+router.register(r'v2/levels-permissions', UserLevelsPermission, basename='levels-permissions')
 
 # deprecated
-router.register(r'project-types', ProjectTypesView, basename='projects-types')
+router.register(r'base-maps', BaseMapViewsetDeprecated, basename='base-maps-deprecated')
+router.register(r'import-tasks', ImportTaskSearchDeprecated, basename='importtask-deprecated')
+router.register(r'features', FeatureViewDeprecated, basename='features-deprecated')
+router.register(r'feature-types', FeatureTypeViewDeprecated, basename='feature-types-deprecated')
+router.register(r'layers', LayerViewsetDeprecated, basename='layers-deprecated')
+router.register(r'levels-permissions', UserLevelsPermissionDeprecated, basename='levels-permissions-deprecated')
+router.register(r'projects', ProjectViewDeprecated, basename='projects-deprecated')
+router.register(r'project-types', ProjectTypesViewDeprecated, basename='projects-types-deprecated')
+router.register(r'users', UserViewSetDeprecated, basename='users-deprecated')
 
 
 urlpatterns = [
@@ -173,10 +190,10 @@ urlpatterns = [
     # deprecated
     path(
         'projects/<slug:slug>/feature-types/',
-        ProjectFeatureTypes.as_view(), name='project-feature-types'),
+        ProjectFeatureTypesDeprecated.as_view(), name='project-feature-types'),
     path(
         'projects/<slug:slug>/feature/',
-        ProjectFeature.as_view(), name='project-feature')
+        ProjectFeatureDeprecated.as_view(), name='project-feature')
 ]
 
 

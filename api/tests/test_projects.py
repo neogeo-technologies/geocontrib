@@ -90,7 +90,7 @@ def test_projects_list(api_client):
     )
 
     # DEPRECATED ENDPOINT API
-    url = reverse('api:projects-types-list')
+    url = reverse('api:projects-types-deprecated-list')
     result = api_client.get(url)
     assert result.status_code == 200
     verify_or_create_json('api/tests/data/test_projects_types_list.json', result.json())
