@@ -1,11 +1,11 @@
-from django.urls import path, re_path
+from django.urls import path
 from rest_framework import routers
 
 
 from api.views.base_map import BaseMapViewset
 from api.views.base_map import GetFeatureInfo
 from api.views.base_map import LayerViewset
-# deprecated
+# ************ deprecated ************
 from api.views.deprecated.base_map_deprecated import BaseMapViewsetDeprecated
 from api.views.deprecated.base_map_deprecated import LayerViewsetDeprecated
 from api.views.deprecated.feature_deprecated import FeatureViewDeprecated
@@ -17,12 +17,13 @@ from api.views.deprecated.project_deprecated import ProjectViewDeprecated
 from api.views.deprecated.project_deprecated import ProjectTypesViewDeprecated
 from api.views.deprecated.user_deprecated import UserLevelsPermissionDeprecated
 from api.views.deprecated.user_deprecated import UserViewSetDeprecated
-
+# ************************************
 from api.views.feature import CustomFields
 from api.views.feature import ExportFeatureList
 from api.views.feature import FeatureEventView
 from api.views.feature import FeatureLinkView
 from api.views.feature import FeatureSearch
+from api.views.feature import FeatureTypeView
 from api.views.feature import FeatureView
 from api.views.feature import FeatureMVTView
 from api.views.feature import GetExternalGeojsonView
@@ -61,6 +62,7 @@ app_name = 'api'
 router = routers.DefaultRouter()
 router.register(r'v2/projects', ProjectView, basename='projects')
 router.register(r'v2/features', FeatureView, basename='features')
+router.register(r'v2/feature-types', FeatureTypeView, basename='feature-types')
 router.register(r'v2/users', UserViewSet, basename='users')
 router.register(r'v2/import-tasks', ImportTaskSearch, basename='importtask')
 router.register(r'v2/base-maps', BaseMapViewset, basename='base-maps')

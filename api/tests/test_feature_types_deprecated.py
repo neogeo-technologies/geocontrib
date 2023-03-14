@@ -6,18 +6,19 @@ from conftest import verify_or_create_json
 
 from geocontrib.models.user import User
 
+# DEPRECATED ENDPOINTS
 
 @pytest.mark.django_db
 @pytest.mark.freeze_time('2021-08-05')
-def test_feature_types_list(api_client):
+def test_feature_types_list_deprecated(api_client):
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
     call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
 
-    features_url = reverse('api:feature-types-list')
+    features_url = reverse('api:feature-types-deprecated-list')
     # Ensure available even when not logged in
     result = api_client.get(features_url)
     assert result.status_code == 200
-    verify_or_create_json("api/tests/data/test_features_types_anon.json", result.json())
+    verify_or_create_json("api/tests/data/deprecated/test_features_types_anon.json", result.json())
 
     user = User.objects.get(username="admin")
     api_client.force_authenticate(user=user)
@@ -68,23 +69,24 @@ def test_feature_types_list(api_client):
     # Test Can create feature type
     result = api_client.post(features_url, data, format="json")
     assert result.status_code == 201
-    verify_or_create_json("api/tests/data/test_features_types_create.json", result.json())
+    verify_or_create_json("api/tests/data/deprecated/test_features_types_create.json", result.json())
     # To be able to edit the previous feature type
     #data["slug"] = "4-new-feature-type"
     data['title'] = "New feature type edited"
 
     # Test Can edit feature type
-    features_url = reverse('api:feature-types-detail', args=['4-new-feature-type'])
+    features_url = reverse('api:feature-types-deprecated-detail', args=['4-new-feature-type'])
     result = api_client.put(features_url, data, format="json")
     assert result.status_code == 200
     # TODO REDMINE 14854 ne marche pas, PUT retourne le vielle objet, pas le nouveau... mais il est bien inscrit en base
-    #verify_or_create_json("api/tests/data/test_features_types_edit.json", result.json())
+    #verify_or_create_json("api/tests/data/deprecated/test_features_types_edit.json", result.json())
 
     result = api_client.get(features_url)
     assert result.status_code == 200
-    verify_or_create_json("api/tests/data/test_features_types_edit.json", result.json())
+    verify_or_create_json("api/tests/data/deprecated/test_features_types_edit.json", result.json())
 
     # TODO ajouter test sur les customfields (ou les ajouter dans ces test
+
 
     # S'assure qu'on peut remonter beaucoup d'options
     for i in range(256):
@@ -98,7 +100,7 @@ def test_feature_types_list(api_client):
 
     result = api_client.get(features_url)
     assert result.status_code == 200
-    verify_or_create_json("api/tests/data/test_features_types_edit_many_options.json", result.json())
+    verify_or_create_json("api/tests/data/deprecated/test_features_types_edit_many_options.json", result.json())
 
 
     # S'assure qu'une option est limité à 256 caractères
@@ -112,7 +114,7 @@ def test_feature_types_list(api_client):
 
     result = api_client.get(features_url)
     assert result.status_code == 200
-    verify_or_create_json("api/tests/data/test_features_types_edit_long_options.json", result.json())
+    verify_or_create_json("api/tests/data/deprecated/test_features_types_edit_long_options.json", result.json())
 
     # S'assure qu'une option est limité à 256 caractères (260 caractères => plante)
     base = "1234567890" * 26
@@ -123,15 +125,10 @@ def test_feature_types_list(api_client):
 
     project_slug = data['project']
 
-    features_url = reverse('api:feature-types-list')
-    url = features_url + '?project__slug=' + project_slug
-    result = api_client.get(url)
+    features_types_url = reverse('api:project-feature-types', args=[project_slug])
+    result = api_client.get(features_types_url)
     assert result.status_code == 200
-    verify_or_create_json("api/tests/data/test_features_types_project_slug.json", result.json())
-
-def test_custom_fields_list(api_client):
-    cf_url = reverse('api:customfields')
-    result = api_client.get(cf_url)
-    assert result.status_code == 200
-    verify_or_create_json("api/tests/data/test_list_customfields.json", result.json())
-
+    verify_or_create_json(
+        "api/tests/data/deprecated/test_features_types_project_slug.json",
+        result.json()['feature_types']
+    )
