@@ -7,6 +7,7 @@ djangorestframework>=3.11.2,<3.12.0
 # waiting https://github.com/corteva/djangorestframework-mvt/issues/10 to be merged
 git+https://github.com/neogeo-technologies/djangorestframework-mvt.git@138a09f092c04247f3f9dfc4546e5dad5d04ccc6#egg=djangorestframework-mvt
 #djangorestframework-mvt>=0.2.5,<0.3.0
+drf-yasg==1.21.5
 ldap3==2.6.1
 Pillow<9.2.0
 psycopg2-binary==2.9.3

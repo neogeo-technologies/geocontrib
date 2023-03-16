@@ -3,6 +3,7 @@ import requests
 import csv
 import collections
 
+from drf_yasg.utils import swagger_auto_schema
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Polygon
@@ -46,7 +47,8 @@ from geocontrib.models import Project
 User = get_user_model()
 
 
-class FeatureView(
+@swagger_auto_schema(deprecated=True)
+class FeatureViewDeprecated(
         mixins.ListModelMixin,
         mixins.RetrieveModelMixin,
         mixins.CreateModelMixin,
@@ -135,7 +137,8 @@ class FeatureView(
         return Response(response)
 
 
-class FeatureTypeView(
+@swagger_auto_schema(deprecated=True)
+class FeatureTypeViewDeprecated(
         mixins.ListModelMixin,
         mixins.RetrieveModelMixin,
         mixins.CreateModelMixin,
@@ -157,7 +160,9 @@ class FeatureTypeView(
         FeatureTypeFilter
     ]
 
-class ProjectFeatureTypes(views.APIView):
+
+@swagger_auto_schema(deprecated=True)
+class ProjectFeatureTypesDeprecated(views.APIView):
     queryset = Project.objects.all()
     lookup_field = 'slug'
     http_method_names = ['get', ]
@@ -171,7 +176,8 @@ class ProjectFeatureTypes(views.APIView):
         return Response(data, status=200)
 
 
-class ProjectFeature(views.APIView):
+@swagger_auto_schema(deprecated=True)
+class ProjectFeatureDeprecated(views.APIView):
     queryset = Project.objects.all()
     lookup_field = 'slug'
     http_method_names = ['get', ]

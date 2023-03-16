@@ -40,7 +40,7 @@ CORE_APPS = [
     'django.contrib.flatpages',
     'django_admin_listfilter_dropdown',
 ]
-THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis, django_celery_beat,', cast=Csv())
+THIRD_PARTY_DJANGO_APPS = config('THIRD_PARTY_DJANGO_APPS', default='rest_framework, rest_framework_gis, django_celery_beat, drf_yasg,', cast=Csv())
 OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
 SSO_PLUGIN = config('SSO_PLUGIN', default='', cast=Csv())
 INSTALLED_APPS = CORE_APPS + THIRD_PARTY_DJANGO_APPS + OUR_APPS + SSO_PLUGIN

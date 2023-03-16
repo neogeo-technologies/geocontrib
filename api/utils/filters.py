@@ -1,8 +1,14 @@
 from logging import log
-from rest_framework import filters
-from geocontrib.models import Authorization, UserLevelPermission, user
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from rest_framework import filters
 
+from api.serializers import FeatureDetailedSerializer
+from api.serializers import FeatureListSerializer
+from geocontrib.models import Authorization
+from geocontrib.models import Feature
+from geocontrib.models import FeatureType
+from geocontrib.models import Project
 
 class AuthorizationLevelCodenameFilter(filters.BaseFilterBackend):
 
@@ -78,4 +84,15 @@ class ProjectsTypeFilter(filters.BaseFilterBackend):
                 queryset = queryset.filter(is_project_type=True)
             if is_project_type == 'false':
                 queryset = queryset.filter(is_project_type=False)
+        return queryset
+
+
+class FeatureTypeFilter(filters.BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        slug = request.query_params.get('project__slug', None)
+        if slug:
+            queryset = FeatureType.objects.filter(
+                project__slug=slug
+                ).order_by("title")
         return queryset
