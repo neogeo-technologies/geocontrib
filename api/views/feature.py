@@ -2,6 +2,7 @@ import json
 import requests
 import csv
 import collections
+from datetime import date
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -133,6 +134,14 @@ class FeatureView(
             ).data
 
         return Response(response)
+
+    def destroy(self, request, *args, **kwargs):
+        feature = self.get_object()
+        feature.deletion_on = date.today()
+        feature.save()
+        message = {"message": "Le signalement a était supprimé"}
+        return Response(message)
+
 
 
 class FeatureTypeView(
@@ -485,6 +494,7 @@ class FeatureMVTView(BaseMVTView):
 
         project_slug = self.request.query_params.get('project__slug')
         project_id = self.request.query_params.get('project_id')
+        deletion_on = self.request.query_params.get('deletion', None)
         if project_slug or project_id:
             qs_kwargs = dict()
             if project_slug:
@@ -509,6 +519,10 @@ class FeatureMVTView(BaseMVTView):
             raise ValidationError(detail="Must provide one of the parameters:"
                                   "project_id, project__slug, featuretype_id or feature_type__slug")
 
+        if deletion_on and deletion_on == 'true':
+            queryset = queryset.filter(deletion_on__isnull=False)
+        else:
+            queryset = queryset.filter(deletion_on__isnull=True)
         if not request.GET._mutable:
             request.GET._mutable = True
         request.GET["pk__in"] = queryset.order_by("created_on").values_list("pk", flat=True)
