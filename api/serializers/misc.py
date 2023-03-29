@@ -143,8 +143,8 @@ class CommentSerializer(serializers.ModelSerializer):
                 feature = Feature.objects.get(feature_id=obj.feature_id)
                 res = {
                     'feature_id': str(feature.feature_id),
+                    'feature_type_slug': str(feature.feature_type.slug),
                     'title': str(feature.title),
-                    'feature_url': feature.get_view_url()
                 }
             except Exception:
                 logger.exception('No related feature found')
