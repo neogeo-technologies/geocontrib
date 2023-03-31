@@ -13,7 +13,7 @@ Pillow<9.2.0
 psycopg2-binary==2.9.3
 python-decouple==3.3
 python-magic==0.4.24
-redis==3.5.3
+redis==4.4.4
 requests
 django-admin-list-filter-dropdown
 django-cas-ng
