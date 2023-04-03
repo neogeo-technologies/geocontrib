@@ -246,6 +246,7 @@ def test_project_feature_bbox(api_client):
 def test_project_export(api_client):
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
     call_command("loaddata", "api/tests/data/test_features.json", verbosity=0)
+    project_slug = "1-aze"
 
     # Test : export a feature type in geojson
     features_url = reverse('api:project-export', args=["1-aze", "2-type-2"])
@@ -257,6 +258,23 @@ def test_project_export(api_client):
     result = api_client.get(f'{ features_url }?format_export=csv')
     assert result.status_code == 200
     verify_or_create("api/tests/data/test_project_export.csv", result.content)
+
+    features_url = reverse('api:features-list')
+    url = features_url + '?project__slug=' + project_slug
+    result = api_client.get(url)
+    feature = result.json()['features'][0]
+    fts = feature['properties']['feature_type']
+    feature_id = feature['id']
+    features_url = reverse('api:features-detail', args=[feature_id])
+
+    user = User.objects.get(username="admin")
+    api_client.force_authenticate(user=user)
+    url = f'{ features_url }?project__slug={project_slug}&feature_type__slug={fts}'
+    result = api_client.delete(
+        url,
+        format="json"
+    )
+    assert result.status_code == 200
 
     # Test : export a feature type in MVT
     # TODO Test avec feature type Slug (fails)

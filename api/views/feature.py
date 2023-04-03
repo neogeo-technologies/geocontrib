@@ -517,7 +517,8 @@ class FeatureMVTView(BaseMVTView):
         if not any([feature_type_slug, project_slug, project_id, featuretype_id]):
             raise ValidationError(detail="Must provide one of the parameters:"
                                   "project_id, project__slug, featuretype_id or feature_type__slug")
-
+        # Ticket 16246, filter is deletion_on
+        queryset = queryset.filter(deletion_on__isnull=False)
         if not request.GET._mutable:
             request.GET._mutable = True
         request.GET["pk__in"] = queryset.order_by("created_on").values_list("pk", flat=True)
