@@ -24,7 +24,7 @@
                 {% if event.related_feature %}
                   {{ event.created_on }} - <a href="{{ event.related_feature.feature_url|absurl }}">"{{ event.related_feature.title }}"</a>
                 {% else %}
-                  {{ event.created_on }} - <s>"{{ event.data.feature_title }}"</s> <i>(Ressource supprimée depuis)</i> -
+                  {{ event.created_on }} - <s>"{{ event.data.feature_title }}"</s> <em>(Ressource supprimée depuis)</em> -
                 {% endif%}
 
                 {% if event.event_type == 'create' %}
