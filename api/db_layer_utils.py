@@ -1,7 +1,7 @@
 from api.utils.db_utils import fetch_raw_data
 
 
-def get_pre_recorded_values(name, pattern=''):
+def get_pre_recorded_values(name, pattern='', limit=''):
     """
         Fonction recuperant les valeurs pré
         enregistrées.
@@ -24,7 +24,11 @@ def get_pre_recorded_values(name, pattern=''):
         """.format(
             pattern=pattern)
 
-    sql += "ORDER BY values LIMIT 10;"
+    sql += "ORDER BY values"
+    if limit:
+        sql += " LIMIT {limit};".format(
+                limit=limit,
+            )
 
     return fetch_raw_data('default', sql)
 

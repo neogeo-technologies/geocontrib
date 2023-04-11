@@ -36,3 +36,15 @@ def test_get_prerecorded_values_list(api_client):
     verify_or_create_json("api/tests/data/test_pre_recorded_values_list.json",
                           result.json(),
                          )
+    
+    result = api_client.get(f'{ prv_url }?pattern=l&limit=5')
+    assert result.status_code == 200
+    verify_or_create_json("api/tests/data/test_pre_recorded_values_list_5.json",
+                          result.json(),
+                         )
+
+    result = api_client.get(f'{ prv_url }?pattern=l&limit=')
+    assert result.status_code == 200
+    verify_or_create_json("api/tests/data/test_pre_recorded_values_list_all_l.json",
+                          result.json(),
+                         )
