@@ -570,10 +570,9 @@ class PreRecordedValuesView(APIView):
         permissions.IsAuthenticatedOrReadOnly
     ]
 
-    def get(self, request):
+    def get(self, request, name=None):
         response=[]
         values=[]
-        name = self.kwargs.get('name', None)
         pattern = self.request.query_params.get('pattern', '')
         limit = self.request.query_params.get('limit', '')
 
