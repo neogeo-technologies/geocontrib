@@ -46,25 +46,3 @@ class FeatureTypeFilter(SimpleListFilter):
             )
 
         return queryset
-
-class DeletionOnListFilter(SimpleListFilter):
-
-    title = ('Date de suppression')
-
-    parameter_name = 'has_deletion_on'
-
-    def lookups(self, request, model_admin):
-
-        return (
-            ('yes', ('Oui')),
-            ('no',  ('Non')),
-        )
-
-    def queryset(self, request, queryset):
-
-        if self.value() == 'yes':
-            return queryset.filter(deletion_on__isnull=False)
-
-        if self.value() == 'no':
-            return queryset.filter(deletion_on__isnull=True)
-

@@ -1,9 +1,7 @@
-from datetime import date
 import logging
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.actions import delete_selected
 from django.contrib.auth import get_user_model
 from django.contrib.gis import admin
 from django.contrib.postgres.aggregates import StringAgg
@@ -18,7 +16,6 @@ from django.urls import path
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 
-from geocontrib.admin.filters import DeletionOnListFilter
 from geocontrib.admin.filters import FeatureTypeFilter
 from geocontrib.admin.filters import ProjectFilter
 from geocontrib.forms import FeatureTypeAdminForm
@@ -74,8 +71,6 @@ class FeatureTypeAdmin(admin.ModelAdmin):
     list_display = ('title', 'project')
 
     ordering = ('project', 'title')
-
-    delete_selected.short_description = 'Purger les signalements sélectionnés'
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
@@ -209,22 +204,19 @@ class FeatureAdmin(admin.ModelAdmin):
         'project',
         'feature_type_title',
         'status',
-        'contributeurs',
-        'deletion_on'
+        'contributeurs'
     )
     list_filter = (
         ('project__slug', DropdownFilter),
         ('feature_type__title', DropdownFilter),
         'status',
         ('creator', RelatedDropdownFilter),
-        (DeletionOnListFilter),
     )
     actions = (
         'to_draft',
         'to_pending',
         'to_published',
-        'to_archived',
-        'to_erased'
+        'to_archived'
     )
     ordering = ('project', 'feature_type', 'title')
 
@@ -283,10 +275,6 @@ class FeatureAdmin(admin.ModelAdmin):
     def to_archived(self, request, queryset):
         queryset.update(status='archived')
     to_archived.short_description = "Changer status à Archivé"
-
-    def to_erased(self, request, queryset):
-        queryset.update(deletion_on=date.today())
-    to_erased.short_description = "Supprimer les signalements sélectionnés"
 
 
 class FeatureLinkAdmin(admin.ModelAdmin):

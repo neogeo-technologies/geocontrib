@@ -157,6 +157,7 @@ class FeatureListSerializer(serializers.ModelSerializer):
             'feature_type',
             'geom',
             'feature_data',
+            'archived_on',
         )
 
     def get_feature_data(self, obj):
@@ -207,6 +208,7 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             'status',
             'created_on',
             'updated_on',
+            'archived_on',
             'deletion_on',
             'feature_type',
             'project',
@@ -217,6 +219,7 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
         read_only_fields = (
             'created_on',
             'updated_on',
+            'archived_on',
             'deletion_on',
             'display_last_editor',
         )
@@ -324,6 +327,7 @@ class FeatureCSVSerializer(serializers.ModelSerializer):
             'status',
             'created_on',
             'updated_on',
+            'archived_on',
             'deletion_on',
             'feature_type',
             'project',
@@ -336,6 +340,7 @@ class FeatureCSVSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'created_on',
             'updated_on',
+            'archived_on',
             'deletion_on',
             'display_last_editor',
         )
@@ -411,6 +416,7 @@ class FeatureSearchSerializer(serializers.ModelSerializer):
             'creator',
             'created_on',
             'updated_on',
+            'archived_on',
             'deletion_on',
             'project_slug',
             'feature_type_slug',
@@ -437,6 +443,8 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
 
     updated_on = serializers.DateTimeField(format="%d/%m/%Y %H:%M")
 
+    archived_on = serializers.DateField(format="%d/%m/%Y")
+
     class Meta:
         model = Feature
         geo_field = 'geom'
@@ -449,6 +457,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
             'display_last_editor',
             'created_on',
             'updated_on',
+            'archived_on',
             'deletion_on',
             'feature_type',
             'feature_url',
