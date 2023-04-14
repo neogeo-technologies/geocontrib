@@ -139,7 +139,7 @@ class FeatureView(
         feature = self.get_object()
         feature.deletion_on = date.today()
         feature.save()
-        message = {"message": "Le signalement a était supprimé"}
+        message = {"message": "Le signalement a été supprimé"}
         return Response(message)
 
 
