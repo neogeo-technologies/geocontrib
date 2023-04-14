@@ -1,3 +1,3 @@
-id,title,description,status,created_on,updated_on,deletion_on,feature_type,project,display_creator,display_last_editor,creator,lat,lon
-75540f8e-0f4d-4317-9818-cc1219a5df8c,publié,,published,2021-09-30T13:25:44.913000+02:00,2021-09-30T13:25:44.913000+02:00,,1-dfsdfs,1-aze,admin,Utilisateur supprimé,1,45.033764,1.099397
-71f9778a-fe84-4c2e-ab9b-4dba95d2aeee,type 1 brouillon,,draft,2021-09-30T13:25:10.297000+02:00,2021-09-30T13:42:42.269000+02:00,,1-dfsdfs,1-aze,admin,Utilisateur supprimé,1,47.582285,8.221315
+id,title,description,status,created_on,updated_on,archived_on,deletion_on,feature_type,project,display_creator,display_last_editor,creator,lat,lon
+75540f8e-0f4d-4317-9818-cc1219a5df8c,publié,,published,2021-09-30T13:25:44.913000+02:00,2021-09-30T13:25:44.913000+02:00,,,1-dfsdfs,1-aze,admin,Utilisateur supprimé,1,45.033764,1.099397
+71f9778a-fe84-4c2e-ab9b-4dba95d2aeee,type 1 brouillon,,draft,2021-09-30T13:25:10.297000+02:00,2021-09-30T13:42:42.269000+02:00,,,1-dfsdfs,1-aze,admin,Utilisateur supprimé,1,47.582285,8.221315

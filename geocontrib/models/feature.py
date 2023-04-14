@@ -40,11 +40,11 @@ class Feature(models.Model):
 
     updated_on = models.DateTimeField("Date de maj", null=True, blank=True)
 
+    archived_on = models.DateField(
+        "Date d'archivage automatique", null=True, blank=True)
+
     deletion_on = models.DateField(
-        "Date de suppression",
-        null=True,
-        blank=True
-    )
+        "Date de suppression automatique", null=True, blank=True)
 
     creator = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, verbose_name="Créateur",

@@ -46,7 +46,8 @@
                     "field_type": "list",
                     "value": ""
                 }
-            ]
+            ],
+            "archived_on": null
         },
         {
             "feature_id": "7e29a761-6683-4baf-ae8b-9ce14557f053",
@@ -94,7 +95,8 @@
                     "field_type": "boolean",
                     "value": ""
                 }
-            ]
+            ],
+            "archived_on": null
         }
     ]
 }

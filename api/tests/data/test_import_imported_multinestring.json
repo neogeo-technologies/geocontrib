@@ -41,6 +41,7 @@
                 "status": "draft",
                 "created_on": "2021-08-05T02:00:00+02:00",
                 "updated_on": "2021-08-05T02:00:00+02:00",
+                "archived_on": null,
                 "deletion_on": null,
                 "feature_type": "3-type-multilinestring",
                 "project": "1-aze",
