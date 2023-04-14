@@ -38,7 +38,6 @@
             },
             "id": "bcc78877-ecbb-47cc-9cbc-ddbec72d0ee1",
             "properties": {
-                "archived_on": null,
                 "created_on": "2020-11-27T10:16:21.193604+01:00",
                 "deletion_on": null,
                 "description": "",
@@ -102,7 +101,6 @@
             },
             "id": "50253011-059d-4297-b996-fbd76934abe5",
             "properties": {
-                "archived_on": null,
                 "created_on": "2020-11-27T10:15:31.971317+01:00",
                 "deletion_on": null,
                 "description": "",

@@ -1,1 +1,57 @@
-{"type": "FeatureCollection", "features": [{"id": "a0fdf7a9-84ac-485c-b165-fe95f16a48e6", "type": "Feature", "geometry": {"type": "MultiPoint", "coordinates": [[26.515404898762355, 38.65952443378535], [1.81649009719906, 43.84846827347161], [20.770156184651952, 43.54872517476559]]}, "properties": {"title": "b189f40b-c1dd-457f-883d-9476f5b34aa3", "description": null, "status": "published", "created_on": "2022-08-31T10:31:03.198483+02:00", "updated_on": "2022-09-01T10:39:43.795753+02:00", "archived_on": null, "deletion_on": null, "feature_type": "369-centre_permis_conduire_multipoint", "project": "276-fast-edition", "display_creator": "admin", "display_last_editor": "admin", "creator": 1, "nom": "indiv DDTM", "code": 60170, "xcoord": 419944, "ycoord": 6316805, "adresse1": "DDTM", "adresse2": "351 BL SAINT MEDARD BP 369", "permis_a": "a", "permis_b": "b", "permis_ec": null, "a_nomb_exa": 0, "b_nomb_exa": 0, "code_commu": 40192, "code_posta": 40012, "code_rubri": "CEXAM", "ec_nomb_ex": 0, "etg_nomb_e": 17, "nom_commun": "MONT DE MARSAN", "permis_etg": "ETG"}}]}
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "a0fdf7a9-84ac-485c-b165-fe95f16a48e6",
+            "type": "Feature",
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": [
+                    [
+                        26.515404898762355,
+                        38.65952443378535
+                    ],
+                    [
+                        1.81649009719906,
+                        43.84846827347161
+                    ],
+                    [
+                        20.770156184651952,
+                        43.54872517476559
+                    ]
+                ]
+            },
+            "properties": {
+                "title": "b189f40b-c1dd-457f-883d-9476f5b34aa3",
+                "description": null,
+                "status": "published",
+                "created_on": "2022-08-31T10:31:03.198483+02:00",
+                "updated_on": "2022-09-01T10:39:43.795753+02:00",
+                "deletion_on": null,
+                "feature_type": "369-centre_permis_conduire_multipoint",
+                "project": "276-fast-edition",
+                "display_creator": "admin",
+                "display_last_editor": "admin",
+                "creator": 1,
+                "nom": "indiv DDTM",
+                "code": 60170,
+                "xcoord": 419944,
+                "ycoord": 6316805,
+                "adresse1": "DDTM",
+                "adresse2": "351 BL SAINT MEDARD BP 369",
+                "permis_a": "a",
+                "permis_b": "b",
+                "permis_ec": null,
+                "a_nomb_exa": 0,
+                "b_nomb_exa": 0,
+                "code_commu": 40192,
+                "code_posta": 40012,
+                "code_rubri": "CEXAM",
+                "ec_nomb_ex": 0,
+                "etg_nomb_e": 17,
+                "nom_commun": "MONT DE MARSAN",
+                "permis_etg": "ETG"
+            }
+        }
+    ]
+}

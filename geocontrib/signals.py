@@ -96,8 +96,6 @@ def create_symetrical_relation(sender, instance, created, **kwargs):
 def update_feature_dates(sender, instance, **kwargs):
     if instance.project.archive_feature and instance.project.delete_feature:
         if instance.pk is None and instance.project:
-            instance.archived_on = instance.created_on + timezone.timedelta(
-                days=instance.project.archive_feature)
             instance.deletion_on = instance.created_on + timezone.timedelta(
                 days=instance.project.delete_feature)
 

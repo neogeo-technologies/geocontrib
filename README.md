@@ -157,13 +157,6 @@ L'envoi de mails de norifications, vous pouvez l'appeler toutes les minutes ou t
 python manage.py notify_subscribers
 ```
 
-L'archivage et la suppression des signalements, à invoquer une fois par jour
-```shell
-python manage.py data_cleansing
-```
-
-
-
 
 ## Déploiement dans un environnement geOrchestra
 

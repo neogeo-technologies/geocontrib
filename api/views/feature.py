@@ -2,6 +2,7 @@ import json
 import requests
 import csv
 import collections
+from datetime import date
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -133,6 +134,14 @@ class FeatureView(
             ).data
 
         return Response(response)
+
+    def destroy(self, request, *args, **kwargs):
+        feature = self.get_object()
+        feature.deletion_on = date.today()
+        feature.save()
+        message = {"message": "Le signalement a été supprimé"}
+        return Response(message)
+
 
 
 class FeatureTypeView(
@@ -508,11 +517,13 @@ class FeatureMVTView(BaseMVTView):
         if not any([feature_type_slug, project_slug, project_id, featuretype_id]):
             raise ValidationError(detail="Must provide one of the parameters:"
                                   "project_id, project__slug, featuretype_id or feature_type__slug")
-
+        # Ticket 16246, filter is deletion_on
+        queryset = queryset.filter(deletion_on__isnull=False)
         if not request.GET._mutable:
             request.GET._mutable = True
         request.GET["pk__in"] = queryset.order_by("created_on").values_list("pk", flat=True)
         return super().get( request, *args, **kwargs)
+
 
 
 class GetIdgoCatalogView(views.APIView):
