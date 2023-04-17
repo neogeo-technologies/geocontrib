@@ -1,22 +1,15 @@
 from django.urls import path
 from rest_framework import routers
 
-
 from api.views.base_map import BaseMapViewset
 from api.views.base_map import GetFeatureInfo
 from api.views.base_map import LayerViewset
 # ************ deprecated ************
-from api.views.deprecated.base_map_deprecated import BaseMapViewsetDeprecated
-from api.views.deprecated.base_map_deprecated import LayerViewsetDeprecated
-from api.views.deprecated.feature_deprecated import FeatureViewDeprecated
-from api.views.deprecated.feature_deprecated import FeatureTypeViewDeprecated
 from api.views.deprecated.feature_deprecated import ProjectFeatureDeprecated
 from api.views.deprecated.feature_deprecated import ProjectFeatureTypesDeprecated
-from api.views.deprecated.misc_deprecated import ImportTaskSearchDeprecated
-from api.views.deprecated.project_deprecated import ProjectViewDeprecated
+from api.views.deprecated.feature_deprecated import FeatureViewDeprecated
+from api.views.deprecated.feature_deprecated import FeatureTypeViewDeprecated
 from api.views.deprecated.project_deprecated import ProjectTypesViewDeprecated
-from api.views.deprecated.user_deprecated import UserLevelsPermissionDeprecated
-from api.views.deprecated.user_deprecated import UserViewSetDeprecated
 # ************************************
 from api.views.feature import CustomFields
 from api.views.feature import ExportFeatureList
@@ -70,15 +63,9 @@ router.register(r'v2/layers', LayerViewset, basename='layers')
 router.register(r'v2/levels-permissions', UserLevelsPermission, basename='levels-permissions')
 
 # deprecated
-router.register(r'base-maps', BaseMapViewsetDeprecated, basename='base-maps-deprecated')
-router.register(r'import-tasks', ImportTaskSearchDeprecated, basename='importtask-deprecated')
 router.register(r'features', FeatureViewDeprecated, basename='features-deprecated')
 router.register(r'feature-types', FeatureTypeViewDeprecated, basename='feature-types-deprecated')
-router.register(r'layers', LayerViewsetDeprecated, basename='layers-deprecated')
-router.register(r'levels-permissions', UserLevelsPermissionDeprecated, basename='levels-permissions-deprecated')
-router.register(r'projects', ProjectViewDeprecated, basename='projects-deprecated')
 router.register(r'project-types', ProjectTypesViewDeprecated, basename='projects-types-deprecated')
-router.register(r'users', UserViewSetDeprecated, basename='users-deprecated')
 
 
 urlpatterns = [
