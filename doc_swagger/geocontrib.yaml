@@ -76,16 +76,47 @@ paths:
           content:
             application/xml:
               schema:
-                $ref: '#/components/schemas/ProjetGet'
+                $ref: '#/components/schemas/ProjectsGet'
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjetGet'
-        
-        '403':
-          description: | 
-           {"detail": "Informations d'authentification non fournies."}
+                $ref: '#/components/schemas/ProjectsGet'
+        '404':
+          description:  | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
       deprecated: false
       security: []
+  /v2/projects/{slug}:
+    get:
+      tags:
+        - projects
+      summary: getProject
+      description: |-
+        Ce service permet de récuperer le detail d'un project.
+      operationId: getProject
+      parameters:
+        - name : slug
+          in: path
+          description: Recherche par slug (string)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ProjectGet'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectGet'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
 
   /get-token:
     get:
@@ -159,8 +190,8 @@ components:
           type: string
         id:
           type: integer
-    ProjetGet:
-      title: ProjetGet
+    ProjectsGet:
+      title: ProjectsGet
       type: object
       properties:
         count:
@@ -236,6 +267,72 @@ components:
               feature_browsing_default_sort:
                 type: integer
                 description: Tri par défaut du parcours du signalement
+    ProjectGet:
+      title: ProjectGet
+      type: object
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+        created_on:
+          type: string
+          description: Date de création
+          example: AAAA-MM-JJ ou JJ-MM-AAAA
+        updated_on:
+          type: string
+          description: Date de modification
+          example: AAAA-MM-JJ ou JJ-MM-AAAA
+        description:
+          type: string
+        moderation:
+          type: boolean
+        is_project_type:
+          type: boolean
+          description: Est un projet type
+        generate_share_link:
+          type: boolean
+          description: Génération d'un lien de partage externe
+        fast_edition_mode:
+          type: boolean
+          description: Génération d'un lien de partage externe
+        thumbnail:
+          type: string
+          description: Date de création
+        creator:
+          type: integer
+          description: Créateur
+        access_level_pub_feature:
+          type: string
+          description: Visibilité des signalements publiés
+        access_level_arch_feature:
+          type: string
+          description: Visibilité des signalements archivés
+        archive_feature:
+          type: integer
+          description: Délai avant archivage
+        delete_feature:
+          type: integer
+          description: Délai avant suppression
+        map_max_zoom_level:
+          type: integer
+          description: Niveau de zoom maximum de la carte
+        nb_features:
+          type: integer
+        nb_published_features:
+          type: integer
+        nb_comments:
+          type: integer
+        nb_published_features_comments:
+          type: integer
+        nb_contributors:
+          type: integer
+        feature_browsing_default_filter:
+          type: integer
+          description: Mode d'édition rapide de signalements
+        feature_browsing_default_sort:
+          type: integer
+          description: Tri par défaut du parcours du signalement
   securitySchemes:
     bearerAuth:
       type: http
