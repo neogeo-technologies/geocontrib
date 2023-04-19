@@ -1,0 +1,253 @@
+openapi: 3.0.0
+info:
+  title: Documentation API GéoContrib
+  description: Cette page décrit l'ensemble des services REST offerts par l'API GéoContrib.
+  contact:
+    email: contact@geocontrib.fr
+  version: 1.0.0
+servers:
+  - url: geocontrib.dev.neogeo.fr/geocontrib/api/
+    variables: {}
+  - url: geocontrib.dev.neogeo.fr/geocontrib/api/
+    variables: {}
+paths:
+  /v2/projects:
+    get:
+      tags:
+        - projects
+      summary: getProjects
+      description: |-
+        Ce service permet de récuperer tous les projects.
+      operationId: getProjects
+      parameters:
+        - name: search
+          in: query
+          description: Recherche par un paramètre de requête ?search=..., et peut être délimité par des virgules et/ou des espaces
+          required: false
+          schema:
+            type: string
+        - name: is_project_type
+          in: query
+          description: Recherche par un paramètre de requête ?is_project_type=..., true/false
+          required: false
+          schema:
+            type: string
+        - name: moderation
+          in: query
+          description: Recherche par un paramètre de requête ?moderation=..., true/false
+          required: false
+          schema:
+            type: string
+        - name: access_level
+          in: query
+          description: Recherche par un paramètre de requête ?access_level=..., anonymous/logged_user/contributor/super_contributor/moderator/admin
+          required: false
+          schema:
+            type: string
+        - name: user_access_level
+          in: query
+          description: Recherche par un paramètre de requête ?user_access_level=..., anonymous/logged_user/contributor/super_contributor/moderator/admin
+          schema:
+            type: string
+        - name : accessible
+          in: query
+          description: Recherche par un paramètre de requête ?accessible=...,  true/false
+          schema:
+            type: string
+        - name : myaccount
+          in: query
+          description: Recherche par un paramètre de requête ?myaccount=...,  true/false
+          schema:
+            type: string
+        # TODO : UTILISES ?
+        # - name : slug
+        #   in: query
+        #   description: Recherche par un paramètre de requête ?slug=...,  string
+        #   schema:
+        #     type: string
+        # - name : title
+        #   in: query
+        #   description: Recherche par un paramètre de requête ?title=...,  string
+        #   schema:
+        #     type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ProjetGet'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjetGet'
+        
+        '403':
+          description: | 
+           {"detail": "Informations d'authentification non fournies."}
+      deprecated: false
+      security: []
+
+  /get-token:
+    get:
+      tags:
+        - users
+      summary: getToken
+      description: |-
+        Ce service permet de récuperer le token de l'utilisateur connecté.
+      operationId: getToken
+      responses:
+        '200':
+          description: Résultat
+          content:
+           application/json:
+            schema:
+                type: object
+           application/xml:
+            schema:
+                type: object
+        
+        '403':
+          description: | 
+           {"detail": "Informations d'authentification non fournies."}
+      deprecated: false
+      security: []
+  /user_info:
+    get:
+      tags:
+        - users
+      summary: userInfo
+      description: |-
+        Ce service permet de récuperer le token de l'utilisateur connecté.
+      operationId: userInfo
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: | 
+           {"detail": "Informations d'authentification non fournies."}
+      deprecated: false
+      security: []
+ 
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      properties:
+        username:
+          type: string
+        is_active:
+          type: boolean
+        firs_tName:
+          type: string
+        last_Name:
+          type: string
+        is_administrator:
+          type: boolean
+        is_superuser:
+          type: boolean
+        can_create_project:
+          type: boolean
+        email:
+          type: string
+        id:
+          type: integer
+    ProjetGet:
+      title: ProjetGet
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+        previous: 
+          type: string
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              slug:
+                type: string
+              created_on:
+                type: string
+                description: Date de création
+                example: AAAA-MM-JJ ou JJ-MM-AAAA
+              updated_on:
+                type: string
+                description: Date de modification
+                example: AAAA-MM-JJ ou JJ-MM-AAAA
+              description:
+                type: string
+              moderation:
+                type: boolean
+              is_project_type:
+                type: boolean
+                description: Est un projet type
+              generate_share_link:
+                type: boolean
+                description: Génération d'un lien de partage externe
+              fast_edition_mode:
+                type: boolean
+                description: Génération d'un lien de partage externe
+              thumbnail:
+                type: string
+                description: Date de création
+              creator:
+                type: integer
+                description: Créateur
+              access_level_pub_feature:
+                type: string
+                description: Visibilité des signalements publiés
+              access_level_arch_feature:
+                type: string
+                description: Visibilité des signalements archivés
+              archive_feature:
+                type: integer
+                description: Délai avant archivage
+              delete_feature:
+                type: integer
+                description: Délai avant suppression
+              map_max_zoom_level:
+                type: integer
+                description: Niveau de zoom maximum de la carte
+              nb_features:
+                type: integer
+              nb_published_features:
+                type: integer
+              nb_comments:
+                type: integer
+              nb_published_features_comments:
+                type: integer
+              nb_contributors:
+                type: integer
+              feature_browsing_default_filter:
+                type: integer
+                description: Mode d'édition rapide de signalements
+              feature_browsing_default_sort:
+                type: integer
+                description: Tri par défaut du parcours du signalement
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security: 
+  - bearerAuth: []
+tags:
+  - name: dossiers
+    description: Composent dossier
+  # - name: user
+  #   description: Composent user
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
