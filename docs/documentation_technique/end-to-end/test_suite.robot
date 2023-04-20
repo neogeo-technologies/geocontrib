@@ -371,7 +371,8 @@ Create Feature Type & Feature with Multiple Choices List CustomField
         Element should contain      id:${MULTICHOICESLISTNAME}      ${choice}
     END
     # edit feature
-    Click Link                                  css:a[href*=editer]
+    Click Element                               id:feature_detail_title_input
+    Click Element                               css:[data-tooltip="Éditer le signalement"]
     # select some choices
     Wait Until Location contains                /editer
     Select Checkbox                             ${MULTICHOICESLISTOPTIONS[0]}
@@ -437,7 +438,7 @@ Browse Features At click On Feature On Map # TODO: IF POSSIBLE...
     # Start from main page
     Find Project
     Go To Project Page
-    Geocontrib Click At Coordinates     ${250}         ${240}         ${BROWSER_NAME}
+    Geocontrib Click At Coordinates     ${250}         ${235}         ${BROWSER_NAME}
     Wait Until Page Contains Element    id:goToFeatureDetail
     Click Link                          id:goToFeatureDetail
     Wait Until Page Does Not Contain    Recherche du signalement
