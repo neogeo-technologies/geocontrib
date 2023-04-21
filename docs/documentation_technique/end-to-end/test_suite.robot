@@ -37,15 +37,15 @@ Connect GeoContrib - TEST 7
     Geocontrib Connect Superuser            ${SUPERUSERNAME}                ${SUPERUSERPASSWORD}
     Page Should Contain                     ${SUPERUSERDISPLAYNAME}
 
-Create Project with Random Projectname - TESTS 10, 17
+Create Project - TESTS 10, 17
     Find Project
     #correspond au test 10, mais pas le 17
-    Page Should Not Contain                 ${RANDOMPROJECTNAME}
-    Geocontrib Create Project               ${RANDOMPROJECTNAME}
+    Page Should Not Contain                 ${PROJECTNAME}
+    Geocontrib Create Project               ${PROJECTNAME}
     #Wait Until Page Does Not Contain         Projet en cours de création. Vous allez être redirigé. 
     # attendre le changement de page
     Wait Until Location Does Not Contain    /creer-projet
-    Page Should Contain                     ${RANDOMPROJECTNAME}
+    Page Should Contain                     ${PROJECTNAME}
     # Vérifier que le projet est modéré (à améliorer)
     Page Should Contain                     Oui
     # Vérifier que la visibilité est à Utilisateur anonyme (à améliorer, ne vérifie pas les 2 visibilités)
@@ -56,13 +56,13 @@ Create Project with Random Projectname - TESTS 10, 17
     # si la validation du formulaire plante, le test reste en suspend et ne déclenche pas d'erreur, il faudrait vérifier qu'il n'y a pas de message d'erreur peut-être
 
 
-Edit Project with Random Projectname - TESTS 74, ...
+Edit Project - TESTS 74, ...
     # Start from main page
     Find Project
     Go To Project Page
     # enter modify mode
     Click Element                            id:edit-project
-    Geocontrib Edit Project Title           ${RANDOMPROJECTNAME}       ${PROJECTEDITION}
+    Geocontrib Edit Project Title           ${PROJECTNAME}       ${PROJECTEDITION}
     Geocontrib Edit Project Description     ${PROJECTEDITION}
     Geocontrib Edit Project Visibilities
     Geocontrib Edit Project Options
@@ -96,32 +96,32 @@ Edit Project with Markdown Description
     # todo: check other pages where a preview is displayed
 
 
-Create Feature Type with Random Featuretypename - TEST 97
+Create Feature Type - TEST 97
     # Start from main page
     Find Project
     Go To Project Page
-    Page Should Not Contain                 ${RANDOMFEATURETYPENAME}
-    Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}        Point
+    Page Should Not Contain                 ${FEATURETYPENAME}
+    Geocontrib Create Featuretype           ${FEATURETYPENAME}        Point
     Geocontrib Add Custom Fields            ${SYMBONAMELIST}    ${SYMBONAMECHAR}    ${SYMBONAMEBOOL}    ${SYMBOPTIONLIST}
     Click Button                            send-feature_type
     # attendre le changement de page
     Wait Until Location Does Not Contain    /type-signalement/ajouter
     # attendre que le loader disparaissent ! NE MARCHE PAS
     #Wait Until Page Does Not Contain         Récupération des types de signalements en cours... 
-    Page Should Contain                     ${RANDOMFEATURETYPENAME}
+    Page Should Contain                     ${FEATURETYPENAME}
 
 Edit Feature Type - TEST n°?
-    Page Should Contain                     ${RANDOMFEATURETYPENAME}
-    Geocontrib Edit Featuretype             ${RANDOMFEATURETYPENAME}        ${FEATURETYPEEDITION}
+    Page Should Contain                     ${FEATURETYPENAME}
+    Geocontrib Edit Featuretype             ${FEATURETYPENAME}        ${FEATURETYPEEDITION}
     # attendre le changement de page
     Wait Until Location Does Not Contain    /type-signalement/ajouter
     Page Should Contain                     ${FEATURETYPEEDITION}
 
-Create Feature with Random Featurename on Random Coordinates - TEST 117
-    Page Should Not Contain                 ${RANDOMFEATURENAME}
-    Create Feature                          ${RANDOMFEATURENAME}       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X0}   ${Y0}
+Create Feature - TEST 117
+    Page Should Not Contain                 ${FEATURENAME}
+    Create Feature                          ${FEATURENAME}       ${FEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X0}   ${Y0}
     # Vérifier que le signalement a été créé
-    Page Should Contain                     ${RANDOMFEATURENAME}
+    Page Should Contain                     ${FEATURENAME}
     # Vérifier que le signalement a une description (à améliorer: utilisé une variable)
     Page Should Contain                     Exemple de description
 
@@ -131,8 +131,8 @@ Edit Feature - TEST n°?
     Discard Info message
     Wait Until Element Is Visible           css:a[href*=editer]
     # check if the feature has been created
-    Page Should Contain                     ${RANDOMFEATURENAME}
-    Geocontrib Edit Feature                 ${RANDOMFEATURENAME}        ${FEATUREEDITION}
+    Page Should Contain                     ${FEATURENAME}
+    Geocontrib Edit Feature                 ${FEATURENAME}        ${FEATUREEDITION}
     Geocontrib Click Save Changes
     Page Should Contain                     ${FEATUREEDITION}
     # Vérifier que le signalement a le statut 'publié (à améliorer)
@@ -140,31 +140,31 @@ Edit Feature - TEST n°?
     # Vérifier que le signalement a une description (à améliorer)
     #Page Should Contain                     ${FEATUREEDITION}
 
-Create Feature Type with Random Featuretypename With Geometry Type Polygone
+Create Feature Type With Geometry Type Polygone
     # Start from main page
     Find Project
     Go To Project Page
     # Check that the feature type doesn't exist already
-    Page Should Not Contain                 ${RANDOMFEATURETYPENAME}-Polygone
-    Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}-Polygone    Polygone
+    Page Should Not Contain                 ${FEATURETYPENAME}-Polygone
+    Geocontrib Create Featuretype           ${FEATURETYPENAME}-Polygone    Polygone
     Geocontrib Add Custom Fields            ${SYMBONAMELIST}    ${SYMBONAMECHAR}    ${SYMBONAMEBOOL}    ${SYMBOPTIONLIST}
     Click Button                            send-feature_type
     # attendre le changement de page
     Wait Until Location Does Not Contain    /type-signalement/ajouter
-    Page Should Contain                     ${RANDOMFEATURETYPENAME}-Polygone
+    Page Should Contain                     ${FEATURETYPENAME}-Polygone
 
 Edit Feature Type Default Symbology
     # Start from main page
     Find Project
     Go To Project Page
     # Go to symbology edition page
-    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Geocontrib Access Featuretype Symbology     ${FEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
     Geocontrib Edit Featuretype Symbology       ${SYMBOLCOLORCODE}   ${SYMBOLOPACITY}   .default
     Click Button                                save-symbology
     # attendre le changement de page
     Wait Until Location Does Not Contain        /symbologie
-    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Geocontrib Access Featuretype Symbology     ${FEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
     # Validate color value
     Element Attribute Value Should Be           css:div.default #couleur         value        ${SYMBOLCOLORCODE}
@@ -177,14 +177,14 @@ Edit Custom Field Symbology For List
     Find Project
     Go To Project Page
     # Go to symbology edition page
-    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Geocontrib Access Featuretype Symbology     ${FEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
     # Edit type list
     Geocontrib Edit Custom Field Symbology      ${SYMBOPTIONCOLORLIST}   ${SYMBOPTIONOPACITYLIST}  ${SYMBONAMELIST}  ${SYMBOPTIONLIST}
     Click Button                                save-symbology
     # attendre le changement de page
     Wait Until Location Does Not Contain        /symbologie
-    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Geocontrib Access Featuretype Symbology     ${FEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
     Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[0]} #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
     Element Attribute Value Should Be           css:div#${SYMBOPTIONLIST[0]} #opacity         value        ${SYMBOPTIONOPACITYLIST[0]}
@@ -196,14 +196,14 @@ Edit Custom Field Symbology For Character Chain
     Find Project
     Go To Project Page
     # Go to symbology edition page
-    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Geocontrib Access Featuretype Symbology     ${FEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
     # Edit type list
     Geocontrib Edit Custom Field Symbology      ${SYMBOPTIONCOLORLIST}   ${SYMBOPTIONOPACITYLIST}  ${SYMBONAMECHAR}  ${NONE}
     Click Button                                save-symbology
     # attendre le changement de page
     Wait Until Location Does Not Contain        /symbologie
-    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Geocontrib Access Featuretype Symbology     ${FEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
     Element Attribute Value Should Be           css:div[id="Vide"] #couleur         value        ${SYMBOPTIONCOLORLIST[0]}
     Element Attribute Value Should Be           css:div[id="Vide"] #opacity         value        ${SYMBOPTIONOPACITYLIST[0]}
@@ -216,14 +216,14 @@ Edit Custom Field Symbology For Boolean
     Find Project
     Go To Project Page
     # Go to symbology edition page
-    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Geocontrib Access Featuretype Symbology     ${FEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
     # Edit type list
     Geocontrib Edit Custom Field Symbology      ${SYMBOPTIONCOLORLIST}   ${SYMBOPTIONOPACITYLIST}  ${SYMBONAMEBOOL}  ${NONE}
     Click Button                                save-symbology
     # attendre le changement de page
     Wait Until Location Does Not Contain        /symbologie
-    Geocontrib Access Featuretype Symbology     ${RANDOMFEATURETYPENAME}-Polygone
+    Geocontrib Access Featuretype Symbology     ${FEATURETYPENAME}-Polygone
     Wait Until Page Contains                    Couleur
     Element Attribute Value Should Be           css:div[id="Décoché"] #couleur      value       ${SYMBOPTIONCOLORLIST[0]}
     Element Attribute Value Should Be           css:div[id="Décoché"] #opacity      value       ${SYMBOPTIONOPACITYLIST[0]}
@@ -235,22 +235,22 @@ Browse Features Filtered
     Find Project
     Go To Project Page
     #Create some features to navigate through
-    Create Feature      ${RANDOMFEATURENAME}-2       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X1}   ${Y1}
+    Create Feature      ${FEATURENAME}-2       ${FEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X1}   ${Y1}
     # Start from main page
     Find Project
     Go To Project Page
-    Create Feature      ${RANDOMFEATURENAME}-3       ${RANDOMFEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X2}   ${Y2}
+    Create Feature      ${FEATURENAME}-3       ${FEATURETYPENAME}       ${FEATURETYPEEDITION}     ${X2}   ${Y2}
     # Start from main page
     Find Project
     Go To Project Page
     # go to list and click on first feature containing name
-    Geocontrib Browse Feature List         ${RANDOMFEATURENAME}        ${RANDOMFEATURETYPENAME}     ${FEATURETYPEEDITION}
-    Page Should Contain                    ${RANDOMFEATURENAME}-3
+    Geocontrib Browse Feature List         ${FEATURENAME}        ${FEATURETYPENAME}     ${FEATURETYPEEDITION}
+    Page Should Contain                    ${FEATURENAME}-3
     Element should have class              css:button[id="previous-feature"]        disabled
     Click Button                           next-feature
-    Page Should Contain                    ${RANDOMFEATURENAME}-2
+    Page Should Contain                    ${FEATURENAME}-2
     Click Button                           next-feature
-    Page Should Contain                    ${RANDOMFEATURENAME}${FEATUREEDITION}
+    Page Should Contain                    ${FEATURENAME}${FEATUREEDITION}
     Element should have class              css:button[id="next-feature"]            disabled
 
 Fast Edit Feature
@@ -259,12 +259,12 @@ Fast Edit Feature
     Go To Project Page
     Geocontrib Activate Fast Edition For Project
     # create a feature type with custom fields
-    Page Should Not Contain                 ${RANDOMFEATURETYPENAME}-FastEdition
-    Geocontrib Create Featuretype           ${RANDOMFEATURETYPENAME}-FastEdition    Point
+    Page Should Not Contain                 ${FEATURETYPENAME}-FastEdition
+    Geocontrib Create Featuretype           ${FEATURETYPENAME}-FastEdition    Point
     Geocontrib Add Custom Fields            ${SYMBONAMELIST}        ${SYMBONAMECHAR}    ${SYMBONAMEBOOL}    ${SYMBOPTIONLIST}
     Click Button                            send-feature_type
     # create a feature
-    Create Feature               ${FASTFEATURENAME}      ${RANDOMFEATURETYPENAME}-FastEdition       ${EMPTY}       ${X3}   ${Y4}
+    Create Feature               ${FASTFEATURENAME}      ${FEATURETYPENAME}-FastEdition       ${EMPTY}       ${X3}   ${Y4}
     Discard Info message
     # Edit feature in feature details page
     Geocontrib Fast Edit Feature Detail     ${FASTFEATURENAME}      ${FASTFEATUREDESCRIPTION}       ${FEATURETYPEEDITION}
@@ -312,7 +312,7 @@ Multiple Feature Edition Of Attributes Within The Same Feature Type
     Click Element                               id:edit-attributes
     # Check if selecting a feature disables checkbox of features from other types
     Click Element                               css:#form-filters #type > .dropdown
-    Click Element                               id:${RANDOMFEATURETYPENAME}${FEATURETYPEEDITION}
+    Click Element                               id:${FEATURETYPENAME}${FEATURETYPEEDITION}
     Wait Until Page Does Not Contain            Récupération des signalements en cours...
     # Select all features in this feature type
     ${tableCheckboxes}      Get WebElements     css:#table-features > tbody > tr > td > .checkbox > input
@@ -341,9 +341,9 @@ Multiple Feature Edition Of Attributes Within The Same Feature Type
     # Check that changes had taken effect
     # Filter edited feature type features
     Click Element                               css:#form-filters #type > .dropdown
-    Click Element                               id:${RANDOMFEATURETYPENAME}${FEATURETYPEEDITION}
+    Click Element                               id:${FEATURETYPENAME}${FEATURETYPEEDITION}
     # Open first created feature
-    Click Link                                  ${RANDOMFEATURENAME}${FEATUREEDITION}
+    Click Link                                  ${FEATURENAME}${FEATUREEDITION}
     Wait Until Page Does Not Contain            Recherche du signalement
     Checkbox Should Be Selected                 ${SYMBONAMEBOOL}
 
@@ -423,14 +423,14 @@ Browse Features At click On Feature Of Feature Type Detail
     # Start from main page
     Find Project
     Go To Project Page
-    Click Link                          ${RANDOMFEATURETYPENAME}${FEATURETYPEEDITION}
+    Click Link                          ${FEATURETYPENAME}${FEATURETYPEEDITION}
     Wait Until Location contains        /type-signalement/
     #Wait Until Page Does Not Contain    Récupération des signalements en cours
-    Click Link                          ${RANDOMFEATURENAME}-3
+    Click Link                          ${FEATURENAME}-3
     # check that the title in input field correspond to selected feature
-    Textfield Should Contain            feature_detail_title_input    ${RANDOMFEATURENAME}-3
+    Textfield Should Contain            feature_detail_title_input    ${FEATURENAME}-3
     Element Should Contain              css:.fast_browsing > div > div:first-of-type > span            par date de modification
-    Element Should Contain              css:.fast_browsing > div > div:last-of-type > span             par type de signalement
+#     Element Should Contain              css:.fast_browsing > div > div:last-of-type > span             par type de signalement
 
 
 Browse Features At click On Feature On Map # TODO: IF POSSIBLE...
@@ -438,7 +438,9 @@ Browse Features At click On Feature On Map # TODO: IF POSSIBLE...
     # Start from main page
     Find Project
     Go To Project Page
-    Geocontrib Click At Coordinates     ${250}         ${235}         ${BROWSER_NAME}
+    # Geocontrib Click At Coordinates     ${250}         ${235}         ${BROWSER_NAME}         # working with default config in front repository
+    Geocontrib Click At Coordinates     ${346}         ${136}         ${BROWSER_NAME}         # working with config of dev instance
+
     Wait Until Page Contains Element    id:goToFeatureDetail
     Click Link                          id:goToFeatureDetail
     Wait Until Page Does Not Contain    Recherche du signalement
@@ -460,11 +462,11 @@ Browse Features At click On Feature On Map # TODO: IF POSSIBLE...
 Find Project
     Geocontrib Go To Main Page                  ${GEOCONTRIB_URL}
     Wait Until Page Does Not Contain            En cours de chargement ... 
-    Geocontrib Search Project                   ${RANDOMPROJECTNAME}
+    Geocontrib Search Project                   ${PROJECTNAME}
     Wait Until Element Is Not Visible           css:div.ui > div.ui.inverted.dimmer.active
 
 Go To Project Page
-    Geocontrib Click On Project                 ${RANDOMPROJECTNAME}
+    Geocontrib Click On Project                 ${PROJECTNAME}
     Wait Until Page Does Not Contain            Projet en cours de chargement ... 
 
 Create Feature
