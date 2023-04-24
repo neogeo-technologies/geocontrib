@@ -26,7 +26,7 @@ ${SELSPEED}     0.1
 
 *** Test Cases ***
 
-[Setup]             Run Keywords            Open Browser                    ${GEOCONTRIB _URL}      ${BROWSER_NAME}
+[Setup]             Run Keywords            Open Browser                    ${GEOCONTRIB_URL}      ${BROWSER_NAME}
 ...                 AND                     Set Window Size                 1024    768
 #...                 AND                     Maximize Browser Window
 ...                 AND                     Set Selenium Speed              ${SELSPEED}
@@ -110,7 +110,7 @@ Create Feature Type - TEST 97
     #Wait Until Page Does Not Contain         Récupération des types de signalements en cours... 
     Page Should Contain                     ${FEATURETYPENAME}
 
-Edit Feature Type - TEST n°?
+Edit Feature Type
     Page Should Contain                     ${FEATURETYPENAME}
     Geocontrib Edit Featuretype             ${FEATURETYPENAME}        ${FEATURETYPEEDITION}
     # attendre le changement de page
@@ -125,7 +125,7 @@ Create Feature - TEST 117
     # Vérifier que le signalement a une description (à améliorer: utilisé une variable)
     Page Should Contain                     Exemple de description
 
-Edit Feature - TEST n°?
+Edit Feature
     # départ depuis la page de détail du signalement juste créé
     # fermer le message d'info si présent pour pouvoir cliquer sur le bouton d'édition
     Discard Info message
@@ -276,7 +276,7 @@ Fast Edit Feature
     Element Should Contain                  css:#status .default.text > div     Archivé
     Element Should Contain                  css:#${SYMBONAMELIST} .default.text > div     ${SYMBOPTIONLIST[0]}
     Textfield Value Should Be               css:#${SYMBONAMECHAR} input     ${SYMBONAMECHAR}
-    Checkbox Should Be Selected             css:#${SYMBONAMEBOOL} input
+   Checkbox Should Be Selected             css:#${SYMBONAMEBOOL} input
 
 Import Multi Geometry Feature
     # Start from main page
@@ -337,6 +337,7 @@ Multiple Feature Edition Of Attributes Within The Same Feature Type
     # Go back to features list
     Wait Until Page Does Not Contain            Récupération des signalements en cours...
     Discard Info message
+    Sleep                                       3s
     Click Link                                  show-list
     # Check that changes had taken effect
     # Filter edited feature type features
@@ -430,17 +431,16 @@ Browse Features At click On Feature Of Feature Type Detail
     # check that the title in input field correspond to selected feature
     Textfield Should Contain            feature_detail_title_input    ${FEATURENAME}-3
     Element Should Contain              css:.fast_browsing > div > div:first-of-type > span            par date de modification
-#     Element Should Contain              css:.fast_browsing > div > div:last-of-type > span             par type de signalement
+    Element Should Contain              css:.fast_browsing > div > div:last-of-type > span             par type de signalement
 
 
-Browse Features At click On Feature On Map # TODO: IF POSSIBLE...
+Browse Features At click On Feature On Map # To click on a feature might not work, if map or features on map are not the same, it doesn't mean the functionnality doesn't work.
     ## Project page: feature on map
     # Start from main page
     Find Project
     Go To Project Page
-    # Geocontrib Click At Coordinates     ${250}         ${235}         ${BROWSER_NAME}         # working with default config in front repository
-    Geocontrib Click At Coordinates     ${346}         ${136}         ${BROWSER_NAME}         # working with config of dev instance
-
+    # Geocontrib Click At Coordinates     ${250}         ${235}         ${BROWSER_NAME}         # working with default config in front repository                        3s
+    Geocontrib Click At Coordinates     ${346}         ${146}         ${BROWSER_NAME}         # working with config of dev instance
     Wait Until Page Contains Element    id:goToFeatureDetail
     Click Link                          id:goToFeatureDetail
     Wait Until Page Does Not Contain    Recherche du signalement
