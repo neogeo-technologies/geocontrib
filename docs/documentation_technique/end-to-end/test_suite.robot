@@ -439,7 +439,7 @@ Browse Features At click On Feature On Map # To click on a feature might not wor
     # Start from main page
     Find Project
     Go To Project Page
-    # Geocontrib Click At Coordinates     ${250}         ${235}         ${BROWSER_NAME}         # working with default config in front repository                        3s
+    # Geocontrib Click At Coordinates     ${250}         ${235}         ${BROWSER_NAME}         # working with default config in front repository
     Geocontrib Click At Coordinates     ${346}         ${146}         ${BROWSER_NAME}         # working with config of dev instance
     Wait Until Page Contains Element    id:goToFeatureDetail
     Click Link                          id:goToFeatureDetail
