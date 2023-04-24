@@ -341,8 +341,8 @@ components:
 security: 
   - bearerAuth: []
 tags:
-  - name: dossiers
-    description: Composent dossier
+  # - name: dossiers
+    # description: Composent dossier
   # - name: user
   #   description: Composent user
 externalDocs:
