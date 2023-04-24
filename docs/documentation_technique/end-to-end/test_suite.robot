@@ -276,7 +276,7 @@ Fast Edit Feature
     Element Should Contain                  css:#status .default.text > div     Archivé
     Element Should Contain                  css:#${SYMBONAMELIST} .default.text > div     ${SYMBOPTIONLIST[0]}
     Textfield Value Should Be               css:#${SYMBONAMECHAR} input     ${SYMBONAMECHAR}
-   Checkbox Should Be Selected             css:#${SYMBONAMEBOOL} input
+    Checkbox Should Be Selected             css:#${SYMBONAMEBOOL} input
 
 Import Multi Geometry Feature
     # Start from main page
