@@ -140,6 +140,12 @@ Deux types de tâches requièrent d'invoquer une commande régulièrement (depui
 
 ### Tâches périodiques depuis celery
 
+Copier le contenu du fichier config_sample/celery.py dans config/celery.py.
+```shell
+cp config_sample/celery.py config/celery.py
+```
+Pour une installation en local, si on a besoin de faire des imports de signalements par exemple, il faut ouvrir un nouveau terminal, activer l'environnement virtuel et lancer la commande suvante.
+
 Lancer le worker celery:
 
     celery -A config worker
