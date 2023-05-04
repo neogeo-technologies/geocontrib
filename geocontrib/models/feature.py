@@ -40,11 +40,11 @@ class Feature(models.Model):
 
     updated_on = models.DateTimeField("Date de maj", null=True, blank=True)
 
-    archived_on = models.DateField(
-        "Date d'archivage automatique", null=True, blank=True)
-
     deletion_on = models.DateField(
-        "Date de suppression automatique", null=True, blank=True)
+        "Date de suppression",
+        null=True,
+        blank=True
+    )
 
     creator = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, verbose_name="Créateur",
@@ -248,7 +248,10 @@ class FeatureType(models.Model):
     @property
     def is_editable(self):
         Feature = apps.get_model(app_label='geocontrib', model_name="Feature")
-        return not Feature.objects.filter(feature_type=self).exists()
+        queryset = Feature.objects.filter(feature_type=self)
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        queryset = queryset.filter(deletion_on__isnull=True)
+        return not queryset.exists()
 
 # class CustomFieldInterface(models.Model):
 #

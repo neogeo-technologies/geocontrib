@@ -2,6 +2,7 @@ import json
 import requests
 import csv
 import collections
+from datetime import date
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -83,6 +84,9 @@ class FeatureView(
             raise ValidationError(detail="Must provide parameter project__slug "
                                          "or feature_type__slug")
 
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        queryset = queryset.filter(deletion_on__isnull=True)
+
         title_contains = self.request.query_params.get('title__contains')
         if title_contains:
             queryset = queryset.filter(title__contains=title_contains)
@@ -134,6 +138,14 @@ class FeatureView(
 
         return Response(response)
 
+    def destroy(self, request, *args, **kwargs):
+        feature = self.get_object()
+        feature.deletion_on = date.today()
+        feature.save()
+        message = {"message": "Le signalement a été supprimé"}
+        return Response(message)
+
+
 
 class FeatureTypeView(
         mixins.ListModelMixin,
@@ -156,20 +168,6 @@ class FeatureTypeView(
     filter_backends = [
         FeatureTypeFilter
     ]
-
-class ProjectFeatureTypes(views.APIView):
-    queryset = Project.objects.all()
-    lookup_field = 'slug'
-    http_method_names = ['get', ]
-
-    def get(self, request, slug):
-        feature_types = FeatureType.objects.filter(project__slug=slug).order_by("title")
-        serializers = FeatureTypeListSerializer(feature_types, many=True)
-        data = {
-            'feature_types': serializers.data,
-        }
-        return Response(data, status=200)
-
 
 class ProjectFeature(views.APIView):
     queryset = Project.objects.all()
@@ -241,6 +239,8 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         status__value = self.request.query_params.get('status__value')
         feature_type_slug = self.request.query_params.get('feature_type_slug')
         title = self.request.query_params.get('title')
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        queryset = queryset.filter(deletion_on__isnull=True)
 
         if status__value:
             queryset = queryset.filter(status__icontains=status__value)
@@ -288,6 +288,9 @@ class ProjectFeaturePositionInList(views.APIView):
         feature_type_slug = request.GET.get('feature_type_slug')
         status__value = request.GET.get('status')
         title = request.GET.get('title')
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        queryset = queryset.filter(deletion_on__isnull=True)
+
         if feature_type_slug:
             queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
         if status__value:
@@ -297,8 +300,11 @@ class ProjectFeaturePositionInList(views.APIView):
         # Position :
         try:
             instance = queryset.filter(feature_id=feature_id).first()
-            position = (*queryset,).index(instance)
-            return Response(data=position, status=200)
+            if instance:
+                position = (*queryset,).index(instance)
+                return Response(data=position, status=200)
+            else:
+                return Response(status=204)
 
         except Exception as e:
             logger.exception("Les données sont inaccessibles %s", e)
@@ -329,7 +335,6 @@ class ProjectFeatureBbox(generics.ListAPIView):
     def get_queryset(self):
         slug = self.kwargs.get('slug')
         project = get_object_or_404(Project, slug=slug)
-
         queryset = Feature.handy.availables(user=self.request.user, project=project)
 
         queryset = queryset.select_related('creator')
@@ -355,6 +360,8 @@ class ExportFeatureList(views.APIView):
         """
         project = get_object_or_404(Project, slug=slug)
         features = Feature.handy.availables(request.user, project).filter( feature_type__slug=feature_type_slug).order_by("created_on")
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        features = features.filter(deletion_on__isnull=True)
         format = request.GET.get('format_export')
         if format == 'geojson':
             serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
@@ -508,7 +515,8 @@ class FeatureMVTView(BaseMVTView):
         if not any([feature_type_slug, project_slug, project_id, featuretype_id]):
             raise ValidationError(detail="Must provide one of the parameters:"
                                   "project_id, project__slug, featuretype_id or feature_type__slug")
-
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        queryset = queryset.filter(deletion_on__isnull=True)
         if not request.GET._mutable:
             request.GET._mutable = True
         request.GET["pk__in"] = queryset.order_by("created_on").values_list("pk", flat=True)
@@ -573,13 +581,14 @@ class PreRecordedValuesView(APIView):
     def get(self, request, name=None):
         response=[]
         values=[]
+        name = self.kwargs.get('name', None)
         pattern = self.request.query_params.get('pattern', '')
-        limit = self.request.query_params.get('limit', '')
 
         if name:
-            values = get_pre_recorded_values(name, pattern, limit)
+            values = get_pre_recorded_values(name, pattern)
             for value in values:
                 response.append(value['values'])
+            response.sort()
         else:
             response = list(PreRecordedValues.objects.values("name"))
         status = 200
