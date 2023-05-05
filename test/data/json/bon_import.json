@@ -10,7 +10,6 @@
             },
             "id": "176b74af-5fc3-4565-9139-babc487bfe97",
             "properties": {
-                "archived_on": null,
                 "created_on": "2020-11-27T10:22:08.693686+01:00",
                 "deletion_on": null,
                 "description": "",
@@ -31,7 +30,6 @@
             },
             "id": "1448e381-0ba1-4b1a-a3b8-463feef5efd0",
             "properties": {
-                "archived_on": null,
                 "created_on": "2020-11-27T10:20:15.608381+01:00",
                 "deletion_on": null,
                 "description": "",
@@ -52,7 +50,6 @@
             },
             "id": "f59494b0-daa6-4807-8b60-8c405b840531",
             "properties": {
-                "archived_on": null,
                 "created_on": "2020-11-27T10:18:34.768793+01:00",
                 "deletion_on": null,
                 "description": "",
@@ -73,7 +70,6 @@
             },
             "id": "1be3b47b-9107-46c7-afa5-e140dcd0c3cb",
             "properties": {
-                "archived_on": null,
                 "created_on": "2020-11-27T10:17:40.987820+01:00",
                 "deletion_on": null,
                 "description": "",
@@ -94,7 +90,6 @@
             },
             "id": "ad7f6b05-1871-4b5b-93f8-04d70d357373",
             "properties": {
-                "archived_on": null,
                 "created_on": "2020-11-27T10:06:12.155235+01:00",
                 "deletion_on": null,
                 "description": "",
@@ -115,7 +110,6 @@
             },
             "id": "17c3f0ec-533a-44bc-8dae-73bc8a2ff739",
             "properties": {
-                "archived_on": null,
                 "created_on": "2020-11-27T10:05:06.980899+01:00",
                 "deletion_on": null,
                 "description": "",
@@ -136,7 +130,6 @@
             },
             "id": "095a211b-560e-4f80-a465-65f1057be830",
             "properties": {
-                "archived_on": null,
                 "created_on": "2020-11-27T10:01:29.739480+01:00",
                 "deletion_on": null,
                 "description": "",
