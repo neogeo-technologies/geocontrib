@@ -70,6 +70,7 @@ class FeatureView(
 
         project_slug = self.request.query_params.get('project__slug')
         if project_slug:
+            # breakpoint()
             project = get_object_or_404(Project, slug=project_slug)
             queryset = Feature.handy.availables(self.request.user, project)
 

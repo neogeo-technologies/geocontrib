@@ -59,17 +59,11 @@ paths:
           description: Recherche par un paramètre de requête ?myaccount=...,  true/false
           schema:
             type: string
-        # TODO : UTILISES ?
-        # - name : slug
-        #   in: query
-        #   description: Recherche par un paramètre de requête ?slug=...,  string
-        #   schema:
-        #     type: string
-        # - name : title
-        #   in: query
-        #   description: Recherche par un paramètre de requête ?title=...,  string
-        #   schema:
-        #     type: string
+        - name : page
+          in: query
+          description: Recherche par un paramètre de requête ?page=...,  1/2/3 ...
+          schema:
+            type: string
       responses:
         '200':
           description: Résultat
@@ -87,6 +81,47 @@ paths:
           content: {}
       deprecated: false
       security: []
+    post:
+      tags:
+        - projects
+      summary: addProjects
+      description: |-
+        Ce service permet de créer un project.
+      operationId: addProjects
+      parameters: []
+      requestBody:
+        description: Ce service permet de créer un projet sur GéoContrib.
+                    En réponse un nouveau projet est créé et son  contenu sont affiché.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectPost'
+        required: true
+      responses:
+        '201':
+          description: Création
+          content:
+           application/json:
+            schema:
+                type: object
+           application/xml:
+            schema:
+                type: object
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+
   /v2/projects/{slug}:
     get:
       tags:
@@ -117,7 +152,189 @@ paths:
             {"detail": "Pas trouvé."}
           headers: {}
           content: {}
+  /v2/features:
+    get:
+      tags:
+        - features
+      summary: getFeatures
+      description: |-
+        Ce service permet de récuperer tous les signalements.
+      operationId: getFeatures
+      parameters:
+        - name: project__slug
+          in: query
+          description: Recherche par un paramètre de requête ?project__slug=...
+          required: false
+          schema:
+            type: string
+        - name: feature_type__slug
+          in: query
+          description: Recherche par un paramètre de requête ?feature_type__slug=...
+          required: false
+          schema:
+            type: string
+        - name: output
+          in: query
+          description: Recherche par un paramètre de requête ?output=..., geojson/list, geojson par default
+          required: false
+          schema:
+            type: string
+        - name: title__contains
+          in: query
+          description: Recherche par un paramètre de requête ?title__contains=...
+          required: false
+          schema:
+            type: string
+        - name: title__icontains
+          in: query
+          description: Recherche par un paramètre de requête ?title__icontains=...
+          schema:
+            type: string
+        - name : ordering
+          in: query
+          description: Recherche par un paramètre de requête ?ordering=...
+          schema:
+            type: string
+        - name : limit
+          in: query
+          description: Recherche par un paramètre de requête ?limit=...,  10/50/100
+          schema:
+            type: string
+        - name : id
+          in: query
+          description: Recherche par un paramètre de requête ?id=...,  1/2/3 ...
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeaturesGet'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturesGet'
+        '404':
+          description:  | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+  /v2/features/{feature_id}:
+    get:
+      tags:
+        - features
+      summary: getFeature
+      description: |-
+        Ce service permet de récuperer le detail d'un signalement.
+      operationId: getFeature
+      parameters:
+        - name : feature_id
+          in: path
+          description: Recherche par feature_id (uuid)
+          required: true
+          schema:
+            type: string
+        - name: project__slug
+          in: query
+          description: Recherche par un paramètre de requête ?project__slug=...
+          required: false
+          schema:
+            type: string
+        - name: feature_type__slug
+          in: query
+          description: Recherche par un paramètre de requête ?feature_type__slug=...
+          required: false
+          schema:
+            type: string
+        
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureGet'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureGet'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+  /v2/feature-types:
+    get:
+      tags:
+        - featurestypes
+      summary: getFeaturesTypes
+      description: |-
+        Ce service permet de récuperer tous les types de signalements.
+      operationId: getFeaturesTypes
+      parameters:
+        - name: project__slug
+          in: query
+          description: Recherche par un paramètre de requête ?project__slug=...
+          required: false
+          schema:
+            type: string
+        - name: feature_type__slug
+          in: query
+          description: Recherche par un paramètre de requête ?feature_type__slug=...
+          required: false
+          schema:
+            type: string
+        
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeaturesTypesGet'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturesTypesGet'
+        '404':
+          description:  | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+  /v2/feature-types/{slug}:
+    get:
+      tags:
+        - featurestypes
+      summary: getFeatureType
+      description: |-
+        Ce service permet de récuperer le detail d'un type de signalement.
+      operationId: getFeatureType
+      parameters:
+        - name : slug
+          in: path
+          description: Recherche par feature type slug
+          required: true
+          schema:
+            type: string
 
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureTypeGet'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureTypeGet'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
   /get-token:
     get:
       tags:
@@ -190,6 +407,63 @@ components:
           type: string
         id:
           type: integer
+    ProjectPost:
+      title: ProjectPost
+      type: object
+      required:
+        - title
+        - access_level_arch_feature
+        - access_level_pub_feature
+        - archive_feature
+        - delete_feature
+        - description
+        - fast_edition_mode
+        - generate_share_link
+        - is_project_type
+        - map_max_zoom_level
+        - moderation
+      properties:
+        title:
+          type: string
+        slug: 
+          type: string
+        description:
+          type: string
+        moderation:
+          type: boolean
+        is_project_type:
+          type: boolean
+          description: Est un projet type
+        generate_share_link:
+          type: boolean
+          description: Génération d'un lien de partage externe
+        fast_edition_mode:
+          type: boolean
+          description: Génération d'un lien de partage externe
+        creator:
+          type: integer
+          description: Créateur
+        access_level_pub_feature:
+          type: string
+          description: Visibilité des signalements publiés
+        access_level_arch_feature:
+          type: string
+          description: Visibilité des signalements archivés
+        archive_feature:
+          type: integer
+          description: Délai avant archivage
+        delete_feature:
+          type: integer
+          description: Délai avant suppression
+        map_max_zoom_level:
+          type: integer
+          description: Niveau de zoom maximum de la carte
+        feature_browsing_default_filter:
+          type: integer
+          description: Mode d'édition rapide de signalements
+        feature_browsing_default_sort:
+          type: integer
+          description: Tri par défaut du parcours du signalement
     ProjectsGet:
       title: ProjectsGet
       type: object
@@ -333,6 +607,242 @@ components:
         feature_browsing_default_sort:
           type: integer
           description: Tri par défaut du parcours du signalement
+    FeaturesGet:
+        title: FeaturesGet
+        type: object
+        properties:
+          count:
+            type: integer
+          features:
+            type: array
+            items:
+              type: object
+              properties:
+                feature_id:
+                  type: string
+                title:
+                  type: string
+                description:
+                  type: string
+                status:
+                  type: string
+                created_on:
+                  type: string
+                  description: Date de création
+                  example: AAAA-MM-JJ ou JJ-MM-AAAA
+                updated_on:
+                  type: string
+                  description: Date de modification
+                  example: AAAA-MM-JJ ou JJ-MM-AAAA
+                creator:
+                  type: string
+                display_creator:
+                  type: string
+                display_last_editor:
+                  type: string
+                project:
+                  type: string
+                feature_type:
+                  type: object
+                  description: Génération d'un lien de partage externe
+                  properties:
+                    title:
+                      type: string
+                    slug:
+                      type: string
+                    geom_type:
+                      type: string
+                    customfield_set:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          position:
+                            type: string
+                          label:
+                            type: string
+                          name:
+                            type: string
+                          field_type:
+                            type: string
+                          options:
+                            type: array
+                            items:
+                              type: string
+                          is_mandatory:
+                            type: boolean
+                    project:
+                      type: string
+                geom:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    coordinates:
+                      type: array
+                      items:
+                        type: number
+                feature_data:
+                  type: array
+                  items:
+                    properties:
+                      label:
+                        type: string
+                      field_type:
+                        type: string
+                      value:
+                        type: string
+                archived_on:
+                  type: boolean
+                  
+                access_level_pub_feature:
+                  type: string
+                  description: Visibilité des signalements publiés
+                access_level_arch_feature:
+                  type: string
+                  description: Visibilité des signalements archivés
+                archive_feature:
+                  type: integer
+                  description: Délai avant archivage
+                delete_feature:
+                  type: integer
+                  description: Délai avant suppression
+                map_max_zoom_level:
+                  type: integer
+                  description: Niveau de zoom maximum de la carte
+                nb_features:
+                  type: integer
+                nb_published_features:
+                  type: integer
+                nb_comments:
+                  type: integer
+                nb_published_features_comments:
+                  type: integer
+                nb_contributors:
+                  type: integer
+                feature_browsing_default_filter:
+                  type: integer
+                  description: Mode d'édition rapide de signalements
+                feature_browsing_default_sort:
+                  type: integer
+                  description: Tri par défaut du parcours du signalement
+    FeatureGet:
+      title: FeatureGet
+      type: object
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+        created_on:
+          type: string
+          description: Date de création
+          example: AAAA-MM-JJ ou JJ-MM-AAAA
+        updated_on:
+          type: string
+          description: Date de modification
+          example: AAAA-MM-JJ ou JJ-MM-AAAA
+        description:
+          type: string
+        moderation:
+          type: boolean
+        is_project_type:
+          type: boolean
+          description: Est un projet type
+        generate_share_link:
+          type: boolean
+          description: Génération d'un lien de partage externe
+        fast_edition_mode:
+          type: boolean
+          description: Génération d'un lien de partage externe
+        thumbnail:
+          type: string
+          description: Date de création
+        creator:
+          type: integer
+          description: Créateur
+        access_level_pub_feature:
+          type: string
+          description: Visibilité des signalements publiés
+        access_level_arch_feature:
+          type: string
+          description: Visibilité des signalements archivés
+        archive_feature:
+          type: integer
+          description: Délai avant archivage
+        delete_feature:
+          type: integer
+          description: Délai avant suppression
+        map_max_zoom_level:
+          type: integer
+          description: Niveau de zoom maximum de la carte
+        nb_features:
+          type: integer
+        nb_published_features:
+          type: integer
+        nb_comments:
+          type: integer
+        nb_published_features_comments:
+          type: integer
+        nb_contributors:
+          type: integer
+        feature_browsing_default_filter:
+          type: integer
+          description: Mode d'édition rapide de signalements
+        feature_browsing_default_sort:
+          type: integer
+          description: Tri par défaut du parcours du signalement
+    FeatureTypeGet:
+      title: FeatureTypeGet
+      type: object
+      properties:
+        title:
+          type: string
+        title_optional:
+          type: boolean
+        slug:
+          type: string
+        geom_type:
+          type: string
+        icon:
+          type: string
+        opacity:
+          type: string
+        color_style:
+          type: object
+          properties:
+            colors:
+              type: object
+            custom_field_name:
+              type: string
+        project:
+          type: string
+        customfield_set:
+          type: array
+          items:
+            type: object
+            properties:
+              position:
+                type: string
+              label:
+                type: string
+              name:
+                type: string
+              field_type:
+                type: string
+              options:
+                type: array
+                items:
+                  type: string
+              is_mandatory:
+                type: boolean
+        is_editable:
+          type: boolean
+    FeaturesTypesGet:
+      title: FeaturesTypesGet
+      type: array
+      items:
+        $ref: '#/components/schemas/FeatureTypeGet'
   securitySchemes:
     bearerAuth:
       type: http
@@ -341,10 +851,12 @@ components:
 security: 
   - bearerAuth: []
 tags:
-  # - name: dossiers
-    # description: Composent dossier
-  # - name: user
-  #   description: Composent user
+  - name: users
+    description: Composent users
+  - name: projects
+    description: Composent projects
+  - name: features
+    description: Composent features
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
