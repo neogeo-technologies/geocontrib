@@ -217,6 +217,57 @@ paths:
         '403':
           description: |-
             "detail :	"Informations d'authentification non fournies."
+            "detail": "Nom d'utilisateur et/ou mot de passe non valide(s)."
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+      deprecated: false
+      security: []
+  /projects/{slug}/duplicate:
+    post:
+      tags:
+        - projects
+      summary: addProjectDuplicate
+      description: |-
+        Ce service permet de dupliquer un project.
+      operationId: addProjectDuplicate
+      parameters:
+        - name : slug
+          in: path
+          description: Creation du project à partir de son slug (string)
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Ce service permet de dupliquer un projet sur GéoContrib.
+                    En réponse un nouveau projet est créé et son contenu sont affiché.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectPost'
+        required: true
+      responses:
+        '201':
+          description: Création
+          content:
+           application/json:
+            schema:
+                type: object
+           application/xml:
+            schema:
+                type: object
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
       deprecated: false
       security: []
   /v2/features:
@@ -449,9 +500,199 @@ paths:
            {"detail": "Informations d'authentification non fournies."}
       deprecated: false
       security: []
+  /user-level-projects:
+    get:
+      tags:
+        - users
+      summary: userLevelProjects
+      description: |-
+        Ce service permet de récuperer les profiles de l'utilisateur connecté par projet.
+      operationId: userLevelProjects
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserLevelProjects'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLevelProjects'
+      deprecated: false
+      security: []
+  /user-permissions:
+    get:
+      tags:
+        - users
+      summary: userPermissions
+      description: |-
+        Ce service permet de récuperer tous les permissions de l'utilisateur connecté par projet.
+      operationId: userPermissions
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/userPermissions'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userPermissions'
+      deprecated: false
+      security: []
+  /login:
+    post:
+      tags:
+        - auth
+      summary: login
+      description: |-
+        Ce service permet de se logguer sur geocontrib.
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/LoginDetail'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginDetail'
+        '400':
+          description: | 
+            {"username": ["Ce champ est obligatoire."]}
+            {"password": ["Ce champ est obligatoire."]}
+        '403':
+          description: | 
+            {"detail": "Informations d'authentification incorrectes."}
+            {"detail": "Informations d'authentification non fournies."}
+      deprecated: false
+      security: []
+  /logout:
+    get:
+      tags:
+        - auth
+      summary: logout
+      description: |-
+        Ce service permet de se delogguer sur geocontrib.
+      operationId: logout
+      responses:
+        '200':
+          description:  | 
+            "detail": {username} signed out"
+        '403':
+          description: | 
+           {"detail": "Informations d'authentification non fournies."}
+      deprecated: false
+      security: []
+  /version:
+    get:
+      tags:
+        - version
+      summary: version
+      description: |-
+        Ce service permet de récuperer la version de geocontrib.
+      operationId: version
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Version'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Version'
+      deprecated: false
+      security: []
+  /flat-pages:
+    get:
+      tags:
+        - flat-pages
+      summary: flat-pages
+      description: |-
+        Ce service permet permet recuperer le contenu HTML "plat" dans la base de données.
+      operationId: flat-pages
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FlatPages'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlatPages'
+      deprecated: false
+      security: []
  
 components:
   schemas:
+    FlatPages:
+      title: FlatPages
+      type: object
+      properties:
+        url:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        sites:
+          type: array
+          items: 
+            type: number
+        template_name:
+          type: string
+    Login:
+      title: Login
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    LoginDetail:
+      title: LoginDetail
+      type: object
+      properties:
+        detail:
+          type: string
+        user:
+          type: object
+          properties:
+            username:
+              type: string
+            is_active:
+              type: string
+            first_name:
+              type: string
+            last_name:
+              type: string
+            is_administrator:
+              type: boolean
+            is_superuser:
+              type: boolean
+            can_create_project:
+              type: boolean
+            email:
+              type: string
+            id:
+              type: number
+    Version:
+      title: Version
+      type: object
+      properties:
+        geocontrib:
+          type: string
+        geocontrib-celery:
+          type: string
     User:
       title: User
       type: object
@@ -474,6 +715,45 @@ components:
           type: string
         id:
           type: integer
+    UserLevelProjects:
+      title: UserLevelProjects
+      type: object
+      properties:
+        project-name:
+          type: string
+    userPermissions:
+      title: userPermissions
+      type: object
+      properties:
+        project-name:
+          type: object
+          properties:
+            can_view_project:
+              type: boolean
+            can_create_project:
+              type: boolean
+            can_update_project:
+              type: boolean
+            can_view_feature:
+              type: boolean
+            can_view_archived_feature:
+              type: boolean
+            can_create_feature:
+              type: boolean
+            can_delete_feature:
+              type: boolean
+            can_publish_feature:
+              type: boolean
+            can_create_feature_type:
+              type: boolean
+            can_view_feature_type:
+              type: boolean
+            is_project_super_contributor:
+              type: boolean
+            is_project_moderator:
+              type: boolean
+            is_project_administrator:
+              type: boolean
     ProjectPost:
       title: ProjectPost
       type: object
