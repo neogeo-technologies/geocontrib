@@ -175,8 +175,8 @@ paths:
               $ref: '#/components/schemas/ProjectUpdate'
         required: true
       responses:
-        '201':
-          description: Création
+        '200':
+          description: Mise à jour
           content:
            application/json:
             schema:
@@ -256,6 +256,179 @@ paths:
            application/xml:
             schema:
                 type: object
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+  /projects/{slug}/thumbnail:
+    get:
+      tags:
+        - projects
+      summary: getProjectThumbnail
+      description: |-
+        Ce service permet de récupérer la vignette d'un project.
+      operationId: getProjectThumbnail
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vignette image en format JPEG
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+    put:
+      tags:
+        - projects
+      summary: putProjectThumbnail
+      description: |-
+        Ce service permet de mettre à jour la vignette d'un project.
+      operationId: putProjectThumbnail
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Ce service permet de mettre à jour la vignette d'un projet sur GéoContrib.
+                    En réponse le projet est mis à jour et son  contenu sont affiché.
+        content: 
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: Detail du projet
+          content:
+           application/json:
+            schema:
+                $ref: '#/components/schemas/ProjectsGet'
+           application/xml:
+            schema:
+                $ref: '#/components/schemas/ProjectsGet'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+  /projects/{slug}/utilisateurs:
+    get:
+      tags:
+        - projects
+      summary: getProjectUtilisateurs
+      description: |-
+        Ce service permet de récupérer tous les utilisateurs d'un project.
+      operationId: getProjectUtilisateurs
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserProject'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProject'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+    put:
+      tags:
+        - projects
+      summary: putProjectUtilisateurs
+      description: |-
+        Ce service permet de récupérer tous les utilisateurs d'un project.
+      operationId: putProjectUtilisateurs
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Ce service permet de mettre à les utilisateurs d'un projet.
+                    En réponse les utilisateurs du projet sont mis à jour et son  contenu sont affiché.
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProject'
+        required: true
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserProject'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProject'
         '401':
           description: |
 
@@ -617,7 +790,7 @@ paths:
         - flat-pages
       summary: flat-pages
       description: |-
-        Ce service permet permet recuperer le contenu HTML "plat" dans la base de données.
+        Ce service permet permet récupérer le contenu HTML "plat" dans la base de données.
       operationId: flat-pages
       responses:
         '200':
@@ -721,6 +894,30 @@ components:
       properties:
         project-name:
           type: string
+    UserProject:
+      title: UserProject
+      type: array
+      items:
+        type: object
+        properties:
+          user:
+            type: object
+            properties:
+              id:
+                type: number
+              first_name:
+                type: string
+              last_name:
+                type: string
+              username:
+                type: string
+          level:
+            type: object
+            properties:
+              display:
+                type: string
+              codename:
+                type: string
     userPermissions:
       title: userPermissions
       type: object
