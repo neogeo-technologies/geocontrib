@@ -356,7 +356,8 @@ class ExportFeatureList(views.APIView):
         """
         project = get_object_or_404(Project, slug=slug)
         features = Feature.handy.availables(request.user, project).filter( feature_type__slug=feature_type_slug).order_by("created_on")
-        format = request.GET.get('format_export')
+        # FIX query format_export. by default => geojson
+        format = request.GET.get('format_export', 'geojson')
         if format == 'geojson':
             serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
             response = HttpResponse(json.dumps(serializer.data), content_type='application/json')

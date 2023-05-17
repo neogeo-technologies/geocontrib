@@ -443,6 +443,200 @@ paths:
           content: {}
       deprecated: false
       security: []
+  /projects/{slug}/feature-bbox:
+    get:
+      tags:
+        - projects
+      summary: getProjectFeatureBbox
+      description: |-
+        Ce service permet de récupérer une bbox des signalements d'un project.
+      operationId: getProjectFeatureBbox
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BboxProject'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BboxProject'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+  /projects/{slug}/comments:
+    get:
+      tags:
+        - projects
+      summary: getProjectComments
+      description: |-
+        Ce service permet de récupérer des dernières commentaires sur des signalements d'un project.
+      operationId: getProjectComments
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ProjectComments'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectComments'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+  /projects/{slug}/feature-type/{feature_type_slug}/:
+    get:
+      tags:
+        - projects
+      summary: getSignalementsProject
+      description: |-
+        Ce service permet le téléchargement des signalements lié à un projet.
+      operationId: getSignalementsProject
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+        - name: feature_type_slug
+          in: path
+          description: Slug (string) du type de signalement
+          required: true
+          schema:
+            type: string
+        - name: format_export
+          in: query
+          description: Type de format attendu => geojson / csv
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Fichier des signalements en format geojson ou csv
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeojsonFeatures'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+  /projects/{slug}/feature-search:
+    get:
+      tags:
+        - projects
+      summary: getProjectSearch
+      description: |-
+        Ce service permet de récupérer des signalements d'un project, selon paramètres.
+      operationId: getProjectSearch
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+        - name: geom
+          in: query
+          description: Type de format attendu => geojson / csv
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Type de format attendu => geojson / csv
+          schema:
+            type: string
+        - name: feature_type_slug
+          in: query
+          description: Type de format attendu => geojson / csv
+          schema:
+            type: string
+        - name: title
+          in: query
+          description: Type de format attendu => geojson / csv
+          schema:
+            type: string
+        - name: feature_id
+          in: query
+          description: Type de format attendu => geojson / csv
+          schema:
+            type: string
+        - name: exclude_feature_id
+          in: query
+          description: Type de format attendu => geojson / csv
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureSearch'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureSearch'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
   /v2/features:
     get:
       tags:
@@ -807,6 +1001,24 @@ paths:
  
 components:
   schemas:
+    ProjectComments:
+      title: ProjectComments
+      type: object
+      properties:
+        last_comments:
+          type: string
+    BboxProject:
+      title: BboxProject
+      type: object
+      properties:
+        minLon:
+          type: number
+        minLat:
+          type: number
+        maxLon:
+          type: number
+        maxLat:
+          type: number
     FlatPages:
       title: FlatPages
       type: object
@@ -1297,7 +1509,6 @@ components:
                         type: string
                 archived_on:
                   type: boolean
-                  
                 access_level_pub_feature:
                   type: string
                   description: Visibilité des signalements publiés
@@ -1395,6 +1606,65 @@ components:
         feature_browsing_default_sort:
           type: integer
           description: Tri par défaut du parcours du signalement
+    FeatureSearch:
+      title: FeatureSearch
+      type: object
+      properties:
+          count:
+            type: integer
+          next:
+            type: string
+          previous:
+            type: string
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                feature_id:
+                  type: string
+                title:
+                  type: string
+                description:
+                  type: string
+                status:
+                  type: string
+                creator:
+                  type: object
+                  properties:
+                    full_name:
+                      type: string
+                    username:
+                      type: string
+                created_on:
+                  type: string
+                  description: Date de création
+                  example: AAAA-MM-JJ ou JJ-MM-AAAA
+                updated_on:
+                  type: string
+                  description: Date de modification
+                  example: AAAA-MM-JJ ou JJ-MM-AAAA
+                archived_on:
+                  type: string
+                  description: Date de archive
+                  example: AAAA-MM-JJ ou JJ-MM-AAAA
+                deletion_on:
+                  type: string
+                  description: Date de suppresion
+                  example: AAAA-MM-JJ ou JJ-MM-AAAA
+                project_slug:
+                  type: string
+                feature_type_slug:
+                  type: string
+                geom:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    coordinates:
+                      type: array
+                      items:
+                        type: number
     FeatureTypeGet:
       title: FeatureTypeGet
       type: object
@@ -1446,6 +1716,55 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/FeatureTypeGet'
+    GeojsonFeatures:
+      title: GeojsonFeatures
+      type: object
+      properties:
+        type:
+          type: string
+        features:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              type:
+                type: string
+              geometry:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  coordinates:
+                    type: array
+                    items:
+                      type: string
+              properties:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  status:
+                    type: string
+                  created_on:
+                    type: string
+                  updated_on:
+                    type: string
+                  archived_on:
+                    type: string
+                  deletion_on:
+                    type: string
+                  feature_type:
+                    type: string
+                  project:
+                    type: string
+                  display_creator:
+                    type: string
+                  creator:
+                    type: number
   securitySchemes:
     bearerAuth:
       type: http
