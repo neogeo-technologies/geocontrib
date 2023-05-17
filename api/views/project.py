@@ -86,6 +86,14 @@ class ProjectView(viewsets.ModelViewSet):
             return super().destroy(request, *args, **kwargs)
         raise exceptions.PermissionDenied
 
+    def update(self, request, *args, **kwargs):
+        slug = self.kwargs.get('slug')
+        project = get_object_or_404(Project, slug=slug)
+        perms = Authorization.all_permissions(self.request.user, project)
+        if perms and (self.request.user.is_superuser or perms['is_project_administrator']):
+            return super().update(request, *args, **kwargs)
+        raise exceptions.PermissionDenied
+
 
 class ProjectTypesView(
         mixins.ListModelMixin,
