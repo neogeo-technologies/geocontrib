@@ -11,7 +11,7 @@ servers:
   - url: geocontrib.dev.neogeo.fr/geocontrib/api/
     variables: {}
 paths:
-  /v2/projects:
+  /api/v2/projects:
     get:
       tags:
         - projects
@@ -122,7 +122,7 @@ paths:
       deprecated: false
       security: []
 
-  /v2/projects/{slug}:
+  /api/v2/projects/{slug}:
     get:
       tags:
         - projects
@@ -223,7 +223,7 @@ paths:
             {"detail": "Pas trouvé."}
       deprecated: false
       security: []
-  /projects/{slug}/duplicate:
+  /api/projects/{slug}/duplicate:
     post:
       tags:
         - projects
@@ -270,7 +270,7 @@ paths:
           content: {}
       deprecated: false
       security: []
-  /projects/{slug}/thumbnail:
+  /api/projects/{slug}/thumbnail:
     get:
       tags:
         - projects
@@ -358,7 +358,7 @@ paths:
           content: {}
       deprecated: false
       security: []
-  /projects/{slug}/utilisateurs:
+  /api/projects/{slug}/utilisateurs:
     get:
       tags:
         - projects
@@ -443,7 +443,7 @@ paths:
           content: {}
       deprecated: false
       security: []
-  /projects/{slug}/feature-bbox:
+  /api/projects/{slug}/feature-bbox:
     get:
       tags:
         - projects
@@ -482,7 +482,7 @@ paths:
           content: {}
       deprecated: false
       security: []
-  /projects/{slug}/comments:
+  /api/projects/{slug}/comments:
     get:
       tags:
         - projects
@@ -521,7 +521,7 @@ paths:
           content: {}
       deprecated: false
       security: []
-  /projects/{slug}/feature-type/{feature_type_slug}/:
+  /api/projects/{slug}/feature-type/{feature_type_slug}/:
     get:
       tags:
         - projects
@@ -568,7 +568,7 @@ paths:
           content: {}
       deprecated: false
       security: []
-  /projects/{slug}/feature-search:
+  /api/projects/{slug}/feature-search:
     get:
       tags:
         - projects
@@ -637,7 +637,357 @@ paths:
           content: {}
       deprecated: false
       security: []
-  /v2/features:
+
+  /api/projects/{slug}/subscription/:
+    get:
+      tags:
+        - projects
+      summary: getProjectSubscription
+      description: |-
+        Ce service permet de récupérer la subscription à un project de l'utilisateur connecté.
+      operationId: getProjectSubscription
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+
+    put:
+      tags:
+        - projects
+      summary: putProjectSubscription
+      description: |-
+        Ce service permet de mettre à jour la subscription à un project de l'utilisateur connecté.
+      operationId: putProjectSubscription
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+        required: true
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+
+  /api/projects/{slug}/feature/{feature_id}/position-in-list/:
+    get:
+      tags:
+        - projects
+      summary: getProjectFeaturePositionInList
+      description: |-
+        Ce service permet de récupérer 
+      operationId: getProjectFeaturePositionInList
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+        - name : feature_id
+          in: path
+          description: UUID du signalement
+          required: true
+          schema:
+            type: string
+        - name : ordering
+          in: query
+          description: Recherche par un paramètre de requête ?ordering=...
+          schema:
+            type: string
+        - name : offset
+          in: query
+          description: Recherche par un paramètre de requête ?offset=...,  10/50/100
+          schema:
+            type: string
+        - name : feature_type_slug
+          in: query
+          description: Recherche par un paramètre de requête ?feature_type_slug=...
+          schema:
+            type: string
+        - name : status
+          in: query
+          description: Recherche par un paramètre de requête ?status=...
+          schema:
+            type: string
+        - name : title
+          in: query
+          description: Recherche par un paramètre de requête ?title=...
+          schema:
+            type: string
+      responses:
+        '200':
+           description:  | 
+            un entiere de 0 à N
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+
+  /api/projects/{slug}/feature-paginated/:
+    get:
+      tags:
+        - projects
+      summary: getProjectFeaturePaginated
+      description: |-
+        Ce service permet de récupérer 
+      operationId: getProjectFeaturePaginated
+      parameters:
+        - name : slug
+          in: path
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+        - name : ordering
+          in: query
+          description: Recherche par un paramètre de requête ?ordering=...
+          schema:
+            type: string
+        - name : limit
+          in: query
+          description: Recherche par un paramètre de requête ?limit=...
+          schema:
+            type: string
+        - name : offset
+          in: query
+          description: Recherche par un paramètre de requête ?offset=...,  10/50/100
+          schema:
+            type: string
+        - name : feature_type_slug
+          in: query
+          description: Recherche par un paramètre de requête ?feature_type_slug=...
+          schema:
+            type: string
+        - name : status__value
+          in: query
+          description: Recherche par un paramètre de requête ?status__value=...
+          schema:
+            type: string
+        - name : title
+          in: query
+          description: Recherche par un paramètre de requête ?title=...
+          schema:
+            type: string
+        - name : output
+          in: query
+          description: Recherche par un paramètre de requête ?output=...
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeaturesPaginated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturesPaginated'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+
+  /api/events/:
+    get:
+      tags:
+        - projects
+      summary: getEvents
+      description: |-
+        Ce service permet de récupérer tous les evenements, signalement et commentaires d'un projet ou de tous les projets.
+      operationId: getEvents
+      parameters:
+        - name : project_slug
+          in: query
+          description: Slug (string) du projet
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Events'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Events'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+
+  /api/exif-geom-reader/:
+    post:
+    tags:
+      - misc
+    summary: addExifGeomReader
+    description: |-
+      Ce service permet de dupliquer un project.
+    operationId: addExifGeomReader
+    parameters:
+      - name : slug
+        in: path
+        description: Creation du project à partir de son slug (string)
+        required: true
+        schema:
+          type: string
+    requestBody:
+      content:
+        image/png:
+          schema:
+            type: string
+            format: binary
+      required: true
+    responses:
+      '201':
+        description: Création
+        content:
+          application/json:
+          schema:
+              type: object
+          application/xml:
+          schema:
+              type: object
+      '401':
+        description: |
+
+      '400':
+        description:  |
+
+      '403':
+        description: | 
+      '405':
+        description: Invalid input
+        headers: {}
+        content: {}
+    deprecated: false
+    security: []
+      
+
+  # /api/features/<uuid:feature_id>/feature-links/:
+  # /api/features/<uuid:feature_id>/events/:
+  # /api/features/<uuid:feature_id>/attachments/:
+  # /api/features/<uuid:feature_id>/attachments/<uuid:attachment_id>/:
+  # /api/features/<uuid:feature_id>/attachments/<uuid:attachment_id>/upload-file/:
+  # /api/features/<uuid:feature_id>/comments/:
+  # /api/features/<uuid:feature_id>/comments/<uuid:comment_id>/:
+  # /api/features/<uuid:feature_id>/comments/<uuid:comment_id>/upload-file/:
+  # /api/features.mvt/:
+  # /api/external-geojson/:
+  # /api/idgo-catalog/:
+  # /api/proxy/:
+  # /api/prerecorded-list-values/:
+  # /api/prerecorded-list-values/<str:name>/:
+  # /api/get-token/:
+  # /api/customfields/:
+  # /api/projects/<slug:slug>/feature-types/:
+  # /api/projects/<slug:slug>/feature/:
+  # /api/v2/users/:
+  # /api/v2/users/{pk}/:
+  # /api/v2/import-tasks/:
+  # /api/v2/import-tasks/{pk}/:
+  # /api/v2/base-maps/:
+  # /api/v2/base-maps/{pk}/:
+  # /api/v2/layers/:
+  # /api/v2/layers/{pk}/:
+  # /api/v2/levels-permissions/:
+  # /api/v2/levels-permissions/{pk}/:
+  # /api/features/:
+  # /api/features/{feature_id}/:
+  # /api/feature-types/:
+  # /api/feature-types/{slug}/:
+  # /api/project-types/:
+  # /api/project-types/{pk}/:
+  # /api/{format}/:
+
+  /api/v2/features:
     get:
       tags:
         - features
@@ -707,7 +1057,7 @@ paths:
           content: {}
       deprecated: false
       security: []
-  /v2/features/{feature_id}:
+  /api/v2/features/{feature_id}:
     get:
       tags:
         - features
@@ -750,7 +1100,7 @@ paths:
             {"detail": "Pas trouvé."}
           headers: {}
           content: {}
-  /v2/feature-types:
+  /api/v2/feature-types:
     get:
       tags:
         - featurestypes
@@ -789,7 +1139,7 @@ paths:
           content: {}
       deprecated: false
       security: []
-  /v2/feature-types/{slug}:
+  /api/v2/feature-types/{slug}:
     get:
       tags:
         - featurestypes
@@ -820,7 +1170,8 @@ paths:
             {"detail": "Pas trouvé."}
           headers: {}
           content: {}
-  /get-token:
+
+  /api/get-token:
     get:
       tags:
         - users
@@ -844,7 +1195,7 @@ paths:
            {"detail": "Informations d'authentification non fournies."}
       deprecated: false
       security: []
-  /user_info:
+  /api/user_info:
     get:
       tags:
         - users
@@ -867,7 +1218,7 @@ paths:
            {"detail": "Informations d'authentification non fournies."}
       deprecated: false
       security: []
-  /user-level-projects:
+  /api/user-level-projects:
     get:
       tags:
         - users
@@ -887,7 +1238,7 @@ paths:
                 $ref: '#/components/schemas/UserLevelProjects'
       deprecated: false
       security: []
-  /user-permissions:
+  /api/user-permissions:
     get:
       tags:
         - users
@@ -907,7 +1258,7 @@ paths:
                 $ref: '#/components/schemas/userPermissions'
       deprecated: false
       security: []
-  /login:
+  /api/login:
     post:
       tags:
         - auth
@@ -941,7 +1292,7 @@ paths:
             {"detail": "Informations d'authentification non fournies."}
       deprecated: false
       security: []
-  /logout:
+  /api/logout:
     get:
       tags:
         - auth
@@ -958,7 +1309,7 @@ paths:
            {"detail": "Informations d'authentification non fournies."}
       deprecated: false
       security: []
-  /version:
+  /api/version:
     get:
       tags:
         - version
@@ -978,7 +1329,7 @@ paths:
                 $ref: '#/components/schemas/Version'
       deprecated: false
       security: []
-  /flat-pages:
+  /api/flat-pages:
     get:
       tags:
         - flat-pages
@@ -1540,6 +1891,95 @@ components:
                 feature_browsing_default_sort:
                   type: integer
                   description: Tri par défaut du parcours du signalement
+    FeaturesPaginated:
+        title: FeaturesPaginated
+        type: object
+        properties:
+          count:
+            type: integer
+          next:
+            type: string
+          previous:
+            type: string
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                feature_id:
+                  type: string
+                title:
+                  type: string
+                description:
+                  type: string
+                status:
+                  type: string
+                created_on:
+                  type: string
+                  description: Date de création
+                  example: AAAA-MM-JJ ou JJ-MM-AAAA
+                updated_on:
+                  type: string
+                  description: Date de modification
+                  example: AAAA-MM-JJ ou JJ-MM-AAAA
+                creator:
+                  type: string
+                display_creator:
+                  type: string
+                display_last_editor:
+                  type: string
+                project:
+                  type: string
+                feature_type:
+                  type: object
+                  description: Génération d'un lien de partage externe
+                  properties:
+                    title:
+                      type: string
+                    slug:
+                      type: string
+                    geom_type:
+                      type: string
+                    customfield_set:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          position:
+                            type: string
+                          label:
+                            type: string
+                          name:
+                            type: string
+                          field_type:
+                            type: string
+                          options:
+                            type: array
+                            items:
+                              type: string
+                          is_mandatory:
+                            type: boolean
+                    project:
+                      type: string
+                geom:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    coordinates:
+                      type: array
+                      items:
+                        type: number
+                feature_data:
+                  type: array
+                  items:
+                    properties:
+                      label:
+                        type: string
+                      field_type:
+                        type: string
+                      value:
+                        type: string
     FeatureGet:
       title: FeatureGet
       type: object
@@ -1751,6 +2191,8 @@ components:
                     type: string
                   created_on:
                     type: string
+                    description: Date de création
+                    example: AAAA-MM-JJ ou JJ-MM-AAAA
                   updated_on:
                     type: string
                   archived_on:
@@ -1765,6 +2207,217 @@ components:
                     type: string
                   creator:
                     type: number
+    Subscription:
+      title: Subscription
+      type: object
+      properties:
+        is_suscriber:
+          type: boolean
+    Events:
+      title: GeojsonFeatures
+      type: object
+      properties:
+        events:
+          type: object
+          properties:
+            created_on:
+              type: string
+              description: Date de création
+              example: AAAA-MM-JJ ou JJ-MM-AAAA
+            object_type:
+              type: string
+            event_type:
+              type: string
+            data:
+              type: object
+              properties:
+                extra:
+                  type: object
+                  properties:
+                    nom:
+                      type: string
+                    code:
+                      type: string
+                feature_title:
+                  type: string
+                feature_status:
+                  type: string
+                project_slug:
+                  type: object
+                  properties:
+                    new_status:
+                      type: string
+                    has_changed:
+                      type: boolean
+            project_slug:
+              type: string
+            feature_type_slug:
+              type: string
+            feature_id:
+              type: string
+            comment_id:
+              type: string
+            attachment_id:
+              type: string
+            display_user:
+              type: string
+            related_comment:
+              type: object
+              properties:
+                comment:
+                  type: string
+                
+                attachments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                      title:
+                        type: string
+            related_feature:
+              type: object
+              properties:
+                feature_id:
+                  type: string
+                title:
+                  type: string
+                feature_url:
+                  type: string
+            project_url:
+              type: string
+        features:
+          type: array
+          items:
+            type: object
+            properties:
+              created_on:
+                type: string
+                description: Date de création
+                example: AAAA-MM-JJ ou JJ-MM-AAAA
+              object_type:
+                type: string
+              event_type:
+                type: string
+              data:
+                type: object
+                properties:
+                  extra:
+                    type: object
+                    properties:
+                      nom:
+                        type: string
+                      code:
+                        type: string
+                  feature_title:
+                    type: string
+                  feature_status:
+                    type: object
+                    properties:
+                      new_status:
+                        type: string
+                      has_changed:
+                        type: boolean
+              project_slug:
+                type: string
+              feature_type_slug:
+                type: string
+              feature_id:
+                type: string
+              comment_id:
+                type: string
+              attachment_id:
+                type: string
+              display_user:
+                type: string
+              related_comment:
+                type: object
+                properties:
+                  comment:
+                    type: string
+                  attachments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                        title:
+                          type: string
+              related_feature:
+                type: object
+                properties:
+                  feature_id:
+                    type: string
+                  title:
+                    type: string
+                  feature_url:
+                    type: string
+              project_url:
+                type: string
+        comments:
+          type: array
+          items:
+            type: object
+            properties:
+              created_on:
+                type: string
+                description: Date de création
+                example: AAAA-MM-JJ ou JJ-MM-AAAA
+              object_type:
+                type: string
+              event_type:
+                type: string
+              data:
+                type: object
+                properties:
+                  author:
+                    type: string
+                  comment:
+                    type: string
+                  username:
+                    type: string
+                  project_slug:
+                    type: string
+              project_slug:
+                type: string
+              feature_type_slug:
+                type: string
+              feature_id:
+                type: string
+              comment_id:
+                type: string
+              attachment_id:
+                type: string
+              display_user:
+                type: string
+              related_comment:
+                type: object
+                properties:
+                  comment:
+                    type: string
+                  attachments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                        title:
+                          type: string
+              related_feature:
+                type: object
+                properties:
+                  feature_id:
+                    type: string
+                  title:
+                    type: string
+                  feature_url:
+                    type: string
+              project_url:
+                type: string
+
   securitySchemes:
     bearerAuth:
       type: http
