@@ -905,70 +905,580 @@ paths:
 
   /api/exif-geom-reader/:
     post:
-    tags:
-      - misc
-    summary: addExifGeomReader
-    description: |-
-      Ce service permet de dupliquer un project.
-    operationId: addExifGeomReader
-    parameters:
-      - name : slug
-        in: path
-        description: Creation du project à partir de son slug (string)
+      tags:
+        - misc
+      summary: addExifGeomReader
+      description: |-
+        Ce service permet de dupliquer un project.
+      operationId: addExifGeomReader
+      requestBody:
+        content: 
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image_file:
+                  type: string
+                  format: binary
         required: true
-        schema:
-          type: string
-    requestBody:
-      content:
-        image/png:
+      responses:
+        '201':
+          description: Création
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exif'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Exif'
+        '401':
+          description: |
+
+        '400':
+          description:  |
+                {error : "Erreur lors de la lecture des données GPS."}
+        '403':
+          description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+
+  /api/features/{feature_id}/feature-links/:
+    get:
+      tags:
+        - features
+      summary: getFeatureLinks
+      description: |-
+        Ce service permet de récuperer le liason entre signalements.
+      operationId: getFeatureLinks
+      parameters:
+        - name : feature_id
+          in: path
+          description: Recherche par feature_id (uuid)
+          required: true
           schema:
             type: string
-            format: binary
-      required: true
-    responses:
-      '201':
-        description: Création
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureLinksUpdated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureLinksUpdated'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+    put:
+      tags:
+        - features
+      summary: putFeatureLinks
+      description: |-
+        Ce service permet de mettre à jour le liason entre signalements.
+      operationId: putFeatureLinks
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature ID (uuid)
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Ce service permet de mettre à jour la liason entre deux signalements.
+                    En réponse le signalement est mis à jour et son  contenu sont affiché.
         content:
           application/json:
+            schema:
+              $ref: '#/components/schemas/FeatureLinksUpdate'
+        required: true
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureLinksUpdated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureLinksUpdated'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+
+  /api/features/{feature_id}/events/:
+    get:
+      tags:
+        - features
+      summary: getFeatureEvents
+      description: |-
+        Ce service permet de récuperer les evenements d'un signalements.
+      operationId: getFeatureEvents
+      parameters:
+        - name : feature_id
+          in: path
+          description: Recherche par feature_id (uuid)
+          required: true
           schema:
-              type: object
-          application/xml:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureEvents'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureEvents'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+
+  /api/features/{feature_id}/attachments/:
+    get:
+      tags:
+        - features
+      summary: getFeatureAttachments
+      description: |-
+        Ce service permet de récuperer les attachements d'un signalements.
+      operationId: getFeatureAttachments
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature id (uuid)
+          required: true
           schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureAttachmentsGet'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureAttachmentsGet'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+    post:
+      tags:
+        - features
+      summary: postFeatureAttachments
+      description: |-
+        Ce service permet de créer un attachement dans un signalement.
+      operationId: postFeatureAttachments
+      requestBody:
+        content: 
+          multipart/form-data:
+            schema:
               type: object
-      '401':
-        description: |
+              properties:
+                file:
+                  type: string
+                  format: binary
+        required: true
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature id (uuid)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureAttachmentsCreated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureAttachmentsCreated'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
 
-      '400':
-        description:  |
+  /api/features/{feature_id}/attachments/{attachment_id}/:
+    get:
+      tags:
+        - features
+      summary: getFeatureAttachmentDetail
+      description: |-
+        Ce service permet de récuperer un attachement d'un signalements.
+      operationId: getFeatureAttachmentDetail
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature ID (uuid)
+          required: true
+          schema:
+            type: string
+        - name : attachment_id
+          in: path
+          description: Attachment id (uuid)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureAttachmentsCreated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureAttachmentsCreated'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+    put:
+      tags:
+        - features
+      summary: putFeatureAttachment
+      description: |-
+        Ce service permet de mettre à jour le title et info d'un attachement dans un signalement.
+      operationId: putFeatureAttachment
+      requestBody:
+        content: 
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                name:
+                  type: string
+        required: true
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature_id (uuid)
+          required: true
+          schema:
+            type: string
+        - name : attachment_id
+          in: path
+          description: Attachment id (uuid)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureAttachmentsCreated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureAttachmentsCreated'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
 
-      '403':
-        description: | 
-      '405':
-        description: Invalid input
-        headers: {}
-        content: {}
-    deprecated: false
-    security: []
-      
+  /api/features/{feature_id}/attachments/{attachment_id}/upload-file/:
+    put:
+      tags:
+        - features
+      summary: putFeatureAttachmentUploadFile
+      description: |-
+        Ce service permet de mettre à jour l'image d'un attachement dans un signalement.
+      operationId: putFeatureAttachmentUploadFile
+      requestBody:
+        content: 
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        required: true
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature_id (uuid)
+          required: true
+          schema:
+            type: string
+        - name : attachment_id
+          in: path
+          description: Attachment id (uuid)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureAttachmentsCreated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureAttachmentsCreated'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
 
-  # /api/features/<uuid:feature_id>/feature-links/:
-  # /api/features/<uuid:feature_id>/events/:
-  # /api/features/<uuid:feature_id>/attachments/:
-  # /api/features/<uuid:feature_id>/attachments/<uuid:attachment_id>/:
-  # /api/features/<uuid:feature_id>/attachments/<uuid:attachment_id>/upload-file/:
-  # /api/features/<uuid:feature_id>/comments/:
-  # /api/features/<uuid:feature_id>/comments/<uuid:comment_id>/:
-  # /api/features/<uuid:feature_id>/comments/<uuid:comment_id>/upload-file/:
+  /api/features/{feature_id}/comments/:
+    get:
+      tags:
+        - features
+      summary: getFeatureComments
+      description: |-
+        Ce service permet de récuperer des dernières commentaires d'un signalements.
+      operationId: getFeatureComments
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature ID (uuid)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeatureComments'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureComments'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+    post:
+      tags:
+        - features
+      summary: postFeatureComments
+      description: |-
+        Ce service permet de créer un commentaire dans un signalement.
+      operationId: postFeatureComments
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature ID (uuid)
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentsCreate'
+        required: true
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CommentsCreated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentsCreated'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+  
+  /api/features/{feature_id}/comments/{comment_id}/:
+    get:
+      tags:
+        - features
+      summary: getFeatureCommentsDetail
+      description: |-
+        Ce service permet de récuperer un commentaire d'un signalements.
+      operationId: getFeatureCommentsDetail
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature ID (uuid)
+          required: true
+          schema:
+            type: string
+        - name : comment_id
+          in: path
+          description: Comment ID (uuid)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CommentsCreated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentsCreated'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+    put:
+      tags:
+        - features
+      summary: putFeatureCommentsDetail
+      description: |-
+        Ce service permet de mettre à jour un commentaire d'un signalements.
+      operationId: putFeatureCommentsDetail
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature ID (uuid)
+          required: true
+          schema:
+            type: string
+        - name : comment_id
+          in: path
+          description: Comment ID (uuid)
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentsCreate'
+        required: true
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CommentsCreated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentsCreated'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+    delete:
+      tags:
+        - features
+      summary: deleteFeatureCommentsDetail
+      description: |-
+        Ce service permet de supprimer un commentaire d'un signalements.
+      operationId: deleteFeatureCommentsDetail
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature ID (uuid)
+          required: true
+          schema:
+            type: string
+        - name : comment_id
+          in: path
+          description: Comment ID (uuid)
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: |-
+
+        '403':
+          description: |-
+            "detail :	"Informations d'authentification non fournies."
+            "detail": "Nom d'utilisateur et/ou mot de passe non valide(s)."
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+      deprecated: false
+      security: []
+
+  /api/features/{feature_id}/comments/{comment_id}/upload-file/:
+    put:
+      tags:
+        - features
+      summary: putFeatureCommentsDetailUploadFile
+      description: |-
+        Ce service permet de mettre à jour une image sur un commentaire d'un signalements.
+      operationId: putFeatureCommentsDetailUploadFile
+      parameters:
+        - name : feature_id
+          in: path
+          description: Feature ID (uuid)
+          required: true
+          schema:
+            type: string
+        - name : comment_id
+          in: path
+          description: Comment ID (uuid)
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content: 
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CommentsCreated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentsCreated'
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+
   # /api/features.mvt/:
   # /api/external-geojson/:
   # /api/idgo-catalog/:
   # /api/proxy/:
   # /api/prerecorded-list-values/:
-  # /api/prerecorded-list-values/<str:name>/:
+  # /api/prerecorded-list-values/{name}/:
   # /api/get-token/:
   # /api/customfields/:
-  # /api/projects/<slug:slug>/feature-types/:
-  # /api/projects/<slug:slug>/feature/:
+  # /api/projects/{slug}/feature-types/:
+  # /api/projects/{slug}/feature/:
   # /api/v2/users/:
   # /api/v2/users/{pk}/:
   # /api/v2/import-tasks/:
@@ -2105,6 +2615,145 @@ components:
                       type: array
                       items:
                         type: number
+    FeatureLinksUpdate:
+      title: FeatureLinksUpdate
+      type: object
+      properties:
+        dataKey:
+          type: number
+        feature_to:
+          type: object
+          properties:
+            feature_id:
+              type: string
+        relation_type:
+          type: string
+    FeatureLinksUpdated:
+      title: FeatureLinksUpdate
+      type: object
+      properties:
+        relation_type:
+          type: string
+        relation_type_display:
+          type: string
+        feature_to:
+          type: object
+          properties:
+            feature_id:
+              type: string
+            title:
+              type: string
+            display_creator:
+              type: string
+            created_on:
+              type: string
+            url:
+              type: string
+            feature_type_slug:
+              type: string
+    FeatureEvents:
+      title: FeatureEvents
+      type: object
+      properties:
+        created_on:
+          type: string
+        object_type:
+          type: string
+        event_type:
+          type: string
+        display_user:
+          type: string
+        related_comment:
+          type: object
+          properties:
+            comment:
+              type: string
+            attachment:
+              type: object
+              properties:
+                url:
+                  type: string
+                title:
+                  type: string
+    FeatureAttachmentsCreated:
+      title: FeatureAttachmentsCreated
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        info:
+          type: string
+        attachment_file:
+          type: string
+        extension:
+          type: string
+        created_on:
+          type: string
+        display_author:
+          type: string
+    FeatureAttachmentsGet:
+      title: FeatureAttachments
+      type: array
+      items:
+        $ref: '#/components/schemas/FeatureAttachmentsCreated'
+    CommentsCreate:
+      title: CommentsCreate
+      type: object
+      properties:
+        comment:
+          type: string
+    CommentsCreated:
+      title: CommentsCreated
+      type: object
+      properties:
+        id:
+          type: string
+        comment:
+          type: string
+        created_on:
+          type: string
+        display_author:
+          type: string
+        attachment:
+          type: object
+          properties:
+            url:
+              type: string
+            extension:
+              type: string
+            title:
+              type: string
+            info:
+              type: string
+    FeatureCommentsCreated:
+      title: FeatureCommentsCreated
+      type: object
+      properties:
+        last_comments:
+            type: array
+            items:
+                type: object
+                properties:
+                  created_on:
+                    type: string
+                  comment:
+                    type: string
+                  display_author:
+                    type: object
+                    properties:
+                      feature_id:
+                        type: string
+                      title:
+                        type: string
+                      feature_url:
+                        type: string
+    FeatureComments:
+      title: FeatureComments
+      type: array
+      items:
+        $ref: '#/components/schemas/FeatureCommentsCreated'
     FeatureTypeGet:
       title: FeatureTypeGet
       type: object
@@ -2417,7 +3066,17 @@ components:
                     type: string
               project_url:
                 type: string
-
+    Exif:
+      title: Exif
+      type: object
+      properties:
+        events:
+          type: object
+          properties:
+            geom:
+              type: string
+              description: Point
+              example: POINT (2.0008333333333335 49.00055555555556)
   securitySchemes:
     bearerAuth:
       type: http
