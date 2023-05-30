@@ -446,6 +446,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
             'description',
             'status',
             'creator',
+            'display_creator',
             'display_last_editor',
             'created_on',
             'updated_on',
