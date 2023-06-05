@@ -1469,17 +1469,336 @@ paths:
           headers: {}
           content: {}
 
-  # /api/features.mvt/:
+  /api/features.mvt/:
+    get:
+      tags:
+        - features
+      summary: getFeatureMVT
+      description: |-
+        Ce service permet de récuperer des Mapbox Vector Tiles.
+      operationId: getFeatureMVT
+      parameters:
+        - name : tile
+          in: query
+          description: Tuile (4/8/5)
+          required: true
+          schema:
+            type: string
+        - name : project_id
+          in: query
+          description: Project ID
+          required: true
+          schema:
+            type: string
+        - name : project__slug
+          in: query
+          description: Project Slug
+          schema:
+            type: string
+        - name : featuretype_id
+          in: query
+          description: Feature type ID
+          schema:
+            type: string
+        - name : feature_type__slug
+          in: query
+          description: Feature type slug
+          schema:
+            type: string
+        - name : offset
+          in: query
+          description: Recherche par un paramètre de requête ?offset=...,  10/50/100
+          schema:
+            type: string
+        - name : limit
+          in: query
+          description: Recherche par un paramètre de requête ?limit=...,  10/50/100
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                type:
+                  string
+            application/json:
+              schema:
+                type:
+                  string
+        '404':
+          description:   | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+        '500':
+          description:   | 
+            "ValueError"
+          headers: {}
+          content: {}
+
   # /api/external-geojson/:
   # /api/idgo-catalog/:
-  # /api/proxy/:
-  # /api/prerecorded-list-values/:
-  # /api/prerecorded-list-values/{name}/:
-  # /api/get-token/:
-  # /api/customfields/:
-  # /api/projects/{slug}/feature-types/:
-  # /api/projects/{slug}/feature/:
-  # /api/v2/users/:
+
+  /api/proxy/:
+    get:
+      tags:
+        - features
+      summary: GetFeatureInfo
+      description: |-
+        Ce service permet de récuperer les informations d'un signalements.
+      operationId: GetFeatureInfo
+      parameters:
+        - name : url
+          in: query
+          description: URL => https://www.geo2france.fr/geoserver/ows
+          required: true
+          schema:
+            type: string
+        - name : request
+          in: query
+          description: Type de request, ... GetFeatureInfo
+          schema:
+            type: string
+        - name : service
+          in: query
+          description: Type de Service, ... WMS
+          schema:
+            type: string
+        - name : srs
+          in: query
+          description: EPSG:3857
+          schema:
+            type: string
+        - name : version
+          in: query
+          description: Version, ... 1.1.1
+          schema:
+            type: string
+        - name : bbox
+          in: query
+          description: Recherche par un paramètre de requête ?bbox=..., xx,yy,ww,zz
+          schema:
+            type: string
+        - name : height
+          in: query
+          description: Recherche par un paramètre de requête ?height=...,  256
+          schema:
+            type: string
+        - name : width
+          in: query
+          description: Recherche par un paramètre de requête ?width=...,  256
+          schema:
+            type: string
+        - name : x
+          in: query
+          description: Recherche par un paramètre de requête ?x=...,  253
+          schema:
+            type: string
+        - name : \y
+          in: query
+          description: Recherche par un paramètre de requête ?y=...,  80
+          schema:
+            type: string
+        - name : query_layers
+          in: query
+          description: Recherche par un paramètre de requête ?query_layers=...,  pci:cadastre_2020
+          schema:
+            type: string
+        - name : info_format
+          in: query
+          description: Recherche par un paramètre de requête ?info_format=..., application/json
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                type:
+                  string
+            application/json:
+              schema:
+                type:
+                  string
+        '404':
+          description:   | 
+            {"Les données sont inaccessibles"}
+          headers: {}
+          content: {}
+        '500':
+          description:   | 
+            "ValueError"
+          headers: {}
+          content: {}
+
+  /api/prerecorded-list-values/:
+    get:
+      tags:
+        - features
+      summary: GetFeaturePreRecordedListValuesName
+      description: |-
+        Ce service permet de récuperer les noms des listes pré enregistrées.
+      operationId: GetFeaturePreRecordedListValuesName
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Array'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Array'
+
+  /api/prerecorded-list-values/{name}:
+    get:
+      tags:
+        - features
+      summary: GetFeaturePreRecordedListValues
+      description: |-
+        Ce service permet de récuperer la liste des valeurs pré enregistré d'un type de signalement.
+      operationId: GetFeaturePreRecordedListValues
+      parameters:
+        - name: name
+          in: path
+          description: Pattern de la recherche
+          required: true
+          schema:
+            type: string
+        - name : pattern
+          in: query
+          description: Pattern de la recherche
+          schema:
+            type: string
+        - name : limit
+          in: query
+          description: Recherche par un paramètre de requête ?limit=...,  10/50/100
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Array'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Array'
+
+  /api/customfields/:
+    get:
+      tags:
+        - features
+      summary: GetCustomFields
+      description: |-
+        Ce service permet de récuperer la liste des champs personnalisés.
+      operationId: GetCustomFields
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CustomFields'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFields'
+
+  /api/projects/{slug}/feature-types/:
+    get:
+      tags:
+        - featurestypes
+      summary: getFeaturesTypesDeprecated
+      description: |-
+        Ce service permet de récuperer tous les types de signalements d'un projet.
+      operationId: getFeaturesTypesDeprecated
+      parameters:
+        - name: slug
+          in: path
+          description: Recherche par un paramètre de path project slug.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeaturesTypesGetDeprecated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturesTypesGetDeprecated'
+        '404':
+          description:  | 
+            {"detail": "Pas trouvé."}
+          headers: {}
+          content: {}
+      deprecated: false
+      security: []
+
+  /api/projects/{slug}/feature/:
+    get:
+      tags:
+        - features
+      summary: getFeaturesDeprecated
+      description: |-
+        Ce service permet de récuperer tous les signalements d'un projet.
+      operationId: getFeaturesDeprecated
+      parameters:
+        - name: slug
+          in: path
+          description: Recherche par un paramètre de path project slug.
+          required: true
+          schema:
+            type: string
+        - name : output
+          in: query
+          description: Format de la response ?output=... geojson
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FeaturesGetDeprecated'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeaturesGetDeprecated'
+      deprecated: false
+      security: []
+
+  /api/v2/users/:
+    get:
+      tags:
+        - users
+      summary: getUsers
+      description: |-
+        Ce service permet de récuperer tous les utilisateurs.
+      operationId: getUsers
+      responses:
+        '200':
+          description: Résultat
+          content:
+           application/json:
+            schema:
+              $ref: '#/components/schemas/UsersGet'
+           application/xml:
+            schema:
+              $ref: '#/components/schemas/UsersGet'
+        
+        '403':
+          description: | 
+           {"detail": "Informations d'authentification non fournies."}
+      deprecated: false
+      security: []
+
   # /api/v2/users/{pk}/:
   # /api/v2/import-tasks/:
   # /api/v2/import-tasks/{pk}/:
@@ -1939,6 +2258,19 @@ components:
           type: string
         geocontrib-celery:
           type: string
+    UserShort:
+      title: UserShort
+      type: object
+      properties:
+        full_name:
+          type: string
+        username:
+          type: string
+    UsersGet:
+      title: UsersGet
+      type: array
+      items:
+        $ref: '#/components/schemas/UserShort'
     User:
       title: User
       type: object
@@ -2401,6 +2733,84 @@ components:
                 feature_browsing_default_sort:
                   type: integer
                   description: Tri par défaut du parcours du signalement
+    Feature:
+      title: Feature
+      type: object
+      properties:
+        feature_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        created_on:
+          type: string
+          description: Date de création
+          example: AAAA-MM-JJ ou JJ-MM-AAAA
+        updated_on:
+          type: string
+          description: Date de modification
+          example: AAAA-MM-JJ ou JJ-MM-AAAA
+        creator:
+          type: string
+        display_creator:
+          type: string
+        display_last_editor:
+          type: string
+        project:
+          type: string
+        feature_type:
+          type: object
+          description: Génération d'un lien de partage externe
+          properties:
+            title:
+              type: string
+            slug:
+              type: string
+            geom_type:
+              type: string
+            customfield_set:
+              type: array
+              items:
+                type: object
+                properties:
+                  position:
+                    type: string
+                  label:
+                    type: string
+                  name:
+                    type: string
+                  field_type:
+                    type: string
+                  options:
+                    type: array
+                    items:
+                      type: string
+                  is_mandatory:
+                    type: boolean
+            project:
+              type: string
+        geom:
+          type: object
+          properties:
+            type:
+              type: string
+            coordinates:
+              type: array
+              items:
+                type: number
+        feature_data:
+          type: array
+          items:
+            properties:
+              label:
+                type: string
+              field_type:
+                type: string
+              value:
+                type: string
     FeaturesPaginated:
         title: FeaturesPaginated
         type: object
@@ -2414,82 +2824,7 @@ components:
           results:
             type: array
             items:
-              type: object
-              properties:
-                feature_id:
-                  type: string
-                title:
-                  type: string
-                description:
-                  type: string
-                status:
-                  type: string
-                created_on:
-                  type: string
-                  description: Date de création
-                  example: AAAA-MM-JJ ou JJ-MM-AAAA
-                updated_on:
-                  type: string
-                  description: Date de modification
-                  example: AAAA-MM-JJ ou JJ-MM-AAAA
-                creator:
-                  type: string
-                display_creator:
-                  type: string
-                display_last_editor:
-                  type: string
-                project:
-                  type: string
-                feature_type:
-                  type: object
-                  description: Génération d'un lien de partage externe
-                  properties:
-                    title:
-                      type: string
-                    slug:
-                      type: string
-                    geom_type:
-                      type: string
-                    customfield_set:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          position:
-                            type: string
-                          label:
-                            type: string
-                          name:
-                            type: string
-                          field_type:
-                            type: string
-                          options:
-                            type: array
-                            items:
-                              type: string
-                          is_mandatory:
-                            type: boolean
-                    project:
-                      type: string
-                geom:
-                  type: object
-                  properties:
-                    type:
-                      type: string
-                    coordinates:
-                      type: array
-                      items:
-                        type: number
-                feature_data:
-                  type: array
-                  items:
-                    properties:
-                      label:
-                        type: string
-                      field_type:
-                        type: string
-                      value:
-                        type: string
+              $ref: '#/components/schemas/Feature'
     FeatureGet:
       title: FeatureGet
       type: object
@@ -2556,6 +2891,14 @@ components:
         feature_browsing_default_sort:
           type: integer
           description: Tri par défaut du parcours du signalement
+    FeaturesGetDeprecated:
+      title: FeaturesGetDeprecated
+      type: object
+      properties:
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
     FeatureSearch:
       title: FeatureSearch
       type: object
@@ -2580,12 +2923,7 @@ components:
                 status:
                   type: string
                 creator:
-                  type: object
-                  properties:
-                    full_name:
-                      type: string
-                    username:
-                      type: string
+                  $ref: '#/components/schemas/UserShort'
                 created_on:
                   type: string
                   description: Date de création
@@ -2805,6 +3143,14 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/FeatureTypeGet'
+    FeaturesTypesGetDeprecated:
+      title: FeaturesTypesGetDeprecated
+      type: object
+      properties:
+        feature_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeatureTypeGet'
     GeojsonFeatures:
       title: GeojsonFeatures
       type: object
@@ -3077,6 +3423,20 @@ components:
               type: string
               description: Point
               example: POINT (2.0008333333333335 49.00055555555556)
+    CustomFields:
+      title: CustomFields
+      type: object
+      properties:
+        type:
+          type: string
+        label:
+          type: string
+    Array:
+      title: Array
+      type: array
+      items:
+        type: string
+
   securitySchemes:
     bearerAuth:
       type: http
