@@ -67,7 +67,7 @@ class ProjectsUserAccountFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         myaccount = request.query_params.get('myaccount', None)
         user = request.user
-        if myaccount and user :
+        if myaccount and user and not user.is_anonymous :
             project_authorized = Authorization.objects.filter(user=user
             ).filter(
                 level__rank__gte=2

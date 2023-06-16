@@ -6,12 +6,10 @@ info:
     email: contact@geocontrib.fr
   version: 1.0.0
 servers:
-  - url: geocontrib.dev.neogeo.fr/geocontrib/api/
-    variables: {}
-  - url: geocontrib.dev.neogeo.fr/geocontrib/api/
+  - url: https://geocontrib.dev.neogeo.fr/geocontrib/
     variables: {}
 paths:
-  /api/v2/projects:
+  /api/v2/projects/:
     get:
       tags:
         - projects
@@ -68,9 +66,6 @@ paths:
         '200':
           description: Résultat
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ProjectsGet'
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectsGet'
@@ -81,6 +76,7 @@ paths:
           content: {}
       deprecated: false
       security: []
+
     post:
       tags:
         - projects
@@ -120,9 +116,10 @@ paths:
           headers: {}
           content: {}
       deprecated: false
-      security: []
+      security:
+        - bearerAuth: []
 
-  /api/v2/projects/{slug}:
+  /api/v2/projects/{slug}/:
     get:
       tags:
         - projects
@@ -197,7 +194,8 @@ paths:
           headers: {}
           content: {}
       deprecated: false
-      security: []
+      security:
+        - bearerAuth: []
     delete:
       tags:
         - projects
@@ -222,8 +220,9 @@ paths:
           description:   | 
             {"detail": "Pas trouvé."}
       deprecated: false
-      security: []
-  /api/projects/{slug}/duplicate:
+      security:
+        - bearerAuth: []
+  /api/projects/{slug}/duplicate/:
     post:
       tags:
         - projects
@@ -269,8 +268,9 @@ paths:
           headers: {}
           content: {}
       deprecated: false
-      security: []
-  /api/projects/{slug}/thumbnail:
+      security:
+        - bearerAuth: []
+  /api/projects/{slug}/thumbnail/:
     get:
       tags:
         - projects
@@ -358,7 +358,7 @@ paths:
           content: {}
       deprecated: false
       security: []
-  /api/projects/{slug}/utilisateurs:
+  /api/projects/{slug}/utilisateurs/:
     get:
       tags:
         - projects
@@ -377,9 +377,6 @@ paths:
         '200':
           description: Résultat
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/UserProject'
             application/json:
               schema:
                 $ref: '#/components/schemas/UserProject'
@@ -1797,7 +1794,8 @@ paths:
           description: | 
            {"detail": "Informations d'authentification non fournies."}
       deprecated: false
-      security: []
+      security:
+        - bearerAuth: []
 
   # /api/v2/users/{pk}/:
   # /api/v2/import-tasks/:
@@ -2000,7 +1998,7 @@ paths:
           headers: {}
           content: {}
 
-  /api/get-token:
+  /api/get-token/:
     get:
       tags:
         - users
@@ -2023,8 +2021,10 @@ paths:
           description: | 
            {"detail": "Informations d'authentification non fournies."}
       deprecated: false
-      security: []
-  /api/user_info:
+      security:
+        - bearerAuth: []
+
+  /api/user_info/:
     get:
       tags:
         - users
@@ -2036,9 +2036,6 @@ paths:
         '200':
           description: Résultat
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
@@ -2046,8 +2043,10 @@ paths:
           description: | 
            {"detail": "Informations d'authentification non fournies."}
       deprecated: false
-      security: []
-  /api/user-level-projects:
+      security:
+        - bearerAuth: []
+
+  /api/user-level-projects/:
     get:
       tags:
         - users
@@ -2059,15 +2058,14 @@ paths:
         '200':
           description: Résultat
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/UserLevelProjects'
             application/json:
               schema:
                 $ref: '#/components/schemas/UserLevelProjects'
       deprecated: false
-      security: []
-  /api/user-permissions:
+      security:
+        - bearerAuth: []
+
+  /api/user-permissions/:
     get:
       tags:
         - users
@@ -2079,14 +2077,12 @@ paths:
         '200':
           description: Résultat
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/userPermissions'
             application/json:
               schema:
                 $ref: '#/components/schemas/userPermissions'
       deprecated: false
-      security: []
+      security:
+        - bearerAuth: []
   /api/login:
     post:
       tags:
@@ -2394,10 +2390,10 @@ components:
           description: Créateur
         access_level_pub_feature:
           type: string
-          description: Visibilité des signalements publiés
+          description: Visibilité des signalements publiés => anonymous / logged_user / contributor / super_contributor/ moderator / admin
         access_level_arch_feature:
           type: string
-          description: Visibilité des signalements archivés
+          description: Visibilité des signalements archivés => anonymous / logged_user / contributor / super_contributor/ moderator / admin
         archive_feature:
           type: integer
           description: Délai avant archivage
@@ -3440,8 +3436,7 @@ components:
   securitySchemes:
     bearerAuth:
       type: http
-      scheme: bearer
-      bearerFormat: JWT
+      scheme: basic
 security: 
   - bearerAuth: []
 tags:

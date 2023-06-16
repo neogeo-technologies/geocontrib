@@ -96,6 +96,9 @@ class ProjectTypesView(
 class ProjectDuplicate(APIView):
     http_method_names = ['post', ]
     serializer_class = ProjectCreationSerializer
+    permission_classes = (
+        permissions.IsAuthenticated,
+    )
 
     PROJECT_COPY_RELATED = getattr(settings, 'PROJECT_COPY_RELATED', {})
 
