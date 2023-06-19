@@ -233,8 +233,8 @@ def test_project_duplicate(api_client):
 
     # anon call fails
     url = reverse('api:project-duplicate', args=['1-aze'])
-    with pytest.raises(ValueError):
-        result = api_client.post(url, data)
+    result = api_client.post(url, data)
+    assert result.status_code == 403
 
     user = User.objects.get(username="admin")
     api_client.force_authenticate(user=user)
