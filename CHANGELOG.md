@@ -5,6 +5,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [4.2.3] - 2023-06-30
+
+### Evolutions
+
+- Redmine 14470 : Fusionner l'API projet type avec l'API projet 
+- Redmine 16246 : Ajouter un filtre sur la querystring pour récupérer les signalement modifié depuis une certaine date
+- Redmine 16253 : Connexion QR code - Ticket 3 : point d'entrée API GET /user-info
+- Redmine 16254 : Connexion QR code - Ticket 4 : Middleware pour récupérer le token + envoi du token
+- Redmine 16649 : Listes de valeurs pré-enregistrées - Amélioration point d'entrée
+- Redmine 16826 : Augmenter la capacité des fichiers importés
+- Redmine 17372 : Ajouter une fonctionnalité de mise en plein écran de la carte
+
+### Corrections
+
+
+
+## [4.2.3] - 2023-06-29
+
+### Corrections
+
+- Redmine 16399 : Accueil projet - Clic sur un commentaire dans "Derniers commentaires" donne une erreur
+- Redmine 16768 : Suppression d'un signalemement depuis le détail d'un signalement
+- Redmine 16825 : Page du projet - Le zoom via la molette de la souris ne fonctionne pas
+- Redmine 16826 : Augmenter la capacité des fichiers importés
+- Redmine 16873 : Page d'accueil du projet - Clic sur un signalement sur la carte, mauvais signalement affiché
+- Redmine 16897 : Import signalement | tooltip masqué et problèmes affichage
+- Redmine 16905 : Import signalement | formulaire non désactivé
+- Redmine 17171 : Dropdown - sélection effacée
+- Redmine 17145 : Ajout signalement - champs personnalisés trop serré
+- Redmine 17201 : Carte passant au dessus du footer
+- Redmine 17202 : Loader et popup apparaisent au milieu de la page et non de la fenêtre
+- Redmine 17219 : Liaison signalement - duplication dédoublée
+
 ## [4.2.2] - 2023-03-03
 
 ### Correction
