@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
-## [4.2.3] - 2023-06-30
+## [5.0.0] - 2023-06-30
 
 ### Evolutions
 
@@ -16,9 +16,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 16649 : Listes de valeurs pré-enregistrées - Amélioration point d'entrée
 - Redmine 16826 : Augmenter la capacité des fichiers importés
 - Redmine 17372 : Ajouter une fonctionnalité de mise en plein écran de la carte
-
-### Corrections
-
 
 
 ## [4.2.3] - 2023-06-29
