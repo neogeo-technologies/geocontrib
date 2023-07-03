@@ -21,6 +21,7 @@ from .misc import ImportTaskSerializer
 from .misc import StackedEventSerializer
 from .misc import UserSerializer
 from .misc import FeatureEventSerializer
+from .misc import GeneratedTokenSerializer
 from .project import ProjectDetailedSerializer
 from .project import ProjectSerializer
 from .user import UserLevelsPermissionSerializer
@@ -38,6 +39,7 @@ __all__ = [
     'FeatureCSVSerializer',
     'FeatureDetailedSerializer',
     'FeatureEventSerializer',
+    'GeneratedTokenSerializer',
     'FeatureGeoJSONSerializer',
     'FeatureLinkSerializer',
     'FeatureListSerializer',

@@ -10,9 +10,11 @@ from rest_framework.response import Response
 
 from api.serializers import UserSerializer
 from api.serializers import UserLevelsPermissionSerializer
+from api.serializers import GeneratedTokenSerializer
 from geocontrib.models import Authorization
 from geocontrib.models import Project
 from geocontrib.models import UserLevelPermission
+from geocontrib.models import GeneratedToken
 
 User = get_user_model()
 
@@ -40,7 +42,27 @@ class TokenView(views.APIView):
                 status=400
             )
         return Response(data=token, status=200)
-    
+
+class GeneratedTokenView(views.APIView):
+    authentication_classes = [] #disables authentication
+    permission_classes = [] #disables permission
+    def get(self, request):
+        # get login, mail and name/surname if provided
+        login = request.GET.get('login', '')
+        mail = request.GET.get('mail', '')
+        nom = request.GET.get('nom', '')
+        prenom = request.GET.get('prenom', '')
+        # generate & save token, login, mail,... in DB
+        token = GeneratedToken.objects.create(
+            username = login,
+            email = mail,
+            first_name = prenom,
+            last_name = nom
+        )
+        # return the token
+        token_data = GeneratedTokenSerializer(token).data
+        return Response(data=token_data, status=200)
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.

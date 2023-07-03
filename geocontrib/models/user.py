@@ -201,3 +201,15 @@ class Authorization(models.Model):
         if isinstance(auths, dict):
             return auths.get(permission, False)
         return False
+
+class GeneratedToken(models.Model):
+    token = models.UUIDField(
+        'uuid',
+        unique=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    username = models.CharField(max_length=150)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    email = models.EmailField(blank=True)

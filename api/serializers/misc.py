@@ -9,6 +9,7 @@ from geocontrib.models import Project
 from geocontrib.models import Event
 from geocontrib.models import StackedEvent
 from geocontrib.models import ImportTask
+from geocontrib.models import GeneratedToken
 
 
 User = get_user_model()
@@ -28,6 +29,17 @@ class UserSerializer(serializers.ModelSerializer):
             'username'
         )
 
+class GeneratedTokenSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GeneratedToken
+        fields = (
+            'token',
+            'username',
+            'first_name',
+            'last_name',
+            'email'
+        )
 
 class FeatureAttachmentSerializer(serializers.ModelSerializer):
 

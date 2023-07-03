@@ -17,11 +17,13 @@ from .task import ImportTask
 from .user import User
 from .user import UserLevelPermission
 from .user import Authorization
+from .user import GeneratedToken
 
 __all__ = [
     'AnnotationAbstract',
     'Attachment',
     'Authorization',
+    'GeneratedToken',
     'BaseMap',
     'ContextLayer',
     'Comment',
