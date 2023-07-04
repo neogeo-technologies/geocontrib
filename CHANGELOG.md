@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [4.2.4] - 2023-07-04
+
+### Correction
+
+- Redmine 17502 : Bouton recherche dans la carte d'ajout de signalement
 
 ## [4.2.3] - 2023-06-29
 
