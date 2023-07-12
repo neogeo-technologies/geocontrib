@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [5.0.1] - 2023-07-12
+
+### Corrections
+
+- Redmine 16945 : Liste&carte - pb responsive bouton radios
+- Redmine 17232 : Fonds de plan GéoContrib : problème d'ordre et d'opacité
+
 ## [5.0.0] - 2023-06-30
 
 ### Evolutions
