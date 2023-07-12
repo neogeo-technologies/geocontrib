@@ -1,7 +1,8 @@
 import logging
 import uuid
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
+from django.utils import timezone
 from rest_framework import mixins
 from rest_framework import views
 from rest_framework import viewsets
@@ -10,9 +11,12 @@ from rest_framework.response import Response
 
 from api.serializers import UserSerializer
 from api.serializers import UserLevelsPermissionSerializer
+from api.serializers import GeneratedTokenSerializer
+from api.serializers.user import UserSerializer as DetailedUserSerializer
 from geocontrib.models import Authorization
 from geocontrib.models import Project
 from geocontrib.models import UserLevelPermission
+from geocontrib.models import GeneratedToken
 
 User = get_user_model()
 
@@ -40,7 +44,62 @@ class TokenView(views.APIView):
                 status=400
             )
         return Response(data=token, status=200)
+
+class GenerateTokenView(views.APIView):
+    authentication_classes = [] #disables authentication
+    permission_classes = [] #disables permission
+    def get(self, request):
+        # get login, mail and name/surname if provided
+        login = request.GET.get('login', '')
+        mail = request.GET.get('mail', '')
+        nom = request.GET.get('nom', '')
+        prenom = request.GET.get('prenom', '')
+        # generate & save token, login, mail,... in DB
+        token = GeneratedToken.objects.create(
+            username = login,
+            email = mail,
+            first_name = prenom,
+            last_name = nom
+        )
+        # return the token
+        token_data = GeneratedTokenSerializer(token).data
+        return Response(data=token_data, status=200)
     
+class LoginByTokenView(views.APIView):
+    authentication_classes = [] # disables authentication
+    permission_classes = [] # disables permission
+    def get(self, request):
+        # retrieve token
+        token = request.GET.get('token', '')
+        # check if token exist in bdd)
+        queryset = GeneratedToken.objects.all().filter(token_sha256=token).first()
+        if queryset:
+            # check if token expire_on is previous to now
+            if queryset.expire_on < timezone.now():
+                # if token is not valid delete it and return error response
+                queryset.delete()
+                return Response(data="Le token fourni n'est plus valide", status=401)
+            # check if a user exists already
+            elif queryset.username:
+                user = User.objects.all().filter(username=queryset.username).first()
+                status = 200
+                # if doesn't exist => create user
+                if not user:
+                    user = User.objects.create(
+                        username=queryset.username,
+                        first_name=queryset.first_name,
+                        last_name=queryset.last_name,
+                        email=queryset.email,
+                    )
+                    user.save()
+                    status = 201
+                # log the user
+                login(request, user)
+                user_data = DetailedUserSerializer(user).data
+                return Response(data=user_data, status=status)
+
+        return Response(data="Le token fourni n'a pas pu être authentifié", status=404)
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.

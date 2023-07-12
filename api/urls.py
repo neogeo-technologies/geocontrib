@@ -41,9 +41,8 @@ from api.views.project import ProjectAuthorizationView
 from api.views.project import ProjectSubscription
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
-from api.views.project import ProjectTypesView
 from api.views.project import ProjectDuplicate
-from api.views.user import TokenView
+from api.views.user import TokenView, GenerateTokenView, LoginByTokenView
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
@@ -174,6 +173,16 @@ urlpatterns = [
     path(
         'customfields/',
         CustomFields.as_view(), name='customfields'
+    ),
+
+    # login with token
+    path(
+        'generatetoken/',
+        GenerateTokenView.as_view(), name='generate-token'
+    ),
+    path(
+        'login-token/',
+        LoginByTokenView.as_view(), name='generate-token'
     ),
 
     # deprecated
