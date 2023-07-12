@@ -41,6 +41,7 @@
             "options": [
                 "liste de villes"
             ],
+            "is_mandatory": true,
             "conditional_field_config": null
         }
     ],

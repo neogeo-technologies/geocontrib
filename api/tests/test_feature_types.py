@@ -32,8 +32,8 @@ def test_feature_types_list(api_client):
                 "125"
             ],
             "position": 0,
-            'is_mandatory': True,
-            'conditional_field_config': None,
+            "is_mandatory": True,
+            "conditional_field_config": None,
         },
         {
             "field_type": "list",
@@ -45,7 +45,7 @@ def test_feature_types_list(api_client):
             ],
             "position": 1,
             "is_mandatory": False,
-            'conditional_field_config': None,
+            "conditional_field_config": None,
         },
         {
             "field_type": "pre_recorded_list",
@@ -53,8 +53,8 @@ def test_feature_types_list(api_client):
             "name": "Villes",
             "position": 3,
             "options": ["liste de villes"],
-            'is_mandatory': True,
-            'conditional_field_config': None,
+            "is_mandatory": True,
+            "conditional_field_config": None,
         },
     ]
 
