@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [4.2.5] - 2023-07-12
+
+### Corrections
+
+- Redmine 17552 : GéoContrib : symbologie du type de signalement
+- Redmine 17232 : Fonds de plan GéoContrib : problème d'ordre et d'opacité
+
 ## [4.2.4] - 2023-07-04
 
 ### Correction
