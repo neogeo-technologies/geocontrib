@@ -13,7 +13,8 @@
         "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
       ],
       "position": 0,
-      "conditional_field_config": null
+      "conditional_field_config": null,
+      "forced_value_config": null
     },
     {
       "field_type": "list",
@@ -25,7 +26,8 @@
         "123"
       ],
       "position": 1,
-      "conditional_field_config": null
+      "conditional_field_config": null,
+      "forced_value_config": null
     },
     {
       "field_type": "pre_recorded_list",
@@ -36,7 +38,8 @@
         "liste de villes"
       ],
       "position": 3,
-      "conditional_field_config": null
+      "conditional_field_config": null,
+      "forced_value_config": null
     }
   ],
   "geom_type": "point",

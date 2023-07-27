@@ -296,6 +296,9 @@ class CustomField(models.Model):
     conditional_field_config = models.JSONField(
         "Configuration champ conditionnel", blank=True, null=True
     )
+    forced_value_config = models.JSONField(
+        "Configuration champ à valeur forcée", blank=True, null=True
+    )
 
     # interface = models.ForeignKey(
     #     "geocontrib.CustomFieldInterface", on_delete=models.CASCADE, null=True, blank=True)
