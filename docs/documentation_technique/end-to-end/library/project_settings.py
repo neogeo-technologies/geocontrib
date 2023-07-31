@@ -42,7 +42,7 @@ def get_variables():
                 "MULTICHOICESLISTNAME":         "typeVegetation",
                 "MULTICHOICESLISTOPTIONS":      ["persistant", "exotique", "feuillu", "arbustif", "envahissant"],
                 "MULTICHOICEFEATURETYPENAME":   "Type de végétation",
-                "MULTICHOICEFEATURENAME":       "SEMIARUNDINARIA yashadake 'Kimmei",
+                "MULTICHOICEFEATURENAME":       "SEMIARUNDINARIA yashadake 'Kimmei'",
                 "IMPORTED_FEATURE_NAME":        "b189f40b-c1dd-457f-883d-9476f5b34aa3",
                 }
     return variables
