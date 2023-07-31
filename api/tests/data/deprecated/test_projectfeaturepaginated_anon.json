@@ -28,7 +28,8 @@
                             "jolie",
                             "pas jolie"
                         ],
-                        "is_mandatory": false
+                        "is_mandatory": false,
+                        "conditional_field_config": null
                     }
                 ],
                 "project": "1-aze"
@@ -70,7 +71,8 @@
                         "name": "Arbol",
                         "field_type": "boolean",
                         "options": [],
-                        "is_mandatory": true
+                        "is_mandatory": true,
+                        "conditional_field_config": null
                     }
                 ],
                 "project": "1-aze"
