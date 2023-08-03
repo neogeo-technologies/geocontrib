@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [5.0.2] - 2023-08-03
+
+### Corrections
+
+- Redmine 17824 : Fond de plan qui ne se rafraichit pas en édition rapide
+- Redmine 17877 : Détail d'un signalement - Mauvais affichage du nom du type de signalement d'un signalement s'il est trop long
+
 ## [5.0.1] - 2023-07-12
 
 ### Corrections
