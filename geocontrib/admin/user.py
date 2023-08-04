@@ -15,6 +15,7 @@ User = get_user_model()
 
 
 class UserAdmin(DjangoUserAdmin):
+    # if users added/managed externally, hide button to create user from django admin
     if settings.HIDE_USER_CREATION_BUTTON:
         def has_add_permission(self, request):
             return False

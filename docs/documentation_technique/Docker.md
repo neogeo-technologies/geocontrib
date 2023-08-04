@@ -37,7 +37,8 @@ L'image docker de base possèdes ces variables de configuration :
 * "EMAIL_USE_TLS", cast=bool, default=True
 * "FAVICON_PATH", default=os.path.join(MEDIA_URL, "logo-neogeo-circle.png")
 * "FILE_MAX_SIZE", default=10000000
-* "HIDE_USER_CREATION_BUTTON", default=False
+* "LOGOUT_HIDDEN", default=False, cast=bool
+* "HIDE_USER_CREATION_BUTTON", default=False, cast=bool
 * "IDGO_LOGIN", default="geocontrib"
 * "IDGO_PASSWORD", default="CHANGE_ME"
 * "IDGO_URL", default="https://idgo.dev.neogeo.local/api/resources_vector_by_user/"
