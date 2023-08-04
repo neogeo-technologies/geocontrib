@@ -77,6 +77,7 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * MAGIC\_IS\_AVAILABLE (default: False) active la vérification des images téléversées ;
 * LOGO_PATH : chemin vers le logo affiché en page d'accueil ;
 * FAVICON_PATH : chemin vers la favicon affichée dans l'onglet du navigateur ;
+* HIDE_USER_CREATION_BUTTON : désactive le bouton d'ajout d'un utilisateur (utile dans le cadre du SSO)
 * DISABLE_LOGIN_BUTTON : désactive le bouton de connexion (utile dans le cadre du SSO)
 * LOG_URL : URL de connexion externe (utile dans le cadre du SSO)
 * IDGO_URL = URL pour récupérer le catalogue DataSud ;
