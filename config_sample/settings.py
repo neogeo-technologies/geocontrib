@@ -150,6 +150,9 @@ if cas_server_url:
     )
     CAS_APPLY_ATTRIBUTES_TO_USER = True
 
+# Configure django admin
+HIDE_USER_CREATION_BUTTON = config("HIDE_USER_CREATION_BUTTON", default=False)
+
 # Configure frontend
 LOG_URL = config("LOG_URL", default=None)
 DISABLE_LOGIN_BUTTON = config("DISABLE_LOGIN_BUTTON", default=None)
