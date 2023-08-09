@@ -35,6 +35,7 @@ def test_feature_types_list_deprecated(api_client):
             "position": 0,
             "is_mandatory": True,
             "conditional_field_config": None,
+            "forced_value_config": None,
         },
         {
             "field_type": "list",
@@ -47,6 +48,7 @@ def test_feature_types_list_deprecated(api_client):
             "position": 1,
             "is_mandatory": False,
             "conditional_field_config": None,
+            "forced_value_config": None,
         },
         {
             "field_type": "pre_recorded_list",
@@ -56,6 +58,7 @@ def test_feature_types_list_deprecated(api_client):
             "options": ["liste de villes"],
             "is_mandatory": True,
             "conditional_field_config": None,
+            "forced_value_config": None,
         },
     ]
 

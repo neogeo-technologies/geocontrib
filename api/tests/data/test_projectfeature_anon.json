@@ -26,7 +26,8 @@
                             "pas jolie"
                         ],
                         "is_mandatory": false,
-                        "conditional_field_config": null
+                        "conditional_field_config": null,
+                        "forced_value_config": null
                     }
                 ],
                 "project": "1-aze"
@@ -69,7 +70,8 @@
                         "field_type": "boolean",
                         "options": [],
                         "is_mandatory": true,
-                        "conditional_field_config": null
+                        "conditional_field_config": null,
+                        "forced_value_config": null
                     }
                 ],
                 "project": "1-aze"

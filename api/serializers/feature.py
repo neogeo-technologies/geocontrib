@@ -34,7 +34,8 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             'field_type',
             'options',
             'is_mandatory',
-            'conditional_field_config'
+            'conditional_field_config',
+            'forced_value_config'
         )
 
 

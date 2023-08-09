@@ -275,7 +275,8 @@
                 "1234567890255"
             ],
             "is_mandatory": true,
-            "conditional_field_config": null
+            "conditional_field_config": null,
+            "forced_value_config": null
         },
         {
             "position": 1,
@@ -287,7 +288,8 @@
                 "123"
             ],
             "is_mandatory": false,
-            "conditional_field_config": null
+            "conditional_field_config": null,
+            "forced_value_config": null
         },
         {
             "position": 3,
@@ -298,7 +300,8 @@
                 "liste de villes"
             ],
             "is_mandatory": true,
-            "conditional_field_config": null
+            "conditional_field_config": null,
+            "forced_value_config": null
         }
     ],
     "is_editable": true
