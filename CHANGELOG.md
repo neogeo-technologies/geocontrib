@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [5.1.2] - 2023-08-09
+
+### Corrections
+
+- Redmine 17876 : Paramètre - Enlever le bouton de création d'un utilisateur dans le back office Django
+- Redmine 17876 : Paramètre - Enlever le bouton de déconnexion
+
+### Environement variables
+
+- HIDE_USER_CREATION_BUTTON (default : false)
+-> permet de cacher le bouton de creation d'un utilisateur dans l'admin Django
+
+- LOGOUT_HIDDEN (default false)
+-> permet de cacher le bouton de déconnexion dans le frontend et dans le backend Django
+
+## [5.1.1] - 2023-08-03
+
+### Corrections
+
+- Redmine 17824 : Fond de plan qui ne se rafraichit pas en édition rapide
+- Redmine 17877 : Détail d'un signalement - Mauvais affichage du nom du type de signalement d'un signalement s'il est trop long
+
 ## [5.1.0] - 2023-07-12
 
 ### Evolution
