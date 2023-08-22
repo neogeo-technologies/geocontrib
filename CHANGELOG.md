@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [5.2.0] - 2023-08-22
+
+### Evolutions
+
+- Redmine 17413 : Nouveau formulaire de création des listes de valeurs
+- Redmine 17602 : Activer la recherche dans une liste de valeurs classique
+- Redmine 17605 : Afficher la valeur d'un champ selon la valeur d'un autre champ
+- Redmine 17628 : Forcer la valeur d'un champ selon une condition
+
+## [5.1.3] - 2023-08-22
+
+### Corrections
+
+- Redmine 17962 : Gestion de la concurrence des sessions avec WordPress
+- Redmine 17966 : Limiter la validité du token à 24h
+- Redmine 17963 : Affichage des projets erroné avec la connexion WordPress
+
 ## [5.1.2] - 2023-08-09
 
 ### Corrections
