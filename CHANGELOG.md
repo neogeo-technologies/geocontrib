@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [5.1.3] - 2023-08-22
+
+- Redmine 17962 : Gestion de la concurrence des sessions avec WordPress
+- Redmine 17966 : Limiter la validité du token à 24h
+- Redmine 17963 : Affichage des projets erroné avec la connexion WordPress
+
+### Corrections
+
+- Redmine 17876 : Paramètre - Enlever le bouton de création d'un utilisateur dans le back office Django
+- Redmine 17876 : Paramètre - Enlever le bouton de déconnexion
+
 ## [5.1.2] - 2023-08-09
 
 ### Corrections
