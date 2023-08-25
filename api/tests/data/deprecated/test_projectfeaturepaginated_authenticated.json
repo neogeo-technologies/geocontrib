@@ -1,1 +1,269 @@
-{"count": 5, "next": null, "previous": null, "results": [{"feature_id": "71f9778a-fe84-4c2e-ab9b-4dba95d2aeee", "title": "type 1 brouillon", "description": "", "status": "draft", "created_on": "2021-09-30T13:25:10.297000+02:00", "updated_on": "2021-09-30T13:42:42.269000+02:00", "creator": 1, "display_creator": "admin", "display_last_editor": "Utilisateur supprim\u00e9", "project": "1-aze", "feature_type": {"title": "dfsdfs", "slug": "1-dfsdfs", "geom_type": "point", "customfield_set": [{"position": 0, "label": "Etat\u00e9s", "name": "etat", "field_type": "list", "options": ["jolie", "pas jolie"], "is_mandatory": false}], "project": "1-aze"}, "geom": {"type": "Point", "coordinates": [8.221315, 47.582285]}, "feature_data": [{"label": "Etat\u00e9s", "field_type": "list", "value": ""}], "archived_on": null}, {"feature_id": "75540f8e-0f4d-4317-9818-cc1219a5df8c", "title": "publi\u00e9", "description": "", "status": "published", "created_on": "2021-09-30T13:25:44.913000+02:00", "updated_on": "2021-09-30T13:25:44.913000+02:00", "creator": 1, "display_creator": "admin", "display_last_editor": "Utilisateur supprim\u00e9", "project": "1-aze", "feature_type": {"title": "dfsdfs", "slug": "1-dfsdfs", "geom_type": "point", "customfield_set": [{"position": 0, "label": "Etat\u00e9s", "name": "etat", "field_type": "list", "options": ["jolie", "pas jolie"], "is_mandatory": false}], "project": "1-aze"}, "geom": {"type": "Point", "coordinates": [1.099397, 45.033764]}, "feature_data": [{"label": "Etat\u00e9s", "field_type": "list", "value": ""}], "archived_on": null}, {"feature_id": "7e29a761-6683-4baf-ae8b-9ce14557f053", "title": "type 2 publi\u00e9", "description": "", "status": "published", "created_on": "2021-09-30T13:44:36.068000+02:00", "updated_on": "2021-09-30T13:44:36.068000+02:00", "creator": 1, "display_creator": "admin", "display_last_editor": "Utilisateur supprim\u00e9", "project": "1-aze", "feature_type": {"title": "type 2", "slug": "2-type-2", "geom_type": "linestring", "customfield_set": [{"position": 0, "label": "tree", "name": "Arbol", "field_type": "boolean", "options": [], "is_mandatory": true}], "project": "1-aze"}, "geom": {"type": "LineString", "coordinates": [[0.220148, 46.140523], [3.29752, 47.759785]]}, "feature_data": [{"label": "tree", "field_type": "boolean", "value": ""}], "archived_on": null}, {"feature_id": "b81fdc88-fedf-4075-977f-b92e564cd4d7", "title": "type 2 brouillon", "description": "", "status": "draft", "created_on": "2021-09-30T13:43:51.073000+02:00", "updated_on": "2021-09-30T13:43:51.073000+02:00", "creator": 1, "display_creator": "admin", "display_last_editor": "Utilisateur supprim\u00e9", "project": "1-aze", "feature_type": {"title": "type 2", "slug": "2-type-2", "geom_type": "linestring", "customfield_set": [{"position": 0, "label": "tree", "name": "Arbol", "field_type": "boolean", "options": [], "is_mandatory": true}], "project": "1-aze"}, "geom": {"type": "LineString", "coordinates": [[0.549733, 48.547271], [4.638241, 45.122778]]}, "feature_data": [{"label": "tree", "field_type": "boolean", "value": ""}], "archived_on": null}, {"feature_id": "b81fdc88-fedf-4075-977f-b92e564cd4d8", "title": "type 3 multilinestring", "description": "", "status": "draft", "created_on": "2021-09-30T14:43:51.074000+02:00", "updated_on": "2021-09-30T14:43:51.074000+02:00", "creator": 1, "display_creator": "admin", "display_last_editor": "Utilisateur supprim\u00e9", "project": "1-aze", "feature_type": {"title": "type 2", "slug": "2-type-2", "geom_type": "linestring", "customfield_set": [{"position": 0, "label": "tree", "name": "Arbol", "field_type": "boolean", "options": [], "is_mandatory": true}], "project": "1-aze"}, "geom": {"type": "MultiLineString", "coordinates": [[[347465.963841, 6291105.409479], [347470.730749, 6291074.01899], [347470.134116, 6291063.247433], [347450.586946, 6291047.042766], [347412.359035, 6291077.252445], [347409.372152, 6291101.624821]]]}, "feature_data": [{"label": "tree", "field_type": "boolean", "value": ""}], "archived_on": null}]}
+{
+    "count": 5,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "feature_id": "71f9778a-fe84-4c2e-ab9b-4dba95d2aeee",
+            "title": "type 1 brouillon",
+            "description": "",
+            "status": "draft",
+            "created_on": "2021-09-30T13:25:10.297000+02:00",
+            "updated_on": "2021-09-30T13:42:42.269000+02:00",
+            "creator": 1,
+            "display_creator": "admin",
+            "display_last_editor": "Utilisateur supprim\u00e9",
+            "project": "1-aze",
+            "feature_type": {
+                "title": "dfsdfs",
+                "slug": "1-dfsdfs",
+                "geom_type": "point",
+                "customfield_set": [
+                    {
+                        "position": 0,
+                        "label": "Etat\u00e9s",
+                        "name": "etat",
+                        "field_type": "list",
+                        "options": [
+                            "jolie",
+                            "pas jolie"
+                        ],
+                        "is_mandatory": false,
+                        "conditional_field_config": null,
+                        "forced_value_config": null
+                    }
+                ],
+                "project": "1-aze"
+            },
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    8.221315,
+                    47.582285
+                ]
+            },
+            "feature_data": [
+                {
+                    "label": "Etat\u00e9s",
+                    "field_type": "list",
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "feature_id": "75540f8e-0f4d-4317-9818-cc1219a5df8c",
+            "title": "publi\u00e9",
+            "description": "",
+            "status": "published",
+            "created_on": "2021-09-30T13:25:44.913000+02:00",
+            "updated_on": "2021-09-30T13:25:44.913000+02:00",
+            "creator": 1,
+            "display_creator": "admin",
+            "display_last_editor": "Utilisateur supprim\u00e9",
+            "project": "1-aze",
+            "feature_type": {
+                "title": "dfsdfs",
+                "slug": "1-dfsdfs",
+                "geom_type": "point",
+                "customfield_set": [
+                    {
+                        "position": 0,
+                        "label": "Etat\u00e9s",
+                        "name": "etat",
+                        "field_type": "list",
+                        "options": [
+                            "jolie",
+                            "pas jolie"
+                        ],
+                        "is_mandatory": false,
+                        "conditional_field_config": null,
+                        "forced_value_config": null
+                    }
+                ],
+                "project": "1-aze"
+            },
+            "geom": {
+                "type": "Point",
+                "coordinates": [
+                    1.099397,
+                    45.033764
+                ]
+            },
+            "feature_data": [
+                {
+                    "label": "Etat\u00e9s",
+                    "field_type": "list",
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "feature_id": "7e29a761-6683-4baf-ae8b-9ce14557f053",
+            "title": "type 2 publi\u00e9",
+            "description": "",
+            "status": "published",
+            "created_on": "2021-09-30T13:44:36.068000+02:00",
+            "updated_on": "2021-09-30T13:44:36.068000+02:00",
+            "creator": 1,
+            "display_creator": "admin",
+            "display_last_editor": "Utilisateur supprim\u00e9",
+            "project": "1-aze",
+            "feature_type": {
+                "title": "type 2",
+                "slug": "2-type-2",
+                "geom_type": "linestring",
+                "customfield_set": [
+                    {
+                        "position": 0,
+                        "label": "tree",
+                        "name": "Arbol",
+                        "field_type": "boolean",
+                        "options": [],
+                        "is_mandatory": true,
+                        "conditional_field_config": null,
+                        "forced_value_config": null
+                    }
+                ],
+                "project": "1-aze"
+            },
+            "geom": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        0.220148,
+                        46.140523
+                    ],
+                    [
+                        3.29752,
+                        47.759785
+                    ]
+                ]
+            },
+            "feature_data": [
+                {
+                    "label": "tree",
+                    "field_type": "boolean",
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "feature_id": "b81fdc88-fedf-4075-977f-b92e564cd4d7",
+            "title": "type 2 brouillon",
+            "description": "",
+            "status": "draft",
+            "created_on": "2021-09-30T13:43:51.073000+02:00",
+            "updated_on": "2021-09-30T13:43:51.073000+02:00",
+            "creator": 1,
+            "display_creator": "admin",
+            "display_last_editor": "Utilisateur supprim\u00e9",
+            "project": "1-aze",
+            "feature_type": {
+                "title": "type 2",
+                "slug": "2-type-2",
+                "geom_type": "linestring",
+                "customfield_set": [
+                    {
+                        "position": 0,
+                        "label": "tree",
+                        "name": "Arbol",
+                        "field_type": "boolean",
+                        "options": [],
+                        "is_mandatory": true,
+                        "conditional_field_config": null,
+                        "forced_value_config": null
+                    }
+                ],
+                "project": "1-aze"
+            },
+            "geom": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        0.549733,
+                        48.547271
+                    ],
+                    [
+                        4.638241,
+                        45.122778
+                    ]
+                ]
+            },
+            "feature_data": [
+                {
+                    "label": "tree",
+                    "field_type": "boolean",
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "feature_id": "b81fdc88-fedf-4075-977f-b92e564cd4d8",
+            "title": "type 3 multilinestring",
+            "description": "",
+            "status": "draft",
+            "created_on": "2021-09-30T14:43:51.074000+02:00",
+            "updated_on": "2021-09-30T14:43:51.074000+02:00",
+            "creator": 1,
+            "display_creator": "admin",
+            "display_last_editor": "Utilisateur supprim\u00e9",
+            "project": "1-aze",
+            "feature_type": {
+                "title": "type 2",
+                "slug": "2-type-2",
+                "geom_type": "linestring",
+                "customfield_set": [
+                    {
+                        "position": 0,
+                        "label": "tree",
+                        "name": "Arbol",
+                        "field_type": "boolean",
+                        "options": [],
+                        "is_mandatory": true,
+                        "conditional_field_config": null,
+                        "forced_value_config": null
+                    }
+                ],
+                "project": "1-aze"
+            },
+            "geom": {
+                "type": "MultiLineString",
+                "coordinates": [
+                    [
+                        [
+                            347465.963841,
+                            6291105.409479
+                        ],
+                        [
+                            347470.730749,
+                            6291074.01899
+                        ],
+                        [
+                            347470.134116,
+                            6291063.247433
+                        ],
+                        [
+                            347450.586946,
+                            6291047.042766
+                        ],
+                        [
+                            347412.359035,
+                            6291077.252445
+                        ],
+                        [
+                            347409.372152,
+                            6291101.624821
+                        ]
+                    ]
+                ]
+            },
+            "feature_data": [
+                {
+                    "label": "tree",
+                    "field_type": "boolean",
+                    "value": ""
+                }
+            ]
+        }
+    ]
+}

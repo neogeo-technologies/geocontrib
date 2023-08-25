@@ -1,5 +1,6 @@
 import uuid
 from enum import Enum, unique
+import hashlib
 
 from django.apps import apps
 from django.conf import settings
@@ -201,3 +202,17 @@ class Authorization(models.Model):
         if isinstance(auths, dict):
             return auths.get(permission, False)
         return False
+
+class GeneratedToken(models.Model):
+    token_sha256= models.CharField("Empreinte SHA256 du username et date de validité", max_length=64)
+    expire_on = models.DateTimeField("Timestamp d'expiration du token", blank=True, null=True)
+    username = models.CharField(max_length=150)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    email = models.EmailField(blank=True)
+
+    def save(self, *args, **kwargs):
+        self.expire_on = timezone.now() + timezone.timedelta(days=1)
+        token_string = self.username + str(self.expire_on)
+        self.token_sha256 = hashlib.sha256(token_string.encode('utf-8')).hexdigest()
+        super().save(*args, **kwargs)

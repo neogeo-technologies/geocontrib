@@ -30,3 +30,8 @@ urlpatterns = [path(url_prefix, include(urlpatterns))]
 if settings.DEBUG:
     urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# if user connection managed externally, hide button to disconnect user from django admin
+if settings.LOGOUT_HIDDEN:
+    admin.site.index_template = 'admin/geocontrib/base.html'
+    admin.autodiscover()

@@ -1,1 +1,53 @@
-{"title": "New feature type edited", "title_optional": false, "slug": "4-new-feature-type", "geom_type": "point", "color": "#000000", "icon": null, "opacity": "0.5", "colors_style": null, "project": "1-aze", "customfield_set": [{"position": 0, "label": "SA0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789", "name": "ZA", "field_type": "list", "options": ["12", "125", "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"], "is_mandatory": true}, {"position": 1, "label": "SA1", "name": "ZA2", "field_type": "list", "options": ["13", "123"], "is_mandatory": false}, {"position": 3, "label": "villes", "name": "Villes", "field_type": "pre_recorded_list", "options": ["liste de villes"], "is_mandatory": true}], "is_editable": true}
+{
+    "title": "New feature type edited",
+    "title_optional": false,
+    "slug": "4-new-feature-type",
+    "geom_type": "point",
+    "color": "#000000",
+    "icon": null,
+    "opacity": "0.5",
+    "colors_style": null,
+    "project": "1-aze",
+    "customfield_set": [
+        {
+            "position": 0,
+            "label": "SA0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789",
+            "name": "ZA",
+            "field_type": "list",
+            "options": [
+                "12",
+                "125",
+                "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+            ],
+            "is_mandatory": true,
+            "conditional_field_config": null,
+            "forced_value_config": null
+        },
+        {
+            "position": 1,
+            "label": "SA1",
+            "name": "ZA2",
+            "field_type": "list",
+            "options": [
+                "13",
+                "123"
+            ],
+            "is_mandatory": false,
+            "conditional_field_config": null,
+            "forced_value_config": null
+        },
+        {
+            "position": 3,
+            "label": "villes",
+            "name": "Villes",
+            "field_type": "pre_recorded_list",
+            "options": [
+                "liste de villes"
+            ],
+            "is_mandatory": true,
+            "conditional_field_config": null,
+            "forced_value_config": null
+        }
+    ],
+    "is_editable": true
+}

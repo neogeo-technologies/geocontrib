@@ -40,11 +40,11 @@ class Feature(models.Model):
 
     updated_on = models.DateTimeField("Date de maj", null=True, blank=True)
 
-    archived_on = models.DateField(
-        "Date d'archivage automatique", null=True, blank=True)
-
     deletion_on = models.DateField(
-        "Date de suppression automatique", null=True, blank=True)
+        "Date de suppression",
+        null=True,
+        blank=True
+    )
 
     creator = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, verbose_name="Créateur",
@@ -206,26 +206,23 @@ class FeatureType(models.Model):
 
     geom_type = models.CharField(
         "Type de géométrie", choices=GEOM_CHOICES, max_length=50,
-        default="point")
-
+        default="point"
+    )
     color = models.CharField(
         verbose_name='Couleur', max_length=7, blank=True, null=True
     )
-
     icon = models.CharField(
         verbose_name='Icône', max_length=128, blank=True, null=True
     )
-
     opacity = models.CharField(
         verbose_name='Opacité', max_length=4, blank=True, null=True
     )
-
     colors_style = models.JSONField(
         "Style Champs coloré", blank=True, null=True
     )
-
     project = models.ForeignKey(
-        "geocontrib.Project", on_delete=models.CASCADE)
+        "geocontrib.Project", on_delete=models.CASCADE
+    )
 
     class Meta:
         verbose_name = "Type de signalement"
@@ -248,7 +245,10 @@ class FeatureType(models.Model):
     @property
     def is_editable(self):
         Feature = apps.get_model(app_label='geocontrib', model_name="Feature")
-        return not Feature.objects.filter(feature_type=self).exists()
+        queryset = Feature.objects.filter(feature_type=self)
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        queryset = queryset.filter(deletion_on__isnull=True)
+        return not queryset.exists()
 
 # class CustomFieldInterface(models.Model):
 #
@@ -277,23 +277,28 @@ class CustomField(models.Model):
     name = models.CharField("Nom", max_length=128, null=True, blank=True)
 
     position = models.PositiveSmallIntegerField(
-        "Position", default=0, blank=False, null=False)
-
+        "Position", default=0, blank=False, null=False
+    )
     field_type = models.CharField(
         "Type de champ", choices=TYPE_CHOICES, max_length=50,
-        default="boolean", null=False, blank=False)
-
+        default="boolean", null=False, blank=False
+    )
     feature_type = models.ForeignKey(
         "geocontrib.FeatureType", on_delete=models.CASCADE
     )
-
     options = ArrayField(
-        base_field=models.CharField(max_length=256), null=True, blank=True)
-
+        base_field=models.CharField(max_length=256), null=True, blank=True
+    )
     is_mandatory = models.BooleanField(
         "Obligatoire",
         default=False
-        )
+    )
+    conditional_field_config = models.JSONField(
+        "Configuration champ conditionnel", blank=True, null=True
+    )
+    forced_value_config = models.JSONField(
+        "Configuration champ à valeur forcée", blank=True, null=True
+    )
 
     # interface = models.ForeignKey(
     #     "geocontrib.CustomFieldInterface", on_delete=models.CASCADE, null=True, blank=True)

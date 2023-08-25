@@ -28,11 +28,6 @@ def task_csv_processing(import_task_id):
 
 
 @shared_task()
-def task_data_cleansing():
-    call_command('data_cleansing', 'all')
-
-
-@shared_task()
 def task_notify_subscribers():
     call_command('notify_subscribers')
 

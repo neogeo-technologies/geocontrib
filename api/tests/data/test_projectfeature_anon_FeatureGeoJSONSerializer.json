@@ -1,1 +1,59 @@
-{"type": "FeatureCollection", "features": [{"id": "75540f8e-0f4d-4317-9818-cc1219a5df8c", "type": "Feature", "geometry": {"type": "Point", "coordinates": [1.099397, 45.033764]}, "properties": {"title": "publi\u00e9", "description": "", "status": "published", "created_on": "2021-09-30T13:25:44.913000+02:00", "updated_on": "2021-09-30T13:25:44.913000+02:00", "archived_on": null, "deletion_on": null, "feature_type": "1-dfsdfs", "project": "1-aze", "display_creator": "N/A", "display_last_editor": "N/A", "creator": 1}}, {"id": "7e29a761-6683-4baf-ae8b-9ce14557f053", "type": "Feature", "geometry": {"type": "LineString", "coordinates": [[0.220148, 46.140523], [3.29752, 47.759785]]}, "properties": {"title": "type 2 publi\u00e9", "description": "", "status": "published", "created_on": "2021-09-30T13:44:36.068000+02:00", "updated_on": "2021-09-30T13:44:36.068000+02:00", "archived_on": null, "deletion_on": null, "feature_type": "2-type-2", "project": "1-aze", "display_creator": "N/A", "display_last_editor": "N/A", "creator": 1}}]}
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "75540f8e-0f4d-4317-9818-cc1219a5df8c",
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    1.099397,
+                    45.033764
+                ]
+            },
+            "properties": {
+                "title": "publi\u00e9",
+                "description": "",
+                "status": "published",
+                "created_on": "2021-09-30T13:25:44.913000+02:00",
+                "updated_on": "2021-09-30T13:25:44.913000+02:00",
+                "deletion_on": null,
+                "feature_type": "1-dfsdfs",
+                "project": "1-aze",
+                "display_creator": "N/A",
+                "display_last_editor": "N/A",
+                "creator": 1
+            }
+        },
+        {
+            "id": "7e29a761-6683-4baf-ae8b-9ce14557f053",
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        0.220148,
+                        46.140523
+                    ],
+                    [
+                        3.29752,
+                        47.759785
+                    ]
+                ]
+            },
+            "properties": {
+                "title": "type 2 publi\u00e9",
+                "description": "",
+                "status": "published",
+                "created_on": "2021-09-30T13:44:36.068000+02:00",
+                "updated_on": "2021-09-30T13:44:36.068000+02:00",
+                "deletion_on": null,
+                "feature_type": "2-type-2",
+                "project": "1-aze",
+                "display_creator": "N/A",
+                "display_last_editor": "N/A",
+                "creator": 1
+            }
+        }
+    ]
+}

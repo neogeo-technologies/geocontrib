@@ -25,7 +25,9 @@
                             "jolie",
                             "pas jolie"
                         ],
-                        "is_mandatory": false
+                        "is_mandatory": false,
+                        "conditional_field_config": null,
+                        "forced_value_config": null
                     }
                 ],
                 "project": "1-aze"
@@ -43,8 +45,7 @@
                     "field_type": "list",
                     "value": ""
                 }
-            ],
-            "archived_on": null
+            ]
         },
         {
             "feature_id": "7e29a761-6683-4baf-ae8b-9ce14557f053",
@@ -68,7 +69,9 @@
                         "name": "Arbol",
                         "field_type": "boolean",
                         "options": [],
-                        "is_mandatory": true
+                        "is_mandatory": true,
+                        "conditional_field_config": null,
+                        "forced_value_config": null
                     }
                 ],
                 "project": "1-aze"
@@ -92,8 +95,7 @@
                     "field_type": "boolean",
                     "value": ""
                 }
-            ],
-            "archived_on": null
+            ]
         }
     ],
     "count": 2

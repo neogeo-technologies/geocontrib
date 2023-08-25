@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.gis import admin
@@ -7,7 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from geocontrib.models import Authorization
 from geocontrib.models import Subscription
-from geocontrib.models import UserLevelPermission
 
 
 logger = logging.getLogger(__name__)
@@ -15,6 +15,11 @@ User = get_user_model()
 
 
 class UserAdmin(DjangoUserAdmin):
+    # if users added/managed externally, hide button to create user from django admin
+    if settings.HIDE_USER_CREATION_BUTTON:
+        def has_add_permission(self, request):
+            return False
+    
     list_display = (
         'username', 'last_name', 'first_name', 'email',
         'is_superuser', 'is_administrator', 'is_staff', 'is_active'

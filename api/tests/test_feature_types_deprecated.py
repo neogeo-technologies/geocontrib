@@ -33,7 +33,9 @@ def test_feature_types_list_deprecated(api_client):
                 "125"
             ],
             "position": 0,
-            'is_mandatory': True,
+            "is_mandatory": True,
+            "conditional_field_config": None,
+            "forced_value_config": None,
         },
         {
             "field_type": "list",
@@ -44,7 +46,9 @@ def test_feature_types_list_deprecated(api_client):
                 "123"
             ],
             "position": 1,
-            "is_mandatory": False
+            "is_mandatory": False,
+            "conditional_field_config": None,
+            "forced_value_config": None,
         },
         {
             "field_type": "pre_recorded_list",
@@ -52,18 +56,20 @@ def test_feature_types_list_deprecated(api_client):
             "name": "Villes",
             "position": 3,
             "options": ["liste de villes"],
-            'is_mandatory': True,
+            "is_mandatory": True,
+            "conditional_field_config": None,
+            "forced_value_config": None,
         },
     ]
 
     data = {
-        'title': "New feature type",
-        'title_optional': False,
-        'geom_type': "point",
-        'color': "#000000",
-        'opacity': "0.5",
-        'project': '1-aze',
-        'customfield_set': customfield
+        "title": "New feature type",
+        "title_optional": False,
+        "geom_type": "point",
+        "color": "#000000",
+        "opacity": "0.5",
+        "project": "1-aze",
+        "customfield_set": customfield
     }
 
     # Test Can create feature type

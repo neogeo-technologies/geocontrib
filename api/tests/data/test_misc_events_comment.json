@@ -1,1 +1,59 @@
-{"events": [{"created_on": "05/08/2021 02:00", "object_type": "comment", "event_type": "create", "data": {"author": "", "comment": "ceci est un commentaire", "username": "admin", "project_slug": "1-aze"}, "project_slug": "1-aze", "feature_type_slug": "", "feature_id": "75540f8e-0f4d-4317-9818-cc1219a5df8c", "comment_id": "b9f97d12-9def-4c21-b7f9-3697f1a51a48", "attachment_id": null, "display_user": "admin", "related_comment": {"comment": "ceci est un commentaire", "attachments": []}, "related_feature": {"feature_id": "75540f8e-0f4d-4317-9818-cc1219a5df8c", "title": "publi\u00e9", "feature_url": "/geocontrib/projet/1-aze/type-signalement/1-dfsdfs/signalement/75540f8e-0f4d-4317-9818-cc1219a5df8c/"}, "project_url": "/geocontrib/projet/1-aze/"}], "features": [], "comments": [{"created_on": "05/08/2021 02:00", "object_type": "comment", "event_type": "create", "data": {"author": "", "comment": "ceci est un commentaire", "username": "admin", "project_slug": "1-aze"}, "project_slug": "1-aze", "feature_type_slug": "", "feature_id": "75540f8e-0f4d-4317-9818-cc1219a5df8c", "comment_id": "b9f97d12-9def-4c21-b7f9-3697f1a51a48", "attachment_id": null, "display_user": "admin", "related_comment": {"comment": "ceci est un commentaire", "attachments": []}, "related_feature": {"feature_id": "75540f8e-0f4d-4317-9818-cc1219a5df8c", "title": "publi\u00e9", "feature_url": "/geocontrib/projet/1-aze/type-signalement/1-dfsdfs/signalement/75540f8e-0f4d-4317-9818-cc1219a5df8c/"}, "project_url": "/geocontrib/projet/1-aze/"}]}
+{
+    "events": [
+        {
+            "created_on": "05/08/2021 02:00",
+            "object_type": "comment",
+            "event_type": "create",
+            "data": {
+                "author": "",
+                "comment": "ceci est un commentaire",
+                "username": "admin",
+                "project_slug": "1-aze"
+            },
+            "project_slug": "1-aze",
+            "feature_type_slug": "",
+            "feature_id": "75540f8e-0f4d-4317-9818-cc1219a5df8c",
+            "comment_id": "b9f97d12-9def-4c21-b7f9-3697f1a51a48",
+            "attachment_id": null,
+            "display_user": "admin",
+            "related_comment": {
+                "comment": "ceci est un commentaire",
+                "attachments": []
+            },
+            "related_feature": {
+                "deletion_on": "None",
+                "title": "publi\u00e9"
+            },
+            "project_title": "aze"
+        }
+    ],
+    "features": [],
+    "comments": [
+        {
+            "created_on": "05/08/2021 02:00",
+            "object_type": "comment",
+            "event_type": "create",
+            "data": {
+                "author": "",
+                "comment": "ceci est un commentaire",
+                "username": "admin",
+                "project_slug": "1-aze"
+            },
+            "project_slug": "1-aze",
+            "feature_type_slug": "",
+            "feature_id": "75540f8e-0f4d-4317-9818-cc1219a5df8c",
+            "comment_id": "b9f97d12-9def-4c21-b7f9-3697f1a51a48",
+            "attachment_id": null,
+            "display_user": "admin",
+            "related_comment": {
+                "comment": "ceci est un commentaire",
+                "attachments": []
+            },
+            "related_feature": {
+                "deletion_on": "None",
+                "title": "publi\u00e9"
+            },
+            "project_title": "aze"
+        }
+    ]
+}

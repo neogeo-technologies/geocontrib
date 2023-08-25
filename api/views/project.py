@@ -6,6 +6,7 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import Http404
 from django.conf import settings
+from rest_framework import exceptions
 from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
@@ -76,6 +77,22 @@ class ProjectView(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        slug = self.kwargs.get('slug')
+        project = get_object_or_404(Project, slug=slug)
+        perms = Authorization.all_permissions(self.request.user, project)
+        if perms and (self.request.user.is_superuser or perms['is_project_administrator']):
+            return super().destroy(request, *args, **kwargs)
+        raise exceptions.PermissionDenied
+
+    def update(self, request, *args, **kwargs):
+        slug = self.kwargs.get('slug')
+        project = get_object_or_404(Project, slug=slug)
+        perms = Authorization.all_permissions(self.request.user, project)
+        if perms and (self.request.user.is_superuser or perms['is_project_administrator']):
+            return super().update(request, *args, **kwargs)
+        raise exceptions.PermissionDenied
 
 
 class ProjectTypesView(

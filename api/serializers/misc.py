@@ -171,7 +171,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     related_feature = serializers.SerializerMethodField()
 
-    project_url = serializers.SerializerMethodField()
+    project_title = serializers.SerializerMethodField()
 
     def get_related_comment(self, obj):
         res = {}
@@ -193,24 +193,28 @@ class EventSerializer(serializers.ModelSerializer):
         if obj.feature_id:
             try:
                 feature = Feature.objects.get(feature_id=obj.feature_id)
+                # if feature :
                 res = {
-                    'feature_id': str(feature.feature_id),
                     'title': str(feature.title),
-                    'feature_url': feature.get_view_url()
+                    'deletion_on': str(feature.deletion_on),
                 }
             except Exception:
                 logger.exception('No related feature found')
         return res
 
-    def get_project_url(self, obj):
-        url = ''
+    def get_project_title(self, obj):
+        title = None
         if obj.project_slug:
+            #breakpoint()
             try:
                 project = Project.objects.get(slug=obj.project_slug)
-                url = project.get_absolute_url()
+                if project :
+                    title = project.title
+                #if obj.project_slug == '352-delete-copie-22052023-1122':
+                #url = project.get_absolute_url()
             except Exception:
                 logger.exception('No related project found')
-        return url
+        return title
 
     class Meta:
         model = Event
@@ -227,7 +231,7 @@ class EventSerializer(serializers.ModelSerializer):
             'display_user',
             'related_comment',
             'related_feature',
-            'project_url',
+            'project_title',
         )
 
 

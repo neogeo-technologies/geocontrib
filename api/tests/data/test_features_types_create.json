@@ -11,7 +11,9 @@
         "12",
         "125"
       ],
-      "position": 0
+      "position": 0,
+      "conditional_field_config": null,
+      "forced_value_config": null
     },
     {
       "field_type": "list",
@@ -22,7 +24,9 @@
         "13",
         "123"
       ],
-      "position": 1
+      "position": 1,
+      "conditional_field_config": null,
+      "forced_value_config": null
     },
     {
       "field_type": "pre_recorded_list",
@@ -32,7 +36,9 @@
       "options": [
         "liste de villes"
       ],
-      "position": 3
+      "position": 3,
+      "conditional_field_config": null,
+      "forced_value_config": null
     }
   ],
   "geom_type": "point",

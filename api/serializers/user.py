@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from geocontrib.models import Authorization
 from geocontrib.models import UserLevelPermission
+from geocontrib.models import GeneratedToken
 
 User = get_user_model()
 
@@ -65,3 +66,16 @@ class UserLevelsPermissionSerializer(serializers.ModelSerializer):
             'user_type_id',
             'rank',
         ]
+
+class GeneratedTokenSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GeneratedToken
+        fields = (
+            'token_sha256',
+            'expire_on',
+            'username',
+            'first_name',
+            'last_name',
+            'email'
+        )

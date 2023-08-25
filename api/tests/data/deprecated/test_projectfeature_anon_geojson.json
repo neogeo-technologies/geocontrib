@@ -1,1 +1,79 @@
-{"type": "FeatureCollection", "features": [{"id": "75540f8e-0f4d-4317-9818-cc1219a5df8c", "type": "Feature", "geometry": {"type": "Point", "coordinates": [1.099397, 45.033764]}, "properties": {"title": "publi\u00e9", "description": "", "status": {"value": "published", "label": "Publi\u00e9"}, "creator": {}, "display_last_editor": "N/A", "created_on": "30/09/2021 13:25", "updated_on": "30/09/2021 13:25", "archived_on": null, "deletion_on": null, "feature_type": {"title": "dfsdfs", "slug": "1-dfsdfs", "geom_type": "point", "color": "#000000"}, "feature_url": "/geocontrib/projet/1-aze/type-signalement/1-dfsdfs/signalement/75540f8e-0f4d-4317-9818-cc1219a5df8c/", "feature_type_url": "/geocontrib/projet/1-aze/type-signalement/1-dfsdfs/", "color": "#000000"}}, {"id": "7e29a761-6683-4baf-ae8b-9ce14557f053", "type": "Feature", "geometry": {"type": "LineString", "coordinates": [[0.220148, 46.140523], [3.29752, 47.759785]]}, "properties": {"title": "type 2 publi\u00e9", "description": "", "status": {"value": "published", "label": "Publi\u00e9"}, "creator": {}, "display_last_editor": "N/A", "created_on": "30/09/2021 13:44", "updated_on": "30/09/2021 13:44", "archived_on": null, "deletion_on": null, "feature_type": {"title": "type 2", "slug": "2-type-2", "geom_type": "linestring", "color": "#ff0000"}, "feature_url": "/geocontrib/projet/1-aze/type-signalement/2-type-2/signalement/7e29a761-6683-4baf-ae8b-9ce14557f053/", "feature_type_url": "/geocontrib/projet/1-aze/type-signalement/2-type-2/", "color": "#ff0000"}}]}
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "75540f8e-0f4d-4317-9818-cc1219a5df8c",
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    1.099397,
+                    45.033764
+                ]
+            },
+            "properties": {
+                "title": "publi\u00e9",
+                "description": "",
+                "display_creator": "admin",
+                "status": {
+                    "value": "published",
+                    "label": "Publi\u00e9"
+                },
+                "creator": {},
+                "display_last_editor": "N/A",
+                "created_on": "30/09/2021 13:25",
+                "updated_on": "30/09/2021 13:25",
+                "deletion_on": null,
+                "feature_type": {
+                    "title": "dfsdfs",
+                    "slug": "1-dfsdfs",
+                    "geom_type": "point",
+                    "color": "#000000"
+                },
+                "feature_url": "/geocontrib/projet/1-aze/type-signalement/1-dfsdfs/signalement/75540f8e-0f4d-4317-9818-cc1219a5df8c/",
+                "feature_type_url": "/geocontrib/projet/1-aze/type-signalement/1-dfsdfs/",
+                "color": "#000000"
+            }
+        },
+        {
+            "id": "7e29a761-6683-4baf-ae8b-9ce14557f053",
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        0.220148,
+                        46.140523
+                    ],
+                    [
+                        3.29752,
+                        47.759785
+                    ]
+                ]
+            },
+            "properties": {
+                "title": "type 2 publi\u00e9",
+                "description": "",
+                "display_creator": "admin",
+                "status": {
+                    "value": "published",
+                    "label": "Publi\u00e9"
+                },
+                "creator": {},
+                "display_last_editor": "N/A",
+                "created_on": "30/09/2021 13:44",
+                "updated_on": "30/09/2021 13:44",
+                "deletion_on": null,
+                "feature_type": {
+                    "title": "type 2",
+                    "slug": "2-type-2",
+                    "geom_type": "linestring",
+                    "color": "#ff0000"
+                },
+                "feature_url": "/geocontrib/projet/1-aze/type-signalement/2-type-2/signalement/7e29a761-6683-4baf-ae8b-9ce14557f053/",
+                "feature_type_url": "/geocontrib/projet/1-aze/type-signalement/2-type-2/",
+                "color": "#ff0000"
+            }
+        }
+    ]
+}

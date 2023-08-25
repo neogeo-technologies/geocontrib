@@ -57,10 +57,10 @@ synchronisation : ceux figurant dans au moins un groupe d'utilisateurs présent 
 Certains utilisateurs se voient automatiquement attribuer des droits sur les projets de GéoContrib lors de la 
 synchronisation :
 * les utilisateurs appartenant aux groupes paramétrés dans le champ "Groupes LDAP des contributeurs et modérateurs" du
-projet (cf. interface d'administrration Django de GéoContrib dans le formulaire du projet) recoivent automatiquement le 
+projet (cf. interface d'administration Django de GéoContrib dans le formulaire du projet) recoivent automatiquement le 
 rôle de contributeur pour le projet. Néanmoins un utilisateur ayant déjà le rôle de modérateur reste modérateur.
 * les utilisateurs appartenant aux groupes paramétrés dans le champ "Groupes LDAP des administrateurs" du
-projet (cf. interface d'administrration Django de GéoContrib dans le formulaire du projet) recoivent automatiquement le 
+projet (cf. interface d'administration Django de GéoContrib dans le formulaire du projet) recoivent automatiquement le 
 rôle d'administrateur du projet.
 * les utilisateurs qui ne font pas partis des groupes LDAP mentionnés dans l'interface d'admin, et auxquels des rôles
 ont été attribués depuis l'onglet "Membres" d'un projet, conservent bien leurs rôles après une synchronisation.

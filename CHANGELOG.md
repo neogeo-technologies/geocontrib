@@ -5,6 +5,81 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [5.2.0] - 2023-08-22
+
+### Evolutions
+
+- Redmine 17413 : Nouveau formulaire de création des listes de valeurs
+- Redmine 17602 : Activer la recherche dans une liste de valeurs classique
+- Redmine 17605 : Afficher la valeur d'un champ selon la valeur d'un autre champ
+- Redmine 17628 : Forcer la valeur d'un champ selon une condition
+
+## [5.1.3] - 2023-08-22
+
+### Corrections
+
+- Redmine 17962 : Gestion de la concurrence des sessions avec WordPress
+- Redmine 17966 : Limiter la validité du token à 24h
+- Redmine 17963 : Affichage des projets erroné avec la connexion WordPress
+
+## [5.1.2] - 2023-08-09
+
+### Corrections
+
+- Redmine 17876 : Paramètre - Enlever le bouton de création d'un utilisateur dans le back office Django
+- Redmine 17876 : Paramètre - Enlever le bouton de déconnexion
+
+### Environement variables
+
+- HIDE_USER_CREATION_BUTTON (default : false)
+-> permet de cacher le bouton de creation d'un utilisateur dans l'admin Django
+
+- LOGOUT_HIDDEN (default false)
+-> permet de cacher le bouton de déconnexion dans le backend Django
+
+## [5.1.1] - 2023-08-03
+
+### Corrections
+
+- Redmine 17824 : Fond de plan qui ne se rafraichit pas en édition rapide
+- Redmine 17877 : Détail d'un signalement - Mauvais affichage du nom du type de signalement d'un signalement s'il est trop long
+
+## [5.1.0] - 2023-07-12
+
+### Evolution
+
+-  Redmine 17472 : Connexion annuaire WP et GéoContrib
+
+## [5.0.0] - 2023-06-30
+
+### Evolutions
+
+- Redmine 14470 : Fusionner l'API projet type avec l'API projet 
+- Redmine 16246 : Ajouter un filtre sur la querystring pour récupérer les signalement modifié depuis une certaine date
+- Redmine 16253 : Connexion QR code - Ticket 3 : point d'entrée API GET /user-info
+- Redmine 16254 : Connexion QR code - Ticket 4 : Middleware pour récupérer le token + envoi du token
+- Redmine 16649 : Listes de valeurs pré-enregistrées - Amélioration point d'entrée
+- Redmine 16826 : Augmenter la capacité des fichiers importés
+- Redmine 17372 : Ajouter une fonctionnalité de mise en plein écran de la carte
+
+
+## [4.2.3] - 2023-06-29
+
+### Corrections
+
+- Redmine 16399 : Accueil projet - Clic sur un commentaire dans "Derniers commentaires" donne une erreur
+- Redmine 16768 : Suppression d'un signalemement depuis le détail d'un signalement
+- Redmine 16825 : Page du projet - Le zoom via la molette de la souris ne fonctionne pas
+- Redmine 16826 : Augmenter la capacité des fichiers importés
+- Redmine 16873 : Page d'accueil du projet - Clic sur un signalement sur la carte, mauvais signalement affiché
+- Redmine 16897 : Import signalement | tooltip masqué et problèmes affichage
+- Redmine 16905 : Import signalement | formulaire non désactivé
+- Redmine 17171 : Dropdown - sélection effacée
+- Redmine 17145 : Ajout signalement - champs personnalisés trop serré
+- Redmine 17201 : Carte passant au dessus du footer
+- Redmine 17202 : Loader et popup apparaisent au milieu de la page et non de la fenêtre
+- Redmine 17219 : Liaison signalement - duplication dédoublée
+
 ## [4.2.2] - 2023-03-03
 
 ### Correction

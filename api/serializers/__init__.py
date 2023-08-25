@@ -24,6 +24,7 @@ from .misc import FeatureEventSerializer
 from .project import ProjectDetailedSerializer
 from .project import ProjectSerializer
 from .user import UserLevelsPermissionSerializer
+from .user import GeneratedTokenSerializer
 
 
 __all__ = [
@@ -38,6 +39,7 @@ __all__ = [
     'FeatureCSVSerializer',
     'FeatureDetailedSerializer',
     'FeatureEventSerializer',
+    'GeneratedTokenSerializer',
     'FeatureGeoJSONSerializer',
     'FeatureLinkSerializer',
     'FeatureListSerializer',

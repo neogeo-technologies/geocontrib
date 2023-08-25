@@ -18,9 +18,12 @@ import datetime
 
 def get_variables():
     variables = {
-                "RANDOMPROJECTNAME":            "Tests automatisés",#"projet - {}".format(datetime.datetime.now()),
-                "RANDOMFEATURETYPENAME":        "TypeAuto", #"type - {}".format(datetime.datetime.now()),
-                "RANDOMFEATURENAME":            "SignalementAuto",#"signalement - {}".format(datetime.datetime.now()),
+                "PROJECTNAME":                  "Tests automatisés",
+                "RANDOMPROJECTNAME":            "projet - {}".format(datetime.datetime.now()),
+                "FEATURETYPENAME":              "TypeAuto",
+                "RANDOMFEATURETYPENAME":        "type - {}".format(datetime.datetime.now()),
+                "FEATURENAME":                  "SignalementAuto",
+                "RANDOMFEATURENAME":            "signalement - {}".format(datetime.datetime.now()),
                 "PROJECTEDITION":               "-projet édité",
                 "MARKDOWNDESCRIPTION":          "# Description en h1\n## Description en h2",
                 "FEATURETYPEEDITION":           "-type édité",
@@ -39,7 +42,7 @@ def get_variables():
                 "MULTICHOICESLISTNAME":         "typeVegetation",
                 "MULTICHOICESLISTOPTIONS":      ["persistant", "exotique", "feuillu", "arbustif", "envahissant"],
                 "MULTICHOICEFEATURETYPENAME":   "Type de végétation",
-                "MULTICHOICEFEATURENAME":       "SEMIARUNDINARIA yashadake 'Kimmei",
+                "MULTICHOICEFEATURENAME":       "SEMIARUNDINARIA yashadake 'Kimmei'",
                 "IMPORTED_FEATURE_NAME":        "b189f40b-c1dd-457f-883d-9476f5b34aa3",
                 }
     return variables

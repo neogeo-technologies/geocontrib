@@ -77,6 +77,8 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * MAGIC\_IS\_AVAILABLE (default: False) active la vérification des images téléversées ;
 * LOGO_PATH : chemin vers le logo affiché en page d'accueil ;
 * FAVICON_PATH : chemin vers la favicon affichée dans l'onglet du navigateur ;
+* LOGOUT_HIDDEN : -> permet de cacher le bouton de déconnexion dans le backend Django (utile dans le cadre du SSO)
+* HIDE_USER_CREATION_BUTTON : désactive le bouton d'ajout d'un utilisateur (utile dans le cadre du SSO)
 * DISABLE_LOGIN_BUTTON : désactive le bouton de connexion (utile dans le cadre du SSO)
 * LOG_URL : URL de connexion externe (utile dans le cadre du SSO)
 * IDGO_URL = URL pour récupérer le catalogue DataSud ;
@@ -140,6 +142,12 @@ Deux types de tâches requièrent d'invoquer une commande régulièrement (depui
 
 ### Tâches périodiques depuis celery
 
+Copier le contenu du fichier config_sample/celery.py dans config/celery.py.
+```shell
+cp config_sample/celery.py config/celery.py
+```
+Pour une installation en local, si on a besoin de faire des imports de signalements par exemple, il faut ouvrir un nouveau terminal, activer l'environnement virtuel et lancer la commande suvante.
+
 Lancer le worker celery:
 
     celery -A config worker
@@ -152,7 +160,7 @@ Dans `/admin/django_celery_beat/periodictask`, saisissez des tâches avec leur p
 
 ### Tâches périodiques depuis un cron
 
-L'envoi de mails de norifications, vous pouvez l'appeler toutes les minutes ou tous les jours selon vos préférences d'envoi
+L'envoi de mails de notifications, vous pouvez l'appeler toutes les minutes ou tous les jours selon vos préférences d'envoi
 ```shell
 python manage.py notify_subscribers
 ```
