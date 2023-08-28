@@ -128,6 +128,20 @@ def test_feature_list(api_client):
                           sorter=sort_features_by_title,
                          )
 
+    result = api_client.get(f'{ features_url }?feature_type__slug=1-dfsdfs&ordering=created_on&from_date=2021-09-30T13:40:30')
+    assert result.status_code == 200
+    verify_or_create_json("api/tests/data/test_features_featuretype_from_only_date.json",
+                          result.json(),
+                          sorter=sort_features_by_title,
+                         )
+
+    result = api_client.get(f'{ features_url }?feature_type__slug=1-dfsdfs&ordering=created_on&from_date=2021-09-30')
+    assert result.status_code == 200
+    verify_or_create_json("api/tests/data/test_features_featuretype_from_datetime.json",
+                          result.json(),
+                          sorter=sort_features_by_title,
+                         )
+    
     # Ensure wrong project fails
     result = api_client.get(f'{ features_url }?project__slug=1-wrong')
     assert result.status_code == 404
@@ -284,7 +298,6 @@ def test_project_export(api_client):
     # features_mvt_url = reverse('api:features-mvt')
     # result = api_client.get(f'{ features_mvt_url }?project_id=1&tile=4%2F7%2F5&limit=10&offset=0')
     # assert result.status_code == 200
-    # breakpoint()
     # verify_or_create("api/tests/data/test_project_export.mvt", result.content)
 
 
