@@ -1864,9 +1864,15 @@ paths:
             type: string
         - name : id
           in: query
-          description: Recherche par un paramètre de requête ?id=...,  1/2/3 ...
+          description: Recherche par id=...,  1/2/3 ...
           schema:
             type: string
+        - name : from_date
+          in: query
+          description: Recherche à partir d'un date de création, modification et suppresion, ?from_date=...,  YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
+          schema:
+            type: string
+            format: date
       responses:
         '200':
           description: Résultat
