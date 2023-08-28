@@ -50,5 +50,5 @@
         }
     ],
     "is_editable": true,
-    "displayed_fields": null
+    "displayed_fields":  ["status", "feature_type", "updated_on"]
 }

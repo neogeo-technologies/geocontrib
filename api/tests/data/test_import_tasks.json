@@ -13,7 +13,7 @@
                 "custom_field_name": ""
             },
             "project": 1,
-            "displayed_fields": null
+            "displayed_fields":  ["status", "feature_type", "updated_on"]
         }
     },
     {
@@ -30,7 +30,7 @@
                 "custom_field_name": ""
             },
             "project": 1,
-            "displayed_fields": null
+            "displayed_fields":  ["status", "feature_type", "updated_on"]
         }
     },
     {
@@ -47,7 +47,7 @@
                 "custom_field_name": ""
             },
             "project": 1,
-            "displayed_fields": null,
+            "displayed_fields":  ["status", "feature_type", "updated_on"],
             "opacity": 0.5
         }
     },

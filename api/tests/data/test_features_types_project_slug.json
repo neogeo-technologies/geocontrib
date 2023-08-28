@@ -28,7 +28,7 @@
             }
         ],
         "is_editable": false,
-        "displayed_fields": null
+        "displayed_fields":  ["status", "feature_type", "updated_on"]
     },
     {
         "title": "New feature type edited",
@@ -82,7 +82,7 @@
             }
         ],
         "is_editable": true,
-        "displayed_fields": null
+        "displayed_fields":  ["status", "feature_type", "updated_on"]
     },
     {
         "title": "type 2",
@@ -110,7 +110,7 @@
             }
         ],
         "is_editable": false,
-        "displayed_fields": null
+        "displayed_fields":  ["status", "feature_type", "updated_on"]
     },
     {
         "title": "type multilinestring",
@@ -127,6 +127,6 @@
         "project": "1-aze",
         "customfield_set": [],
         "is_editable": true,
-        "displayed_fields": null
+        "displayed_fields":  ["status", "feature_type", "updated_on"]
     }
 ]

@@ -49,5 +49,5 @@
   "slug": "4-new-feature-type",
   "title": "New feature type edited",
   "title_optional": false,
-  "displayed_fields": null
+  "displayed_fields":  ["status", "feature_type", "updated_on"]
 }
