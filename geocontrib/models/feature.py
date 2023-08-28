@@ -223,6 +223,9 @@ class FeatureType(models.Model):
     project = models.ForeignKey(
         "geocontrib.Project", on_delete=models.CASCADE
     )
+    displayed_fields = ArrayField(
+        verbose_name="Champs conditionels à afficher",
+        base_field=models.CharField(max_length=256), blank=True, null=True)
 
     class Meta:
         verbose_name = "Type de signalement"

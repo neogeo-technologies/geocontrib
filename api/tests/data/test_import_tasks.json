@@ -12,7 +12,8 @@
                 "colors": {},
                 "custom_field_name": ""
             },
-            "project": 1
+            "project": 1,
+            "displayed_fields": null
         }
     },
     {
@@ -28,7 +29,8 @@
                 "colors": {},
                 "custom_field_name": ""
             },
-            "project": 1
+            "project": 1,
+            "displayed_fields": null
         }
     },
     {
@@ -45,6 +47,7 @@
                 "custom_field_name": ""
             },
             "project": 1,
+            "displayed_fields": null,
             "opacity": 0.5
         }
     },

@@ -304,5 +304,6 @@
             "forced_value_config": null
         }
     ],
-    "is_editable": true
+    "is_editable": true,
+    "displayed_fields": null
 }
