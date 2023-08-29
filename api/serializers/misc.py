@@ -205,7 +205,6 @@ class EventSerializer(serializers.ModelSerializer):
     def get_project_title(self, obj):
         title = None
         if obj.project_slug:
-            #breakpoint()
             try:
                 project = Project.objects.get(slug=obj.project_slug)
                 if project :

@@ -1,9 +1,11 @@
+from datetime import datetime
 import json
 import requests
 import csv
 import collections
 from datetime import date
 
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Polygon
@@ -84,8 +86,23 @@ class FeatureView(
             raise ValidationError(detail="Must provide parameter project__slug "
                                          "or feature_type__slug")
 
-        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
-        queryset = queryset.filter(deletion_on__isnull=True)
+        from_date = self.request.query_params.get('from_date')
+        if from_date:
+            try:
+                parsed_date = datetime.strptime(from_date, '%Y-%m-%dT%H:%M:%S')
+            except ValueError:
+                try:
+                    parsed_date = datetime.strptime(from_date, '%Y-%m-%d')
+                except ValueError:
+                    raise ValidationError(detail=f"Invalid 'from_date' format."
+                                          "Use YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS")
+            queryset = queryset.filter(
+                Q(created_on__gte=parsed_date) | 
+                Q(updated_on__gte=parsed_date) | 
+                Q(deletion_on__gte=parsed_date)
+            )
+        else:
+            queryset = queryset.filter(deletion_on__isnull=True)
 
         title_contains = self.request.query_params.get('title__contains')
         if title_contains:
@@ -98,6 +115,7 @@ class FeatureView(
         ordering = self.request.query_params.get('ordering')
         if ordering:
             queryset = queryset.order_by(ordering)
+
         limit = self.request.query_params.get('limit')
         if limit:
             queryset = queryset[:int(limit)]
