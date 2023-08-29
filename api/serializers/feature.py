@@ -77,6 +77,7 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
             'project',
             'customfield_set',
             'is_editable',
+            'displayed_fields',
         )
         read_only_fields = [
             'slug',
@@ -107,18 +108,18 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
 
         # Look for symbology differences
-        comp_keys = ['color', 'icon', 'opacity', 'colors_style']
-        # is_symbology_edited = not all(DeepDiff(self.data.get(key), validated_data.get(key), ignore_order=True) for key in comp_keys)
-        is_symbology_edited = not all(self.data.get(key) == validated_data.get(key) for key in comp_keys)
+        comp_keys = ['color', 'icon', 'opacity', 'colors_style', 'displayed_fields']
+        is_display_edited = not all(self.data.get(key) == validated_data.get(key) for key in comp_keys)
 
         if not instance.is_editable:
 
-            if is_symbology_edited:
+            if is_display_edited:
                 # Handle symbology edition
                 setattr(instance, 'color', validated_data.get('color'))
                 setattr(instance, 'icon', validated_data.get('icon'))
                 setattr(instance, 'opacity', validated_data.get('opacity'))
                 setattr(instance, 'colors_style', validated_data.get('colors_style'))
+                setattr(instance, 'displayed_fields', validated_data.get('displayed_fields'))
 
             else:
                 raise serializers.ValidationError({

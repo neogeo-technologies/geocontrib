@@ -189,6 +189,9 @@ class FeatureLink(models.Model):
 
 class FeatureType(models.Model):
 
+    def get_displayed_fields_default():
+        return ['status', 'feature_type', 'updated_on']
+
     GEOM_CHOICES = (
         ("linestring", "Ligne"),
         ("point", "Point"),
@@ -224,6 +227,11 @@ class FeatureType(models.Model):
         "geocontrib.Project", on_delete=models.CASCADE
     )
 
+    displayed_fields = ArrayField(
+        verbose_name="Champs conditionels à afficher",
+        base_field=models.CharField(max_length=256), blank=True, null=True,
+        default=get_displayed_fields_default)
+
     class Meta:
         verbose_name = "Type de signalement"
         verbose_name_plural = "Types de signalements"
@@ -241,6 +249,8 @@ class FeatureType(models.Model):
 
     def __str__(self):
         return self.title
+    
+
 
     @property
     def is_editable(self):

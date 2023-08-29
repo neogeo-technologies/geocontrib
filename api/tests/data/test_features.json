@@ -13,7 +13,8 @@
                 "custom_field_name": ""
             },
             "project": 1,
-            "opacity": 0.5
+            "opacity": 0.5,
+            "displayed_fields":  ["status", "feature_type", "updated_on"]
         }
     },
     {
@@ -30,7 +31,8 @@
                 "custom_field_name": ""
             },
             "project": 1,
-            "opacity": 0.5
+            "opacity": 0.5,
+            "displayed_fields":  ["status", "feature_type", "updated_on"]
         }
     },
     {
@@ -47,7 +49,8 @@
                 "custom_field_name": ""
             },
             "project": 1,
-            "opacity": 0.5
+            "opacity": 0.5,
+            "displayed_fields":  ["status", "feature_type", "updated_on"]
         }
     },
     {
