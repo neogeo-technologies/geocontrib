@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [5.3.0] - 2023-09-01
+
+### Evolutions
+
+- Redmine 17473 : Zoomer sur la carte en fonction de la localisation
+- Redmine 17474 : Ajouter un geocodeur ETALAB sur les cartes
+- Redmine 17475 : Affichage des informations attributaires dans la pop-up au clic sur les signalements
+- Redmine 17858 : Adaptation de la barre de menu pour logo hors format
+
+### Corrections
+
+- Redmine 18160 : Duplication des champs dans le formulaire de visualisation
+
 ## [5.2.0] - 2023-08-22
 
 ### Evolutions
