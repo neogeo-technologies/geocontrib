@@ -77,7 +77,8 @@ def test_projects_list(api_client):
             'nb_published_features': 0,
             'nb_comments': 0,
             'nb_published_features_comments': 0,
-            'nb_contributors': 1
+            'nb_contributors': 1,
+            'bbox': None
         }]
     }
 
@@ -201,6 +202,7 @@ def test_projects_thumbnail(api_client):
         'slug': '1-projet-3',
         'title': 'Projet 3',
         'updated_on': '05/08/2021',
+        'bbox': None
     }
 
     # ensure can't POST

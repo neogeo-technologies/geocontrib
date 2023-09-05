@@ -115,6 +115,11 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
 
     thumbnail = serializers.SerializerMethodField()
 
+    bbox = serializers.SerializerMethodField()
+
+    def get_bbox(self, obj):
+        return obj.calculate_bbox()
+
     def get_nb_features(self, obj):
         return Feature.objects.filter(project=obj).count()
 
@@ -172,6 +177,7 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'nb_contributors',
             'feature_browsing_default_filter',
             'feature_browsing_default_sort',
+            'bbox'
         )
 
 

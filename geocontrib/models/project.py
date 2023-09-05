@@ -102,3 +102,10 @@ class Project(models.Model):
 
     def get_absolute_url(self):
         return reverse('geocontrib:project', kwargs={'slug': self.slug})
+
+    def calculate_bbox(self):
+        if self.feature_set.exists():
+            bbox = self.feature_set.aggregate(models.Extent('geom'))['geom__extent']
+            return bbox
+        else:
+            return None
