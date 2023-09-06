@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [5.2.1] - 2023-09-06
+
+### Correction
+
+- Redmine 18160 : Duplication des champs dans le formulaire de visualisation
+
+
 ## [5.2.0] - 2023-08-22
 
 ### Evolutions
