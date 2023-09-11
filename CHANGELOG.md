@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+## [5.1.4] - 2023-09-11
+
+### Corrections
+
+- Redmine 17338 : Page mon compte - Activer le parcours des signalements
+- Redmine 18124 : Accueil projet - Les libellés sont coupés au milieu d'une lettre
+- Redmine 18130 : Améliorer l'affichage du logo dans la barre de menu
+- Redmine 18181 : Redirection systématique vers la page de login
+- Redmine 18184 : Temps de chargement carte accueil très lent
+
 ## [5.1.3] - 2023-08-22
 
 ### Corrections
