@@ -19,3 +19,15 @@ Ainsi, le rythme de sortie des versions est le suivant : 1 version LTS, 2 versio
 * POC : Snap sur les objets existants à la création / édition d'un signalement
 * Permettre la rédaction en Markdown de la description d'un projet et limiter l'affichage sur l'accueil
 * Pouvoir rendre obligatoire la saisie des signalements
+
+## Version 5 de GéoContrib, sortie en Long Term Support en Mars 2024
+
+* Nouveau formulaire de création des listes de valeurs plus ergonomique
+* Mise en plein écran de la carte
+* Ajout d'un outil de recherche dans les champs personnalisés de type "Liste de valeurs"
+* Option d'affichage des champs personnalisés conditionnel : afficher un champ selon la valeur d'un autre champ
+* Forcer la valeur d'un champs selon la valeur d'un autre champ
+* Ajout d'un Geocodeur ETALAB performant
+* Affichage des informations attributaires dans la pop-up au clic sur les signalements
+* Ajout d'un outil de géolocalisation sur la carte
+* Adaptation de la barre de menu pour logo hors format
