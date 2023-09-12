@@ -3,7 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+## [4.2.6] - 2023-09-12
+
+### Corrections
+
+- Redmine 18181 : Retrait de la redirection systématique vers la page de login
+- Redmine 17338 : Page mon compte - Activer le parcours des signalements
 
 ## [4.2.5] - 2023-07-12
 
