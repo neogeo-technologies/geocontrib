@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.3.2] - 2023-09-13
+
+### Corrections
+
+- Redmine 18295 : Paramétrage de l'affichage des signalement - La page ne n'affiche plus
 
 ## [5.3.1] - 2023-09-13
 
