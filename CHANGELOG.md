@@ -3,7 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+
+## [5.3.0] - 2023-09-13
+
+### Corrections
+
+- Redmine 18186 : Géolocalisation : lenteurs / fonction KO de manière aléatoire
+- Redmine 18185 : Prévisualisation des champs illisible
+- Redmine 18184 : Temps de chargement carte accueil très lent
+- Redmine 18130 : Améliorer l'affichage du logo dans la barre de menu
+- Redmine 18124 : Accueil projet - Les libellés sont coupés au milieu d'une lettre
 
 ## [5.3.0] - 2023-09-01
 
