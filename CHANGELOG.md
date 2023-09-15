@@ -3,7 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+
+## [5.0.3] - 2023-09-15
+
+### Corrections
+
+- Redmine 17905 : Droits des membres qui se réinitialisent
+- Redmine 18264 : Erreur 504 sur le geocoder sur la page de création / édition d'un signalement + au clic sur le geocoder, validation du formulaire inopinée
+- Redmine 17896 : Problème lié à l'ordre des fonds
+
 
 ## [5.0.2] - 2023-08-03
 
