@@ -1,6 +1,7 @@
 from uuid import uuid4, UUID
 import csv
 import logging
+import json
 
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.contrib.gis.geos.error import GEOSException
@@ -60,8 +61,12 @@ class CSVProcessing:
     @transaction.atomic
     def create_features(self, import_task):
         with open(import_task.file.path, 'r') as csvfile:
+            # get headers to determine correct delimiters, since object in csv give a wrong result being ':'
+            dict_reader = csv.DictReader(csvfile)
+            header_output = dict_reader.fieldnames
+            # find the delimiter using an empty csv file
             sniffer = csv.Sniffer()
-            dialect = sniffer.sniff(csvfile.read())
+            dialect = sniffer.sniff(json.dumps(header_output))
             csvfile.seek(0)
             data = csv.DictReader(csvfile, dialect=dialect)
             features = list(data)
