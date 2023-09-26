@@ -1,7 +1,7 @@
 from uuid import uuid4, UUID
 import csv
-import logging
 import json
+import logging
 
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.contrib.gis.geos.error import GEOSException
@@ -33,9 +33,27 @@ class CSVProcessing:
 
     def get_feature_data(self, feature_type, properties, field_names):
         feature_data = {}
+        boolean_as_string = ['True', 'False']
         if hasattr(feature_type, 'customfield_set'):
             for field in field_names:
-                feature_data[field] = properties.get(field)
+                value = properties.get(field)
+                # check if string value contains a number to avoid converting into number by json.loads, in order to stay consistent with types in the app
+                try :
+                    float(value)
+                    # if no error is raised, we can keep the value as a string and add it to feature_data
+                    feature_data[field] = value
+                # if ValueError is raised, then it is not a number
+                except ValueError:
+                    # object and arrays need to be unstringified to keep same format as in the app
+                    try:
+                        feature_data[field] = json.loads(value.replace("'", '"'))
+                    except json.decoder.JSONDecodeError:
+                        # boolean needs to be unstringified to keep same format as in the app
+                        if value in boolean_as_string:
+                            feature_data[field] = bool(value)
+                        # the rest can stay as a string
+                        else:
+                            feature_data[field] = value
         return feature_data
 
     def validate_uuid4(self, id):
