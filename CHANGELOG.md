@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.0.4] - 2023-10-05
+
+### Corrections
+
+- Redmine 18348 : Erreur lors de l'import avec champ pre_recorded_list
+- Redmine 18401 : Les listes de valeurs pré-définies ne se rafraichissent pas 
+
 
 ## [5.0.3] - 2023-09-15
 
