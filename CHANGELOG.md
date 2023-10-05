@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.2.4] - 2023-10-05
+
+### Correction
+
+- Redmine 18162 : Export CSV ne fonctionne plus, duplication de colonnes
+- Redmine 18348 : Import geojson avec champ pre_recorded_list
+- Redmine 18401 : Les listes de valeurs pré-définies ne se rafraichissent pas
+
+
 ## [5.2.3] - 2023-09-26
 
 ### Correction
