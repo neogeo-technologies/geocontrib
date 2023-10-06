@@ -37,6 +37,24 @@ Options : {
             }
 ```
 
+### Exemples de configuration de couches WMTS
+
+**Couche WMTS au format JPEG :**
+```Titre : Orthophotographie régionale 2018
+Type de couche : WMTS
+Service : https://wxs.ign.fr/essentiels/geoportail/wmts
+Options :  {
+        "version": "1.0.0",
+        "layer": "ORTHOIMAGERY.ORTHOPHOTOS",
+        "matrixSet": "PM",
+        "style": "normal",
+        "format": "image/jpeg",
+        "opacity": "0.9",
+        "attributions": "IGN-F/Géoportail",
+        "ignoreUrlInCapabiltiesResponse": "",
+    },
+```
+
 ### Exemples de configuration de couches TMS
 
 **Couche faded du serveur OSM de Géo2France :**

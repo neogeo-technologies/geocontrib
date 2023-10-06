@@ -57,6 +57,7 @@ class ContextLayer(models.Model):
 class Layer(models.Model):
     SCHEMAS = (
         ('wms', 'WMS'),
+        ('wmts', 'WMTS'),
         ('tms', 'TMS')
     )
 
