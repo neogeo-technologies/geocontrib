@@ -75,7 +75,7 @@ Variables utilisées pour configurer le frontend:
 * BASE_URL
 * CATALOG_NAME                  # name of the catalog to import features from
 * IDGO                          # boolean to display import features from catalog buttons
-* DEFAULT_BASE_MAP_SCHEMA_TYPE  # type of basemap used by default (like TMS or WMS)
+* DEFAULT_BASE_MAP_SCHEMA_TYPE  # type of basemap used by default (like TMS, WMTS or WMS)
 * DEFAULT_BASE_MAP_SERVICE      # service providing the default basemap
 * DEFAULT_BASE_MAP_OPTIONS      # default basemap options, contains maxZoom and attribution
 * DEFAULT_MAP_VIEW_CENTER       # center setting at maps loading

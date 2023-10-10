@@ -48,6 +48,7 @@ from geocontrib.models import Project
 
 
 User = get_user_model()
+no_data_msg = "Les données sont inaccessibles"
 
 
 class FeatureView(
@@ -326,8 +327,8 @@ class ProjectFeaturePositionInList(views.APIView):
                 return Response(status=204)
 
         except Exception as e:
-            logger.exception("Les données sont inaccessibles %s", e)
-            return Response(data="Les données sont inaccessibles", status=404)
+            logger.exception("%s %s", no_data_msg, e)
+            return Response(data=no_data_msg, status=404)
 
 class ProjectFeatureBbox(generics.ListAPIView):
     queryset = Project.objects.all()
@@ -570,8 +571,8 @@ class GetIdgoCatalogView(views.APIView):
             code = response.status_code
             return Response(data=data, status=code)
         except Exception as e:
-            logger.exception("Les données sont inaccessibles %s", e)
-            return Response(data="Les données sont inaccessibles", status=404)
+            logger.exception("%s %s", no_data_msg, e)
+            return Response(data=no_data_msg, status=404)
 
 class GetExternalGeojsonView(views.APIView):
     http_method_names = ['get', ]
@@ -599,8 +600,8 @@ class GetExternalGeojsonView(views.APIView):
                 data = "Les données ne sont pas au format geoJSON"
             return Response(data=data, status=code)
         except Exception as e:
-            logger.exception("Les données sont inaccessibles %s", e)
-            return Response(data="Les données sont inaccessibles", status=404)
+            logger.exception("%s %s", no_data_msg, e)
+            return Response(data=no_data_msg, status=404)
 
 
 class PreRecordedValuesView(APIView):

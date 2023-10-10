@@ -37,6 +37,23 @@ Options : {
             }
 ```
 
+### Exemples de configuration de couches WMTS (par GetCapabilities)
+
+**Couche WMTS au format PNG :**
+```Titre : Service de visualisation WMTS Geoportail Publique
+Type de couche : WMTS
+Service : https://wxs.ign.fr/essentiels/geoportail/wmts?request=GetCapabilities&service=WMTS
+Options :  {
+            "layer": "ORTHOIMAGERY.ORTHOPHOTOS",
+            "style": "normal",
+            "format": "image/jpeg",
+            "opacity": "0 .8",
+            "version": "1.0.0",
+            "matrixSet": "PM",
+            "attributions": "<a href='https://www.ign.fr/' target='_blank'><img src='https://wxs.ign.fr/static/logos/IGN/IGN.gif' title='Institut national de l\\'information géographique et forestière' alt='IGN'></a>"
+            }
+```
+
 ### Exemples de configuration de couches TMS
 
 **Couche faded du serveur OSM de Géo2France :**
