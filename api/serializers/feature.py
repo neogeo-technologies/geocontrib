@@ -18,8 +18,6 @@ from geocontrib.models import FeatureType
 from geocontrib.models import PreRecordedValues
 from geocontrib.models import Project
 
-# from deepdiff import DeepDiff
-
 User = get_user_model()
 
 
@@ -343,20 +341,6 @@ class FeatureCSVSerializer(serializers.ModelSerializer):
             'display_last_editor',
         )
 
-    # def handle_custom_fields(self, validated_data, instance):
-    #     # Hack: les champs extra n'etant pas serializés ou définis dans le modèle
-    #     # FIXME: les champs ne sont donc pas validés mais récupérés direct
-    #     # depuis les données initiales
-    #     custom_fields = validated_data.get(
-    #         'feature_type'
-    #     ).customfield_set.values_list('name', flat=True)
-    #     if instance.feature_data:
-    #         for key, value in instance.feature_data:
-    #             if key in custom_fields:
-    #                 validated_data[key] = value
-
-    #     return validated_data
-
     def get_display_creator(self, obj):
         res = 'N/A'
         if self.context['request'].user.is_authenticated:
@@ -381,14 +365,12 @@ class FeatureCSVSerializer(serializers.ModelSerializer):
         try:
             instance = Feature.objects.create(**validated_data)
             validated_data['creator'] = self.context.get('request').user
-            # validated_data = self.handle_custom_fields(validated_data, instance)
             validated_data = self.handle_title(validated_data)
         except Exception as err:
             raise serializers.ValidationError({'detail': str(err)})
         return instance
 
     def update(self, instance, validated_data):
-        # validated_data = self.handle_custom_fields(validated_data, instance)
         validated_data['last_editor'] = self.context.get('request').user
         try:
             for k, v in validated_data.items():
