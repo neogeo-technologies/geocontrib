@@ -3,6 +3,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.3.3] - 2023-10-13
+
+### Evolution
+
+- Redmine 18514 : Rendre possible l'affichage des WMTS pour les fonds de plan
+
+### Corrections
+
+- Redmine 16896 : Import signalement - pas de rafraichissement des signalements sur la page du projet
+- Redmine 17139 : Page édition signalement - pas de suppression attribut liste pré-enregistrée ou liste
+- Redmine 17338 : Page mon compte - Activer le parcours des signalements
+- Redmine 18500 : Derniers signalements absents sur page d'accueil suite passage aux signalements MVT
+- Redmine 18666 : Les formulaires de listes à choix multiples ne se rafraichissent pas
+- Redmine 18644 : Problème d'affichage sur les tool tip (message de description bouton)
+
 ## [5.3.2] - 2023-09-13
 
 ### Corrections
