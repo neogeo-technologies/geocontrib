@@ -268,7 +268,7 @@ class ProjectFeatureBbox(generics.ListAPIView):
         feature_type_slug = self.request.query_params.get('feature_type_slug')
         title = self.request.query_params.get('title')
         # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
-        features = features.filter(deletion_on__isnull=True)
+        queryset = queryset.filter(deletion_on__isnull=True)
 
         if status__value:
             queryset = queryset.filter(status__icontains=status__value)
