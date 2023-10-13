@@ -189,63 +189,6 @@ class FeatureTypeView(
         FeatureTypeFilter
     ]
 
-class ProjectFeature(views.APIView):
-    queryset = Project.objects.all()
-    lookup_field = 'slug'
-    http_method_names = ['get', ]
-
-    def get(self, request, slug):
-        project = get_object_or_404(Project, slug=slug)
-        features = Feature.handy.availables(request.user, project)
-        title_contains = self.request.query_params.get('title__contains')
-        if title_contains:
-            features = features.filter(title__contains=title_contains)
-
-        title_icontains = self.request.query_params.get('title__icontains')
-        if title_icontains:
-            features = features.filter(title__icontains=title_icontains)
-
-        feature_type__slug = self.request.query_params.get('feature_type__slug')
-        if feature_type__slug:
-            features = features.filter(feature_type__slug=feature_type__slug)
-
-        feature_id = self.request.query_params.get('feature_id')
-        if feature_id:
-            features = features.filter(feature_id=feature_id)
-        count = features.count()
-        ordering = self.request.query_params.get('ordering')
-        if ordering:
-            features = features.order_by(ordering)
-        limit = self.request.query_params.get('limit')
-        if limit:
-            features = features[:int(limit)]
-
-        _id = self.request.query_params.get('id')
-        if _id:
-            features = features.filter(pk=_id)
-
-
-        format = request.query_params.get('output')
-        if format and format == 'geojson':
-            data = FeatureDetailedSerializer(
-                features,
-                is_authenticated=request.user.is_authenticated,
-                many=True,
-                context={"request": request},
-            ).data
-        else:
-            serializers = FeatureListSerializer(
-                features,
-                many=True,
-                context={"request": request},
-            )
-            data = {
-                'features': serializers.data,
-                'count': count,
-            }
-        return Response(data, status=200)
-
-
 class ProjectFeaturePaginated(generics.ListAPIView):
     queryset = Project.objects.all()
     pagination_class = CustomPagination
@@ -343,6 +286,8 @@ class ProjectFeatureBbox(generics.ListAPIView):
         status__value = self.request.query_params.get('status__value')
         feature_type_slug = self.request.query_params.get('feature_type_slug')
         title = self.request.query_params.get('title')
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        features = features.filter(deletion_on__isnull=True)
 
         if status__value:
             queryset = queryset.filter(status__icontains=status__value)
@@ -450,6 +395,8 @@ class FeatureSearch(generics.ListAPIView):
                 queryset = queryset.filter(geom__intersects=Polygon.from_bbox(geom.split(',')))
             except (GEOSException, ValueError):
                 logger.exception("Api FeatureSearch geom error")
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        queryset = queryset.filter(deletion_on__isnull=True)
         if status:
             queryset = queryset.filter(status__icontains=status)
         if feature_type_slug:
