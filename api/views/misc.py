@@ -110,6 +110,9 @@ class ProjectComments(views.APIView):
             project=project
         ).order_by('-created_on')
 
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        features = features.filter(deletion_on__isnull=True)
+
         # On filtre les commentaire selon les signalements visibles
         last_comments = Comment.objects.filter(
             project=project,
