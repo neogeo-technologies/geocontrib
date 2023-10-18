@@ -36,6 +36,7 @@ from api.utils.filters import FeatureTypeFilter
 from api.utils.paginations import CustomPagination
 from api.db_layer_utils import get_pre_recorded_values
 from geocontrib.choices import TYPE_CHOICES
+from geocontrib.models import CustomField
 from geocontrib.models import Event
 from geocontrib.models import Feature
 from geocontrib.models import FeatureLink
@@ -316,23 +317,36 @@ class ExportFeatureList(views.APIView):
             serializer = FeatureCSVSerializer(features, many=True, context={'request': request})
             response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = 'attachment; filename=export_projet.csv'
-            headers = [*serializer.data[0].keys()]
+            # get list of feature field names to build csv headers
+            featureFieldNames = [*serializer.data[0].keys()]
+            # get list of all custom field names to build csv headers (retrieving it from the model to avoid missing custom fields in feature data when their value is null)
+            feature_type = FeatureType.objects.get(slug=feature_type_slug)
+            custom_fields = CustomField.objects.filter(feature_type=feature_type)
+            customFieldNames = [custField.name for custField in custom_fields]
+            # concatenate all field names into csv headers
+            headers = [*featureFieldNames, *customFieldNames]
+            # remove unused geom field
             headers.remove('geom')
+            # remove unused feature_data field
             headers.remove('feature_data')
+            # create new fields to add converted geom data
             headers.append('lat')
             headers.append('lon')
-            feature_data = serializer.data[0]['feature_data']
-            headers.extend(feature_data.keys() if feature_data else [])
+            # initialize a csv writer with the prepared headers
             writer = csv.DictWriter(response, fieldnames=headers)
             writer.writeheader()
+            # loop each feature to add its values to the csv file
             for row in serializer.data:
+                # transform geom object to lon/lat entries
                 row['lon'] = row['geom']['coordinates'][0]
                 row['lat'] = row['geom']['coordinates'][1]
+                # merging feature datas with its custom fields datas into a full_row
                 data = row['feature_data'].items() if row['feature_data'] else []
                 full_row = collections.OrderedDict(list(row.items()) +
                                                    list(data))
                 del full_row['geom']
                 del full_row['feature_data']
+                # write the full_row into the csv
                 writer.writerow(full_row)
         return response
 
