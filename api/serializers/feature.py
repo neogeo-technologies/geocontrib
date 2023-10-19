@@ -222,12 +222,13 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
         )
 
     def get_properties(self, instance, fields):
-        # Ici on retourne les champs extra d'une feature au meme niveau
-        # que les champs de bases
+        # Ici on retourne les champs extra d'une feature au meme niveau que les champs de bases
         properties = super().get_properties(instance, fields)
         if instance.feature_data:
-            for key, value in instance.feature_data.items():
-                properties[key] = value
+            # Afin d'inclure les champs extra non définis dans feature_data, on a besoin de récupérer tous les champs existants pour ce type de signalement
+            feature_type = FeatureType.objects.get(id=instance.feature_type_id)
+            for custom_field in CustomField.objects.filter(feature_type=feature_type):
+                properties[custom_field.name] = instance.feature_data.get(custom_field.name, None)
         return properties
 
     def handle_custom_fields(self, validated_data):
