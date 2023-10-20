@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.3.4] - 2023-10-20
+
+### Corrections
+
+- Redmine 18568 : Certains liens vers signalement en parcours rapide sont invalides
+- Redmine 18401 : Les listes de valeurs pré-définies ne se rafraichissent pas
+- Redmine 17338 : Page mon compte - Activer le parcours des signalements
+- Redmine 17139 : Page édition signalement - pas de suppression attribut liste pré-enregistrée ou liste
+- Redmine 16896 : Import signalement - pas de rafraichissement des signalements sur la page du projet
+
 ## [5.3.3] - 2023-10-13
 
 ### Evolution
