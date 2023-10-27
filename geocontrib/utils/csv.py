@@ -90,7 +90,7 @@ class CSVProcessing:
         
                 try:
                     try:
-                        feature_exist = Feature.objects.get(feature_id=feature_id)
+                        feature_exist = Feature.objects.get(feature_id=feature_id, deletion_on=None)
                     except Feature.DoesNotExist:
                         feature_exist = None
                         # Le geojson peut venir avec un ancien ID. On reset l'ID ici aussi
