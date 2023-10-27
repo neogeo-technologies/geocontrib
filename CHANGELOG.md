@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.2.5] - 2023-10-27
+
+### Corrections
+
+- Redmine 18568 : Certains liens vers signalement en parcours rapide sont invalides
+- Redmine 18401 : Les listes de valeurs pré-définies ne se rafraichissent pas
+- Redmine 17338 : Page mon compte - Activer le parcours des signalements
+- Redmine 17139 : Page édition signalement - pas de suppression attribut liste pré-enregistrée ou liste
+- Redmine 16896 : Import signalement - pas de rafraichissement des signalements sur la page du projet
+- Redmine 18740 : Export signalements - Liste de valeurs pré-enregistrées n'ont pas la bonne forme
+- Redmine 18721 : Problème de tri lors du signalement
+- Redmine 18644 : Problème d'affichage sur les tool tip (message de description bouton)
+- Redmine 18666 : Les formulaires de listes à choix multiples ne se rafraichissent pas
+- Redmine 18757 : Export - Champs perdus
+- Redmine 18568 : Certains liens vers signalement en parcours rapide sont invalides
+- Redmine 18736 : Parcours de signalement & édition rapide - erreur de détection de changement avec booléens
+
 ## [5.2.4] - 2023-10-05
 
 ### Correction
