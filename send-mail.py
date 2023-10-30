@@ -71,11 +71,7 @@ def main():
         )
         logger.info(f"Email sent successfully to {args.to} with subject '{args.subject}'.")
     except Exception as e:
-        # Vérifier si l'erreur est "Relay access denied"
-        if 'Relay access denied' in str(e):
-            logger.error("Failed to send email due to SMTP relay access denied. Check your SMTP server configuration.")
-        else:
-            logger.error(f"Error sending email: {e}")
+        logger.error(f"Error sending email: {e}")
 
     logger.debug("Exiting main function...")
 
