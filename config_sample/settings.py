@@ -122,6 +122,14 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_PARSER_CLASSES': (
+        # declare other parsers before xml to set them as default
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        # accept xml logout request from CAS server as geOrchestra
+        'rest_framework_xml.parsers.XMLParser',
+    ),
 }
 
 # URL prefix
