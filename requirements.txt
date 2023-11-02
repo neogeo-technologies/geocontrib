@@ -18,3 +18,5 @@ requests
 django-admin-list-filter-dropdown
 django-cas-ng
 django-celery-beat<2.3.0
+defusedxml==0.7.1
+djangorestframework-xml==2.0.0
