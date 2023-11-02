@@ -68,18 +68,20 @@ class UserInfoView(views.APIView):
 
 
 class LogoutView(views.APIView):
-#class SignoutView(views.APIView):
 
     permission_classes = [
         permissions.IsAuthenticated,
-        #permissions.AllowAny,
     ]
+    def logout_user(self):
+        username = self.request.user.username
+        logout(self.request)
+        return {"detail": _(f"{username} signed out")}
 
     def get(self, request):
-        username = request.user.username
-        logout(request)
-        data = {"detail": _(f"{username} signed out")}
-        return Response(data=data, status=status.HTTP_200_OK)
+        return Response(data=self.logout_user(), status=status.HTTP_200_OK)
+
+    def post(self, request):
+        return Response(data=self.logout_user(), status=status.HTTP_200_OK)
 
 
 class MyAccountView(views.APIView):
