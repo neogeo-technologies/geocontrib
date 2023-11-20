@@ -197,6 +197,7 @@ class EventSerializer(serializers.ModelSerializer):
                 res = {
                     'title': str(feature.title),
                     'deletion_on': str(feature.deletion_on),
+                    'feature_url': feature.get_view_url()
                 }
             except Exception:
                 logger.exception('No related feature found')
