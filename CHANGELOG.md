@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.2.6] - 2023-11-20
+
+### Corrections
+
+- Redmine 14157 : Création d'un type de signalement - Interdire les noms des champs par défaut des properties
+- Redmine 18942 : notifications mails - liens de notif qui pointent sur une URL générique au lieu d'une URL d'accès direct au signalement
+
 ## [5.2.5] - 2023-10-27
 
 ### Corrections
