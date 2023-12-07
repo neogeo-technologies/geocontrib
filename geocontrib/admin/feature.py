@@ -204,6 +204,9 @@ to_archived.short_description = "Changer status à Archivé"
 
 
 class FeatureAdmin(admin.ModelAdmin):
+    # Specifies a custom template to use for the 'change' (edit) form in the admin.
+    change_form_template = 'admin/geocontrib/feature_no_geom_feat_type_list.html'
+
     list_display = (
         'title',
         'project',
@@ -287,6 +290,34 @@ class FeatureAdmin(admin.ModelAdmin):
     def to_erased(self, request, queryset):
         queryset.update(deletion_on=date.today())
     to_erased.short_description = "Supprimer les signalements sélectionnés"
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """
+        Overridden change_view method to add custom context to the admin change form.
+
+        Args:
+            request: HttpRequest object representing current request.
+            object_id: ID of the object being changed.
+            form_url: URL for the form endpoint.
+            extra_context: Dictionary containing context data (default is None).
+
+        Returns:
+            HttpResponse object representing the rendered change form.
+        """
+        # Ensure extra_context is a dictionary.
+        extra_context = extra_context or {}
+
+        # Query FeatureType instances where geom_type is 'none'.
+        no_geom_feat_types = FeatureType.objects.filter(geom_type='none')
+
+        # Extract the titles of these instances into a list.
+        no_geom_feat_type_titles = [feat_type.title for feat_type in no_geom_feat_types]
+
+        # Add this list to the context under the key 'no_geom_feat_type_list'.
+        extra_context['no_geom_feat_type_list'] = no_geom_feat_type_titles
+
+        # Call the superclass method and return its result.
+        return super().change_view(request, object_id, form_url, extra_context)
 
 
 class FeatureLinkAdmin(admin.ModelAdmin):
