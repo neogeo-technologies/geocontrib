@@ -53,7 +53,7 @@ def test_feature_creation(api_client, with_multiple_stackedevents):
     assert result.status_code == 400
     assert result.json() == {
         'feature_type': ['Ce champ est obligatoire.'],
-        'geom': ['Ce champ est obligatoire.'],
+        'geom': {'geom': ['Ce champ est obligatoire.']},
         'project': ['Ce champ est obligatoire.'],
     }
 
