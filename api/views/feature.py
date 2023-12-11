@@ -157,6 +157,15 @@ class FeatureView(
             ).data
 
         return Response(response)
+    
+    def validate(self, data):
+        """
+        Manually call the 'clean' method of the model.
+        """
+        instance = Feature(**data)
+        instance.clean()
+        return data
+
 
     def destroy(self, request, *args, **kwargs):
         feature = self.get_object()
