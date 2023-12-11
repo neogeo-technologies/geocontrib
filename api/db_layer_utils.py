@@ -1,31 +1,37 @@
-from api.utils.db_utils import fetch_raw_data
-
+from django.db import connection
 
 def get_pre_recorded_values(name, pattern=''):
     """
-        Fonction recuperant les valeurs pré
-        enregistrées.
+    Retrieves pre-recorded values from the database based on a given pattern.
+
+    :param name: The name of the pre-recorded values to retrieve.
+    :param pattern: An optional search pattern. If provided, only values containing this pattern will be returned.
+    :param limit: An optional limit to the number of values to retrieve.
+    :return: A list of values that match the given name and optional pattern.
     """
-    sql = """
+
+    with connection.cursor() as cursor:
+        sql = """
             WITH NewScores AS (
-                SELECT TRIM('"' 
-                    from json_array_elements(
-                        geocontrib_prerecordedvalues.values::json)::text)
-                    as values
-                FROM   geocontrib_prerecordedvalues
-                WHERE  name = '{name}'
-            ) SELECT values from NewScores
-            """.format(
-                name=name,
+                SELECT TRIM(BOTH '"' FROM json_array_elements(geocontrib_prerecordedvalues.values::json)::text) AS values
+                FROM geocontrib_prerecordedvalues
+                WHERE name = %s
             )
-    if pattern:
-        sql+="""
-             WHERE lower(values) like lower('%%{pattern}%%')
-        """.format(
-            pattern=pattern)
+            SELECT values FROM NewScores
+        """
 
-    sql += "ORDER BY values LIMIT 10;"
+        params = [name]  # Parameters for the SQL query
 
-    return fetch_raw_data('default', sql)
+        if pattern:
+            sql += " WHERE lower(values) LIKE lower(%s)"
+            params.append(f'%{pattern}%')  # Appending the pattern surrounded by % for partial matching
 
+        sql += " ORDER BY values"
 
+        print("Executing SQL:", sql)
+        print("With parameters:", params)
+
+        cursor.execute(sql, params)
+        rows = cursor.fetchall()
+
+    return [row[0] for row in rows]
