@@ -1,4 +1,5 @@
 from uuid import uuid4, UUID
+import re
 import csv
 import json
 import logging
@@ -34,6 +35,29 @@ class CSVProcessing:
     def get_feature_data(self, feature_type, properties, field_names):
         feature_data = {}
         boolean_as_string = ['True', 'False']
+        def adapt_json_string(field_in_feature):
+            # Remplacer les occurrences de 'label', ‘label’ ou “label” par "label"
+            field_in_feature = re.sub(r"['‘’\"]\s*label\s*['‘’\"]\s*:", '"label":', field_in_feature)
+            # Formater les paires clé-valeur pour que les valeurs soient entre guillemets doubles
+            field_in_feature = re.sub(r":\s*['‘’\"](.+?)['‘’\"]\s*(?=[,}])", r':"\1"', field_in_feature)
+            return field_in_feature
+
+        def convert_to_dict(json_str):
+            # Nettoyer la chaîne
+            cleaned_str = adapt_json_string(json_str)
+            try:
+                # Essayer de la convertir en JSON
+                json_dict = json.loads(cleaned_str)
+                # Accéder à la valeur de 'label' si elle existe
+                label_value = json_dict.get('label')
+                return label_value
+            except json.JSONDecodeError:
+                 # Enregistrer l'erreur
+                logger.error(f"JSON decode error: {e}")
+                # Continuer après avoir enregistré l'erreur
+                pass
+
+        # Start processing features
         if hasattr(feature_type, 'customfield_set'):
             for field in field_names:
                 value = properties.get(field)
@@ -46,7 +70,12 @@ class CSVProcessing:
                 except ValueError:
                     # object and arrays need to be unstringified to keep same format as in the app
                     try:
-                        feature_data[field] = json.loads(value.replace("'", '"'))
+                        # Vérifier si la chaîne commence par '{'
+                        if value.startswith('{'):
+                            feature_data[field] = convert_to_dict(value);
+                        # Si la chaîne ne commence pas par '{', traiter le cas d'un tableau sous forme d'une string
+                        else:
+                            feature_data[field] = json.loads(value.replace("'", '"'))
                     except json.decoder.JSONDecodeError:
                         # boolean needs to be unstringified to keep same format as in the app
                         if value in boolean_as_string:
