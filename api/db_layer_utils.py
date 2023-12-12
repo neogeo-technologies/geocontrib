@@ -1,41 +1,35 @@
-from django.db import connection
+from api.utils.db_utils import fetch_raw_data
+
 
 def get_pre_recorded_values(name, pattern='', limit=''):
     """
-    Retrieves pre-recorded values from the database based on a given pattern.
-
-    :param name: The name of the pre-recorded values to retrieve.
-    :param pattern: An optional search pattern. If provided, only values containing this pattern will be returned.
-    :param limit: An optional limit to the number of values to retrieve.
-    :return: A list of values that match the given name and optional pattern.
+        Fonction recuperant les valeurs pré
+        enregistrées.
     """
-
-    with connection.cursor() as cursor:
-        sql = """
+    sql = """
             WITH NewScores AS (
-                SELECT TRIM(BOTH '"' FROM json_array_elements(geocontrib_prerecordedvalues.values::json)::text) AS values
-                FROM geocontrib_prerecordedvalues
-                WHERE name = %s
+                SELECT TRIM('"' 
+                    from json_array_elements(
+                        geocontrib_prerecordedvalues.values::json)::text)
+                    as values
+                FROM   geocontrib_prerecordedvalues
+                WHERE  name = '{name}'
+            ) SELECT values from NewScores
+            """.format(
+                name=name,
             )
-            SELECT values FROM NewScores
-        """
+    if pattern:
+        sql+="""
+             WHERE lower(values) like lower('%%{pattern}%%')
+        """.format(
+            pattern=pattern)
 
-        params = [name]  # Parameters for the SQL query
+    sql += "ORDER BY values"
+    if limit:
+        sql += " LIMIT {limit};".format(
+                limit=limit,
+            )
 
-        if pattern:
-            sql += " WHERE lower(values) LIKE lower(%s)"
-            params.append(f'%{pattern}%')  # Appending the pattern surrounded by % for partial matching
+    return fetch_raw_data('default', sql)
 
-        sql += " ORDER BY values"
 
-        if limit:
-            sql += " LIMIT %s;"
-            params.append(limit)  # Appending the limit to the parameters
-
-        print("Executing SQL:", sql)
-        print("With parameters:", params)
-
-        cursor.execute(sql, params)
-        rows = cursor.fetchall()
-
-    return [row[0] for row in rows]
