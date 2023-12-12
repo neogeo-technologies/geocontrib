@@ -530,14 +530,11 @@ class PreRecordedValuesView(APIView):
 
     def get(self, request, name=None):
         response=[]
-        values=[]
         name = self.kwargs.get('name', None)
         pattern = self.request.query_params.get('pattern', '')
 
         if name:
-            values = get_pre_recorded_values(name, pattern)
-            for value in values:
-                response.append(value['values'])
+            response = get_pre_recorded_values(name, pattern)
             response.sort()
         else:
             response = list(PreRecordedValues.objects.values("name"))
