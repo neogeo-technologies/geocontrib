@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [4.2.9] - 2023-11-20
+
+### Corrections
+
+- Redmine 19251 : Listes de valeurs pré-enr. - Vérification que l'option existe bien dans la liste ne fonctionne pas dans le cas où j'ai un string
+- Redmine 19451 : Suppression en masse - Le superadmin ne peut pas cocher les cases
+
 ## [4.2.8] - 2023-11-20
 
 ### Corrections
