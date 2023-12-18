@@ -8,7 +8,7 @@ Depuis la version 2.0.0, l'interface web est dans une dépôt séparé : https:/
 
 La version stable de GéoContrib est une version qui a été testée et validée par la communauté GéoContrib. Nous recommandons l'installation de cette version dans le cas d'une utilisation optimale et sans instabilité. 
 
-La version actuellement stabilisée est la version **4.2.8**.
+La version actuellement stabilisée est la version **4.2.9**.
 
 ## Installation
 
