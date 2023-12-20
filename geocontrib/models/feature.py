@@ -97,6 +97,7 @@ class Feature(models.Model):
                 raise ValidationError({'geom': 'Ce champ est obligatoire.'})
 
     def save(self, *args, **kwargs):
+        self.clean()
         if self._state.adding:
             self.created_on = timezone.now()
             self.last_editor = self.creator
