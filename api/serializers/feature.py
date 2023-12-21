@@ -186,7 +186,7 @@ class FeatureTypeColoredSerializer(serializers.ModelSerializer):
         )
 
 
-class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
+class FeatureJSONSerializer(serializers.ModelSerializer):
     
     feature_type = serializers.SlugRelatedField(
         slug_field='slug', queryset=FeatureType.objects.all())
@@ -200,7 +200,6 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = Feature
-        geo_field = 'geom'
         fields = (
             'feature_id',
             'title',
@@ -302,6 +301,10 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             raise serializers.ValidationError([str(err), ])
         return instance
 
+class FeatureGeoJSONSerializer(FeatureJSONSerializer, GeoFeatureModelSerializer):
+
+    class Meta(FeatureJSONSerializer.Meta):
+        geo_field = 'geom'
 
 class FeatureCSVSerializer(serializers.ModelSerializer):
 

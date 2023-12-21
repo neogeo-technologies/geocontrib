@@ -27,6 +27,7 @@ from rest_framework.views import APIView
 from api import logger
 from api.serializers.feature import FeatureDetailedAuthenticatedSerializer
 from api.serializers import FeatureDetailedSerializer
+from api.serializers import FeatureJSONSerializer
 from api.serializers import FeatureGeoJSONSerializer
 from api.serializers import FeatureCSVSerializer
 from api.serializers import FeatureLinkSerializer
@@ -328,7 +329,11 @@ class ExportFeatureList(views.APIView):
         # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
         features = features.filter(deletion_on__isnull=True)
         format = request.GET.get('format_export')
-        if format == 'geojson':
+        if format == 'json':
+            serializer = FeatureJSONSerializer(features, many=True, context={'request': request})
+            response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
+            response['Content-Disposition'] = 'attachment; filename=export_projet.json'
+        elif format == 'geojson':
             serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
             response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
             response['Content-Disposition'] = 'attachment; filename=export_projet.json'

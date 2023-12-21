@@ -3,6 +3,7 @@ from .base_map import ContextLayerSerializer
 from .base_map import LayerSerializer
 from .feature import CustomFieldSerializer
 from .feature import FeatureDetailedSerializer
+from .feature import FeatureJSONSerializer
 from .feature import FeatureGeoJSONSerializer
 from .feature import FeatureCSVSerializer
 from .feature import FeatureLinkSerializer
@@ -40,6 +41,7 @@ __all__ = [
     'FeatureDetailedSerializer',
     'FeatureEventSerializer',
     'GeneratedTokenSerializer',
+    'FeatureJSONSerializer',
     'FeatureGeoJSONSerializer',
     'FeatureLinkSerializer',
     'FeatureListSerializer',
