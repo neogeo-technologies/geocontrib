@@ -13,17 +13,33 @@ from geocontrib.models import FeatureLink
 
 logger = logging.getLogger(__name__)
 
+# Custom exception class for handling failures in GeoJSON processing
 class GeoJSONProcessingFailed(Exception):
     pass
 
-
+# Class for processing GeoJSON and JSON data
 class GeoJSONProcessing:
+    """
+    This class is designed to process both GeoJSON and JSON data formats. It can handle scenarios
+    where features do not have geographical data ('geom'), following an update to support non-geographical
+    feature types. The class provides methods to validate, create, and check features, adapting to the presence
+    or absence of geometry data.
+
+    GeoJSON vs. JSON Handling:
+    The class discerns between GeoJSON and JSON formats based on the structure of the input data.
+    For GeoJSON, it expects a dictionary format with a 'features' key. For JSON format, typically
+    used for non-geographical data, it accepts a list of features.
+
+    Feature Creation and Validation:
+    The class includes methods to create feature instances in the database, validate input data, and handle
+    specific attribute processing like generating titles and extracting custom field data.
+    """
 
     def __init__(self, *args, **kwargs):
-        self.infos = []
+        self.infos = []  # Information messages to be logged or displayed
 
     def get_geom(self, geom):
-        # Si geoJSON
+        # If geoJSON converts GeoJSON geometry to GEOSGeometry object, or returns None if conversion fails
         if isinstance(geom, dict):
             geom = str(geom)
         try:
@@ -33,6 +49,7 @@ class GeoJSONProcessing:
         return geom
 
     def get_feature_data(self, feature_type, properties, field_names):
+        # Extracts and returns custom field data from properties based on the feature type
         feature_data = {}
         if hasattr(feature_type, 'customfield_set'):
             for field in field_names:
@@ -40,6 +57,7 @@ class GeoJSONProcessing:
         return feature_data
 
     def handle_title(self, title, feature_id):
+        # Handles title generation based on feature_id, generates UUID if both are missing
         if not title or title == '':
             title = feature_id
             if not feature_id or feature_id == '':
@@ -50,14 +68,14 @@ class GeoJSONProcessing:
         return title, feature_id
 
     @transaction.atomic
-    def create_features(self, data, import_task):
+    def create_features(self, features, import_task):
+        # Creates Feature instances from provided features list
         feature_type = import_task.feature_type
-        new_features = data.get('features')
-        nb_features = len(new_features)
+        nb_features = len(features)
         field_names = feature_type.customfield_set.values_list('name', flat=True)
 
-        for feature in new_features:
-            properties = feature.get('properties')
+        for feature in features:
+            properties = feature.get('properties', feature) # TODO : add fallback with feature for json
 
             feature_data = self.get_feature_data(
                 feature_type, properties, field_names)
@@ -87,10 +105,8 @@ class GeoJSONProcessing:
                         # mais on souhaite créer le signalement dans un autre projet
                         # On set l'ID à None
                         feature_id = None
-                current, _ = Feature.objects.update_or_create(
-                    feature_id=feature_id,
-                    # project=feature_type.project,
-                    defaults={
+
+                new_feature_data = {
                         'title': title,
                         'description' : description,
                         # TODO fix status
@@ -98,9 +114,16 @@ class GeoJSONProcessing:
                         'creator': import_task.user,
                         'project' : feature_type.project,
                         'feature_type' : feature_type,
-                        'geom' : self.get_geom(feature.get('geometry')),
                         'feature_data' : feature_data,
                     }
+                # Ajout conditionnel de 'geom' 
+                if feature_type.geom_type != 'none':
+                    new_feature_data['geom'] = self.get_geom(feature.get('geometry'))
+
+                current, _ = Feature.objects.update_or_create(
+                    feature_id=feature_id,
+                    # project=feature_type.project,
+                    defaults=new_feature_data
                 )
                 
             except Exception as er:
@@ -126,15 +149,10 @@ class GeoJSONProcessing:
             msg = "{nb} signalement(s) importé(s). ".format(nb=nb_features)
             self.infos.append(msg)
 
-    def check_feature_type(self, data, import_task):
+    def check_feature_type(self, features, import_task):
+        # Checks if the feature type of incoming features matches the expected type
         feature_type = import_task.feature_type
-
-        features = data.get('features', [])
-        if len(features) == 0:
-            self.infos.append(
-                "Aucun signalement n'est indiqué dans l'entrée 'features'. ")
-            raise GeoJSONProcessingFailed
-
+ 
         for feature in features:
             geom = feature.get('geometry')
             if str(geom['type']).lower() != feature_type.geom_type:
@@ -142,7 +160,15 @@ class GeoJSONProcessing:
                     f"L'edition de feature a echoué. Le type de features sont différents. ")
                 raise GeoJSONProcessingFailed
 
+    def check_has_features(self, features):
+        # Checks if the features list is empty and raises an exception if so
+        if len(features) == 0:
+            self.infos.append(
+                "Aucun signalement n'est indiqué dans l'entrée 'features'. ")
+            raise GeoJSONProcessingFailed
+
     def validate_data(self, file):
+        # Validates and loads data from a provided file, handles JSON decoding
         try:
             up_file = file.read()
             data = json.loads(up_file.decode('utf-8'))
@@ -154,13 +180,25 @@ class GeoJSONProcessing:
             return data
 
     def __call__(self, import_task):
+    # Main processing method, handles the flow of feature import and updates task status
         try:
             import_task.status = "processing"
             import_task.started_on = timezone.now()
             data = self.validate_data(import_task.file)
-            # self.check_feature_type_slug(data, import_task)
-            self.check_feature_type(data, import_task)
-            self.create_features(data, import_task)
+
+            if isinstance(data, dict):
+                # Si data est un dictionnaire c'est un geojson, utilisez .get() ou un accès direct
+                features = data.get('features')
+                self.check_feature_type(features, import_task)
+            elif isinstance(data, list):
+                # Si data est une liste, c'est un json donc un type de signalement sans géométrie
+                features = data
+            else:
+                self.infos.append("Unexpected data type")
+                raise GeoJSONProcessingFailed
+
+            self.check_has_features(features)
+            self.create_features(features, import_task)
         except GeoJSONProcessingFailed:
             import_task.status = "failed"
         else:
@@ -169,7 +207,7 @@ class GeoJSONProcessing:
         import_task.infos = "/n".join(self.infos)
         import_task.save(update_fields=['status', 'started_on', 'finished_on', 'infos'])
 
-
+# Function to initiate GeoJSON processing with an import task
 def geojson_processing(import_task):
     process = GeoJSONProcessing()
     process(import_task)
