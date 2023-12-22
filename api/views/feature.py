@@ -316,62 +316,113 @@ class ProjectFeatureBbox(generics.ListAPIView):
             bbox = {'minLon': geom[0], 'minLat': geom[1], 'maxLon' : geom[2], 'maxLat': geom[3] }
         return Response(bbox)
 
+
 class ExportFeatureList(views.APIView):
+    """
+    API view for exporting feature data related to a project in various formats such as JSON, GeoJSON, or CSV.
+    """
 
     http_method_names = ['get', ]
 
+    def get_csv_headers(self, serializer, feature_type):
+        """
+        Builds and returns headers for the CSV file.
+
+        Parameters:
+        - serializer: The serializer containing the feature data.
+        - feature_type: The feature type object used to determine if additional geographical fields are needed.
+
+        Returns:
+        - List[str]: Column headers for the CSV file.
+        """
+        # Retrieve feature field names from the serializer data
+        featureFieldNames = [*serializer.data[0].keys()]
+        # Get custom field names from the FeatureType model
+        customFieldNames = [custField.name for custField in CustomField.objects.filter(feature_type=feature_type)]
+        # Combine feature field names and custom field names
+        headers = [*featureFieldNames, *customFieldNames]
+        # Remove 'feature_data' and 'geom' fields, as they are not needed in the CSV
+        headers.remove('feature_data')
+        headers.remove('geom')
+        # Add latitude and longitude columns for geographical feature types
+        if feature_type.geom_type != 'none':
+            headers += ['lat', 'lon']
+        return headers
+
+    def prepare_csv_row(self, row, feature_type):
+        """
+        Prepares and returns a single row for the CSV file.
+
+        Parameters:
+        - row: Dict representing a single feature's data.
+        - feature_type: The feature type object used to determine if geographical data conversion is necessary.
+
+        Returns:
+        - OrderedDict: A single row in the CSV file.
+        """
+        # Convert geom data to latitude and longitude if the feature type is geographical
+        if feature_type.geom_type != 'none' and 'geom' in row:
+            row['lon'] = row['geom']['coordinates'][0]
+            row['lat'] = row['geom']['coordinates'][1]
+        # Merge feature data with custom field data
+        data = row['feature_data'].items() if row['feature_data'] else []
+        full_row = collections.OrderedDict(list(row.items()) + list(data))
+        # Remove 'geom' and 'feature_data' fields from the row
+        full_row.pop('geom', None)
+        full_row.pop('feature_data', None)
+        return full_row
+
     def get(self, request, slug, feature_type_slug):
         """
-            Vue de téléchargement des signalements lié à un projet.
+        Handles GET request to export feature data.
+
+        Parameters:
+        - request: The incoming HTTP request.
+        - slug: Slug of the project.
+        - feature_type_slug: Slug of the feature type.
+
+        Returns:
+        - HttpResponse: Response with exported data in the requested format.
         """
+        # Retrieve the project and features based on the provided slugs
         project = get_object_or_404(Project, slug=slug)
-        features = Feature.handy.availables(request.user, project).filter( feature_type__slug=feature_type_slug).order_by("created_on")
-        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
-        features = features.filter(deletion_on__isnull=True)
+        features = Feature.handy.availables(request.user, project).filter(
+            feature_type__slug=feature_type_slug,
+            # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+            deletion_on__isnull=True
+        ).order_by("created_on")
+
+        # Determine the format for export
         format = request.GET.get('format_export')
+
+        # Handling JSON export
         if format == 'json':
             serializer = FeatureJSONSerializer(features, many=True, context={'request': request})
             response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
             response['Content-Disposition'] = 'attachment; filename=export_projet.json'
+
+        # Handling GeoJSON export
         elif format == 'geojson':
             serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
             response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
             response['Content-Disposition'] = 'attachment; filename=export_projet.json'
+
+        # Handling CSV export
         elif format == 'csv':
             serializer = FeatureCSVSerializer(features, many=True, context={'request': request})
             response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = 'attachment; filename=export_projet.csv'
-            # get list of feature field names to build csv headers
-            featureFieldNames = [*serializer.data[0].keys()]
-            # get list of all custom field names to build csv headers (retrieving it from the model to avoid missing custom fields in feature data when their value is null)
+
             feature_type = FeatureType.objects.get(slug=feature_type_slug)
-            custom_fields = CustomField.objects.filter(feature_type=feature_type)
-            customFieldNames = [custField.name for custField in custom_fields]
-            # concatenate all field names into csv headers
-            headers = [*featureFieldNames, *customFieldNames]
-            # remove unused geom field
-            headers.remove('geom')
-            # remove unused feature_data field
-            headers.remove('feature_data')
-            # create new fields to add converted geom data
-            headers.append('lat')
-            headers.append('lon')
-            # initialize a csv writer with the prepared headers
-            writer = csv.DictWriter(response, fieldnames=headers)
+
+            # Prepare CSV headers and initialize a CSV writer
+            writer = csv.DictWriter(response, fieldnames=self.get_csv_headers(serializer, feature_type))
             writer.writeheader()
-            # loop each feature to add its values to the csv file
+
+            # Write each feature to the CSV file
             for row in serializer.data:
-                # transform geom object to lon/lat entries
-                row['lon'] = row['geom']['coordinates'][0]
-                row['lat'] = row['geom']['coordinates'][1]
-                # merging feature datas with its custom fields datas into a full_row
-                data = row['feature_data'].items() if row['feature_data'] else []
-                full_row = collections.OrderedDict(list(row.items()) +
-                                                   list(data))
-                del full_row['geom']
-                del full_row['feature_data']
-                # write the full_row into the csv
-                writer.writerow(full_row)
+                writer.writerow(self.prepare_csv_row(row, feature_type))
+
         return response
 
 
