@@ -39,7 +39,7 @@ class GeoJSONProcessing:
         self.infos = []  # Information messages to be logged or displayed
 
     def get_geom(self, geom):
-        # If geoJSON converts GeoJSON geometry to GEOSGeometry object, or returns None if conversion fails
+        # If geoJSON, converts GeoJSON geometry to GEOSGeometry object, or returns None if conversion fails
         if isinstance(geom, dict):
             geom = str(geom)
         try:
