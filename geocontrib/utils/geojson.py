@@ -137,7 +137,13 @@ class GeoJSONProcessing:
                 simili_features = Feature.objects.filter(
                     Q(title=title, description=description, feature_type=feature_type) | Q(
                         geom=current.geom, feature_type=feature_type)
-                ).exclude(feature_id=current.feature_id)
+                ).exclude(
+                    # Exclure le feature courant par son ID
+                    feature_id=current.feature_id
+                ).exclude(
+                    # Exclure les features ayant une date de suppression définie (deletion_on n'est pas None)
+                    deletion_on__isnull=False
+                )
                 if simili_features.exists():
                     for row in simili_features:
                         FeatureLink.objects.get_or_create(

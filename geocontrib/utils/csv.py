@@ -258,7 +258,8 @@ class CSVProcessing:
 
     def link_similar_features(self, current_feature, feature_type):
         """
-        Links similar features based on title, description, and feature type.
+        Searc for similar features based on title, description, and feature type.
+        Link them to the new feature as a duplicate.
 
         Parameters:
         - current_feature: The current feature being processed.
