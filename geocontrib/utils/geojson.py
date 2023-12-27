@@ -133,24 +133,9 @@ class GeoJSONProcessing:
                     f"L'edition de feature a echoué {er}'. ")
                 raise GeoJSONProcessingFailed
 
-            if title:
-                simili_features = Feature.objects.filter(
-                    Q(title=title, description=description, feature_type=feature_type) | Q(
-                        geom=current.geom, feature_type=feature_type)
-                ).exclude(
-                    # Exclure le feature courant par son ID
-                    feature_id=current.feature_id
-                ).exclude(
-                    # Exclure les features ayant une date de suppression définie (deletion_on n'est pas None)
-                    deletion_on__isnull=False
-                )
-                if simili_features.exists():
-                    for row in simili_features:
-                        FeatureLink.objects.get_or_create(
-                            relation_type='doublon',
-                            feature_from=current,
-                            feature_to=row
-                        )
+        # Link similar features based on specific criteria
+        self.link_similar_features(current, feature_type)
+
         if nb_features > 0:
             msg = "{nb} signalement(s) importé(s). ".format(nb=nb_features)
             self.infos.append(msg)
@@ -184,6 +169,41 @@ class GeoJSONProcessing:
             raise GeoJSONProcessingFailed
         else:
             return data
+
+    def link_similar_features(self, current_feature, feature_type):
+        """
+        Searc for similar features based on title, description, and feature type.
+        Link them to the new feature as a duplicate.
+
+        Parameters:
+        - current_feature: The current feature being processed.
+        - feature_type: The feature type object associated with the import task.
+        """
+        # Filtrer les features par titre, description et type, ou par géométrie et type
+        simili_features = Feature.objects.filter(
+            Q(title=current_feature.title, description=current_feature.description, feature_type=feature_type)
+        )
+        # Filtrer les features par géométrie et type si le type de signalement est de type géographique
+        if feature_type.geom_type != 'none':
+            simili_features = simili_features.filter(
+                Q(geom=current_feature.geom, feature_type=feature_type)
+            )
+
+        simili_features = simili_features.exclude( 
+            # Exclure le feature courant par son ID
+            feature_id=current_feature.feature_id
+        ).exclude(
+            # Exclure les features ayant une date de suppression définie (deletion_on n'est pas None)
+            deletion_on__isnull=False
+        )
+
+        if simili_features.exists():
+            for row in simili_features:
+                FeatureLink.objects.get_or_create(
+                    relation_type='doublon',
+                    feature_from=current_feature,
+                    feature_to=row
+                )
 
     def __call__(self, import_task):
     # Main processing method, handles the flow of feature import and updates task status
