@@ -172,7 +172,7 @@ class GeoJSONProcessing:
 
     def link_similar_features(self, current_feature, feature_type):
         """
-        Searc for similar features based on title, description, and feature type.
+        Search for similar features based on title, description, and feature type.
         Link them to the new feature as a duplicate.
 
         Parameters:
