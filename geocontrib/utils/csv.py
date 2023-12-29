@@ -300,7 +300,7 @@ class CSVProcessing:
         - count: The number of features processed.
         """
         if count > 0:
-            msg = f"{count} signalement(s) importé(s)."
+            msg = "{nb} signalement(s) importé(s). ".format(nb=count)
             self.infos.append(msg)
         
     def validate_data(self, file):
