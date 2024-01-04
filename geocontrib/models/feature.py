@@ -58,7 +58,7 @@ class Feature(models.Model):
 
     feature_type = models.ForeignKey("geocontrib.FeatureType", on_delete=models.CASCADE)
 
-    geom = models.GeometryField("Géométrie", srid=4326)
+    geom = models.GeometryField("Géométrie", srid=4326, blank=True, null=True)
 
     feature_data = models.JSONField(blank=True, null=True)
 
@@ -73,10 +73,31 @@ class Feature(models.Model):
         verbose_name_plural = "Signalements"
 
     def clean(self):
+        """
+        Overridden clean method to perform custom validations on the model instance.
+
+        Raises:
+            ValidationError: If the validations fail for feature_data or geom fields.
+        """
+
+        # Validate the format of feature_data. If it's present but not a dictionary, raise a ValidationError.
         if self.feature_data and not isinstance(self.feature_data, dict):
-            raise ValidationError('Format de donnée invalide')
+            raise ValidationError({'feature_data': 'Invalid data format'})
+
+        # Check if the feature_type attribute exists on the object.
+        if hasattr(self, 'feature_type'):
+
+            # If geom_type of feature_type is 'none', ensure geom field is empty.
+            if self.feature_type.geom_type == "none":
+                self.geom = None  # Set geom to None if geom_type is 'none'.
+
+            # If geom_type is not 'none', ensure that geom field is not empty.
+            elif self.feature_type.geom_type != "none" and self.geom is None:
+                # Raise a ValidationError if geom field is required but empty.
+                raise ValidationError({'geom': 'Ce champ est obligatoire.'})
 
     def save(self, *args, **kwargs):
+        self.clean()
         if self._state.adding:
             self.created_on = timezone.now()
             self.last_editor = self.creator
@@ -199,6 +220,7 @@ class FeatureType(models.Model):
         ("multipolygon", "Multipolygone"),
         ("multipoint", "Multipoint"),
         ("multilinestring", "Multilinestring"),
+        ("none", "Aucune"),
     )
 
     title = models.CharField("Titre", max_length=128)
