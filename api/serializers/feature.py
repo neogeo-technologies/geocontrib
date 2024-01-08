@@ -221,14 +221,37 @@ class FeatureJSONSerializer(serializers.ModelSerializer):
             'display_last_editor',
         )
 
-    def get_properties(self, instance, fields):
-        # Ici on retourne les champs extra d'une feature au meme niveau que les champs de bases
-        properties = super().get_properties(instance, fields)
+    def get_custom_properties(self, instance):
+        """
+        Retrieves custom properties for a feature instance.
+
+        This method is responsible for extracting custom field data from the feature instance.
+        It checks if the instance has any data in its 'feature_data' attribute. If so, it iterates
+        over all custom fields defined for the feature's type. For each custom field, it attempts to
+        fetch the corresponding value from 'feature_data'. If a value is present, it's included in the
+        result; otherwise, None is used as a default.
+
+        Parameters:
+        - instance: The Feature model instance whose custom properties are being retrieved.
+
+        Returns:
+        - dict: A dictionary of custom properties with their values.
+        """
+        # Initialize an empty dictionary to hold custom properties
+        properties = {}
+
+        # Check if the instance has feature_data (which stores custom field values)
         if instance.feature_data:
-            # Afin d'inclure les champs extra non définis dans feature_data, on a besoin de récupérer tous les champs existants pour ce type de signalement
+            # Retrieve the feature type associated with this instance
             feature_type = FeatureType.objects.get(id=instance.feature_type_id)
+
+            # Iterate over each custom field defined for this feature type
             for custom_field in CustomField.objects.filter(feature_type=feature_type):
+                # Fetch the value for each custom field from feature_data
+                # If the value is not present, default to None
                 properties[custom_field.name] = instance.feature_data.get(custom_field.name, None)
+
+        # Return the dictionary of custom properties
         return properties
 
     def handle_custom_fields(self, validated_data):
@@ -300,11 +323,60 @@ class FeatureJSONSerializer(serializers.ModelSerializer):
         except Exception as err:
             raise serializers.ValidationError([str(err), ])
         return instance
+    
+    def to_representation(self, instance):
+        """
+        Customize the representation of the instance for serialization.
+
+        This method overrides the default `to_representation` method to include custom properties.
+        It first calls the base implementation to get the initial representation, and then it
+        enhances this with additional custom properties specific to the instance. This approach
+        ensures that all relevant data, including custom fields, are included in the serialized output.
+
+        Parameters:
+        - instance: The model instance that is being serialized.
+
+        Returns:
+        - dict: A dictionary representation of the instance, including custom properties.
+        """
+        # Call the base implementation first to get a dictionary
+        ret = super().to_representation(instance)
+        # Retrieve custom properties for the instance
+        custom_properties = self.get_custom_properties(instance)
+        # Update the dictionary with custom properties
+        ret.update(custom_properties)
+        return ret
+
 
 class FeatureGeoJSONSerializer(FeatureJSONSerializer, GeoFeatureModelSerializer):
 
     class Meta(FeatureJSONSerializer.Meta):
         geo_field = 'geom'
+
+    def get_properties(self, instance, fields):
+        properties = super().get_properties(instance, fields)
+        custom_properties = self.get_custom_properties(instance)
+        properties.update(custom_properties)
+        return properties
+
+    def to_representation(self, instance):
+        """
+        Generate the dictionary representation of the instance.
+
+        Overrides the parent class's `to_representation` method to exclude any custom properties
+        handling specific to the FeatureJSONSerializer. This ensures that the representation 
+        for the GeoJSON format is based solely on the functionality provided by the parent
+        FeatureJSONSerializer, maintaining the integrity of the GeoJSON format.
+
+        Parameters:
+        - instance: The model instance that is being serialized.
+
+        Returns:
+        - dict: A dictionary representation of the instance, formatted as per the parent class.
+        """
+        return super(FeatureJSONSerializer, self).to_representation(instance)
+
+
 
 class FeatureCSVSerializer(serializers.ModelSerializer):
 
