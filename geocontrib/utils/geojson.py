@@ -56,14 +56,27 @@ class GeoJSONProcessing:
                 feature_data[field] = properties.get(field)
         return feature_data
 
-    def handle_title(self, title, feature_id):
-        # Handles title generation based on feature_id, generates UUID if both are missing
+    def handle_title(self, title, feature):
+        """
+        Handles the generation of a title for a feature, and ensures a valid feature ID.
+
+        This function checks if a title is provided and generates one if necessary. It also checks for
+        the presence of either 'id' or 'feature_id' in the feature data, and uses the appropriate one.
+        If neither 'id' nor 'feature_id' is provided, it generates a new UUID.
+
+        Parameters:
+        - title (str): The title of the feature.
+        - feature (dict): The feature data, which may contain 'id' or 'feature_id'.
+
+        Returns:
+        - tuple: A tuple containing the processed title and feature ID.
+        """
+        # Use 'feature_id' if it exists, otherwise use 'id', or generate a new UUID
+        feature_id = feature.get("feature_id") or feature.get("id") or str(uuid4())
+
+        # Generate a title if it's missing or empty
         if not title or title == '':
             title = feature_id
-            if not feature_id or feature_id == '':
-                uid = uuid4()
-                feature_id = str(uid)
-                title = feature_id
 
         return title, feature_id
 
@@ -80,8 +93,7 @@ class GeoJSONProcessing:
             feature_data = self.get_feature_data(
                 feature_type, properties, field_names)
 
-            title, feature_id = self.handle_title(
-                properties.get("title"), feature.get("id"))
+            title, feature_id = self.handle_title(properties.get("title"), feature)
 
             description = properties.get('description')
 
