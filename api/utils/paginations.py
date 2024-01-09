@@ -51,10 +51,8 @@ class CustomPagination(LimitOffsetPagination):
         """
         # Use the geom_count attribute for the paginated response
         return Response({
-            'links': {
-               'next': self.get_next_link(),
-               'previous': self.get_previous_link()
-            },
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
             'count': self.count,
             'geom_count': self.geom_count,
             'results': data
