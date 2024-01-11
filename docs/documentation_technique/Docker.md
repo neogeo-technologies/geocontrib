@@ -71,6 +71,10 @@ Variables utilisées pour configurer le frontend:
 * LOGO_PATH
 * FAVICON_PATH
 * DISABLE_LOGIN_BUTTON
+* FONT_FAMILY
+* HEADER_COLOR
+* PRIMARY_COLOR
+* PRIMARY_HIGHLIGHT_COLOR
 * LOG_URL
 * BASE_URL
 * CATALOG_NAME                  # name of the catalog to import features from
