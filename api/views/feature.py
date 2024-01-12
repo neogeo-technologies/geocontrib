@@ -131,7 +131,6 @@ class FeatureView(
     def list(self, request):
         response = {}
         queryset = self.get_queryset()
-        count = queryset.count()
         format = self.request.query_params.get('output')
         if format and format == 'geojson':
             response = FeatureDetailedSerializer(
@@ -148,7 +147,7 @@ class FeatureView(
             )
             response = {
                 'features': serializers.data,
-                'count': count,
+                'count': queryset.count(),
             }
         else:
             response = FeatureGeoJSONSerializer(
