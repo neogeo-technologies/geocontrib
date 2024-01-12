@@ -72,9 +72,9 @@ Variables utilisées pour configurer le frontend:
 * FAVICON_PATH
 * DISABLE_LOGIN_BUTTON
 * FONT_FAMILY
-* HEADER_COLOR
-* PRIMARY_COLOR
-* PRIMARY_HIGHLIGHT_COLOR
+* HEADER_COLOR                  # color to customize the header background
+* PRIMARY_COLOR                 # color to customize the app elements, like borders, icons (override teal color)
+* PRIMARY_HIGHLIGHT_COLOR       # color for the app elements, at hover, focus, active,... (better to be darker, brighter would need to change font color too, not implemented)
 * LOG_URL
 * BASE_URL
 * CATALOG_NAME                  # name of the catalog to import features from
