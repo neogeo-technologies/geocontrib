@@ -24,6 +24,18 @@ variables:
   DISABLE_LOGIN_BUTTON:
     env_config_front: DISABLE_LOGIN_BUTTON
 
+  VUE_APP_FONT_FAMILY:
+    env_config_front: FONT_FAMILY
+
+  VUE_APP_HEADER_COLOR:
+    env_config_front: HEADER_COLOR
+
+  VUE_APP_PRIMARY_COLOR:
+    env_config_front: PRIMARY_COLOR
+
+  VUE_APP_PRIMARY_HIGHLIGHT_COLOR:
+    env_config_front: PRIMARY_HIGHLIGHT_COLOR
+
   VUE_APP_LOGIN_URL:
     env_config_front: LOG_URL
 
