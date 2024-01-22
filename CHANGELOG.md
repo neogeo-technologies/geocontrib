@@ -3,6 +3,36 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+
+## [5.4.0] - 2024-01-22
+
+### Evolutions
+
+- Redmine 19119 : Permettre la gestion de signalements non-géographiques
+- Redmine 19162 : Adaptation de GéoContrib à une charte UI / UX
+
+### Corrections
+
+- Redmine 19670 : Édition projet - Le fond de carte ne s'affiche pas dans l'aperçu
+- Redmine 19667 : La recherche de doublon à l'import de signalement s'applique sur les signalements supprimés
+- Redmine 19671 : Détails signalement - lien de liaison non mis à jour
+- Redmine 19672 : Édition signalement - Texte popup mal mise en forme
+
+### Environement variables
+
+- FONT_FAMILY (default : '')
+-> Permet de changer la police
+
+- HEADER_COLOR (default : '')
+-> Permet de changer la couleur de fond de la barre de menu
+
+- PRIMARY_COLOR (default : '')
+-> Permet de changer la couleur des éléments colorés de l'application (override couelur turquoise)
+
+- PRIMARY_HIGHLIGHT_COLOR (default : '')
+-> Permet de changer la couleur de focus, survol, activation des éléments
+
+
 ## [5.3.6] - 2023-12-13
 
 ### Correction
