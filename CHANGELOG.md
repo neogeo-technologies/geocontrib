@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.3.7] - 2024-01-22
+
+### Correction
+
+- Redmine 19670 : Édition projet - Le fond de carte ne s'affiche pas dans l'aperçu
+
 ## [5.3.6] - 2023-12-13
 
 ### Correction
