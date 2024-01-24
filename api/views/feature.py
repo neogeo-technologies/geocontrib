@@ -190,6 +190,15 @@ class FeatureTypeView(
     ]
 
 class ProjectFeaturePaginated(generics.ListAPIView):
+    """
+    API view to provide a paginated list of features for a specific project.
+
+    This view extends the ListAPIView from Django Rest Framework to customize
+    queryset filtering based on query parameters like status values, feature
+    type slugs, and title. It also supports dynamic selection of serializer
+    classes based on the requested output format.
+    """
+    
     queryset = Project.objects.all()
     pagination_class = CustomPagination
     lookup_field = 'slug'
@@ -197,23 +206,48 @@ class ProjectFeaturePaginated(generics.ListAPIView):
 
     def filter_queryset(self, queryset):
         """
-        Surchargeant ListModelMixin
+        Overrides the default ListModelMixin to provide customized filtering.
+
+        This method allows filtering based on multiple values for certain fields
+        by using the '__in' lookup in Django ORM. It is important to note that 
+        the '__in' lookup is case-sensitive. However, in this implementation, 
+        this behavior does not present an issue as the filter values are provided 
+        by the application itself and are expected to match the case of the stored data.
+
+        The 'getlist' method is used to retrieve multiple values for the same query 
+        parameter, allowing for more flexible and inclusive filtering compared to 'get',
+        which only retrieves a single value.
+
+        Parameters:
+        - queryset: The initial queryset to be filtered.
+
+        Returns:
+        - QuerySet: The filtered queryset based on the provided query parameters.
         """
-        status__value = self.request.query_params.get('status__value')
-        feature_type_slug = self.request.query_params.get('feature_type_slug')
+        # Retrieve values from the query parameters. 
+        status_values = self.request.query_params.getlist('status__value')
+        feature_type_slugs = self.request.query_params.getlist('feature_type_slug')
         title = self.request.query_params.get('title')
-        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        # Filter out features that have been marked as deleted
         queryset = queryset.filter(deletion_on__isnull=True)
 
-        if status__value:
-            queryset = queryset.filter(status__icontains=status__value)
-        if feature_type_slug:
-            queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
+        # Apply filters for status values, feature type slugs, and title
+        if status_values:
+            queryset = queryset.filter(status__in=status_values)
+        if feature_type_slugs:
+            queryset = queryset.filter(feature_type__slug__in=feature_type_slugs)
         if title:
             queryset = queryset.filter(title__icontains=title)
         return queryset
-        
+
     def get_serializer_class(self):
+        """
+        Override get_serializer_class to dynamically select the serializer class based on
+        the requested output format.
+
+        Returns a detailed serializer for authenticated users requesting geojson format,
+        otherwise returns a standard list serializer.
+        """
         format = self.request.query_params.get('output')
         if format and format == 'geojson':
             if self.request.user.is_authenticated:
@@ -222,6 +256,12 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         return FeatureListSerializer
 
     def get_queryset(self):
+        """
+        Override get_queryset to provide a customized queryset for the view.
+
+        Retrieves the project based on the provided slug and returns a queryset
+        of available features for the project, applying any specified ordering.
+        """
         slug = self.kwargs.get('slug')
         project = get_object_or_404(Project, slug=slug)
 
@@ -230,6 +270,7 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         if ordering:
             queryset = queryset.order_by(ordering)
 
+        # Optimize query performance with select_related
         queryset = queryset.select_related('creator')
         queryset = queryset.select_related('feature_type')
         queryset = queryset.select_related('project')
