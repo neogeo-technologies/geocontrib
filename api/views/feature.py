@@ -225,17 +225,19 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         - QuerySet: The filtered queryset based on the provided query parameters.
         """
         # Retrieve values from the query parameters. 
-        status_values = self.request.query_params.getlist('status__value')
-        feature_type_slugs = self.request.query_params.getlist('feature_type_slug')
+        status_values = self.request.query_params.get('status__value')
+        feature_type_slugs = self.request.query_params.get('feature_type_slug')
         title = self.request.query_params.get('title')
         # Filter out features that have been marked as deleted
         queryset = queryset.filter(deletion_on__isnull=True)
 
         # Apply filters for status values, feature type slugs, and title
         if status_values:
-            queryset = queryset.filter(status__in=status_values)
+            status_values_list = status_values.split(',')
+            queryset = queryset.filter(status__in=status_values_list)
         if feature_type_slugs:
-            queryset = queryset.filter(feature_type__slug__in=feature_type_slugs)
+            feature_type_slug_list = feature_type_slugs.split(',')
+            queryset = queryset.filter(feature_type__slug__in=feature_type_slug_list)
         if title:
             queryset = queryset.filter(title__icontains=title)
         return queryset
