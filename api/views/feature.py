@@ -190,6 +190,15 @@ class FeatureTypeView(
     ]
 
 class ProjectFeaturePaginated(generics.ListAPIView):
+    """
+    API view to provide a paginated list of features for a specific project.
+
+    This view extends the ListAPIView from Django Rest Framework to customize
+    queryset filtering based on query parameters like status values, feature
+    type slugs, and title. It also supports dynamic selection of serializer
+    classes based on the requested output format.
+    """
+    
     queryset = Project.objects.all()
     pagination_class = CustomPagination
     lookup_field = 'slug'
@@ -197,23 +206,50 @@ class ProjectFeaturePaginated(generics.ListAPIView):
 
     def filter_queryset(self, queryset):
         """
-        Surchargeant ListModelMixin
+        Overrides the default ListModelMixin to provide customized filtering.
+
+        This method allows filtering based on multiple values for certain fields
+        by using the '__in' lookup in Django ORM. It is important to note that 
+        the '__in' lookup is case-sensitive. However, in this implementation, 
+        this behavior does not present an issue as the filter values are provided 
+        by the application itself and are expected to match the case of the stored data.
+
+        The 'getlist' method is used to retrieve multiple values for the same query 
+        parameter, allowing for more flexible and inclusive filtering compared to 'get',
+        which only retrieves a single value.
+
+        Parameters:
+        - queryset: The initial queryset to be filtered.
+
+        Returns:
+        - QuerySet: The filtered queryset based on the provided query parameters.
         """
-        status__value = self.request.query_params.get('status__value')
-        feature_type_slug = self.request.query_params.get('feature_type_slug')
+        # Retrieve values from the query parameters. 
+        status_values = self.request.query_params.get('status__value')
+        feature_type_slugs = self.request.query_params.get('feature_type_slug')
         title = self.request.query_params.get('title')
-        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        # Filter out features that have been marked as deleted
         queryset = queryset.filter(deletion_on__isnull=True)
 
-        if status__value:
-            queryset = queryset.filter(status__icontains=status__value)
-        if feature_type_slug:
-            queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
+        # Apply filters for status values, feature type slugs, and title
+        if status_values:
+            status_values_list = status_values.split(',')
+            queryset = queryset.filter(status__in=status_values_list)
+        if feature_type_slugs:
+            feature_type_slug_list = feature_type_slugs.split(',')
+            queryset = queryset.filter(feature_type__slug__in=feature_type_slug_list)
         if title:
             queryset = queryset.filter(title__icontains=title)
         return queryset
-        
+
     def get_serializer_class(self):
+        """
+        Override get_serializer_class to dynamically select the serializer class based on
+        the requested output format.
+
+        Returns a detailed serializer for authenticated users requesting geojson format,
+        otherwise returns a standard list serializer.
+        """
         format = self.request.query_params.get('output')
         if format and format == 'geojson':
             if self.request.user.is_authenticated:
@@ -222,6 +258,12 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         return FeatureListSerializer
 
     def get_queryset(self):
+        """
+        Override get_queryset to provide a customized queryset for the view.
+
+        Retrieves the project based on the provided slug and returns a queryset
+        of available features for the project, applying any specified ordering.
+        """
         slug = self.kwargs.get('slug')
         project = get_object_or_404(Project, slug=slug)
 
@@ -230,6 +272,7 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         if ordering:
             queryset = queryset.order_by(ordering)
 
+        # Optimize query performance with select_related
         queryset = queryset.select_related('creator')
         queryset = queryset.select_related('feature_type')
         queryset = queryset.select_related('project')
@@ -274,45 +317,87 @@ class ProjectFeaturePositionInList(views.APIView):
             return Response(data=no_data_msg, status=404)
 
 class ProjectFeatureBbox(generics.ListAPIView):
+    """
+    API view that provides the bounding box (bbox) of features within a project.
+
+    The view filters features based on specified query parameters, supporting
+    'feature_type_slug' and 'status__value'. It calculates the bbox for the filtered
+    features. The view interprets comma-separated string values in the query parameters
+    as lists.
+
+    Attributes:
+        queryset: Default queryset for Project model.
+        lookup_field: Field used for looking up a project.
+        http_method_names: Allowed HTTP methods for this view.
+    """
     queryset = Project.objects.all()
     lookup_field = 'slug'
     http_method_names = ['get', ]
 
-
     def filter_queryset(self, queryset):
         """
-        Surchargeant ListModelMixin
+        Filters the queryset based on the query parameters.
+
+        Processes 'status__value' and 'feature_type_slug' as comma-separated strings,
+        converts them to lists, and applies filters accordingly. Also filters by 'title' if provided.
+
+        Parameters:
+            queryset: Initial queryset to apply filters on.
+
+        Returns:
+            Filtered queryset based on query parameters.
         """
-        status__value = self.request.query_params.get('status__value')
-        feature_type_slug = self.request.query_params.get('feature_type_slug')
+        # Retrieve string parameters and convert them to lists
+        status_values = self.request.query_params.get('status__value', '')
+        feature_type_slugs = self.request.query_params.get('feature_type_slug', '')
         title = self.request.query_params.get('title')
-        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+
+        status_list = status_values.split(',') if status_values else []
+        feature_type_slug_list = feature_type_slugs.split(',') if feature_type_slugs else []
+
+        # Filter out features with a deletion date
         queryset = queryset.filter(deletion_on__isnull=True)
 
-        if status__value:
-            queryset = queryset.filter(status__icontains=status__value)
-        if feature_type_slug:
-            queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
+        # Apply filters if lists are not empty
+        if status_list:
+            queryset = queryset.filter(status__in=status_list)
+        if feature_type_slug_list:
+            queryset = queryset.filter(feature_type__slug__in=feature_type_slug_list)
         if title:
             queryset = queryset.filter(title__icontains=title)
         return queryset
 
     def get_queryset(self):
+        """
+        Provides a queryset of Feature objects for a specific project.
+
+        Filters the features based on the project slug and applies select_related
+        for related fields to optimize database queries.
+
+        Returns:
+            A queryset of Feature objects for the specified project.
+        """
         slug = self.kwargs.get('slug')
         project = get_object_or_404(Project, slug=slug)
         queryset = Feature.handy.availables(user=self.request.user, project=project)
-
-        queryset = queryset.select_related('creator')
-        queryset = queryset.select_related('feature_type')
-        queryset = queryset.select_related('project')
+        queryset = queryset.select_related('creator', 'feature_type', 'project')
         return queryset
 
     def list(self, request, *args, **kwargs):
+        """
+        Custom list method to return the bbox of filtered features.
+
+        Aggregates the filtered features to calculate their geographic extent (bbox).
+        If features exist, returns their bbox, otherwise returns None.
+
+        Returns:
+            Response with bbox of the filtered features or None if no features are found.
+        """
         bbox = None
         queryset = self.filter_queryset(self.get_queryset()).aggregate(Extent('geom'))
-        geom = queryset['geom__extent'];
-        if geom :
-            bbox = {'minLon': geom[0], 'minLat': geom[1], 'maxLon' : geom[2], 'maxLat': geom[3] }
+        geom_extent = queryset['geom__extent']
+        if geom_extent:
+            bbox = {'minLon': geom_extent[0], 'minLat': geom_extent[1], 'maxLon': geom_extent[2], 'maxLat': geom_extent[3]}
         return Response(bbox)
 
 
