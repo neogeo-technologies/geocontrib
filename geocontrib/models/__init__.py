@@ -13,6 +13,7 @@ from .feature import FeatureType
 from .feature import CustomField
 from .feature import PreRecordedValues
 from .project import Project
+from .project import ProjectAttribute
 from .task import ImportTask
 from .user import User
 from .user import UserLevelPermission
@@ -36,6 +37,7 @@ __all__ = [
     'Layer',
     'PreRecordedValues',
     'Project',
+    'ProjectAttribute',
     'Subscription',
     'StackedEvent',
     'User',

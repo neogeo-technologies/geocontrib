@@ -5,6 +5,7 @@ from .admin import HiddenDeleteModelFormSet
 from .admin import FeatureSelectFieldAdminForm
 from .admin import AddPosgresViewAdminForm
 from .admin import ProjectAdminForm
+from .admin import ProjectAttributeAdminForm
 from .annotation import CommentForm
 from .annotation import AttachmentForm
 from .base_map import ContextLayerForm
@@ -31,6 +32,7 @@ __all__ = [
     'FeatureSelectFieldAdminForm',
     'AddPosgresViewAdminForm',
     'ProjectAdminForm',
+    'ProjectAttributeAdminForm',
     'CommentForm',
     'AttachmentForm',
     'CustomFieldModelBaseFS',

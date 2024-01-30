@@ -3,6 +3,7 @@ from django.contrib.gis import forms
 from geocontrib.models import CustomField
 from geocontrib.models import Feature
 from geocontrib.models import FeatureType
+from geocontrib.models import ProjectAttribute
 from geocontrib.forms.common import alphanumeric
 
 
@@ -85,3 +86,21 @@ class ProjectAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['creator'].required = True
+
+class ProjectAttributeAdminForm(forms.ModelForm):
+    class Meta:
+        model = ProjectAttribute
+        fields = ['label', 'name', 'field_type', 'options', 'default_value']
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectAttributeAdminForm, self).__init__(*args, **kwargs)
+        # Ici, vous pouvez ajuster le champ default_value en fonction de field_type
+        # Par exemple, si field_type est 'boolean', changez le widget en CheckboxInput
+        #breakpoint()
+        if 'field_type' in self.fields:
+            field_type = self.fields['field_type'].initial
+            if field_type == 'boolean':
+                self.fields['default_value'].widget = forms.CheckboxInput()
+            if field_type == 'multi_choices_list':
+                self.fields['default_value'].widget = forms.CheckboxSelectMultiple()
+            # ... autres conditions pour 'list' et 'multi_choices_list'
