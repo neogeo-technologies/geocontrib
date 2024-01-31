@@ -1,15 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Get references to the field_type select box, options, and the container for the default value
   const fieldTypeSelect = document.getElementById('id_field_type');
-  const options = document.getElementById('id_options').value;
-  const defaultValueContainer = document.getElementById('id_default_value').parentElement;
-  const defaultValueLabel = document.getElementById('id_default_value').nextElementSibling;
+  const optionsInputField = document.getElementById('id_options');
+  const hiddenInputField = document.getElementById('id_default_value');
+  if (!hiddenInputField) return
+  const savedDefaultValue = hiddenInputField.value;
+
+  // exit the script if the page doesn't contain the input field
+  // hide the input field to store values in it
+  hiddenInputField.hidden = true;
+
+  // create a container for the custom inputs
+  defaultValueCustomContainer = document.createElement('div');
+  defaultValueCustomContainer.id = 'default_value_custom_container';
+  // insert it after the label
+  hiddenInputField.parentElement.appendChild(defaultValueCustomContainer);
 
   // Update the form input when the page loads
   updateDefaultValueInput();
 
   // Add an event listener to update the form input when the field type changes
-  fieldTypeSelect.addEventListener('change', function() {
+  fieldTypeSelect.addEventListener('change', function() { // TODO : use at input
+      updateDefaultValueInput();
+  });
+
+  console.log('optionsInputField', optionsInputField);
+  // Add an event listener to update the form input when the options changes
+  optionsInputField.addEventListener('change', function() {
       updateDefaultValueInput();
   });
 
@@ -18,8 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.id = id;
-    checkbox.name = 'default_value';
-    checkbox.value = value;
+    checkbox.name = 'custom_default_value';
+    if (value) checkbox.value = value;
+    setEventListener(checkbox);
     return checkbox;
   };
 
@@ -32,14 +50,16 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Function to create a list of checkboxes for the 'multi_choices_list' option
-  function generateCheckboxSelectMultiple(options) {
+  function generateCheckboxSelectMultiple() {
+    const options = optionsInputField.value;
+    const optionsArray = options.split(',').filter(val => val !== '');
     const selectMultipleContainer = document.createElement('ul')
-    selectMultipleContainer.id = 'id_default_value';
-    options.forEach((option, index) => {
+    optionsArray.forEach((option, index) => {
       const id = 'id_default_value_' + index;
       const listElement = document.createElement('li');
       const label = generateLabel(id, option);
-      const checkbox = generateCheckbox(id, option)
+      const checkbox = generateCheckbox(id, option);
+      checkbox.checked = savedDefaultValue.split(',').includes(option)
       label.appendChild(checkbox)
       listElement.appendChild(label);
       selectMultipleContainer.appendChild(listElement)
@@ -47,32 +67,59 @@ document.addEventListener('DOMContentLoaded', function() {
     return selectMultipleContainer;
   };
 
+  function updateDefaultValueHiddenInput() {
+    const fieldType = fieldTypeSelect.value;
+    switch(fieldType) {
+      case 'boolean':
+          const checkbox = document.querySelector('input[name="custom_default_value"]');
+          hiddenInputField.value = checkbox.checked;
+          break;
+      case 'list':
+          // TODO : get value
+          break;
+      case 'multi_choices_list':
+          const checkboxes = document.querySelectorAll('input[name="custom_default_value"]:checked');
+          let values = Array.from(checkboxes).map(cb => cb.value);
+          hiddenInputField.value = values.toString();
+          break;
+      default:
+          // Additional cases can be handled here if needed
+  }  };
+
+  function setEventListener(el) {
+      // Add an event listener to update the hidden input values when a selection occurs
+      el.addEventListener('change', function() {
+        updateDefaultValueHiddenInput();
+    });
+  }
+
   // Function to update the default value input based on the selected field type
   function updateDefaultValueInput() {
-      defaultValueContainer.innerHTML = '';
+    defaultValueCustomContainer.innerHTML = '';
 
       const fieldType = fieldTypeSelect.value;
       switch(fieldType) {
           case 'boolean':
               const checkbox = generateCheckbox('id_default_value');
-              defaultValueContainer.appendChild(checkbox);
-              defaultValueContainer.appendChild(defaultValueLabel);
+              checkbox.checked = savedDefaultValue;
+              defaultValueCustomContainer.appendChild(checkbox);
               break;
           case 'list':
+              // TODO: create a select element
               const textField = document.createElement('input');
               textField.type = 'text';
               textField.id = 'id_default_value';
               textField.name = 'default_value';
-              defaultValueContainer.appendChild(defaultValueLabel);
-              defaultValueContainer.appendChild(textField);
+              defaultValueCustomContainer.appendChild(textField);
               break;
           case 'multi_choices_list':
-              const selectMultiple = generateCheckboxSelectMultiple(options.split(','));
-              defaultValueContainer.appendChild(defaultValueLabel);
-              defaultValueContainer.appendChild(selectMultiple);
+              const selectMultiple = generateCheckboxSelectMultiple();
+              defaultValueCustomContainer.appendChild(selectMultiple);
               break;
           default:
               // Additional cases can be handled here if needed
       }
+      // update value to save when changing data type (in case user save the form after switching field type without selecting a new default value)
+      updateDefaultValueHiddenInput()
   }
 });

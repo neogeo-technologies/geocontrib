@@ -127,18 +127,11 @@ class ProjectAttribute(models.Model):
         base_field=models.CharField(max_length=256), null=True, blank=True
     )
 
-    default_value = models.JSONField(
-        "Valeur par défaut", choices=(
-            ("boolean", "Booléen"),
-            ("list", "Liste de valeurs"),
-            ("multi_choices_list", "Liste à choix multiples")),
+    default_value = models.CharField(
+        "Valeur par défaut",
         max_length=50, null=False, blank=False
     )
 
     class Meta:
         verbose_name = "Attribut projet"
         verbose_name_plural = "Attributs projet"
-
-    # def save(self, *args, **kwargs):
-    #     self.default_value.choices = self.options
-    #     super().save( *args, **kwargs)
