@@ -111,16 +111,16 @@ class Project(models.Model):
             return None
         
 class ProjectAttribute(models.Model):
-    label = models.CharField("Label", max_length=256, null=True, blank=True)
+    label = models.CharField("Label", max_length=256, null=False, blank=False)
 
-    name = models.CharField("Nom", max_length=128, null=True, blank=True)
+    name = models.CharField("Nom", max_length=128, null=False, blank=False)
 
     field_type = models.CharField(
         "Type de champ", choices=(
             ("boolean", "Booléen"),
             ("list", "Liste de valeurs"),
             ("multi_choices_list", "Liste à choix multiples")),
-        max_length=50, default="boolean", null=False, blank=False
+        max_length=50, default="boolean"
     )
 
     options = ArrayField(
@@ -129,7 +129,7 @@ class ProjectAttribute(models.Model):
 
     default_value = models.CharField(
         "Valeur par défaut",
-        max_length=50, null=False, blank=False
+        max_length=50, null=True, blank=True
     )
 
     class Meta:
