@@ -4,7 +4,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.gis import admin
 
 from geocontrib.forms import ProjectAdminForm
+from geocontrib.forms import ProjectAttributeAdminForm
 from geocontrib.models import Project
+from geocontrib.models import ProjectAttribute
 from geocontrib.models import BaseMap
 from geocontrib.models import ContextLayer
 from geocontrib.models import Layer
@@ -45,7 +47,14 @@ class ProjectAdmin(admin.ModelAdmin):
     ordering = ('title', )
 
 
+class ProjectAttributeAdmin(admin.ModelAdmin):
+    form = ProjectAttributeAdminForm
+
+    class Media:
+        js = ('admin/js/project_attribute.js',)
+
 admin.site.register(BaseMap, BaseMapAdmin)
 admin.site.register(Layer)
 admin.site.register(Event)
 admin.site.register(Project, ProjectAdmin)
+admin.site.register(ProjectAttribute, ProjectAttributeAdmin)

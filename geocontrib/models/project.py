@@ -109,3 +109,29 @@ class Project(models.Model):
             return bbox
         else:
             return None
+        
+class ProjectAttribute(models.Model):
+    label = models.CharField("Label", max_length=256, null=False, blank=False)
+
+    name = models.CharField("Nom", max_length=128, null=False, blank=False)
+
+    field_type = models.CharField(
+        "Type de champ", choices=(
+            ("boolean", "Booléen"),
+            ("list", "Liste de valeurs"),
+            ("multi_choices_list", "Liste à choix multiples")),
+        max_length=50, default="boolean"
+    )
+
+    options = ArrayField(
+        base_field=models.CharField(max_length=256), null=True, blank=True
+    )
+
+    default_value = models.CharField(
+        "Valeur par défaut",
+        max_length=50, null=True, blank=True
+    )
+
+    class Meta:
+        verbose_name = "Attribut projet"
+        verbose_name_plural = "Attributs projet"

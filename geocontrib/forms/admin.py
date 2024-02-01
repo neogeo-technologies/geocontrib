@@ -3,6 +3,7 @@ from django.contrib.gis import forms
 from geocontrib.models import CustomField
 from geocontrib.models import Feature
 from geocontrib.models import FeatureType
+from geocontrib.models import ProjectAttribute
 from geocontrib.forms.common import alphanumeric
 
 
@@ -85,3 +86,8 @@ class ProjectAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['creator'].required = True
+
+class ProjectAttributeAdminForm(forms.ModelForm):
+    class Meta:
+        model = ProjectAttribute
+        fields = ['label', 'name', 'field_type', 'options', 'default_value']
