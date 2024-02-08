@@ -45,7 +45,7 @@ class BaseMapAdmin(admin.ModelAdmin):
 class ProjectAttributeAssociationInline(admin.TabularInline):
     model = ProjectAttributeAssociation
     fk_name = "project"
-    extra = 1  # Nombre de formulaires vides à afficher
+    extra = 0  # Nombre de formulaires vides à afficher
 
     class Media:
         js = ('admin/js/project_attribute_association.js',) 
