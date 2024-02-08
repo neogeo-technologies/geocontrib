@@ -85,6 +85,7 @@ class Project(models.Model):
         max_length=20,
         default="-created_on"
     )
+    attributes = models.ManyToManyField('ProjectAttribute', through='ProjectAttributeAssociation', verbose_name="Attributs")
 
     class Meta:
         verbose_name = "Projet"
@@ -135,3 +136,14 @@ class ProjectAttribute(models.Model):
     class Meta:
         verbose_name = "Attribut projet"
         verbose_name_plural = "Attributs projet"
+    
+    def __str__(self):
+        return self.label  # configure display in admin
+
+class ProjectAttributeAssociation(models.Model):
+    project = models.ForeignKey('Project', on_delete=models.CASCADE)
+    attribute = models.ForeignKey('ProjectAttribute', on_delete=models.CASCADE)
+    value = models.CharField("Valeur", max_length=256)
+
+    class Meta:
+        unique_together = ('project', 'attribute')  # Assure l'unicité de chaque association
