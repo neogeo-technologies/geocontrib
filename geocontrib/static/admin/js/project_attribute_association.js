@@ -6,24 +6,28 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Create an object to store data for each project attribute form
+  // Object to store configurations for each project attribute form by field ID.
   let projectAttributeForms = {};
-  let currentFieldId;
 
-  listenToNewForm()
-  // Update forms at load if several already created previously
-  setTimeout(() => {
-    for (const formEl of document.getElementsByClassName('dynamic-projectattributeassociation_set')) {
-      currentFieldId = formEl.id.slice(-1);
-      initNewForm()
-    }
-  }, 100);
-
-  function initNewForm() {
-    // Get references to the necessary HTML elements: attribute field select box and input field.
-    const attributeFieldSelect = document.getElementById(`id_projectattributeassociation_set-${currentFieldId}-attribute`);
+  // Function to initialize form customization and listen for new inline form additions.
+  function initializeFormsAndListeners() {
+    listenToNewFormAdditions();
     
-    const hiddenInputField = document.getElementById(`id_projectattributeassociation_set-${currentFieldId}-value`);
+    // Delay to ensure DOM elements are fully loaded before customization.
+    setTimeout(() => {
+      document.querySelectorAll('.dynamic-projectattributeassociation_set').forEach(formElement => {
+        const fieldId = extractFieldId(formElement.id);
+        initFormCustomization(fieldId);
+      });
+    }, 100);
+  }
+
+  // Initializes customization for a new or existing form identified by fieldId.
+  function initFormCustomization(fieldId) {
+    // Get references to the necessary HTML elements: attribute field select box and input field.
+    const attributeFieldSelect = document.getElementById(`id_projectattributeassociation_set-${fieldId}-attribute`);
+    
+    const hiddenInputField = document.getElementById(`id_projectattributeassociation_set-${fieldId}-value`);
     
     // Exit the script if the hidden input field is not present on the page.
     if (!hiddenInputField) return;
@@ -41,30 +45,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Insert the new container into the DOM after the hidden input field's parent element.
     hiddenInputField.parentElement.appendChild(defaultValueCustomContainer);
     // Create a new entry for this field id in project attribute forms to keep track
-    projectAttributeForms[currentFieldId] = { attributeFieldSelect, defaultValueCustomContainer, hiddenInputField, savedDefaultValue }
+    projectAttributeForms[fieldId] = { attributeFieldSelect, defaultValueCustomContainer, hiddenInputField, savedDefaultValue }
 
     // Call the function to update the form based on the current field type.
-    updateDefaultValueInput();
+    updateDefaultValueInput(fieldId);
     
     // Add event listener to update the form when the attribute field changes.
     attributeFieldSelect.addEventListener('change', function() {
-      updateDefaultValueInput();
+      updateDefaultValueInput(fieldId);
     });
   }
 
-  // Function to create a checkbox input element.
-  function createCheckboxElement(id, value) {
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = id;
-    checkbox.name = 'custom_default_value';
-    if (value) {
-      checkbox.value = value;
-    }
-    // Attach an event listener to each checkbox.
-    setEventListener(checkbox);
-    return checkbox;
-  };
+  // Extracts the field ID from the given element ID.
+  function extractFieldId(elementId) {
+    return elementId.match(/\d+/)[0]; // Matches the first sequence of digits in the ID.
+  }
 
   // Function to create a label element for inputs.
   function createLabelElement(id, text) {
@@ -82,8 +77,22 @@ document.addEventListener('DOMContentLoaded', function() {
     return optionElt;
   };
 
+  // Function to create a checkbox input element.
+  function createCheckboxElement(fieldId, id, value) {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = id;
+    checkbox.name = 'custom_default_value';
+    if (value) {
+      checkbox.value = value;
+    }
+    // Attach an event listener to each checkbox.
+    setEventListener(checkbox, fieldId);
+    return checkbox;
+  };
+
   // Function to create a select dropdown for 'list' field type.
-  function createSelectElement(options, savedDefaultValue) {
+  function createSelectElement(fieldId, options, savedDefaultValue) {
     const selectElt = document.createElement('select');
     selectElt.name = 'custom_default_value';
     // Create a placeholder for te select (not working, should be present at page load, but still keep space and appears if no select)
@@ -97,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
       selectElt.appendChild(optionElt);
     });
     // Attach an event listener to the select element.
-    setEventListener(selectElt);
+    setEventListener(selectElt, fieldId);
     // Set the previously selected option, if any.
     if (savedDefaultValue) {
       selectElt.value = savedDefaultValue;
@@ -106,13 +115,13 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Function to create a list of checkboxes for 'multi_choices_list' field type.
-  function createMultiSelectElement(options, savedDefaultValue) {
+  function createMultiSelectElement(fieldId, options, savedDefaultValue) {
     const multiSelectContainer = document.createElement('ul');
     options.forEach((option, index) => {
       const id = 'id_default_value_' + index;
       const listElt = document.createElement('li');
       const label = createLabelElement(id, option);
-      const checkbox = createCheckboxElement(id, option);
+      const checkbox = createCheckboxElement(fieldId, id, option);
       // Check if the checkbox is in the saved default values.
       checkbox.checked = savedDefaultValue.split(',').includes(option);
       label.appendChild(checkbox);
@@ -123,8 +132,8 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Function to update the hidden input field with the selected values.
-  function updateDefaultValueHiddenInput() {
-    const { attributeFieldSelect, hiddenInputField } = projectAttributeForms[currentFieldId];
+  function updateDefaultValueHiddenInput(fieldId) {
+    const { attributeFieldSelect, hiddenInputField } = projectAttributeForms[fieldId];
     const attributeData = attributesData.find((el) => el.id === Number.parseInt(attributeFieldSelect.value));
     if (!attributeData) return;
   
@@ -146,17 +155,17 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Function to attach change event listeners to custom input elements.
-  function setEventListener(el) {
+  function setEventListener(el, fieldId) {
     el.addEventListener('change', function() {
-      updateDefaultValueHiddenInput();
+      updateDefaultValueHiddenInput(fieldId);
     });
   }
 
   // Main function to update the custom input elements based on the selected project attribute.
-  function updateDefaultValueInput() {
+  function updateDefaultValueInput(fieldId) {
     // Get datas for this form
-    const { attributeFieldSelect, defaultValueCustomContainer, savedDefaultValue } = projectAttributeForms[currentFieldId];
-        
+    const { attributeFieldSelect, defaultValueCustomContainer, savedDefaultValue } = projectAttributeForms[fieldId];
+    
     const attributeData = attributesData.find((el) => el.id === Number.parseInt(attributeFieldSelect.value));
     if (!attributeData) return;
     const { options, field_type } = attributeData;
@@ -166,49 +175,42 @@ document.addEventListener('DOMContentLoaded', function() {
     let formElement;
     switch(field_type) {
         case 'boolean':
-            formElement = createCheckboxElement('id_default_value');
+            formElement = createCheckboxElement(fieldId, 'id_default_value');
             // Set the checkbox state based on the saved value.
             formElement.checked = savedDefaultValue === 'true';
             break;
         case 'list':
-            formElement = createSelectElement(options, savedDefaultValue);
+            formElement = createSelectElement(fieldId, options, savedDefaultValue);
             break;
         case 'multi_choices_list':
-            formElement = createMultiSelectElement(options, savedDefaultValue);
+            formElement = createMultiSelectElement(fieldId, options, savedDefaultValue);
             break;
     }
     if (formElement) {
       // Add the created form element to the custom container.
       defaultValueCustomContainer.appendChild(formElement);
       // Update the value of the hidden input field in case the user switches project attribute.
-      updateDefaultValueHiddenInput();
+      updateDefaultValueHiddenInput(fieldId);
     }
   }
 
-
-  function listenToNewForm() {
-    const observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach(function(addedNode) {
-            if (addedNode.nodeType === Node.ELEMENT_NODE && addedNode.classList.contains('dynamic-projectattributeassociation_set')) {
-              // Ici, vous pouvez appliquer votre logique de personnalisation
-              // sur l'addedNode, qui est le nouveau formulaire ajouté
-              console.log('Nouveau formulaire ajouté:', addedNode);
-              //initNewForm(addedNode.id);
-              currentFieldId = addedNode.id.slice(-1);
-              initNewForm();
-            }
-          });
-        }
+  // Observes the DOM for new inline form additions and initializes customization for each.
+  function listenToNewFormAdditions() {
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(addedNode => {
+          if (addedNode.nodeType === Node.ELEMENT_NODE && addedNode.classList.contains('dynamic-projectattributeassociation_set')) {
+            const newFieldId = extractFieldId(addedNode.id);
+            initFormCustomization(newFieldId);
+          }
+        });
       });
     });
-  
+
     const config = { childList: true, subtree: true };
-    // sélecteur qui cible le conteneur de votre InlineFormSet
     const targetNode = document.querySelector('#projectattributeassociation_set-group');
-    if (targetNode) {
-      observer.observe(targetNode, config);
-    }
-  };
+    if (targetNode) observer.observe(targetNode, config);
+  }
+
+  initializeFormsAndListeners(); // Kick off the process when the DOM is fully loaded.
 });
