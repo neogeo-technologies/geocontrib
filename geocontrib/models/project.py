@@ -150,8 +150,8 @@ class ProjectAttribute(models.Model):
         # Call the superclass's save method to ensure the instance is saved.
         super(ProjectAttribute, self).save(*args, **kwargs)
 
-        # If this is a new instance, update existing projects.
-        if is_new:
+        # If this is a new instance and a default value is set, update existing projects.
+        if is_new and self.default_value:
             self.update_projects_with_default()
 
     def update_projects_with_default(self):

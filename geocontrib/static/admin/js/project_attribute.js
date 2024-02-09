@@ -10,6 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const optionsInputField = document.getElementById('id_options');
   const hiddenInputField = document.getElementById('id_default_value');
 
+  // Hide options in edition mode for boolean
+  const disabledOptionsEl = document.getElementsByClassName('field-options');
+  const fieldTypeEl = document.querySelector(".field-field_type div.readonly")
+  if (disabledOptionsEl.length === 1 && fieldTypeEl && fieldTypeEl.textContent === "Booléen") {
+    console.log(disabledOptionsEl);
+    disabledOptionsEl[0].hidden = true;
+  }
+
   // Exit the script if the hidden input field is not present on the page.
   if (!hiddenInputField) return;
 
