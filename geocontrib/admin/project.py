@@ -2,11 +2,12 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.contrib.gis import admin
+from django.http import JsonResponse
+
 
 from geocontrib.forms import ProjectAdminForm
 from geocontrib.forms import ProjectAttributeAdminForm
-from geocontrib.models import Project
-from geocontrib.models import ProjectAttribute
+from geocontrib.models import Project, ProjectAttribute, ProjectAttributeAssociation
 from geocontrib.models import BaseMap
 from geocontrib.models import ContextLayer
 from geocontrib.models import Layer
@@ -41,11 +42,25 @@ class BaseMapAdmin(admin.ModelAdmin):
             ctx.order = idx
             ctx.save(update_fields=['order'])
 
+class ProjectAttributeAssociationInline(admin.TabularInline):
+    model = ProjectAttributeAssociation
+    fk_name = "project"
+    extra = 0  # Nombre de formulaires vides à afficher
+
+    class Media:
+        js = ('admin/js/project_attribute_association.js',) 
 
 class ProjectAdmin(admin.ModelAdmin):
     form = ProjectAdminForm
     ordering = ('title', )
+    inlines = [ProjectAttributeAssociationInline]
+    change_form_template = 'admin/geocontrib/project_attribute_data_container.html'
 
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        attributes = ProjectAttribute.objects.all()
+        extra_context['attributes_data'] = JsonResponse(list(attributes.values('id', 'name', 'field_type', 'options')), safe=False).content.decode('utf-8')
+        return super().changeform_view(request, object_id, form_url, extra_context)
 
 class ProjectAttributeAdmin(admin.ModelAdmin):
     form = ProjectAttributeAdminForm

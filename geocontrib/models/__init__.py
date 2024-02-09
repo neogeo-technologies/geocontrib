@@ -14,6 +14,7 @@ from .feature import CustomField
 from .feature import PreRecordedValues
 from .project import Project
 from .project import ProjectAttribute
+from .project import ProjectAttributeAssociation
 from .task import ImportTask
 from .user import User
 from .user import UserLevelPermission
@@ -38,6 +39,7 @@ __all__ = [
     'PreRecordedValues',
     'Project',
     'ProjectAttribute',
+    'ProjectAttributeAssociation',
     'Subscription',
     'StackedEvent',
     'User',
