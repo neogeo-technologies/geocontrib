@@ -5,8 +5,7 @@ from django.contrib.gis import admin
 from django.http import JsonResponse
 
 
-from geocontrib.forms import ProjectAdminForm
-from geocontrib.forms import ProjectAttributeAdminForm
+from geocontrib.forms import ProjectAdminForm, ProjectAttributeAdminForm
 from geocontrib.models import Project, ProjectAttribute, ProjectAttributeAssociation
 from geocontrib.models import BaseMap
 from geocontrib.models import ContextLayer
@@ -43,29 +42,63 @@ class BaseMapAdmin(admin.ModelAdmin):
             ctx.save(update_fields=['order'])
 
 class ProjectAttributeAssociationInline(admin.TabularInline):
+    """
+    Defines an inline administration interface for ProjectAttributeAssociation.
+    This allows editing of ProjectAttributeAssociations directly within the Project admin page.
+    """
     model = ProjectAttributeAssociation
-    fk_name = "project"
-    extra = 0  # Nombre de formulaires vides à afficher
+    fk_name = "project"  # Specifies the ForeignKey field to the parent Project model.
+    extra = 0  # Specifies the number of extra blank forms to be displayed. Setting it to 0 to avoid having to manage its customization
 
     class Media:
-        js = ('admin/js/project_attribute_association.js',) 
+        """
+        Includes custom JavaScript in the admin page for this inline.
+        This JavaScript can be used to add dynamic behaviors to the inline forms.
+        """
+        js = ('admin/js/project_attribute_association.js',)
 
 class ProjectAdmin(admin.ModelAdmin):
-    form = ProjectAdminForm
-    ordering = ('title', )
-    inlines = [ProjectAttributeAssociationInline]
-    change_form_template = 'admin/geocontrib/project_attribute_data_container.html'
+    """
+    Admin configuration for the Project model.
+    """
+    form = ProjectAdminForm  # Specifies the custom form to use for editing Projects.
+    ordering = ('title',)  # Orders Projects by their title in the admin listing.
+    inlines = [ProjectAttributeAssociationInline]  # Includes ProjectAttributeAssociationInline within the Project admin.
+    change_form_template = 'admin/geocontrib/project_attribute_data_container.html'  # Custom template for the change form.
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        """
+        Overrides the change form view to pass additional context to the template.
+        This is used to inject 'attributes_data', containing all ProjectAttributes,
+        as a JSON string into the page for use by custom JavaScript.
+        """
         extra_context = extra_context or {}
         attributes = ProjectAttribute.objects.all()
         extra_context['attributes_data'] = JsonResponse(list(attributes.values('id', 'name', 'field_type', 'options')), safe=False).content.decode('utf-8')
         return super().changeform_view(request, object_id, form_url, extra_context)
 
 class ProjectAttributeAdmin(admin.ModelAdmin):
-    form = ProjectAttributeAdminForm
+    """
+    Admin configuration for the ProjectAttribute model.
+    """
+    form = ProjectAttributeAdminForm  # Specifies the custom form for editing ProjectAttributes.
+    fields = ['label', 'name', 'field_type', 'options', 'default_value']  # Explicitly lists all fields to include in the form.
+
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Dynamically determines which fields should be readonly in the admin form.
+        If editing an existing instance (obj is not None), all fields except 'label' and 'name'
+        are set to readonly. If creating a new instance (obj is None), no fields are set to readonly.
+        """
+        if obj:  # Editing an existing instance
+            return [f.name for f in self.model._meta.fields if f.name not in ('label', 'name')]
+        return []  # Creating a new instance
 
     class Media:
+        """
+        Includes custom JavaScript for the ProjectAttribute admin page.
+        This JavaScript can be used for dynamic form behaviors specific to ProjectAttribute.
+        """
         js = ('admin/js/project_attribute.js',)
 
 admin.site.register(BaseMap, BaseMapAdmin)
