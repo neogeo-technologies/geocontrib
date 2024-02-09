@@ -10,6 +10,7 @@ from geocontrib.models import Comment
 from geocontrib.models import Feature
 from geocontrib.models import Project
 from geocontrib.models import UserLevelPermission
+from geocontrib.models import ProjectAttributeAssociation, ProjectAttribute
 
 
 User = get_user_model()
@@ -91,65 +92,94 @@ class ProjectAuthorizationSerializer(serializers.ModelSerializer):
         )
 
 
+class ProjectAttributeSerializer(serializers.ModelSerializer):
+    """
+    Serializer for ProjectAttribute model. Converts ProjectAttribute instances into JSON format
+    and defines how the ProjectAttribute fields are represented in the API.
+    """
+    class Meta:
+        model = ProjectAttribute
+        fields = ['label', 'name', 'field_type', 'options', 'default_value']
+
+
+class ProjectAttributeAssociationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for ProjectAttributeAssociation model. It includes a nested ProjectAttributeSerializer
+    to represent the associated attribute details.
+    """
+    attribute = ProjectAttributeSerializer(read_only=True)
+
+    class Meta:
+        model = ProjectAttributeAssociation
+        fields = ['attribute', 'value']
+
+
 class ProjectDetailedSerializer(serializers.ModelSerializer):
+    """
+    Detailed serializer for the Project model, providing a comprehensive representation of a project
+    and its related data, such as attributes, features, comments, and contributors.
+    """
 
+    # Formats 'created_on' and 'updated_on' fields to a specific date format.
     created_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
-
     updated_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
 
+    # SerializerMethodField is used to define fields that are computed through methods below.
     nb_features = serializers.SerializerMethodField()
-
     nb_published_features = serializers.SerializerMethodField()
-
     nb_comments = serializers.SerializerMethodField()
-
     nb_published_features_comments = serializers.SerializerMethodField()
-
     nb_contributors = serializers.SerializerMethodField()
-
-    access_level_pub_feature = serializers.ReadOnlyField(
-        source='access_level_pub_feature.get_user_type_id_display')
-
-    access_level_arch_feature = serializers.ReadOnlyField(
-        source='access_level_arch_feature.get_user_type_id_display')
-
     thumbnail = serializers.SerializerMethodField()
-
     bbox = serializers.SerializerMethodField()
 
+    # Represents values of certain fields using Django's get_FOO_display method.
+    access_level_pub_feature = serializers.ReadOnlyField(source='access_level_pub_feature.get_user_type_id_display')
+    access_level_arch_feature = serializers.ReadOnlyField(source='access_level_arch_feature.get_user_type_id_display')
+
+    # Includes a nested serializer to represent the project's attributes associations.
+    project_attributes = ProjectAttributeAssociationSerializer(source='projectattributeassociation_set', many=True, read_only=True)
+
+    # Methods to compute values for SerializerMethodFields.
     def get_bbox(self, obj):
+        """Computes the bounding box of the project's features."""
         return obj.calculate_bbox()
 
     def get_nb_features(self, obj):
+        """Returns the total number of features associated with the project."""
         return Feature.objects.filter(project=obj).count()
 
     def get_published_features(self, obj):
+        """Helper method to fetch published features of the project."""
         return Feature.objects.filter(project=obj, status="published")
 
     def get_nb_published_features(self, obj):
+        """Returns the count of published features."""
         return self.get_published_features(obj).count()
 
     def get_nb_comments(self, obj):
+        """Returns the total number of comments associated with the project."""
         return Comment.objects.filter(project=obj).count()
 
     def get_nb_published_features_comments(self, obj):
+        """Returns the count of comments on published features."""
         count = Comment.objects.filter(
             project=obj, feature_id__in=self.get_published_features(obj)
         ).count()
         return count
 
     def get_nb_contributors(self, obj):
+        """Returns the number of contributors with access to the project."""
         return Authorization.objects.filter(project=obj).filter(
             level__rank__gt=1
         ).count()
 
     def get_thumbnail(self, obj):
-        res = None
+        """Provides the URL for the project's thumbnail image, or a default image if not set."""
         if hasattr(obj, 'thumbnail') and obj.thumbnail.name:
-            res = reverse('api:project-thumbnail', kwargs={"slug": obj.slug})
+            return reverse('api:project-thumbnail', kwargs={"slug": obj.slug})
         else:
-            res = static('geocontrib/img/default.png')
-        return res
+            return static('geocontrib/img/default.png')
 
     class Meta:
         model = Project
@@ -177,7 +207,8 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'nb_contributors',
             'feature_browsing_default_filter',
             'feature_browsing_default_sort',
-            'bbox'
+            'bbox',
+            'project_attributes'
         )
 
 
