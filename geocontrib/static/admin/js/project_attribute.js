@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const disabledOptionsEl = document.getElementsByClassName('field-options');
   const fieldTypeEl = document.querySelector(".field-field_type div.readonly")
   if (disabledOptionsEl.length === 1 && fieldTypeEl && fieldTypeEl.textContent === "Booléen") {
-    console.log(disabledOptionsEl);
     disabledOptionsEl[0].hidden = true;
   }
 
