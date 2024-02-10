@@ -10,7 +10,8 @@ from geocontrib.models import Comment
 from geocontrib.models import Feature
 from geocontrib.models import Project
 from geocontrib.models import UserLevelPermission
-from geocontrib.models import ProjectAttributeAssociation, ProjectAttribute
+from geocontrib.models import ProjectAttribute
+from geocontrib.models import ProjectAttributeAssociation
 
 
 User = get_user_model()
@@ -235,6 +236,63 @@ class ProjectCreationSerializer(serializers.ModelSerializer):
             'feature_browsing_default_filter',
             'feature_browsing_default_sort',
         )
+
+
+class ProjectCreationSerializer(serializers.ModelSerializer):
+    access_level_pub_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
+    access_level_arch_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
+    project_attributes = ProjectAttributeAssociationSerializer(source='projectattributeassociation_set', many=True, required=False)
+
+    class Meta:
+        model = Project
+        fields = (
+            'title',
+            'slug',
+            'description',
+            'moderation',
+            'is_project_type',
+            'generate_share_link',
+            'fast_edition_mode',
+            'creator',
+            'access_level_pub_feature',
+            'access_level_arch_feature',
+            'archive_feature',
+            'delete_feature',
+            'map_max_zoom_level',
+            'feature_browsing_default_filter',
+            'feature_browsing_default_sort',
+            'project_attributes',  # Include project attributes in the serialized representation
+        )
+
+    def create(self, validated_data):
+        """
+        Custom create method to handle the creation of project attributes associations
+        alongside the project.
+        """
+        project_attributes_data = validated_data.pop('projectattributeassociation_set', [])
+        with transaction.atomic():
+            project = Project.objects.create(**validated_data)
+            for attribute_data in project_attributes_data:
+                ProjectAttributeAssociation.objects.create(project=project, **attribute_data)
+        return project
+
+    def update(self, instance, validated_data):
+        """
+        Custom update method to handle updating of project attributes associations
+        alongside the project.
+        """
+        project_attributes_data = validated_data.pop('projectattributeassociation_set', [])
+        with transaction.atomic():
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
+            for attribute_data in project_attributes_data:
+                ProjectAttributeAssociation.objects.update_or_create(
+                    project=instance, 
+                    attribute=attribute_data.get('attribute'), 
+                    defaults={'value': attribute_data.get('value')}
+                )
+        return instance
 
 
 class ProjectThumbnailSerializer(serializers.Serializer):
