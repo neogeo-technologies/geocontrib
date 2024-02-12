@@ -23,6 +23,7 @@
         "nb_contributors": 1,
         "feature_browsing_default_filter": "",
         "feature_browsing_default_sort": "-created_on",
-        "bbox": null
+        "bbox": null,
+        "project_attributes":[]
     }
 ]
