@@ -100,7 +100,7 @@ class ProjectAttributeSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = ProjectAttribute
-        fields = ['label', 'name', 'field_type', 'options', 'default_value']
+        fields = ['id', 'label', 'name', 'field_type', 'options', 'default_value']
 
 
 class ProjectAttributeAssociationSerializer(serializers.ModelSerializer):
@@ -108,7 +108,7 @@ class ProjectAttributeAssociationSerializer(serializers.ModelSerializer):
     Serializer for ProjectAttributeAssociation model. It includes a nested ProjectAttributeSerializer
     to represent the associated attribute details.
     """
-    attribute = ProjectAttributeSerializer(read_only=True)
+    attribute = serializers.PrimaryKeyRelatedField(queryset=ProjectAttribute.objects.all())
 
     class Meta:
         model = ProjectAttributeAssociation
@@ -212,30 +212,6 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'project_attributes'
         )
 
-
-class ProjectCreationSerializer(serializers.ModelSerializer):
-    access_level_pub_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
-    access_level_arch_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
-
-    class Meta:
-        model = Project
-        fields = (
-            'title',
-            'slug',
-            'description',
-            'moderation',
-            'is_project_type',
-            'generate_share_link',
-            'fast_edition_mode',
-            'creator',
-            'access_level_pub_feature',
-            'access_level_arch_feature',
-            'archive_feature',
-            'delete_feature',
-            'map_max_zoom_level',
-            'feature_browsing_default_filter',
-            'feature_browsing_default_sort',
-        )
 
 
 class ProjectCreationSerializer(serializers.ModelSerializer):

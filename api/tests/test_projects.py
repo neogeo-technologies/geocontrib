@@ -78,7 +78,8 @@ def test_projects_list(api_client):
             'nb_comments': 0,
             'nb_published_features_comments': 0,
             'nb_contributors': 1,
-            'bbox': None
+            'bbox': None,
+            'project_attributes':[]
         }]
     }
 
@@ -144,6 +145,7 @@ def test_projects_post(api_client):
         'fast_edition_mode': False,
         'feature_browsing_default_filter': '',
         'feature_browsing_default_sort': '-created_on',
+        'project_attributes':[]
     }
 
 
@@ -202,7 +204,8 @@ def test_projects_thumbnail(api_client):
         'slug': '1-projet-3',
         'title': 'Projet 3',
         'updated_on': '05/08/2021',
-        'bbox': None
+        'bbox': None,
+        'project_attributes':[]
     }
 
     # ensure can't POST
