@@ -105,14 +105,22 @@ class ProjectAttributeSerializer(serializers.ModelSerializer):
 
 class ProjectAttributeAssociationSerializer(serializers.ModelSerializer):
     """
-    Serializer for ProjectAttributeAssociation model. It includes a nested ProjectAttributeSerializer
-    to represent the associated attribute details.
+    Serializer for the ProjectAttributeAssociation model. This serializer converts instances of ProjectAttributeAssociation
+    into JSON format and defines how the fields of the association are represented in the API.
+
+    The 'attribute' field of the model is represented in the serialized output as 'attribute_id' to explicitly indicate
+    that it contains the ID of the associated ProjectAttribute.
     """
-    attribute = serializers.PrimaryKeyRelatedField(queryset=ProjectAttribute.objects.all())
+
+    attribute_id = serializers.PrimaryKeyRelatedField(
+        source='attribute',  # Maps 'attribute_id' in the serializer back to the 'attribute' field in the model
+        queryset=ProjectAttribute.objects.all(),
+        write_only=False  # Set to True if 'attribute_id' should not be included in the serialized output
+    )
 
     class Meta:
         model = ProjectAttributeAssociation
-        fields = ['attribute', 'value']
+        fields = ['attribute_id', 'value']  # Include 'attribute_id' instead of 'attribute'
 
 
 class ProjectDetailedSerializer(serializers.ModelSerializer):
