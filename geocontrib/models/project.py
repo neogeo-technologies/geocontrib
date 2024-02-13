@@ -179,15 +179,20 @@ class ProjectAttribute(models.Model):
 
 class ProjectAttributeAssociation(models.Model):
     """
-    Defines an association between a Project and a ProjectAttribute, storing the value
-    of the attribute for the specific project. Ensures that each project-attribute
-    combination is unique.
-    """
+    Represents an association between a Project and a ProjectAttribute, storing the value of the attribute for a specific project.
+    This model ensures that each combination of project and attribute is unique.
+
+    Attributes:
+        project (ForeignKey): A reference to the Project model. This field defines a many-to-one relationship, indicating that each association is linked to a specific project.
+        attribute (ForeignKey): A reference to the ProjectAttribute model, stored in the database under the 'attribute_id' column. It represents the attribute associated with the project.
+        value (CharField): Stores the value of the attribute for the specified project. This can be any string that the attribute is set to hold.
     
+    Meta:
+        unique_together: Ensures that each project-attribute pair is unique within the database to prevent duplicate associations.
+    """
     project = models.ForeignKey('Project', on_delete=models.CASCADE)
-    attribute = models.ForeignKey('ProjectAttribute', on_delete=models.CASCADE)
+    attribute = models.ForeignKey('ProjectAttribute', on_delete=models.CASCADE, db_column='attribute_id')
     value = models.CharField("Valeur", max_length=256)
 
     class Meta:
-        # Ensure that each project-attribute pair is unique.
         unique_together = ('project', 'attribute')

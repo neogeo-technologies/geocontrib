@@ -5,8 +5,11 @@ from django.contrib.gis import admin
 from django.http import JsonResponse
 
 
-from geocontrib.forms import ProjectAdminForm, ProjectAttributeAdminForm
-from geocontrib.models import Project, ProjectAttribute, ProjectAttributeAssociation
+from geocontrib.forms import ProjectAdminForm
+from geocontrib.forms import ProjectAttributeAdminForm
+from geocontrib.models import Project
+from geocontrib.models import ProjectAttribute
+from geocontrib.models import ProjectAttributeAssociation
 from geocontrib.models import BaseMap
 from geocontrib.models import ContextLayer
 from geocontrib.models import Layer

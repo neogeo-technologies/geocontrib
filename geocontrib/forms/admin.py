@@ -87,7 +87,21 @@ class ProjectAdminForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['creator'].required = True
 
+
 class ProjectAttributeAdminForm(forms.ModelForm):
+    """
+    A custom ModelForm for the ProjectAttribute model in the Django admin.
+
+    This form is designed to be used in the ProjectAttributeAdmin to provide
+    an interface for creating and editing ProjectAttribute instances. It specifies
+    which fields should be included in the form and allows for further customization
+    of the form behavior and appearance if needed.
+    """
+    
     class Meta:
+        # Specifies the model associated with this form.
         model = ProjectAttribute
+        
+        # Defines the list of fields that should be included in the form.
+        # This ensures only relevant fields are displayed in the admin interface for editing.
         fields = ['label', 'name', 'field_type', 'options', 'default_value']

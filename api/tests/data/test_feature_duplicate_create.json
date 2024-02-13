@@ -13,5 +13,6 @@
     "access_level_arch_feature": "moderator",
     "archive_feature": null,
     "delete_feature": null,
-    "map_max_zoom_level": 22
+    "map_max_zoom_level": 22,
+    "project_attributes":[]
 }

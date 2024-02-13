@@ -22,8 +22,11 @@ from .misc import ImportTaskSerializer
 from .misc import StackedEventSerializer
 from .misc import UserSerializer
 from .misc import FeatureEventSerializer
-from .project import ProjectDetailedSerializer
 from .project import ProjectSerializer
+from .project import ProjectDetailedSerializer
+from .project import ProjectCreationSerializer
+from .project import ProjectAuthorizationSerializer
+from .project import ProjectAttributeSerializer
 from .user import UserLevelsPermissionSerializer
 from .user import GeneratedTokenSerializer
 
@@ -54,6 +57,9 @@ __all__ = [
     'PreRecordedValuesSerializer',
     'ProjectSerializer',
     'ProjectDetailedSerializer',
+    'ProjectCreationSerializer',
+    'ProjectAuthorizationSerializer',
+    'ProjectAttributeSerializer',
     'StackedEventSerializer',
     'UserSerializer',
     'UserLevelsPermissionSerializer',

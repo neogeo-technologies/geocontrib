@@ -42,6 +42,7 @@ from api.views.project import ProjectSubscription
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
 from api.views.project import ProjectDuplicate
+from api.views.project import ProjectAttributeListView
 from api.views.user import TokenView, GenerateTokenView, LoginByTokenView
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
@@ -81,6 +82,10 @@ urlpatterns = [
     path(
         'user-permissions/',
         UserPermissionsView.as_view(), name='user-permissions'),
+    path(
+        'project-attributes/',
+        ProjectAttributeListView.as_view(),
+        name='project-attributes-list'),
     path(
         'projects/<slug:slug>/duplicate/',
         ProjectDuplicate.as_view(), name='project-duplicate'),
