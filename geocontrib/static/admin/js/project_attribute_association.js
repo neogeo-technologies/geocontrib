@@ -1,8 +1,14 @@
 /**
- * This script dynamically updates form inputs based on the selected field type in a Django admin interface.
- * It handles three types of fields: boolean, list, and multi-choice list. According to the selection, 
- * it either displays a checkbox (for boolean), a dropdown (for list), or multiple checkboxes (for multi-choice list).
- * It also updates a hidden input field with the selected values to ensure correct data submission.
+ * Dynamically updates form inputs in the Django admin interface based on selected field types.
+ * Supports boolean, list, and multi-choice list fields by displaying appropriate input elements:
+ * a checkbox for boolean, a dropdown for list, and multiple checkboxes for multi-choice lists.
+ * It ensures that the correct data is captured and submitted by updating a hidden input field.
+ *
+ * Features include:
+ * - Initializing form adjustments for existing inline forms upon page load.
+ * - Dynamically generating input elements matching the selected attribute type.
+ * - Updating a hidden input with selected values for accurate form submission.
+ * - Observing the DOM for new inline form additions and applying customization to each.
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -20,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initFormCustomization(fieldId);
       });
     }, 100);
-  }
+  };
 
   // Initializes customization for a new or existing form identified by fieldId.
   function initFormCustomization(fieldId) {
@@ -54,12 +60,12 @@ document.addEventListener('DOMContentLoaded', function() {
     attributeFieldSelect.addEventListener('change', function() {
       updateDefaultValueInput(fieldId);
     });
-  }
+  };
 
   // Extracts the field ID from the given element ID.
   function extractFieldId(elementId) {
     return elementId.match(/\d+/)[0]; // Matches the first sequence of digits in the ID.
-  }
+  };
 
   // Function to create a label element for inputs.
   function createLabelElement(id, text) {
@@ -159,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
     el.addEventListener('change', function() {
       updateDefaultValueHiddenInput(fieldId);
     });
-  }
+  };
 
   // Main function to update the custom input elements based on the selected project attribute.
   function updateDefaultValueInput(fieldId) {
@@ -192,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Update the value of the hidden input field in case the user switches project attribute.
       updateDefaultValueHiddenInput(fieldId);
     }
-  }
+  };
 
   // Observes the DOM for new inline form additions and initializes customization for each.
   function listenToNewFormAdditions() {
@@ -210,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const config = { childList: true, subtree: true };
     const targetNode = document.querySelector('#projectattributeassociation_set-group');
     if (targetNode) observer.observe(targetNode, config);
-  }
+  };
 
   initializeFormsAndListeners(); // Kick off the process when the DOM is fully loaded.
 });

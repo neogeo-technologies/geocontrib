@@ -5,46 +5,65 @@
  * It also updates a hidden input field with the selected values to ensure correct data submission.
  */
 document.addEventListener('DOMContentLoaded', function() {
-  // Get references to the necessary HTML elements: field_type select box and options input field.
-  const fieldTypeSelect = document.getElementById('id_field_type');
-  const optionsInputField = document.getElementById('id_options');
-  const hiddenInputField = document.getElementById('id_default_value');
+  // Object to store elements of project attribute form
+  let formEls = {};
 
-  // Hide options in edition mode for boolean
-  const disabledOptionsEl = document.getElementsByClassName('field-options');
-  const fieldTypeEl = document.querySelector(".field-field_type div.readonly")
-  if (disabledOptionsEl.length === 1 && fieldTypeEl && fieldTypeEl.textContent === "Booléen") {
-    disabledOptionsEl[0].hidden = true;
-  }
+  // Function to initialize form customization and listen for new inline form additions.
+  function initializeFormsAndListeners() {
+    initFormCustomization();
+    initFilterFormCustomization();
+    listenToEvents();
+  };
 
-  // Exit the script if the hidden input field is not present on the page.
-  if (!hiddenInputField) return;
+  // Initializes forms customization.
+  function initFormCustomization() {
+    // Get references to the necessary HTML elements: field_type select box and options input field.
+    formEls['fieldTypeSelect'] = document.getElementById('id_field_type');
+    formEls['optionsInputField'] = document.getElementById('id_options');
+    formEls['hiddenInputField'] = document.getElementById('id_default_value');
 
-  // Store the saved default value from the hidden input field.
-  const savedDefaultValue = hiddenInputField.value;
+    // Hide forms not activated
+    hideForms();
 
-  // Hide the original input field as we will use custom inputs.
-  hiddenInputField.hidden = true;
+    // Exit the script if the hidden input field is not present on the page.
+    if (!formEls.hiddenInputField) return;
 
-  // Create a new container for custom input elements (checkboxes or select lists).
-  const defaultValueCustomContainer = document.createElement('div');
-  defaultValueCustomContainer.id = 'default_value_custom_container';
+    // Store the saved default value from the hidden input field.
+    formEls['savedDefaultValue'] = formEls.hiddenInputField.value;
 
-  // Insert the new container into the DOM after the hidden input field's parent element.
-  hiddenInputField.parentElement.appendChild(defaultValueCustomContainer);
+    // Hide the original input field as we will use custom inputs.
+    formEls.hiddenInputField.hidden = true;
 
-  // Call the function to update the form based on the current field type.
-  updateDefaultValueInput();
+    // Create a new container for custom input elements (checkboxes or select lists).
+    formEls['defaultValueCustomContainer'] = document.createElement('div');
+    formEls.defaultValueCustomContainer.id = 'default_value_custom_container';
 
-  // Add event listener to update the form when the field type changes.
-  fieldTypeSelect.addEventListener('change', function() {
-      updateDefaultValueInput();
-  });
+    // Insert the new container into the DOM after the hidden input field's parent element.
+    formEls.hiddenInputField.parentElement.appendChild(formEls.defaultValueCustomContainer);
 
-  // Add event listener to update the form when the options change.
-  optionsInputField.addEventListener('change', function() {
-      updateDefaultValueInput();
-  });
+    // Call the function to update the form based on the current field type.
+    updateDefaultValueInput();
+  };
+
+  // Function to update filter default value options
+  function updateFilterValueChoices () {
+    const options = formEls.optionsInputField.value.split(','); // Suppose que les options sont séparées par des virgules
+    formEls.defaultFilterValueField.innerHTML = ''; // Efface les choix existants
+    console.log(options);
+    // Create a placeholder for te select (not working, should be present at page load, but still keep space and appears if no select)
+    formEls.defaultFilterValueField.appendChild(createSelectPlaceholderElement());
+    options.forEach(option => formEls.defaultFilterValueField.appendChild(createOptionElement(option)));
+  };
+
+  // Function to hide form elements
+  function hideForms() {
+    // Hide options in edition mode for boolean
+    const disabledOptionsEl = document.getElementsByClassName('field-options');
+    const fieldTypeEl = document.querySelector(".field-field_type div.readonly")
+    if (disabledOptionsEl.length === 1 && fieldTypeEl && fieldTypeEl.textContent === "Booléen") {
+      disabledOptionsEl[0].hidden = true;
+    }
+  };
 
   // Function to create a checkbox input element.
   function createCheckboxElement(id, value) {
@@ -76,17 +95,22 @@ document.addEventListener('DOMContentLoaded', function() {
     return optionElt;
   };
 
+  // Function to create a placeholder to insert in select element (not working, should be present at page load, but still keep space and appears if no select)
+  function createSelectPlaceholderElement() {
+    const placeholderElt = createOptionElement();
+    placeholderElt.setAttribute('selected', '');
+    placeholderElt.setAttribute('hidden', '');
+    return placeholderElt;
+  }
+
   // Function to create a select dropdown for 'list' field type.
   function createSelectElement() {
     const selectElt = document.createElement('select');
     selectElt.name = 'custom_default_value';
-    // Create a placeholder for te select (not working, should be present at page load, but still keep space and appears if no select)
-    const placeholderElt = createOptionElement();
-    placeholderElt.setAttribute('selected', '');
-    placeholderElt.setAttribute('hidden', '');
-    selectElt.appendChild(placeholderElt);
+    // Add a placeholder to the select element
+    selectElt.appendChild(createSelectPlaceholderElement());
     // Split the options and create an option element for each.
-    const options = optionsInputField.value.split(',').filter(val => val !== '');
+    const options = formEls.optionsInputField.value.split(',').filter(val => val !== '');
     options.forEach(option => {
       const optionElt = createOptionElement(option);
       selectElt.appendChild(optionElt);
@@ -94,8 +118,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Attach an event listener to the select element.
     setEventListener(selectElt);
     // Set the previously selected option, if any.
-    if (savedDefaultValue) {
-      selectElt.value = savedDefaultValue;
+    if (formEls.savedDefaultValue) {
+      selectElt.value = formEls.savedDefaultValue;
     }
     return selectElt;
   };
@@ -103,14 +127,14 @@ document.addEventListener('DOMContentLoaded', function() {
   // Function to create a list of checkboxes for 'multi_choices_list' field type.
   function createMultiSelectElement() {
     const multiSelectContainer = document.createElement('ul');
-    const options = optionsInputField.value.split(',').filter(val => val !== '');
+    const options = formEls.optionsInputField.value.split(',').filter(val => val !== '');
     options.forEach((option, index) => {
       const id = 'id_default_value_' + index;
       const listElt = document.createElement('li');
       const label = createLabelElement(id, option);
       const checkbox = createCheckboxElement(id, option);
       // Check if the checkbox is in the saved default values.
-      checkbox.checked = savedDefaultValue.split(',').includes(option);
+      checkbox.checked = formEls.savedDefaultValue.split(',').includes(option);
       label.appendChild(checkbox);
       listElt.appendChild(label);
       multiSelectContainer.appendChild(listElt);
@@ -120,20 +144,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Function to update the hidden input field with the selected values.
   function updateDefaultValueHiddenInput() {
-    const fieldType = fieldTypeSelect.value;
+    const fieldType = formEls.fieldTypeSelect.value;
     switch(fieldType) {
       case 'boolean':
           const checkbox = document.querySelector('input[name="custom_default_value"]');
-          hiddenInputField.value = checkbox.checked;
+          formEls.hiddenInputField.value = checkbox.checked;
           break;
       case 'list':
           const select = document.querySelector('select[name="custom_default_value"]');
-          hiddenInputField.value = select.value;      
+          formEls.hiddenInputField.value = select.value;      
           break;
       case 'multi_choices_list':
           const checkboxes = document.querySelectorAll('input[name="custom_default_value"]:checked');
           let values = Array.from(checkboxes).map(cb => cb.value);
-          hiddenInputField.value = values.toString();
+          formEls.hiddenInputField.value = values.toString();
           break;
     }
   };
@@ -143,39 +167,77 @@ document.addEventListener('DOMContentLoaded', function() {
     el.addEventListener('change', function() {
       updateDefaultValueHiddenInput();
     });
-  }
+  };
 
   // Main function to update the custom input elements based on the selected field type.
   function updateDefaultValueInput() {
     // Clear the custom container before adding new input elements.
-    defaultValueCustomContainer.innerHTML = '';
+    formEls.defaultValueCustomContainer.innerHTML = '';
 
-    const fieldType = fieldTypeSelect.value;
+    const fieldType = formEls.fieldTypeSelect.value;
     let formElement;
     switch(fieldType) {
         case 'boolean':
             // Hide the options field for the boolean type and create a checkbox.
-            optionsInputField.parentElement.parentElement.hidden = true;
+            formEls.optionsInputField.parentElement.parentElement.hidden = true;
             formElement = createCheckboxElement('id_default_value');
             // Set the checkbox state based on the saved value.
-            formElement.checked = savedDefaultValue === 'true';
+            formElement.checked = formEls.savedDefaultValue === 'true';
             break;
         case 'list':
             // Show the options field for the list type and create a select dropdown.
-            optionsInputField.parentElement.parentElement.hidden = false;
+            formEls.optionsInputField.parentElement.parentElement.hidden = false;
             formElement = createSelectElement();
             break;
         case 'multi_choices_list':
             // Show the options field for the multi-choice list type and create multiple checkboxes.
-            optionsInputField.parentElement.parentElement.hidden = false;
+            formEls.optionsInputField.parentElement.parentElement.hidden = false;
             formElement = createMultiSelectElement();
             break;
     }
     if (formElement) {
       // Add the created form element to the custom container.
-      defaultValueCustomContainer.appendChild(formElement);
+      formEls.defaultValueCustomContainer.appendChild(formElement);
       // Update the value of the hidden input field in case the user switches field type.
       updateDefaultValueHiddenInput();
     }
+  };
+
+  // *** FILTERS *** //
+  function initFilterFormCustomization() {
+    // Get references to the necessary HTML elements: default_filter_enabled checkbox & default_filter_value select.
+    formEls['defaultFilterEnabledField'] = document.getElementById('id_default_filter_enabled');
+    formEls['defaultFilterValueField'] = document.getElementById('id_default_filter_value');
+    
+    // Toggle immediately default filter value field at load
+    toggleDefaultFilterValueField()
+    // Update immediately choices at load
+    updateFilterValueChoices();
   }
+  
+  function toggleDefaultFilterValueField() {
+    formEls.defaultFilterValueField.parentElement.parentElement.hidden = !formEls.defaultFilterEnabledField.checked;
+  }
+  // *** GLOBAL *** //
+
+  // Function to add event listeners
+  function listenToEvents() {
+    // Add event listener to update the form when the field type changes.
+    formEls.fieldTypeSelect.addEventListener('change', function() {
+      updateDefaultValueInput();
+    });
+    
+    // Add event listener to update the form when the options change.
+    formEls.optionsInputField.addEventListener('change', function() {
+      updateDefaultValueInput();
+      updateFilterValueChoices();
+    });
+
+    // Add event listener to toggle default filter select if activated
+    formEls.defaultFilterEnabledField.addEventListener('change', function() {
+      toggleDefaultFilterValueField();
+    })
+  }
+
+  initializeFormsAndListeners(); // Kick off the process when the DOM is fully loaded.
 });

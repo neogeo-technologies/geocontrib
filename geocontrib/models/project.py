@@ -128,13 +128,15 @@ class ProjectAttribute(models.Model):
             ("multi_choices_list", "Liste à choix multiples")),
         max_length=50, default="boolean"
     )
-    options = ArrayField(
-        base_field=models.CharField(max_length=256), null=True, blank=True
-    )
-    default_value = models.CharField(
-        "Valeur par défaut",
-        max_length=50, null=True, blank=True
-    )
+    options = ArrayField(base_field=models.CharField(max_length=256), null=True, blank=True)
+
+    default_value = models.CharField("Valeur par défaut", max_length=50, null=True, blank=True)
+
+    display_filter = models.BooleanField("Afficher un filtre sur la liste des projets", default=False)
+
+    default_filter_enabled = models.BooleanField("Activer le filtre par défaut", default=False)
+
+    default_filter_value = models.CharField("Valeur du filtre par défaut", max_length=50, null=True, blank=True)
 
     class Meta:
         verbose_name = "Attribut projet"
