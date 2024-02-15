@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!hiddenInputField) return;
     
     // Store the saved default value from the hidden input field.
-    const savedValue = hiddenInputField.value;
+    const recordedValue = hiddenInputField.value;
     
     // Hide the original input field as we will use custom inputs.
     hiddenInputField.hidden = true;
@@ -51,14 +51,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Insert the new container into the DOM after the hidden input field's parent element.
     hiddenInputField.parentElement.appendChild(valueCustomContainer);
     // Create a new entry for this field id in project attribute forms to keep track
-    projectAttributeForms[fieldId] = { attributeFieldSelect, valueCustomContainer, hiddenInputField, savedValue }
+    projectAttributeForms[fieldId] = { attributeFieldSelect, valueCustomContainer, hiddenInputField, recordedValue }
 
     // Call the function to update the form based on the current field type.
-    updateDefaultValueInput(fieldId);
+    updateDefaultValueForm(fieldId);
     
     // Add event listener to update the form when the attribute field changes.
     attributeFieldSelect.addEventListener('change', function() {
-      updateDefaultValueInput(fieldId);
+      updateDefaultValueForm(fieldId);
     });
   };
 
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Function to create a select dropdown for 'list' field type.
-  function createSelectElement(fieldId, options, savedValue) {
+  function createSelectElement(fieldId, options, recordedValue) {
     const selectElt = document.createElement('select');
     selectElt.name = 'custom_default_value';
     // Create a placeholder for te select (not working, should be present at page load, but still keep space and appears if no select)
@@ -114,14 +114,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Attach an event listener to the select element.
     setEventListener(selectElt, fieldId);
     // Set the previously selected option, if any.
-    if (savedValue) {
-      selectElt.value = savedValue;
+    if (recordedValue) {
+      selectElt.value = recordedValue;
     }
     return selectElt;
   };
 
   // Function to create a list of checkboxes for 'multi_choices_list' field type.
-  function createMultiSelectElement(fieldId, options, savedValue) {
+  function createMultiSelectElement(fieldId, options, recordedValue) {
     const multiSelectContainer = document.createElement('ul');
     options.forEach((option, index) => {
       const id = 'id_default_value_' + index;
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const label = createLabelElement(id, option);
       const checkbox = createCheckboxElement(fieldId, id, option);
       // Check if the checkbox is in the saved default values.
-      checkbox.checked = savedValue.split(',').includes(option);
+      checkbox.checked = recordedValue.split(',').includes(option);
       label.appendChild(checkbox);
       listElt.appendChild(label);
       multiSelectContainer.appendChild(listElt);
@@ -168,9 +168,9 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Main function to update the custom input elements based on the selected project attribute.
-  function updateDefaultValueInput(fieldId) {
+  function updateDefaultValueForm(fieldId) {
     // Get datas for this form
-    const { attributeFieldSelect, valueCustomContainer, savedValue } = projectAttributeForms[fieldId];
+    const { attributeFieldSelect, valueCustomContainer, recordedValue } = projectAttributeForms[fieldId];
     
     const attributeData = attributesData.find((el) => el.id === Number.parseInt(attributeFieldSelect.value));
     if (!attributeData) return;
@@ -183,13 +183,13 @@ document.addEventListener('DOMContentLoaded', function() {
         case 'boolean':
             formElement = createCheckboxElement(fieldId, 'id_default_value');
             // Set the checkbox state based on the saved value.
-            formElement.checked = savedValue === 'true';
+            formElement.checked = recordedValue === 'true';
             break;
         case 'list':
-            formElement = createSelectElement(fieldId, options, savedValue);
+            formElement = createSelectElement(fieldId, options, recordedValue);
             break;
         case 'multi_choices_list':
-            formElement = createMultiSelectElement(fieldId, options, savedValue);
+            formElement = createMultiSelectElement(fieldId, options, recordedValue);
             break;
     }
     if (formElement) {
