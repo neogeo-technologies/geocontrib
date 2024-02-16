@@ -29,6 +29,7 @@ from api.utils.filters import ProjectsTypeFilter
 from api.utils.filters import ProjectsUserAccessLevelFilter
 from api.utils.filters import ProjectsUserAccessibleFilter
 from api.utils.filters import ProjectsUserAccountFilter
+from api.utils.filters import ProjectsAttributeFilter
 from api.utils.paginations import SimplePagination
 from geocontrib.models import Authorization
 from geocontrib.models import Project
@@ -56,7 +57,8 @@ class ProjectView(viewsets.ModelViewSet):
         ProjectsAccessLevelFilter,
         ProjectsUserAccessLevelFilter,
         ProjectsUserAccessibleFilter,
-        ProjectsUserAccountFilter
+        ProjectsUserAccountFilter,
+        ProjectsAttributeFilter
     ]
     search_fields = [
         'slug',

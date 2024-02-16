@@ -1,14 +1,9 @@
-from logging import log
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
+import json
 from rest_framework import filters
 
-from api.serializers import FeatureDetailedSerializer
-from api.serializers import FeatureListSerializer
 from geocontrib.models import Authorization
-from geocontrib.models import Feature
 from geocontrib.models import FeatureType
-from geocontrib.models import Project
 
 class AuthorizationLevelCodenameFilter(filters.BaseFilterBackend):
 
@@ -40,6 +35,28 @@ class ProjectsAccessLevelFilter(filters.BaseFilterBackend):
         access_level = request.query_params.get('access_level')
         if access_level:
             queryset = queryset.filter(access_level_pub_feature_id=access_level)
+        return queryset
+
+class ProjectsAttributeFilter(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        attributes_param = request.query_params.get('attributes')
+        if attributes_param:
+            try:
+                # Converts the JSON query string into a Python dictionary
+                attributes = json.loads(attributes_param)
+                
+                # Constructs a Q object for each attribute_id-value pair and combines them
+                q_objects = Q()
+                for attribute_id, value in attributes.items():
+                    # Uses 'projectattributeassociation' to access through the intermediary table
+                    q_objects &= Q(projectattributeassociation__attribute_id=attribute_id,
+                                   projectattributeassociation__value=value)
+                
+                # Applies the constructed filter to the queryset and uses distinct() to avoid duplicates
+                queryset = queryset.filter(q_objects).distinct()
+            except json.JSONDecodeError:
+                # Handles the error or ignores the filter if the JSON string is invalid
+                pass
         return queryset
 
 class ProjectsUserAccessLevelFilter(filters.BaseFilterBackend):
