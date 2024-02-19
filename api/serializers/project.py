@@ -100,7 +100,7 @@ class ProjectAttributeSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = ProjectAttribute
-        fields = ['id', 'label', 'name', 'field_type', 'options', 'default_value']
+        fields = ['id', 'label', 'name', 'field_type', 'options', 'default_value', 'display_filter', 'default_filter_enabled', 'default_filter_value']
 
 
 class ProjectAttributeAssociationSerializer(serializers.ModelSerializer):

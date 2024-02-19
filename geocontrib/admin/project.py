@@ -85,7 +85,7 @@ class ProjectAttributeAdmin(admin.ModelAdmin):
     Admin configuration for the ProjectAttribute model.
     """
     form = ProjectAttributeAdminForm  # Specifies the custom form for editing ProjectAttributes.
-    fields = ['label', 'name', 'field_type', 'options', 'default_value']  # Explicitly lists all fields to include in the form.
+    fields = ['label', 'name', 'field_type', 'options', 'default_value', 'display_filter', 'default_filter_enabled', 'default_filter_value'] # Explicitly lists all fields to include in the form.
 
     def get_readonly_fields(self, request, obj=None):
         """
@@ -94,7 +94,7 @@ class ProjectAttributeAdmin(admin.ModelAdmin):
         are set to readonly. If creating a new instance (obj is None), no fields are set to readonly.
         """
         if obj:  # Editing an existing instance
-            return [f.name for f in self.model._meta.fields if f.name not in ('label', 'name')]
+            return [f.name for f in self.model._meta.fields if f.name not in ('label', 'name', 'display_filter', 'default_filter_enabled', 'default_filter_value')]
         return []  # Creating a new instance
 
     class Media:

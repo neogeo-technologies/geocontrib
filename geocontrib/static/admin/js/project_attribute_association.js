@@ -1,8 +1,14 @@
 /**
- * This script dynamically updates form inputs based on the selected field type in a Django admin interface.
- * It handles three types of fields: boolean, list, and multi-choice list. According to the selection, 
- * it either displays a checkbox (for boolean), a dropdown (for list), or multiple checkboxes (for multi-choice list).
- * It also updates a hidden input field with the selected values to ensure correct data submission.
+ * Dynamically updates form inputs in the Django admin interface based on selected field types.
+ * Supports boolean, list, and multi-choice list fields by displaying appropriate input elements:
+ * a checkbox for boolean, a dropdown for list, and multiple checkboxes for multi-choice lists.
+ * It ensures that the correct data is captured and submitted by updating a hidden input field.
+ *
+ * Features include:
+ * - Initializing form adjustments for existing inline forms upon page load.
+ * - Dynamically generating input elements matching the selected attribute type.
+ * - Updating a hidden input with selected values for accurate form submission.
+ * - Observing the DOM for new inline form additions and applying customization to each.
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -20,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initFormCustomization(fieldId);
       });
     }, 100);
-  }
+  };
 
   // Initializes customization for a new or existing form identified by fieldId.
   function initFormCustomization(fieldId) {
@@ -33,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!hiddenInputField) return;
     
     // Store the saved default value from the hidden input field.
-    const savedValue = hiddenInputField.value;
+    const recordedValue = hiddenInputField.value;
     
     // Hide the original input field as we will use custom inputs.
     hiddenInputField.hidden = true;
@@ -45,21 +51,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Insert the new container into the DOM after the hidden input field's parent element.
     hiddenInputField.parentElement.appendChild(valueCustomContainer);
     // Create a new entry for this field id in project attribute forms to keep track
-    projectAttributeForms[fieldId] = { attributeFieldSelect, valueCustomContainer, hiddenInputField, savedValue }
+    projectAttributeForms[fieldId] = { attributeFieldSelect, valueCustomContainer, hiddenInputField, recordedValue }
 
     // Call the function to update the form based on the current field type.
-    updateDefaultValueInput(fieldId);
+    updateDefaultValueForm(fieldId);
     
     // Add event listener to update the form when the attribute field changes.
     attributeFieldSelect.addEventListener('change', function() {
-      updateDefaultValueInput(fieldId);
+      updateDefaultValueForm(fieldId);
     });
-  }
+  };
 
   // Extracts the field ID from the given element ID.
   function extractFieldId(elementId) {
     return elementId.match(/\d+/)[0]; // Matches the first sequence of digits in the ID.
-  }
+  };
 
   // Function to create a label element for inputs.
   function createLabelElement(id, text) {
@@ -92,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Function to create a select dropdown for 'list' field type.
-  function createSelectElement(fieldId, options, savedValue) {
+  function createSelectElement(fieldId, options, recordedValue) {
     const selectElt = document.createElement('select');
     selectElt.name = 'custom_default_value';
     // Create a placeholder for te select (not working, should be present at page load, but still keep space and appears if no select)
@@ -108,14 +114,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Attach an event listener to the select element.
     setEventListener(selectElt, fieldId);
     // Set the previously selected option, if any.
-    if (savedValue) {
-      selectElt.value = savedValue;
+    if (recordedValue) {
+      selectElt.value = recordedValue;
     }
     return selectElt;
   };
 
   // Function to create a list of checkboxes for 'multi_choices_list' field type.
-  function createMultiSelectElement(fieldId, options, savedValue) {
+  function createMultiSelectElement(fieldId, options, recordedValue) {
     const multiSelectContainer = document.createElement('ul');
     options.forEach((option, index) => {
       const id = 'id_default_value_' + index;
@@ -123,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const label = createLabelElement(id, option);
       const checkbox = createCheckboxElement(fieldId, id, option);
       // Check if the checkbox is in the saved default values.
-      checkbox.checked = savedValue.split(',').includes(option);
+      checkbox.checked = recordedValue.split(',').includes(option);
       label.appendChild(checkbox);
       listElt.appendChild(label);
       multiSelectContainer.appendChild(listElt);
@@ -159,12 +165,12 @@ document.addEventListener('DOMContentLoaded', function() {
     el.addEventListener('change', function() {
       updateDefaultValueHiddenInput(fieldId);
     });
-  }
+  };
 
   // Main function to update the custom input elements based on the selected project attribute.
-  function updateDefaultValueInput(fieldId) {
+  function updateDefaultValueForm(fieldId) {
     // Get datas for this form
-    const { attributeFieldSelect, valueCustomContainer, savedValue } = projectAttributeForms[fieldId];
+    const { attributeFieldSelect, valueCustomContainer, recordedValue } = projectAttributeForms[fieldId];
     
     const attributeData = attributesData.find((el) => el.id === Number.parseInt(attributeFieldSelect.value));
     if (!attributeData) return;
@@ -177,13 +183,13 @@ document.addEventListener('DOMContentLoaded', function() {
         case 'boolean':
             formElement = createCheckboxElement(fieldId, 'id_default_value');
             // Set the checkbox state based on the saved value.
-            formElement.checked = savedValue === 'true';
+            formElement.checked = recordedValue === 'true';
             break;
         case 'list':
-            formElement = createSelectElement(fieldId, options, savedValue);
+            formElement = createSelectElement(fieldId, options, recordedValue);
             break;
         case 'multi_choices_list':
-            formElement = createMultiSelectElement(fieldId, options, savedValue);
+            formElement = createMultiSelectElement(fieldId, options, recordedValue);
             break;
     }
     if (formElement) {
@@ -192,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Update the value of the hidden input field in case the user switches project attribute.
       updateDefaultValueHiddenInput(fieldId);
     }
-  }
+  };
 
   // Observes the DOM for new inline form additions and initializes customization for each.
   function listenToNewFormAdditions() {
@@ -210,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const config = { childList: true, subtree: true };
     const targetNode = document.querySelector('#projectattributeassociation_set-group');
     if (targetNode) observer.observe(targetNode, config);
-  }
+  };
 
   initializeFormsAndListeners(); // Kick off the process when the DOM is fully loaded.
 });

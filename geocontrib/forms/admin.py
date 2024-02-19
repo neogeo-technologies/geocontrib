@@ -104,4 +104,5 @@ class ProjectAttributeAdminForm(forms.ModelForm):
         
         # Defines the list of fields that should be included in the form.
         # This ensures only relevant fields are displayed in the admin interface for editing.
-        fields = ['label', 'name', 'field_type', 'options', 'default_value']
+        fields = ['label', 'name', 'field_type', 'options', 'default_value', 'display_filter', 'default_filter_enabled', 'default_filter_value']
+
