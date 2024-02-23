@@ -45,15 +45,9 @@ class ProjectsAttributeFilter(filters.BaseFilterBackend):
                 # Converts the JSON query string into a Python dictionary
                 attributes = json.loads(attributes_param)
                 
-                # Constructs a Q object for each attribute_id-value pair and combines them
-                q_objects = Q()
                 for attribute_id, value in attributes.items():
-                    # Uses 'projectattributeassociation' to access through the intermediary table
-                    q_objects &= Q(projectattributeassociation__attribute_id=attribute_id,
+                    queryset = queryset.filter(projectattributeassociation__attribute_id=attribute_id,
                                    projectattributeassociation__value=value)
-                
-                # Applies the constructed filter to the queryset and uses distinct() to avoid duplicates
-                queryset = queryset.filter(q_objects).distinct()
             except json.JSONDecodeError:
                 # Handles the error or ignores the filter if the JSON string is invalid
                 pass
