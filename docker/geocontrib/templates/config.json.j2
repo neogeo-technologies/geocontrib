@@ -21,6 +21,8 @@
     "VUE_APP_PRIMARY_COLOR": "{{ VUE_APP_PRIMARY_COLOR|default('', true) }}",
     "VUE_APP_PRIMARY_HIGHLIGHT_COLOR": "{{ VUE_APP_PRIMARY_HIGHLIGHT_COLOR|default('', true) }}",
 
+    "VUE_APP_PROJECT_FILTERS": "{{ VUE_APP_PROJECT_FILTERS|default('', []) }}",
+
     "DEFAULT_BASE_MAP_SCHEMA_TYPE": "{{ DEFAULT_BASE_MAP_SCHEMA_TYPE|default('tms', true) }}",
     "DEFAULT_BASE_MAP_SERVICE": "{{ DEFAULT_BASE_MAP_SERVICE|default('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', true) }}",
     "DEFAULT_BASE_MAP_OPTIONS": {{ DEFAULT_BASE_MAP_OPTIONS|default('{ "attribution": "&copy; contributeurs d\'<a href=\'https://osm.org/copyright\'>OpenStreetMap</a>", "maxZoom": 20 }', true) }},

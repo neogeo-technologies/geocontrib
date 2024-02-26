@@ -36,6 +36,9 @@ variables:
   VUE_APP_PRIMARY_HIGHLIGHT_COLOR:
     env_config_front: PRIMARY_HIGHLIGHT_COLOR
 
+  VUE_APP_PROJECT_FILTERS:
+    env_config_front: PROJECT_FILTERS
+
   VUE_APP_LOGIN_URL:
     env_config_front: LOG_URL
 
