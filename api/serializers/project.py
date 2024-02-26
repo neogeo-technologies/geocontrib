@@ -117,6 +117,7 @@ class ProjectAttributeAssociationSerializer(serializers.ModelSerializer):
         queryset=ProjectAttribute.objects.all(),
         write_only=False  # Set to True if 'attribute_id' should not be included in the serialized output
     )
+    value = serializers.CharField(allow_blank=True)  # Allow empty values to pass data validation, then access code to delete the attribute if value is empty
 
     class Meta:
         model = ProjectAttributeAssociation
@@ -221,7 +222,6 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
         )
 
 
-
 class ProjectCreationSerializer(serializers.ModelSerializer):
     access_level_pub_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
     access_level_arch_feature = serializers.PrimaryKeyRelatedField(queryset=UserLevelPermission.objects.all())
@@ -245,39 +245,51 @@ class ProjectCreationSerializer(serializers.ModelSerializer):
             'map_max_zoom_level',
             'feature_browsing_default_filter',
             'feature_browsing_default_sort',
-            'project_attributes',  # Include project attributes in the serialized representation
+            'project_attributes',
         )
 
     def create(self, validated_data):
         """
-        Custom create method to handle the creation of project attributes associations
-        alongside the project.
+        Overrides the default create method to handle project attributes associations.
+        If an attribute value is empty, it skips the creation for that attribute.
         """
         project_attributes_data = validated_data.pop('projectattributeassociation_set', [])
-        with transaction.atomic():
-            project = Project.objects.create(**validated_data)
-            for attribute_data in project_attributes_data:
+        project = Project.objects.create(**validated_data)
+
+        # Handle project attributes associations
+        for attribute_data in project_attributes_data:
+            if attribute_data.get('value'):  # Check if value is not empty
                 ProjectAttributeAssociation.objects.create(project=project, **attribute_data)
+
         return project
 
     def update(self, instance, validated_data):
         """
-        Custom update method to handle updating of project attributes associations
-        alongside the project.
+        Overrides the default update method to handle project attributes associations.
+        If an attribute value is empty, the association is deleted if it exists.
         """
         project_attributes_data = validated_data.pop('projectattributeassociation_set', [])
         with transaction.atomic():
+            # Update the project instance
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
             instance.save()
-            for attribute_data in project_attributes_data:
-                ProjectAttributeAssociation.objects.update_or_create(
-                    project=instance, 
-                    attribute=attribute_data.get('attribute'), 
-                    defaults={'value': attribute_data.get('value')}
-                )
-        return instance
 
+            # Update project attributes associations
+            for attribute_data in project_attributes_data:
+                if attribute_data.get('value'):  # Check if value is not empty
+                    ProjectAttributeAssociation.objects.update_or_create(
+                        project=instance,
+                        attribute=attribute_data.get('attribute'),
+                        defaults={'value': attribute_data.get('value')}
+                    )
+                else:  # If value is empty, delete the association
+                    ProjectAttributeAssociation.objects.filter(
+                        project=instance,
+                        attribute=attribute_data.get('attribute')
+                    ).delete()
+
+        return instance
 
 class ProjectThumbnailSerializer(serializers.Serializer):
     thumbnail = serializers.FileField()

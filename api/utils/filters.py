@@ -4,6 +4,7 @@ from rest_framework import filters
 
 from geocontrib.models import Authorization
 from geocontrib.models import FeatureType
+from geocontrib.models import ProjectAttributeAssociation
 
 class AuthorizationLevelCodenameFilter(filters.BaseFilterBackend):
 
@@ -38,20 +39,54 @@ class ProjectsAccessLevelFilter(filters.BaseFilterBackend):
         return queryset
 
 class ProjectsAttributeFilter(filters.BaseFilterBackend):
+    """
+    A filter backend that adjusts the queryset based on project attributes.
+    It handles boolean attribute filters by including projects without an association 
+    for the attribute when the filter value is 'false', and excludes projects 
+    with the attribute set to 'true' when filtering for 'false'.
+    """
+    
     def filter_queryset(self, request, queryset, view):
+        # Retrieve the 'attributes' parameter from the query string.
         attributes_param = request.query_params.get('attributes')
+        
         if attributes_param:
             try:
-                # Converts the JSON query string into a Python dictionary
+                # Attempt to parse the JSON string into a Python dictionary.
                 attributes = json.loads(attributes_param)
-                
+
                 for attribute_id, value in attributes.items():
-                    queryset = queryset.filter(projectattributeassociation__attribute_id=attribute_id,
-                                   projectattributeassociation__value=value)
+                    # Convert the attribute value string to a boolean if it represents a boolean value.
+                    if value.lower() in ['true', 'false']:
+                        value_bool = value.lower() == 'true'
+                        
+                        if not value_bool:  # If the filter value is 'false'.
+                            # Find projects that have a 'true' association for this attribute.
+                            projects_with_attr_true = ProjectAttributeAssociation.objects.filter(
+                                attribute_id=attribute_id, value='true'
+                            ).values_list('project_id', flat=True)
+                            
+                            # Exclude those projects from the queryset, effectively including projects without an association or with a 'false' value.
+                            queryset = queryset.exclude(id__in=projects_with_attr_true)
+                        else:  # If the filter value is 'true'.
+                            # Directly filter the projects that have an association with the value 'true'.
+                            queryset = queryset.filter(
+                                projectattributeassociation__attribute_id=attribute_id, 
+                                projectattributeassociation__value='true'
+                            )
+                    else:
+                        # Handle non-boolean attribute values as per the original logic.
+                        queryset = queryset.filter(
+                            projectattributeassociation__attribute_id=attribute_id,
+                            projectattributeassociation__value=value
+                        )
+
             except json.JSONDecodeError:
-                # Handles the error or ignores the filter if the JSON string is invalid
+                # If the JSON parsing fails, ignore the filter.
                 pass
-        return queryset
+
+        # Ensure no duplicates are included in the final queryset.
+        return queryset.distinct()
 
 class ProjectsUserAccessLevelFilter(filters.BaseFilterBackend):
 
