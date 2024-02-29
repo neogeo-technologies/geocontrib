@@ -92,11 +92,16 @@ document.addEventListener('DOMContentLoaded', function() {
     selectElt.name = formName;
     // Add a placeholder to the select element
     selectElt.appendChild(createSelectPlaceholderElement());
+    // Add an option to unselect any values at beginning
+    const emptyValueOptionElt = createOptionElement('Aucune');
+    emptyValueOptionElt.value = '';
+    selectElt.appendChild(emptyValueOptionElt);
     // Create an option element for each.
     getOptions().forEach(option => {
       const optionElt = createOptionElement(option);
       selectElt.appendChild(optionElt);
     });
+
     // Attach an event listener to the select element.
     setCustomFormEventListener(selectElt, formName);
     // Set the previously selected value, if any.
@@ -157,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
       case 'list':
       case 'Liste de valeurs':
           const select = document.querySelector(`select[name="${formName}"]`);
-          hiddenInputElt.value = select.value;      
+          hiddenInputElt.value = select.value;
           break;
       case 'multi_choices_list':
       case 'Liste à choix multiples':
