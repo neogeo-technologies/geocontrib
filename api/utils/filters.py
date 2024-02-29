@@ -75,11 +75,17 @@ class ProjectsAttributeFilter(filters.BaseFilterBackend):
                                 projectattributeassociation__value='true'
                             )
                     else:
-                        # Handle non-boolean attribute values as per the original logic.
-                        queryset = queryset.filter(
-                            projectattributeassociation__attribute_id=attribute_id,
-                            projectattributeassociation__value=value
-                        )
+                        # For non-boolean values, use OR condition for matching attribute values.
+                        # Initialize an empty Q object to start with no conditions
+                        query = Q()
+                        # Split comma-separated string into a list of values
+                        list_values = value.split(',')
+                        # Loop over each value and build OR conditions
+                        for list_value in list_values:
+                            query |= Q(projectattributeassociation__attribute_id=attribute_id,
+                                               projectattributeassociation__value__icontains=list_value)
+                        # Apply the constructed OR conditions to the queryset.
+                        queryset = queryset.filter(query).distinct()
 
             except json.JSONDecodeError:
                 # If the JSON parsing fails, ignore the filter.
