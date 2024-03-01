@@ -75,7 +75,7 @@ Variables utilisées pour configurer le frontend:
 * HEADER_COLOR                  # color to customize the header background
 * PRIMARY_COLOR                 # color to customize the app elements, like borders, icons (override teal color)
 * PRIMARY_HIGHLIGHT_COLOR       # color for the app elements, at hover, focus, active,... (better to be darker, brighter would need to change font color too, not implemented)
-* PROJECT_FILTERS               # filters to be displayed on project list: should be a list as a string. The complete list of available filters is: 'access_level,user_access_level,moderation,search'
+* PROJECT_FILTERS               # filters to be displayed on project list: should be a list as a string. For example: the complete list of all available filters should be: 'access_level,user_access_level,moderation,search' To not display any filters, the value would be 'empty' (or any string not included in the available filters, '' would not work, since the default value would override it)
 * LOG_URL
 * BASE_URL
 * CATALOG_NAME                  # name of the catalog to import features from
