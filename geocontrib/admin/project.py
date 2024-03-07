@@ -94,7 +94,7 @@ class ProjectAttributeAdmin(admin.ModelAdmin):
         are set to readonly. If creating a new instance (obj is None), no fields are set to readonly.
         """
         if obj:  # Editing an existing instance
-            return [f.name for f in self.model._meta.fields if f.name not in ('label', 'name', 'display_filter', 'default_filter_enabled', 'default_filter_value')]
+            return [f.name for f in self.model._meta.fields if f.name not in ('label', 'name', 'options', 'default_value', 'display_filter', 'default_filter_enabled', 'default_filter_value')]
         return []  # Creating a new instance
 
     class Media:

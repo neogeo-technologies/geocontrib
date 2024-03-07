@@ -44,8 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Get options from input elements in creation mode otherwise from readonly element in edit mode
   function getOptions() {
     let options = formEls.optionsInputField ? formEls.optionsInputField.value : retrieveFieldValueInEditMode('options');
-    // Split the options string into an array, remove empty values and trim whitespace (for edition mode)
-    return options.split(',').filter(val => val !== '').map(val => val.trim());
+    // if no options defined the value is 'null' as a string
+    return options && options !== 'null' ? JSON.parse(options) : [];
   }
 
   // Function to create a checkbox input element.
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     checkbox.id = id;
     checkbox.name = formName;
     if (value) {
-      checkbox.value = value;
+      checkbox.value = value.id || value;
     }
     // Attach an event listener to each checkbox.
     setCustomFormEventListener(checkbox, formName);
@@ -73,8 +73,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Function to create an option element for select.
   function createOptionElement(option='') {
     const optionElt = document.createElement('option');
-    optionElt.value = option;
-    optionElt.text = option || 'Sélectionner une option';
+    optionElt.value = option.id || option;
+    optionElt.text = option.label || option || 'Sélectionner une option';
     return optionElt;
   };
 
@@ -117,10 +117,10 @@ document.addEventListener('DOMContentLoaded', function() {
     getOptions().forEach((option, index) => {
       const id = 'id_default_value_' + index;
       const listElt = document.createElement('li');
-      const label = createLabelElement(id, option);
+      const label = createLabelElement(id, option.label);
       const checkbox = createCheckboxElement(id, formName, option);
       // Check if the checkbox is in the previously recorded value.
-      checkbox.checked = recordedValue.split(',').includes(option);
+      checkbox.checked = recordedValue.split(',').includes(option.id);
       label.appendChild(checkbox);
       listElt.appendChild(label);
       multiSelectContainer.appendChild(listElt);
