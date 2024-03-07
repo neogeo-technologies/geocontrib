@@ -62,14 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
     return checkbox;
   };
 
-  // Function to create a label element for inputs.
-  function createLabelElement(id, text) {
-    const optionLabel = document.createElement('label');
-    optionLabel.setAttribute('for', id);
-    optionLabel.textContent = '\n' + text + '\n';
-    return optionLabel;
-  };
-
   // Function to create an option element for select.
   function createOptionElement(option='') {
     const optionElt = document.createElement('option');
@@ -117,12 +109,22 @@ document.addEventListener('DOMContentLoaded', function() {
     getOptions().forEach((option, index) => {
       const id = 'id_default_value_' + index;
       const listElt = document.createElement('li');
-      const label = createLabelElement(id, option.label);
+      listElt.style.whiteSpace = 'nowrap';
+      // Create a label element an set its id
+      const label = document.createElement('label');
+      label.setAttribute('for', id);
+      // Create a checkbox element
       const checkbox = createCheckboxElement(id, formName, option);
       // Check if the checkbox is in the previously recorded value.
       checkbox.checked = recordedValue.split(',').includes(option.id);
+      // Add the checkbox inside the label
       label.appendChild(checkbox);
+      // Create a text node for label and add it after the checkbox
+      const labelText = document.createTextNode('\u00A0' + option.label + '\u00A0');
+      label.appendChild(labelText);
+      // add the label containing the checkbox inside the list element
       listElt.appendChild(label);
+      // Add the option element to the container
       multiSelectContainer.appendChild(listElt);
     });
     return multiSelectContainer;
