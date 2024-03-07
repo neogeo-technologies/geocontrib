@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function createOptionElement(option='') {
     const optionElt = document.createElement('option');
     optionElt.value = option.id || option;
-    optionElt.text = option.label || option || 'Sélectionner une option';
+    optionElt.text = option.name || option || 'Sélectionner une option';
     return optionElt;
   };
 
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Add the checkbox inside the label
       label.appendChild(checkbox);
       // Create a text node for label and add it after the checkbox
-      const labelText = document.createTextNode('\u00A0' + option.label + '\u00A0');
+      const labelText = document.createTextNode('\u00A0' + option.name + '\u00A0');
       label.appendChild(labelText);
       // add the label containing the checkbox inside the list element
       listElt.appendChild(label);
