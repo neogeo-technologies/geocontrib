@@ -128,7 +128,7 @@ class ProjectAttribute(models.Model):
             ("multi_choices_list", "Liste à choix multiples")),
         max_length=50, default="boolean"
     )
-    options = ArrayField(base_field=models.CharField(max_length=256), null=True, blank=True)
+    options = models.JSONField("Options de l'attribut", blank=True, null=True)
 
     default_value = models.CharField("Valeur par défaut", max_length=50, null=True, blank=True)
 

@@ -67,30 +67,22 @@ document.addEventListener('DOMContentLoaded', function() {
     return elementId.match(/\d+/)[0]; // Matches the first sequence of digits in the ID.
   };
 
-  // Function to create a label element for inputs.
-  function createLabelElement(id, text) {
-    const optionLabel = document.createElement('label');
-    optionLabel.setAttribute('for', id);
-    optionLabel.textContent = '\n' + text + '\n';
-    return optionLabel;
-  };
-
   // Function to create an option element for select.
   function createOptionElement(option='') {
     const optionElt = document.createElement('option');
-    optionElt.value = option;
-    optionElt.text = option || 'Sélectionner une option';
+    optionElt.value = option.id || option;
+    optionElt.text = option.name || option || 'Sélectionner une option';
     return optionElt;
   };
 
   // Function to create a checkbox input element.
-  function createCheckboxElement(fieldId, id, value) {
+  function createCheckboxElement(id, fieldId, value) {
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.id = id;
     checkbox.name = 'custom_default_value';
     if (value) {
-      checkbox.value = value;
+      checkbox.value = value.id || value;
     }
     // Attach an event listener to each checkbox.
     setEventListener(checkbox, fieldId);
@@ -122,16 +114,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Function to create a list of checkboxes for 'multi_choices_list' field type.
   function createMultiSelectElement(fieldId, options, recordedValue) {
-    const multiSelectContainer = document.createElement('ul');
+    const multiSelectContainer = document.createElement('div');
     options.forEach((option, index) => {
       const id = 'id_default_value_' + index;
-      const listElt = document.createElement('li');
-      const label = createLabelElement(id, option);
-      const checkbox = createCheckboxElement(fieldId, id, option);
-      // Check if the checkbox is in the saved default values.
-      checkbox.checked = recordedValue.split(',').includes(option);
+      const listElt = document.createElement('div');
+      listElt.style.whiteSpace = 'nowrap';
+      // Create a label element an set its id
+      const label = document.createElement('label');
+      label.setAttribute('for', id);
+      // Create a checkbox element
+      const checkbox = createCheckboxElement(id, fieldId, option);
+      // Check if the checkbox is in the previously recorded value.
+      checkbox.checked = recordedValue.split(',').includes(option.id);
+      // Add the checkbox inside the label
       label.appendChild(checkbox);
+      // Create a text node for label and add it after the checkbox
+      const labelText = document.createTextNode('\u00A0' + option.name + '\u00A0');
+      label.appendChild(labelText);
+      // add the label containing the checkbox inside the list element
       listElt.appendChild(label);
+      // Add the option element to the container
       multiSelectContainer.appendChild(listElt);
     });
     return multiSelectContainer;
@@ -181,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let formElement;
     switch(field_type) {
         case 'boolean':
-            formElement = createCheckboxElement(fieldId, 'id_default_value');
+            formElement = createCheckboxElement('id_default_value', fieldId);
             // Set the checkbox state based on the saved value.
             formElement.checked = recordedValue === 'true';
             break;
