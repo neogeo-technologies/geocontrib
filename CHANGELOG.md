@@ -22,7 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 20677 : Utilisation des flux de la geoplateforme IGN
 - Redmine 20788 : Lien popup ne dirige plus vers signalement
 
-# Environment variables
+### Environment variables
 
 
 - PROJECT_FILTERS: chaine de caractère ou liste de chaînes de caractères.
