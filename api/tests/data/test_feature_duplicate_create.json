@@ -11,7 +11,5 @@
     "creator": 1,
     "access_level_pub_feature": "anonymous",
     "access_level_arch_feature": "moderator",
-    "archive_feature": null,
-    "delete_feature": null,
     "map_max_zoom_level": 22
 }

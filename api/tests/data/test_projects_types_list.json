@@ -13,8 +13,6 @@
         "creator": 1,
         "access_level_pub_feature": "Utilisateur anonyme",
         "access_level_arch_feature": "Utilisateur anonyme",
-        "archive_feature": null,
-        "delete_feature": null,
         "map_max_zoom_level": 22,
         "nb_features": 0,
         "nb_published_features": 0,

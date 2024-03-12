@@ -76,12 +76,6 @@ class ProjectModelForm(forms.ModelForm):
     is_project_type = forms.BooleanField(
         label="Est un projet type", required=False)
 
-    archive_feature = forms.IntegerField(
-        label='Délai avant archivage', required=False)
-
-    delete_feature = forms.IntegerField(
-        label='Délai avant suppression', required=False)
-
     access_level_pub_feature = forms.ModelChoiceField(
         label='Visibilité des signalements publiés',
         queryset=UserLevelPermission.objects.filter(rank__lte=2).order_by('rank'),
@@ -103,8 +97,6 @@ class ProjectModelForm(forms.ModelForm):
             'thumbnail',
             'access_level_pub_feature',
             'access_level_arch_feature',
-            'archive_feature',
-            'delete_feature',
             'is_project_type',
             'create_from',
         ]
@@ -115,28 +107,20 @@ class ProjectModelForm(forms.ModelForm):
         project_type = Project.objects.filter(slug=slug).first()
 
         super().__init__(*args, **kwargs)
-        instance = kwargs.get('instance')
+        instance = kwargs.get('instance')        
+        if not instance:
+            if project_type:
+                for key in [
+                        'access_level_pub_feature', 'access_level_arch_feature',
+                        'description', 'moderation', 'thumbnail']:
+                    source = getattr(project_type, key)
+                    self.fields[key].initial = source
+                self.fields['title'].initial = "{} (Copie-{})".format(
+                    project_type.title, timezone.now().strftime("%d/%m/%Y %H:%M")
+                )
+                self.fields['title'].help_text = "Le titre d'un projet doit etre unique. "
+                self.fields['create_from'].initial = slug
 
-        if instance:
-            # Optionnel
-            for key in ['archive_feature', 'delete_feature']:
-                source = getattr(instance, key)
-                self.fields[key].initial = source
-        elif project_type:
-            for key in [
-                    'archive_feature', 'delete_feature',
-                    'access_level_pub_feature', 'access_level_arch_feature',
-                    'description', 'moderation', 'thumbnail']:
-                source = getattr(project_type, key)
-                self.fields[key].initial = source
-            self.fields['title'].initial = "{} (Copie-{})".format(
-                project_type.title, timezone.now().strftime("%d/%m/%Y %H:%M")
-            )
-            self.fields['title'].help_text = "Le titre d'un projet doit etre unique. "
-            self.fields['create_from'].initial = slug
-        else:
-            self.fields['archive_feature'].initial = 0
-            self.fields['delete_feature'].initial = 0
 
     def clean_title(self):
         title = self.cleaned_data.get('title')
@@ -149,13 +133,3 @@ class ProjectModelForm(forms.ModelForm):
                 msg = "Veuillez modifier le titre de votre projet, un projet avec ce titre existe déjà."
                 raise forms.ValidationError(msg)
         return title
-
-    def clean(self):
-        cleaned_data = super().clean()
-        archive_feature = cleaned_data.get('archive_feature', None)
-        delete_feature = cleaned_data.get('delete_feature', None)
-        if archive_feature and delete_feature and archive_feature > delete_feature:
-            raise forms.ValidationError({
-                'archive_feature': "Le délais de suppression doit être supérieur au délais d'archivage. "
-            })
-        return cleaned_data
