@@ -3,6 +3,37 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.0.0] - 2024-03-12
+
+### Evolutions
+
+- Redmine 19720 : Amélioration du bouton de suppression sur la carte
+- Redmine 19721 : Ajouter des attributs dans les projets
+- Redmine 19722 : Créer des filtres pour les attributs projet sur l'accueil de l'application
+- Redmine 19723 : Sélectionner les filtres « classiques » à afficher sur l’accueil projet
+- Redmine 19724 : Liste et carte – Faire de la sélection multiple dans les filtres
+
+### Corrections
+
+- Redmine 18836 : La recherche par adresse ne disparait pas
+- Redmine 19667 : La recherche de doublon à l'import de signalement s'applique sur les signalements supprimés
+- Redmine 20240 : Liste et carte - La carte passe par dessus la liste des types de signalements
+- Redmine 20344 : Mettre à jour le lien vers la documentation sur l'accueil projet
+- Redmine 20677 : Utilisation des flux de la geoplateforme IGN
+- Redmine 20788 : Lien popup ne dirige plus vers signalement
+
+# Environment variables
+
+
+- PROJECT_FILTERS: chaine de caractère ou liste de chaînes de caractères.
+-> Permet de sélectionner les filtres affichés sur la page d'accueil. 
+   Valeurs possibles : 'access_level,user_access_level,moderation,search'
+   Valeur par défaut : 'access_level,user_access_level,moderation,search'
+
+To not display any filters, the value would be 'empty' (or any string not included in the available filters, '' would not work, since the default value would override it)
+
+Lien vers la liste des valeurs possibles pour configurer les filtres: https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docs/documentation_technique/Docker.md?plain=1#L78
+
 
 ## [5.4.0] - 2024-01-22
 
