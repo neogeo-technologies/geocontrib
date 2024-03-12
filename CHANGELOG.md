@@ -26,11 +26,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 - PROJECT_FILTERS: chaine de caractère ou liste de chaînes de caractères.
--> Permet de sélectionner les filtres affichés sur la page d'accueil. 
-   Valeurs possibles : 'access_level,user_access_level,moderation,search'
-   Valeur par défaut : 'access_level,user_access_level,moderation,search'
+-> Permet de sélectionner les filtres affichés sur la page d'accueil.
 
-To not display any filters, the value would be 'empty' (or any string not included in the available filters, '' would not work, since the default value would override it)
+Valeurs possibles : 'access_level,user_access_level,moderation,search'
+Valeur par défaut : 'access_level,user_access_level,moderation,search'
+
+Pour n'afficher aucun filtre, la valeur doit être 'empty' (ou n'importe quelle autre valeur qui ne fait pas partie des filtres existants)
 
 Lien vers la liste des valeurs possibles pour configurer les filtres: https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docs/documentation_technique/Docker.md?plain=1#L78
 
