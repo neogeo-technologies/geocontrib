@@ -88,3 +88,4 @@ Variables utilisées pour configurer le frontend:
 * MAP_PREVIEW_CENTER            # center of the map preview displayed when setting project max scale
 * DISPLAY_FORBIDDEN_PROJECTS
 * DISPLAY_FORBIDDEN_PROJECTS_DEFAULT
+* URL_DOCUMENTATION             # url de la documentation de Géocontrib
