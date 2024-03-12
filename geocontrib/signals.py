@@ -90,16 +90,6 @@ def create_symetrical_relation(sender, instance, created, **kwargs):
 #     for instance in related:
 #         instance.delete()
 
-
-@receiver(models.signals.pre_save, sender='geocontrib.Feature')
-@disable_for_loaddata
-def update_feature_dates(sender, instance, **kwargs):
-    if instance.project.archive_feature and instance.project.delete_feature:
-        if instance.pk is None and instance.project:
-            instance.deletion_on = instance.created_on + timezone.timedelta(
-                days=instance.project.delete_feature)
-
-
 @receiver(models.signals.post_save, sender='geocontrib.FeatureType')
 @disable_for_loaddata
 def slugify_feature_type(sender, instance, created, **kwargs):

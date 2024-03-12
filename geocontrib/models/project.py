@@ -50,12 +50,6 @@ class Project(models.Model):
         related_name="access_archived"
     )
 
-    archive_feature = models.PositiveIntegerField(
-        "Délai avant archivage", blank=True, null=True)
-
-    delete_feature = models.PositiveIntegerField(
-        "Délai avant suppression", blank=True, null=True)
-
     map_max_zoom_level = models.PositiveIntegerField(
         "Niveau de zoom maximum de la carte", default=22)
 
