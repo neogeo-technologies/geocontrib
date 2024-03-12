@@ -39,6 +39,9 @@ variables:
   VUE_APP_PROJECT_FILTERS:
     env_config_front: PROJECT_FILTERS
 
+  VUE_APP_SSO_LOGIN_URL_WITH_REDIRECT:
+    env_config_front: SSO_LOGIN_URL_WITH_REDIRECT
+
   VUE_APP_LOGIN_URL:
     env_config_front: LOG_URL
 
