@@ -75,7 +75,7 @@ class FeatureTypeAdmin(admin.ModelAdmin):
 
     ordering = ('project', 'title')
 
-    delete_selected.short_description = 'Purger les signalements sélectionnés'
+    delete_selected.short_description = 'Supprimer les éléments sélectionnés de la base de données'
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
