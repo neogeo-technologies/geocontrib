@@ -3,6 +3,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.1.0] - 2024-03-20
+
+### Evolution
+
+- Redmine 19725 : Redirection vers la page de connexion d'un portail externe si l'utilisateur n'est pas connecté
+
+### Corrections
+
+- Redmine 19510 : Admin Django - Le label de suppression n'est pas bon dans la table "Valeurs pré-enregistrées"
+- Redmine 19670 : Édition projet - Le fond de carte ne s'affiche pas dans l'aperçu
+- Redmine 20442 : Accueil projet - Ajouter un bouton pour l'import d'un JSON (non-géo)
+- Redmine 20500 : Création d'un nouveau signalement en géométrie multi
+- Redmine 21098 : La recherche textuelle n'est pas conservé au changement de page
+
 ## [6.0.0] - 2024-03-12
 
 ### Evolutions
