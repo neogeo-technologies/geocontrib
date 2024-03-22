@@ -235,6 +235,7 @@ class FeatureJSONSerializer(serializers.ModelSerializer):
             'display_creator',
             'display_last_editor',
             'creator',
+            'assigned_member',
         )
         read_only_fields = (
             'created_on',
