@@ -67,12 +67,13 @@ class Project(models.Model):
         verbose_name="Groupes LDAP des administrateurs",
         base_field=models.CharField(max_length=256), blank=True, null=True)
 
-    is_project_type = models.BooleanField(
-        "Est un projet type", default=False, blank=True)
+    is_project_type = models.BooleanField("Est un projet type", default=False, blank=True)
 
     generate_share_link = models.BooleanField("Génération d'un lien de partage externe", default=False)
 
     fast_edition_mode = models.BooleanField("Mode d'édition rapide de signalements", default=False)
+
+    feature_assignement = models.BooleanField("Activation de l'assignation de signalements aux membres du projet", default=False)
 
     feature_browsing_default_filter = models.CharField(
         verbose_name="Filtre par défaut du parcours du signalement",
