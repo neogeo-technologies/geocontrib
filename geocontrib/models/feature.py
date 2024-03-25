@@ -12,7 +12,9 @@ from django.utils.functional import cached_property
 
 from rest_framework_mvt.managers import MVTManager
 
+from geocontrib import logger
 from geocontrib.choices import TYPE_CHOICES
+from geocontrib.emails import notif_project_member_assigned_feature
 from geocontrib.managers import AvailableFeaturesManager
 from geocontrib.managers import FeatureLinkManager
 
@@ -117,14 +119,21 @@ class Feature(models.Model):
             self.last_editor = self.creator
             # If the feature is created with an assigned_member: send an email to inform of the creation of a Feature object with an assigned_member
             if self.assigned_member:
-                subject = "Nouveau signalement créé"
-                message = f"Un nouveau signalement intitulé '{self.title}' a été créé et assigné à {self.assigned_member}."
-                send_mail(subject, message, None, [self.assigned_member.email]) # If the sender is set as None, Django will use DEFAULT_FROM_EMAIL
+                new_assignement_to_notify = True
         # If the feature is updated and the assigned_member changed: send an email to inform of the modification of the field assigned_member
-        elif self._original_assigned_member != self.assigned_member:# 
-                subject = "Changement d'assignation"
-                message = f"Le signalement '{self.title}' a été assigné à {self.assigned_member}."
-                send_mail(subject, message, None, [self.assigned_member.email])
+        elif self._original_assigned_member != self.assigned_member:
+            new_assignement_to_notify = True
+
+        if new_assignement_to_notify:
+            context = {
+                'feature': self,
+                'user_assigner': self.last_editor,
+            }
+            try:
+                notif_project_member_assigned_feature(
+                    emails=[self.assigned_member.email, ], context=context)
+            except Exception:
+                logger.exception('Email could not be send')
         # Set the time the feature was updated (or created)
         self.updated_on = timezone.now()
         super().save(*args, **kwargs)

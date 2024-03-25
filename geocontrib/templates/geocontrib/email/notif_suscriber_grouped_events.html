@@ -37,7 +37,7 @@
                     <strong>{{ event.related_comment.comment }}</strong>
                     {% if event.related_comment.attachments %}
                       {% for att in event.related_comment.attachments %}
-                        <a href="{{ att.url|absurl }}" target="_blank" rel="noopener">{ att.title }} </a>
+                        <a href="{{ att.url|absurl }}" target="_blank" rel="noopener">{{ att.title }} </a>
                       {% endfor %}
                     {% endif %}
 
