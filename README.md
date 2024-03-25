@@ -4,6 +4,11 @@ GéoContrib est un outil libre de signalement contributif et collaboratif. Une v
 
 Depuis la version 2.0.0, l'interface web est dans une dépôt séparé : https://git.neogeo.fr/geocontrib/geocontrib-frontend
 
+## Documentation
+
+L'intégralité de la documentation de GéoContrib est accessible ici : https://www.onegeosuite.fr/docs/module-geocontrib/intro
+Celle-ci n'est plus disponible dans le répertoire /docs du dépôt à partir de la version 5.4.1.
+
 ## Version stable
 
 La version stable de GéoContrib est une version qui a été testée et validée par la communauté GéoContrib. Nous recommandons l'installation de cette version dans le cas d'une utilisation optimale et sans instabilité. 
