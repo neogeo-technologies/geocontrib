@@ -112,6 +112,7 @@ class Feature(models.Model):
 
     def save(self, *args, **kwargs):
         self.clean()
+        new_assignement_to_notify = False
         # if the feature is being created
         new_assignement_to_notify = False
         if self._state.adding:
