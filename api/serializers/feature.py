@@ -539,6 +539,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
             'feature_url',
             'feature_type_url',
             'color',
+            'assigned_member',
         )
         read_only_fields = fields
 
