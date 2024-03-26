@@ -1,1 +1,30 @@
-{"type": "FeatureCollection", "features": [{"id": "71f9778a-fe84-4c2e-ab9b-4dba95d2aeee", "type": "Feature", "geometry": {"type": "Point", "coordinates": [8.221315, 47.582285]}, "properties": {"title": "type 1 brouillon", "description": "", "status": "draft", "created_on": "2021-09-30T13:25:10.297000+02:00", "updated_on": "2021-09-30T13:42:42.269000+02:00", "deletion_on": null, "feature_type": "1-dfsdfs", "project": "1-aze", "display_creator": "admin", "display_last_editor": "Utilisateur supprim\u00e9", "creator": 1}}]}
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "71f9778a-fe84-4c2e-ab9b-4dba95d2aeee",
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.221315,
+          47.582285
+        ]
+      },
+      "properties": {
+        "title": "type 1 brouillon",
+        "description": "",
+        "status": "draft",
+        "created_on": "2021-09-30T13:25:10.297000+02:00",
+        "updated_on": "2021-09-30T13:42:42.269000+02:00",
+        "deletion_on": null,
+        "feature_type": "1-dfsdfs",
+        "project": "1-aze",
+        "display_creator": "admin",
+        "display_last_editor": "Utilisateur supprim\u00e9",
+        "creator": 1,
+        "assigned_member": null
+      }
+    }
+  ]
+}
