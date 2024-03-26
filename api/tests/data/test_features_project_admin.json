@@ -22,7 +22,8 @@
                 "project": "1-aze",
                 "display_creator": "admin",
                 "display_last_editor": "Utilisateur supprim\u00e9",
-                "creator": 1
+                "creator": 1,
+                "assigned_member": null
             }
         },
         {
@@ -46,7 +47,8 @@
                 "project": "1-aze",
                 "display_creator": "admin",
                 "display_last_editor": "Utilisateur supprim\u00e9",
-                "creator": 1
+                "creator": 1,
+                "assigned_member": null
             }
         },
         {
@@ -76,7 +78,8 @@
                 "project": "1-aze",
                 "display_creator": "admin",
                 "display_last_editor": "Utilisateur supprim\u00e9",
-                "creator": 1
+                "creator": 1,
+                "assigned_member": null
             }
         },
         {
@@ -106,7 +109,8 @@
                 "project": "1-aze",
                 "display_creator": "admin",
                 "display_last_editor": "Utilisateur supprim\u00e9",
-                "creator": 1
+                "creator": 1,
+                "assigned_member": null
             }
         },
         {
@@ -154,7 +158,8 @@
                 "project": "1-aze",
                 "display_creator": "admin",
                 "display_last_editor": "Utilisateur supprim\u00e9",
-                "creator": 1
+                "creator": 1,
+                "assigned_member": null
             }
         }
     ]
