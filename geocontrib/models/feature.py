@@ -126,7 +126,7 @@ class Feature(models.Model):
         elif self._original_assigned_member != self.assigned_member:
             new_assignement_to_notify = True
 
-        if new_assignement_to_notify:
+        if new_assignement_to_notify and self.assigned_member is not None:
             context = {
                 'feature': self,
                 'user_assigner': self.last_editor,
