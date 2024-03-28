@@ -22,7 +22,8 @@
                 "project": "1-aze",
                 "display_creator": "admin",
                 "display_last_editor": "admin",
-                "creator": 1
+                "creator": 1,
+                "assigned_member": null
             }
         },
         {
@@ -46,7 +47,8 @@
                 "project": "1-aze",
                 "display_creator": "admin",
                 "display_last_editor": "admin",
-                "creator": 1
+                "creator": 1,
+                "assigned_member": null
             }
         }
     ]

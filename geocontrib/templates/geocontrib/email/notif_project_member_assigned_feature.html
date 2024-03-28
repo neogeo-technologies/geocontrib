@@ -1,0 +1,17 @@
+{% load app_filters %}
+<!DOCTYPE html>
+<html lang="fr-FR">
+<head>
+<meta content="text/html; charset=UTF-8">
+<title>Notifications</title>
+</head>
+<body>
+  <p>Bonjour,</p>
+  <p>L'utilisateur {{ user_assigner }} vous a assigné le signalement&nbsp;:</p>
+  <ul>
+    <li>
+      <a href="{{ url_feature }}">{{ feature.title }}</a>
+    </li>
+  </ul>
+</body>
+</html>

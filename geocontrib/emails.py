@@ -93,3 +93,16 @@ def notif_suscriber_grouped_events(emails, context):
         template='geocontrib/email/notif_suscriber_grouped_events.html')
 
     email.send()
+
+def notif_project_member_assigned_feature(emails, context):
+    feature = context['feature']
+
+    context['url_feature'] = urljoin(BASE_URL, feature.get_view_url())
+
+    subject = "[{}] Un utilisateur vous a assigné un signalement".format(settings.APPLICATION_NAME)
+
+    email = EmailBaseBuilder(
+        context=context, bcc=emails, subject=subject,
+        template='geocontrib/email/notif_project_member_assigned_feature.html')
+
+    email.send()

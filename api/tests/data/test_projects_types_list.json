@@ -9,6 +9,7 @@
         "is_project_type": true,
         "generate_share_link": false,
         "fast_edition_mode": false,
+        "feature_assignement": false,
         "thumbnail": "/geocontrib/api/projects/2-projet-2/thumbnail/",
         "creator": 1,
         "access_level_pub_feature": "Utilisateur anonyme",
