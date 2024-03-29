@@ -148,7 +148,9 @@ def set_users_perms(sender, instance, created, **kwargs):
                 new_authorizations.append(Authorization(
                     project_id=instance.pk,
                     user_id=user.pk,
-                    level=default_permission_level
+                    level=default_permission_level,
+                    created_on = timezone.now(),
+                    updated_on = timezone.now()
                 ))
 
             with transaction.atomic():
