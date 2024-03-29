@@ -5,6 +5,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.dispatch import receiver
+from django.db import transaction
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -125,13 +126,34 @@ def set_users_perms(sender, instance, created, **kwargs):
             )
         except Exception:
             logger.exception('Trigger.set_users_perms')
+        """
+        On ajoute la permission d'utilisateur connecté pour le projet à tous les autres utilisateurs actifs.
+        Pour éviter que le traitement des autorisations avec beaucoup d'utiliseurs ne prennent trop de temps
+        et déclenche une erreur 502 à cause d'un timeout, on utilise un bulk create pour faire une transitions unique
+        Il n'y a pas d'équivalent de create_or_update et je n'ai pas trouvé le moyen d'exclure les autorisation déjà existante
+        sur un projet pour un utilisateur, mais comme l'opération n'est effectué qu'au create du projet, il ne devrait pas
+        y avoir ce type d'erreur. En cas d'erreurs, la bdd ne devrait pas être polluée en utilisant une transaction.atomic,
+        car aucune opération n'est effectué sur la bdd en présence d'une erreur.
+        """
         try:
-            for user in User.objects.filter(is_active=True).exclude(pk=instance.creator.pk):
-                Authorization.objects.update_or_create(
-                    project=instance,
-                    user=user,
-                    defaults={'level': UserLevelPermission.objects.get(rank=1)}
-                )
+            active_users = (
+                User.objects
+                .filter(is_active=True)
+                .exclude(pk=instance.creator.pk)
+            )
+            default_permission_level = UserLevelPermission.objects.get(rank=1)
+
+            new_authorizations = []
+            for user in active_users:
+                new_authorizations.append(Authorization(
+                    project_id=instance.pk,
+                    user_id=user.pk,
+                    level=default_permission_level
+                ))
+
+            with transaction.atomic():
+                Authorization.objects.bulk_create(new_authorizations)
+
         except Exception:
             logger.exception('Trigger.set_users_perms')
 
