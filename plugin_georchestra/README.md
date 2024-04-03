@@ -144,3 +144,19 @@ utilisateurs. Exemple : `cn=pendingorg,ou=pendingorgs,dc=georchestra,dc=org`. Va
 Deux méthodes :
 * Utiliser LDAP_SEARCH_BASE avec la valeur `ou=users,dc=georchestra,dc=org`;
 * Utiliser EXCLUDED_USER_GROUPS en y insérant le groupe `cn=pendingorg,ou=pendingorgs,dc=georchestra,dc=org`.
+
+
+# Débug
+
+Pour vérifier les utilisateurs présents : 
+
+```
+# Lancer la commande Python
+python manage.py shell
+# Importer les outils
+from geocontrib.models import User
+# Vérifier la présence d’un utilisateur en particulier
+User.objects.filter(username='cblanchon')
+# Compter le nombre d’utilisateurs
+User.objects.count() 
+```

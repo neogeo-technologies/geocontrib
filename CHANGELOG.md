@@ -3,6 +3,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.1.0] - 2024-03-20
+
+### Evolution
+
+- Redmine 19725 : Redirection vers la page de connexion d'un portail externe si l'utilisateur n'est pas connecté
+
+### Corrections
+
+- Redmine 19510 : Admin Django - Le label de suppression n'est pas bon dans la table "Valeurs pré-enregistrées"
+- Redmine 19670 : Édition projet - Le fond de carte ne s'affiche pas dans l'aperçu
+- Redmine 20442 : Accueil projet - Ajouter un bouton pour l'import d'un JSON (non-géo)
+- Redmine 20500 : Création d'un nouveau signalement en géométrie multi
+- Redmine 21098 : La recherche textuelle n'est pas conservé au changement de page
+
+### Environment variables
+
+- SSO_LOGIN_URL_WITH_REDIRECT : chaine de caractères
+-> Permet de rediriger l'utilisateur vers un lien de connexion s'il n'est pas déjà connecté.
+
 ## [6.0.0] - 2024-03-12
 
 ### Evolutions
@@ -24,7 +43,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Environment variables
 
-
 - PROJECT_FILTERS: chaine de caractère ou liste de chaînes de caractères.
 -> Permet de sélectionner les filtres affichés sur la page d'accueil.
 
@@ -34,6 +52,11 @@ Valeur par défaut : 'access_level,user_access_level,moderation,search'
 Pour n'afficher aucun filtre, la valeur doit être 'empty' (ou n'importe quelle autre valeur qui ne fait pas partie des filtres existants)
 
 Lien vers la liste des valeurs possibles pour configurer les filtres: https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docs/documentation_technique/Docker.md?plain=1#L78
+
+- URL_DOCUMENTATION: chaine de caractères
+-> Permet de sélectionner le lien vers la doucmentation sur le bouton "?" sur l'accueil de GéoContrib
+
+Valeur par défaut : https://www.onegeosuite.fr/docs/module-geocontrib/intro
 
 
 ## [5.4.0] - 2024-01-22
