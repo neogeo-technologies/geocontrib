@@ -3,6 +3,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.4.1] - 2024-04-09
+
+### Corrections
+
+- Redmine 19667 : La recherche de doublon à l'import de signalement s'applique sur les signalements supprimés
+- Redmine 19671 : Détails signalement - lien de liaison non mis à jour
+- Redmine 19672 : Édition signalement - Texte popup mal mise en forme
+- Redmine 19510 : Admin Django - Le label de suppression n'est pas bon dans la table "Valeurs pré-enregistrées"
+- Redmine 19670 : Édition projet - Le fond de carte ne s'affiche pas dans l'aperçu
+- Redmine 20240 : Liste et carte - La carte passe par dessus la liste des types de signalements
+- Redmine 20344 : Mettre à jour le lien vers la documentation sur l'accueil projet
+- Redmine 20442 : Accueil projet - Ajouter un bouton pour l'import d'un JSON (non-géo)
+- Redmine 20463 : Accueil projet - Créer un type de signalement non géo depuis un CSV
+- Redmine 20476 : Multiple checkbox ne conserve pas valeur initial
+- Redmine 20478 : Admin Django - Projets : enlever les champs "Délai avant..."
+- Redmine 20500 : Empêcher la création d'un nouveau signalement en géométrie multi
+- Redmine 20677 : Utilisation des flux de la geoplateforme IGN
+- Redmine 20788 : Lien popup ne dirige plus vers signalement
+- Redmine 21098 : La recherche textuelle n'est pas conservé au changement de page
+- Redmine 21264 : La variable d'env HEADER COLOR n'est pas correctement prise en compte
+- Redmine 21366 : Variable de centre et zoom de la carte par défaut
+
+### Environement variable
+
+- DEFAULT_MAP_VIEW (default : '')
+-> Permet de choisir le centrage et le niveau de zoom par défaut de la carte
+-> Exemple : {"center": [43.6,1.433333],"zoom": 11}
 
 ## [5.4.0] - 2024-01-22
 
