@@ -90,3 +90,4 @@ Variables utilisées pour configurer le frontend:
 * DISPLAY_FORBIDDEN_PROJECTS
 * DISPLAY_FORBIDDEN_PROJECTS_DEFAULT
 * URL_DOCUMENTATION             # url de la documentation de Géocontrib
+* URL_DOCUMENTATION_FEATURE     # url de la documentation de Géocontrib pour les features
