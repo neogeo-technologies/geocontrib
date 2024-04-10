@@ -3,6 +3,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.4.2] - 2024-04-10
+
+### Corrections
+
+- Redmine 20344 : Mettre à jour le lien vers la documentation sur l'accueil projet
+
+### Environement variables
+
+- URL_DOCUMENTATION (default : https://www.onegeosuite.fr/docs/module-geocontrib/intro)
+-> Permet de modifier le lien de renvoi au clic sur le bouton "?" sur l'accueil des projets
+
+- URL_DOCUMENTATION_FEATURE (default : https://www.onegeosuite.fr/docs/module-geocontrib/project_settings) 
+-> Permet de modifier le lien de renvoi au clic sur le bouton "?" sur la création / édition d'un projet
+
+
 ## [5.4.1] - 2024-04-09
 
 ### Corrections
@@ -13,7 +28,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 19510 : Admin Django - Le label de suppression n'est pas bon dans la table "Valeurs pré-enregistrées"
 - Redmine 19670 : Édition projet - Le fond de carte ne s'affiche pas dans l'aperçu
 - Redmine 20240 : Liste et carte - La carte passe par dessus la liste des types de signalements
-- Redmine 20344 : Mettre à jour le lien vers la documentation sur l'accueil projet
 - Redmine 20442 : Accueil projet - Ajouter un bouton pour l'import d'un JSON (non-géo)
 - Redmine 20463 : Accueil projet - Créer un type de signalement non géo depuis un CSV
 - Redmine 20476 : Multiple checkbox ne conserve pas valeur initial
