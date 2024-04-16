@@ -5,6 +5,7 @@ from django.contrib.gis import admin
 from django_admin_listfilter_dropdown.filters import DropdownFilter
 
 from geocontrib.models import StackedEvent
+from geocontrib.models import NotificationModels
 
 
 logger = logging.getLogger(__name__)
@@ -23,3 +24,4 @@ class StackedEventAdmin(admin.ModelAdmin):
     )
 
 admin.site.register(StackedEvent, StackedEventAdmin)
+admin.site.register(NotificationModels)
