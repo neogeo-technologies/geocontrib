@@ -5,7 +5,12 @@ from django.template.loader import render_to_string
 from django.template import Context
 from django.template import Template
 from django.utils.html import strip_tags
-
+"""
+import directly from the file to avoid circular import and not from model/__init__.py
+since there are imports into a model(annotation.py) from geocontrib/emails.py
+which trigger import of NotificationModel before the model is fully registrated
+fixed by removing the import from model/__init__.py
+"""
 from geocontrib.models.mail import NotificationModel
 
 import logging
