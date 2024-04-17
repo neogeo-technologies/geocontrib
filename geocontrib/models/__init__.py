@@ -4,7 +4,6 @@ from .annotation import Comment
 from .annotation import Event
 from .annotation import Subscription
 from .annotation import StackedEvent
-from .annotation import NotificationModels
 from .base_map import BaseMap
 from .base_map import ContextLayer
 from .base_map import Layer
@@ -37,7 +36,6 @@ __all__ = [
     'FeatureType',
     'ImportTask',
     'Layer',
-    'NotificationModels',
     'PreRecordedValues',
     'Project',
     'ProjectAttribute',

@@ -2,7 +2,11 @@ from urllib.parse import urljoin
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.template import Context
+from django.template import Template
 from django.utils.html import strip_tags
+
+from geocontrib.models.mail import NotificationModel
 
 import logging
 logger = logging.getLogger(__name__)
@@ -53,20 +57,6 @@ def notif_moderators_pending_features(emails, context):
     email.send()
 
 
-def notif_suscribers_project_event(emails, context):
-
-    project = context['project']
-    subject = "[GéoContrib:{project_slug}] Un projet a été mis à jour.".format(
-        project_slug=project.slug
-    )
-
-    email = EmailBaseBuilder(
-        context=context, bcc=emails, subject=subject,
-        template='geocontrib/email/notif_suscribers_project_event.html')
-
-    email.send()
-
-
 def notif_creator_published_feature(emails, context):
     feature = context['feature']
 
@@ -85,7 +75,25 @@ def notif_creator_published_feature(emails, context):
 
 def notif_suscriber_grouped_events(emails, context):
 
-    subject = "[{}] Activité des projets que vous suivez".format(settings.APPLICATION_NAME)
+    notification_model = NotificationModel.objects.get(template_name="grouped_events")
+    if notification_model:
+        subject = notification_model.subject
+
+        if notification_model.notification_type == per_project and context.project:
+            data = Context({
+                'nom_projet': context.project
+            })
+            template = Template(notification_model.message)
+            message = template.render(data)
+        else :
+            message = notification_model.message
+
+        context['message'] = message
+
+    else:
+        subject = "[{}] Activité des projets que vous suivez"
+
+    subject.format(settings.APPLICATION_NAME)
     context['APPLICATION_NAME'] = settings.APPLICATION_NAME
 
     email = EmailBaseBuilder(
