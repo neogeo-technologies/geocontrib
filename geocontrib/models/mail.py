@@ -27,3 +27,6 @@ class NotificationModel(models.Model):
     class Meta:
         verbose_name = "Modèle de notifications"
         verbose_name_plural = "Modèles de notifications"
+
+    def __str__(self):
+        return self.template_name
