@@ -6,8 +6,13 @@
 <title>Notifications</title>
 </head>
 <body>
-  Bonjour,<br>
-  Derniers évènements des projets que vous suivez&nbsp;:<br>
+  {% if message %}
+    {{ message }}
+  {% else %}
+    Bonjour,<br>
+    Derniers évènements des projets que vous suivez&nbsp;:
+  {% endif%}
+  <br>
   <ul>
     {% for stacked_event in stacked_events %}
       <li>{{ stacked_event.project_data.title }} :
