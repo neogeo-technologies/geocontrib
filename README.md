@@ -108,6 +108,7 @@ python manage.py migrate
 python manage.py loaddata geocontrib/data/perm.json
 python manage.py loaddata geocontrib/data/flatpages.json
 python manage.py loaddata geocontrib/data/geocontrib_beat.json
+python manage.ploaddata geocontrib/data/notification_templates.json
 ```
 
 Ne faites pas attention aux messages d'avertissement suivants :
