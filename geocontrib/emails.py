@@ -11,7 +11,7 @@ since there are imports into a model(annotation.py) from geocontrib/emails.py
 which trigger import of NotificationModel before the model is fully registrated
 fixed by removing the import from model/__init__.py
 """
-from geocontrib.models.mail import NotificationModel
+from geocontrib.models.notification import NotificationModel
 
 import logging
 logger = logging.getLogger(__name__)
