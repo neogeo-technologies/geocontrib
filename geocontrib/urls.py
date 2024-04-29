@@ -14,6 +14,15 @@ from geocontrib.views import MyAccount
 from geocontrib.views import FeatureTypeDetail
 from geocontrib.views import view404
 
+import logging
+# Configuration du logging
+logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+
+logger.warning("Warning: Django URL initialized successfully.")
+logger.info("Info: Django URL initialized successfully.")
+logger.debug("Debugger: Django URL initialized successfully.")
+
 app_name = 'geocontrib'
 
 """
@@ -22,9 +31,14 @@ without having the right access to the feature to which the attachment is associ
 It uses the method to retrieve available features for a given user which does all the checks
 with custom permissions designed within geocontrib application
 """
-def protected_serve(request, path, document_root=None, show_indexes=False):
+def protected_serve(request, path='', document_root=None, show_indexes=False):
+
+    logger.warning("Warning: Media url matched successfully.")
+    logger.info("Info: Media url matched successfully.")
+    logger.debug("Debugger: Media url matched successfully.")
+
     # check if an attachment exist with the file pathname
-    attachment = Attachment.objects.get(attachment_file=path)
+    attachment = Attachment.objects.filter(attachment_file=path).first()
     if attachment:
         # retrieve project instance to get available feature for current user
         attachment_project = Project.objects.get(id=attachment.project_id)
