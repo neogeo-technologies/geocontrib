@@ -1,5 +1,4 @@
 from django.urls import path
-from django.urls import re_path
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth import views as auth_views
@@ -14,15 +13,6 @@ from geocontrib.views import MyAccount
 from geocontrib.views import FeatureTypeDetail
 from geocontrib.views import view404
 
-import logging
-# Configuration du logging
-logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
-
-logger.warning("Warning: Django URL initialized successfully.")
-logger.info("Info: Django URL initialized successfully.")
-logger.debug("Debugger: Django URL initialized successfully.")
-
 app_name = 'geocontrib'
 
 """
@@ -32,11 +22,6 @@ It uses the method to retrieve available features for a given user which does al
 with custom permissions designed within geocontrib application
 """
 def protected_serve(request, path='', document_root=None, show_indexes=False):
-
-    logger.warning("Warning: Media url matched successfully.")
-    logger.info("Info: Media url matched successfully.")
-    logger.debug("Debugger: Media url matched successfully.")
-
     # check if an attachment exist with the file pathname
     attachment = Attachment.objects.filter(attachment_file=path).first()
     if attachment:
@@ -56,7 +41,7 @@ def protected_serve(request, path='', document_root=None, show_indexes=False):
 
 urlpatterns = [
     # Get the media files path to register routes towards it and control if the requested files can be viewed by current user
-    re_path(r'^%s(?P<path>.*)$' % settings.MEDIA_URL[1:], protected_serve, {'document_root': settings.MEDIA_ROOT}),
+    path('media/<path:path>', protected_serve, {'document_root': settings.MEDIA_ROOT}),
     # Vues générales de navigation
     path('', HomePageView.as_view(), name='index'),
     path('connexion/', auth_views.LoginView.as_view(
