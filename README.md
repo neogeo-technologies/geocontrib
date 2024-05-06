@@ -39,7 +39,7 @@ source geocontrib_venv/bin/activate
 # Clonage du projet - récupération des sources
 # Actuellement, la branche par défaut du projet est develop
 # Ce sera celle qui sera active par défaut immédiatement après le clonage
-git clone https://github.com/neogeo-technologies/geocontrib.git
+git clone https://git.neogeo.fr/geocontrib/geocontrib-django.git
 cd geocontrib
 
 # Installer les dépendances
