@@ -211,3 +211,40 @@ Le graphique est disponible ici [docs/model.png](docs/model.png)
 
 export DJANGO_SETTINGS_MODULE=config.settings
 pytest
+
+
+DEVELOPPEMENT
+=============
+
+Général
+-------
+
+Geocontrib est un projet initié par NeoGeo.
+Le code source de l'application est maintenu sur la plateforme https://git.neogeo.fr/geocontrib/.
+
+les Mainteneurs actuels :
+ - Timothée POUSSARD (Neogeo)
+ - Camille BLANCHON (Neogeo)
+ - Matthieu ETOURNEAU (Neogeo)
+ - Angela Escobar (Neogeo)
+
+La documentation de l'application 
+*********************************
+
+https://www.onegeosuite.fr/docs/team_geocontrib
+
+Pratiques et règles de developpement
+------------------------------------
+
+Afin de partager des règles communes de développement et faciliter l'intégration de 
+nouveau code, veuillez lire les recommandations et bonnes pratiques recommandées pour contribuer
+au projet GeoContrib.
+
+Git
+***
+
+ - Faire une demande de contribution en envoyant un mail à metourneau@neogeo.fr
+ - Un compte vous sera créé sur notre plateforme gitlab
+ - Faire un fork de l'application
+ - Faire des merge requests vers la branch ``develop``
+ - Faire des ``git pull`` avant chaque développement et avant chaque commit
