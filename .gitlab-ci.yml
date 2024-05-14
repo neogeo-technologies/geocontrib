@@ -5,9 +5,6 @@ stages:
   - deploy
 
 variables:
-  SONAR_PROJECTKEY: "$CI_PROJECT_NAME"
-  SONAR_HOST_URL: "https://sonarqube.neogeo.fr"
-  SONAR_LOGIN: $SONAR_TOKEN
   GIT_DEPTH: 0
   # Used to configure CI Test
   POSTGRES_DB: geocontrib
@@ -86,7 +83,7 @@ sonarqube-check:
     - test
   allow_failure: true
   script:
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.projectName=$CI_PROJECT_NAME -Dsonar.projectVersion=$CI_COMMIT_BRANCH -Dsonar.cpd.exclusions=api/**/deprecated/**/*
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=id-$CI_PROJECT_ID -Dsonar.projectName="$CI_PROJECT_PATH" -Dsonar.projectVersion=$CI_COMMIT_BRANCH -Dsonar.cpd.exclusions=api/**/deprecated/**/*
 
 test:
   stage: test
