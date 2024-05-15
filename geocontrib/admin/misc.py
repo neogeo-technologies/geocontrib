@@ -32,7 +32,7 @@ class StackedEventAdmin(admin.ModelAdmin):
 class NotificationModelAdmin(admin.ModelAdmin):
     def get_fields(self, request, obj=None):
         # Always include these fields
-        fields = ['template_name', 'subject', 'message']
+        fields = ['subject', 'message']
         
         # Conditionally include 'notification_type'
         if obj and obj.template_name == 'Événements groupés':
