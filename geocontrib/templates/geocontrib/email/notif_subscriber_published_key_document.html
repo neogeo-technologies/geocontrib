@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+<head>
+<meta content="text/html; charset=UTF-8">
+<title>Notification de publication d'un document clé</title>
+</head>
+<body>
+  {% if message %}
+    {{ message }}
+  {% else %}
+    Notification de publication d'un document clé:
+  {% endif%}
+
+  <ul>
+    {% for event in stacked_event.stack_data.events %}
+    <li>
+      
+      <!-- TODO: ADAPT TO NEW EVENT TYPE KEY DOCUMENT -->
+
+      {% if event.related_comment.attachments %}
+        {% for att in event.related_comment.attachments %}
+          <a href="{{ att.url|absurl }}" target="_blank" rel="noopener">{ att.title }} </a>
+        {% endfor %}
+      {% endif %}
+
+      {% elif event.object_type == 'attachment' %}
+        {{ event.created_on }} - Pièce-jointe ajoutée par {{ event.display_user }}
+      {% endif %}
+
+      {% elif event.event_type == 'update' %}
+
+
+        {% elif event.object_type == 'attachment' %}
+          Pièce-jointe mise à jour par {{ event.display_user }}
+        {% endif %}
+        
+      {% endif %}
+
+    </li>
+    {% endfor %}
+  </ul>
+
+  <hr style="width:100%;height:1px;background:#ccc;border:0;margin:1.2em">
+  <span class="footer" style="font-size:0.8em;font-style:italic">
+    <p>Vous avez reçu ce message car vous êtes abonné(e) à l'outil {{ APPLICATION_NAME }}</p>
+  </span>
+</body>
+</html>

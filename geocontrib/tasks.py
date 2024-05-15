@@ -31,6 +31,10 @@ def task_csv_processing(import_task_id):
 def task_notify_subscribers():
     call_command('notify_subscribers')
 
+@shared_task()
+def task_notify_subscribers_key_document():
+    call_command('notify_subscribers_key_document')
+
 
 @shared_task(soft_time_limit=2)
 def get_geocontrib_version():
