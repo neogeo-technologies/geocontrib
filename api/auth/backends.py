@@ -7,6 +7,9 @@ from rest_framework.authentication import get_authorization_header
 from api import messages
 from geocontrib.models import User
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TokenAuthentication(BaseAuthentication):
     www_authenticate_realm = 'api'
@@ -37,13 +40,22 @@ class TokenAuthentication(BaseAuthentication):
         return user
     
     def authenticate(self, request):
-        header = get_authorization_header(request)
-        if header is None:
-            return None
+        # Check for custom header first
+        custom_header = request.META.get('HTTP_AUTHORIZATION_GEOCONTRIB')
+        if custom_header:
+            # Directly use the token from custom header
+            logger.error('authenticate from TokenAuthentification with custom_header')
+            raw_token = custom_header.encode('ascii')
+        else:
+            logger.error('authenticate from TokenAuthentification with Bearer')
+            header = get_authorization_header(request)
+            if header is None:
+                return None
 
-        raw_token = self.get_raw_token(header)
-        if raw_token is None:
-            return None
+            raw_token = self.get_raw_token(header)
+            if raw_token is None:
+                return None
+
         try:
             user = self.validate_token(raw_token)
         except:
