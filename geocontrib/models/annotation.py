@@ -72,6 +72,8 @@ class Attachment(AnnotationAbstract):
     comment = models.ForeignKey(
         "geocontrib.Comment", on_delete=models.SET_NULL, blank=True, null=True)
 
+    is_document_key = models.BooleanField("Document clé", default=False)
+
     class Meta:
         verbose_name = "Pièce jointe"
         verbose_name_plural = "Pièces jointes"
