@@ -2,7 +2,9 @@ from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth import views as auth_views
-from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.urls import NoReverseMatch
 from django.views.static import serve
 
 from geocontrib.models import Attachment
@@ -13,7 +15,51 @@ from geocontrib.views import MyAccount
 from geocontrib.views import FeatureTypeDetail
 from geocontrib.views import view404
 
+import logging
+
 app_name = 'geocontrib'
+
+# Configuration du logging
+logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+"""
+This function distinguishes between a URL name and an absolute URL.
+For a URL name, it constructs the absolute URL by appending the base URL.
+"""
+def build_full_url(url_name):
+    logger.debug(f"Building full URL for {url_name}.")
+    if url_name.startswith(('http://', 'https://')):
+        # It's already an absolute URL, return it as is
+        return url_name
+    else:
+        try:
+            # Try to resolve the URL name using reverse
+            resolved_url = reverse(url_name)
+            # Build the full URL if settings.BASE_URL is defined
+            logger.debug(f"Value for resolved URL: {resolved_url}.")
+            logger.debug(f"Value for environment variable BASE_URL: {settings.BASE_URL}.")
+            full_url = f"{settings.BASE_URL}{resolved_url}" if hasattr(settings, 'BASE_URL') else resolved_url
+            return full_url
+        except NoReverseMatch:
+            # Handle the error if the URL name is not valid
+            logger.error(f"No reverse match for {url_name}. Check your URL configuration.")
+            return None
+
+"""Redirects the user to a login page if they are not authenticated."""
+def redirect_to_login(request):
+    # Get custom login URL if the environment variable LOG_URL is defined
+    login_url = getattr(settings, 'LOG_URL', None)
+    if login_url is None:
+        # Or get LOGIN_URL (either specified custom login URL or Django's default)
+        login_url = settings.LOGIN_URL
+    # Resolve the login URL using our utility function to handle both types of URLs
+    login_url = build_full_url(login_url)
+    # Use build_absolute_uri to obtain the complete URL of the current request
+    full_url = request.build_absolute_uri()
+    # Create the redirect URL including the original URL as a query parameter for later redirection
+    redirect_url = f'{login_url}?url_redirect={full_url}'
+    logger.debug(f"User not allowed to access this resource, redirecting to login URL: {redirect_url}.")
+    return HttpResponseRedirect(redirect_url)
 
 """
 This function aims at protecting files served in media folder from being viewed
@@ -22,6 +68,7 @@ It uses the method to retrieve available features for a given user which does al
 with custom permissions designed within geocontrib application
 """
 def protected_serve(request, path='', document_root=None, show_indexes=False):
+    logger.debug(f"Entering function to protect static files for {path}.")
     # check if an attachment exist with the file pathname
     attachment = Attachment.objects.filter(attachment_file=path).first()
     if attachment:
@@ -36,8 +83,8 @@ def protected_serve(request, path='', document_root=None, show_indexes=False):
                 # if the feature associated with the attachment is found among the available features
                 # for this user, then continue with serving the ressource
                 return serve(request, path, document_root, show_indexes)
-    # else return a permission denied exception
-    raise PermissionDenied()
+    # If permission denied or attachment not found, redirect user to login page
+    return redirect_to_login(request)
 
 urlpatterns = [
     # Get the media files path to register routes towards it and control if the requested files can be viewed by current user
