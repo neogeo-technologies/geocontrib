@@ -3,8 +3,6 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.urls import NoReverseMatch
 from django.views.static import serve
 
 from geocontrib.models import Attachment
@@ -32,26 +30,19 @@ def build_full_url(url_name):
         # It's already an absolute URL, return it as is
         return url_name
     else:
-        try:
-            # Try to resolve the URL name using reverse
-            resolved_url = reverse(url_name)
-            # Build the full URL if settings.BASE_URL is defined
-            logger.debug(f"Value for resolved URL: {resolved_url}.")
-            logger.debug(f"Value for environment variable BASE_URL: {settings.BASE_URL}.")
-            full_url = f"{settings.BASE_URL}{resolved_url}" if hasattr(settings, 'BASE_URL') else resolved_url
-            return full_url
-        except NoReverseMatch:
-            # Handle the error if the URL name is not valid
-            logger.error(f"No reverse match for {url_name}. Check your URL configuration.")
-            return None
+        # Assume it's a path and append BASE_URL if available
+        full_url = f"{settings.BASE_URL}{url_name}" if hasattr(settings, 'BASE_URL') else url_name
+        logger.debug(f"Full URL built: {full_url}.")
+        return full_url
 
 """Redirects the user to a login page if they are not authenticated."""
 def redirect_to_login(request):
     # Get custom login URL if the environment variable LOG_URL is defined
-    login_url = getattr(settings, 'LOG_URL', None)
+    default = '/geocontrib/connexion'
+    login_url = getattr(settings, 'LOG_URL', default)
+    # Since the value being None if not defined in env file, the default is not use, thus we check if the value is None to use default
     if login_url is None:
-        # Or get LOGIN_URL (either specified custom login URL or Django's default)
-        login_url = settings.LOGIN_URL
+        login_url = default
     # Resolve the login URL using our utility function to handle both types of URLs
     login_url = build_full_url(login_url)
     # Use build_absolute_uri to obtain the complete URL of the current request
