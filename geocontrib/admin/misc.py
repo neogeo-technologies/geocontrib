@@ -30,8 +30,15 @@ class StackedEventAdmin(admin.ModelAdmin):
     )
 
 class NotificationModelAdmin(admin.ModelAdmin):
-    fields = ['subject', 'message'] # Explicitly lists all fields to include in the form.
-    #fields = ['subject', 'message', 'notification_type'] # Explicitly lists all fields to include in the form.
+    def get_fields(self, request, obj=None):
+        # Always include these fields
+        fields = ['subject', 'message']
+        
+        # Conditionally include 'notification_type'
+        if obj and obj.template_name == 'Événements groupés':
+            fields.append('notification_type')
+        
+        return fields
 
 admin.site.register(StackedEvent, StackedEventAdmin)
 admin.site.register(NotificationModel, NotificationModelAdmin)

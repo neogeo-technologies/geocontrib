@@ -139,17 +139,15 @@ def notif_suscriber_grouped_events(emails, context):
         data = Context({
             'application_name': settings.APPLICATION_NAME
         })
+        # retrieve project_name from context if notification set to be per project
+        if 'project_name' in context:
+            data.push({'project_name': context['project_name']})
         # get and render the mail object template
         subject_template = Template(notification_model.subject)
         subject = subject_template.render(data)
 
         # get the mail body header template
         message_template = Template(notification_model.message)
-        # retrieve project_name from context if notification set to be per project
-        if 'project' in context:
-            data = Context({    
-                'project_name': context.project
-            })
         # render the mail body header
         message = message_template.render(data)
         # fill context used in EmailBaseBuilder
