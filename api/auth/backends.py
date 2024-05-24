@@ -44,12 +44,12 @@ class TokenAuthentication(BaseAuthentication):
         custom_header = request.META.get('HTTP_AUTHORIZATION_GEOCONTRIB')
         if custom_header:
             # Directly use the token from custom header
-            logger.error('authenticate from TokenAuthentification with custom_header')
+            logger.debug('authenticate from TokenAuthentification with custom_header')
             raw_token = custom_header.encode('ascii')
         else:
-            logger.error('authenticate from TokenAuthentification with Bearer')
             header = get_authorization_header(request)
             if header is None:
+                logger.debug('authenticate from TokenAuthentification with Bearer')
                 return None
 
             raw_token = self.get_raw_token(header)
