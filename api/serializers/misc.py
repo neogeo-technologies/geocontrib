@@ -30,15 +30,25 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class FeatureAttachmentSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer for handling the serialization and deserialization of Attachment objects,
+    specifically for features within a project. This serializer ensures that certain fields
+    are read-only and handles the creation and updating of Attachment instances based on 
+    validated data.
+    """
+    # Field to display the creation time of the attachment, not editable by the user
     created_on = serializers.DateTimeField(read_only=True)
-
+    # Field to display the author's name or identifier, also read-only
     display_author = serializers.ReadOnlyField()
-
+    # Field to manage file attachment, not editable directly by the user
     attachment_file = serializers.FileField(read_only=True)
+    # Field to specify if the attachement is a key document, in order to send specific notifications
+    is_key_document = serializers.BooleanField(default=False)
 
     class Meta:
+        # Specifies the model associated with this serializer
         model = Attachment
+        # Specifies which fields should be included in serialized output
         fields = (
             'id',
             'title',
@@ -48,34 +58,54 @@ class FeatureAttachmentSerializer(serializers.ModelSerializer):
             # 'comment',
             'created_on',
             'display_author',
+            'is_key_document',
         )
 
     def get_user(self):
+        """
+        Retrieves the user from the request context, used to set the author field
+        during creation or updating of an attachment.
+        """
         request = self.context.get('request')
         user = getattr(request, 'user')
         return user
 
     def create(self, validated_data):
+        """
+        Custom creation method that sets additional fields based on the context and then
+        creates an Attachment instance.
+        """
         feature = self.context.get('feature')
         validated_data['feature_id'] = feature.feature_id
         validated_data['project'] = feature.project
         validated_data['author'] = self.get_user()
         validated_data['object_type'] = 'feature'
+                
         try:
+            # Attempt to create an Attachment instance with the provided validated data
             instance = Attachment.objects.create(**validated_data)
         except Exception as err:
+            # If an error occurs during creation, raise a validation error
             raise serializers.ValidationError({'error': str(err)})
         return instance
 
     def update(self, instance, validated_data):
+        """
+        Custom update method that sets the author again and updates the instance
+        based on the provided validated data.
+        """
+        # Update the author information
         validated_data['author'] = self.get_user()
         try:
+            # Update instance fields with values from validated_data
             for k, v in validated_data.items():
                 setattr(instance, k, v)
-            instance.save()
+            instance.save()  # Save the updated instance
         except Exception as err:
+            # If an error occurs during update, raise a validation error
             raise serializers.ValidationError({'error': str(err)})
         else:
+            # Return the updated instance if no errors occurred
             return instance
 
 
