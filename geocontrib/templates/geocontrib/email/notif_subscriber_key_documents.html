@@ -19,14 +19,12 @@
           <ul>
             {% for event in stacked_event.stack_data.events %}
             <li>
-              {% if event.object_type == 'key_document' %}
-                {% if event.event_type == 'create' %}
-                  {{ event.created_on }} - <a href="{{ event.related_feature.feature_url|absurl }}" target="_blank" rel="noopener">"{{ event.related_feature.title }}"</a>
-                  - Document clé publié par {{ event.display_user }}
-                {% elif event.event_type == 'update' %}
-                  {{ event.created_on }} - Document clé mis à jour par {{ event.display_user }}
-                  <a href="{{ event.related_feature.feature_url|absurl }}" target="_blank" rel="noopener">"{{ event.related_feature.title }}"</a>
-                {% endif %}
+              {% if event.event_type == 'create' %}
+                {{ event.created_on }} - <a href="{{ event.attachment_details.url|absurl }}" target="_blank" rel="noopener">"{{ event.attachment_details.title }}"</a>
+                - Document clé publié par {{ event.display_user }}
+              {% elif event.event_type == 'update' %}
+                {{ event.created_on }} - Document clé mis à jour par {{ event.display_user }}
+                <a href="{{ event.attachment_details.url|absurl }}" target="_blank" rel="noopener">"{{ event.attachment_details.title }}"</a>
               {% endif %}
             </li>
             {% endfor %}

@@ -301,7 +301,9 @@ class StackedEvent(models.Model):
     schedualed_delivery_on = models.DateTimeField(
         "Timestamp d'envoi prévu", blank=True, null=True)
     
-    # Add a property only_key_documents to filter events for notification while creating different StackedEvents in order to track their state
+    # This boolean field determines if the StackedEvent should exclusively contain 'key document' object_type events.
+    # When set to True, only 'key document' events are included in this stack, allowing for targeted notifications
+    # and easier tracking of notification states for these specific events.
     only_key_document = models.BooleanField("Document clé uniquement", default=False)
 
     class Meta:

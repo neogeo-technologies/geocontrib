@@ -203,6 +203,8 @@ class EventSerializer(serializers.ModelSerializer):
 
     project_title = serializers.SerializerMethodField()
 
+    attachment_details = serializers.SerializerMethodField()
+
     def get_related_comment(self, obj):
         res = {}
         if obj.object_type == 'comment':
@@ -223,7 +225,6 @@ class EventSerializer(serializers.ModelSerializer):
         if obj.feature_id:
             try:
                 feature = Feature.objects.get(feature_id=obj.feature_id)
-                # if feature :
                 res = {
                     'title': str(feature.title),
                     'deletion_on': str(feature.deletion_on),
@@ -240,11 +241,23 @@ class EventSerializer(serializers.ModelSerializer):
                 project = Project.objects.get(slug=obj.project_slug)
                 if project :
                     title = project.title
-                #if obj.project_slug == '352-delete-copie-22052023-1122':
-                #url = project.get_absolute_url()
             except Exception:
                 logger.exception('No related project found')
         return title
+    
+    def get_attachment_details(self, obj):
+        # Fetch attachment details if the event is related to an attachment
+        if obj.attachment_id:
+            try:
+                attachment = Attachment.objects.get(id=obj.attachment_id)
+                return {
+                    'title': attachment.title,
+                    'url': attachment.attachment_file.url,
+                }
+            except Attachment.DoesNotExist:
+                logger.exception('Attachment not found for id {}'.format(obj.attachment_id))
+                return {}
+        return {}
 
     class Meta:
         model = Event
@@ -262,6 +275,7 @@ class EventSerializer(serializers.ModelSerializer):
             'related_comment',
             'related_feature',
             'project_title',
+            'attachment_details',
         )
 
 
