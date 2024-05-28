@@ -1,3 +1,4 @@
+{% load app_filters %}
 <!DOCTYPE html>
 <html lang="fr-FR">
 <head>
@@ -5,30 +6,37 @@
 <title>Notification de publication d'un document clé</title>
 </head>
 <body>
-  <p>{% if message %}{{ message }}{% else %}Notification de publication de document clé:{% endif %}</p>
-
+  {% if message %}
+    {{ message }}
+  {% else %}
+    Bonjour,<br>
+    Voici les dernières publications de documents clés des projets que vous suivez&nbsp;:
+  {% endif%}
+  <br>
   <ul>
-    {% for event in stacked_event.stack_data.events %}
-    <li>
-      <!-- Check for attachments related to a comment -->
-      {% if event.related_comment.attachments %}
-        {% for att in event.related_comment.attachments %}
-          <a href="{{ att.url|absurl }}" target="_blank" rel="noopener">{{ att.title }}</a>
-        {% endfor %}
-      {% elif event.object_type == 'attachment' %}
-        <!-- Display info if the event is about an attachment being added -->
-        {{ event.created_on }} - Pièce-jointe ajoutée par {{ event.display_user }}
-      {% elif event.event_type == 'update' and event.object_type == 'attachment' %}
-        <!-- Update info about an attachment -->
-        Pièce-jointe mise à jour par {{ event.display_user }}
-      {% endif %}
-    </li>
+    {% for stacked_event in stacked_events %}
+      <li>{{ stacked_event.project_data.title }} :
+          <ul>
+            {% for event in stacked_event.stack_data.events %}
+            <li>
+              {% if event.object_type == 'key_document' %}
+                {% if event.event_type == 'create' %}
+                  {{ event.created_on }} - <a href="{{ event.related_feature.feature_url|absurl }}" target="_blank" rel="noopener">"{{ event.related_feature.title }}"</a>
+                  - Document clé publié par {{ event.display_user }}
+                {% elif event.event_type == 'update' %}
+                  {{ event.created_on }} - Document clé mis à jour par {{ event.display_user }}
+                  <a href="{{ event.related_feature.feature_url|absurl }}" target="_blank" rel="noopener">"{{ event.related_feature.title }}"</a>
+                {% endif %}
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+      </li>
     {% endfor %}
   </ul>
-
-  <hr style="width:100%;height:1px;background:#ccc;border:none;margin:1.2em 0;">
+  <hr style="width:100%;height:1px;background:#ccc;border:0;margin:1.2em">
   <footer style="font-size:0.8em;font-style:italic">
-    <p>Vous avez reçu ce message car vous êtes abonné(e) à l'outil {{ APPLICATION_NAME }}.</p>
+    <p>Vous avez reçu ce message car vous êtes abonné(e) à l'outil {{ APPLICATION_NAME }}</p>
   </footer>
 </body>
 </html>

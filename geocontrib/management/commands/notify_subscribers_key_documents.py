@@ -7,7 +7,7 @@ from django.utils.timezone import now
 from api.serializers import ProjectDetailedSerializer
 from api.serializers import StackedEventSerializer
 
-from geocontrib.emails import notif_suscriber_grouped_events
+from geocontrib.emails import notif_suscriber_key_documents
 from geocontrib.models import Project
 from geocontrib.models import StackedEvent
 from geocontrib.models import Subscription
@@ -50,10 +50,11 @@ class Command(BaseCommand):
             stacked_events = []
             context = {}
             for slug in project_slugs:
-                # TODO: FILTER ONLY KEY DOCUMENT PUBLISHED EVENTS
+                # Filter only key document published events
                 pending_stack = StackedEvent.objects.filter(
                     project_slug=slug, state='pending',
-                    schedualed_delivery_on__lte=now()
+                    schedualed_delivery_on__lte=now(),
+                    only_key_document=True
                 )
 
                 if pending_stack.exists():
@@ -71,9 +72,9 @@ class Command(BaseCommand):
                             }]
                         }
                         try:
-                            notif_suscriber_grouped_events(emails=[user.email, ], context=single_project_context)
+                            notif_suscriber_key_documents(emails=[user.email, ], context=single_project_context)
                         except Exception:
-                            logger.exception('Error on notif_suscriber_grouped_events: {0}'.format(user.email))
+                            logger.exception('Error on notif_suscriber_key_documents: {0}'.format(user.email))
                         else:
                             logger.info('Batch sent to {0}'.format(user.email))
                     else:    
@@ -87,14 +88,14 @@ class Command(BaseCommand):
                 context['stacked_events'] = stacked_events
                 if len(context['stacked_events']) > 0:
                     try:
-                        notif_suscriber_grouped_events(emails=[user.email, ], context=context)
+                        notif_suscriber_key_documents(emails=[user.email, ], context=context)
                     except Exception:
-                        logger.exception('Error on notif_suscriber_grouped_events: {0}'.format(user.email))
+                        logger.exception('Error on notif_suscriber_key_documents: {0}'.format(user.email))
                     else:
                         logger.info('Batch sent to {0}'.format(user.email))
 
         # TODO @cbenhabib: revoir la gestion des stack en erreur
-        for row in StackedEvent.objects.filter(state='pending', schedualed_delivery_on__lte=now()):
+        for row in StackedEvent.objects.filter(state='pending', schedualed_delivery_on__lte=now(), only_key_document=True):
             row.state = 'successful'
             row.save()
 

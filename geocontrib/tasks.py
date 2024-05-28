@@ -32,8 +32,8 @@ def task_notify_subscribers():
     call_command('notify_subscribers')
 
 @shared_task()
-def task_notify_subscribers_key_document():
-    call_command('notify_subscribers_key_document')
+def task_notify_subscribers_key_documents():
+    call_command('notify_subscribers_key_documents')
 
 
 @shared_task(soft_time_limit=2)

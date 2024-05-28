@@ -81,8 +81,8 @@
     "model": "django_celery_beat.periodictask",
     "pk": 3,
     "fields": {
-      "name": "Geocontrib Notify Suscribers Key Document",
-      "task": "geocontrib.tasks.task_notify_subscribers_key_document",
+      "name": "Geocontrib Notify Suscribers Key Documents",
+      "task": "geocontrib.tasks.task_notify_subscribers_key_documents",
       "interval": 2,
       "crontab": null,
       "solar": null,
