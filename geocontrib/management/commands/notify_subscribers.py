@@ -65,9 +65,11 @@ class Command(BaseCommand):
 
             # Gather all pending notifications for subscribed projects
             for slug in project_slugs:
+                # Filter out key documents events
                 pending_stack = StackedEvent.objects.filter(
                     project_slug=slug, state='pending',
-                    schedualed_delivery_on__lte=now()
+                    schedualed_delivery_on__lte=now(),
+                    only_key_document=False
                 )
 
                 # If there are pending notifications, serialize and prepare them
@@ -114,7 +116,7 @@ class Command(BaseCommand):
 
         # TODO @cbenhabib: revoir la gestion des stack en erreur
         # Update the state of processed notifications
-        for row in StackedEvent.objects.filter(state='pending', schedualed_delivery_on__lte=now()):
+        for row in StackedEvent.objects.filter(state='pending', schedualed_delivery_on__lte=now(), only_key_document=False):
             row.state = 'successful'
             row.save()
 

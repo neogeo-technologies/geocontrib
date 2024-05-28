@@ -311,9 +311,10 @@ def create_event_on_attachment_creation(sender, instance, created, **kwargs):
 @disable_for_loaddata
 def notify_or_stack_events(sender, instance, created, **kwargs):
     """
-    Signal handler that either stacks new events for batch notifications or notifies users immediately,
-    depending on the configured notification frequency.
-    
+    This signal handler either stacks new events for batch notifications or notifies users immediately,
+    depending on the configured notification frequency. It specifically handles 'key_document' events separately
+    by creating or updating a StackedEvent instance dedicated to key documents.
+
     Args:
         sender (Model): The model class that sent the signal.
         instance (Event): The actual instance being saved.
@@ -324,23 +325,30 @@ def notify_or_stack_events(sender, instance, created, **kwargs):
     if created and instance.project_slug and settings.DEFAULT_SENDING_FREQUENCY != 'never':
         # Events are stacked based on the sending frequency setting to notify subscribers later
         StackedEvent = apps.get_model(app_label='geocontrib', model_name="StackedEvent")
+        
+        # Determine the stack type based on the object_type of the event
+        is_key_document = instance.object_type == 'key_document'
+        
         try:
-            # Attempt to get or create a pending stack event for the project
+            # Get or create a pending StackedEvent specific to the event type (key_document or general)
             stack, _ = StackedEvent.objects.get_or_create(
-                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending',
-                project_slug=instance.project_slug)
+                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY,
+                state='pending',
+                project_slug=instance.project_slug,
+                only_key_document=is_key_document  # Use the model field to segregate events
+            )
         except Exception as e:
             logger.exception(e)
             # Log a warning if multiple stacked events exist, suggesting to remove duplicates
-            logger.warning("Several StackedEvent exists with sending_frequency='%s',"
-                           " state='pending', project_slug='%s', remove one",
-                           settings.DEFAULT_SENDING_FREQUENCY,
-                           instance.project_slug)
+            logger.warning("Several StackedEvent exists with sending_frequency='%s', state='pending', project_slug='%s', only_key_document='%s', remove one",
+                           settings.DEFAULT_SENDING_FREQUENCY, instance.project_slug, is_key_document)
             # Retrieve the first pending stack if get_or_create fails due to duplicates
             stack = StackedEvent.objects.filter(
                 sending_frequency=settings.DEFAULT_SENDING_FREQUENCY,
                 state='pending',
-                project_slug=instance.project_slug).first()
+                project_slug=instance.project_slug,
+                only_key_document=is_key_document
+            ).first()
 
         # Add the event instance to the stack and save the stack
         stack.events.add(instance)

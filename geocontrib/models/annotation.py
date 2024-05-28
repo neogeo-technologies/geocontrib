@@ -300,6 +300,9 @@ class StackedEvent(models.Model):
 
     schedualed_delivery_on = models.DateTimeField(
         "Timestamp d'envoi prévu", blank=True, null=True)
+    
+    # Add a property only_key_documents to filter events for notification while creating different StackedEvents in order to track their state
+    only_key_document = models.BooleanField("Document clé uniquement", default=False)
 
     class Meta:
         verbose_name = "Lot de notifications"
