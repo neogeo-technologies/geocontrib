@@ -217,7 +217,7 @@ pytest
 # Système de notifications
 
 ## Vue d'ensemble
-Notre système de notifications est conçu pour informer les utilisateurs des événements significatifs au sein de leurs projets, tels que la création, la mise à jour et la suppression de signalements, de commentaires et de pièces jointes. Ce système supporte des configurations flexibles, permettant d'adapter les notifications aux besoins spécifiques des projets et aux préférences des utilisateurs.
+Notre système de notifications est conçu pour informer les utilisateurs des événements significatifs au sein de leurs projets, tels que la création, la mise à jour et la suppression de signalements, de commentaires et de pièces jointes. Ce système est configurable, permettant d'adapter les notifications aux besoins spécifiques des projets et aux préférences des utilisateurs.
 - **Caractéristiques configurables commune à toutes les notifications** :
   - **Modèles Personnalisables** : Le contenu des notifications peut être personnalisé à travers des modèles éditables stockés dans la base de données, permettant un ajustement dynamique du contenu dans l'interface d'administration.
 
