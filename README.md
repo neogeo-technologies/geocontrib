@@ -202,7 +202,7 @@ Après avoir installé graphiz et django-extensions
 
 ```
 ./manage.py graph_models --pygraphviz geocontrib --output docs/model.png
-````
+```
 
 Le graphique est disponible ici [docs/model.png](docs/model.png)
 
@@ -212,6 +212,44 @@ Le graphique est disponible ici [docs/model.png](docs/model.png)
 export DJANGO_SETTINGS_MODULE=config.settings
 pytest
 
+<br>
+
+# Système de notifications
+
+## Vue d'ensemble
+Notre système de notifications est conçu pour informer les utilisateurs des événements significatifs au sein de leurs projets, tels que la création, la mise à jour et la suppression de signalements, de commentaires et de pièces jointes. Ce système supporte des configurations flexibles, permettant d'adapter les notifications aux besoins spécifiques des projets et aux préférences des utilisateurs.
+- **Caractéristiques configurables commune à toutes les notifications** :
+  - **Modèles Personnalisables** : Le contenu des notifications peut être personnalisé à travers des modèles éditables stockés dans la base de données, permettant un ajustement dynamique du contenu dans l'interface d'administration.
+
+## Types de Notifications
+
+### Notifications groupées
+- **Objectif** : Informer tous les abonnés des différents projets sur les événements variés tels que les mises à jour, les suppressions et les créations de signalement, les évolutions du projet, ainsi que la publication de commentaires ou de pièces jointes.
+- **Fonctionnement** : Les notifications sont regroupées grâce aux instances `StackedEvent`, crées par un Signal
+- **Déclencheur** : Les notifications sont regroupées grâce aux instances `StackedEvent` et envoyées périodiquement selon la configuration de la tâche périodique associée.
+- **Caractéristiques Configurables** :
+  - **Niveau d'envoi des notifications** : Les administrateurs peuvent configurer l'envoi des notifications pour les documents clés à un niveau globale ou par projet. Ceci est géré par le champ `per_project` dans le modèle `NotificationModel`.
+
+### Notifications de publications de documents clés
+- **Objectif** : Informer tous les abonnés des différents projets sur les publications importantes de documents au sein de leurs projets.
+- **Fonctionnement** : Les notifications sont regroupées grâce aux instances `StackedEvent` spécifiques, en utilisant la propriété `only_key_document`. Les piles d'événements sont crées par un Signal, lors de la publication d'une pièce jointe avec le paramètre `is_key_document`.
+- **Déclencheur** : Les notifications sont envoyées périodiquement selon la configuration de la tâche périodique associée.
+- **Caractéristiques Configurables** :
+  - **Activation des Notifications** : Les administrateurs peuvent activer ou désactiver les notifications pour les documents clés au niveau d'un type de signalement. Ceci est géré par le champ booléen `enable_key_doc_notif` dans le modèle `FeatureType`.
+  - **Niveau d'envoi des notifications** : Les administrateurs peuvent configurer l'envoi des notifications pour les documents clés à un niveau globale ou par projet. Ceci est géré par le champ `per_project` dans le modèle `NotificationModel`.
+
+### Notifications de créations de signalements en attente de modération
+- **Objectif** : Informer les modérateurs des signalements nécessitant une modération dans les projets configurés avec le paramètre de modération activé.
+- **Fonctionnement** : L'envoi de la notification est faite au niveau du modèle `Event` par la méthode `ping_users`
+- **Déclencheur** : Se produit lorsqu'un signalement est créé ou modifié par un contributeur, ce qui lui attribue automatiquement le statut "En attente de publication".
+
+### Notifications de publications de signalements après modération
+- **Objectif** : Informer le créateur d'un signalement lorsque sa soumission a été approuvée et publiée par un modérateur.
+- **Fonctionnement** : L'envoi de la notification est faite au niveau du modèle `Event` par la méthode `ping_users`
+- **Déclencheur** : Se produit lorsqu'un signalement passe du statut "En attente de publication" à "Publié'.
+
+<br>
+<br>
 
 DEVELOPPEMENT
 =============
