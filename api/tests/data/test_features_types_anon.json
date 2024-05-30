@@ -28,7 +28,8 @@
             }
         ],
         "is_editable": false,
-        "displayed_fields":  ["status", "feature_type", "updated_on"]
+        "displayed_fields":  ["status", "feature_type", "updated_on"],
+        "enable_key_doc_notif": false
     },
     {
         "title": "type 2",
@@ -56,7 +57,8 @@
             }
         ],
         "is_editable": false,
-        "displayed_fields":  ["status", "feature_type", "updated_on"]
+        "displayed_fields":  ["status", "feature_type", "updated_on"],
+        "enable_key_doc_notif": false
     },
     {
         "title": "type multilinestring",
@@ -73,6 +75,7 @@
         "project": "1-aze",
         "customfield_set": [],
         "is_editable": true,
-        "displayed_fields":  ["status", "feature_type", "updated_on"]
+        "displayed_fields":  ["status", "feature_type", "updated_on"],
+        "enable_key_doc_notif": false
     }
 ]

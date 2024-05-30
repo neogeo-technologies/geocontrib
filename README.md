@@ -173,8 +173,14 @@ Dans `/admin/django_celery_beat/periodictask`, saisissez des tâches avec leur p
 ### Tâches périodiques depuis un cron
 
 L'envoi de mails de notifications, vous pouvez l'appeler toutes les minutes ou tous les jours selon vos préférences d'envoi
+
+- Pour la notification groupée
 ```shell
 python manage.py notify_subscribers
+```
+- Pour la notification de publication de documents clés
+```shell
+python manage.py notify_subscribers_key_documents
 ```
 
 L'archivage et la suppression des signalements, à invoquer une fois par jour
