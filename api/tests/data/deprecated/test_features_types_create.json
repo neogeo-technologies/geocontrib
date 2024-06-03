@@ -49,5 +49,6 @@
         }
     ],
     "is_editable": true,
-    "displayed_fields":  ["status", "feature_type", "updated_on"]
+    "displayed_fields":  ["status", "feature_type", "updated_on"],
+    "enable_key_doc_notif": false
 }

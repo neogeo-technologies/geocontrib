@@ -14,7 +14,8 @@
             },
             "project": 1,
             "opacity": 0.5,
-            "displayed_fields":  ["status", "feature_type", "updated_on"]
+            "displayed_fields":  ["status", "feature_type", "updated_on"],
+            "enable_key_doc_notif": false
         }
     },
     {
@@ -32,7 +33,8 @@
             },
             "project": 1,
             "opacity": 0.5,
-            "displayed_fields":  ["status", "feature_type", "updated_on"]
+            "displayed_fields":  ["status", "feature_type", "updated_on"],
+            "enable_key_doc_notif": false
         }
     },
     {
@@ -50,7 +52,8 @@
             },
             "project": 1,
             "opacity": 0.5,
-            "displayed_fields":  ["status", "feature_type", "updated_on"]
+            "displayed_fields":  ["status", "feature_type", "updated_on"],
+            "enable_key_doc_notif": false
         }
     },
     {
