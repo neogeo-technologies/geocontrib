@@ -83,7 +83,13 @@ sonarqube-check:
     - test
   allow_failure: true
   script:
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=id-$CI_PROJECT_ID -Dsonar.projectName="$CI_PROJECT_PATH" -Dsonar.projectVersion=$CI_COMMIT_BRANCH -Dsonar.cpd.exclusions=api/**/deprecated/**/*sonar-scanner -Dsonar.newCode.coverage.exclusions=**/*.py
+    - sonar-scanner \
+      -Dsonar.qualitygate.wait=true \
+      -Dsonar.projectKey=id-$CI_PROJECT_ID \
+      -Dsonar.projectName="$CI_PROJECT_PATH" \
+      -Dsonar.projectVersion=$CI_COMMIT_BRANCH \
+      -Dsonar.cpd.exclusions="api/**/deprecated/**/*" \
+      -Dsonar.newCode.coverage.exclusions="**/*.py"
 
 test:
   stage: test
