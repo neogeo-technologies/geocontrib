@@ -39,7 +39,7 @@ class Command(BaseCommand):
         users = User.objects.filter(is_active=True)
         # Get the template data to check if notification_type is per project
         notification_model = NotificationModel.objects.get(
-            template_name='Événements groupés'
+            template_name='Publication de documents clés'
         )
         for user in users:
 
@@ -76,7 +76,7 @@ class Command(BaseCommand):
                         except Exception:
                             logger.exception('Error on notif_suscriber_key_documents: {0}'.format(user.email))
                         else:
-                            logger.info('Batch sent to {0}'.format(user.email))
+                            logger.info('Notification sent to {0}'.format(user.email))
                     else:    
                         stacked_events.append(
                             {
@@ -84,15 +84,14 @@ class Command(BaseCommand):
                                 'stack_data': serialized_stack.data,
                             }
                         )
-            if notification_model.notification_type == 'global':
+            if notification_model.notification_type == 'global' and len(stacked_events) > 0:
                 context['stacked_events'] = stacked_events
-                if len(context['stacked_events']) > 0:
-                    try:
-                        notif_suscriber_key_documents(emails=[user.email, ], context=context)
-                    except Exception:
-                        logger.exception('Error on notif_suscriber_key_documents: {0}'.format(user.email))
-                    else:
-                        logger.info('Batch sent to {0}'.format(user.email))
+                try:
+                    notif_suscriber_key_documents(emails=[user.email, ], context=context)
+                except Exception:
+                    logger.exception('Error on notif_suscriber_key_documents: {0}'.format(user.email))
+                else:
+                    logger.info('Batch sent to {0}'.format(user.email))
 
         # TODO @cbenhabib: revoir la gestion des stack en erreur
         for row in StackedEvent.objects.filter(state='pending', schedualed_delivery_on__lte=now(), only_key_document=True):

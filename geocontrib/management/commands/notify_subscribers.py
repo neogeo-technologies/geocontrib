@@ -93,7 +93,7 @@ class Command(BaseCommand):
                         except Exception:
                             logger.exception('Error on notif_suscriber_grouped_events: {0}'.format(user.email))
                         else:
-                            logger.info('Batch sent to {0}'.format(user.email))
+                            logger.info('Notification sent to {0}'.format(user.email))
                     else:
                         # Collect all events for a global notification
                         stacked_events.append(
@@ -104,15 +104,14 @@ class Command(BaseCommand):
                         )
 
             # If global notifications are enabled, send them out
-            if notification_model.notification_type == 'global':
+            if notification_model.notification_type == 'global' and len(stacked_events) > 0:
                 context['stacked_events'] = stacked_events
-                if len(context['stacked_events']) > 0:
-                    try:
-                        notif_suscriber_grouped_events(emails=[user.email, ], context=context)
-                    except Exception:
-                        logger.exception('Error on notif_suscriber_grouped_events: {0}'.format(user.email))
-                    else:
-                        logger.info('Batch sent to {0}'.format(user.email))
+                try:
+                    notif_suscriber_grouped_events(emails=[user.email, ], context=context)
+                except Exception:
+                    logger.exception('Error on notif_suscriber_grouped_events: {0}'.format(user.email))
+                else:
+                    logger.info('Batch sent to {0}'.format(user.email))
 
         # TODO @cbenhabib: revoir la gestion des stack en erreur
         # Update the state of processed notifications

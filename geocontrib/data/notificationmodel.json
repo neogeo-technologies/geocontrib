@@ -25,5 +25,14 @@
       "subject": "[{{ application_name }}] Activité des projets que vous suivez",
       "message": "Bonjour,<br>\nDerniers évènements des projets que vous suivez :"
     }
+  },
+  {
+    "model": "geocontrib.notificationmodel",
+    "pk": 4,
+    "fields": {
+      "template_name": "Publication de documents clés",
+      "subject": "[{{ application_name }}] Publication de documents clés",
+      "message": "Bonjour,<br>\nVoici les dernières publications de documents clés des projets que vous suivez :"
+    }
   }
 ]
