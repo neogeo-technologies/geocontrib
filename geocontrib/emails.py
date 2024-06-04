@@ -189,7 +189,7 @@ def notif_suscriber_key_documents(emails, context):
 
     except ObjectDoesNotExist:
         # Fallback subject if the notification template does not exist
-        subject = "[{}] Publication de documents clés".format(settings.APPLICATION_NAME)
+        subject = "[{}] Un document clé à été publié dans un projet que vous suivez".format(settings.APPLICATION_NAME)
 
     # Always ensure APPLICATION_NAME is in the context
     context['APPLICATION_NAME'] = settings.APPLICATION_NAME

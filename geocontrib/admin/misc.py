@@ -35,7 +35,7 @@ class NotificationModelAdmin(admin.ModelAdmin):
         fields = ['subject', 'message']
         
         # Conditionally include 'notification_type'
-        if obj and (obj.template_name == 'Événements groupés' or obj.template_name == 'Publication de documents clés'):
+        if obj and obj.template_name == 'Événements groupés':
             fields.append('notification_type')
         
         return fields

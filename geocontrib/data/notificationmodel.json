@@ -31,8 +31,8 @@
     "pk": 4,
     "fields": {
       "template_name": "Publication de documents clés",
-      "subject": "[{{ application_name }}] Publication de documents clés",
-      "message": "Bonjour,<br>\nVoici les dernières publications de documents clés des projets que vous suivez :"
+      "subject": "[{{ application_name }}] Un document clé à été publié dans un projet que vous suivez",
+      "message": "Bonjour,<br>\nUn document clé a été publié dans un des projets que vous suivez :"
     }
   }
 ]
