@@ -23,17 +23,22 @@ class Command(BaseCommand):
         des publications de document clé dans les projets auxquelles ils sont abonnés."""
 
     def handle(self, *args, **options):
+        """
+        The entry point for the management command which checks user notification settings
+        and sends out emails based on the specified frequency and type.
+        """
 
+        # Verify that the frequency setting in settings.py is correctly configured
         frequency_setted = settings.DEFAULT_SENDING_FREQUENCY
         if frequency_setted not in ['instantly', 'daily', 'weekly']:
             logger.error('The default frequency setting is incorrect')
             return
 
+        # Fetch all active users
         users = User.objects.filter(is_active=True)
-        # Get the template data to check if notification_type is per project
-        for user in users:
 
-            # Pour chaque utilisateur on filtre les abonnements projets
+        for user in users:
+            # Process each user for their subscriptions and pending notifications
             project_slugs = Subscription.objects.filter(
                 users=user
             ).values_list('project__slug', flat=True)
@@ -46,14 +51,14 @@ class Command(BaseCommand):
                     only_key_document=True
                 )
 
+                # If there are pending notifications, serialize and prepare them
                 if pending_stack.exists():
                     serialized_project = ProjectDetailedSerializer(Project.objects.get(slug=slug))
                     # On ne peut avoir qu'une pile en attente pour un projet donnée
                     serialized_stack = StackedEventSerializer(pending_stack.first())
 
                     for event in serialized_stack.data.get('events'):
-                    #if notification_model.notification_type == 'per_project':
-                        # Send email per event
+                        # Send a notification for each event individually
                         context = {
                             'project_name': serialized_project.data['title'],
                             'events_data': [event],
