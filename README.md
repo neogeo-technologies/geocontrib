@@ -242,7 +242,6 @@ Notre système de notifications est conçu pour informer les utilisateurs des é
 - **Déclencheur** : Les notifications sont envoyées périodiquement selon la configuration de la tâche périodique associée.
 - **Caractéristiques Configurables** :
   - **Activation des Notifications** : Les administrateurs peuvent activer ou désactiver les notifications pour les documents clés au niveau d'un type de signalement. Ceci est géré par le champ booléen `enable_key_doc_notif` dans le modèle `FeatureType`.
-  - **Niveau d'envoi des notifications** : Les administrateurs peuvent configurer l'envoi des notifications pour les documents clés à un niveau globale ou par projet. Ceci est géré par le champ `per_project` dans le modèle `NotificationModel`.
 
 ### Notifications de créations de signalements en attente de modération
 - **Objectif** : Informer les modérateurs des signalements nécessitant une modération dans les projets configurés avec le paramètre de modération activé.
