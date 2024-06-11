@@ -174,18 +174,22 @@ def build_full_url(url_name):
 
 """Redirects the user to a login page if they are not authenticated."""
 def redirect_to_login(request):
-    # Get custom login URL if the environment variable LOG_URL is defined
+    # Define a default login URL that matches the expected path in the frontend application.
     default = '/geocontrib/connexion'
-    login_url = getattr(settings, 'LOG_URL', default)
-    # Since the value being None if not defined in env file, the default is not use, thus we check if the value is None to use default
-    if login_url is None:
-        login_url = default
+
+    # Attempt to retrieve a custom login URL from the Django settings (settings.LOG_URL).
+    # If LOG_URL is not defined in settings, getattr will return the default value specified.
+    # The 'or default' ensures that we fallback to the default URL if LOG_URL is an empty string.
+    # This handles cases where LOG_URL might be set but empty, ensuring there's always a valid URL.
+    login_url = getattr(settings, 'LOG_URL', default) or default
+
     # Resolve the login URL using our utility function to handle both types of URLs
     login_url = build_full_url(login_url)
     # Use build_absolute_uri to obtain the complete URL of the current request
     full_url = request.build_absolute_uri()
     # Create the redirect URL including the original URL as a query parameter for later redirection
     redirect_url = f'{login_url}?url_redirect={full_url}'
+
     logger.error(f"User not allowed to access this resource, redirecting to login URL: {redirect_url}.")
     return HttpResponseRedirect(redirect_url)
 
