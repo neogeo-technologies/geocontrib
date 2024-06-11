@@ -177,11 +177,12 @@ def redirect_to_login(request):
     # Define a default login URL that matches the expected path in the frontend application.
     default = '/geocontrib/connexion'
 
-    # Attempt to retrieve a custom login URL from the Django settings (settings.LOG_URL).
-    # If LOG_URL is not defined in settings, getattr will return the default value specified.
-    # The 'or default' ensures that we fallback to the default URL if LOG_URL is an empty string.
-    # This handles cases where LOG_URL might be set but empty, ensuring there's always a valid URL.
-    login_url = getattr(settings, 'LOG_URL', default) or default
+
+    # Attempt to retrieve a custom login URL from settings, with priority for url accepting a redirect.
+    # If 'SSO_LOGIN_URL_WITH_REDIRECT' is not defined in settings, getattr will return None, fallback to 'LOG_URL'.
+    # If 'LOG_URL' is also not defined in settings, getattr will return the default value specified.
+    # The 'or default' ensures that we fallback to the default URL if LOG_URL is an empty string (which should be the case here).
+    login_url = getattr(settings, 'SSO_LOGIN_URL_WITH_REDIRECT', None) or getattr(settings, 'LOG_URL', default) or default
 
     # Resolve the login URL using our utility function to handle both types of URLs
     login_url = build_full_url(login_url)
