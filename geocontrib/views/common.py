@@ -162,14 +162,14 @@ This function distinguishes between a URL name and an absolute URL.
 For a URL name, it constructs the absolute URL by appending the base URL.
 """
 def build_full_url(url_name):
-    logger.debug(f"Building full URL for {url_name}.")
+    logger.error(f"Building full URL for {url_name}.")
     if url_name.startswith(('http://', 'https://')):
         # It's already an absolute URL, return it as is
         return url_name
     else:
         # Assume it's a path and append BASE_URL if available
         full_url = f"{settings.BASE_URL}{url_name}" if hasattr(settings, 'BASE_URL') else url_name
-        logger.debug(f"Full URL built: {full_url}.")
+        logger.error(f"Full URL built: {full_url}.")
         return full_url
 
 """Redirects the user to a login page if they are not authenticated."""
@@ -186,7 +186,7 @@ def redirect_to_login(request):
     full_url = request.build_absolute_uri()
     # Create the redirect URL including the original URL as a query parameter for later redirection
     redirect_url = f'{login_url}?url_redirect={full_url}'
-    logger.debug(f"User not allowed to access this resource, redirecting to login URL: {redirect_url}.")
+    logger.error(f"User not allowed to access this resource, redirecting to login URL: {redirect_url}.")
     return HttpResponseRedirect(redirect_url)
 
 """
@@ -196,7 +196,7 @@ It uses the method to retrieve available features for a given user which does al
 with custom permissions designed within geocontrib application
 """
 def protected_serve(request, path='', document_root=None, show_indexes=False):
-    logger.debug(f"Entering function to protect static files for {path}.")
+    logger.error(f"Entering function to protect static files for {path}.")
     # check if an attachment exist with the file pathname
     attachment = Attachment.objects.filter(attachment_file=path).first()
     if attachment:
