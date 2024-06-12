@@ -4,66 +4,88 @@
 <head>
 <meta content="text/html; charset=UTF-8">
 <title>Notifications</title>
+<style>
+  /* Styles spécifiques pour l'email pour améliorer la compatibilité */
+  .project-title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .feature-type-title {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .feature-title {
+    font-size: 14px;
+    margin-left: 10px;
+  }
+  .event-detail {
+    font-size: 13px;
+    margin-left: 10px;
+  }
+  .footer {
+    font-size: 0.8em;
+    font-style: italic;
+  }
+</style>
 </head>
 <body>
   {% if message %}
-    {{ message }}
+    {{ message|safe }}
   {% else %}
     Bonjour,<br>
-    Derniers évènements des projets que vous suivez&nbsp;:
-  {% endif%}
+    Voici les derniers événements des projets que vous suivez :
+  {% endif %}
   <br>
   <ul>
     {% for stacked_event in stacked_events %}
-      <li>{{ stacked_event.project_data.title }} :
+      <li>
+        <h3 class="project-title">{{ stacked_event.project_data.title }}</h3>
+        {% for feature_type_title, features in stacked_event.stack_data.events_by_feature_type.items %}
+          <h4 class="feature-type-title"> - {{ feature_type_title }} :</h4>
           <ul>
-            {% for event in stacked_event.stack_data.events %}
-            <li>
-              {% if event.event_type == 'delete' %}
-                {% if event.object_type == 'feature' %}
-                {{ event.created_on }} - "{{ event.data.feature_title }}"
-                  Signalement supprimé par {{ event.display_user }}
-                {% endif %}
-              {% else %}
+            {% for feature_title, feature_details in features.items %}
+              <li>
+                <a href="{{ feature_details.feature_url }}" class="feature-title">{{ feature_title }}</a>
+                <ul>
+                  {% for event in feature_details.events %}
+                    <li class="event-detail">
+                      {{ event.created_on }} - 
+                      {% if event.event_type == 'delete' %}
+                        {% if event.object_type == 'feature' %}
+                          supprimé par {{ event.display_user }}
+                        {% elif event.object_type == 'comment' %}
+                          Commentaire «{{ event.related_comment.comment }}» supprimé par {{ event.display_user }}
+                        {% endif %}
 
-                {% if event.related_feature %}
-                  {{ event.created_on }} - <a href="{{ event.related_feature.feature_url|absurl }}">"{{ event.related_feature.title }}"</a>
-                {% else %}
-                  {{ event.created_on }} - <s>"{{ event.data.feature_title }}"</s> <em>(Ressource supprimée depuis)</em> -
-                {% endif%}
+                      {% elif event.event_type == 'create' %}
+                        {% if event.object_type == 'feature' %}
+                          créé par {{ event.display_user }}
+                        {% elif event.object_type == 'comment' %}
+                          Commentaire «{{ event.related_comment.comment }}» par {{ event.display_user }}
+                          {% if event.related_comment.attachments %}
+                            {% for att in event.related_comment.attachments %}
+                              <a href="{{ att.url|absurl }}" target="_blank" rel="noopener">{{ att.title }}</a>
+                            {% endfor %}
+                          {% endif %}
+                        {% elif event.object_type == 'attachment' %}
+                          ajout d'une <a href="{{ event.attachment_details.url }}">pièce jointe</a> par {{ event.display_user }}
+                        {% endif %}
 
-                {% if event.event_type == 'create' %}
-
-                  {% if event.object_type == 'feature' %}
-                    Signalement créé par {{ event.display_user }}
-
-                  {% elif event.object_type == 'comment' %}
-                    - Commentaire créé par {{ event.display_user }}
-                    <strong>{{ event.related_comment.comment }}</strong>
-                    {% if event.related_comment.attachments %}
-                      {% for att in event.related_comment.attachments %}
-                        <a href="{{ att.url|absurl }}" target="_blank" rel="noopener">{{ att.title }}</a>
-                      {% endfor %}
-                    {% endif %}
-
-                  {% elif event.object_type == 'attachment' %}
-                    {{ event.created_on }} - Pièce-jointe ajoutée par {{ event.display_user }}
-                  {% endif %}
-
-                {% elif event.event_type == 'update' %}
-
-                  {% if event.object_type == 'feature' %}
-                    Signalement mis à jour par {{ event.display_user }}
-
-                  {% elif event.object_type == 'attachment' %}
-                    Pièce-jointe mise à jour par {{ event.display_user }}
-                  {% endif %}
-
-                {% endif %}
-              {% endif %}
-            </li>
+                        
+                      {% elif event.event_type == 'update' %}
+                        {% if event.object_type == 'feature' %}
+                          mis à jour par {{ event.display_user }}
+                        {% elif event.object_type == 'attachment' %}
+                          mise à jour d'une <a href="{{ event.attachment_details.url }}">pièce jointe</a> par {{ event.display_user }}
+                        {% endif %}
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </li>
             {% endfor %}
           </ul>
+        {% endfor %}
       </li>
     {% endfor %}
   </ul>
