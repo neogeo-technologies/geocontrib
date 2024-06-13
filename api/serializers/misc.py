@@ -1,3 +1,4 @@
+from collections import defaultdict 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -5,6 +6,7 @@ from api import logger
 from geocontrib.models import Attachment
 from geocontrib.models import Comment
 from geocontrib.models import Feature
+from geocontrib.models import FeatureType
 from geocontrib.models import Project
 from geocontrib.models import Event
 from geocontrib.models import StackedEvent
@@ -244,7 +246,7 @@ class EventSerializer(serializers.ModelSerializer):
             except Exception:
                 logger.exception('No related project found')
         return title
-    
+
     def get_attachment_details(self, obj):
         # Fetch attachment details if the event is related to an attachment
         if obj.attachment_id:
@@ -311,12 +313,60 @@ class FeatureEventSerializer(serializers.ModelSerializer):
 
 
 class StackedEventSerializer(serializers.ModelSerializer):
-
-    events = EventSerializer(many=True, read_only=True)
+    # Define a custom field to dynamically create the serialized event data
+    events = serializers.SerializerMethodField()
 
     class Meta:
         model = StackedEvent
-        fields = '__all__'
+        fields = '__all__'  # Serialize all fields from StackedEvent model
+
+    def get_events(self, obj):
+        # Retrieve all related events for the stacked event instance
+        events = obj.events.all()
+        # Initialize a nested defaultdict for grouping events by feature type and title
+        events_grouped = defaultdict(lambda: defaultdict(list))
+
+        # Gather all unique feature IDs from the events to minimize database queries
+        feature_ids = {event.feature_id for event in events if event.feature_id}
+        # Retrieve all corresponding Feature objects in a single query, including their types
+        features = Feature.objects.filter(feature_id__in=feature_ids).select_related('feature_type')
+        # Map feature IDs to Feature objects for quick access
+        feature_map = {feature.feature_id: feature for feature in features}
+
+        # Dictionary mapping feature type slugs to their titles
+        feature_types = FeatureType.objects.all().values('slug', 'title')
+        slug_to_title = {ft['slug']: ft['title'] for ft in feature_types}
+
+        # Iterate through each event to group them by feature type and title
+        for event in events:
+            feature_type_slug = event.feature_type_slug
+            # Check and assign the correct feature type slug if not available
+            if not feature_type_slug and event.feature_id and event.feature_id in feature_map:
+                feature = feature_map[event.feature_id]
+                feature_type_slug = feature.feature_type.slug if feature.feature_type else None
+            # Assign a title from the feature map or use 'Unknown Feature' if missing
+            feature_title = feature_map[event.feature_id].title if event.feature_id in feature_map else 'Unknown Feature'
+            # Group the event under the appropriate feature type and title
+            if feature_type_slug:
+                events_grouped[slug_to_title.get(feature_type_slug, 'Type inconnu')][feature_title].append(event)
+
+        # Serialize the grouped events for output
+        grouped_data = {}
+        for feature_type, features in events_grouped.items():
+            feature_data = {}
+            for feature_title, events in features.items():
+                # Retrieve the URL for the feature if available
+                feature_url = feature_map[events[0].feature_id].get_view_url() if events[0].feature_id in feature_map else "#"
+                # Sort events by creation time or other criteria as needed
+                events_sorted = sorted(events, key=lambda x: x.created_on)
+                # Store the sorted events with the feature URL in the serialized data
+                feature_data[feature_title] = {
+                    'feature_url': feature_url,
+                    'events': EventSerializer(events_sorted, many=True, read_only=True).data
+                }
+            grouped_data[feature_type] = feature_data
+
+        return grouped_data
 
 
 class ImportTaskSerializer(serializers.ModelSerializer):
