@@ -7,7 +7,7 @@
 </head>
 <body>
   {% if message %}
-    {{ message|safe }}
+    {{ message }}
   {% else %}
     Bonjour,<br>
     Voici les derniers événements des projets que vous suivez :
@@ -62,7 +62,7 @@
     {% endfor %}
   </ul>
   <hr style="width:100%;height:1px;background:#ccc;border:0;margin:1.2em,0">
-  <span style="font-size:0.8em;font-style:italic;">
+  <span style="font-size:0.8em;font-style:italic">
     <p>Vous avez reçu ce message car vous êtes abonné(e) à l'outil {{ APPLICATION_NAME }}</p>
   </span>
 </body>
