@@ -10,7 +10,7 @@
     {{ message }}
   {% else %}
     Bonjour,<br>
-    Voici les derniers événements des projets que vous suivez :
+    Derniers événements des projets que vous suivez&nbsp;:
   {% endif %}
   <br>
   <ul>
@@ -18,7 +18,7 @@
       <li>
         <h4 style="font-size:1em;font-weight:bold;">{{ stacked_event.project_data.title }}</h4>
         {% for feature_type_title, features in stacked_event.stack_data.events.items %}
-          <p style="font-size:1em;margin-left:10px;"> - {{ feature_type_title }} :</p>
+          <p style="font-size:1em;margin-left:10px;"> - {{ feature_type_title }}&nbsp;:</p>
           <ul>
             {% for feature_title, feature_details in features.items %}
               <li>
