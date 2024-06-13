@@ -56,19 +56,22 @@ class Command(BaseCommand):
                     serialized_project = ProjectDetailedSerializer(Project.objects.get(slug=slug))
                     # On ne peut avoir qu'une pile en attente pour un projet donnée
                     serialized_stack = StackedEventSerializer(pending_stack.first())
-
-                    for event in serialized_stack.data.get('events'):
-                        # Send a notification for each event individually
-                        context = {
-                            'project_name': serialized_project.data['title'],
-                            'events_data': [event],
-                        }
-                        try:
-                            notif_suscriber_key_documents(emails=[user.email, ], context=context)
-                        except Exception:
-                            logger.exception('Error on notif_suscriber_key_documents: {0}'.format(user.email))
-                        else:
-                            logger.info('Notification sent to {0}'.format(user.email))
+                    # Loop over each event, nested inside feature dict, itself nested in feature_type dict
+                    # structure needed for grouped events notification, but here a notification is sent individually for each event
+                    for feature_type_title, features in serialized_stack.data.get('events', {}).items():
+                        for feature_title, feature_details in features.items():
+                            for event in feature_details.get('events', []):
+                                # Send a notification for each event individually
+                                context = {
+                                    'project_name': serialized_project.data['title'],
+                                    'events_data': [event],
+                                }
+                                try:
+                                    notif_suscriber_key_documents(emails=[user.email, ], context=context)
+                                except Exception:
+                                    logger.exception('Error on notif_suscriber_key_documents: {0}'.format(user.email))
+                                else:
+                                    logger.info('Notification sent to {0}'.format(user.email))
 
         # TODO @cbenhabib: revoir la gestion des stack en erreur
         for row in StackedEvent.objects.filter(state='pending', schedualed_delivery_on__lte=now(), only_key_document=True):

@@ -312,13 +312,13 @@ class FeatureEventSerializer(serializers.ModelSerializer):
         )
 
 class StackedEventSerializer(serializers.ModelSerializer):
-    events_by_feature_type = serializers.SerializerMethodField()
+    events = serializers.SerializerMethodField()
 
     class Meta:
         model = StackedEvent
         fields = '__all__'
 
-    def get_events_by_feature_type(self, obj):
+    def get_events(self, obj):
         events = obj.events.all()
         events_grouped = defaultdict(lambda: defaultdict(list))
 
@@ -334,10 +334,6 @@ class StackedEventSerializer(serializers.ModelSerializer):
         for event in events:
             feature_type_slug = event.feature_type_slug
             if not feature_type_slug and event.feature_id and event.feature_id in feature_map:
-#               feature = Feature.objects.get(feature_id=event.feature_id)
-#               feature_type = FeatureType.objects.get(id=feature.feature_type_id)
-#               if feature_type:
-#                   feature_type_slug = feature_type.slug
                 feature = feature_map[event.feature_id]
                 feature_type_slug = feature.feature_type.slug if feature.feature_type else None
             feature_title = feature_map[event.feature_id].title if event.feature_id in feature_map else 'Unknown Feature'
@@ -359,38 +355,6 @@ class StackedEventSerializer(serializers.ModelSerializer):
 
         return grouped_data
 
-
-# class StackedEventSerializer(serializers.ModelSerializer):
-#     events_by_feature_type = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = StackedEvent
-#         fields = '__all__'
-
-#     def get_events_by_feature_type(self, obj):
-#         events = obj.events.all()
-#         events_grouped = defaultdict(list)
-#         breakpoint()
-#         # Créer un dictionnaire des slugs vers les titres de types de fonctionnalité
-#         feature_types = FeatureType.objects.all().values('slug', 'title')
-#         slug_to_title = {ft['slug']: ft['title'] for ft in feature_types}
-
-#         for event in events:
-#             feature_type_slug = event.feature_type_slug
-#             if not feature_type_slug:
-#                 feature = Feature.objects.get(feature_id=event.feature_id)
-#                 feature_type = FeatureType.objects.get(id=feature.feature_type_id)
-#                 if feature_type:
-#                     feature_type_slug = feature_type.slug
-#             events_grouped[feature_type_slug].append(event)
-
-#         # Sérialisation des groupes d'événements avec titres des types de fonctionnalité
-#         grouped_data = {}
-#         for feature_slug, events in events_grouped.items():
-#             title = slug_to_title.get(feature_slug, 'Type inconnu')  # Fallback si le slug n'est pas trouvé
-#             grouped_data[title] = EventSerializer(events, many=True).data
-
-#         return grouped_data
 
 class ImportTaskSerializer(serializers.ModelSerializer):
 
