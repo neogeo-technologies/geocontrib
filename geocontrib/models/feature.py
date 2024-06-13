@@ -258,6 +258,10 @@ class FeatureType(models.Model):
         "Activer la notification de publication de pièces jointes", default=False
     )
 
+    disable_notification = models.BooleanField(
+        "Désactiver les notifications", default=False
+    )
+
     class Meta:
         verbose_name = "Type de signalement"
         verbose_name_plural = "Types de signalements"

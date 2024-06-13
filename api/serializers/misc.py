@@ -313,6 +313,19 @@ class FeatureEventSerializer(serializers.ModelSerializer):
 
 
 class StackedEventSerializer(serializers.ModelSerializer):
+    """
+    Serializer for StackedEvent objects. This serializer dynamically groups and serializes events 
+    associated with a StackedEvent instance. The events are grouped by feature type and feature title,
+    and each group is further processed to include only those events whose feature types have notifications enabled.
+
+    The serializer performs several key operations:
+    - Retrieves and groups all events related to the stacked event instance.
+    - Fetches all Feature objects associated with these events in a single query to minimize database hits.
+    - Utilizes a nested defaultdict to organize events by feature type and then by feature title.
+    - Filters out any events linked to feature types where 'disable_notification' is set to True.
+    - Serializes grouped events, ensuring that each event is associated with its correct feature URL and sorted by creation time.
+    """
+
     # Define a custom field to dynamically create the serialized event data
     events = serializers.SerializerMethodField()
 
@@ -333,9 +346,10 @@ class StackedEventSerializer(serializers.ModelSerializer):
         # Map feature IDs to Feature objects for quick access
         feature_map = {feature.feature_id: feature for feature in features}
 
-        # Dictionary mapping feature type slugs to their titles
-        feature_types = FeatureType.objects.all().values('slug', 'title')
-        slug_to_title = {ft['slug']: ft['title'] for ft in feature_types}
+        # Fetch FeatureTypes including the disable_notification attribute
+        feature_types = FeatureType.objects.all().values('slug', 'title', 'disable_notification')
+        # Dictionary mapping feature type slugs to their titles with disable notification param
+        slug_to_title_and_notification = {ft['slug']: (ft['title'], ft['disable_notification']) for ft in feature_types}
 
         # Iterate through each event to group them by feature type and title
         for event in events:
@@ -344,11 +358,14 @@ class StackedEventSerializer(serializers.ModelSerializer):
             if not feature_type_slug and event.feature_id and event.feature_id in feature_map:
                 feature = feature_map[event.feature_id]
                 feature_type_slug = feature.feature_type.slug if feature.feature_type else None
-            # Assign a title from the feature map or use 'Unknown Feature' if missing
-            feature_title = feature_map[event.feature_id].title if event.feature_id in feature_map else 'Unknown Feature'
-            # Group the event under the appropriate feature type and title
-            if feature_type_slug:
-                events_grouped[slug_to_title.get(feature_type_slug, 'Type inconnu')][feature_title].append(event)
+            # Check if feature_type slug is found and if notifications are not disabled in case it is not a key document
+            if feature_type_slug and (event.object_type == 'key_document' or not slug_to_title_and_notification[feature_type_slug][1]):
+                # Assign a title from the feature map or use 'Élément inconnu' if missing
+                feature_title = feature_map[event.feature_id].title if event.feature_id in feature_map else 'Élément inconnu'
+                # Use the feature type title from the map, fallback to 'Type inconnu' if not found
+                feature_type_title = slug_to_title_and_notification.get(feature_type_slug, ('Type inconnu', False))[0]
+                # Group the event under the appropriate feature type and title
+                events_grouped[feature_type_title][feature_title].append(event)
 
         # Serialize the grouped events for output
         grouped_data = {}
