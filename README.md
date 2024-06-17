@@ -235,6 +235,7 @@ Notre système de notifications est conçu pour informer les utilisateurs des é
 - **Déclencheur** : Les notifications sont regroupées grâce aux instances `StackedEvent` et envoyées périodiquement selon la configuration de la tâche périodique associée.
 - **Caractéristiques Configurables** :
   - **Niveau d'envoi des notifications** : Les administrateurs peuvent configurer l'envoi des notifications pour les documents clés à un niveau globale ou par projet. Ceci est géré par le champ `per_project` dans le modèle `NotificationModel`.
+  - **Désactivation des notifications** : Vous pouvez désactiver les notifications pour un type de signalement via l'interface d'administration ou la configuration d'affichage de signalement dans l'application frontend. L'envoi des notifications de publication de documents clés ne sont pas impactés par ce pramétrage.
 
 ### Notifications de publications de documents clés
 - **Objectif** : Informer tous les abonnés des différents projets sur les publications importantes de documents au sein de leurs projets.

@@ -85,6 +85,7 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
             'is_editable',
             'displayed_fields',
             'enable_key_doc_notif',
+            'disable_notification',
         )
         # Prevents the slug from being modified after creation.
         read_only_fields = [
@@ -130,7 +131,7 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
         Checks for changes in the display properties specifically to handle them conditionally.
         """
         # Check for changes in display-related properties.
-        comp_keys = ['color', 'icon', 'opacity', 'colors_style', 'displayed_fields', 'enable_key_doc_notif']
+        comp_keys = ['color', 'icon', 'opacity', 'colors_style', 'displayed_fields', 'enable_key_doc_notif', 'disable_notification']
         is_display_edited = not all(self.data.get(key) == validated_data.get(key) for key in comp_keys)
 
         if not instance.is_editable:
