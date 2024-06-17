@@ -41,7 +41,7 @@ class TokenAuthentication(BaseAuthentication):
     
     def authenticate(self, request):
         # Check for custom header first
-        custom_header = request.META.get('HTTP_AUTHORIZATION_GEOCONTRIB')
+        custom_header = request.META.get('HTTP_X_AUTHORIZATION_GEOCONTRIB')
         if custom_header:
             # Directly use the token from custom header
             logger.error('authenticate from TokenAuthentification with custom_header')
