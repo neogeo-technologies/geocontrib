@@ -77,9 +77,11 @@ class Command(BaseCommand):
                     serialized_project = ProjectDetailedSerializer(Project.objects.get(slug=slug))
                     # On ne peut avoir qu'une pile en attente pour un projet donnée
                     serialized_stack = StackedEventSerializer(pending_stack.first())
-
+                    # If no events are returned (when notification is disabled in the feature type) skip sending a notification
+                    if not serialized_stack.data.get('events', {}):
+                        pass
                     # Check if notifications should be sent per project or globally
-                    if notification_model.notification_type == 'per_project':
+                    elif notification_model.notification_type == 'per_project':
                         # Send a notification for each project individually
                         single_project_context = {
                             'project_name': serialized_project.data['title'],
