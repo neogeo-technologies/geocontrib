@@ -22,7 +22,11 @@
           <ul>
             {% for feature_title, feature_details in features.items %}
               <li>
-                <a href="{{ feature_details.feature_url|absurl }}" style="font-size:.95em;margin-left:10px;" target="_blank" rel="noopener">« {{ feature_title }} »</a>
+                {% if feature_details.feature_url != "deleted" %}
+                    <a href="{{ feature_details.feature_url|absurl }}" style="font-size:.95em;margin-left:10px;" target="_blank" rel="noopener">« {{ feature_title }} »</a>
+                {% else %}
+                    <p>« {{ feature_title }} »</p>
+                {% endif %}
                 <ul>
                   {% for event in feature_details.events %}
                     <li style="font-size:.9em;margin-left:10px;">
