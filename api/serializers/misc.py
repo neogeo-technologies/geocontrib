@@ -372,8 +372,11 @@ class StackedEventSerializer(serializers.ModelSerializer):
         for feature_type, features in events_grouped.items():
             feature_data = {}
             for feature_title, events in features.items():
-                # Retrieve the URL for the feature if available
-                feature_url = feature_map[events[0].feature_id].get_view_url() if events[0].feature_id in feature_map else "#"
+                # Retrieve the Feature object if it exists in the feature_map
+                feature = feature_map.get(events[0].feature_id)
+                # Only provide the feature URL if the feature has not been deleted
+                # (i.e., deletion_on should be None to include the URL)
+                feature_url = feature.get_view_url() if feature and feature.deletion_on is None else "deleted"
                 # Sort events by creation time or other criteria as needed
                 events_sorted = sorted(events, key=lambda x: x.created_on)
                 # Store the sorted events with the feature URL in the serialized data
