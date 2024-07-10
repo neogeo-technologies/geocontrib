@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.2.0] - 2024-07-10
+
+### Evolutions
+
+- Redmine 19726 : Permettre de modifier le contenu du mail via l’administration Django
+- Redmine 19727 : Rendre paramétrable le fait d’envoyer une notification globale ou une notification par projet
+- Redmine 19728 : Ajouter un nouveau type de notification : Notification de publication d’un document clé
+- Redmine 19729 : Réorganiser les éléments affichés dans le mail de notification
+- Redmine 19730 : Choisir les types de signalements apparaissant sur les notifications
+
 ## [6.1.0] - 2024-03-20
 
 ### Evolution
