@@ -1,7 +1,10 @@
 import requests
+import logging
+import json
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import HttpResponse
 from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -11,6 +14,7 @@ from api.serializers import LayerSerializer
 from geocontrib.models import BaseMap
 from geocontrib.models import Layer
 
+logger = logging.getLogger(__name__)
 
 class GetFeatureInfo(APIView):
 
@@ -51,8 +55,14 @@ class GetFeatureInfo(APIView):
             if code != 200 or not data.get('type', '') == 'FeatureCollection':
                 data = "Les données ne sont pas au format geoJSON"
             return Response(data=data, status=code)
-        except Exception:
-            return Response(data="Les données sont inaccessibles", status=404)
+        except json.decoder.JSONDecodeError as e:
+            logger.error(f"Failed to decode JSON from response: {response.content}")
+            logger.exception(e)
+            return HttpResponse(response.content, status=response.status_code, content_type=response.headers.get('Content-Type'))
+        except Exception as e:
+            logger.error(f"An unexpected error occurred: {e}")
+            logger.exception(e)
+            return Response(data="Les données sont inaccessibles", status=502)
 
 class BaseMapViewset(
         mixins.ListModelMixin,
