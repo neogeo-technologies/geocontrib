@@ -97,6 +97,7 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * IDGO_VERIFY_CERTIFICATE = permet de se connecter à datasud sans certificat, False en dév ;
 * IDGO_LOGIN = login pour accéder au catalogue idgo depuis geocontrib ;
 * IDGO_PASSWORD = mot de passe pour accéder au catalogue idgo depuis geocontrib ;
+* SSO_OGS_SESSION_URL = url api OGS pour vérifier l'activation de la session utilisateur (si défini active la connexion par OGS) ;
 
 
 Copier le contenu du fichier config_sample/urls.py dans config/urls.py
