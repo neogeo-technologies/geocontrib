@@ -64,8 +64,8 @@ class UserInfoView(views.APIView):
     This view handles two scenarios:
     1. If the user is already authenticated in the Django application, it returns the user information.
     2. If the user is not authenticated and SSO with OGS is configured, it checks the OGS session.
-       - If the OGS session is active, it authenticates or creates the user in Django.
-       - If the OGS session is not active, it redirects the user to the login page.
+       - If the OGS session is active, it authenticates or creates the user in Django and returns the user information.
+    Else it raises a not authenticated error
     """
 
     def get(self, request):
@@ -83,39 +83,30 @@ class UserInfoView(views.APIView):
         elif settings.SSO_OGS_SESSION_URL:
             session_id = request.COOKIES.get('sessionid')
 
-            # If there is no session cookie, redirect to login
-            if not session_id:
-                return Response({"redirect": True}, status=status.HTTP_401_UNAUTHORIZED)
-            
-            # Call the OGS session endpoint with the session cookie
-            response = requests.get(settings.SSO_OGS_SESSION_URL, cookies={'sessionid': session_id})
+            # If a session cookie for OGS is found
+            if session_id:
+                # Call the OGS session endpoint with the session cookie
+                response = requests.get(settings.SSO_OGS_SESSION_URL, cookies={'sessionid': session_id})
 
-            # If the response from OGS is successful
-            if response.status_code == 200:
-                data = response.json()
-                username = data.get('user').get('username')
+                # If the response from OGS is successful
+                if response.status_code == 200:
+                    data = response.json()
+                    username = data.get('user').get('username')
 
-                # If the username is found in the response, authenticate or create the user in Django
-                if username:
-                    user, created = User.objects.get_or_create(username=username)
-                    if created:
-                        user.save()
-                    login(request, user)
-                    data = {
-                        "detail": f"{user.username} session is enabled",
-                        "user": UserSerializer(user).data
-                    }
-                    return Response(data=data, status=status.HTTP_200_OK)
-                else:
-                    # If the username is not found, redirect to login
-                    return Response({"redirect": True}, status=status.HTTP_401_UNAUTHORIZED)
-
-            # If the response from OGS is not successful, redirect to login
-            return Response({"redirect": True}, status=status.HTTP_401_UNAUTHORIZED)
+                    # If the username is found in the response, authenticate or create the user in Django
+                    if username:
+                        user, created = User.objects.get_or_create(username=username)
+                        if created:
+                            user.save()
+                        login(request, user)
+                        data = {
+                            "detail": f"{user.username} session is enabled",
+                            "user": UserSerializer(user).data
+                        }
+                        return Response(data=data, status=status.HTTP_200_OK)
         
-        else:
-            # If no authentication method is available, raise an error
-            raise NotAuthenticated()
+        # If no authentication method is available, raise an error
+        raise NotAuthenticated()
 
 class LogoutView(views.APIView):
 
