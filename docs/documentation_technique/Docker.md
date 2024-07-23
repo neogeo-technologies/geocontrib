@@ -67,27 +67,29 @@ L'image docker de base possèdes ces variables de configuration :
 * "USE_X_FORWARDED_HOST", default=False, cast=bool
 
 Variables utilisées pour configurer le frontend:
-* APPLICATION_NAME
-* APPLICATION_ABSTRACT
-* LOGO_PATH
-* FAVICON_PATH
-* DISABLE_LOGIN_BUTTON
-* FONT_FAMILY
-* HEADER_COLOR                  # color to customize the header background
-* PRIMARY_COLOR                 # color to customize the app elements, like borders, icons (override teal color)
-* PRIMARY_HIGHLIGHT_COLOR       # color for the app elements, at hover, focus, active,... (better to be darker, brighter would need to change font color too, not implemented)
-* LOG_URL
-* BASE_URL
+* APPLICATION_ABSTRACT          # short description displayed in app header
+* APPLICATION_NAME              # name of the app, to display in app header and notifications
+* BASE_URL                      # following domain name, it specifies the base URL to use for all relative URLs
 * CATALOG_NAME                  # name of the catalog to import features from
-* IDGO                          # boolean to display import features from catalog buttons
+* DEFAULT_MAP_VIEW_CENTER       # center setting at maps loading
 * DEFAULT_BASE_MAP_SCHEMA_TYPE  # type of basemap used by default (like TMS, WMTS or WMS)
 * DEFAULT_BASE_MAP_SERVICE      # service providing the default basemap
 * DEFAULT_BASE_MAP_OPTIONS      # default basemap options, contains maxZoom and attribution
-* DEFAULT_MAP_VIEW_CENTER       # center setting at maps loading
 * DEFAULT_MAP_VIEW_ZOOM         # zoom setting at maps loading
-* MAP_PREVIEW_CENTER            # center of the map preview displayed when setting project max scale
-* DISPLAY_FORBIDDEN_PROJECTS
+* DISABLE_LOGIN_BUTTON          # hide login button when authentification is managed outside the app
+* DISPLAY_FORBIDDEN_PROJECTS    # specifies if all project should be displayed in the main page list
 * DISPLAY_FORBIDDEN_PROJECTS_DEFAULT
+* FAVICON_PATH                  # path where the favicon is stored
+* FONT_FAMILY                   # specifies which font to use in the app
+* HEADER_COLOR                  # color to customize the header background
+* IDGO                          # boolean to display import features from catalog buttons
+* LOG_URL                       # url used to login through SSO
+* LOGO_PATH                     # path where the logo is stored
+* MAP_PREVIEW_CENTER            # center of the map preview displayed when setting project max scale
+* PRIMARY_COLOR                 # color to customize the app elements, like borders, icons (override teal color)
+* PRIMARY_HIGHLIGHT_COLOR       # color for the app elements, at hover, focus, active,... (better to be darker, brighter would need to change font color too, not implemented)
+* PROJECT_FILTERS               # filters to be displayed on project list: should be a list as a string. For example: the complete list of all available filters should be: 'access_level,user_access_level,moderation,search' To not display any filters, the value would be 'empty' (or any string not included in the available filters, '' would not work, since the default value would override it)
+* SSO_LOGIN_URL_WITH_REDIRECT   # url used to login through SSO and allowing redirection to an origin url
 * URL_DOCUMENTATION             # url de la documentation de Géocontrib
 * URL_DOCUMENTATION_FEATURE     # url de la documentation de Géocontrib pour les features
 
