@@ -145,7 +145,7 @@ class FeatureTypeAdmin(admin.ModelAdmin):
             HttpResponse: A redirect to the `FeatureType` change page if view creation is successful,
                         or a rendered template response with the form if validation fails or for GET requests.
         """
-        
+
         # Define formsets for selecting feature details and custom fields
         FeatureDetailSelectionFormset = formset_factory(
             FeatureSelectFieldAdminForm,  # Form for selecting feature details
@@ -177,7 +177,7 @@ class FeatureTypeAdmin(admin.ModelAdmin):
                 initial=feature_detail_initial)
             cfs_formset = CustomFieldsFormSet(request.POST or None, prefix='cfs')
             pg_form = AddPosgresViewAdminForm(request.POST or None)
-            
+
             # Validate all forms
             if fds_formset.is_valid() and pg_form.is_valid() and cfs_formset.is_valid():
                 view_name = pg_form.cleaned_data.get('name')  # Get view name from form
