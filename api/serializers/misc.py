@@ -1,3 +1,4 @@
+from collections import defaultdict 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -5,6 +6,7 @@ from api import logger
 from geocontrib.models import Attachment
 from geocontrib.models import Comment
 from geocontrib.models import Feature
+from geocontrib.models import FeatureType
 from geocontrib.models import Project
 from geocontrib.models import Event
 from geocontrib.models import StackedEvent
@@ -30,15 +32,25 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class FeatureAttachmentSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer for handling the serialization and deserialization of Attachment objects,
+    specifically for features within a project. This serializer ensures that certain fields
+    are read-only and handles the creation and updating of Attachment instances based on 
+    validated data.
+    """
+    # Field to display the creation time of the attachment, not editable by the user
     created_on = serializers.DateTimeField(read_only=True)
-
+    # Field to display the author's name or identifier, also read-only
     display_author = serializers.ReadOnlyField()
-
+    # Field to manage file attachment, not editable directly by the user
     attachment_file = serializers.FileField(read_only=True)
+    # Field to specify if the attachement is a key document, in order to send specific notifications
+    is_key_document = serializers.BooleanField(default=False)
 
     class Meta:
+        # Specifies the model associated with this serializer
         model = Attachment
+        # Specifies which fields should be included in serialized output
         fields = (
             'id',
             'title',
@@ -48,34 +60,54 @@ class FeatureAttachmentSerializer(serializers.ModelSerializer):
             # 'comment',
             'created_on',
             'display_author',
+            'is_key_document',
         )
 
     def get_user(self):
+        """
+        Retrieves the user from the request context, used to set the author field
+        during creation or updating of an attachment.
+        """
         request = self.context.get('request')
         user = getattr(request, 'user')
         return user
 
     def create(self, validated_data):
+        """
+        Custom creation method that sets additional fields based on the context and then
+        creates an Attachment instance.
+        """
         feature = self.context.get('feature')
         validated_data['feature_id'] = feature.feature_id
         validated_data['project'] = feature.project
         validated_data['author'] = self.get_user()
         validated_data['object_type'] = 'feature'
+                
         try:
+            # Attempt to create an Attachment instance with the provided validated data
             instance = Attachment.objects.create(**validated_data)
         except Exception as err:
+            # If an error occurs during creation, raise a validation error
             raise serializers.ValidationError({'error': str(err)})
         return instance
 
     def update(self, instance, validated_data):
+        """
+        Custom update method that sets the author again and updates the instance
+        based on the provided validated data.
+        """
+        # Update the author information
         validated_data['author'] = self.get_user()
         try:
+            # Update instance fields with values from validated_data
             for k, v in validated_data.items():
                 setattr(instance, k, v)
-            instance.save()
+            instance.save()  # Save the updated instance
         except Exception as err:
+            # If an error occurs during update, raise a validation error
             raise serializers.ValidationError({'error': str(err)})
         else:
+            # Return the updated instance if no errors occurred
             return instance
 
 
@@ -173,6 +205,8 @@ class EventSerializer(serializers.ModelSerializer):
 
     project_title = serializers.SerializerMethodField()
 
+    attachment_details = serializers.SerializerMethodField()
+
     def get_related_comment(self, obj):
         res = {}
         if obj.object_type == 'comment':
@@ -193,7 +227,6 @@ class EventSerializer(serializers.ModelSerializer):
         if obj.feature_id:
             try:
                 feature = Feature.objects.get(feature_id=obj.feature_id)
-                # if feature :
                 res = {
                     'title': str(feature.title),
                     'deletion_on': str(feature.deletion_on),
@@ -210,11 +243,23 @@ class EventSerializer(serializers.ModelSerializer):
                 project = Project.objects.get(slug=obj.project_slug)
                 if project :
                     title = project.title
-                #if obj.project_slug == '352-delete-copie-22052023-1122':
-                #url = project.get_absolute_url()
             except Exception:
                 logger.exception('No related project found')
         return title
+
+    def get_attachment_details(self, obj):
+        # Fetch attachment details if the event is related to an attachment
+        if obj.attachment_id:
+            try:
+                attachment = Attachment.objects.get(id=obj.attachment_id)
+                return {
+                    'title': attachment.title,
+                    'url': attachment.attachment_file.url,
+                }
+            except Attachment.DoesNotExist:
+                logger.exception('Attachment not found for id {}'.format(obj.attachment_id))
+                return {}
+        return {}
 
     class Meta:
         model = Event
@@ -232,6 +277,7 @@ class EventSerializer(serializers.ModelSerializer):
             'related_comment',
             'related_feature',
             'project_title',
+            'attachment_details',
         )
 
 
@@ -267,12 +313,80 @@ class FeatureEventSerializer(serializers.ModelSerializer):
 
 
 class StackedEventSerializer(serializers.ModelSerializer):
+    """
+    Serializer for StackedEvent objects. This serializer dynamically groups and serializes events 
+    associated with a StackedEvent instance. The events are grouped by feature type and feature title,
+    and each group is further processed to include only those events whose feature types have notifications enabled.
 
-    events = EventSerializer(many=True, read_only=True)
+    The serializer performs several key operations:
+    - Retrieves and groups all events related to the stacked event instance.
+    - Fetches all Feature objects associated with these events in a single query to minimize database hits.
+    - Utilizes a nested defaultdict to organize events by feature type and then by feature title.
+    - Filters out any events linked to feature types where 'disable_notification' is set to True.
+    - Serializes grouped events, ensuring that each event is associated with its correct feature URL and sorted by creation time.
+    """
+
+    # Define a custom field to dynamically create the serialized event data
+    events = serializers.SerializerMethodField()
 
     class Meta:
         model = StackedEvent
-        fields = '__all__'
+        fields = '__all__'  # Serialize all fields from StackedEvent model
+
+    def get_events(self, obj):
+        # Retrieve all related events for the stacked event instance
+        events = obj.events.all()
+        # Initialize a nested defaultdict for grouping events by feature type and title
+        events_grouped = defaultdict(lambda: defaultdict(list))
+
+        # Gather all unique feature IDs from the events to minimize database queries
+        feature_ids = {event.feature_id for event in events if event.feature_id}
+        # Retrieve all corresponding Feature objects in a single query, including their types
+        features = Feature.objects.filter(feature_id__in=feature_ids).select_related('feature_type')
+        # Map feature IDs to Feature objects for quick access
+        feature_map = {feature.feature_id: feature for feature in features}
+
+        # Fetch FeatureTypes including the disable_notification attribute
+        feature_types = FeatureType.objects.all().values('slug', 'title', 'disable_notification')
+        # Dictionary mapping feature type slugs to their titles with disable notification param
+        slug_to_title_and_notification = {ft['slug']: (ft['title'], ft['disable_notification']) for ft in feature_types}
+
+        # Iterate through each event to group them by feature type and title
+        for event in events:
+            feature_type_slug = event.feature_type_slug
+            # Check and assign the correct feature type slug if not available
+            if not feature_type_slug and event.feature_id and event.feature_id in feature_map:
+                feature = feature_map[event.feature_id]
+                feature_type_slug = feature.feature_type.slug if feature.feature_type else None
+            # Check if feature_type slug is found and if notifications are not disabled in case it is not a key document
+            if feature_type_slug and (event.object_type == 'key_document' or not slug_to_title_and_notification[feature_type_slug][1]):
+                # Assign a title from the feature map or use 'Élément inconnu' if missing
+                feature_title = feature_map[event.feature_id].title if event.feature_id in feature_map else 'Élément inconnu'
+                # Use the feature type title from the map, fallback to 'Type inconnu' if not found
+                feature_type_title = slug_to_title_and_notification.get(feature_type_slug, ('Type inconnu', False))[0]
+                # Group the event under the appropriate feature type and title
+                events_grouped[feature_type_title][feature_title].append(event)
+
+        # Serialize the grouped events for output
+        grouped_data = {}
+        for feature_type, features in events_grouped.items():
+            feature_data = {}
+            for feature_title, events in features.items():
+                # Retrieve the Feature object if it exists in the feature_map
+                feature = feature_map.get(events[0].feature_id)
+                # Only provide the feature URL if the feature has not been deleted
+                # (i.e., deletion_on should be None to include the URL)
+                feature_url = feature.get_view_url() if feature and feature.deletion_on is None else "deleted"
+                # Sort events by creation time or other criteria as needed
+                events_sorted = sorted(events, key=lambda x: x.created_on)
+                # Store the sorted events with the feature URL in the serialized data
+                feature_data[feature_title] = {
+                    'feature_url': feature_url,
+                    'events': EventSerializer(events_sorted, many=True, read_only=True).data
+                }
+            grouped_data[feature_type] = feature_data
+
+        return grouped_data
 
 
 class ImportTaskSerializer(serializers.ModelSerializer):

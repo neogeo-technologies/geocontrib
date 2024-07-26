@@ -30,7 +30,10 @@ server {
 
     # Don't forget to use the URL_PREFIX geocontrib setting value here:
     location /${URL_PREFIX}media/ {
-        autoindex on;
-        alias /opt/geocontrib/media/;
+        proxy_pass http://geocontrib_site;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-NginX-Proxy true;
     }
 }

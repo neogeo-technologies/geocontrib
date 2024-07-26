@@ -54,9 +54,17 @@ class FeatureTypeSerializer(serializers.ModelSerializer):
 
 
 class FeatureTypeListSerializer(serializers.ModelSerializer):
-
+    """
+    A serializer for listing and handling feature types within a project.
+    This serializer also manages custom fields associated with each feature type,
+    allowing for dynamic modification of these fields based on user input.
+    """
+    
+    # Relates each feature type to a project by its slug.
     project = serializers.SlugRelatedField(
         slug_field='slug', queryset=Project.objects.all())
+    
+    # Nested serializer to handle custom fields, allowing null and not required by default.
     customfield_set = CustomFieldSerializer(
         many=True, allow_null=True, required=False
     )
@@ -76,18 +84,29 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
             'customfield_set',
             'is_editable',
             'displayed_fields',
+            'enable_key_doc_notif',
+            'disable_notification',
         )
+        # Prevents the slug from being modified after creation.
         read_only_fields = [
             'slug',
         ]
 
     def handle_related(self, instance, custom_fields):
+        """
+        Handles the creation or update of custom fields related to a feature type instance.
+        Deletes existing custom fields and recreates them from provided list.
+        """
         if isinstance(custom_fields, list):
             instance.customfield_set.all().delete()
             for field in custom_fields:
                 CustomField.objects.create(feature_type=instance, **field)
 
     def validate_project(self, obj):
+        """
+        Ensures the user has permission to create or edit feature types within the project.
+        Raises a validation error if not authorized.
+        """
         user = self.context['request'].user
         if not Authorization.has_permission(user, 'can_create_feature_type', obj):
             raise serializers.ValidationError({
@@ -95,6 +114,9 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
         return obj
 
     def create(self, validated_data):
+        """
+        Creates a new feature type, handling the related custom fields as a transactional operation.
+        """
         customfield_set = validated_data.pop('customfield_set', None)
         try:
             feature_type = FeatureType.objects.create(**validated_data)
@@ -104,20 +126,20 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
         return feature_type
 
     def update(self, instance, validated_data):
-
-        # Look for symbology differences
-        comp_keys = ['color', 'icon', 'opacity', 'colors_style', 'displayed_fields']
+        """
+        Updates an existing feature type and its related custom fields.
+        Checks for changes in the display properties specifically to handle them conditionally.
+        """
+        # Check for changes in display-related properties.
+        comp_keys = ['color', 'icon', 'opacity', 'colors_style', 'displayed_fields', 'enable_key_doc_notif', 'disable_notification']
         is_display_edited = not all(self.data.get(key) == validated_data.get(key) for key in comp_keys)
 
         if not instance.is_editable:
-
             if is_display_edited:
-                # Handle symbology edition
-                setattr(instance, 'color', validated_data.get('color'))
-                setattr(instance, 'icon', validated_data.get('icon'))
-                setattr(instance, 'opacity', validated_data.get('opacity'))
-                setattr(instance, 'colors_style', validated_data.get('colors_style'))
-                setattr(instance, 'displayed_fields', validated_data.get('displayed_fields'))
+                # Update display-related properties if they have been changed.
+                for key in comp_keys:
+                    if key in validated_data:  # Ensure the key exists in the validated data before setting it.
+                        setattr(instance, key, validated_data.get(key))
 
             else:
                 raise serializers.ValidationError({

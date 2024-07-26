@@ -5,6 +5,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.dispatch import receiver
+from django.db import transaction
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -125,13 +126,36 @@ def set_users_perms(sender, instance, created, **kwargs):
             )
         except Exception:
             logger.exception('Trigger.set_users_perms')
+        """
+        On ajoute la permission d'utilisateur connecté pour le projet à tous les autres utilisateurs actifs.
+        Pour éviter que le traitement des autorisations avec beaucoup d'utiliseurs ne prennent trop de temps
+        et déclenche une erreur 502 à cause d'un timeout, on utilise un bulk create pour faire une transitions unique
+        Il n'y a pas d'équivalent de create_or_update et je n'ai pas trouvé le moyen d'exclure les autorisation déjà existante
+        sur un projet pour un utilisateur, mais comme l'opération n'est effectué qu'au create du projet, il ne devrait pas
+        y avoir ce type d'erreur. En cas d'erreurs, la bdd ne devrait pas être polluée en utilisant une transaction.atomic,
+        car aucune opération n'est effectué sur la bdd en présence d'une erreur.
+        """
         try:
-            for user in User.objects.filter(is_active=True).exclude(pk=instance.creator.pk):
-                Authorization.objects.update_or_create(
-                    project=instance,
-                    user=user,
-                    defaults={'level': UserLevelPermission.objects.get(rank=1)}
-                )
+            active_users = (
+                User.objects
+                .filter(is_active=True)
+                .exclude(pk=instance.creator.pk)
+            )
+            default_permission_level = UserLevelPermission.objects.get(rank=1)
+
+            new_authorizations = []
+            for user in active_users:
+                new_authorizations.append(Authorization(
+                    project_id=instance.pk,
+                    user_id=user.pk,
+                    level=default_permission_level,
+                    created_on = timezone.now(),
+                    updated_on = timezone.now()
+                ))
+
+            with transaction.atomic():
+                Authorization.objects.bulk_create(new_authorizations)
+
         except Exception:
             logger.exception('Trigger.set_users_perms')
 
@@ -188,8 +212,8 @@ def setUser(user):
 @receiver(models.signals.post_save, sender='geocontrib.Feature')
 @disable_for_loaddata
 def create_event_on_feature_create_or_update(sender, instance, created, **kwargs):
-    # Pour la modification d'un signalement l'évènement est generé parallelement
-    # à l'update() afin de recupere l'utilisateur courant.
+    # Pour la modification ou la suppression d'un signalement l'évènement est generé parallelement
+    # à l'update() afin de récupérer l'utilisateur courant.
     # Le signalement peut etre en 'pending' dés la création
     # on force le has_changed pour event.ping_users()
     Event = apps.get_model(app_label='geocontrib', model_name="Event")
@@ -210,25 +234,25 @@ def create_event_on_feature_create_or_update(sender, instance, created, **kwargs
                 }
             }
         )
-    else:
-        if instance:
-            last_editor = setUser(instance.last_editor)
-            Event.objects.create(
-                feature_id=instance.feature_id,
-                event_type='update',
-                object_type='feature',
-                user= last_editor,
-                project_slug=instance.project.slug,
-                feature_type_slug=instance.feature_type.slug,
-                data={
-                    'extra': instance.feature_data,
-                    'feature_title': instance.title,
-                    'feature_status': {
-                        'has_changed': True,
-                        'new_status': instance.status
-                    }
+    elif instance:
+        last_editor = setUser(instance.last_editor)
+        Event.objects.create(
+            feature_id=instance.feature_id,
+            # If deletion_on is set, the feature has been deleted
+            event_type='update' if instance.deletion_on == None else 'delete',
+            object_type='feature',
+            user= last_editor,
+            project_slug=instance.project.slug,
+            feature_type_slug=instance.feature_type.slug,
+            data={
+                'extra': instance.feature_data,
+                'feature_title': instance.title,
+                'feature_status': {
+                    'has_changed': True,
+                    'new_status': instance.status
                 }
-            )
+            }
+        )
 
 
 @receiver(models.signals.post_save, sender='geocontrib.Comment')
@@ -256,50 +280,85 @@ def create_event_on_comment_creation(sender, instance, created, **kwargs):
 @receiver(models.signals.post_save, sender='geocontrib.Attachment')
 @disable_for_loaddata
 def create_event_on_attachment_creation(sender, instance, created, **kwargs):
+    """
+    Creates an event whenever a new attachment is saved to the database.
+    This function checks if the attachment is either not linked to a comment 
+    (as events linked to comments notify subscribers with a global notification), 
+    or is marked as a key document, to send a specific notification for 'key_document' events.
 
+    Args:
+        sender (Model): The model class that sent the signal.
+        instance (Attachment): The actual instance of Attachment being saved.
+        created (bool): True if a new record was created, indicating this is a new attachment.
+        **kwargs: Additional keyword arguments supplied by the signal.
+    """
     Event = apps.get_model(app_label='geocontrib', model_name="Event")
-    # Si creation d'une piece jointe sans rapport avec un commentaire
-    if created and not instance.comment:
+    # Check if the attachment is newly created and either not related to a comment or is a key document
+    if created and (not instance.comment or instance.is_key_document):
+        # Create a new event in the database
         Event.objects.create(
-            feature_id=instance.feature_id,
-            attachment_id=instance.id,
-            event_type='create',
-            object_type='attachment',
-            user=instance.author,
-            project_slug=instance.project.slug,
-            data={}
+            feature_id=instance.feature_id,  # Link the event to the same feature as the attachment
+            attachment_id=instance.id,  # Record the ID of the new attachment
+            event_type='create',  # Define the type of event
+            object_type='key_document' if instance.is_key_document else 'attachment',  # Determine the object type based on whether it's a key document
+            user=instance.author,  # Associate the event with the user who created the attachment
+            project_slug=instance.project.slug,  # Include the project slug for further filtering
+            data={}  # Empty dictionary for additional data, can be used for extending features
         )
 
 
 @receiver(models.signals.post_save, sender='geocontrib.Event')
 @disable_for_loaddata
 def notify_or_stack_events(sender, instance, created, **kwargs):
+    """
+    This signal handler either stacks new events for batch notifications or notifies users immediately,
+    depending on the configured notification frequency. It specifically handles 'key_document' events separately
+    by creating or updating a StackedEvent instance dedicated to key documents.
 
+    Args:
+        sender (Model): The model class that sent the signal.
+        instance (Event): The actual instance being saved.
+        created (bool): True if a new record was created.
+        **kwargs: Additional keyword arguments.
+    """
+    # Process only newly created events that have a related project and when notifications are not set to 'never'
     if created and instance.project_slug and settings.DEFAULT_SENDING_FREQUENCY != 'never':
-        # On empile les evenements pour notifier les abonnés, en fonction de la fréquence d'envoi
+        # Events are stacked based on the sending frequency setting to notify subscribers later
         StackedEvent = apps.get_model(app_label='geocontrib', model_name="StackedEvent")
+        
+        # Determine the stack type based on the object_type of the event
+        is_key_document = instance.object_type == 'key_document'
+        
         try:
+            # Get or create a pending StackedEvent specific to the event type (key_document or general)
             stack, _ = StackedEvent.objects.get_or_create(
-                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY, state='pending',
-                project_slug=instance.project_slug)
+                sending_frequency=settings.DEFAULT_SENDING_FREQUENCY,
+                state='pending',
+                project_slug=instance.project_slug,
+                only_key_document=is_key_document  # Use the model field to segregate events
+            )
         except Exception as e:
             logger.exception(e)
-            logger.warning("Several StackedEvent exists with sending_frequency='%s',"
-                           " state='pending', project_slug='%s', remove one",
-                           settings.DEFAULT_SENDING_FREQUENCY,
-                           instance.project_slug)
+            # Log a warning if multiple stacked events exist, suggesting to remove duplicates
+            logger.warning("Several StackedEvent exists with sending_frequency='%s', state='pending', project_slug='%s', only_key_document='%s', remove one",
+                           settings.DEFAULT_SENDING_FREQUENCY, instance.project_slug, is_key_document)
+            # Retrieve the first pending stack if get_or_create fails due to duplicates
             stack = StackedEvent.objects.filter(
                 sending_frequency=settings.DEFAULT_SENDING_FREQUENCY,
                 state='pending',
-                project_slug=instance.project_slug).first()
+                project_slug=instance.project_slug,
+                only_key_document=is_key_document
+            ).first()
 
+        # Add the event instance to the stack and save the stack
         stack.events.add(instance)
         stack.save()
 
-        # On notifie les collaborateurs des messages nécessitant une action immédiate
+        # Notify collaborators of messages requiring immediate action
         try:
             instance.ping_users()
         except Exception:
+            # Log an exception if there is an error during the ping users operation
             logger.exception('ping_users@notify_or_stack_events')
 
 

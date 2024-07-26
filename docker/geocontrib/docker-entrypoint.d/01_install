@@ -61,6 +61,13 @@ else
         python manage.py loaddata src/geocontrib/data/flatpages.json
     fi
 
+    # Check if notificationmodel exists before loading notificationmodel.json
+    num_notificationmodel=`python manage.py shell --command="from geocontrib.models.notification import NotificationModel; print(len(NotificationModel.objects.all()))"`
+    if [ $num_notificationmodel -eq 0 ]; then
+        # if the number of notificationmodel is 0, then we load the data file
+        python manage.py loaddata src/geocontrib/data/notificationmodel.json
+    fi
+
     echo "Ok" > $marker_file
 fi
 

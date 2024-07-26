@@ -80,3 +80,6 @@ variables:
   
   VUE_APP_URL_DOCUMENTATION:
     env_config_front: URL_DOCUMENTATION
+  
+  VUE_APP_URL_DOCUMENTATION_FEATURE:
+    env_config_front: URL_DOCUMENTATION_FEATURE
