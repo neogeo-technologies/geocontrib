@@ -65,66 +65,104 @@ class CustomFieldTabular(admin.TabularInline):
 
 
 class FeatureTypeAdmin(admin.ModelAdmin):
-    form = FeatureTypeAdminForm
+    """
+    Admin interface for managing `FeatureType` models with custom functionality for PostgreSQL view creation.
+
+    This admin class provides:
+    - A custom form (`FeatureTypeAdminForm`) for managing `FeatureType` instances.
+    - Inline editing of associated `CustomField` models through `CustomFieldTabular`.
+    - A custom change form template that includes options for creating PostgreSQL views.
+    - Custom URL routing for creating PostgreSQL views associated with `FeatureType` models.
+    - Methods for handling the creation of PostgreSQL views, including form processing, SQL execution, and error handling.
+    """
+    form = FeatureTypeAdminForm # Custom form for `FeatureType` model management.
     inlines = (
-        CustomFieldTabular,
+        CustomFieldTabular, # Inline formset for `CustomField` models
     )
-    change_form_template = 'admin/geocontrib/with_create_postrgres_view.html'
+    change_form_template = 'admin/geocontrib/with_create_postrgres_view.html' # Path to the custom template for editing `FeatureType` models.
 
-    list_display = ('title', 'project')
+    list_display = ('title', 'project') # Fields displayed in the list view of `FeatureType` models
+    ordering = ('project', 'title') # Default ordering for the `FeatureType` list view
 
-    ordering = ('project', 'title')
-
-    delete_selected.short_description = 'Supprimer les éléments sélectionnés de la base de données'
+    delete_selected.short_description = 'Supprimer les éléments sélectionnés de la base de données' # Description for the bulk delete action
 
     def get_readonly_fields(self, request, obj=None):
+        """
+        Returns a list of fields that should be read-only based on the edit status of the object.
+        """
         if obj:
             return self.readonly_fields + ('geom_type', )
         return self.readonly_fields
 
     def get_urls(self):
-        urls = super().get_urls()
+        """
+        Adds a custom URL for PostgreSQL view creation.
+        """
+        urls = super().get_urls()  # Default admin URLs
         my_urls = [
             path(
-                '<int:feature_type_id>/create-postgres-view/',
+                '<int:feature_type_id>/create-postgres-view/',  # Custom view creation URL
                 self.admin_site.admin_view(self.create_postgres_view),
                 name='create_postgres_view'),
         ]
-        return my_urls + urls
+        return my_urls + urls  # Combine with default URLs
 
     def pop_deleted_forms(self, cleaned_data):
+        """
+        Removes forms marked for deletion from the cleaned data.
+        """
         return [row for row in cleaned_data if row.get('DELETE') is False]
 
     def exec_sql(self, request, sql_create_view, view_name):
+        """
+        Executes SQL to create a PostgreSQL view and handles messaging based on success or failure.
+        """
         success = False
         with connections['default'].cursor() as cursor:
             try:
-                cursor.execute(sql_create_view)
+                cursor.execute(sql_create_view)  # Execute SQL command
             except Exception as err:
                 logger.exception("PostgreSQL view creation failed: {0}".format(sql_create_view))
-                messages.error(request, "La vue PostgreSQL n'a pas pu être créée : {0}".format(err))
+                messages.error(request, "La vue PostgreSQL n'a pas pu être créée : {0}".format(err))  # Error message
             else:
-                messages.success(request, "La vue PostgreSQL '{0}' est disponible. ".format(view_name))
+                messages.success(request, "La vue PostgreSQL '{0}' est disponible. ".format(view_name))  # Success message
                 success = True
         return success
 
     def create_postgres_view(self, request, feature_type_id, *args, **kwargs):
+        """
+        Handles the creation of a PostgreSQL view for a specific `FeatureType` through a custom admin form.
 
+        This method processes both GET and POST requests:
+        - For GET requests, it initializes and displays the form used to create a PostgreSQL view.
+        - For POST requests, it processes the form submission, validates the data, generates SQL for the view, and executes the SQL command.
+
+        Args:
+            request (HttpRequest): The HTTP request object containing metadata and data for the request.
+            feature_type_id (int): The ID of the `FeatureType` model for which the PostgreSQL view is being created.
+
+        Returns:
+            HttpResponse: A redirect to the `FeatureType` change page if view creation is successful,
+                        or a rendered template response with the form if validation fails or for GET requests.
+        """
+        
+        # Define formsets for selecting feature details and custom fields
         FeatureDetailSelectionFormset = formset_factory(
-            FeatureSelectFieldAdminForm,
-            formset=HiddenDeleteBaseFormSet,
+            FeatureSelectFieldAdminForm,  # Form for selecting feature details
+            formset=HiddenDeleteBaseFormSet,  # Formset class with support for form deletion
             can_delete=True,
-            extra=0
+            extra=0  # No extra empty forms
         )
-
+        # Define formset for custom fields
         CustomFieldsFormSet = modelformset_factory(
-            CustomField,
+            CustomField,  # Model for custom fields
             can_delete=True,
-            form=CustomFieldModelAdminForm,
-            formset=HiddenDeleteModelFormSet,
-            extra=0,
+            form=CustomFieldModelAdminForm,  # Form for editing custom fields
+            formset=HiddenDeleteModelFormSet,  # Formset class with support for form deletion
+            extra=0  # No extra empty forms
         )
 
+        # Prepare initial data for the feature detail formset
         feature_detail_initial = [{
             'related_field': (
                 str(field.name), "{0} - {1}".format(
@@ -133,17 +171,21 @@ class FeatureTypeAdmin(admin.ModelAdmin):
         } for field in Feature._meta.get_fields() if field.name in ('feature_id', 'title', 'description', 'geom')]
 
         if request.method == 'POST':
+            # Process the form submission
             fds_formset = FeatureDetailSelectionFormset(
                 request.POST or None, prefix='fds',
                 initial=feature_detail_initial)
             cfs_formset = CustomFieldsFormSet(request.POST or None, prefix='cfs')
             pg_form = AddPosgresViewAdminForm(request.POST or None)
+            
+            # Validate all forms
             if fds_formset.is_valid() and pg_form.is_valid() and cfs_formset.is_valid():
-                view_name = pg_form.cleaned_data.get('name')
-                status = pg_form.cleaned_data.get('status') or (stat[0] for stat in Feature.STATUS_CHOICES)
-                fds_data = self.pop_deleted_forms(fds_formset.cleaned_data)
-                cfs_data = self.pop_deleted_forms(cfs_formset.cleaned_data)
+                view_name = pg_form.cleaned_data.get('name')  # Get view name from form
+                status = pg_form.cleaned_data.get('status') or (stat[0] for stat in Feature.STATUS_CHOICES)  # Get status from form
+                fds_data = self.pop_deleted_forms(fds_formset.cleaned_data)  # Filter out deleted feature details
+                cfs_data = self.pop_deleted_forms(cfs_formset.cleaned_data)  # Filter out deleted custom fields
 
+                # Generate SQL script for creating the PostgreSQL view
                 sql = render_to_string(
                     'sql/create_view.sql',
                     context=dict(
@@ -151,34 +193,40 @@ class FeatureTypeAdmin(admin.ModelAdmin):
                         cfs_data=cfs_data,
                         feature_type_id=feature_type_id,
                         status=status,
-                        schema=getattr(settings, 'DB_SCHEMA', 'public'),
+                        schema=getattr(settings, 'DB_SCHEMA', 'public'),  # Get database schema from settings
                         view_name=view_name,
-                        user=settings.DATABASES['default']['USER'],
+                        user=settings.DATABASES['default']['USER'],  # Database user from settings
                     ))
-                logger.debug(sql)
+                logger.debug(sql)  # Log the generated SQL for debugging
+
+                # Execute the SQL script
                 its_alright = self.exec_sql(request, sql, view_name)
                 if its_alright:
+                    # Redirect to the change page for the FeatureType if view creation is successful
                     return redirect('admin:geocontrib_featuretype_change', feature_type_id)
-
             else:
+                # Log errors if any of the forms are invalid
                 for formset in [fds_formset, pg_form, cfs_formset]:
                     logger.error(formset.errors)
 
         else:
-            pg_form = AddPosgresViewAdminForm()
+            # Initialize forms for GET request
+            pg_form = AddPosgresViewAdminForm()  # Create an empty form for PostgreSQL view details
             fds_formset = FeatureDetailSelectionFormset(
                 prefix='fds',
-                initial=feature_detail_initial)
+                initial=feature_detail_initial)  # Provide initial data for feature details
             cfs_formset = CustomFieldsFormSet(
-                queryset=CustomField.objects.filter(feature_type__pk=feature_type_id),
+                queryset=CustomField.objects.filter(feature_type__pk=feature_type_id),  # Queryset for custom fields related to the feature type
                 prefix='cfs')
 
+        # Prepare the context for rendering the template
         context = self.admin_site.each_context(request)
         context['opts'] = self.model._meta
         context['fds_formset'] = fds_formset
         context['cfs_formset'] = cfs_formset
         context['pg_form'] = pg_form
 
+        # Render the template with the form for creating the PostgreSQL view
         return TemplateResponse(request, "admin/geocontrib/create_postrges_view_form.html", context)
 
 
