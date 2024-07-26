@@ -36,4 +36,5 @@ def custom_contexts(request):
         'SELECTED_GEOCODER_PROVIDER': settings.SELECTED_GEOCODER.get('PROVIDER'),
         'SSO_SETTED': sso_setted(request),
         'LOGIN_URL': login_url(),
+        'LOGIN_REDIRECT_URL': settings.LOGIN_REDIRECT_URL
     }
