@@ -241,18 +241,6 @@ DEFAULT_MAP_VIEW = {
     'zoom': 4
 }
 
-# Available geocoders
-GEOCODER_PROVIDERS = {
-    'ADDOK': 'addok',
-    'NOMINATIM': 'nominatim',
-    'PHOTON': 'photon'
-}
-
-# Active geocoder
-SELECTED_GEOCODER = {
-    'PROVIDER': config('SELECTED_GEOCODER_PROVIDER', default='addok')
-}
-
 # Project duplication settings
 PROJECT_COPY_RELATED = {
     'AUTHORIZATION': config('PROJECT_COPY_RELATED_AUTHORIZATION', default=True, cast=bool),
