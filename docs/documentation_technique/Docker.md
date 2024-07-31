@@ -56,7 +56,6 @@ L'image docker de base possèdes ces variables de configuration :
 * "OUR_APPS", default="geocontrib, api", cast=Csv()
 * "REDIS_HOST", default="redis"
 * "SECRET_KEY", default="SECRET_KEY"
-* "SELECTED_GEOCODER_PROVIDER", default="addok"
 * "SSO_MIDDLEWARE", default="", cast=Csv()
 * "SSO_PLUGIN", default="", cast=Csv()
 * "THIRD_PARTY_DJANGO_APPS", default="rest_framework, rest_framework_gis, django_celery_beat,", cast=Csv()
