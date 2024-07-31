@@ -147,6 +147,7 @@ AUTH_USER_MODEL = 'geocontrib.User'
 LOGIN_URL = config("LOGIN_URL", default='geocontrib:login')
 LOGIN_REDIRECT_URL = 'geocontrib:index'
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
+SSO_OGS_SESSION_URL = config('SSO_OGS_SESSION_URL', default='')
 
 # CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
 cas_server_url = config('CAS_SERVER_URL', None)
