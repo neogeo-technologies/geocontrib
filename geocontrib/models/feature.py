@@ -347,6 +347,7 @@ class CustomField(models.Model):
         verbose_name = "Champ personnalisé"
         verbose_name_plural = "Champs personnalisés"
         unique_together = (('name', 'feature_type'),)
+        ordering = ['position']
 
     def __str__(self):
         return "{}.{}".format(self.feature_type.slug, self.name)
