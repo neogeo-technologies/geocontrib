@@ -93,7 +93,7 @@ synchroniser."""
             "password": LDAP_PASSWD,
             "auto_bind": True
         }
-        logger.debug("Ldap connexion parameters: {0}".format(connection_dict))
+        #logger.debug("Ldap connexion parameters: {0}".format(connection_dict))
         connection = Connection(**connection_dict)
         data = self.search_ldap(connection)
         return data
@@ -277,7 +277,7 @@ synchroniser."""
 
     def handle(self, *args, **options):
         remote_users = self.get_remote_data()
-        logger.info(remote_users)
+        #logger.info(remote_users)
         self.check_remote_data(remote_users)
         self.flush_local_db(remote_users)
         self.create_users(remote_users)
