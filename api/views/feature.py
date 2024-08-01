@@ -6,9 +6,10 @@ import collections
 from datetime import date
 
 from django.db.models import Q
+from django.db import transaction
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.gis.geos import Polygon
+from django.contrib.gis.geos import Polygon, Polygon, MultiPoint, MultiLineString, MultiPolygon
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.db.models import Extent
 from django.http import HttpResponse
@@ -404,9 +405,30 @@ class ProjectFeatureBbox(generics.ListAPIView):
 class ExportFeatureList(views.APIView):
     """
     API view for exporting feature data related to a project in various formats such as JSON, GeoJSON, or CSV.
+    This view handles the conversion of single geometries to their corresponding multi geometries when necessary,
+    based on the feature type's geom_type.
     """
 
     http_method_names = ['get', ]
+
+    def convert_to_multi_geometry(self, geom, geom_type):
+        """
+        Converts single geometries to their corresponding multi geometries if necessary.
+
+        Parameters:
+        - geom: The geometry to be converted.
+        - geom_type: The type of geometry defined by feature_type.
+
+        Returns:
+        - Geometry: The converted or original geometry.
+        """
+        if geom_type == 'multipoint' and geom.geom_type == 'Point':
+            return MultiPoint([geom])
+        elif geom_type == 'multilinestring' and geom.geom_type == 'LineString':
+            return MultiLineString([geom])
+        elif geom_type == 'multipolygon' and geom.geom_type == 'Polygon':
+            return MultiPolygon([geom])
+        return geom  # Return original geom if no conversion is needed
 
     def get_csv_headers(self, serializer, feature_type):
         """
@@ -478,34 +500,42 @@ class ExportFeatureList(views.APIView):
 
         # Determine the format for export
         format = request.GET.get('format_export')
+        feature_type = FeatureType.objects.get(slug=feature_type_slug)
+        # Process features in batches to optimize memory usage
+        batch_size = 1000
+        start = 0
+        total = features.count()
 
-        # Handling JSON export
-        if format == 'json':
-            serializer = FeatureJSONSerializer(features, many=True, context={'request': request})
-            response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
-            response['Content-Disposition'] = 'attachment; filename=export_projet.json'
-
-        # Handling GeoJSON export
-        elif format == 'geojson':
-            serializer = FeatureGeoJSONSerializer(features, many=True, context={'request': request})
-            response = HttpResponse(json.dumps(serializer.data), content_type='application/json')
-            response['Content-Disposition'] = 'attachment; filename=export_projet.json'
-
-        # Handling CSV export
-        elif format == 'csv':
-            serializer = FeatureCSVSerializer(features, many=True, context={'request': request})
-            response = HttpResponse(content_type='text/csv')
+        # Initialize the response object based on the requested format
+        response = HttpResponse(content_type='text/csv' if format == 'csv' else 'application/json')
+        if format == 'csv':
             response['Content-Disposition'] = 'attachment; filename=export_projet.csv'
-
-            feature_type = FeatureType.objects.get(slug=feature_type_slug)
-
-            # Prepare CSV headers and initialize a CSV writer
-            writer = csv.DictWriter(response, fieldnames=self.get_csv_headers(serializer, feature_type))
+            writer = csv.DictWriter(response, fieldnames=self.get_csv_headers(None, feature_type))
             writer.writeheader()
 
-            # Write each feature to the CSV file
-            for row in serializer.data:
-                writer.writerow(self.prepare_csv_row(row, feature_type))
+        while start < total:
+            end = min(start + batch_size, total)
+            batch = features[start:end]
+
+            # Use a transaction to ensure data consistency within the batch
+            with transaction.atomic():
+                for feature in batch:
+                    # Convert single geometries to multi-geometries if required by feature_type
+                    feature.geom = self.convert_to_multi_geometry(feature.geom, feature_type.geom_type)
+
+                # Serialize the data and write it to the response based on the format
+                if format == 'json':
+                    serializer = FeatureJSONSerializer(batch, many=True, context={'request': request})
+                    response.write(json.dumps(serializer.data))
+                elif format == 'geojson':
+                    serializer = FeatureGeoJSONSerializer(batch, many=True, context={'request': request})
+                    response.write(json.dumps(serializer.data))
+                elif format == 'csv':
+                    serializer = FeatureCSVSerializer(batch, many=True, context={'request': request})
+                    for row in serializer.data:
+                        writer.writerow(self.prepare_csv_row(row, feature_type))
+
+            start = end
 
         return response
 
