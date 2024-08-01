@@ -509,8 +509,9 @@ class ExportFeatureList(views.APIView):
         # Initialize the response object based on the requested format
         response = HttpResponse(content_type='text/csv' if format == 'csv' else 'application/json')
         if format == 'csv':
+            serializer = FeatureCSVSerializer(features, many=True, context={'request': request})
             response['Content-Disposition'] = 'attachment; filename=export_projet.csv'
-            writer = csv.DictWriter(response, fieldnames=self.get_csv_headers(None, feature_type))
+            writer = csv.DictWriter(response, fieldnames=self.get_csv_headers(serializer, feature_type))
             writer.writeheader()
 
         while start < total:
@@ -531,7 +532,6 @@ class ExportFeatureList(views.APIView):
                     serializer = FeatureGeoJSONSerializer(batch, many=True, context={'request': request})
                     response.write(json.dumps(serializer.data))
                 elif format == 'csv':
-                    serializer = FeatureCSVSerializer(batch, many=True, context={'request': request})
                     for row in serializer.data:
                         writer.writerow(self.prepare_csv_row(row, feature_type))
 
