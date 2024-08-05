@@ -4,6 +4,17 @@ GéoContrib est un outil libre de signalement contributif et collaboratif. Une v
 
 Depuis la version 2.0.0, l'interface web est dans une dépôt séparé : https://git.neogeo.fr/geocontrib/geocontrib-frontend
 
+## Documentation
+
+L'intégralité de la documentation de GéoContrib est accessible ici : https://www.onegeosuite.fr/docs/module-geocontrib/intro
+Celle-ci n'est plus disponible dans le répertoire /docs du dépôt à partir de la version 5.4.1.
+
+## Version stable
+
+La version stable de GéoContrib est une version qui a été testée et validée par la communauté GéoContrib. Nous recommandons l'installation de cette version dans le cas d'une utilisation optimale et sans instabilité. 
+
+La version actuellement stabilisée est la version **5.4.1**.
+
 ## Installation
 
 ### Prérequis
@@ -28,7 +39,7 @@ source geocontrib_venv/bin/activate
 # Clonage du projet - récupération des sources
 # Actuellement, la branche par défaut du projet est develop
 # Ce sera celle qui sera active par défaut immédiatement après le clonage
-git clone https://github.com/neogeo-technologies/geocontrib.git
+git clone https://git.neogeo.fr/geocontrib/geocontrib-django.git
 cd geocontrib
 
 # Installer les dépendances
@@ -86,6 +97,7 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * IDGO_VERIFY_CERTIFICATE = permet de se connecter à datasud sans certificat, False en dév ;
 * IDGO_LOGIN = login pour accéder au catalogue idgo depuis geocontrib ;
 * IDGO_PASSWORD = mot de passe pour accéder au catalogue idgo depuis geocontrib ;
+* SSO_OGS_SESSION_URL = url api OGS pour vérifier l'activation de la session utilisateur (si défini active la connexion par OGS) ;
 
 
 Copier le contenu du fichier config_sample/urls.py dans config/urls.py
@@ -97,6 +109,7 @@ python manage.py migrate
 python manage.py loaddata geocontrib/data/perm.json
 python manage.py loaddata geocontrib/data/flatpages.json
 python manage.py loaddata geocontrib/data/geocontrib_beat.json
+python manage.py loaddata geocontrib/data/notificationmodel.json
 ```
 
 Ne faites pas attention aux messages d'avertissement suivants :
@@ -161,8 +174,14 @@ Dans `/admin/django_celery_beat/periodictask`, saisissez des tâches avec leur p
 ### Tâches périodiques depuis un cron
 
 L'envoi de mails de notifications, vous pouvez l'appeler toutes les minutes ou tous les jours selon vos préférences d'envoi
+
+- Pour la notification groupée
 ```shell
 python manage.py notify_subscribers
+```
+- Pour la notification de publication de documents clés
+```shell
+python manage.py notify_subscribers_key_documents
 ```
 
 L'archivage et la suppression des signalements, à invoquer une fois par jour
@@ -190,7 +209,7 @@ Après avoir installé graphiz et django-extensions
 
 ```
 ./manage.py graph_models --pygraphviz geocontrib --output docs/model.png
-````
+```
 
 Le graphique est disponible ici [docs/model.png](docs/model.png)
 
@@ -199,3 +218,78 @@ Le graphique est disponible ici [docs/model.png](docs/model.png)
 
 export DJANGO_SETTINGS_MODULE=config.settings
 pytest
+
+<br>
+
+# Système de notifications
+
+## Vue d'ensemble
+Notre système de notifications est conçu pour informer les utilisateurs des événements significatifs au sein de leurs projets, tels que la création, la mise à jour et la suppression de signalements, de commentaires et de pièces jointes. Ce système est configurable, permettant d'adapter les notifications aux besoins spécifiques des projets et aux préférences des utilisateurs.
+- **Caractéristiques configurables commune à toutes les notifications** :
+  - **Modèles Personnalisables** : Le contenu des notifications peut être personnalisé à travers des modèles éditables stockés dans la base de données, permettant un ajustement dynamique du contenu dans l'interface d'administration.
+
+## Types de Notifications
+
+### Notifications groupées
+- **Objectif** : Informer tous les abonnés des différents projets sur les événements variés tels que les mises à jour, les suppressions et les créations de signalement, les évolutions du projet, ainsi que la publication de commentaires ou de pièces jointes.
+- **Fonctionnement** : Les notifications sont regroupées grâce aux instances `StackedEvent`, crées par un Signal
+- **Déclencheur** : Les notifications sont regroupées grâce aux instances `StackedEvent` et envoyées périodiquement selon la configuration de la tâche périodique associée.
+- **Caractéristiques Configurables** :
+  - **Niveau d'envoi des notifications** : Les administrateurs peuvent configurer l'envoi des notifications pour les documents clés à un niveau globale ou par projet. Ceci est géré par le champ `per_project` dans le modèle `NotificationModel`.
+  - **Désactivation des notifications** : Vous pouvez désactiver les notifications pour un type de signalement via l'interface d'administration ou la configuration d'affichage de signalement dans l'application frontend. L'envoi des notifications de publication de documents clés ne sont pas impactés par ce pramétrage.
+
+### Notifications de publications de documents clés
+- **Objectif** : Informer tous les abonnés des différents projets sur les publications importantes de documents au sein de leurs projets.
+- **Fonctionnement** : Les notifications sont regroupées grâce aux instances `StackedEvent` spécifiques, en utilisant la propriété `only_key_document`. Les piles d'événements sont crées par un Signal, lors de la publication d'une pièce jointe avec le paramètre `is_key_document`.
+- **Déclencheur** : Les notifications sont envoyées périodiquement selon la configuration de la tâche périodique associée.
+- **Caractéristiques Configurables** :
+  - **Activation des Notifications** : Les administrateurs peuvent activer ou désactiver les notifications pour les documents clés au niveau d'un type de signalement. Ceci est géré par le champ booléen `enable_key_doc_notif` dans le modèle `FeatureType`.
+
+### Notifications de créations de signalements en attente de modération
+- **Objectif** : Informer les modérateurs des signalements nécessitant une modération dans les projets configurés avec le paramètre de modération activé.
+- **Fonctionnement** : L'envoi de la notification est faite au niveau du modèle `Event` par la méthode `ping_users`
+- **Déclencheur** : Se produit lorsqu'un signalement est créé ou modifié par un contributeur, ce qui lui attribue automatiquement le statut "En attente de publication".
+
+### Notifications de publications de signalements après modération
+- **Objectif** : Informer le créateur d'un signalement lorsque sa soumission a été approuvée et publiée par un modérateur.
+- **Fonctionnement** : L'envoi de la notification est faite au niveau du modèle `Event` par la méthode `ping_users`
+- **Déclencheur** : Se produit lorsqu'un signalement passe du statut "En attente de publication" à "Publié'.
+
+<br>
+<br>
+
+DEVELOPPEMENT
+=============
+
+Général
+-------
+
+Geocontrib est un projet initié par NeoGeo.
+Le code source de l'application est maintenu sur la plateforme https://git.neogeo.fr/geocontrib/.
+
+les Mainteneurs actuels :
+ - Timothée POUSSARD (Neogeo)
+ - Camille BLANCHON (Neogeo)
+ - Matthieu ETOURNEAU (Neogeo)
+ - Angela Escobar (Neogeo)
+
+La documentation de l'application 
+*********************************
+
+https://www.onegeosuite.fr/docs/team_geocontrib
+
+Pratiques et règles de developpement
+------------------------------------
+
+Afin de partager des règles communes de développement et faciliter l'intégration de 
+nouveau code, veuillez lire les recommandations et bonnes pratiques recommandées pour contribuer
+au projet GeoContrib.
+
+Git
+***
+
+ - Faire une demande de contribution en envoyant un mail à metourneau@neogeo.fr
+ - Un compte vous sera créé sur notre plateforme gitlab
+ - Faire un fork de l'application
+ - Faire des merge requests vers la branch ``develop``
+ - Faire des ``git pull`` avant chaque développement et avant chaque commit

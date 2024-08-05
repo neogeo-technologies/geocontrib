@@ -110,6 +110,9 @@ class ProjectComments(views.APIView):
             project=project
         ).order_by('-created_on')
 
+        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        features = features.filter(deletion_on__isnull=True)
+
         # On filtre les commentaire selon les signalements visibles
         last_comments = Comment.objects.filter(
             project=project,
@@ -131,45 +134,79 @@ class FeatureAttachmentView(
         mixins.DestroyModelMixin,
         viewsets.GenericViewSet
         ):
-
+    """
+    ViewSet for handling CRUD operations on attachments related to a specific feature.
+    This class combines multiple mixins to provide list, create, retrieve, update,
+    and destroy actions.
+    """
+    # Defines the permission classes to determine who can access this view.
+    # Here, authenticated users can access all operations, while read-only operations
+    # are allowed for unauthenticated users.
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
-
+    # Queryset specifically filters attachments by the 'feature' object_type.
     queryset = Attachment.objects.filter(object_type='feature')
-
+    # Specifies the serializer class to be used for serializing and deserializing data.
     serializer_class = FeatureAttachmentSerializer
 
     def get_object(self):
+        """
+        Retrieve a specific attachment by 'attachment_id' and 'feature_id' provided in the URL.
+        """
         attachment_id = self.kwargs['attachment_id']
         feature_id = self.kwargs['feature_id']
+        # Retrieves an object or throws a 404 if the attachment does not exist
         return get_object_or_404(
             Attachment, id=attachment_id, feature_id=feature_id)
 
     def get_queryset(self):
+        """
+        Override to filter the queryset based on 'feature_id' provided in the URL,
+        ensuring that only attachments for a specific feature are returned.
+        """
         feature_id = self.kwargs['feature_id']
+        # Filters the initial queryset by 'feature_id'
         qs = super().get_queryset().filter(feature_id=feature_id)
         return qs
 
     def get_serializer_context(self):
+        """
+        Provides additional context to the serializer, particularly the feature instance,
+        which might be required for serializing data.
+        """
+        # Gets the default context from the base class, which includes request, view, etc.
         context = super().get_serializer_context()
         feature_id = self.kwargs['feature_id']
+        # Retrieves the feature instance associated with 'feature_id' or throws a 404
         feature = get_object_or_404(Feature, feature_id=feature_id)
+        # Updates the context with the feature instance
         context.update({'feature': feature})
         return context
 
 
 class FeatureAttachmentUploadView(views.APIView):
+    """
+    APIView for handling the uploading of attachment files linked to a specific feature.
+    This view handles updating an existing attachment with a new file.
+    """
 
+    # Ensures that only authenticated users can access this view
     permission_classes = [
         permissions.IsAuthenticated,
     ]
 
     def get_object(self, feature_id, attachment_id):
+        """
+        Retrieves the attachment object based on feature_id and attachment_id or returns a 404 error if not found.
+        """
         return get_object_or_404(
             Attachment, id=attachment_id, feature_id=feature_id)
 
     def read_file(self, request):
+        """
+        Extracts the file from the request. Raises a validation error if no file is found in the request data.
+        """
         _file = request.data.get('file')
         if not _file:
             raise exceptions.ValidationError({
@@ -178,14 +215,23 @@ class FeatureAttachmentUploadView(views.APIView):
         return _file
 
     def put(self, request, feature_id, attachment_id):
+        """
+        Handles the PUT request to update an attachment's file. Retrieves the existing attachment,
+        reads the new file from the request, saves it, and returns the updated attachment data.
+        """
+        # Retrieve the attachment object using feature and attachment IDs
         instance = self.get_object(feature_id, attachment_id)
+        # Read the new file from the request
         attachment_file = self.read_file(request)
+        # Save the new file to the instance, updating the file on disk
         instance.attachment_file.save(
             attachment_file.name, attachment_file, save=True)
+        # Serialize the updated attachment instance to prepare response data
         data = FeatureAttachmentSerializer(
             instance=instance,
             context={'request': request}
         ).data
+        # Return the serialized data as a response with status code 200
         return Response(data=data, status=200)
 
 
@@ -227,6 +273,10 @@ class CommentView(
 
 class CommentAttachmentUploadView(views.APIView):
     """
+    API View for uploading attachments related to a specific comment on a feature.
+    Manages attachment uploads by validating and saving files linked to comments, and updates the database accordingly.
+
+    Code commented previously, to be removed if not necessary anymore:
         comment = Comment.objects.create(
             feature_id=feature.feature_id,
             feature_type_slug=feature.feature_type.slug,
@@ -254,29 +304,32 @@ class CommentAttachmentUploadView(views.APIView):
     ]
 
     def get_object(self, feature_id, comment_id):
-        return get_object_or_404(
-            Comment, id=comment_id, feature_id=feature_id)
+        # Retrieve and return a Comment object or raise a 404 if not found
+        return get_object_or_404(Comment, id=comment_id, feature_id=feature_id)
 
     def read_file(self, request):
+        # Extracts file from request, raises error if missing
         _file = request.data.get('file')
         if not _file:
-            raise exceptions.ValidationError({
-                'error': "File entry is missing",
-            })
+            raise exceptions.ValidationError({'error': "File entry is missing"})
         return _file
 
     def read_title(self, request):
+        # Extracts title from request, raises error if missing
         title = request.data.get('title')
         if not title:
-            raise exceptions.ValidationError({
-                'error': "Field 'title' is missing",
-            })
+            raise exceptions.ValidationError({'error': "Field 'title' is missing"})
         return title
 
+
     def put(self, request, feature_id, comment_id):
+        # Retrieve the feature datas needed for attachment creation/update
         feature = get_object_or_404(Feature, feature_id=feature_id)
+        # Retrieve the comment related to the uploaded attachment
         comment = self.get_object(feature_id, comment_id)
+        # Get the file from the request to save in static folder
         attachment_file = self.read_file(request)
+        # Create the attachment instance related to the uploaded file
         attachment, create = Attachment.objects.update_or_create(
             comment=comment,
             defaults={
@@ -285,11 +338,16 @@ class CommentAttachmentUploadView(views.APIView):
                 'info': request.data.get('info', ''),
                 'feature_id': feature.feature_id,
                 'author': request.user,
-                'object_type': 'comment'
+                'object_type': 'comment',
+                # Retrieve the 'is_key_document' as a string and convert it to a boolean in Python;
+                # 'true' or 'True' yields True, anything else yields False.
+                'is_key_document': request.data.get('is_key_document') in ['true', 'True']
             }
         )
+        # Save the attachment file on the disk
         attachment.attachment_file.save(
             attachment_file.name, attachment_file, save=True)
+        # Prepare data to be sent with the response
         data = CommentDetailedSerializer(
             instance=comment,
             context={'request': request}

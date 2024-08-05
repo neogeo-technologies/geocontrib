@@ -48,15 +48,30 @@ def test_feature_creation(api_client, with_multiple_stackedevents):
     user = User.objects.get(username="admin")
     api_client.force_authenticate(user=user)
 
-    # Ensure admin with data => Fails
+    # Ensure admin without data => Fails
     result = api_client.post(features_url)
     assert result.status_code == 400
     assert result.json() == {
         'feature_type': ['Ce champ est obligatoire.'],
-        'geom': ['Ce champ est obligatoire.'],
         'project': ['Ce champ est obligatoire.'],
     }
 
+    # Ensure admin with data without geom => Fails (since we cannot test all error messages at the same time we split in two)
+    data_no_geom = {
+        'type': "Feature",
+        "properties": {
+            'project': "1-aze",
+            'feature_type': '1-dfsdfs',
+            "description": "description de mon signalement",
+            'status': "draft",
+            'title': 'titre de mon signalement',
+        }
+    }
+    result = api_client.post(features_url, data_no_geom, format='json')
+    assert result.status_code == 400
+    assert result.json() == {'detail': "{'geom': ['Ce champ est obligatoire.']}"}
+
+    # add the geometry to data
     data = {
         'type': "Feature",
         'geometry': "{\"type\":\"LineString\",\"coordinates\":[[1.173194580078125,43.654672565596],[1.1031567382812502,43.54726848158805],[1.11963623046875,43.444658199457194],[1.0083996582031252,43.439672680464525]]}",

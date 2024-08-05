@@ -17,8 +17,9 @@ from rest_framework.views import APIView
 from rest_framework import mixins
 
 from api.serializers import ProjectDetailedSerializer
-from api.serializers.project import ProjectCreationSerializer
-from api.serializers.project import ProjectAuthorizationSerializer
+from api.serializers import ProjectAttributeSerializer
+from api.serializers import ProjectCreationSerializer
+from api.serializers import ProjectAuthorizationSerializer
 from api.utils.permissions import ProjectPermission
 from api.utils.validators import validate_image_file
 from api.utils.filters import AuthorizationLevelCodenameFilter
@@ -28,12 +29,14 @@ from api.utils.filters import ProjectsTypeFilter
 from api.utils.filters import ProjectsUserAccessLevelFilter
 from api.utils.filters import ProjectsUserAccessibleFilter
 from api.utils.filters import ProjectsUserAccountFilter
+from api.utils.filters import ProjectsAttributeFilter
 from api.utils.paginations import SimplePagination
 from geocontrib.models import Authorization
 from geocontrib.models import Project
 from geocontrib.models import Subscription
 from geocontrib.models import FeatureType
 from geocontrib.models import BaseMap
+from geocontrib.models import ProjectAttribute
 
 
 User = get_user_model()
@@ -54,7 +57,8 @@ class ProjectView(viewsets.ModelViewSet):
         ProjectsAccessLevelFilter,
         ProjectsUserAccessLevelFilter,
         ProjectsUserAccessibleFilter,
-        ProjectsUserAccountFilter
+        ProjectsUserAccountFilter,
+        ProjectsAttributeFilter
     ]
     search_fields = [
         'slug',
@@ -300,3 +304,7 @@ class ProjectSubscription(APIView):
                 obj.save()
         data = {'is_suscriber': Subscription.is_suscriber(request.user, project)}
         return Response(data=data, status=200)
+
+class ProjectAttributeListView(generics.ListAPIView):
+    queryset = ProjectAttribute.objects.all()
+    serializer_class = ProjectAttributeSerializer

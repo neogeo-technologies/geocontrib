@@ -50,12 +50,6 @@ class Project(models.Model):
         related_name="access_archived"
     )
 
-    archive_feature = models.PositiveIntegerField(
-        "Délai avant archivage", blank=True, null=True)
-
-    delete_feature = models.PositiveIntegerField(
-        "Délai avant suppression", blank=True, null=True)
-
     map_max_zoom_level = models.PositiveIntegerField(
         "Niveau de zoom maximum de la carte", default=22)
 
@@ -85,6 +79,7 @@ class Project(models.Model):
         max_length=20,
         default="-created_on"
     )
+    attributes = models.ManyToManyField('ProjectAttribute', through='ProjectAttributeAssociation', verbose_name="Attributs")
 
     class Meta:
         verbose_name = "Projet"
@@ -102,3 +97,98 @@ class Project(models.Model):
 
     def get_absolute_url(self):
         return reverse('geocontrib:project', kwargs={'slug': self.slug})
+
+    def calculate_bbox(self):
+        if self.feature_set.exists():
+            bbox = self.feature_set.aggregate(models.Extent('geom'))['geom__extent']
+            return bbox
+        else:
+            return None
+
+class ProjectAttribute(models.Model):
+    """
+    Represents a customizable attribute for a project within the application. Each attribute
+    can have a specific type (e.g., boolean, list, multi-choice list), along with options for
+    list-based types and a default value. When a new ProjectAttribute is created, it updates
+    existing projects to associate them with this new attribute and its default value.
+    """
+    
+    label = models.CharField("Label", max_length=256, null=False, blank=False)
+    name = models.CharField("Nom", max_length=128, null=False, blank=False)
+    field_type = models.CharField(
+        "Type de champ", choices=(
+            ("boolean", "Booléen"),
+            ("list", "Liste de valeurs"),
+            ("multi_choices_list", "Liste à choix multiples")),
+        max_length=50, default="boolean"
+    )
+    options = models.JSONField("Options de l'attribut", blank=True, null=True)
+
+    default_value = models.CharField("Valeur par défaut", max_length=50, null=True, blank=True)
+
+    display_filter = models.BooleanField("Afficher un filtre sur la liste des projets", default=False)
+
+    default_filter_enabled = models.BooleanField("Activer le filtre par défaut", default=False)
+
+    default_filter_value = models.CharField("Valeur du filtre par défaut", max_length=50, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Attribut projet"
+        verbose_name_plural = "Attributs projet"
+
+    def save(self, *args, **kwargs):
+        """
+        Overrides the default save method to update existing projects with this attribute's
+        default value when a new ProjectAttribute instance is created.
+        """
+        # Check if this is a new instance being created by looking for the absence of self._state.adding.
+        is_new = self._state.adding
+        # Call the superclass's save method to ensure the instance is saved.
+        super(ProjectAttribute, self).save(*args, **kwargs)
+
+        # If this is a new instance and a default value is set, update existing projects.
+        if is_new and self.default_value:
+            self.update_projects_with_default()
+
+    def update_projects_with_default(self):
+        """
+        Updates all existing projects by associating them with this attribute and its default value,
+        creating a new ProjectAttributeAssociation if one does not already exist.
+        """
+        # Fetch all existing projects from the database.
+        projects = Project.objects.all()
+
+        for project in projects:
+            # For each project, create an association with this attribute and its default value,
+            # if such an association does not already exist.
+            ProjectAttributeAssociation.objects.get_or_create(
+                project=project,
+                attribute=self,
+                defaults={'value': self.default_value}
+            )
+
+    def __str__(self):
+        """
+        String representation of the ProjectAttribute instance, displaying its label.
+        """
+        return self.label
+
+class ProjectAttributeAssociation(models.Model):
+    """
+    Represents an association between a Project and a ProjectAttribute, storing the value of the attribute for a specific project.
+    This model ensures that each combination of project and attribute is unique.
+
+    Attributes:
+        project (ForeignKey): A reference to the Project model. This field defines a many-to-one relationship, indicating that each association is linked to a specific project.
+        attribute (ForeignKey): A reference to the ProjectAttribute model, stored in the database under the 'attribute_id' column. It represents the attribute associated with the project.
+        value (CharField): Stores the value of the attribute for the specified project. This can be any string that the attribute is set to hold.
+    
+    Meta:
+        unique_together: Ensures that each project-attribute pair is unique within the database to prevent duplicate associations.
+    """
+    project = models.ForeignKey('Project', on_delete=models.CASCADE)
+    attribute = models.ForeignKey('ProjectAttribute', on_delete=models.CASCADE, db_column='attribute_id')
+    value = models.CharField("Valeur", max_length=256)
+
+    class Meta:
+        unique_together = ('project', 'attribute')

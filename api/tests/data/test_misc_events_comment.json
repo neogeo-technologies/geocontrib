@@ -22,9 +22,11 @@
             },
             "related_feature": {
                 "deletion_on": "None",
-                "title": "publi\u00e9"
+                "title": "publi\u00e9",
+                "feature_url": "/geocontrib/projet/1-aze/type-signalement/1-dfsdfs/signalement/75540f8e-0f4d-4317-9818-cc1219a5df8c/"
             },
-            "project_title": "aze"
+            "project_title": "aze",
+            "attachment_details": {}
         }
     ],
     "features": [],
@@ -51,9 +53,11 @@
             },
             "related_feature": {
                 "deletion_on": "None",
-                "title": "publi\u00e9"
+                "title": "publi\u00e9",
+                "feature_url": "/geocontrib/projet/1-aze/type-signalement/1-dfsdfs/signalement/75540f8e-0f4d-4317-9818-cc1219a5df8c/"
             },
-            "project_title": "aze"
+            "project_title": "aze",
+            "attachment_details": {}
         }
     ]
 }

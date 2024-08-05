@@ -1,6 +1,8 @@
 import logging
+import requests
 
 from django.db.models import Q
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
@@ -54,32 +56,73 @@ class LoginView(views.APIView):
         }
         return Response(data=data, status=status.HTTP_200_OK)
 
+
 class UserInfoView(views.APIView):
+    """
+    API view to retrieve user information.
+
+    This view handles two scenarios:
+    1. If the user is already authenticated in the Django application, it returns the user information.
+    2. If the user is not authenticated and SSO with OGS is configured, it checks the OGS session.
+       - If the OGS session is active, it authenticates or creates the user in Django and returns the user information.
+    Else it raises a not authenticated error
+    """
 
     def get(self, request):
         user = request.user
-        if not user or user.is_anonymous:
-            raise NotAuthenticated()
-        data = {
-            "detail": _(f"{user.username} session is enabled"),
-            "user":  UserSerializer(user).data
-        }
-        return Response(data=data, status=status.HTTP_200_OK)
 
+        # Check if the user is already authenticated in Django
+        if user and not user.is_anonymous:
+            data = {
+                "detail": f"{user.username} session is enabled",
+                "user": UserSerializer(user).data
+            }
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        # If the user is not authenticated, check the OGS session if configured
+        elif settings.SSO_OGS_SESSION_URL:
+            session_id = request.COOKIES.get('sessionid')
+
+            # If a session cookie for OGS is found
+            if session_id:
+                # Call the OGS session endpoint with the session cookie
+                response = requests.get(settings.SSO_OGS_SESSION_URL, cookies={'sessionid': session_id})
+
+                # If the response from OGS is successful
+                if response.status_code == 200:
+                    data = response.json()
+                    username = data.get('user').get('username')
+
+                    # If the username is found in the response, authenticate or create the user in Django
+                    if username:
+                        user, created = User.objects.get_or_create(username=username)
+                        if created:
+                            user.save()
+                        login(request, user)
+                        data = {
+                            "detail": f"{user.username} session is enabled",
+                            "user": UserSerializer(user).data
+                        }
+                        return Response(data=data, status=status.HTTP_200_OK)
+        
+        # If no authentication method is available, raise an error
+        raise NotAuthenticated()
 
 class LogoutView(views.APIView):
-#class SignoutView(views.APIView):
 
     permission_classes = [
         permissions.IsAuthenticated,
-        #permissions.AllowAny,
     ]
+    def logout_user(self):
+        username = self.request.user.username
+        logout(self.request)
+        return {"detail": _(f"{username} signed out")}
 
     def get(self, request):
-        username = request.user.username
-        logout(request)
-        data = {"detail": _(f"{username} signed out")}
-        return Response(data=data, status=status.HTTP_200_OK)
+        return Response(data=self.logout_user(), status=status.HTTP_200_OK)
+
+    def post(self, request):
+        return Response(data=self.logout_user(), status=status.HTTP_200_OK)
 
 
 class MyAccountView(views.APIView):

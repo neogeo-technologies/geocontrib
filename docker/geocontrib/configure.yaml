@@ -24,6 +24,24 @@ variables:
   DISABLE_LOGIN_BUTTON:
     env_config_front: DISABLE_LOGIN_BUTTON
 
+  VUE_APP_FONT_FAMILY:
+    env_config_front: FONT_FAMILY
+
+  VUE_APP_HEADER_COLOR:
+    env_config_front: HEADER_COLOR
+
+  VUE_APP_PRIMARY_COLOR:
+    env_config_front: PRIMARY_COLOR
+
+  VUE_APP_PRIMARY_HIGHLIGHT_COLOR:
+    env_config_front: PRIMARY_HIGHLIGHT_COLOR
+
+  VUE_APP_PROJECT_FILTERS:
+    env_config_front: PROJECT_FILTERS
+
+  VUE_APP_SSO_LOGIN_URL_WITH_REDIRECT:
+    env_config_front: SSO_LOGIN_URL_WITH_REDIRECT
+
   VUE_APP_LOGIN_URL:
     env_config_front: LOG_URL
 
@@ -59,3 +77,9 @@ variables:
   
   DISPLAY_FORBIDDEN_PROJECTS_DEFAULT:
     env_config_front: DISPLAY_FORBIDDEN_PROJECTS_DEFAULT
+  
+  VUE_APP_URL_DOCUMENTATION:
+    env_config_front: URL_DOCUMENTATION
+  
+  VUE_APP_URL_DOCUMENTATION_FEATURE:
+    env_config_front: URL_DOCUMENTATION_FEATURE

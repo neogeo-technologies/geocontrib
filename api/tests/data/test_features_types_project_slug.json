@@ -27,7 +27,10 @@
                 "forced_value_config": null
             }
         ],
-        "is_editable": false
+        "is_editable": false,
+        "displayed_fields":  ["status", "feature_type", "updated_on"],
+        "enable_key_doc_notif": false,
+        "disable_notification": false
     },
     {
         "title": "New feature type edited",
@@ -80,7 +83,10 @@
                 "forced_value_config": null
             }
         ],
-        "is_editable": true
+        "is_editable": true,
+        "displayed_fields":  ["status", "feature_type", "updated_on"],
+        "enable_key_doc_notif": false,
+        "disable_notification": false
     },
     {
         "title": "type 2",
@@ -107,7 +113,10 @@
                 "forced_value_config": null
             }
         ],
-        "is_editable": false
+        "is_editable": false,
+        "displayed_fields":  ["status", "feature_type", "updated_on"],
+        "enable_key_doc_notif": false,
+        "disable_notification": false
     },
     {
         "title": "type multilinestring",
@@ -123,6 +132,9 @@
         },
         "project": "1-aze",
         "customfield_set": [],
-        "is_editable": true
+        "is_editable": true,
+        "displayed_fields":  ["status", "feature_type", "updated_on"],
+        "enable_key_doc_notif": false,
+        "disable_notification": false
     }
 ]

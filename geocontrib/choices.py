@@ -52,6 +52,7 @@ ALL_LEVELS = LOWER_LEVELS + EXTENDED_LEVELS
 COMMENT = 'comment'
 FEATURE = 'feature'
 ATTACHMENT = 'attachment'
+KEY_DOCUMENT = 'key_document'
 PROJECT = 'project'
 
 RELATED_MODELS = (
@@ -61,6 +62,7 @@ RELATED_MODELS = (
 
 OTHERS_MODELS = (
     (ATTACHMENT, 'Pièce jointe'),
+    (KEY_DOCUMENT, 'Document clé'),
     (PROJECT, 'Projet'),
 )
 

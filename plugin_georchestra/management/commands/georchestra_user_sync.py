@@ -93,7 +93,7 @@ synchroniser."""
             "password": LDAP_PASSWD,
             "auto_bind": True
         }
-        logger.debug("Ldap connexion parameters: {0}".format(connection_dict))
+        #logger.debug("Ldap connexion parameters: {0}".format(connection_dict))
         connection = Connection(**connection_dict)
         data = self.search_ldap(connection)
         return data
@@ -141,7 +141,7 @@ synchroniser."""
             # et qui sont "utilisateur connecté" de ces projets deviennent contributeurs
 
             # On liste les projets pour lesquels l'utilisateur est membre des groupes 'ldap_project_contrib_groups'
-            # Ces utilisateurs se retrouvent "contributeur" s'ils n'étaient pas déjà "modérateur"
+            # Ces utilisateurs se retrouvent "contributeur" s'ils n'étaient pas déjà "modérateur" ou "administrateur"
             contrib_qs = Project.objects.filter(ldap_project_contrib_groups__overlap=flattened_groups)
             if contrib_qs.exists():
                 for project in contrib_qs or []:
@@ -155,10 +155,9 @@ synchroniser."""
                         # il ne sera pas déclassé en contributeur,
 
                         # Si un utilisateur d’un des groupes de 'ldap_project_contrib_groups'
-                        # est déjà présent dans le projet comme administrateur projet
-                        # il sera automatiquement déclassé en contributeur,
-                        # idem pour simple utilisateur
-                        if auth.level.user_type_id != choices.MODERATOR:
+                        # est déjà présent dans le projet comme simple utilisateur
+                        # il sera automatiquement reclassé en contributeur
+                        if auth.level.user_type_id != choices.MODERATOR and auth.level.user_type_id != choices.ADMIN:
                             auth.level = UserLevelPermission.objects.get(user_type_id=choices.CONTRIBUTOR)
                             auth.save(update_fields=['level', ])
                             logger.debug("User '{0}' set as {1}'s Project '{2}' ".format(
@@ -278,7 +277,7 @@ synchroniser."""
 
     def handle(self, *args, **options):
         remote_users = self.get_remote_data()
-        logger.info(remote_users)
+        #logger.info(remote_users)
         self.check_remote_data(remote_users)
         self.flush_local_db(remote_users)
         self.create_users(remote_users)

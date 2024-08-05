@@ -3,6 +3,7 @@ from django.contrib.gis import forms
 from geocontrib.models import CustomField
 from geocontrib.models import Feature
 from geocontrib.models import FeatureType
+from geocontrib.models import ProjectAttribute
 from geocontrib.forms.common import alphanumeric
 
 
@@ -48,21 +49,36 @@ class HiddenDeleteModelFormSet(forms.BaseModelFormSet, HiddenDeleteBaseFormSet):
 
 
 class FeatureSelectFieldAdminForm(forms.Form):
+    """
+    A form for selecting fields from the Feature model to include in a formset.
+    
+    This form allows users to choose fields from the `Feature` model to include in a PostgreSQL view.
+    It provides options for selecting fields and specifying aliases for those fields. 
+    The 'deletion_on' field is excluded from the choices to ensure since it is not included 
+    in the PostgreSQL view.
+    """
+    
+    # A choice field for selecting which field from the `Feature` model to include.
     related_field = forms.ChoiceField(
         label="Champs à ajouter",
-        choices=[(
-            str(field.name), "{0} - {1}".format(field.name, field.get_internal_type())
-        ) for field in Feature._meta.get_fields(include_parents=False) if field.concrete is True],
-        required=False
-    )
+        choices=[
+            (
+                str(field.name),  # Value sent in the form submission
+                "{0} - {1}".format(field.name, field.get_internal_type())  # Human-readable label
+            ) for field in Feature._meta.get_fields(include_parents=False)  # Get fields of the Feature model
+            if field.concrete is True and field.name != 'deletion_on'  # Exclude non-concrete fields and 'deletion_on'
+        ],
+        required=False  # This field is optional
+    )    
+    # A text field for specifying an alias for the selected field.
     alias = forms.CharField(
         label="Alias",
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': "Alias pour cette colonne"
+            'placeholder': "Alias pour cette colonne"  # Placeholder text in the input field
         }),
-        validators=[alphanumeric]
+        validators=[alphanumeric]  # Apply alphanumeric validation to the input
     )
 
 
@@ -85,3 +101,23 @@ class ProjectAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['creator'].required = True
+
+
+class ProjectAttributeAdminForm(forms.ModelForm):
+    """
+    A custom ModelForm for the ProjectAttribute model in the Django admin.
+
+    This form is designed to be used in the ProjectAttributeAdmin to provide
+    an interface for creating and editing ProjectAttribute instances. It specifies
+    which fields should be included in the form and allows for further customization
+    of the form behavior and appearance if needed.
+    """
+    
+    class Meta:
+        # Specifies the model associated with this form.
+        model = ProjectAttribute
+        
+        # Defines the list of fields that should be included in the form.
+        # This ensures only relevant fields are displayed in the admin interface for editing.
+        fields = ['label', 'name', 'field_type', 'options', 'default_value', 'display_filter', 'default_filter_enabled', 'default_filter_value']
+

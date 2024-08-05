@@ -1,0 +1,8 @@
+<!-- templates/admin/myapp/myinline/change_form.html -->
+{% extends "admin/change_form.html" %}
+{% block extrahead %}
+    {{ block.super }}
+    <script id="attributes_data" type="text/javascript">
+        var attributesData = {{ attributes_data|safe }};
+    </script>
+{% endblock %}

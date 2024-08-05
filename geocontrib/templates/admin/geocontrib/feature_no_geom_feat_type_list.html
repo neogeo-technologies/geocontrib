@@ -1,0 +1,58 @@
+{% extends "admin/change_form.html" %}
+{% block extrahead %}
+    {{ block.super }}
+    {{ no_geom_feat_type_list|json_script:"no-geom-feat-type-list-data" }}
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Retrieve the list of non-geometric feature types
+            var noGeomFeatTypeListData = document.getElementById('no-geom-feat-type-list-data').textContent;
+            var noGeomFeatTypeList = JSON.parse(noGeomFeatTypeListData);
+            console.log(noGeomFeatTypeList);
+
+            // JavaScript logic to show/hide fields
+
+            var featureTypeField = document.getElementById('id_feature_type');
+            var geomField = document.getElementsByClassName('field-geom');
+
+            // Function to wait for the geomField's style to be available
+            function waitForGeomFieldStyle() {
+                let maxTry = 10; // Set the maximum number of attempts
+
+                var intervalId = setInterval(function() {
+                    maxTry--; // Decrement the number of remaining tries
+
+                    // Check if geomField is available and has style
+                    if (geomField.length === 1 && geomField[0].style) {
+                        clearInterval(intervalId); // Stop the interval if condition is met
+                        toggleGeomFieldDisplay(); // Call function to toggle display
+                    } else if (maxTry <= 0) {
+                        clearInterval(intervalId); // Stop the interval if maximum tries reached
+                        console.log("Max tries reached, geomField not found.");
+                    }
+                }, 300); // Interval in milliseconds
+            }
+
+
+            // Function to toggle the display of geomField
+            function toggleGeomFieldDisplay() {
+                if (geomField.length === 1 && geomField[0].style) {
+                    // Check if the selected option of featureTypeField is in noGeomFeatTypeList
+                    if (featureTypeField.selectedOptions.length === 1 && 
+                            noGeomFeatTypeList.includes(featureTypeField.selectedOptions[0].textContent)) {
+                        geomField[0].style.display = 'none'; // Hide geomField
+                    } else {
+                        geomField[0].style.display = ''; // Show geomField
+                    }
+                } else {
+                    waitForGeomFieldStyle(); // Wait for the geomField style to be available
+                }
+            }
+
+            // Call the function on page load
+            toggleGeomFieldDisplay();
+
+            // Attach change event to the featureTypeField
+            featureTypeField.addEventListener('change', toggleGeomFieldDisplay);
+        });
+    </script>
+{% endblock %}

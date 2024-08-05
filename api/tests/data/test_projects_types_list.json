@@ -13,8 +13,6 @@
         "creator": 1,
         "access_level_pub_feature": "Utilisateur anonyme",
         "access_level_arch_feature": "Utilisateur anonyme",
-        "archive_feature": null,
-        "delete_feature": null,
         "map_max_zoom_level": 22,
         "nb_features": 0,
         "nb_published_features": 0,
@@ -22,6 +20,8 @@
         "nb_published_features_comments": 0,
         "nb_contributors": 1,
         "feature_browsing_default_filter": "",
-        "feature_browsing_default_sort": "-created_on"
+        "feature_browsing_default_sort": "-created_on",
+        "bbox": null,
+        "project_attributes":[]
     }
 ]

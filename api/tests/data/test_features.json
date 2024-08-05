@@ -13,7 +13,9 @@
                 "custom_field_name": ""
             },
             "project": 1,
-            "opacity": 0.5
+            "opacity": 0.5,
+            "displayed_fields":  ["status", "feature_type", "updated_on"],
+            "enable_key_doc_notif": false
         }
     },
     {
@@ -30,7 +32,9 @@
                 "custom_field_name": ""
             },
             "project": 1,
-            "opacity": 0.5
+            "opacity": 0.5,
+            "displayed_fields":  ["status", "feature_type", "updated_on"],
+            "enable_key_doc_notif": false
         }
     },
     {
@@ -47,7 +51,9 @@
                 "custom_field_name": ""
             },
             "project": 1,
-            "opacity": 0.5
+            "opacity": 0.5,
+            "displayed_fields":  ["status", "feature_type", "updated_on"],
+            "enable_key_doc_notif": false
         }
     },
     {
@@ -109,8 +115,6 @@
             "creator": 1,
             "access_level_pub_feature": "anonymous",
             "access_level_arch_feature": "anonymous",
-            "archive_feature": 0,
-            "delete_feature": 0,
             "map_max_zoom_level": 22,
             "ldap_project_contrib_groups": null,
             "ldap_project_admin_groups": null,

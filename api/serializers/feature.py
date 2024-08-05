@@ -18,8 +18,6 @@ from geocontrib.models import FeatureType
 from geocontrib.models import PreRecordedValues
 from geocontrib.models import Project
 
-# from deepdiff import DeepDiff
-
 User = get_user_model()
 
 
@@ -56,9 +54,17 @@ class FeatureTypeSerializer(serializers.ModelSerializer):
 
 
 class FeatureTypeListSerializer(serializers.ModelSerializer):
-
+    """
+    A serializer for listing and handling feature types within a project.
+    This serializer also manages custom fields associated with each feature type,
+    allowing for dynamic modification of these fields based on user input.
+    """
+    
+    # Relates each feature type to a project by its slug.
     project = serializers.SlugRelatedField(
         slug_field='slug', queryset=Project.objects.all())
+    
+    # Nested serializer to handle custom fields, allowing null and not required by default.
     customfield_set = CustomFieldSerializer(
         many=True, allow_null=True, required=False
     )
@@ -77,18 +83,30 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
             'project',
             'customfield_set',
             'is_editable',
+            'displayed_fields',
+            'enable_key_doc_notif',
+            'disable_notification',
         )
+        # Prevents the slug from being modified after creation.
         read_only_fields = [
             'slug',
         ]
 
     def handle_related(self, instance, custom_fields):
+        """
+        Handles the creation or update of custom fields related to a feature type instance.
+        Deletes existing custom fields and recreates them from provided list.
+        """
         if isinstance(custom_fields, list):
             instance.customfield_set.all().delete()
             for field in custom_fields:
                 CustomField.objects.create(feature_type=instance, **field)
 
     def validate_project(self, obj):
+        """
+        Ensures the user has permission to create or edit feature types within the project.
+        Raises a validation error if not authorized.
+        """
         user = self.context['request'].user
         if not Authorization.has_permission(user, 'can_create_feature_type', obj):
             raise serializers.ValidationError({
@@ -96,6 +114,9 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
         return obj
 
     def create(self, validated_data):
+        """
+        Creates a new feature type, handling the related custom fields as a transactional operation.
+        """
         customfield_set = validated_data.pop('customfield_set', None)
         try:
             feature_type = FeatureType.objects.create(**validated_data)
@@ -105,20 +126,20 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
         return feature_type
 
     def update(self, instance, validated_data):
-
-        # Look for symbology differences
-        comp_keys = ['color', 'icon', 'opacity', 'colors_style']
-        # is_symbology_edited = not all(DeepDiff(self.data.get(key), validated_data.get(key), ignore_order=True) for key in comp_keys)
-        is_symbology_edited = not all(self.data.get(key) == validated_data.get(key) for key in comp_keys)
+        """
+        Updates an existing feature type and its related custom fields.
+        Checks for changes in the display properties specifically to handle them conditionally.
+        """
+        # Check for changes in display-related properties.
+        comp_keys = ['color', 'icon', 'opacity', 'colors_style', 'displayed_fields', 'enable_key_doc_notif', 'disable_notification']
+        is_display_edited = not all(self.data.get(key) == validated_data.get(key) for key in comp_keys)
 
         if not instance.is_editable:
-
-            if is_symbology_edited:
-                # Handle symbology edition
-                setattr(instance, 'color', validated_data.get('color'))
-                setattr(instance, 'icon', validated_data.get('icon'))
-                setattr(instance, 'opacity', validated_data.get('opacity'))
-                setattr(instance, 'colors_style', validated_data.get('colors_style'))
+            if is_display_edited:
+                # Update display-related properties if they have been changed.
+                for key in comp_keys:
+                    if key in validated_data:  # Ensure the key exists in the validated data before setting it.
+                        setattr(instance, key, validated_data.get(key))
 
             else:
                 raise serializers.ValidationError({
@@ -187,7 +208,7 @@ class FeatureTypeColoredSerializer(serializers.ModelSerializer):
         )
 
 
-class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
+class FeatureJSONSerializer(serializers.ModelSerializer):
     
     feature_type = serializers.SlugRelatedField(
         slug_field='slug', queryset=FeatureType.objects.all())
@@ -201,7 +222,6 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = Feature
-        geo_field = 'geom'
         fields = (
             'feature_id',
             'title',
@@ -223,13 +243,37 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
             'display_last_editor',
         )
 
-    def get_properties(self, instance, fields):
-        # Ici on retourne les champs extra d'une feature au meme niveau
-        # que les champs de bases
-        properties = super().get_properties(instance, fields)
+    def get_custom_properties(self, instance):
+        """
+        Retrieves custom properties for a feature instance.
+
+        This method is responsible for extracting custom field data from the feature instance.
+        It checks if the instance has any data in its 'feature_data' attribute. If so, it iterates
+        over all custom fields defined for the feature's type. For each custom field, it attempts to
+        fetch the corresponding value from 'feature_data'. If a value is present, it's included in the
+        result; otherwise, None is used as a default.
+
+        Parameters:
+        - instance: The Feature model instance whose custom properties are being retrieved.
+
+        Returns:
+        - dict: A dictionary of custom properties with their values.
+        """
+        # Initialize an empty dictionary to hold custom properties
+        properties = {}
+
+        # Check if the instance has feature_data (which stores custom field values)
         if instance.feature_data:
-            for key, value in instance.feature_data.items():
-                properties[key] = value
+            # Retrieve the feature type associated with this instance
+            feature_type = FeatureType.objects.get(id=instance.feature_type_id)
+
+            # Iterate over each custom field defined for this feature type
+            for custom_field in CustomField.objects.filter(feature_type=feature_type):
+                # Fetch the value for each custom field from feature_data
+                # If the value is not present, default to None
+                properties[custom_field.name] = instance.feature_data.get(custom_field.name, None)
+
+        # Return the dictionary of custom properties
         return properties
 
     def handle_custom_fields(self, validated_data):
@@ -301,6 +345,59 @@ class FeatureGeoJSONSerializer(GeoFeatureModelSerializer):
         except Exception as err:
             raise serializers.ValidationError([str(err), ])
         return instance
+    
+    def to_representation(self, instance):
+        """
+        Customize the representation of the instance for serialization.
+
+        This method overrides the default `to_representation` method to include custom properties.
+        It first calls the base implementation to get the initial representation, and then it
+        enhances this with additional custom properties specific to the instance. This approach
+        ensures that all relevant data, including custom fields, are included in the serialized output.
+
+        Parameters:
+        - instance: The model instance that is being serialized.
+
+        Returns:
+        - dict: A dictionary representation of the instance, including custom properties.
+        """
+        # Call the base implementation first to get a dictionary
+        ret = super().to_representation(instance)
+        # Retrieve custom properties for the instance
+        custom_properties = self.get_custom_properties(instance)
+        # Update the dictionary with custom properties
+        ret.update(custom_properties)
+        return ret
+
+
+class FeatureGeoJSONSerializer(FeatureJSONSerializer, GeoFeatureModelSerializer):
+
+    class Meta(FeatureJSONSerializer.Meta):
+        geo_field = 'geom'
+
+    def get_properties(self, instance, fields):
+        properties = super().get_properties(instance, fields)
+        custom_properties = self.get_custom_properties(instance)
+        properties.update(custom_properties)
+        return properties
+
+    def to_representation(self, instance):
+        """
+        Generate the dictionary representation of the instance.
+
+        Overrides the parent class's `to_representation` method to exclude any custom properties
+        handling specific to the FeatureJSONSerializer. This ensures that the representation 
+        for the GeoJSON format is based solely on the functionality provided by the parent
+        FeatureJSONSerializer, maintaining the integrity of the GeoJSON format.
+
+        Parameters:
+        - instance: The model instance that is being serialized.
+
+        Returns:
+        - dict: A dictionary representation of the instance, formatted as per the parent class.
+        """
+        return super(FeatureJSONSerializer, self).to_representation(instance)
+
 
 
 class FeatureCSVSerializer(serializers.ModelSerializer):
@@ -342,20 +439,6 @@ class FeatureCSVSerializer(serializers.ModelSerializer):
             'display_last_editor',
         )
 
-    # def handle_custom_fields(self, validated_data, instance):
-    #     # Hack: les champs extra n'etant pas serializés ou définis dans le modèle
-    #     # FIXME: les champs ne sont donc pas validés mais récupérés direct
-    #     # depuis les données initiales
-    #     custom_fields = validated_data.get(
-    #         'feature_type'
-    #     ).customfield_set.values_list('name', flat=True)
-    #     if instance.feature_data:
-    #         for key, value in instance.feature_data:
-    #             if key in custom_fields:
-    #                 validated_data[key] = value
-
-    #     return validated_data
-
     def get_display_creator(self, obj):
         res = 'N/A'
         if self.context['request'].user.is_authenticated:
@@ -380,14 +463,12 @@ class FeatureCSVSerializer(serializers.ModelSerializer):
         try:
             instance = Feature.objects.create(**validated_data)
             validated_data['creator'] = self.context.get('request').user
-            # validated_data = self.handle_custom_fields(validated_data, instance)
             validated_data = self.handle_title(validated_data)
         except Exception as err:
             raise serializers.ValidationError({'detail': str(err)})
         return instance
 
     def update(self, instance, validated_data):
-        # validated_data = self.handle_custom_fields(validated_data, instance)
         validated_data['last_editor'] = self.context.get('request').user
         try:
             for k, v in validated_data.items():

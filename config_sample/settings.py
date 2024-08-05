@@ -122,6 +122,14 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_PARSER_CLASSES': (
+        # declare other parsers before xml to set them as default
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        # accept xml logout request from CAS server as geOrchestra
+        'rest_framework_xml.parsers.XMLParser',
+    ),
 }
 
 # URL prefix
@@ -139,6 +147,7 @@ AUTH_USER_MODEL = 'geocontrib.User'
 LOGIN_URL = config("LOGIN_URL", default='geocontrib:login')
 LOGIN_REDIRECT_URL = 'geocontrib:index'
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
+SSO_OGS_SESSION_URL = config('SSO_OGS_SESSION_URL', default='')
 
 # CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
 cas_server_url = config('CAS_SERVER_URL', None)
@@ -245,18 +254,6 @@ DEFAULT_MAP_VIEW = {
 #     'zoom': 7
 # }
 
-# Available geocoders
-GEOCODER_PROVIDERS = {
-    'ADDOK': 'addok',
-    'NOMINATIM': 'nominatim',
-    'PHOTON': 'photon'
-}
-
-# Active geocoder
-SELECTED_GEOCODER = {
-    'PROVIDER': config('SELECTED_GEOCODER_PROVIDER', default='addok')
-}
-
 # Project duplication settings
 PROJECT_COPY_RELATED = {
     'AUTHORIZATION': config('PROJECT_COPY_RELATED_AUTHORIZATION', default=True, cast=bool),
@@ -295,3 +292,5 @@ MAPSERVER_URL = config('MAPSERVER_URL', default='https://mapserver.dev.neogeo.lo
 IDGO_VERIFY_CERTIFICATE = config('IDGO_VERIFY_CERTIFICATE', default=False)
 IDGO_LOGIN = config('IDGO_LOGIN', default='geocontrib')
 IDGO_PASSWORD = config('IDGO_PASSWORD', default='CHANGE_ME')
+
+SESSION_COOKIE_NAME='geocontrib-session-id'

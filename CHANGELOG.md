@@ -3,7 +3,172 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## Unreleased
+## [6.2.0] - 2024-07-10
+
+### Evolutions
+
+- Redmine 19726 : Permettre de modifier le contenu du mail via l’administration Django
+- Redmine 19727 : Rendre paramétrable le fait d’envoyer une notification globale ou une notification par projet
+- Redmine 19728 : Ajouter un nouveau type de notification : Notification de publication d’un document clé
+- Redmine 19729 : Réorganiser les éléments affichés dans le mail de notification
+- Redmine 19730 : Choisir les types de signalements apparaissant sur les notifications
+
+## [6.1.0] - 2024-03-20
+
+### Evolution
+
+- Redmine 19725 : Redirection vers la page de connexion d'un portail externe si l'utilisateur n'est pas connecté
+
+### Corrections
+
+- Redmine 19510 : Admin Django - Le label de suppression n'est pas bon dans la table "Valeurs pré-enregistrées"
+- Redmine 19670 : Édition projet - Le fond de carte ne s'affiche pas dans l'aperçu
+- Redmine 20442 : Accueil projet - Ajouter un bouton pour l'import d'un JSON (non-géo)
+- Redmine 20500 : Création d'un nouveau signalement en géométrie multi
+- Redmine 21098 : La recherche textuelle n'est pas conservé au changement de page
+
+### Environment variables
+
+- SSO_LOGIN_URL_WITH_REDIRECT : chaine de caractères
+-> Permet de rediriger l'utilisateur vers un lien de connexion s'il n'est pas déjà connecté.
+
+## [6.0.0] - 2024-03-12
+
+### Evolutions
+
+- Redmine 19720 : Amélioration du bouton de suppression sur la carte
+- Redmine 19721 : Ajouter des attributs dans les projets
+- Redmine 19722 : Créer des filtres pour les attributs projet sur l'accueil de l'application
+- Redmine 19723 : Sélectionner les filtres « classiques » à afficher sur l’accueil projet
+- Redmine 19724 : Liste et carte – Faire de la sélection multiple dans les filtres
+
+### Corrections
+
+- Redmine 18836 : La recherche par adresse ne disparait pas
+- Redmine 19667 : La recherche de doublon à l'import de signalement s'applique sur les signalements supprimés
+- Redmine 20240 : Liste et carte - La carte passe par dessus la liste des types de signalements
+- Redmine 20344 : Mettre à jour le lien vers la documentation sur l'accueil projet
+- Redmine 20677 : Utilisation des flux de la geoplateforme IGN
+- Redmine 20788 : Lien popup ne dirige plus vers signalement
+
+### Environment variables
+
+- PROJECT_FILTERS: chaine de caractère ou liste de chaînes de caractères.
+-> Permet de sélectionner les filtres affichés sur la page d'accueil.
+
+Valeurs possibles : 'access_level,user_access_level,moderation,search'
+Valeur par défaut : 'access_level,user_access_level,moderation,search'
+
+Pour n'afficher aucun filtre, la valeur doit être 'empty' (ou n'importe quelle autre valeur qui ne fait pas partie des filtres existants)
+
+Lien vers la liste des valeurs possibles pour configurer les filtres: https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docs/documentation_technique/Docker.md?plain=1#L78
+
+- URL_DOCUMENTATION: chaine de caractères
+-> Permet de sélectionner le lien vers la doucmentation sur le bouton "?" sur l'accueil de GéoContrib
+
+Valeur par défaut : https://www.onegeosuite.fr/docs/module-geocontrib/intro
+
+
+## [5.4.0] - 2024-01-22
+
+### Evolutions
+
+- Redmine 19119 : Permettre la gestion de signalements non-géographiques
+- Redmine 19162 : Adaptation de GéoContrib à une charte UI / UX
+
+### Corrections
+
+- Redmine 19670 : Édition projet - Le fond de carte ne s'affiche pas dans l'aperçu
+- Redmine 19667 : La recherche de doublon à l'import de signalement s'applique sur les signalements supprimés
+- Redmine 19671 : Détails signalement - lien de liaison non mis à jour
+- Redmine 19672 : Édition signalement - Texte popup mal mise en forme
+
+### Environement variables
+
+- FONT_FAMILY (default : '')
+-> Permet de changer la police
+
+- HEADER_COLOR (default : '')
+-> Permet de changer la couleur de fond de la barre de menu
+
+- PRIMARY_COLOR (default : '')
+-> Permet de changer la couleur des éléments colorés de l'application (override couelur turquoise)
+
+- PRIMARY_HIGHLIGHT_COLOR (default : '')
+-> Permet de changer la couleur de focus, survol, activation des éléments
+
+
+## [5.3.6] - 2023-12-13
+
+### Correction
+
+- Redmine 19251 : Listes de valeurs pré-enr. - Vérification que l'option existe bien dans la liste ne fonctionne pas dans le cas où j'ai un string
+
+## [5.3.5] - 2023-11-20
+
+### Corrections
+
+- Redmine 14157 : Création d'un type de signalement - Interdire les noms des champs par défaut des properties
+- Redmine 18942 : notifications mails - liens de notif qui pointent sur une URL générique au lieu d'une URL d'accès direct au signalement
+
+## [5.3.4] - 2023-10-20
+
+### Corrections
+
+- Redmine 18568 : Certains liens vers signalement en parcours rapide sont invalides
+- Redmine 18401 : Les listes de valeurs pré-définies ne se rafraichissent pas
+- Redmine 17338 : Page mon compte - Activer le parcours des signalements
+- Redmine 17139 : Page édition signalement - pas de suppression attribut liste pré-enregistrée ou liste
+- Redmine 16896 : Import signalement - pas de rafraichissement des signalements sur la page du projet
+- Redmine 18644 : Problème d'affichage sur les tool tip (message de description bouton)
+- Redmine 18666 : Les formulaires de listes à choix multiples ne se rafraichissent pas
+- Redmine 18757 : Export - Champs perdus
+- Redmine 18568 : Certains liens vers signalement en parcours rapide sont invalides
+- Redmine 18736 : Parcours de signalement & édition rapide - erreur de détection de changement avec booléens
+
+## [5.3.3] - 2023-10-13
+
+### Evolution
+
+- Redmine 18514 : Rendre possible l'affichage des WMTS pour les fonds de plan
+
+### Corrections
+
+- Redmine 16896 : Import signalement - pas de rafraichissement des signalements sur la page du projet
+- Redmine 17139 : Page édition signalement - pas de suppression attribut liste pré-enregistrée ou liste
+- Redmine 17338 : Page mon compte - Activer le parcours des signalements
+- Redmine 18500 : Derniers signalements absents sur page d'accueil suite passage aux signalements MVT
+- Redmine 18666 : Les formulaires de listes à choix multiples ne se rafraichissent pas
+- Redmine 18644 : Problème d'affichage sur les tool tip (message de description bouton)
+
+## [5.3.2] - 2023-09-13
+
+### Corrections
+
+- Redmine 18295 : Paramétrage de l'affichage des signalement - La page ne n'affiche plus
+
+## [5.3.1] - 2023-09-13
+
+### Corrections
+
+- Redmine 18186 : Géolocalisation : lenteurs / fonction KO de manière aléatoire
+- Redmine 18185 : Prévisualisation des champs illisible
+- Redmine 18184 : Temps de chargement carte accueil très lent
+- Redmine 18130 : Améliorer l'affichage du logo dans la barre de menu
+- Redmine 18124 : Accueil projet - Les libellés sont coupés au milieu d'une lettre
+
+## [5.3.0] - 2023-09-01
+
+### Evolutions
+
+- Redmine 17473 : Zoomer sur la carte en fonction de la localisation
+- Redmine 17474 : Ajouter un geocodeur ETALAB sur les cartes
+- Redmine 17475 : Affichage des informations attributaires dans la pop-up au clic sur les signalements
+- Redmine 17858 : Adaptation de la barre de menu pour logo hors format
+
+### Corrections
+
+- Redmine 18160 : Duplication des champs dans le formulaire de visualisation
 
 ## [5.2.0] - 2023-08-22
 

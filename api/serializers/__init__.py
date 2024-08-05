@@ -3,6 +3,7 @@ from .base_map import ContextLayerSerializer
 from .base_map import LayerSerializer
 from .feature import CustomFieldSerializer
 from .feature import FeatureDetailedSerializer
+from .feature import FeatureJSONSerializer
 from .feature import FeatureGeoJSONSerializer
 from .feature import FeatureCSVSerializer
 from .feature import FeatureLinkSerializer
@@ -21,8 +22,11 @@ from .misc import ImportTaskSerializer
 from .misc import StackedEventSerializer
 from .misc import UserSerializer
 from .misc import FeatureEventSerializer
-from .project import ProjectDetailedSerializer
 from .project import ProjectSerializer
+from .project import ProjectDetailedSerializer
+from .project import ProjectCreationSerializer
+from .project import ProjectAuthorizationSerializer
+from .project import ProjectAttributeSerializer
 from .user import UserLevelsPermissionSerializer
 from .user import GeneratedTokenSerializer
 
@@ -40,6 +44,7 @@ __all__ = [
     'FeatureDetailedSerializer',
     'FeatureEventSerializer',
     'GeneratedTokenSerializer',
+    'FeatureJSONSerializer',
     'FeatureGeoJSONSerializer',
     'FeatureLinkSerializer',
     'FeatureListSerializer',
@@ -52,6 +57,9 @@ __all__ = [
     'PreRecordedValuesSerializer',
     'ProjectSerializer',
     'ProjectDetailedSerializer',
+    'ProjectCreationSerializer',
+    'ProjectAuthorizationSerializer',
+    'ProjectAttributeSerializer',
     'StackedEventSerializer',
     'UserSerializer',
     'UserLevelsPermissionSerializer',

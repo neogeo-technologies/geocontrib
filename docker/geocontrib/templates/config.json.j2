@@ -4,8 +4,8 @@
     "VUE_APP_LOCALE": "fr-FR",
     "VUE_APP_APPLICATION_NAME": "{{ VUE_APP_APPLICATION_NAME|default("GéoContrib", true) }}",
     "VUE_APP_APPLICATION_ABSTRACT": "{{ VUE_APP_APPLICATION_ABSTRACT|default("Application de saisie d'informations géographiques contributive", true) }}",
-    "VUE_APP_LOGO_PATH": "{{ VUE_APP_LOGO_PATH|default("@/assets/img/logo-neogeo-circle.png", true) }}",
-    "VUE_APP_APPLICATION_FAVICO": "{{ VUE_APP_APPLICATION_FAVICO|default("@/assets/img/icons/favicon-32x32.png", true) }}",
+    "VUE_APP_LOGO_PATH": "{{ VUE_APP_LOGO_PATH|default("/geocontrib/img/logo-neogeo-circle.png", true) }}",
+    "VUE_APP_APPLICATION_FAVICO": "{{ VUE_APP_APPLICATION_FAVICO|default("/geocontrib/img/favicon_gc.png", true) }}",
     "VUE_APP_DJANGO_BASE": "{{ BASE_URL|default('') }}",
     "VUE_APP_DJANGO_API_BASE": "/geocontrib/api/",
 
@@ -16,6 +16,14 @@
     "VUE_APP_LOGIN_URL": "{{ VUE_APP_LOGIN_URL|default('', true) }}",
     "VUE_APP_DISABLE_LOGIN_BUTTON": {{ DISABLE_LOGIN_BUTTON|default('false', true) }},
 
+    "VUE_APP_FONT_FAMILY": "{{ VUE_APP_FONT_FAMILY|default('', true) }}",
+    "VUE_APP_HEADER_COLOR": "{{ VUE_APP_HEADER_COLOR|default('', true) }}",
+    "VUE_APP_PRIMARY_COLOR": "{{ VUE_APP_PRIMARY_COLOR|default('', true) }}",
+    "VUE_APP_PRIMARY_HIGHLIGHT_COLOR": "{{ VUE_APP_PRIMARY_HIGHLIGHT_COLOR|default('', true) }}",
+
+    "VUE_APP_PROJECT_FILTERS": "{{ VUE_APP_PROJECT_FILTERS|default('access_level,user_access_level,moderation,search', true) }}",
+    "VUE_APP_SSO_LOGIN_URL_WITH_REDIRECT": "{{ VUE_APP_SSO_LOGIN_URL_WITH_REDIRECT|default('', true) }}",
+
     "DEFAULT_BASE_MAP_SCHEMA_TYPE": "{{ DEFAULT_BASE_MAP_SCHEMA_TYPE|default('tms', true) }}",
     "DEFAULT_BASE_MAP_SERVICE": "{{ DEFAULT_BASE_MAP_SERVICE|default('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', true) }}",
     "DEFAULT_BASE_MAP_OPTIONS": {{ DEFAULT_BASE_MAP_OPTIONS|default('{ "attribution": "&copy; contributeurs d\'<a href=\'https://osm.org/copyright\'>OpenStreetMap</a>", "maxZoom": 20 }', true) }},
@@ -24,14 +32,8 @@
         "zoom": {{ DEFAULT_MAP_VIEW_ZOOM|default('4', true) }}
     },
     "MAP_PREVIEW_CENTER" : {{ MAP_PREVIEW_CENTER|default([43.60882653785945, 1.447888090697796], true) }},
-    "GEOCODER_PROVIDERS" : {
-        "ADDOK": "addok",
-        "NOMINATIM": "nominatim",
-        "PHOTON": "photon"
-    },
-    "SELECTED_GEOCODER" : {
-        "PROVIDER": "addok"
-    },
     "DISPLAY_FORBIDDEN_PROJECTS" : {{ DISPLAY_FORBIDDEN_PROJECTS|default("true", true) }},
-    "DISPLAY_FORBIDDEN_PROJECTS_DEFAULT" : {{ DISPLAY_FORBIDDEN_PROJECTS_DEFAULT|default("true", true) }}
+    "DISPLAY_FORBIDDEN_PROJECTS_DEFAULT" : {{ DISPLAY_FORBIDDEN_PROJECTS_DEFAULT|default("true", true) }},
+    "VUE_APP_URL_DOCUMENTATION" : "{{ VUE_APP_URL_DOCUMENTATION|default('https://www.onegeosuite.fr/docs/module-geocontrib/intro', true) }}",
+    "VUE_APP_URL_DOCUMENTATION_FEATURE" : "{{ VUE_APP_URL_DOCUMENTATION_FEATURE|default('https://www.onegeosuite.fr/docs/module-geocontrib/project_settings', true) }}"
 }

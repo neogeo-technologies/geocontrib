@@ -9,8 +9,8 @@ git+https://github.com/neogeo-technologies/djangorestframework-mvt.git@138a09f09
 #djangorestframework-mvt>=0.2.5,<0.3.0
 drf-yasg==1.21.5
 ldap3==2.6.1
-Pillow<9.2.0
-psycopg2-binary==2.9.3
+Pillow==9.5
+psycopg2-binary==2.9.3 #Use binary for windows
 python-decouple==3.3
 python-magic==0.4.24
 redis==3.5.3
@@ -18,3 +18,5 @@ requests
 django-admin-list-filter-dropdown
 django-cas-ng
 django-celery-beat<2.3.0
+defusedxml==0.7.1
+djangorestframework-xml==2.0.0

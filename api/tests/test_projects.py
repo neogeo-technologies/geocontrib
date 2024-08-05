@@ -70,14 +70,14 @@ def test_projects_list(api_client):
             'creator': 1,
             'access_level_pub_feature': 'Utilisateur anonyme',
             'access_level_arch_feature': 'Utilisateur anonyme',
-            'archive_feature': None,
-            'delete_feature': None,
             'map_max_zoom_level': 22,
             'nb_features': 0,
             'nb_published_features': 0,
             'nb_comments': 0,
             'nb_published_features_comments': 0,
-            'nb_contributors': 1
+            'nb_contributors': 1,
+            'bbox': None,
+            'project_attributes':[]
         }]
     }
 
@@ -117,8 +117,6 @@ def test_projects_post(api_client):
         title="Projet 2",
         access_level_pub_feature="anonymous",
         access_level_arch_feature="anonymous",
-        archive_feature=1,
-        delete_feature=2,
         map_max_zoom_level=20,
     )
 
@@ -130,9 +128,7 @@ def test_projects_post(api_client):
     assert result.json() == {
         'access_level_arch_feature': "anonymous",
         'access_level_pub_feature': "anonymous",
-        'archive_feature': 1,
         'creator': user.pk,
-        'delete_feature': 2,
         'map_max_zoom_level': 20,
         'description': None,
         'is_project_type': False,
@@ -143,6 +139,7 @@ def test_projects_post(api_client):
         'fast_edition_mode': False,
         'feature_browsing_default_filter': '',
         'feature_browsing_default_sort': '-created_on',
+        'project_attributes':[]
     }
 
 
@@ -181,10 +178,8 @@ def test_projects_thumbnail(api_client):
     assert result_json == {
         'access_level_arch_feature': 'Utilisateur anonyme',
         'access_level_pub_feature': 'Utilisateur anonyme',
-        'archive_feature': None,
         'created_on': '05/08/2021',
         'creator': user.pk,
-        'delete_feature': None,
         'map_max_zoom_level': 22,
         'description': None,
         'is_project_type': False,
@@ -201,6 +196,8 @@ def test_projects_thumbnail(api_client):
         'slug': '1-projet-3',
         'title': 'Projet 3',
         'updated_on': '05/08/2021',
+        'bbox': None,
+        'project_attributes':[]
     }
 
     # ensure can't POST

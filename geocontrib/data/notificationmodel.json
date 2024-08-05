@@ -1,0 +1,38 @@
+[
+  {
+    "model": "geocontrib.notificationmodel",
+    "pk": 1,
+    "fields": {
+      "template_name": "Signalement à modérer",
+      "subject": "[GéoContrib:{{ project_slug }}] Un signalement est en attente de publication.",
+      "message": "Bonjour,\n<br>\n<p>Vous recevez ce message automatique en tant que modérateur du projet {{ application_name }} {{ feature.project.title|title }}.</p>\n<p>Nous vous signalons que le signalement suivant est mis attente de publication par {{ event_initiator.get_full_name|default:event_initiator.username }},</p>\n<p>Vous pouvez confirmer sa publication en passant son statut de « en attente de publication » à « publié ».</p>"
+    }
+  },
+  {
+    "model": "geocontrib.notificationmodel",
+    "pk": 2,
+    "fields": {
+      "template_name": "Signalement publié",
+      "subject": "[GéoContrib:{{ project_slug }}] Confirmation de la publication de l'un de vos signalements.",
+      "message": "La publication du signalement <a href=\"{{ url_feature }}\">{{ feature.title|title }} </a> a été confirmée par un modérateur du projet {{ feature.project.title|title }} le {{ event.created_on }}"
+    }
+  },
+  {
+    "model": "geocontrib.notificationmodel",
+    "pk": 3,
+    "fields": {
+      "template_name": "Événements groupés",
+      "subject": "[{{ application_name }}] Activité des projets que vous suivez",
+      "message": "Bonjour,<br>\nDerniers évènements des projets que vous suivez :"
+    }
+  },
+  {
+    "model": "geocontrib.notificationmodel",
+    "pk": 4,
+    "fields": {
+      "template_name": "Publication de documents clés",
+      "subject": "[{{ application_name }}] Un document clé à été publié dans un projet que vous suivez",
+      "message": "Bonjour,<br>\nUn document clé a été publié dans un des projets que vous suivez :"
+    }
+  }
+]
