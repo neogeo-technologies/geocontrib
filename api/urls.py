@@ -56,12 +56,12 @@ from rest_framework import permissions
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="REST APIs",
-        default_version='v1',
-        description="API documentation",
-        terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="contact@snippets.local"),
-        license=openapi.License(name="BSD License"),
+        title="Documentation REST APIs GéoContrib",
+        default_version='1.0.0',
+        description="Cette page décrit l'ensemble des services REST offerts par l'API GéoContrib.",
+        terms_of_service="https://www.gnu.org/licenses/agpl-3.0.fr.html",
+        contact=openapi.Contact(email="contact@geocontrib.fr"),
+        license=openapi.License(name="GNU Affero General Public License v3"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
@@ -93,7 +93,7 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     # Vues générales de navigation
     path('version', version, name='version'),
-    path('login/', LoginView.as_view(), name='login'),
+    path('login/', LoginView.as_view(), name='signin-view'),
     path('user_info/', UserInfoView.as_view(), name='user-info'),
     path('logout/', LogoutView.as_view(), name='signout-view'),
     path('flat-pages/', FlatPagesView.as_view(), name='help'),

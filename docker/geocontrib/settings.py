@@ -286,3 +286,8 @@ IDGO_LOGIN = config('IDGO_LOGIN', default='geocontrib')
 IDGO_PASSWORD = config('IDGO_PASSWORD', default='CHANGE_ME')
 
 SESSION_COOKIE_NAME='geocontrib-session-id'
+
+# Required to avoid error in swagger
+SWAGGER_SETTINGS = {
+    'LOGIN_URL': '/login/',
+}
