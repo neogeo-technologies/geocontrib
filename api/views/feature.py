@@ -35,6 +35,7 @@ from api.serializers import FeatureListSerializer
 from api.serializers import FeatureSearchSerializer
 from api.serializers import FeatureTypeListSerializer
 from api.serializers import FeatureEventSerializer
+from api.serializers import BboxSerializer
 from api.utils.filters import FeatureTypeFilter
 from api.utils.paginations import CustomPagination
 from api.db_layer_utils import get_pre_recorded_values
@@ -316,6 +317,7 @@ class ProjectFeaturePositionInList(views.APIView):
             logger.exception("%s %s", no_data_msg, e)
             return Response(data=no_data_msg, status=404)
 
+
 class ProjectFeatureBbox(generics.ListAPIView):
     """
     API view that provides the bounding box (bbox) of features within a project.
@@ -333,6 +335,7 @@ class ProjectFeatureBbox(generics.ListAPIView):
     queryset = Project.objects.all()
     lookup_field = 'slug'
     http_method_names = ['get', ]
+    serializer_class = BboxSerializer
 
     def filter_queryset(self, queryset):
         """

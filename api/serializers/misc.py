@@ -29,6 +29,27 @@ class UserSerializer(serializers.ModelSerializer):
             'full_name',
             'username'
         )
+        ref_name = 'MiscUserSerializer'
+
+
+class BboxSerializer(serializers.Serializer):
+    """
+    Serializer for representing a bounding box (bbox).
+
+    This serializer defines the fields required to represent the
+    geographic extent of a set of features. It includes the minimum
+    and maximum longitude and latitude values to define the bbox.
+
+    Fields:
+        minLon (float): Minimum longitude of the bbox.
+        minLat (float): Minimum latitude of the bbox.
+        maxLon (float): Maximum longitude of the bbox.
+        maxLat (float): Maximum latitude of the bbox.
+    """
+    minLon = serializers.FloatField()
+    minLat = serializers.FloatField()
+    maxLon = serializers.FloatField()
+    maxLat = serializers.FloatField()
 
 
 class FeatureAttachmentSerializer(serializers.ModelSerializer):

@@ -5,17 +5,72 @@ info:
   contact:
     email: contact@geocontrib.fr
   version: 1.0.0
+
 servers:
   - url: https://geocontrib.dev.neogeo.fr/geocontrib/
     variables: {}
+
 paths:
+  /api/login:
+    post:
+      tags:
+        - auth
+      summary: login
+      description: |-
+        Ce service permet de se logguer sur geocontrib.
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/LoginDetail'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginDetail'
+        '400':
+          description: | 
+            {"username": ["Ce champ est obligatoire."]}
+            {"password": ["Ce champ est obligatoire."]}
+        '403':
+          description: | 
+            {"detail": "Informations d'authentification incorrectes."}
+            {"detail": "Informations d'authentification non fournies."}
+      deprecated: false
+      security: []
+
+  /api/logout:
+    get:
+      tags:
+        - auth
+      summary: logout
+      description: |-
+        Ce service permet de se delogguer sur geocontrib.
+      operationId: logout
+      responses:
+        '200':
+          description:  | 
+            "detail": {username} signed out"
+        '403':
+          description: | 
+           {"detail": "Informations d'authentification non fournies."}
+      deprecated: false
+      security: []
+
   /api/v2/projects/:
     get:
       tags:
         - projects
       summary: getProjects
       description: |-
-        Ce service permet de récuperer tous les projects.
+        Ce service permet de récupérer tous les projects.
       operationId: getProjects
       parameters:
         - name: search
@@ -87,7 +142,7 @@ paths:
       parameters: []
       requestBody:
         description: Ce service permet de créer un projet sur GéoContrib.
-                    En réponse un nouveau projet est créé et son  contenu sont affiché.
+                    En réponse un nouveau projet est créé et son contenu est affiché.
         content:
           application/json:
             schema:
@@ -103,14 +158,14 @@ paths:
            application/xml:
             schema:
                 type: object
-        '401':
-          description: |
+        # '401':
+        #   description: |
 
-        '400':
-          description:  |
+        # '400':
+        #   description:  |
 
-        '403':
-          description: | 
+        # '403':
+        #   description: | 
         '405':
           description: Invalid input
           headers: {}
@@ -125,7 +180,7 @@ paths:
         - projects
       summary: getProject
       description: |-
-        Ce service permet de récuperer le detail d'un project.
+        Ce service permet de récupérer les détails d'un project.
       operationId: getProject
       parameters:
         - name : slug
@@ -181,14 +236,14 @@ paths:
            application/xml:
             schema:
                 type: object
-        '401':
-          description: |
+        # '401':
+        #   description: |
 
-        '400':
-          description:  |
+        # '400':
+        #   description:  |
 
-        '403':
-          description: | 
+        # '403':
+        #   description: | 
         '405':
           description: Invalid input
           headers: {}
@@ -255,14 +310,14 @@ paths:
            application/xml:
             schema:
                 type: object
-        '401':
-          description: |
+        # '401':
+        #   description: |
 
-        '400':
-          description:  |
+        # '400':
+        #   description:  |
 
-        '403':
-          description: | 
+        # '403':
+        #   description: | 
         '405':
           description: Invalid input
           headers: {}
@@ -900,56 +955,13 @@ paths:
       deprecated: false
       security: []
 
-  /api/exif-geom-reader/:
-    post:
-      tags:
-        - misc
-      summary: addExifGeomReader
-      description: |-
-        Ce service permet de dupliquer un project.
-      operationId: addExifGeomReader
-      requestBody:
-        content: 
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                image_file:
-                  type: string
-                  format: binary
-        required: true
-      responses:
-        '201':
-          description: Création
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Exif'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Exif'
-        '401':
-          description: |
-
-        '400':
-          description:  |
-                {error : "Erreur lors de la lecture des données GPS."}
-        '403':
-          description: | 
-        '405':
-          description: Invalid input
-          headers: {}
-          content: {}
-      deprecated: false
-      security: []
-
   /api/features/{feature_id}/feature-links/:
     get:
       tags:
         - features
       summary: getFeatureLinks
       description: |-
-        Ce service permet de récuperer le liason entre signalements.
+        Ce service permet de récupérer le liason entre signalements.
       operationId: getFeatureLinks
       parameters:
         - name : feature_id
@@ -1017,7 +1029,7 @@ paths:
         - features
       summary: getFeatureEvents
       description: |-
-        Ce service permet de récuperer les evenements d'un signalements.
+        Ce service permet de récupérer les evenements d'un signalements.
       operationId: getFeatureEvents
       parameters:
         - name : feature_id
@@ -1048,7 +1060,7 @@ paths:
         - features
       summary: getFeatureAttachments
       description: |-
-        Ce service permet de récuperer les attachements d'un signalements.
+        Ce service permet de récupérer les attachements d'un signalements.
       operationId: getFeatureAttachments
       parameters:
         - name : feature_id
@@ -1118,7 +1130,7 @@ paths:
         - features
       summary: getFeatureAttachmentDetail
       description: |-
-        Ce service permet de récuperer un attachement d'un signalements.
+        Ce service permet de récupérer un attachement d'un signalements.
       operationId: getFeatureAttachmentDetail
       parameters:
         - name : feature_id
@@ -1248,7 +1260,7 @@ paths:
         - features
       summary: getFeatureComments
       description: |-
-        Ce service permet de récuperer des dernières commentaires d'un signalements.
+        Ce service permet de récupérer des dernières commentaires d'un signalements.
       operationId: getFeatureComments
       parameters:
         - name : feature_id
@@ -1314,7 +1326,7 @@ paths:
         - features
       summary: getFeatureCommentsDetail
       description: |-
-        Ce service permet de récuperer un commentaire d'un signalements.
+        Ce service permet de récupérer un commentaire d'un signalements.
       operationId: getFeatureCommentsDetail
       parameters:
         - name : feature_id
@@ -1472,7 +1484,7 @@ paths:
         - features
       summary: getFeatureMVT
       description: |-
-        Ce service permet de récuperer des Mapbox Vector Tiles.
+        Ce service permet de récupérer des Mapbox Vector Tiles.
       operationId: getFeatureMVT
       parameters:
         - name : tile
@@ -1544,7 +1556,7 @@ paths:
         - features
       summary: GetFeatureInfo
       description: |-
-        Ce service permet de récuperer les informations d'un signalements.
+        Ce service permet de récupérer les informations d'un signalements.
       operationId: GetFeatureInfo
       parameters:
         - name : url
@@ -1637,7 +1649,7 @@ paths:
         - features
       summary: GetFeaturePreRecordedListValuesName
       description: |-
-        Ce service permet de récuperer les noms des listes pré enregistrées.
+        Ce service permet de récupérer les noms des listes pré enregistrées.
       operationId: GetFeaturePreRecordedListValuesName
       responses:
         '200':
@@ -1656,7 +1668,7 @@ paths:
         - features
       summary: GetFeaturePreRecordedListValues
       description: |-
-        Ce service permet de récuperer la liste des valeurs pré enregistré d'un type de signalement.
+        Ce service permet de récupérer la liste des valeurs pré enregistré d'un type de signalement.
       operationId: GetFeaturePreRecordedListValues
       parameters:
         - name: name
@@ -1692,7 +1704,7 @@ paths:
         - features
       summary: GetCustomFields
       description: |-
-        Ce service permet de récuperer la liste des champs personnalisés.
+        Ce service permet de récupérer la liste des champs personnalisés.
       operationId: GetCustomFields
       responses:
         '200':
@@ -1708,10 +1720,10 @@ paths:
   /api/projects/{slug}/feature-types/:
     get:
       tags:
-        - featurestypes
+        - feature types
       summary: getFeaturesTypesDeprecated
       description: |-
-        Ce service permet de récuperer tous les types de signalements d'un projet.
+        Ce service permet de récupérer tous les types de signalements d'un projet.
       operationId: getFeaturesTypesDeprecated
       parameters:
         - name: slug
@@ -1744,7 +1756,7 @@ paths:
         - features
       summary: getFeaturesDeprecated
       description: |-
-        Ce service permet de récuperer tous les signalements d'un projet.
+        Ce service permet de récupérer tous les signalements d'un projet.
       operationId: getFeaturesDeprecated
       parameters:
         - name: slug
@@ -1777,7 +1789,7 @@ paths:
         - users
       summary: getUsers
       description: |-
-        Ce service permet de récuperer tous les utilisateurs.
+        Ce service permet de récupérer tous les utilisateurs.
       operationId: getUsers
       responses:
         '200':
@@ -1820,7 +1832,7 @@ paths:
         - features
       summary: getFeatures
       description: |-
-        Ce service permet de récuperer tous les signalements.
+        Ce service permet de récupérer tous les signalements.
       operationId: getFeatures
       parameters:
         - name: project__slug
@@ -1896,7 +1908,7 @@ paths:
         - features
       summary: getFeature
       description: |-
-        Ce service permet de récuperer le detail d'un signalement.
+        Ce service permet de récupérer le detail d'un signalement.
       operationId: getFeature
       parameters:
         - name : feature_id
@@ -1936,10 +1948,10 @@ paths:
   /api/v2/feature-types:
     get:
       tags:
-        - featurestypes
+        - feature types
       summary: getFeaturesTypes
       description: |-
-        Ce service permet de récuperer tous les types de signalements.
+        Ce service permet de récupérer tous les types de signalements.
       operationId: getFeaturesTypes
       parameters:
         - name: project__slug
@@ -1975,10 +1987,10 @@ paths:
   /api/v2/feature-types/{slug}:
     get:
       tags:
-        - featurestypes
+        - feature types
       summary: getFeatureType
       description: |-
-        Ce service permet de récuperer le detail d'un type de signalement.
+        Ce service permet de récupérer le detail d'un type de signalement.
       operationId: getFeatureType
       parameters:
         - name : slug
@@ -2010,7 +2022,7 @@ paths:
         - users
       summary: getToken
       description: |-
-        Ce service permet de récuperer le token de l'utilisateur connecté.
+        Ce service permet de récupérer le token de l'utilisateur connecté.
       operationId: getToken
       responses:
         '200':
@@ -2036,7 +2048,7 @@ paths:
         - users
       summary: userInfo
       description: |-
-        Ce service permet de récuperer le token de l'utilisateur connecté.
+        Ce service permet de récupérer le token de l'utilisateur connecté.
       operationId: userInfo
       responses:
         '200':
@@ -2058,7 +2070,7 @@ paths:
         - users
       summary: userLevelProjects
       description: |-
-        Ce service permet de récuperer les profiles de l'utilisateur connecté par projet.
+        Ce service permet de récupérer les profiles de l'utilisateur connecté par projet.
       operationId: userLevelProjects
       responses:
         '200':
@@ -2077,7 +2089,7 @@ paths:
         - users
       summary: userPermissions
       description: |-
-        Ce service permet de récuperer tous les permissions de l'utilisateur connecté par projet.
+        Ce service permet de récupérer tous les permissions de l'utilisateur connecté par projet.
       operationId: userPermissions
       responses:
         '200':
@@ -2089,77 +2101,50 @@ paths:
       deprecated: false
       security:
         - bearerAuth: []
-  /api/login:
+
+  /api/exif-geom-reader/:
     post:
       tags:
-        - auth
-      summary: login
+        - misc
+      summary: addExifGeomReader
       description: |-
-        Ce service permet de se logguer sur geocontrib.
-      operationId: login
+        Ce service permet de géolocaliser une image.
+      operationId: addExifGeomReader
       requestBody:
-        content:
-          application/json:
+        content: 
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Login'
+              type: object
+              properties:
+                image_file:
+                  type: string
+                  format: binary
         required: true
       responses:
-        '200':
-          description: Résultat
+        '201':
+          description: Création
           content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/LoginDetail'
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginDetail'
+                $ref: '#/components/schemas/Exif'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Exif'
+        # '401':
+        #   description: |
+
         '400':
-          description: | 
-            {"username": ["Ce champ est obligatoire."]}
-            {"password": ["Ce champ est obligatoire."]}
-        '403':
-          description: | 
-            {"detail": "Informations d'authentification incorrectes."}
-            {"detail": "Informations d'authentification non fournies."}
+          description:  |
+                {error : "Erreur lors de la lecture des données GPS."}
+        # '403':
+        #   description: | 
+        '405':
+          description: Invalid input
+          headers: {}
+          content: {}
       deprecated: false
       security: []
-  /api/logout:
-    get:
-      tags:
-        - auth
-      summary: logout
-      description: |-
-        Ce service permet de se delogguer sur geocontrib.
-      operationId: logout
-      responses:
-        '200':
-          description:  | 
-            "detail": {username} signed out"
-        '403':
-          description: | 
-           {"detail": "Informations d'authentification non fournies."}
-      deprecated: false
-      security: []
-  /api/version:
-    get:
-      tags:
-        - version
-      summary: version
-      description: |-
-        Ce service permet de récuperer la version de geocontrib.
-      operationId: version
-      responses:
-        '200':
-          description: Résultat
-          content:
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Version'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Version'
-      deprecated: false
-      security: []
+
   /api/flat-pages:
     get:
       tags:
@@ -2180,7 +2165,28 @@ paths:
                 $ref: '#/components/schemas/FlatPages'
       deprecated: false
       security: []
- 
+
+  /api/version:
+    get:
+      tags:
+        - version
+      summary: version
+      description: |-
+        Ce service permet de récupérer la version de geocontrib.
+      operationId: version
+      responses:
+        '200':
+          description: Résultat
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Version'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Version'
+      deprecated: false
+      security: []
+
 components:
   schemas:
     ProjectComments:
@@ -3446,12 +3452,22 @@ components:
 security: 
   - bearerAuth: []
 tags:
+  - name: auth
+    description: Login and logout user in app
   - name: users
-    description: Composent users
+    description: Get users related informations
   - name: projects
-    description: Composent projects
+    description: Retrieve, list, edit and delete projects
+  - name: feature types
+    description: Retrieve, list, edit and delete feature types
   - name: features
-    description: Composent features
+    description: Retrieve, list, edit and delete features
+  - name: misc
+    description: Miscellanous
+  - name: flat-pages
+    description: Static pages content
+  - name: version
+    description: Get app version number
 externalDocs:
-  description: Find out more about Swagger
-  url: http://swagger.io
+  description: Find more about Geocontrib
+  url: https://www.onegeosuite.fr/docs/module-geocontrib/intro

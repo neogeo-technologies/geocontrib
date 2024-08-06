@@ -139,9 +139,6 @@ class FeatureAttachmentView(
     This class combines multiple mixins to provide list, create, retrieve, update,
     and destroy actions.
     """
-    # Defines the permission classes to determine who can access this view.
-    # Here, authenticated users can access all operations, while read-only operations
-    # are allowed for unauthenticated users.
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
@@ -172,11 +169,16 @@ class FeatureAttachmentView(
 
     def get_serializer_context(self):
         """
-        Provides additional context to the serializer, particularly the feature instance,
-        which might be required for serializing data.
+        Provides additional context to the serializer.
+        If the view is being used for schema generation (`swagger_fake_view`),
+        it short-circuits and returns the default context. 
+        Otherwise, it retrieves the `feature_id` from the URL parameters,
+        fetches the corresponding feature instance, and adds it to the context.
         """
         # Gets the default context from the base class, which includes request, view, etc.
         context = super().get_serializer_context()
+        if getattr(self, 'swagger_fake_view', False):
+            return context
         feature_id = self.kwargs['feature_id']
         # Retrieves the feature instance associated with 'feature_id' or throws a 404
         feature = get_object_or_404(Feature, feature_id=feature_id)
@@ -243,7 +245,11 @@ class CommentView(
         mixins.DestroyModelMixin,
         viewsets.GenericViewSet
         ):
-
+    """
+    Viewset  for handling CRUD operations associated with specific features.
+    This class combines multiple mixins to provide list, create, retrieve, update,
+    and destroy actions.
+    """
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
@@ -253,18 +259,33 @@ class CommentView(
     serializer_class = CommentDetailedSerializer
 
     def get_object(self):
+        """
+        Retrieves a specific comment object based on comment_id and feature_id.
+        """
         comment_id = self.kwargs['comment_id']
         feature_id = self.kwargs['feature_id']
         return get_object_or_404(
             Comment, id=comment_id, feature_id=feature_id)
 
     def get_queryset(self):
+        """
+        Retrieves the queryset of comments filtered by feature_id.
+        """
         feature_id = self.kwargs['feature_id']
         qs = super().get_queryset().filter(feature_id=feature_id)
         return qs
 
     def get_serializer_context(self):
+        """
+        Provides additional context to the serializer.
+        If the view is being used for schema generation (`swagger_fake_view`),
+        it short-circuits and returns the default context.
+        Otherwise, it retrieves the `feature_id` from the URL parameters,
+        fetches the corresponding feature instance, and adds it to the context.
+        """
         context = super().get_serializer_context()
+        if getattr(self, 'swagger_fake_view', False):
+            return context
         feature_id = self.kwargs['feature_id']
         feature = get_object_or_404(Feature, feature_id=feature_id)
         context.update({'feature': feature})

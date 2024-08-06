@@ -50,6 +50,24 @@ from api.views.user import UserViewSet
 from api.views.user import UserLevelsPermission
 from api.views import version
 
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="REST APIs",
+        default_version='v1',
+        description="API documentation",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="contact@snippets.local"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
+
 app_name = 'api'
 
 router = routers.DefaultRouter()
@@ -69,9 +87,13 @@ router.register(r'project-types', ProjectTypesViewDeprecated, basename='projects
 
 
 urlpatterns = [
+    # Include DRF-Swagger URLs
+    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     # Vues générales de navigation
     path('version', version, name='version'),
-    path('login/', LoginView.as_view(), name='signin-view'),
+    path('login/', LoginView.as_view(), name='login'),
     path('user_info/', UserInfoView.as_view(), name='user-info'),
     path('logout/', LogoutView.as_view(), name='signout-view'),
     path('flat-pages/', FlatPagesView.as_view(), name='help'),

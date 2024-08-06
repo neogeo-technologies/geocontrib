@@ -38,6 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'username'
         )
+        ref_name = 'ProjectUserSerializer'
 
     def to_internal_value(self, data):
         return User.objects.get(id=data.get('id'))

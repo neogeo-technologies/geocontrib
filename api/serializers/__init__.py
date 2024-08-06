@@ -14,14 +14,15 @@ from .feature import FeatureTypeListSerializer
 from .feature import FeatureTypeSerializer
 from .feature import PreRecordedValuesSerializer
 from .flat_pages import FlatPagesSerializer
-from .misc import FeatureAttachmentSerializer
+from .misc import BboxSerializer
 from .misc import CommentSerializer
 from .misc import CommentDetailedSerializer
 from .misc import EventSerializer
+from .misc import FeatureAttachmentSerializer
+from .misc import FeatureEventSerializer
 from .misc import ImportTaskSerializer
 from .misc import StackedEventSerializer
 from .misc import UserSerializer
-from .misc import FeatureEventSerializer
 from .project import ProjectSerializer
 from .project import ProjectDetailedSerializer
 from .project import ProjectCreationSerializer
@@ -33,6 +34,7 @@ from .user import GeneratedTokenSerializer
 
 __all__ = [
     'BaseMapSerializer',
+    'BboxSerializer',
     'ContextLayerSerializer',
     'CommentSerializer',
     'CommentDetailedSerializer',
