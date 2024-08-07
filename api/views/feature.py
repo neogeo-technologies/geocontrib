@@ -14,6 +14,8 @@ from django.contrib.gis.db.models import Extent
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import permissions
@@ -719,7 +721,30 @@ class CustomFields(APIView):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
-
+    @swagger_auto_schema(
+        operation_summary= 'Retrieve a list of custom field types available',
+        responses={
+            200: openapi.Response(
+                description="A list of custom field types.",
+                examples={
+                    "application/json": [
+                        {"type": "boolean", "label": "Booléen"},
+                    ]
+                },
+                schema=openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'type': openapi.Schema(type=openapi.TYPE_STRING),
+                            'label': openapi.Schema(type=openapi.TYPE_STRING),
+                        }
+                    )
+                )
+            ),
+        },
+        tags=["feature type"]
+    )
     def get(self, request):
         type_choices = [] 
         status = 200
