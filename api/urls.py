@@ -50,8 +50,10 @@ from api.views.user import UserViewSet
 from api.views.user import UserLevelsPermission
 from api.views import version
 
+from api.doc_swagger.custom_schema_generator import CustomSchemaGenerator
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+
 from rest_framework import permissions
 
 schema_view = get_schema_view(
@@ -65,6 +67,7 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
+    generator_class=CustomSchemaGenerator,
 )
 
 
