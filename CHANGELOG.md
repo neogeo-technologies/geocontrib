@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [5.4.3] - 2024-06-18
+## [5.4.4] - 2024-08-08
 
 ### Evolutions
 
