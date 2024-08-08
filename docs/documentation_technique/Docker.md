@@ -82,6 +82,7 @@ Variables utilisées pour configurer le frontend:
 * FAVICON_PATH                  # path where the favicon is stored
 * FONT_FAMILY                   # specifies which font to use in the app
 * HEADER_COLOR                  # color to customize the header background
+* GEORCHESTRA_INTEGRATION       # activate header component to integrate into georchestra
 * IDGO                          # boolean to display import features from catalog buttons
 * LOG_URL                       # url used to login through SSO
 * LOGO_PATH                     # path where the logo is stored
