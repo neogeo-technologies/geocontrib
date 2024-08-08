@@ -5,6 +5,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [5.4.3] - 2024-06-18
 
+### Evolutions
+
+- Redmine 18860 : Authentification GéoContrib via API OGS
+- Redmine 22911 : Ajout du header geOrchestra
+
+### Correction
+
+- Redmine 21879 : Import signalement mix simple et multi
+
+### Environement variables
+
+- GEORCHESTRA_INTEGRATION (default : "")
+-> Permet d'activer le composant header geOrchestra remplaçant celui de GéoContrib
+
+Configuration minimale pour activer le header : 
+
+```
+{
+  "GEORCHESTRA_INTEGRATION": {
+    "HEADER": {
+      "LEGACY_HEADER": false,
+      "LEGACY_URL": "/header/",
+      "STYLE": "",
+      "STYLESHEET": "",
+      "HEADER_SCRIPT": "https://cdn.jsdelivr.net/gh/georchestra/header@dist/header.js" 
+    }
+  }
+}
+```
+
+- SSO_OGS_SESSION_URL (default : "")
+-> Permet de se connecter via un environnement OneGeoSuite, URL de vérification de la session dans OGS
+
+Pour que la redirection dans OGS soit permise, il faut ajouter la route /geocontrib/ dans la configuration d'OGS.
+
+## [5.4.3] - 2024-06-18
+
 ### Corrections
 
 - Redmine 21792 : correctif pour connexion à l'application mobile
