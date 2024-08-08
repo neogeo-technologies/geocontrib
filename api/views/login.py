@@ -1,29 +1,20 @@
 import logging
 import requests
 
-from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework import views
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated
 from rest_framework.response import Response
 
-from geocontrib import choices
-
-from api.serializers import EventSerializer
-from api.serializers import ProjectDetailedSerializer
 from api.serializers.signin import SigninSerializer
 from api.serializers.user import UserSerializer
-from api.serializers.user import UserLevelPermissionSerializer
-from api.serializers.user import AuthorizationSerializer
-from geocontrib.models import Authorization
-from geocontrib.models import Event
-from geocontrib.models import Project
-from geocontrib.models import UserLevelPermission
 
 
 User = get_user_model()
@@ -31,7 +22,9 @@ logger = logging.getLogger(__name__)
 
 
 class LoginView(views.APIView):
-
+    """
+    Login view to authenticate a user and start a session.
+    """
     authentication_classes = []
 
     permission_classes = [
@@ -40,7 +33,70 @@ class LoginView(views.APIView):
 
     serializer_class = SigninSerializer
 
+    @swagger_auto_schema(
+        request_body=SigninSerializer,
+        responses={
+            200: openapi.Response(
+                description="OK",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'detail': openapi.Schema(type=openapi.TYPE_STRING, description='Detail message'),
+                        'user': openapi.Schema(type=openapi.TYPE_OBJECT, description='User data', example={
+                            "username": "user1",
+                            "is_active": True,
+                            "first_name": "",
+                            "last_name": "",
+                            "is_administrator": False,
+                            "is_superuser": False,
+                            "can_create_project": True,
+                            "email": "user1@example.com",
+                            "id": 1
+                        })
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "username": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Items(type=openapi.TYPE_STRING),
+                            description="Username validation errors"
+                        ),
+                        "password": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Items(type=openapi.TYPE_STRING),
+                            description="Password validation errors"
+                        ),
+                    },
+                    example={
+                        "username": ["Ce champ est obligatoire."],
+                        "password": ["Ce champ est obligatoire."]
+                    }
+                )
+            ),
+            403: openapi.Response(
+                description="Forbidden",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "detail": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
+                    },
+                    example={"detail": "Informations d'authentification incorrectes."}
+                )
+            ),
+        },
+        operation_description="",
+        operation_summary="Authenticate a user and start a session.",
+        tags=["auth"]
+    )
     def post(self, request):
+        """
+        Authenticates a user with username and password.
+        """
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         username = serializer.data['username']
@@ -56,7 +112,6 @@ class LoginView(views.APIView):
         }
         return Response(data=data, status=status.HTTP_200_OK)
 
-
 class UserInfoView(views.APIView):
     """
     API view to retrieve user information.
@@ -67,7 +122,46 @@ class UserInfoView(views.APIView):
        - If the OGS session is active, it authenticates or creates the user in Django and returns the user information.
     Else it raises a not authenticated error
     """
-
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response(
+                description="OK",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'detail': openapi.Schema(type=openapi.TYPE_STRING, description='Detail message'),
+                        'user': openapi.Schema(type=openapi.TYPE_OBJECT, description='User data', example={
+                            "username": "user1",
+                            "is_active": True,
+                            "first_name": "",
+                            "last_name": "",
+                            "is_administrator": False,
+                            "is_superuser": False,
+                            "can_create_project": True,
+                            "email": "user1@example.com",
+                            "id": 1
+                        })
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                examples={
+                    "application/json": [
+                        {"username": ["Ce champ est obligatoire."]},
+                        {"password": ["Ce champ est obligatoire."]}
+                    ]
+                }
+            ),
+            403: openapi.Response(
+                description="Forbidden",
+                examples={ "application/json": {"detail": "Informations d'authentification incorrectes."}}
+            ),
+        },
+        operation_description="Authenticate a user and start a session.",
+        operation_summary="Authenticate a user and start a session.",
+        tags=["users"]
+    )
     def get(self, request):
         user = request.user
 
@@ -118,65 +212,38 @@ class LogoutView(views.APIView):
         logout(self.request)
         return {"detail": _(f"{username} signed out")}
 
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response(
+                description="OK",
+                examples={ "application/json": {"detail": "user1 signed out"}}
+            ),
+            403: openapi.Response(
+                description="Forbidden",
+                examples={ "application/json": {"detail": "Informations d'authentification incorrectes."}}
+            ),
+        },
+        operation_description="",
+        operation_summary="Logs out current logged in user session",
+        tags=["auth"]
+    )
     def get(self, request):
         return Response(data=self.logout_user(), status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response(
+                description="OK",
+                examples={ "application/json": {"detail": "user1 signed out"}}
+            ),
+            403: openapi.Response(
+                description="Forbidden",
+                examples={ "application/json": {"detail": "Informations d'authentification incorrectes."}}
+            ),
+        },
+        operation_description="",
+        operation_summary="Logs out current logged in user session",
+        tags=["auth"]
+    )
     def post(self, request):
         return Response(data=self.logout_user(), status=status.HTTP_200_OK)
-
-
-class MyAccountView(views.APIView):
-
-    def get(self, request):
-        data = {}
-        user = request.user
-        # data['user'] = user
-
-        # on liste les droits de l'utilisateur pour chaque projet
-        data['permissions'] = {}
-        data['rank'] = {}
-        for project in Project.objects.all():
-            data['permissions'][project.slug] = Authorization.has_permission(
-                user, 'can_view_project', project)
-            
-            try:
-                rank = Authorization.objects.get(project=project, user=user).level
-                rank = AuthorizationSerializer(rank).data
-            except Exception:
-                if user.is_superuser:
-                    usertype = choices.ADMIN
-                else:
-                    usertype = choices.LOGGED_USER
-                serializer_rank = UserLevelPermission.objects.get(user_type_id=usertype)
-                rank = UserLevelPermissionSerializer(serializer_rank).data
-
-            data['rank'][project.slug] = rank
-
-        project_authorized = Authorization.objects.filter(
-            user=user
-        ).filter(
-            level__rank__lte=2
-        ).values_list('project__pk', flat=True)
-        serialized_projects = ProjectDetailedSerializer(
-            Project.objects.filter(
-                Q(pk__in=project_authorized) | Q(creator=user)
-            ).order_by('-created_on'), many=True)
-
-        all_events = Event.objects.filter(user=user).order_by('-created_on')
-        serialized_events = EventSerializer(all_events[0:5], many=True)
-
-        feature_events = Event.objects.filter(
-            user=user, object_type='feature').order_by('-created_on')
-        serialized_feature_events = EventSerializer(feature_events[0:5], many=True)
-
-        comment_events = Event.objects.filter(
-            user=user, object_type='comment').order_by('-created_on')
-        serialized_comment_events = EventSerializer(comment_events[0:5], many=True)
-
-        data['projects'] = serialized_projects.data
-        data['events'] = serialized_events.data
-        data['features'] = serialized_feature_events.data
-        data['comments'] = serialized_comment_events.data
-        data['title'] = "Mon compte"
-
-        return Response(data=data, status=status.HTTP_200_OK)
