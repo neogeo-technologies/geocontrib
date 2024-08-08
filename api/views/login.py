@@ -20,6 +20,84 @@ from api.serializers.user import UserSerializer
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
+# Data to fill responses in swagger doc
+user_login_responses ={
+    200: openapi.Response(
+        description="OK",
+        schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'detail': openapi.Schema(type=openapi.TYPE_STRING, description='Detail message'),
+                'user': openapi.Schema(type=openapi.TYPE_OBJECT, description='User data', example={
+                    "username": "user1",
+                    "is_active": True,
+                    "first_name": "",
+                    "last_name": "",
+                    "is_administrator": False,
+                    "is_superuser": False,
+                    "can_create_project": True,
+                    "email": "user1@example.com",
+                    "id": 1
+                })
+            }
+        )
+    ),
+    400: openapi.Response(
+        description="Bad Request",
+        schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "username": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_STRING),
+                    description="Username validation errors"
+                ),
+                "password": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_STRING),
+                    description="Password validation errors"
+                ),
+            },
+            example={
+                "username": ["Ce champ est obligatoire."],
+                "password": ["Ce champ est obligatoire."]
+            }
+        )
+    ),
+    403: openapi.Response(
+        description="Forbidden",
+        schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "detail": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
+            },
+            example={"detail": "Informations d'authentification incorrectes."}
+        )
+    ),
+}
+
+user_logout_responses = {
+    200: openapi.Response(
+        description="OK",
+        schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "detail": openapi.Schema(type=openapi.TYPE_STRING, description="Detail message")
+            },
+            example={"detail": "user1 signed out"}
+        )
+    ),
+    403: openapi.Response(
+        description="Forbidden",
+        schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "detail": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
+            },
+            example={"detail": "Informations d'authentification incorrectes."}
+        )
+    ),
+}
 
 class LoginView(views.APIView):
     """
@@ -34,64 +112,11 @@ class LoginView(views.APIView):
     serializer_class = SigninSerializer
 
     @swagger_auto_schema(
-        request_body=SigninSerializer,
-        responses={
-            200: openapi.Response(
-                description="OK",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        'detail': openapi.Schema(type=openapi.TYPE_STRING, description='Detail message'),
-                        'user': openapi.Schema(type=openapi.TYPE_OBJECT, description='User data', example={
-                            "username": "user1",
-                            "is_active": True,
-                            "first_name": "",
-                            "last_name": "",
-                            "is_administrator": False,
-                            "is_superuser": False,
-                            "can_create_project": True,
-                            "email": "user1@example.com",
-                            "id": 1
-                        })
-                    }
-                )
-            ),
-            400: openapi.Response(
-                description="Bad Request",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "username": openapi.Schema(
-                            type=openapi.TYPE_ARRAY,
-                            items=openapi.Items(type=openapi.TYPE_STRING),
-                            description="Username validation errors"
-                        ),
-                        "password": openapi.Schema(
-                            type=openapi.TYPE_ARRAY,
-                            items=openapi.Items(type=openapi.TYPE_STRING),
-                            description="Password validation errors"
-                        ),
-                    },
-                    example={
-                        "username": ["Ce champ est obligatoire."],
-                        "password": ["Ce champ est obligatoire."]
-                    }
-                )
-            ),
-            403: openapi.Response(
-                description="Forbidden",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        "detail": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
-                    },
-                    example={"detail": "Informations d'authentification incorrectes."}
-                )
-            ),
-        },
         operation_description="",
         operation_summary="Authenticate a user and start a session.",
-        tags=["auth"]
+        tags=["auth"],
+        request_body=SigninSerializer,
+        responses=user_login_responses
     )
     def post(self, request):
         """
@@ -123,44 +148,9 @@ class UserInfoView(views.APIView):
     Else it raises a not authenticated error
     """
     @swagger_auto_schema(
-        responses={
-            200: openapi.Response(
-                description="OK",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    properties={
-                        'detail': openapi.Schema(type=openapi.TYPE_STRING, description='Detail message'),
-                        'user': openapi.Schema(type=openapi.TYPE_OBJECT, description='User data', example={
-                            "username": "user1",
-                            "is_active": True,
-                            "first_name": "",
-                            "last_name": "",
-                            "is_administrator": False,
-                            "is_superuser": False,
-                            "can_create_project": True,
-                            "email": "user1@example.com",
-                            "id": 1
-                        })
-                    }
-                )
-            ),
-            400: openapi.Response(
-                description="Bad Request",
-                examples={
-                    "application/json": [
-                        {"username": ["Ce champ est obligatoire."]},
-                        {"password": ["Ce champ est obligatoire."]}
-                    ]
-                }
-            ),
-            403: openapi.Response(
-                description="Forbidden",
-                examples={ "application/json": {"detail": "Informations d'authentification incorrectes."}}
-            ),
-        },
-        operation_description="Authenticate a user and start a session.",
         operation_summary="Authenticate a user and start a session.",
-        tags=["users"]
+        tags=["auth"],
+        responses=user_login_responses
     )
     def get(self, request):
         user = request.user
@@ -213,37 +203,19 @@ class LogoutView(views.APIView):
         return {"detail": _(f"{username} signed out")}
 
     @swagger_auto_schema(
-        responses={
-            200: openapi.Response(
-                description="OK",
-                examples={ "application/json": {"detail": "user1 signed out"}}
-            ),
-            403: openapi.Response(
-                description="Forbidden",
-                examples={ "application/json": {"detail": "Informations d'authentification incorrectes."}}
-            ),
-        },
         operation_description="",
         operation_summary="Logs out current logged in user session",
-        tags=["auth"]
+        tags=["auth"],
+        responses=user_logout_responses
     )
     def get(self, request):
         return Response(data=self.logout_user(), status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        responses={
-            200: openapi.Response(
-                description="OK",
-                examples={ "application/json": {"detail": "user1 signed out"}}
-            ),
-            403: openapi.Response(
-                description="Forbidden",
-                examples={ "application/json": {"detail": "Informations d'authentification incorrectes."}}
-            ),
-        },
         operation_description="",
         operation_summary="Logs out current logged in user session",
-        tags=["auth"]
+        tags=["auth"],
+        responses=user_logout_responses
     )
     def post(self, request):
         return Response(data=self.logout_user(), status=status.HTTP_200_OK)

@@ -131,6 +131,10 @@ class FeatureView(
 
         return queryset
 
+    @swagger_auto_schema(
+        operation_summary="List features",
+        tags=["features"],
+    )
     def list(self, request):
         response = {}
         queryset = self.get_queryset()
@@ -161,6 +165,10 @@ class FeatureView(
 
         return Response(response)
 
+    @swagger_auto_schema(
+        operation_summary="Delete features",
+        tags=["features"],
+    )
     def destroy(self, request, *args, **kwargs):
         feature = self.get_object()
         feature.deletion_on = date.today()
@@ -178,19 +186,52 @@ class FeatureTypeView(
         mixins.DestroyModelMixin,
         viewsets.GenericViewSet
     ):
+    """
+    View to manage feature types, allowing listing, retrieval, creation, updating, and deletion of feature types.
 
+    * Uses 'slug' as the lookup field.
+    * Requires authentication for modifications.
+    """
     lookup_field = 'slug'
-
     queryset = FeatureType.objects.all()
-
     serializer_class = FeatureTypeListSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [FeatureTypeFilter]
 
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly
-    ]
-    filter_backends = [
-        FeatureTypeFilter
-    ]
+    @swagger_auto_schema(
+        operation_summary="List feature types",
+        tags=["feature types"],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Retrieve feature type",
+        tags=["feature types"],
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Create feature type",
+        tags=["feature types"],
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Update feature type",
+        tags=["feature types"],
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Delete feature type",
+        tags=["feature types"],
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
 class ProjectFeaturePaginated(generics.ListAPIView):
     """
@@ -743,7 +784,7 @@ class CustomFields(APIView):
                 )
             ),
         },
-        tags=["feature type"]
+        tags=["feature types"]
     )
     def get(self, request):
         type_choices = [] 

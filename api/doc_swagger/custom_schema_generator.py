@@ -28,13 +28,5 @@ class CustomSchemaGenerator(OpenAPISchemaGenerator):
                 "name": "misc",
                 "description": "Miscellaneous"
             },
-            {
-                "name": "flat-pages",
-                "description": "Static pages content"
-            },
-            {
-                "name": "version",
-                "description": "Get app version number"
-            }
         ]
         return schema
