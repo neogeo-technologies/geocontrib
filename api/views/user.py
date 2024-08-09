@@ -3,6 +3,7 @@ import uuid
 
 from django.contrib.auth import get_user_model, login
 from django.utils import timezone
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins
 from rest_framework import views
 from rest_framework import viewsets
@@ -101,13 +102,51 @@ class LoginByTokenView(views.APIView):
         return Response(data="Le token fourni n'a pas pu être authentifié", status=404)
 
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    @swagger_auto_schema(
+        tags=["users"],
+        operation_summary="Retrieve a list of users"
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=["users"],
+        operation_summary="Retrieve a specific user"
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=["users"],
+        operation_summary="Create a new user"
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=["users"],
+        operation_summary="Update a specific user"
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=["users"],
+        operation_summary="Partially update a specific user"
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=["users"],
+        operation_summary="Delete a specific user"
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
 class UserLevelProjectView(views.APIView):
     permission_classes = [
