@@ -4,6 +4,7 @@ import uuid
 from django.contrib.auth import get_user_model, login
 from django.utils import timezone
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from rest_framework import mixins
 from rest_framework import views
 from rest_framework import viewsets
@@ -148,13 +149,40 @@ class UserViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
 
+
 class UserLevelProjectView(views.APIView):
+    """
+    Retrieve the user level for each project.
+    """
+
     permission_classes = [
         permissions.AllowAny,
-        # permissions.IsAuthenticated,
     ]
 
+    @swagger_auto_schema(
+        operation_summary="Retrieve user levels for all projects",
+        tags=["users"],
+        responses={
+            200: openapi.Response(
+                description="A dictionary mapping project slugs to user levels.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    additional_properties=openapi.Schema(
+                        type=openapi.TYPE_STRING,
+                        example="Utilisateur anonyme"
+                    ),
+                    example={
+                        "1-projet1": "Utilisateur anonyme",
+                        "2-mon-projet": "Administrateur projet",
+                    }
+                )
+            )
+        }
+    )
     def get(self, request):
+        """
+        Returns a dictionary where each key is a project slug and the value is the user's level within that project.
+        """
         try:
             user_level_projects = Authorization.get_user_level_projects(request.user)
         except Exception:
@@ -164,20 +192,93 @@ class UserLevelProjectView(views.APIView):
 
 
 class UserPermissionsView(views.APIView):
+    """
+    Retrieve permissions for the current user across all projects.
+    """
+
     permission_classes = [
         permissions.AllowAny,
     ]
 
+    @swagger_auto_schema(
+        operation_summary="Retrieve user permissions for all projects",
+        tags=["users"],
+        responses={
+            200: openapi.Response(
+                description="A dictionary of permissions for each project.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    additional_properties=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "can_view_project": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "can_create_project": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "can_update_project": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "can_view_feature": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "can_view_archived_feature": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "can_create_feature": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "can_update_feature": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "can_delete_feature": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "can_publish_feature": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "can_create_feature_type": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "can_view_feature_type": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "is_project_super_contributor": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "is_project_moderator": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                            "is_project_administrator": openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                        }
+                    ),
+                    example={
+                        "1-projet1": {
+                            "can_view_project": True,
+                            "can_create_project": False,
+                            "can_update_project": False,
+                            "can_view_feature": True,
+                            "can_view_archived_feature": False,
+                            "can_create_feature": False,
+                            "can_update_feature": False,
+                            "can_delete_feature": False,
+                            "can_publish_feature": False,
+                            "can_create_feature_type": False,
+                            "can_view_feature_type": True,
+                            "is_project_super_contributor": False,
+                            "is_project_moderator": False,
+                            "is_project_administrator": False
+                        }
+                    }
+                )
+            )
+        }
+    )
     def get(self, request):
+        """
+        Returns a dictionary containing the permissions of the current user for each project.
+
+        The key is the project slug, and the value is a list of permissions for that project.
+        """
         data = {}
         user = request.user
         for project in Project.objects.all():
             data[project.slug] = Authorization.all_permissions(user, project)
         return Response(data=data, status=200)
 
-class UserLevelsPermission(mixins.RetrieveModelMixin,
-                            mixins.ListModelMixin,
-                            viewsets.GenericViewSet):
-    
+class UserLevelsPermission(
+        mixins.RetrieveModelMixin,
+        mixins.ListModelMixin,
+        viewsets.GenericViewSet):
+
     queryset = UserLevelPermission.objects.all()
     serializer_class = UserLevelsPermissionSerializer
+
+    @swagger_auto_schema(
+        operation_summary="Retrieve a specific user level permission",
+        tags=["users"]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="List all user level permissions",
+        tags=["users"]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)

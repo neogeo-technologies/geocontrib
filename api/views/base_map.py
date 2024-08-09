@@ -140,6 +140,9 @@ class BaseMapViewset(
 class LayerViewset(
         mixins.ListModelMixin,
         viewsets.GenericViewSet):
+    """
+    API endpoint that allows layers to be viewed.
+    """
 
     permission_classes = [
         permissions.AllowAny,
@@ -148,3 +151,13 @@ class LayerViewset(
     queryset = Layer.objects.all()
 
     serializer_class = LayerSerializer
+
+    @swagger_auto_schema(
+        operation_summary="List layers",
+        tags=["base-maps"]
+    )
+    def list(self, request, *args, **kwargs):
+        """
+        Retrieve a list of all layers.
+        """
+        return super().list(request, *args, **kwargs)

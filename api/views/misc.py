@@ -31,14 +31,32 @@ class ImportTaskSearch(
         mixins.CreateModelMixin,
         mixins.ListModelMixin,
         viewsets.GenericViewSet):
-
+    """
+    Allows the creation and retrieval of tasks for importing features from file.
+    """
+    
     queryset = ImportTask.objects.all()
-
     serializer_class = ImportTaskSerializer
-
     http_method_names = ['get', 'post']
 
+    @swagger_auto_schema(
+        operation_summary="List tasks for features import",
+        tags=["misc"]
+    )
+    def list(self, request, *args, **kwargs):
+        """
+        Retrieve a list of import tasks with optional filters.
+        """
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Create a new task for features import",
+        tags=["misc"]
+    )
     def create(self, request, *args, **kwargs):
+        """
+        Create a new import task based on the provided file.
+        """
         try:
             if request.FILES.get('json_file'):
                 up_file = request.FILES['json_file']
@@ -65,6 +83,9 @@ class ImportTaskSearch(
         return Response({'detail': "L'import du fichier réussi. Le traitement des données est en cours. "}, status=200)
 
     def filter_queryset(self, queryset):
+        """
+        Apply filters to the queryset based on query parameters.
+        """
         status = self.request.query_params.get('status')
         feature_type_slug = self.request.query_params.get('feature_type_slug')
         project_slug = self.request.query_params.get('project_slug')
@@ -78,6 +99,9 @@ class ImportTaskSearch(
         return queryset
 
     def get_queryset(self):
+        """
+        Get the base queryset with related data preloaded.
+        """
         queryset = super().get_queryset()
         queryset = queryset.select_related('user')
         queryset = queryset.select_related('feature_type')
