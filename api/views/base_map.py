@@ -5,6 +5,7 @@ import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpResponse
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -81,6 +82,10 @@ class BaseMapViewset(
     serializer_class = BaseMapSerializer
 
     def get_queryset(self):
+        """
+        Optionally restricts the returned base maps to a given project
+        by filtering against a `project__slug` query parameter in the URL.
+        """
         queryset = super().get_queryset()
 
         project_slug = self.request.query_params.get('project__slug')
@@ -88,6 +93,48 @@ class BaseMapViewset(
             queryset = queryset.filter(project__slug=project_slug)
 
         return queryset
+
+    @swagger_auto_schema(
+        tags=["base-maps"],
+        operation_summary="Retrieve a list of base maps"
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=["base-maps"],
+        operation_summary="Retrieve a specific base map"
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=["base-maps"],
+        operation_summary="Create a new base map"
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=["base-maps"],
+        operation_summary="Update a specific base map"
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=["base-maps"],
+        operation_summary="Partially update a specific base map"
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=["base-maps"],
+        operation_summary="Delete a specific base map"
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
 
 class LayerViewset(

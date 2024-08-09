@@ -25,6 +25,10 @@ class CustomSchemaGenerator(OpenAPISchemaGenerator):
                 "description": "Retrieve, list, edit and delete features"
             },
             {
+                "name": "base-maps",
+                "description": "Retrieve, list, edit and delete base-maps"
+            },
+            {
                 "name": "misc",
                 "description": "Miscellaneous"
             },
