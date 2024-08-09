@@ -1,16 +1,13 @@
-import json
-
 from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from rest_framework import exceptions
-from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import views
 from rest_framework import viewsets
-from rest_framework.exceptions import ValidationError
-from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 
 from api.serializers import FeatureAttachmentSerializer
@@ -375,27 +372,137 @@ class CommentAttachmentUploadView(views.APIView):
         ).data
         return Response(data=data, status=200)
 
+# Schema for swagger API documentation of EventView
+event_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'created_on': openapi.Schema(type=openapi.TYPE_STRING, format='date-time', description='Creation date'),
+        'object_type': openapi.Schema(type=openapi.TYPE_STRING, description='Type of the object (feature, project, comment, etc.)'),
+        'event_type': openapi.Schema(type=openapi.TYPE_STRING, description='Type of event (create, update, delete)'),
+        'data': openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'extra': openapi.Schema(type=openapi.TYPE_OBJECT, additional_properties=openapi.Schema(type=openapi.TYPE_STRING)),
+                'feature_title': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the feature'),
+                'feature_status': openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'new_status': openapi.Schema(type=openapi.TYPE_STRING, description='New status of the feature'),
+                        'has_changed': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Indicates if the status has changed')
+                    }
+                )
+            }
+        ),
+        'project_slug': openapi.Schema(type=openapi.TYPE_STRING, description='Slug of the project'),
+        'feature_type_slug': openapi.Schema(type=openapi.TYPE_STRING, description='Slug of the feature type'),
+        'feature_id': openapi.Schema(type=openapi.TYPE_STRING, format='uuid', description='ID of the feature'),
+        'comment_id': openapi.Schema(type=openapi.TYPE_STRING, format='uuid', description='ID of the comment', nullable=True),
+        'attachment_id': openapi.Schema(type=openapi.TYPE_STRING, format='uuid', description='ID of the attachment', nullable=True),
+        'display_user': openapi.Schema(type=openapi.TYPE_STRING, description='Username of the user who triggered the event'),
+        'related_comment': openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'comment': openapi.Schema(type=openapi.TYPE_STRING, description='Content of the related comment'),
+                'attachments': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'url': openapi.Schema(type=openapi.TYPE_STRING, description='URL of the attachment'),
+                            'title': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the attachment')
+                        }
+                    )
+                )
+            }
+        ),
+        'related_feature': openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'title': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the related feature'),
+                'deletion_on': openapi.Schema(type=openapi.TYPE_STRING, format='date', description='Deletion date', nullable=True),
+                'feature_url': openapi.Schema(type=openapi.TYPE_STRING, description='URL of the related feature')
+            }
+        ),
+        'project_title': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the project'),
+        'attachment_details': openapi.Schema(type=openapi.TYPE_OBJECT, description='Details about the attachment', additional_properties=openapi.Schema(type=openapi.TYPE_STRING))
+    }
+)
+
+response_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'events': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=event_schema
+        ),
+        'features': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=event_schema
+        ),
+        'comments': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=event_schema
+        )
+    }
+)
 
 class EventView(views.APIView):
-
+    """
+    Retrieve the latest events, features, and comments for the authenticated user.
+    
+    - **events**: List of recent events.
+    - **features**: List of recent feature-related events.
+    - **comments**: List of recent comment-related events.
+    """
     permission_classes = [
         permissions.IsAuthenticated
     ]
 
+    @swagger_auto_schema(
+        operation_summary="Get user events",
+        tags=["users"],
+        manual_parameters=[
+            openapi.Parameter(
+                'project_slug',
+                openapi.IN_QUERY,
+                description="Filter events by project slug",
+                type=openapi.TYPE_STRING
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="A list of events, features, and comments",
+                schema=response_schema
+            ),
+            403: openapi.Response(
+                description="Forbidden",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "detail": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
+                    },
+                    example={"detail": "Informations d'authentification incorrectes."}
+                )
+            ),
+        }
+    )
     def get(self, request):
         user = request.user
         project_slug = request.GET.get('project_slug', '')
+        
         # notifications
         all_events = Event.objects.filter(user=user).order_by('-created_on')
         if project_slug:
             all_events = all_events.filter(project_slug=project_slug)
         serialized_events = EventSerializer(all_events[0:5], many=True)
+        
         # signalements
         feature_events = Event.objects.filter(
             user=user, object_type='feature').order_by('-created_on')
         if project_slug:
             feature_events = feature_events.filter(project_slug=project_slug)
         serialized_feature_events = EventSerializer(feature_events[0:5], many=True)
+        
         # commentaires
         comment_events = Event.objects.filter(
             user=user, object_type='comment').order_by('-created_on')

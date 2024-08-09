@@ -28,5 +28,13 @@ class CustomSchemaGenerator(OpenAPISchemaGenerator):
                 "name": "misc",
                 "description": "Miscellaneous"
             },
+            {
+                "name": "[deprecated] feature types",
+                "description": "Retrieve, list, edit and delete feature types"
+            },
+            {
+                "name": "[deprecated] features",
+                "description": "Retrieve, list, edit and delete features"
+            },
         ]
         return schema
