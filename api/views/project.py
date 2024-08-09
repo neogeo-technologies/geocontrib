@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import Http404
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from rest_framework import exceptions
 from rest_framework import filters
 from rest_framework import permissions
@@ -339,6 +340,81 @@ class ProjectSubscription(APIView):
         data = {'is_suscriber': Subscription.is_suscriber(request.user, project)}
         return Response(data=data, status=200)
 
+
 class ProjectAttributeListView(generics.ListAPIView):
+    """
+    View to list all project attributes.
+    """
+
     queryset = ProjectAttribute.objects.all()
     serializer_class = ProjectAttributeSerializer
+
+    @swagger_auto_schema(
+        operation_summary="List all project attributes",
+        tags=["projects"],
+        manual_parameters=[
+            openapi.Parameter(
+                'project_id',
+                openapi.IN_QUERY,
+                description="Filter attributes by project ID",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+            openapi.Parameter(
+                'name',
+                openapi.IN_QUERY,
+                description="Filter attributes by name",
+                type=openapi.TYPE_STRING,
+                required=False
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description="A list of project attributes.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "id": openapi.Schema(type=openapi.TYPE_INTEGER, example=1),
+                            "label": openapi.Schema(type=openapi.TYPE_STRING, example="Actif"),
+                            "name": openapi.Schema(type=openapi.TYPE_STRING, example="active"),
+                            "field_type": openapi.Schema(type=openapi.TYPE_STRING, example="boolean"),
+                            "options": openapi.Schema(type=openapi.TYPE_STRING, nullable=True, example=None),
+                            "default_value": openapi.Schema(type=openapi.TYPE_STRING, example="true"),
+                            "display_filter": openapi.Schema(type=openapi.TYPE_BOOLEAN, example=False),
+                            "default_filter_enabled": openapi.Schema(type=openapi.TYPE_BOOLEAN, example=False),
+                            "default_filter_value": openapi.Schema(type=openapi.TYPE_STRING, example="false"),
+                        }
+                    )
+                ),
+                examples={
+                    "application/json": [
+                        {
+                            "id": 1,
+                            "label": "Actif",
+                            "name": "active",
+                            "field_type": "boolean",
+                            "options": None,
+                            "default_value": "true",
+                            "display_filter": False,
+                            "default_filter_enabled": False,
+                            "default_filter_value": "false"
+                        }
+                    ]
+                }
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    example="Invalid request parameters."
+                )
+            )
+        }
+    )
+    def get(self, request, *args, **kwargs):
+        """
+        Retrieve a list of project attributes, with optional filters by project ID and name.
+        """
+        return super().get(request, *args, **kwargs)

@@ -8,6 +8,7 @@ from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import views
 from rest_framework import viewsets
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
 from api.serializers import FeatureAttachmentSerializer
@@ -543,20 +544,64 @@ class EventView(views.APIView):
 
 
 class ExifGeomReaderView(views.APIView):
+    """
+    API endpoint to extract and return the geometric data (WKT) from an image file's EXIF metadata.
+    """
 
-    def get_geom(self, geom):
-        # Si geoJSON
-        if isinstance(geom, dict):
-            geom = str(geom)
-        geom = GEOSGeometry(geom, srid=4326)
-        return geom
+    parser_classes = [MultiPartParser]
 
+    @swagger_auto_schema(
+        operation_summary="Extract geometry from image EXIF data",
+        tags=["misc"],
+        manual_parameters=[
+            openapi.Parameter(
+                name="image_file",
+                in_=openapi.IN_FORM,
+                type=openapi.TYPE_FILE,
+                description="The image file containing EXIF data",
+                required=True
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="Successful extraction of geometry",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'geom': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="The geometry in WKT format",
+                            example="POINT(1.2345 6.7890)"
+                        )
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Error message detailing what went wrong",
+                            example="Erreur lors de la lecture des données GPS."
+                        )
+                    }
+                )
+            ),
+        },
+        consumes=['multipart/form-data']
+    )
     def post(self, request):
+        """
+        Extracts geometric data (WKT format) from the EXIF metadata of the provided image file.
+        """
         image_file = request.data.get('image_file')
         if not image_file:
             raise exceptions.ValidationError({
                 'error': "Aucun fichier à ajouter",
             })
+
         try:
             data_geom_wkt = exif.get_image_geoloc_as_wkt(
                 image_file, with_alt=False, ewkt=False)
@@ -567,3 +612,13 @@ class ExifGeomReaderView(views.APIView):
             })
 
         return Response({'geom': geom.wkt}, status=200)
+
+    def get_geom(self, geom):
+        """
+        Converts the input geometry (in string or GeoJSON format) to a GEOSGeometry object.
+        """
+        # If geoJSON
+        if isinstance(geom, dict):
+            geom = str(geom)
+        geom = GEOSGeometry(geom, srid=4326)
+        return geom

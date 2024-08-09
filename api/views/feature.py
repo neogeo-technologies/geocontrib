@@ -820,24 +820,73 @@ class FeatureEventView(views.APIView):
 
 
 class FeatureMVTView(BaseMVTView):
+    """
+    API endpoint that provides Mapbox Vector Tiles (MVT) for features.
+    
+    This view handles requests to retrieve features in MVT format, filtered by various query parameters.
+    """
+
     model = Feature
     geom_col = "geom"
 
+    @swagger_auto_schema(
+        operation_summary="Retrieve MVT data for features",
+        tags=["features"],
+        manual_parameters=[
+            openapi.Parameter('project__slug', openapi.IN_QUERY, description="Slug of the project", type=openapi.TYPE_STRING),
+            openapi.Parameter('project_id', openapi.IN_QUERY, description="ID of the project", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('feature_type__slug', openapi.IN_QUERY, description="Slug of the feature type", type=openapi.TYPE_STRING),
+            openapi.Parameter('featuretype_id', openapi.IN_QUERY, description="ID of the feature type", type=openapi.TYPE_INTEGER),
+        ],
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="Successfully retrieved MVT data.",
+                content={
+                    'application/x-protobuf': {}
+                }
+            ),
+            status.HTTP_400_BAD_REQUEST: openapi.Response(
+                description="Invalid parameters provided.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "detail": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
+                    },
+                    example={"detail": "Must provide one of the parameters: project_id, project__slug, featuretype_id or feature_type__slug"}
+                )
+            ),
+            status.HTTP_404_NOT_FOUND: openapi.Response(
+                description="Project or feature type not found.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "detail": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
+                    },
+                    example={"detail": "Not found."}
+                )
+            ),
+        }
+    )
     def get(self, request, *args, **kwargs):
-
+        """
+        Retrieve MVT data for features.
+        Filters the queryset based on provided query parameters such as project slug, project ID, feature type slug, or feature type ID.
+        """
+        
+        # Retrieve project based on slug or ID
         project_slug = self.request.query_params.get('project__slug')
         project_id = self.request.query_params.get('project_id')
         if project_slug or project_id:
             qs_kwargs = dict()
             if project_slug:
                 qs_kwargs["slug"] = project_slug
-
             if project_id:
                 qs_kwargs["id"] = project_id
 
             project = get_object_or_404(Project, **qs_kwargs)
             queryset = Feature.handy.availables(self.request.user, project)
 
+        # Retrieve feature type based on slug or ID
         feature_type_slug = self.request.query_params.get('feature_type__slug')
         featuretype_id = self.request.query_params.get('featuretype_id')
         if feature_type_slug or featuretype_id:
@@ -847,20 +896,85 @@ class FeatureMVTView(BaseMVTView):
             queryset = Feature.handy.availables(self.request.user, project)
             queryset = queryset.filter(feature_type__slug=feature_type_slug, pk=featuretype_id)
 
+        # Validate that at least one filtering parameter is provided
         if not any([feature_type_slug, project_slug, project_id, featuretype_id]):
             raise ValidationError(detail="Must provide one of the parameters:"
                                   "project_id, project__slug, featuretype_id or feature_type__slug")
-        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
+        # Filter out features with a deletion date
         queryset = queryset.filter(deletion_on__isnull=True)
+        
+        # Modify the request to include the primary keys of the filtered queryset
         if not request.GET._mutable:
             request.GET._mutable = True
         request.GET["pk__in"] = queryset.order_by("created_on").values_list("pk", flat=True)
-        return super().get( request, *args, **kwargs)
+        
+        # Call the parent class's get method to continue the response process
+        return super().get(request, *args, **kwargs)
 
 
 class GetIdgoCatalogView(views.APIView):
     http_method_names = ['get', ]
 
+    @swagger_auto_schema(
+        operation_summary="Retrieve IDGO catalog data for a specific user",
+        tags=["misc"],
+        manual_parameters=[
+            openapi.Parameter(
+                'user',
+                openapi.IN_QUERY,
+                description="The user identifier for fetching specific catalog data.",
+                type=openapi.TYPE_STRING,
+                required=False
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description="Successfully retrieved catalog data.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "catalog": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    "id": openapi.Schema(type=openapi.TYPE_STRING, example="12345"),
+                                    "name": openapi.Schema(type=openapi.TYPE_STRING, example="Sample Dataset"),
+                                    "description": openapi.Schema(type=openapi.TYPE_STRING, example="A description of the dataset."),
+                                    "url": openapi.Schema(type=openapi.TYPE_STRING, example="https://example.com/dataset"),
+                                }
+                            )
+                        )
+                    }
+                ),
+                examples={
+                    "application/json": {
+                        "catalog": [
+                            {
+                                "id": "12345",
+                                "name": "Sample Dataset",
+                                "description": "A description of the dataset.",
+                                "url": "https://example.com/dataset"
+                            },
+                            {
+                                "id": "67890",
+                                "name": "Another Dataset",
+                                "description": "Another description.",
+                                "url": "https://example.com/another-dataset"
+                            }
+                        ]
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description="Data not found or an error occurred while fetching the catalog.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    example="Les données ne sont pas disponibles"
+                )
+            )
+        }
+    )
     def get(self, request):
         url = settings.IDGO_URL
         user = request.query_params.get('user')
@@ -876,9 +990,86 @@ class GetIdgoCatalogView(views.APIView):
             logger.exception("%s %s", no_data_msg, e)
             return Response(data=no_data_msg, status=404)
 
+
 class GetExternalGeojsonView(views.APIView):
     http_method_names = ['get', ]
 
+    @swagger_auto_schema(
+        operation_summary="Retrieve external GeoJSON data",
+        tags=["misc"],
+        manual_parameters=[
+            openapi.Parameter(
+                'organization_slug',
+                openapi.IN_QUERY,
+                description="The slug of the organization to query.",
+                type=openapi.TYPE_STRING,
+                required=False
+            ),
+            openapi.Parameter(
+                'typename',
+                openapi.IN_QUERY,
+                description="The typename to request from the WFS service.",
+                type=openapi.TYPE_STRING,
+                required=False
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description="Successfully retrieved GeoJSON data.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "type": openapi.Schema(type=openapi.TYPE_STRING, example="FeatureCollection"),
+                        "features": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    "type": openapi.Schema(type=openapi.TYPE_STRING, example="Feature"),
+                                    "geometry": openapi.Schema(
+                                        type=openapi.TYPE_OBJECT,
+                                        properties={
+                                            "type": openapi.Schema(type=openapi.TYPE_STRING, example="Point"),
+                                            "coordinates": openapi.Schema(
+                                                type=openapi.TYPE_ARRAY,
+                                                items=openapi.Schema(type=openapi.TYPE_NUMBER),
+                                                example=[102.0, 0.5]
+                                            )
+                                        }
+                                    ),
+                                    "properties": openapi.Schema(type=openapi.TYPE_OBJECT)
+                                }
+                            )
+                        )
+                    }
+                ),
+                examples={
+                    "application/json": {
+                        "type": "FeatureCollection",
+                        "features": [
+                            {
+                                "type": "Feature",
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [102.0, 0.5]
+                                },
+                                "properties": {
+                                    "name": "Sample Point"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ),
+            404: openapi.Response(
+                description="No data found or an error occurred while fetching the data.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    example="Les données ne sont pas au format geoJSON"
+                )
+            )
+        }
+    )
     def get(self, request):
         payload = {}
         url = settings.MAPSERVER_URL
@@ -902,27 +1093,86 @@ class GetExternalGeojsonView(views.APIView):
                 data = "Les données ne sont pas au format geoJSON"
             return Response(data=data, status=code)
         except Exception as e:
-            logger.exception("%s %s", no_data_msg, e)
-            return Response(data=no_data_msg, status=404)
+            logger.exception("Les données ne sont pas disponibles %s", e)
+            return Response(data="Les données ne sont pas disponibles", status=404)
 
 
 class PreRecordedValuesView(APIView):
-    queryset = PreRecordedValues.objects.all()
+    """
+    Retrieves a list of pre-recorded value names. If a name is provided, it filters the values based on the provided pattern and limit.
+    """
 
+    queryset = PreRecordedValues.objects.all()
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
 
+    @swagger_auto_schema(
+        operation_summary="Retrieve pre-recorded value names or filtered values based on name, pattern, and limit",
+        tags=["feature types"],
+        manual_parameters=[
+            openapi.Parameter(
+                'pattern',
+                openapi.IN_QUERY,
+                description="A pattern to filter the value names.",
+                type=openapi.TYPE_STRING,
+                required=False
+            ),
+            openapi.Parameter(
+                'limit',
+                openapi.IN_QUERY,
+                description="Limit the number of results returned.",
+                type=openapi.TYPE_INTEGER,
+                required=False
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description="A list of pre-recorded value names.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "name": openapi.Schema(type=openapi.TYPE_STRING, example="Catégories"),
+                        }
+                    )
+                ),
+                examples={
+                    "application/json": [
+                        {"name": "Catégories"},
+                        {"name": "Autre"}
+                    ]
+                }
+            ),
+            404: openapi.Response(
+                description="No pre-recorded values found.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    example="No pre-recorded values found."
+                )
+            )
+        }
+    )
     def get(self, request, name=None):
-        response=[]
+        response = []
         name = self.kwargs.get('name', None)
         pattern = self.request.query_params.get('pattern', '')
-        limit = self.request.query_params.get('limit', '')
+        limit = self.request.query_params.get('limit', None)
 
         if name:
             response = get_pre_recorded_values(name, pattern, limit)
         else:
             response = list(PreRecordedValues.objects.values("name"))
+
+        # Apply pattern filtering if specified
+        if pattern:
+            response = [item for item in response if pattern.lower() in item.lower()]
+
+        # Apply limit if specified
+        if limit:
+            response = response[:int(limit)]
+
         status = 200
         return JsonResponse(response, safe=False, status=status)
 

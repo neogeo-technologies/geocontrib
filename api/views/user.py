@@ -22,17 +22,53 @@ from geocontrib.models import GeneratedToken
 
 User = get_user_model()
 
+
 class TokenView(views.APIView):
+    """
+    Retrieve or generate the mobile app authentication token for the authenticated user.
+    
+    This token is used specifically for generating a QR code that allows the user to authenticate in the mobile app.
+    If the user does not already have a token, a new one will be generated and returned.
+    """
+
     permission_classes = [
         permissions.IsAuthenticated,
     ]
 
+    @swagger_auto_schema(
+        operation_summary="Retrieve or generate a mobile app authentication token",
+        tags=["auth"],
+        responses={
+            200: openapi.Response(
+                description="The user's token, either retrieved or newly generated.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    example="19535786-698b-44ce-9d61-2077f7642a1d"
+                ),
+                examples={
+                    "application/json": "19535786-698b-44ce-9d61-2077f7642a1d"
+                }
+            ),
+            400: openapi.Response(
+                description="Bad request: User is missing or not authenticated.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    example="Bad request : USER is missing"
+                )
+            ),
+        }
+    )
     def get(self, request):
+        """
+        Retrieve the token for the authenticated user.
+        If the token does not exist, generate a new one and save it to the user profile.
+        """
         user = request.user
         if user:
-            token = request.user.token
+            token = user.token
             if not token:
-                user.token = uuid.uuid4()
+                token = uuid.uuid4()
+                user.token = token
                 user.save()
         else:
             logging.error(
@@ -45,47 +81,194 @@ class TokenView(views.APIView):
                 "Bad request : USER is missing",
                 status=400
             )
-        return Response(data=token, status=200)
+        return Response(data=str(token), status=200)
+
 
 class GenerateTokenView(views.APIView):
+    """
+    Generate an access token for authenticating the user on an external platform.
+    
+    This token is generated based on the user's credentials from another platform and is used to authenticate the user within the GeoContrib application.
+    After generating this token, the external platform can redirect the user to GeoContrib with the token in the URL to seamlessly log the user into the application.
+    """
     authentication_classes = [] #disables authentication
     permission_classes = [] #disables permission
+
+    @swagger_auto_schema(
+        operation_summary="Generate a token for external platform authentication",
+        tags=["auth"],
+        manual_parameters=[
+            openapi.Parameter(
+                'login',
+                openapi.IN_QUERY,
+                description="The user's login",
+                type=openapi.TYPE_STRING,
+                required=True,
+                example="johndoe"
+            ),
+            openapi.Parameter(
+                'mail',
+                openapi.IN_QUERY,
+                description="The user's email",
+                type=openapi.TYPE_STRING,
+                required=False,
+                example="johndoe@example.com"
+            ),
+            openapi.Parameter(
+                'nom',
+                openapi.IN_QUERY,
+                description="The user's last name",
+                type=openapi.TYPE_STRING,
+                required=False,
+                example="Doe"
+            ),
+            openapi.Parameter(
+                'prenom',
+                openapi.IN_QUERY,
+                description="The user's first name",
+                type=openapi.TYPE_STRING,
+                required=False,
+                example="John"
+            ),
+        ],
+        responses={
+            200: openapi.Response(
+                description="Token successfully generated.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "token_sha256": openapi.Schema(type=openapi.TYPE_STRING, example="7ad01429e095a442dc9296abc12d675694f8569f3024e39f6112286ec215dfb9"),
+                        "username": openapi.Schema(type=openapi.TYPE_STRING, example="johndoe"),
+                        "email": openapi.Schema(type=openapi.TYPE_STRING, example="johndoe@example.com"),
+                        "first_name": openapi.Schema(type=openapi.TYPE_STRING, example="John"),
+                        "last_name": openapi.Schema(type=openapi.TYPE_STRING, example="Doe"),
+                        "expire_on": openapi.Schema(type=openapi.TYPE_STRING, format="date-time", example="2024-08-31T12:34:56Z"),
+                    }
+                ),
+                examples={
+                    "application/json": {
+                        "token_sha256": "7ad01429e095a442dc9296abc12d675694f8569f3024e39f6112286ec215dfb9",
+                        "expire_on": "2024-08-31T12:34:56Z",
+                        "username": "johndoe",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "johndoe@example.com"
+                    }
+                }
+            )
+        }
+    )
     def get(self, request):
         # get login, mail and name/surname if provided
         login = request.GET.get('login', '')
         mail = request.GET.get('mail', '')
         nom = request.GET.get('nom', '')
         prenom = request.GET.get('prenom', '')
-        # generate & save token, login, mail,... in DB
+
+        # generate & save token, login, mail, etc., in DB
         token = GeneratedToken.objects.create(
-            username = login,
-            email = mail,
-            first_name = prenom,
-            last_name = nom
+            username=login,
+            email=mail,
+            first_name=prenom,
+            last_name=nom
         )
+
         # return the token
         token_data = GeneratedTokenSerializer(token).data
         return Response(data=token_data, status=200)
-    
+
+# Response datas for swagger documentation
+swagger_login_token_schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "username": openapi.Schema(type=openapi.TYPE_STRING, example="johndoe"),
+                        "is_active": openapi.Schema(type=openapi.TYPE_BOOLEAN, example=True),
+                        "first_name": openapi.Schema(type=openapi.TYPE_STRING, example="John"),
+                        "last_name": openapi.Schema(type=openapi.TYPE_STRING, example="Doe"),
+                        "is_administrator": openapi.Schema(type=openapi.TYPE_BOOLEAN, example=False),
+                        "is_superuser": openapi.Schema(type=openapi.TYPE_BOOLEAN, example=False),
+                        "can_create_project": openapi.Schema(type=openapi.TYPE_BOOLEAN, example=False),
+                        "email": openapi.Schema(type=openapi.TYPE_STRING, example="johndoe@example.com"),
+                        "id": openapi.Schema(type=openapi.TYPE_INTEGER, example=6),
+                    }
+                )
+swagger_login_token_example={
+                    "application/json": {
+                        "username": "johndoe",
+                        "is_active": True,
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "is_administrator": False,
+                        "is_superuser": False,
+                        "can_create_project": False,
+                        "email": "johndoe@example.com",
+                        "id": 6
+                    }
+                }
 class LoginByTokenView(views.APIView):
+    """
+    Authenticates a user via a token generated by GeoContrib (api/generatetoken/) based on user information provided by an external platform.
+    
+    This token is passed in the URL by the external platform, enabling the user to log in to GeoContrib without re-entering credentials.
+    """
     authentication_classes = [] # disables authentication
     permission_classes = [] # disables permission
+
+    @swagger_auto_schema(
+    operation_summary="Authenticate user using a token generated by GeoContrib at the request of an external platform.",
+        tags=["auth"],
+        manual_parameters=[
+            openapi.Parameter(
+                'token',
+                openapi.IN_QUERY,
+                description="The token used for authentication",
+                type=openapi.TYPE_STRING,
+                required=True,
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="User successfully authenticated and logged in.",
+                schema=swagger_login_token_schema,
+                examples=swagger_login_token_example
+            ),
+            201: openapi.Response(
+                description="New user created and logged in.",
+                schema=swagger_login_token_schema,
+                examples=swagger_login_token_example
+            ),
+            401: openapi.Response(
+                description="Token is expired and no longer valid.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    example="Le token fourni n'est plus valide"
+                )
+            ),
+            404: openapi.Response(
+                description="Token not found or cannot be authenticated.",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    example="Le token fourni n'a pas pu être authentifié"
+                )
+            )
+        }
+    )
     def get(self, request):
         # retrieve token
         token = request.GET.get('token', '')
-        # check if token exist in bdd)
+        # check if token exists in the database
         queryset = GeneratedToken.objects.all().filter(token_sha256=token).first()
         if queryset:
-            # check if token expire_on is previous to now
+            # check if token's expire_on is earlier than now
             if queryset.expire_on < timezone.now():
-                # if token is not valid delete it and return error response
+                # if token is not valid, delete it and return error response
                 queryset.delete()
                 return Response(data="Le token fourni n'est plus valide", status=401)
-            # check if a user exists already
+            # check if a user already exists
             elif queryset.username:
                 user = User.objects.all().filter(username=queryset.username).first()
                 status = 200
-                # if doesn't exist => create user
+                # if user doesn't exist, create a new user
                 if not user:
                     user = User.objects.create(
                         username=queryset.username,
@@ -95,12 +278,13 @@ class LoginByTokenView(views.APIView):
                     )
                     user.save()
                     status = 201
-                # log the user
+                # log the user in
                 login(request, user)
                 user_data = DetailedUserSerializer(user).data
                 return Response(data=user_data, status=status)
 
         return Response(data="Le token fourni n'a pas pu être authentifié", status=404)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')

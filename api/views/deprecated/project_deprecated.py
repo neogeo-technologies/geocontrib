@@ -10,7 +10,6 @@ from geocontrib.models import Project
 User = get_user_model()
 
 
-@swagger_auto_schema(deprecated=True)
 class ProjectTypesViewDeprecated(
         mixins.ListModelMixin,
         viewsets.GenericViewSet):
@@ -25,4 +24,11 @@ class ProjectTypesViewDeprecated(
 
     serializer_class = ProjectDetailedSerializer
 
+    @swagger_auto_schema(
+        operation_summary="List all project types",
+        tags=['[deprecated] projects'],
+        deprecated=True
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 

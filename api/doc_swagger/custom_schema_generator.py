@@ -33,6 +33,10 @@ class CustomSchemaGenerator(OpenAPISchemaGenerator):
                 "description": "Miscellaneous"
             },
             {
+                "name": "[deprecated] projects",
+                "description": "Retrieve, list, edit and delete projects"
+            },
+            {
                 "name": "[deprecated] feature types",
                 "description": "Retrieve, list, edit and delete feature types"
             },
