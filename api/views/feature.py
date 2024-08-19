@@ -6,9 +6,10 @@ import collections
 from datetime import date
 
 from django.db.models import Q
+from django.db import transaction
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.gis.geos import Polygon
+from django.contrib.gis.geos import Polygon, Polygon, MultiPoint, MultiLineString, MultiPolygon
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.db.models import Extent
 from django.http import HttpResponse
@@ -546,6 +547,25 @@ class ExportFeatureList(views.APIView):
 
     http_method_names = ['get', ]
 
+    def convert_to_multi_geometry(self, geom, geom_type):
+        """
+        Converts single geometries to their corresponding multi geometries if necessary.
+
+        Parameters:
+        - geom: The geometry to be converted.
+        - geom_type: The type of geometry defined by feature_type.
+
+        Returns:
+        - Geometry: The converted or original geometry.
+        """
+        if geom_type == 'multipoint' and geom.geom_type == 'Point':
+            return MultiPoint([geom])
+        elif geom_type == 'multilinestring' and geom.geom_type == 'LineString':
+            return MultiLineString([geom])
+        elif geom_type == 'multipolygon' and geom.geom_type == 'Polygon':
+            return MultiPolygon([geom])
+        return geom  # Return original geom if no conversion is needed
+
     def get_csv_headers(self, serializer, feature_type):
         """
         Builds and returns headers for the CSV file.
@@ -691,6 +711,10 @@ class ExportFeatureList(views.APIView):
             # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
             deletion_on__isnull=True
         ).order_by("created_on")
+
+        for feature in features:
+            # Convert single geometries to multi-geometries if required by feature_type
+            feature.geom = self.convert_to_multi_geometry(feature.geom, feature_type.geom_type)
 
         format = request.GET.get('format_export', 'geojson')
 

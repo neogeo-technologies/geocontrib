@@ -246,15 +246,15 @@ class EventSerializer(serializers.ModelSerializer):
     def get_related_feature(self, obj):
         res = {}
         if obj.feature_id:
-            try:
-                feature = Feature.objects.get(feature_id=obj.feature_id)
+            feature = Feature.objects.filter(feature_id=obj.feature_id).first()
+            if feature:
                 res = {
                     'title': str(feature.title),
                     'deletion_on': str(feature.deletion_on),
                     'feature_url': feature.get_view_url()
                 }
-            except Exception:
-                logger.exception('No related feature found')
+            else:
+                logger.exception(f'Feature with ID {obj.feature_id} not found.')
         return res
 
     def get_project_title(self, obj):
@@ -379,8 +379,12 @@ class StackedEventSerializer(serializers.ModelSerializer):
             if not feature_type_slug and event.feature_id and event.feature_id in feature_map:
                 feature = feature_map[event.feature_id]
                 feature_type_slug = feature.feature_type.slug if feature.feature_type else None
+
+            # Get notification settings with default fallback if slug is not in the dictionary
+            notification_settings = slug_to_title_and_notification.get(feature_type_slug, ('Type inconnu', False))
+
             # Check if feature_type slug is found and if notifications are not disabled in case it is not a key document
-            if feature_type_slug and (event.object_type == 'key_document' or not slug_to_title_and_notification[feature_type_slug][1]):
+            if feature_type_slug and (event.object_type == 'key_document' or not notification_settings[1]):
                 # Assign a title from the feature map or use 'Élément inconnu' if missing
                 feature_title = feature_map[event.feature_id].title if event.feature_id in feature_map else 'Élément inconnu'
                 # Use the feature type title from the map, fallback to 'Type inconnu' if not found

@@ -15,7 +15,18 @@
       "day_of_week": "*",
       "day_of_month": "*",
       "month_of_year": "*",
-      "timezone": "UTC"
+      "timezone": "Europe/Paris"
+    }
+  }, {
+    "model": "django_celery_beat.crontabschedule",
+    "pk": 2,
+    "fields": {
+        "minute": "0",
+        "hour": "8",
+        "day_of_week": "*",
+        "day_of_month": "*",
+        "month_of_year": "*",
+        "timezone": "Europe/Paris"
     }
   }, {
     "model": "django_celery_beat.periodictasks",
@@ -52,12 +63,12 @@
     }
   }, {
     "model": "django_celery_beat.periodictask",
-    "pk": 3,
+    "pk": 2,
     "fields": {
       "name": "Geocontrib Notify Suscribers",
       "task": "geocontrib.tasks.task_notify_subscribers",
-      "interval": 2,
-      "crontab": null,
+      "interval": null,
+      "crontab": 2,
       "solar": null,
       "clocked": null,
       "args": "[]",
