@@ -104,7 +104,6 @@ class GenerateTokenView(views.APIView):
                 description="The user's login",
                 type=openapi.TYPE_STRING,
                 required=True,
-                example="johndoe"
             ),
             openapi.Parameter(
                 'mail',
@@ -112,7 +111,6 @@ class GenerateTokenView(views.APIView):
                 description="The user's email",
                 type=openapi.TYPE_STRING,
                 required=False,
-                example="johndoe@example.com"
             ),
             openapi.Parameter(
                 'nom',
@@ -120,7 +118,6 @@ class GenerateTokenView(views.APIView):
                 description="The user's last name",
                 type=openapi.TYPE_STRING,
                 required=False,
-                example="Doe"
             ),
             openapi.Parameter(
                 'prenom',
@@ -128,7 +125,6 @@ class GenerateTokenView(views.APIView):
                 description="The user's first name",
                 type=openapi.TYPE_STRING,
                 required=False,
-                example="John"
             ),
         ],
         responses={
