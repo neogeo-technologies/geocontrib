@@ -221,6 +221,39 @@ pytest
 
 <br>
 
+# Documentation de l'API
+
+## Introduction
+
+La documentation de notre API est conçue pour fournir une référence complète et claire des différents endpoints disponibles. Elle permet aux développeurs d'explorer les fonctionnalités offertes par l'API, de tester des requêtes, et de comprendre les formats de réponse.
+
+## Accès à la documentation
+
+La documentation de l'API est disponible via une interface Swagger à l'adresse suivante : `/api/swagger/`. Cette interface interactive permet de :
+
+- **Explorer les endpoints** : Une navigation claire pour parcourir tous les endpoints disponibles, classés par catégorie.
+- **Tester des requêtes** : Un outil intégré pour exécuter des requêtes en temps réel et visualiser les réponses directement dans le navigateur.
+- **Consulter les schémas de réponse** : Des schémas JSON détaillés accompagnent chaque endpoint pour clarifier les formats de réponse attendus.
+- **Voir les exemples d'utilisation** : Chaque endpoint est documenté avec des exemples de requêtes et de réponses pour aider à comprendre comment l'utiliser efficacement.
+
+## Structure de la documentation
+
+La documentation est organisée de manière à être à la fois exhaustive et facile à naviguer. Chaque section couvre :
+
+- **Les paramètres de requête** : Description des paramètres acceptés par chaque endpoint, avec leur type et leur format.
+- **Les réponses possibles** : Détails des différents codes de réponse HTTP pouvant être retournés, ainsi que les formats de données associés.
+- **Les exemples** : Illustrations concrètes des requêtes et des réponses, pour faciliter l'intégration dans vos applications.
+
+## Formulaires interactifs
+
+Pour chaque endpoint, la documentation propose des formulaires interactifs permettant de tester les différents paramètres directement depuis l'interface. Ces formulaires aident les développeurs à valider leurs requêtes avant de les intégrer dans leur code.
+
+- **Essayez** : Utilisez la fonction "Try it out" dans Swagger pour tester les endpoints directement.
+- **Authentification** : Des identifiants ou tokens sont nécessaires si vous souhaitez interagir avec les endpoints sécurisés.
+
+
+<br>
+
 # Système de notifications
 
 ## Vue d'ensemble
