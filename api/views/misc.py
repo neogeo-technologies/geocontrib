@@ -1,16 +1,14 @@
-import json
-
 from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from rest_framework import exceptions
-from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import views
 from rest_framework import viewsets
-from rest_framework.exceptions import ValidationError
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
 from api.serializers import FeatureAttachmentSerializer
@@ -34,14 +32,32 @@ class ImportTaskSearch(
         mixins.CreateModelMixin,
         mixins.ListModelMixin,
         viewsets.GenericViewSet):
-
+    """
+    Allows the creation and retrieval of tasks for importing features from file.
+    """
+    
     queryset = ImportTask.objects.all()
-
     serializer_class = ImportTaskSerializer
-
     http_method_names = ['get', 'post']
 
+    @swagger_auto_schema(
+        operation_summary="List tasks for features import",
+        tags=["misc"]
+    )
+    def list(self, request, *args, **kwargs):
+        """
+        Retrieve a list of import tasks with optional filters.
+        """
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Create a new task for features import",
+        tags=["misc"]
+    )
     def create(self, request, *args, **kwargs):
+        """
+        Create a new import task based on the provided file.
+        """
         try:
             if request.FILES.get('json_file'):
                 up_file = request.FILES['json_file']
@@ -68,6 +84,9 @@ class ImportTaskSearch(
         return Response({'detail': "L'import du fichier réussi. Le traitement des données est en cours. "}, status=200)
 
     def filter_queryset(self, queryset):
+        """
+        Apply filters to the queryset based on query parameters.
+        """
         status = self.request.query_params.get('status')
         feature_type_slug = self.request.query_params.get('feature_type_slug')
         project_slug = self.request.query_params.get('project_slug')
@@ -81,6 +100,9 @@ class ImportTaskSearch(
         return queryset
 
     def get_queryset(self):
+        """
+        Get the base queryset with related data preloaded.
+        """
         queryset = super().get_queryset()
         queryset = queryset.select_related('user')
         queryset = queryset.select_related('feature_type')
@@ -139,9 +161,6 @@ class FeatureAttachmentView(
     This class combines multiple mixins to provide list, create, retrieve, update,
     and destroy actions.
     """
-    # Defines the permission classes to determine who can access this view.
-    # Here, authenticated users can access all operations, while read-only operations
-    # are allowed for unauthenticated users.
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
@@ -172,11 +191,16 @@ class FeatureAttachmentView(
 
     def get_serializer_context(self):
         """
-        Provides additional context to the serializer, particularly the feature instance,
-        which might be required for serializing data.
+        Provides additional context to the serializer.
+        If the view is being used for schema generation (`swagger_fake_view`),
+        it short-circuits and returns the default context. 
+        Otherwise, it retrieves the `feature_id` from the URL parameters,
+        fetches the corresponding feature instance, and adds it to the context.
         """
         # Gets the default context from the base class, which includes request, view, etc.
         context = super().get_serializer_context()
+        if getattr(self, 'swagger_fake_view', False):
+            return context
         feature_id = self.kwargs['feature_id']
         # Retrieves the feature instance associated with 'feature_id' or throws a 404
         feature = get_object_or_404(Feature, feature_id=feature_id)
@@ -243,7 +267,11 @@ class CommentView(
         mixins.DestroyModelMixin,
         viewsets.GenericViewSet
         ):
-
+    """
+    Viewset  for handling CRUD operations associated with specific features.
+    This class combines multiple mixins to provide list, create, retrieve, update,
+    and destroy actions.
+    """
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly
     ]
@@ -253,18 +281,33 @@ class CommentView(
     serializer_class = CommentDetailedSerializer
 
     def get_object(self):
+        """
+        Retrieves a specific comment object based on comment_id and feature_id.
+        """
         comment_id = self.kwargs['comment_id']
         feature_id = self.kwargs['feature_id']
         return get_object_or_404(
             Comment, id=comment_id, feature_id=feature_id)
 
     def get_queryset(self):
+        """
+        Retrieves the queryset of comments filtered by feature_id.
+        """
         feature_id = self.kwargs['feature_id']
         qs = super().get_queryset().filter(feature_id=feature_id)
         return qs
 
     def get_serializer_context(self):
+        """
+        Provides additional context to the serializer.
+        If the view is being used for schema generation (`swagger_fake_view`),
+        it short-circuits and returns the default context.
+        Otherwise, it retrieves the `feature_id` from the URL parameters,
+        fetches the corresponding feature instance, and adds it to the context.
+        """
         context = super().get_serializer_context()
+        if getattr(self, 'swagger_fake_view', False):
+            return context
         feature_id = self.kwargs['feature_id']
         feature = get_object_or_404(Feature, feature_id=feature_id)
         context.update({'feature': feature})
@@ -354,27 +397,137 @@ class CommentAttachmentUploadView(views.APIView):
         ).data
         return Response(data=data, status=200)
 
+# Schema for swagger API documentation of EventView
+event_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'created_on': openapi.Schema(type=openapi.TYPE_STRING, format='date-time', description='Creation date'),
+        'object_type': openapi.Schema(type=openapi.TYPE_STRING, description='Type of the object (feature, project, comment, etc.)'),
+        'event_type': openapi.Schema(type=openapi.TYPE_STRING, description='Type of event (create, update, delete)'),
+        'data': openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'extra': openapi.Schema(type=openapi.TYPE_OBJECT, additional_properties=openapi.Schema(type=openapi.TYPE_STRING)),
+                'feature_title': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the feature'),
+                'feature_status': openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'new_status': openapi.Schema(type=openapi.TYPE_STRING, description='New status of the feature'),
+                        'has_changed': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Indicates if the status has changed')
+                    }
+                )
+            }
+        ),
+        'project_slug': openapi.Schema(type=openapi.TYPE_STRING, description='Slug of the project'),
+        'feature_type_slug': openapi.Schema(type=openapi.TYPE_STRING, description='Slug of the feature type'),
+        'feature_id': openapi.Schema(type=openapi.TYPE_STRING, format='uuid', description='ID of the feature'),
+        'comment_id': openapi.Schema(type=openapi.TYPE_STRING, format='uuid', description='ID of the comment', nullable=True),
+        'attachment_id': openapi.Schema(type=openapi.TYPE_STRING, format='uuid', description='ID of the attachment', nullable=True),
+        'display_user': openapi.Schema(type=openapi.TYPE_STRING, description='Username of the user who triggered the event'),
+        'related_comment': openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'comment': openapi.Schema(type=openapi.TYPE_STRING, description='Content of the related comment'),
+                'attachments': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'url': openapi.Schema(type=openapi.TYPE_STRING, description='URL of the attachment'),
+                            'title': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the attachment')
+                        }
+                    )
+                )
+            }
+        ),
+        'related_feature': openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'title': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the related feature'),
+                'deletion_on': openapi.Schema(type=openapi.TYPE_STRING, format='date', description='Deletion date', nullable=True),
+                'feature_url': openapi.Schema(type=openapi.TYPE_STRING, description='URL of the related feature')
+            }
+        ),
+        'project_title': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the project'),
+        'attachment_details': openapi.Schema(type=openapi.TYPE_OBJECT, description='Details about the attachment', additional_properties=openapi.Schema(type=openapi.TYPE_STRING))
+    }
+)
+
+response_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'events': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=event_schema
+        ),
+        'features': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=event_schema
+        ),
+        'comments': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=event_schema
+        )
+    }
+)
 
 class EventView(views.APIView):
-
+    """
+    Retrieve the latest events, features, and comments for the authenticated user.
+    
+    - **events**: List of recent events.
+    - **features**: List of recent feature-related events.
+    - **comments**: List of recent comment-related events.
+    """
     permission_classes = [
         permissions.IsAuthenticated
     ]
 
+    @swagger_auto_schema(
+        operation_summary="Get user events",
+        tags=["users"],
+        manual_parameters=[
+            openapi.Parameter(
+                'project_slug',
+                openapi.IN_QUERY,
+                description="Filter events by project slug",
+                type=openapi.TYPE_STRING
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="A list of events, features, and comments",
+                schema=response_schema
+            ),
+            403: openapi.Response(
+                description="Forbidden",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "detail": openapi.Schema(type=openapi.TYPE_STRING, description="Error message")
+                    },
+                    example={"detail": "Informations d'authentification incorrectes."}
+                )
+            ),
+        }
+    )
     def get(self, request):
         user = request.user
         project_slug = request.GET.get('project_slug', '')
+        
         # notifications
         all_events = Event.objects.filter(user=user).order_by('-created_on')
         if project_slug:
             all_events = all_events.filter(project_slug=project_slug)
         serialized_events = EventSerializer(all_events[0:5], many=True)
+        
         # signalements
         feature_events = Event.objects.filter(
             user=user, object_type='feature').order_by('-created_on')
         if project_slug:
             feature_events = feature_events.filter(project_slug=project_slug)
         serialized_feature_events = EventSerializer(feature_events[0:5], many=True)
+        
         # commentaires
         comment_events = Event.objects.filter(
             user=user, object_type='comment').order_by('-created_on')
@@ -391,20 +544,64 @@ class EventView(views.APIView):
 
 
 class ExifGeomReaderView(views.APIView):
+    """
+    API endpoint to extract and return the geometric data (WKT) from an image file's EXIF metadata.
+    """
 
-    def get_geom(self, geom):
-        # Si geoJSON
-        if isinstance(geom, dict):
-            geom = str(geom)
-        geom = GEOSGeometry(geom, srid=4326)
-        return geom
+    parser_classes = [MultiPartParser]
 
+    @swagger_auto_schema(
+        operation_summary="Extract geometry from image EXIF data",
+        tags=["misc"],
+        manual_parameters=[
+            openapi.Parameter(
+                name="image_file",
+                in_=openapi.IN_FORM,
+                type=openapi.TYPE_FILE,
+                description="The image file containing EXIF data",
+                required=True
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="Successful extraction of geometry",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'geom': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="The geometry in WKT format",
+                            example="POINT(1.2345 6.7890)"
+                        )
+                    }
+                )
+            ),
+            400: openapi.Response(
+                description="Bad Request",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'error': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Error message detailing what went wrong",
+                            example="Erreur lors de la lecture des données GPS."
+                        )
+                    }
+                )
+            ),
+        },
+        consumes=['multipart/form-data']
+    )
     def post(self, request):
+        """
+        Extracts geometric data (WKT format) from the EXIF metadata of the provided image file.
+        """
         image_file = request.data.get('image_file')
         if not image_file:
             raise exceptions.ValidationError({
                 'error': "Aucun fichier à ajouter",
             })
+
         try:
             data_geom_wkt = exif.get_image_geoloc_as_wkt(
                 image_file, with_alt=False, ewkt=False)
@@ -415,3 +612,13 @@ class ExifGeomReaderView(views.APIView):
             })
 
         return Response({'geom': geom.wkt}, status=200)
+
+    def get_geom(self, geom):
+        """
+        Converts the input geometry (in string or GeoJSON format) to a GEOSGeometry object.
+        """
+        # If geoJSON
+        if isinstance(geom, dict):
+            geom = str(geom)
+        geom = GEOSGeometry(geom, srid=4326)
+        return geom

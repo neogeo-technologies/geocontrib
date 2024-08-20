@@ -50,6 +50,27 @@ from api.views.user import UserViewSet
 from api.views.user import UserLevelsPermission
 from api.views import version
 
+from api.doc_swagger.custom_schema_generator import CustomSchemaGenerator
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+from rest_framework import permissions
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Documentation REST APIs GéoContrib",
+        default_version='1.0.0',
+        description="Cette page décrit l'ensemble des services REST offerts par l'API GéoContrib.",
+        terms_of_service="https://www.gnu.org/licenses/agpl-3.0.fr.html",
+        contact=openapi.Contact(email="contact@geocontrib.fr"),
+        license=openapi.License(name="GNU Affero General Public License v3"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+    generator_class=CustomSchemaGenerator,
+)
+
+
 app_name = 'api'
 
 router = routers.DefaultRouter()
@@ -69,6 +90,10 @@ router.register(r'project-types', ProjectTypesViewDeprecated, basename='projects
 
 
 urlpatterns = [
+    # Include DRF-Swagger URLs
+    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     # Vues générales de navigation
     path('version', version, name='version'),
     path('login/', LoginView.as_view(), name='signin-view'),
