@@ -19,39 +19,51 @@ La version actuellement stabilisée est la version **5.4.1**.
 
 ### Prérequis
 
-* Python 3.7 (minimum 3.6)
+* Python 3.12 (minimum 3.6)
 * Instance de PostgreSQL/PostGIS avec une base de données dédiée à l'application 
 (cf. paramètre DATABASES du fichier settings.py)
 
 
 ### Création du projet Django et clone du repo
 
+1. **Installation des dépendances**
+
 ```shell
-# installation dépendances
+# Ces dépendances sont requises pour les fonctionnalités de base du projet, telles que l'interaction avec une base de données PostgreSQL, la manipulation de fichiers géospatiaux, etc.
 apt-get install -y libproj-dev gdal-bin ldap-utils libpq-dev libmagic1
 
-# Création d'un environnement virtuel Python
-python3 -m venv geocontrib_venv/
+# Ces dépendances sont nécessaires pour compiler et utiliser la bibliothèque Pillow, qui est utilisée pour le traitement d'images (depuis passage à python 3.12).
+apt-get install -y libjpeg-dev zlib1g-dev libpng-dev
+```
 
+2. **Création et activation d'un environnement virtuel Python**
+```shell
+# Création d'un environnement virtuel
+python3 -m venv geocontrib_venv/
 # Activation de cet environnement
 source geocontrib_venv/bin/activate
+```
 
-# Clonage du projet - récupération des sources
-# Actuellement, la branche par défaut du projet est develop
-# Ce sera celle qui sera active par défaut immédiatement après le clonage
+3. **Clonage du projet - récupération des sources**  
+```shell
+# Actuellement, la branche par défaut du projet est develop. Ce sera celle qui sera active par défaut immédiatement après le clonage.
 git clone https://git.neogeo.fr/geocontrib/geocontrib-django.git
-cd geocontrib
-
-# Installer les dépendances
+# Se déplacer dans le répertoire cloné
+cd geocontrib-django
+```
+4. **Installer les dépendances**
+```shell
 pip install -r requirements.txt
+```
 
-# Création d'un projet Django
+5. **Création d'un projet Django**
+```shell
 django-admin startproject config .
 ```
 
 ### Installation de l'interface Web en VueJS
 
-L'interface Web intégrée à Django n'est plus maintenue depuis la 2.0, et sera retirée dans la 2.3
+L'interface Web intégrée à Django n'est plus maintenue depuis la 2.0, et a été retirée dans la 2.3
 
 Il faut utiliser cette interface à la place: https://git.neogeo.fr/geocontrib/geocontrib-frontend
 
@@ -221,13 +233,13 @@ pytest
 
 <br>
 
-# Documentation de l'API
+## Documentation de l'API
 
-## Introduction
+### Introduction
 
 La documentation de notre API est conçue pour fournir une référence complète et claire des différents endpoints disponibles. Elle permet aux développeurs d'explorer les fonctionnalités offertes par l'API, de tester des requêtes, et de comprendre les formats de réponse.
 
-## Accès à la documentation
+### Accès à la documentation
 
 La documentation de l'API est disponible via une interface Swagger à l'adresse suivante : `/api/swagger/`. Cette interface interactive permet de :
 
@@ -236,7 +248,7 @@ La documentation de l'API est disponible via une interface Swagger à l'adresse 
 - **Consulter les schémas de réponse** : Des schémas JSON détaillés accompagnent chaque endpoint pour clarifier les formats de réponse attendus.
 - **Voir les exemples d'utilisation** : Chaque endpoint est documenté avec des exemples de requêtes et de réponses pour aider à comprendre comment l'utiliser efficacement.
 
-## Structure de la documentation
+### Structure de la documentation
 
 La documentation est organisée de manière à être à la fois exhaustive et facile à naviguer. Chaque section couvre :
 
@@ -244,7 +256,7 @@ La documentation est organisée de manière à être à la fois exhaustive et fa
 - **Les réponses possibles** : Détails des différents codes de réponse HTTP pouvant être retournés, ainsi que les formats de données associés.
 - **Les exemples** : Illustrations concrètes des requêtes et des réponses, pour faciliter l'intégration dans vos applications.
 
-## Formulaires interactifs
+### Formulaires interactifs
 
 Pour chaque endpoint, la documentation propose des formulaires interactifs permettant de tester les différents paramètres directement depuis l'interface. Ces formulaires aident les développeurs à valider leurs requêtes avant de les intégrer dans leur code.
 
@@ -254,16 +266,16 @@ Pour chaque endpoint, la documentation propose des formulaires interactifs perme
 
 <br>
 
-# Système de notifications
+## Système de notifications
 
-## Vue d'ensemble
+### Vue d'ensemble
 Notre système de notifications est conçu pour informer les utilisateurs des événements significatifs au sein de leurs projets, tels que la création, la mise à jour et la suppression de signalements, de commentaires et de pièces jointes. Ce système est configurable, permettant d'adapter les notifications aux besoins spécifiques des projets et aux préférences des utilisateurs.
 - **Caractéristiques configurables commune à toutes les notifications** :
   - **Modèles Personnalisables** : Le contenu des notifications peut être personnalisé à travers des modèles éditables stockés dans la base de données, permettant un ajustement dynamique du contenu dans l'interface d'administration.
 
-## Types de Notifications
+### Types de Notifications
 
-### Notifications groupées
+#### - Notifications groupées
 - **Objectif** : Informer tous les abonnés des différents projets sur les événements variés tels que les mises à jour, les suppressions et les créations de signalement, les évolutions du projet, ainsi que la publication de commentaires ou de pièces jointes.
 - **Fonctionnement** : Les notifications sont regroupées grâce aux instances `StackedEvent`, crées par un Signal
 - **Déclencheur** : Les notifications sont regroupées grâce aux instances `StackedEvent` et envoyées périodiquement selon la configuration de la tâche périodique associée.
@@ -271,19 +283,19 @@ Notre système de notifications est conçu pour informer les utilisateurs des é
   - **Niveau d'envoi des notifications** : Les administrateurs peuvent configurer l'envoi des notifications pour les documents clés à un niveau globale ou par projet. Ceci est géré par le champ `per_project` dans le modèle `NotificationModel`.
   - **Désactivation des notifications** : Vous pouvez désactiver les notifications pour un type de signalement via l'interface d'administration ou la configuration d'affichage de signalement dans l'application frontend. L'envoi des notifications de publication de documents clés ne sont pas impactés par ce pramétrage.
 
-### Notifications de publications de documents clés
+#### - Notifications de publications de documents clés
 - **Objectif** : Informer tous les abonnés des différents projets sur les publications importantes de documents au sein de leurs projets.
 - **Fonctionnement** : Les notifications sont regroupées grâce aux instances `StackedEvent` spécifiques, en utilisant la propriété `only_key_document`. Les piles d'événements sont crées par un Signal, lors de la publication d'une pièce jointe avec le paramètre `is_key_document`.
 - **Déclencheur** : Les notifications sont envoyées périodiquement selon la configuration de la tâche périodique associée.
 - **Caractéristiques Configurables** :
   - **Activation des Notifications** : Les administrateurs peuvent activer ou désactiver les notifications pour les documents clés au niveau d'un type de signalement. Ceci est géré par le champ booléen `enable_key_doc_notif` dans le modèle `FeatureType`.
 
-### Notifications de créations de signalements en attente de modération
+#### - Notifications de créations de signalements en attente de modération
 - **Objectif** : Informer les modérateurs des signalements nécessitant une modération dans les projets configurés avec le paramètre de modération activé.
 - **Fonctionnement** : L'envoi de la notification est faite au niveau du modèle `Event` par la méthode `ping_users`
 - **Déclencheur** : Se produit lorsqu'un signalement est créé ou modifié par un contributeur, ce qui lui attribue automatiquement le statut "En attente de publication".
 
-### Notifications de publications de signalements après modération
+#### - Notifications de publications de signalements après modération
 - **Objectif** : Informer le créateur d'un signalement lorsque sa soumission a été approuvée et publiée par un modérateur.
 - **Fonctionnement** : L'envoi de la notification est faite au niveau du modèle `Event` par la méthode `ping_users`
 - **Déclencheur** : Se produit lorsqu'un signalement passe du statut "En attente de publication" à "Publié'.
