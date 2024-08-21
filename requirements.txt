@@ -20,3 +20,5 @@ django-cas-ng
 django-celery-beat<2.3.0
 defusedxml==0.7.1
 djangorestframework-xml==2.0.0
+# Le module distutils, n'est plus inclus par défaut dans Python et fait partie de setuptools à partir de Python 3.12
+setuptools==73.0.0
