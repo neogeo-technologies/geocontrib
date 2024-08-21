@@ -26,7 +26,7 @@ La version actuellement stabilisée est la version **5.4.1**.
 
 ### Création du projet Django et clone du repo
 
-1. **Installation des dépendances**
+#### 1. Installation des dépendances système
 
 ```shell
 # Ces dépendances sont requises pour les fonctionnalités de base du projet, telles que l'interaction avec une base de données PostgreSQL, la manipulation de fichiers géospatiaux, etc.
@@ -36,7 +36,7 @@ apt-get install -y libproj-dev gdal-bin ldap-utils libpq-dev libmagic1
 apt-get install -y libjpeg-dev zlib1g-dev libpng-dev
 ```
 
-2. **Création et activation d'un environnement virtuel Python**
+#### 2. Création et activation d'un environnement virtuel Python
 ```shell
 # Création d'un environnement virtuel
 python3 -m venv geocontrib_venv/
@@ -44,19 +44,20 @@ python3 -m venv geocontrib_venv/
 source geocontrib_venv/bin/activate
 ```
 
-3. **Clonage du projet - récupération des sources**  
+#### 3. Clonage du projet - récupération des sources  
 ```shell
 # Actuellement, la branche par défaut du projet est develop. Ce sera celle qui sera active par défaut immédiatement après le clonage.
 git clone https://git.neogeo.fr/geocontrib/geocontrib-django.git
 # Se déplacer dans le répertoire cloné
 cd geocontrib-django
 ```
-4. **Installer les dépendances**
+
+#### 4. Installer les dépendances Python
 ```shell
 pip install -r requirements.txt
 ```
 
-5. **Création d'un projet Django**
+#### 5. Création d'un projet Django
 ```shell
 django-admin startproject config .
 ```
@@ -201,9 +202,6 @@ L'archivage et la suppression des signalements, à invoquer une fois par jour
 python manage.py data_cleansing
 ```
 
-
-
-
 ## Déploiement dans un environnement geOrchestra
 
 Reportez-vous au README.md présent dans le répertoire `plugin_georchestra`.
@@ -211,7 +209,7 @@ Reportez-vous au README.md présent dans le répertoire `plugin_georchestra`.
 
 ## Sauvegarde des données
 
-```
+```shell
 python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > dump.json
 ```
 
@@ -219,23 +217,46 @@ python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e
 
 Après avoir installé graphiz et django-extensions
 
-```
+```shell
 ./manage.py graph_models --pygraphviz geocontrib --output docs/model.png
 ```
 
 Le graphique est disponible ici [docs/model.png](docs/model.png)
 
+<br>
 
-## RUN TESTS
+## Exécuter les tests unitaires
 
-export DJANGO_SETTINGS_MODULE=config.settings
+Pour garantir la stabilité et la qualité de l'application, vous pouvez exécuter les tests unitaires avec les commandes suivantes.
+
+### Prérequis :
+
+- Lors du développement en local, pour garantir que les tests s'exécutent de manière cohérente avec l'environnement de déploiement et la configuration CI, assurez-vous de définir la variable d'environnement URL_PREFIX='geocontrib/'.
+
+- Avant d'exécuter les tests unitaires, assurez-vous d'installer les dépendances de développement en plus des dépendances principales. Cela inclut `pytest` et d'autres outils nécessaires pour exécuter les tests et effectuer des vérifications de code.
+```shell
+pip install -r requirements-dev.txt
+```
+
+- Certains tests, en particulier ceux liés aux imports, nécessitent que Celery soit activé. Assurez-vous que Celery est en cours d'exécution avant d'exécuter ces tests.
+
+### Exécution des tests
+
+- Pour lancer tous les tests du projet, utilisez simplement :
+```shell
 pytest
-
+```
+- Si vous souhaitez exécuter les tests d'une application ou d'un fichier spécifique, utilisez :
+```shell
+pytest path/to/test_directory_or_file.py
+```
+- Pour exécuter un test particulier dans un fichier spécifique :
+```shell
+pytest path/to/test_file.py::nom_du_test
+```
 <br>
 
 ## Documentation de l'API
-
-### Introduction
 
 La documentation de notre API est conçue pour fournir une référence complète et claire des différents endpoints disponibles. Elle permet aux développeurs d'explorer les fonctionnalités offertes par l'API, de tester des requêtes, et de comprendre les formats de réponse.
 
