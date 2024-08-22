@@ -224,11 +224,10 @@ class ProjectFeaturePaginated(generics.ListAPIView):
     def get_queryset(self):
         slug = self.kwargs.get('slug')
         project = get_object_or_404(Project, slug=slug)
-
-        queryset = Feature.handy.availables(user=self.request.user, project=project)
-        ordering = self.request.query_params.get('ordering')
-        if ordering:
-            queryset = queryset.order_by(ordering)
+        # Ordering :
+        ordering = self.request.query_params.get('ordering') or '-created_on'
+        # Fallback ordering by feature_id in case dates are exactly the sames https://redmine.neogeo.fr/issues/23018
+        queryset = Feature.handy.availables(user=self.request.user, project=project).order_by(ordering, 'feature_id')
 
         queryset = queryset.select_related('creator')
         queryset = queryset.select_related('feature_type')
@@ -236,6 +235,9 @@ class ProjectFeaturePaginated(generics.ListAPIView):
         return queryset
 
 class ProjectFeaturePositionInList(views.APIView):
+    """
+    Retrieve the position of a feature in an ordered list within a project to find paginated feature from outside of list
+    """
 
     http_method_names = ['get', ]
 
@@ -245,12 +247,13 @@ class ProjectFeaturePositionInList(views.APIView):
         """
         project = get_object_or_404(Project, slug=slug)
         # Ordering :
-        ordering = request.GET.get('ordering') or '-created_on'
-        queryset = Feature.handy.availables(request.user, project).order_by(ordering)
+        ordering = self.request.query_params.get('ordering') or '-created_on'
+        # Fallback ordering by feature_id in case dates are exactly the sames https://redmine.neogeo.fr/issues/23018
+        queryset = Feature.handy.availables(request.user, project).order_by(ordering, 'feature_id')
         # Filters :
-        feature_type_slug = request.GET.get('feature_type_slug')
-        status__value = request.GET.get('status')
-        title = request.GET.get('title')
+        feature_type_slug = self.request.query_params.get('feature_type_slug')
+        status__value = self.request.query_params.get('status')
+        title = self.request.query_params.get('title')
         # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
         queryset = queryset.filter(deletion_on__isnull=True)
 
@@ -582,7 +585,7 @@ class GetExternalGeojsonView(views.APIView):
     def get(self, request):
         payload = {}
         url = settings.MAPSERVER_URL
-        organization_slug = request.GET.get('organization_slug', '')
+        organization_slug = self.request.query_params.get('organization_slug', '')
         if organization_slug:
             url += organization_slug
 
@@ -590,7 +593,7 @@ class GetExternalGeojsonView(views.APIView):
         payload["request"] = "GetFeature"
         payload["version"] = "2.0.0"
         payload["outputFormat"] = "geojson"
-        typename = request.GET.get('typename', '')
+        typename = self.request.query_params.get('typename', '')
         if typename:
             payload["typename"] = typename
 
