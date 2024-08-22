@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.4.5] - 2024-08-22
+
+### Corrections
+
+- Redmine 23021 : Problème interrogation d'un signalement avec fond requêtable
+- Redmine 23018 : Bug sur ordre des signalements si dates identiques
+
 ## [5.4.4] - 2024-08-08
 
 ### Evolutions
