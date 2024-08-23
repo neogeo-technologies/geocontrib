@@ -1,4 +1,4 @@
-FROM python:3.7-slim-bullseye
+FROM python:3.12-slim-bullseye
 
 ENV PYTHONUNBUFFERED=1
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal

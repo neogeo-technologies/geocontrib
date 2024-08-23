@@ -19,7 +19,7 @@ La version actuellement stabilisée est la version **5.4.1**.
 
 ### Prérequis
 
-* Python 3.12 (minimum 3.6)
+* Python 3.12 (minimum 3.8)
 * Instance de PostgreSQL/PostGIS avec une base de données dédiée à l'application 
 (cf. paramètre DATABASES du fichier settings.py)
 
