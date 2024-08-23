@@ -1,24 +1,20 @@
-# bug dans nouvelles version de importlib-metadata
-importlib-metadata<5.0
-celery<5.3.0
-Django>=3.2.0,<3.3.0
-djangorestframework-gis==0.18
-djangorestframework>=3.11.2,<3.12.0
-# waiting https://github.com/corteva/djangorestframework-mvt/issues/10 to be merged
-git+https://github.com/neogeo-technologies/djangorestframework-mvt.git@138a09f092c04247f3f9dfc4546e5dad5d04ccc6#egg=djangorestframework-mvt
-#djangorestframework-mvt>=0.2.5,<0.3.0
-drf-yasg==1.21.5
-ldap3==2.6.1
-Pillow==9.5
-psycopg2-binary==2.9.3 #Use binary for windows
-python-decouple==3.3
-python-magic==0.4.24
-redis==3.5.3
-requests
-django-admin-list-filter-dropdown
-django-cas-ng
-django-celery-beat<2.3.0
+celery==5.4.0
 defusedxml==0.7.1
+Django==4.2
+djangorestframework-gis==1.1
+djangorestframework==3.15.2
+# Utilisation d'une version personnalisée de djangorestframework-mvt en attendant la fusion d'un correctif
+git+https://github.com/neogeo-technologies/djangorestframework-mvt.git@138a09f092c04247f3f9dfc4546e5dad5d04ccc6#egg=djangorestframework-mvt
 djangorestframework-xml==2.0.0
-# Le module distutils, n'est plus inclus par défaut dans Python et fait partie de setuptools à partir de Python 3.12
-setuptools==73.0.0
+django-admin-list-filter-dropdown==1.0.3
+django-cas-ng==5.0.1
+django-celery-beat==2.7.0           # Garder la compatibilité avec Celery
+drf-yasg==1.21.7
+ldap3==2.9.1
+Pillow==10.4.0
+psycopg2-binary==2.9.9              # Utiliser la version binaire pour éviter les problèmes sur Windows
+python-decouple==3.8
+python-magic==0.4.27
+redis==5.0.8
+requests==2.32.3
+setuptools==73.0.1                  # Le module distutils n'est plus inclus par défaut dans Python 3.12 et fait partie de setuptools
