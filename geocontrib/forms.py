@@ -4,7 +4,7 @@ from django.contrib.gis import forms
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator
 from django.forms import HiddenInput
-from django.contrib.postgres.forms import JSONField
+from django.forms import JSONField
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
 from django.forms.models import BaseModelFormSet

@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.postgres.forms import JSONField
+from django.forms import JSONField
 from django.forms.models import BaseModelFormSet
 
 from geocontrib.models import CustomField
