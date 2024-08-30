@@ -44,7 +44,7 @@
                         {% elif event.object_type == 'comment' %}
                           Commentaire «{{ event.related_comment.comment }}» par {{ event.display_user }}
                         {% elif event.object_type == 'attachment' %}
-                          ajout d'une <a href="{{ event.attachment_details.url|absurl }}" target="_blank" rel="noopener">pièce jointe</a> par {{ event.display_user }}
+                          ajout d'une <a href="{{ '/attachment-preview/?file='|absurl }}{{ event.attachment_details.url|absurl|urlencode }}" target="_blank" rel="noopener">pièce jointe</a> par {{ event.display_user }}
                         {% endif %}
 
                         
@@ -52,7 +52,7 @@
                         {% if event.object_type == 'feature' %}
                           mis à jour par {{ event.display_user }}
                         {% elif event.object_type == 'attachment' %}
-                          mise à jour d'une <a href="{{ event.attachment_details.url|absurl }}" target="_blank" rel="noopener">pièce jointe</a> par {{ event.display_user }}
+                          mise à jour d'une <a href="{{ '/attachment-preview/?file='|absurl }}{{ event.attachment_details.url|absurl|urlencode }}" target="_blank" rel="noopener">pièce jointe</a> par {{ event.display_user }}
                         {% endif %}
                       {% endif %}
                     </li>
