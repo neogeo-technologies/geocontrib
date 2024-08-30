@@ -1,32 +1,21 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.utils.decorators import method_decorator
-from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic.base import TemplateView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.static import serve
 
 from api.serializers import BaseMapSerializer
-from api.serializers import EventSerializer
 from api.serializers import FeatureDetailedSerializer
 from api.serializers import LayerSerializer
-from api.serializers import ProjectDetailedSerializer
-from geocontrib import choices
 from geocontrib import logger
-from geocontrib.models import Authorization
 from geocontrib.models import Attachment
 from geocontrib.models import BaseMap
-from geocontrib.models import Event
 from geocontrib.models import Feature
 from geocontrib.models import FeatureType
 from geocontrib.models import Layer
 from geocontrib.models import Project
-from geocontrib.models import UserLevelPermission
 
 
 DECORATORS = [csrf_exempt, login_required(login_url=settings.LOGIN_URL)]
@@ -135,9 +124,12 @@ def protected_serve(request, path='', document_root=None, show_indexes=False):
             accessible_features = Feature.handy.availables(user=request.user, project=attachment_project)
             # retrieve the feature to which the file is associated inside available features
             attachment_feature = accessible_features.filter(feature_id=attachment.feature_id)
+            # if the feature associated with the attachment is found among the available
+            # features for this user, then continue with serving the ressource
             if attachment_feature:
-                # if the feature associated with the attachment is found among the available features
-                # for this user, then continue with serving the ressource
-                return serve(request, path, document_root, show_indexes)
+                # Adapt header X-Frame-Options to view file in element like <embed> to view pdf in frontend
+                response = serve(request, path, document_root, show_indexes)
+                response['X-Frame-Options'] = 'ALLOW-FROM {}'.format(settings.BASE_URL)
+                return response
     # If permission denied or attachment not found, redirect user to login page
     return redirect_to_login(request)
