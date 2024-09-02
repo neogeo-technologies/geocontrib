@@ -353,9 +353,9 @@ class CSVProcessing:
             with open(file.path, 'r') as csvfile:
                 # Use csv.Sniffer to detect the dialect of the CSV file
                 sniffer = csv.Sniffer()
-                # Read the first 1024 characters of the file to detect the CSV dialect.
-                # This sample size is usually sufficient to accurately determine the delimiter and other formatting details.
-                dialect = sniffer.sniff(csvfile.read(1024))
+                # Read the first 10000 characters of the file to detect the CSV dialect.
+                # This sample size has been increased to be sufficent to accurately determine delimiter within CSV file containing long lines
+                dialect = sniffer.sniff(csvfile.read(10000))
 
                 # Reset the file pointer back to the start of the file after sniffing.
                 # This ensures that when we process the file, we start from the beginning, including the part read for sniffing.
