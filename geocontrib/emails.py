@@ -153,8 +153,7 @@ def notif_suscriber_grouped_events(emails, context):
 
     # Always ensure APPLICATION_NAME is in the context
     context['APPLICATION_NAME'] = settings.APPLICATION_NAME
-    # Add prefix for attachment preview url building
-    context['URL_PREFIX'] = settings.URL_PREFIX
+
     # Send the email using the EmailBaseBuilder
     email = EmailBaseBuilder(
         context=context, to=emails, subject=subject,
@@ -195,8 +194,7 @@ def notif_suscriber_key_documents(emails, context):
 
     # Always ensure APPLICATION_NAME is in the context
     context['APPLICATION_NAME'] = settings.APPLICATION_NAME
-    # Add prefix for attachment preview url building
-    context['URL_PREFIX'] = settings.URL_PREFIX
+
     # Send the email using the EmailBaseBuilder
     email = EmailBaseBuilder(
         context=context, to=emails, subject=subject,
