@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.2.1] - 2024-09-03
+
+### Evolutions
+
+- Redmine 22911 : Ajout du header geOrchestra
+- Redmine 20757 : Créer la periodic task "Notify subscribers" automatiquement au déploiement de l'appli
+
+### Corrections
+
+- Redmine 19725 : Faille sécu - accès aux documents PDF d'un signalement sans authentification préalabletion vers la page de connexion du portail MRN si l'utilisateur n'est pas connecté - Correctif sur les liens des mails
+- Redmine 21879 : Import signalement mix simple et multi
+- Redmine 21772 : Faire fonctionner l'affichage du favicon
+- Redmine 21598 : Membres du projet - pas d'erreur affichée si pas d'admin projet
+- Redmine 21366 : Centre et zoom de la carte par défaut
+- Redmine 21029 : Erreur console template inexistant
+- Redmine 20534 : Détail d'un signalement - Ordre des champs
+
 ## [6.2.0] - 2024-07-10
 
 ### Evolutions
