@@ -17,11 +17,11 @@
     {% for event in events_data %}
     <li>
       {% if event.event_type == 'create' %}
-        {{ event.created_on }} - <a href="{{ event.related_feature.feature_url|add:'/attachment-preview/?file='|absurl }}{{ event.attachment_details.url|absurl|urlencode }}" target="_blank" rel="noopener">"{{ event.attachment_details.title }}"</a>
+        {{ event.created_on }} - <a href="{{ event.related_feature.feature_url|add:'attachment-preview/?file='|absurl }}{{ event.attachment_details.url|absurl|urlencode }}" target="_blank" rel="noopener">"{{ event.attachment_details.title }}"</a>
         - Document clé publié par {{ event.display_user }}
       {% elif event.event_type == 'update' %}
         {{ event.created_on }} - Document clé mis à jour par {{ event.display_user }}
-        <a href="{{ event.related_feature.feature_url|add:'/attachment-preview/?file='|absurl }}{{ event.attachment_details.url|absurl|urlencode }}" target="_blank" rel="noopener">"{{ event.attachment_details.title }}"</a>
+        <a href="{{ event.related_feature.feature_url|add:'attachment-preview/?file='|absurl }}{{ event.attachment_details.url|absurl|urlencode }}" target="_blank" rel="noopener">"{{ event.attachment_details.title }}"</a>
       {% endif %}
     </li>
     {% endfor %}
