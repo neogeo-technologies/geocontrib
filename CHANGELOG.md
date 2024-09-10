@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.2.2] - 2024-09-10
+
+### Correction
+
+- Redmine 19725 : Accès aux documents PDF : erreur 404 à la redirection
+
 ## [6.2.1] - 2024-09-03
 
 ### Evolutions
