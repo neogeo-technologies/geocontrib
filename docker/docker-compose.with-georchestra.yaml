@@ -21,7 +21,7 @@ services:
   # ---------------------------------------------------------------- #
   geocontrib-db:
     container_name: "geocontrib_db"
-    image: mdillon/postgis:latest
+    image: postgis/postgis:16-3.4
     environment:
       - POSTGRES_USER=geocontrib
       - POSTGRES_PASSWORD=geocontrib
