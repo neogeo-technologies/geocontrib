@@ -348,7 +348,6 @@ class CSVProcessing:
 
                 # Reset the file pointer back to the start of the file after sniffing.
                 csvfile.seek(0)
-                #rdb.set_trace()  # <- set break-point
 
                 # Read the CSV data using the detected dialect
                 reader = csv.DictReader(csvfile, dialect=dialect)
@@ -360,7 +359,7 @@ class CSVProcessing:
                 data = list(reader)
         except Exception as err:
             # Log and raise an error if any issues occur while reading the CSV
-            logger.warn(type(err), err)
+            logger.warning(type(err), err)
             self.infos.append("Erreur à la lecture du fichier CSV: {} ".format(str(err)))
             raise CSVProcessingFailed
         else:
