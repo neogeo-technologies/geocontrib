@@ -133,27 +133,6 @@ class CSVProcessing:
             if not feature_id or feature_id == '':
                 title = feature_id
         return title, feature_id
-    
-
-    # def detect_csv_dialect(self, filepath):
-    #     """
-    #     Detects the dialect of a CSV file.
-
-    #     Opens the file and uses csv.Sniffer to determine the delimiter and other
-    #     formatting aspects of the CSV file.
-
-    #     Parameters:
-    #     - filepath: Path to the CSV file.
-
-    #     Returns:
-    #     - A csv.Dialect object representing the detected dialect of the CSV file.
-    #     """
-    #     with open(filepath, 'r') as csvfile:
-    #         dict_reader = csv.DictReader(csvfile)
-    #         header_output = dict_reader.fieldnames
-    #         sniffer = csv.Sniffer()
-    #         dialect = sniffer.sniff(json.dumps(header_output))
-    #     return dialect
 
     def process_feature_row(self, feature, feature_type, field_names, creator):
         """
@@ -331,7 +310,7 @@ class CSVProcessing:
         if count > 0:
             msg = "{nb} signalement(s) importé(s). ".format(nb=count)
             self.infos.append(msg)
-        
+
     def validate_data(self, file):
         """
         Validates and loads data from a CSV file.
@@ -351,27 +330,39 @@ class CSVProcessing:
         try:
             # Open the CSV file for reading
             with open(file.path, 'r') as csvfile:
-                # Use csv.Sniffer to detect the dialect of the CSV file
-                sniffer = csv.Sniffer()
                 # Read the first 10000 characters of the file to detect the CSV dialect.
                 # This sample size has been increased to be sufficent to accurately determine delimiter within CSV file containing long lines
-                dialect = sniffer.sniff(csvfile.read(10000))
+                sample = csvfile.read(10000)
+                sniffer = csv.Sniffer()
+                try:
+                    # Exclude line breaks to avoid conflict with multiline text
+                    dialect = sniffer.sniff(sample, delimiters=[',', ';', '\t'])
+                except csv.Error:
+                    logger.warning("Sniffer failed to detect the delimiter. Defaulting to comma.")
+                    dialect = csv.excel()
+                    dialect.delimiter = ','
+
+                # Set quoting to handle multiline text properly
+                dialect.quoting = csv.QUOTE_MINIMAL
+                dialect.quotechar = '"'  # Ensure quote character is set to double quotes
 
                 # Reset the file pointer back to the start of the file after sniffing.
-                # This ensures that when we process the file, we start from the beginning, including the part read for sniffing.
                 csvfile.seek(0)
 
                 # Read the CSV data using the detected dialect
                 reader = csv.DictReader(csvfile, dialect=dialect)
+
+                # Log the detected delimiter for debugging
+                logger.info(f"Detected CSV delimiter: {dialect.delimiter}")
+
                 # Convert the read data into a list of dictionaries
                 data = list(reader)
         except Exception as err:
             # Log and raise an error if any issues occur while reading the CSV
-            logger.warn(type(err), err)
+            logger.warning(type(err), err)
             self.infos.append("Erreur à la lecture du fichier CSV: {} ".format(str(err)))
             raise CSVProcessingFailed
         else:
-            # Return the loaded data if successful
             return data
 
 
