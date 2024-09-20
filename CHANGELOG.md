@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.3.0] - 2024-09-20
+
+### Evolution
+
+- Redmine 21162 : Assignation d’un signalement à un utilisateur - envoi d’un mail de notification immédiat à la personnes assignée
+
 ## [6.2.2] - 2024-09-10
 
 ### Correction
