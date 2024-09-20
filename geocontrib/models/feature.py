@@ -5,13 +5,16 @@ from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 
 from rest_framework_mvt.managers import MVTManager
 
+from geocontrib import logger
 from geocontrib.choices import TYPE_CHOICES
+from geocontrib.emails import notif_project_member_assigned_feature
 from geocontrib.managers import AvailableFeaturesManager
 from geocontrib.managers import FeatureLinkManager
 
@@ -54,6 +57,10 @@ class Feature(models.Model):
         to=settings.AUTH_USER_MODEL, verbose_name="Dernier éditeur",
         on_delete=models.SET_NULL, related_name='edited_features', null=True, blank=True)
 
+    assigned_member = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL, verbose_name="Membre assigné",
+        on_delete=models.SET_NULL, related_name='assigned_features', null=True, blank=True)
+
     project = models.ForeignKey("geocontrib.Project", on_delete=models.CASCADE)
 
     feature_type = models.ForeignKey("geocontrib.FeatureType", on_delete=models.CASCADE)
@@ -67,10 +74,17 @@ class Feature(models.Model):
     handy = AvailableFeaturesManager()
 
     vector_tiles = MVTManager()
+    # temporary property to compare new and old value at update
+    _original_assigned_member = None
 
     class Meta:
         verbose_name = "Signalement"
         verbose_name_plural = "Signalements"
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # store the previous value to compare with new value (if provided) at update in save method
+        self._original_assigned_member = self.assigned_member
 
     def clean(self):
         """
@@ -98,9 +112,31 @@ class Feature(models.Model):
 
     def save(self, *args, **kwargs):
         self.clean()
+        new_assignement_to_notify = False
+        # if the feature is being created
+        new_assignement_to_notify = False
         if self._state.adding:
+            # Set the time of creation and the last_editor, beeing the creator
             self.created_on = timezone.now()
             self.last_editor = self.creator
+            # If the feature is created with an assigned_member: send an email to inform of the creation of a Feature object with an assigned_member
+            if self.assigned_member:
+                new_assignement_to_notify = True
+        # If the feature is updated and the assigned_member changed: send an email to inform of the modification of the field assigned_member
+        elif self._original_assigned_member != self.assigned_member:
+            new_assignement_to_notify = True
+
+        if new_assignement_to_notify and self.assigned_member is not None:
+            context = {
+                'feature': self,
+                'user_assigner': self.last_editor,
+            }
+            try:
+                notif_project_member_assigned_feature(
+                    emails=[self.assigned_member.email, ], context=context)
+            except Exception:
+                logger.exception('Email could not be send')
+        # Set the time the feature was updated (or created)
         self.updated_on = timezone.now()
         super().save(*args, **kwargs)
 
