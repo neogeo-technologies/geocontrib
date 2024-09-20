@@ -17,6 +17,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import permissions
+from rest_framework import status
 from rest_framework import views
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
@@ -351,16 +352,17 @@ class ExportFeatureList(views.APIView):
             headers += ['lat', 'lon']
         return headers
 
-    def prepare_csv_row(self, row, feature_type):
+    def prepare_csv_row(self, row, headers, feature_type):
         """
         Prepares and returns a single row for the CSV file.
 
         Parameters:
         - row: Dict representing a single feature's data.
+        - headers: List of valid headers for the CSV.
         - feature_type: The feature type object used to determine if geographical data conversion is necessary.
 
         Returns:
-        - OrderedDict: A single row in the CSV file.
+        - OrderedDict: A single row in the CSV file with only the valid fields.
         """
         # Convert geom data to latitude and longitude if the feature type is geographical
         if feature_type.geom_type != 'none' and 'geom' in row:
@@ -372,7 +374,9 @@ class ExportFeatureList(views.APIView):
         # Remove 'geom' and 'feature_data' fields from the row
         full_row.pop('geom', None)
         full_row.pop('feature_data', None)
-        return full_row
+        # Filter out fields that are not in the CSV headers, in case of custom field deletion (https://redmine.neogeo.fr/issues/23023)
+        filtered_row = {key: full_row[key] for key in headers if key in full_row}
+        return filtered_row
 
     def get(self, request, slug, feature_type_slug):
         """
@@ -418,12 +422,19 @@ class ExportFeatureList(views.APIView):
             feature_type = FeatureType.objects.get(slug=feature_type_slug)
 
             # Prepare CSV headers and initialize a CSV writer
-            writer = csv.DictWriter(response, fieldnames=self.get_csv_headers(serializer, feature_type))
+            headers = self.get_csv_headers(serializer, feature_type)
+            writer = csv.DictWriter(response, fieldnames=headers)
             writer.writeheader()
 
             # Write each feature to the CSV file
             for row in serializer.data:
-                writer.writerow(self.prepare_csv_row(row, feature_type))
+                filtered_row = self.prepare_csv_row(row, headers, feature_type)
+                writer.writerow(filtered_row)
+        else:
+            return Response(
+                {"error": "Le format d'export spécifié est invalide. Doit être parmi: 'json', 'geojson', 'csv'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         return response
 
