@@ -235,6 +235,7 @@ class FeatureJSONSerializer(serializers.ModelSerializer):
             'display_creator',
             'display_last_editor',
             'creator',
+            'assigned_member',
         )
         read_only_fields = (
             'created_on',
@@ -538,6 +539,7 @@ class FeatureDetailedSerializer(GeoFeatureModelSerializer):
             'feature_url',
             'feature_type_url',
             'color',
+            'assigned_member',
         )
         read_only_fields = fields
 
