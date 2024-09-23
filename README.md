@@ -13,7 +13,7 @@ Celle-ci n'est plus disponible dans le répertoire /docs du dépôt à partir de
 
 La version stable de GéoContrib est une version qui a été testée et validée par la communauté GéoContrib. Nous recommandons l'installation de cette version dans le cas d'une utilisation optimale et sans instabilité. 
 
-La version actuellement stabilisée est la version **5.4.1**.
+La version actuellement stabilisée est la version **5.4.7**.
 
 ## Installation
 
