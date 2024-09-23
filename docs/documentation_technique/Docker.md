@@ -61,7 +61,6 @@ L'image docker de base possèdes ces variables de configuration :
 * "THIRD_PARTY_DJANGO_APPS", default="rest_framework, rest_framework_gis, django_celery_beat,", cast=Csv()
 * "TIME_ZONE", default="Europe/Paris"
 * "URL_PREFIX", default=""
-* "USE_L10N", default=False, cast=bool
 * "USE_X_FORWARDED_HOST", default=False, cast=bool
 
 Variables utilisées pour configurer le frontend:

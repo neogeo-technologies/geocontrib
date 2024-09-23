@@ -871,7 +871,7 @@ class FeatureMVTView(BaseMVTView):
             status.HTTP_200_OK: openapi.Response(
                 description="Successfully retrieved MVT data.",
                 content={
-                    'application/x-protobuf': {}
+                    'application/x-protobuf': openapi.Schema(type=openapi.TYPE_STRING, format='binary')
                 }
             ),
             status.HTTP_400_BAD_REQUEST: openapi.Response(

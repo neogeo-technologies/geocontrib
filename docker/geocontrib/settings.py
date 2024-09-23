@@ -116,7 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = config('LANGUAGE_CODE', default='fr-FR')
 TIME_ZONE = config("TIME_ZONE", default='Europe/Paris')
 USE_I18N = True
-USE_L10N = config('USE_L10N', default=False, cast=bool)
 USE_TZ = True
 
 REST_FRAMEWORK = {

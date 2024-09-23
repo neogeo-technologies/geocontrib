@@ -87,7 +87,7 @@ sonarqube-check:
 
 test:
   stage: test
-  image: python:3.7
+  image: python:3.12
   services:
     - redis
     - postgis/postgis

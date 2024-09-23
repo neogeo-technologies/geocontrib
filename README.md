@@ -19,39 +19,52 @@ La version actuellement stabilisée est la version **5.4.7**.
 
 ### Prérequis
 
-* Python 3.7 (minimum 3.6)
+* Python 3.12 (minimum 3.8)
 * Instance de PostgreSQL/PostGIS avec une base de données dédiée à l'application 
 (cf. paramètre DATABASES du fichier settings.py)
 
 
 ### Création du projet Django et clone du repo
 
+#### 1. Installation des dépendances système
+
 ```shell
-# installation dépendances
+# Ces dépendances sont requises pour les fonctionnalités de base du projet, telles que l'interaction avec une base de données PostgreSQL, la manipulation de fichiers géospatiaux, etc.
 apt-get install -y libproj-dev gdal-bin ldap-utils libpq-dev libmagic1
 
-# Création d'un environnement virtuel Python
-python3 -m venv geocontrib_venv/
+# Ces dépendances sont nécessaires pour compiler et utiliser la bibliothèque Pillow, qui est utilisée pour le traitement d'images (depuis passage à python 3.12).
+apt-get install -y libjpeg-dev zlib1g-dev libpng-dev
+```
 
+#### 2. Création et activation d'un environnement virtuel Python
+```shell
+# Création d'un environnement virtuel
+python3 -m venv geocontrib_venv/
 # Activation de cet environnement
 source geocontrib_venv/bin/activate
+```
 
-# Clonage du projet - récupération des sources
-# Actuellement, la branche par défaut du projet est develop
-# Ce sera celle qui sera active par défaut immédiatement après le clonage
+#### 3. Clonage du projet - récupération des sources  
+```shell
+# Actuellement, la branche par défaut du projet est develop. Ce sera celle qui sera active par défaut immédiatement après le clonage.
 git clone https://git.neogeo.fr/geocontrib/geocontrib-django.git
-cd geocontrib
+# Se déplacer dans le répertoire cloné
+cd geocontrib-django
+```
 
-# Installer les dépendances
+#### 4. Installer les dépendances Python
+```shell
 pip install -r requirements.txt
+```
 
-# Création d'un projet Django
+#### 5. Création d'un projet Django
+```shell
 django-admin startproject config .
 ```
 
 ### Installation de l'interface Web en VueJS
 
-L'interface Web intégrée à Django n'est plus maintenue depuis la 2.0, et sera retirée dans la 2.3
+L'interface Web intégrée à Django n'est plus maintenue depuis la 2.0, et a été retirée dans la 2.3
 
 Il faut utiliser cette interface à la place: https://git.neogeo.fr/geocontrib/geocontrib-frontend
 
@@ -189,9 +202,6 @@ L'archivage et la suppression des signalements, à invoquer une fois par jour
 python manage.py data_cleansing
 ```
 
-
-
-
 ## Déploiement dans un environnement geOrchestra
 
 Reportez-vous au README.md présent dans le répertoire `plugin_georchestra`.
@@ -199,7 +209,7 @@ Reportez-vous au README.md présent dans le répertoire `plugin_georchestra`.
 
 ## Sauvegarde des données
 
-```
+```shell
 python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > dump.json
 ```
 
@@ -207,30 +217,86 @@ python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e
 
 Après avoir installé graphiz et django-extensions
 
-```
+```shell
 ./manage.py graph_models --pygraphviz geocontrib --output docs/model.png
 ```
 
 Le graphique est disponible ici [docs/model.png](docs/model.png)
 
+<br>
 
-## RUN TESTS
+## Exécuter les tests unitaires
 
-export DJANGO_SETTINGS_MODULE=config.settings
+Pour garantir la stabilité et la qualité de l'application, vous pouvez exécuter les tests unitaires avec les commandes suivantes.
+
+### Prérequis :
+
+- Lors du développement en local, pour garantir que les tests s'exécutent de manière cohérente avec l'environnement de déploiement et la configuration CI, assurez-vous de définir la variable d'environnement URL_PREFIX='geocontrib/'.
+
+- Avant d'exécuter les tests unitaires, assurez-vous d'installer les dépendances de développement en plus des dépendances principales. Cela inclut `pytest` et d'autres outils nécessaires pour exécuter les tests et effectuer des vérifications de code.
+```shell
+pip install -r requirements-dev.txt
+```
+
+- Certains tests, en particulier ceux liés aux imports, nécessitent que Celery soit activé. Assurez-vous que Celery est en cours d'exécution avant d'exécuter ces tests.
+
+### Exécution des tests
+
+- Pour lancer tous les tests du projet, utilisez simplement :
+```shell
 pytest
+```
+- Si vous souhaitez exécuter les tests d'une application ou d'un fichier spécifique, utilisez :
+```shell
+pytest path/to/test_directory_or_file.py
+```
+- Pour exécuter un test particulier dans un fichier spécifique :
+```shell
+pytest path/to/test_file.py::nom_du_test
+```
+<br>
+
+## Documentation de l'API
+
+La documentation de notre API est conçue pour fournir une référence complète et claire des différents endpoints disponibles. Elle permet aux développeurs d'explorer les fonctionnalités offertes par l'API, de tester des requêtes, et de comprendre les formats de réponse.
+
+### Accès à la documentation
+
+La documentation de l'API est disponible via une interface Swagger à l'adresse suivante : `/api/swagger/`. Cette interface interactive permet de :
+
+- **Explorer les endpoints** : Une navigation claire pour parcourir tous les endpoints disponibles, classés par catégorie.
+- **Tester des requêtes** : Un outil intégré pour exécuter des requêtes en temps réel et visualiser les réponses directement dans le navigateur.
+- **Consulter les schémas de réponse** : Des schémas JSON détaillés accompagnent chaque endpoint pour clarifier les formats de réponse attendus.
+- **Voir les exemples d'utilisation** : Chaque endpoint est documenté avec des exemples de requêtes et de réponses pour aider à comprendre comment l'utiliser efficacement.
+
+### Structure de la documentation
+
+La documentation est organisée de manière à être à la fois exhaustive et facile à naviguer. Chaque section couvre :
+
+- **Les paramètres de requête** : Description des paramètres acceptés par chaque endpoint, avec leur type et leur format.
+- **Les réponses possibles** : Détails des différents codes de réponse HTTP pouvant être retournés, ainsi que les formats de données associés.
+- **Les exemples** : Illustrations concrètes des requêtes et des réponses, pour faciliter l'intégration dans vos applications.
+
+### Formulaires interactifs
+
+Pour chaque endpoint, la documentation propose des formulaires interactifs permettant de tester les différents paramètres directement depuis l'interface. Ces formulaires aident les développeurs à valider leurs requêtes avant de les intégrer dans leur code.
+
+- **Essayez** : Utilisez la fonction "Try it out" dans Swagger pour tester les endpoints directement.
+- **Authentification** : Des identifiants ou tokens sont nécessaires si vous souhaitez interagir avec les endpoints sécurisés.
+
 
 <br>
 
-# Système de notifications
+## Système de notifications
 
-## Vue d'ensemble
+### Vue d'ensemble
 Notre système de notifications est conçu pour informer les utilisateurs des événements significatifs au sein de leurs projets, tels que la création, la mise à jour et la suppression de signalements, de commentaires et de pièces jointes. Ce système est configurable, permettant d'adapter les notifications aux besoins spécifiques des projets et aux préférences des utilisateurs.
 - **Caractéristiques configurables commune à toutes les notifications** :
   - **Modèles Personnalisables** : Le contenu des notifications peut être personnalisé à travers des modèles éditables stockés dans la base de données, permettant un ajustement dynamique du contenu dans l'interface d'administration.
 
-## Types de Notifications
+### Types de Notifications
 
-### Notifications groupées
+#### - Notifications groupées
 - **Objectif** : Informer tous les abonnés des différents projets sur les événements variés tels que les mises à jour, les suppressions et les créations de signalement, les évolutions du projet, ainsi que la publication de commentaires ou de pièces jointes.
 - **Fonctionnement** : Les notifications sont regroupées grâce aux instances `StackedEvent`, crées par un Signal
 - **Déclencheur** : Les notifications sont regroupées grâce aux instances `StackedEvent` et envoyées périodiquement selon la configuration de la tâche périodique associée.
@@ -238,19 +304,19 @@ Notre système de notifications est conçu pour informer les utilisateurs des é
   - **Niveau d'envoi des notifications** : Les administrateurs peuvent configurer l'envoi des notifications pour les documents clés à un niveau globale ou par projet. Ceci est géré par le champ `per_project` dans le modèle `NotificationModel`.
   - **Désactivation des notifications** : Vous pouvez désactiver les notifications pour un type de signalement via l'interface d'administration ou la configuration d'affichage de signalement dans l'application frontend. L'envoi des notifications de publication de documents clés ne sont pas impactés par ce pramétrage.
 
-### Notifications de publications de documents clés
+#### - Notifications de publications de documents clés
 - **Objectif** : Informer tous les abonnés des différents projets sur les publications importantes de documents au sein de leurs projets.
 - **Fonctionnement** : Les notifications sont regroupées grâce aux instances `StackedEvent` spécifiques, en utilisant la propriété `only_key_document`. Les piles d'événements sont crées par un Signal, lors de la publication d'une pièce jointe avec le paramètre `is_key_document`.
 - **Déclencheur** : Les notifications sont envoyées périodiquement selon la configuration de la tâche périodique associée.
 - **Caractéristiques Configurables** :
   - **Activation des Notifications** : Les administrateurs peuvent activer ou désactiver les notifications pour les documents clés au niveau d'un type de signalement. Ceci est géré par le champ booléen `enable_key_doc_notif` dans le modèle `FeatureType`.
 
-### Notifications de créations de signalements en attente de modération
+#### - Notifications de créations de signalements en attente de modération
 - **Objectif** : Informer les modérateurs des signalements nécessitant une modération dans les projets configurés avec le paramètre de modération activé.
 - **Fonctionnement** : L'envoi de la notification est faite au niveau du modèle `Event` par la méthode `ping_users`
 - **Déclencheur** : Se produit lorsqu'un signalement est créé ou modifié par un contributeur, ce qui lui attribue automatiquement le statut "En attente de publication".
 
-### Notifications de publications de signalements après modération
+#### - Notifications de publications de signalements après modération
 - **Objectif** : Informer le créateur d'un signalement lorsque sa soumission a été approuvée et publiée par un modérateur.
 - **Fonctionnement** : L'envoi de la notification est faite au niveau du modèle `Event` par la méthode `ping_users`
 - **Déclencheur** : Se produit lorsqu'un signalement passe du statut "En attente de publication" à "Publié'.
