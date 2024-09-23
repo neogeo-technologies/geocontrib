@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Redmine 23023 : Export CSV KO
 - Redmine 21597 : Lien vers signalement avec id - erreur si position(offset) égale à 0
+- Redmine 23331 : Lien GéoPlateforme IGN en TMS - Erreur 404
 
 ## [5.4.6] - 2024-09-11
 
