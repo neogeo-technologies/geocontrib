@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.4.7] - 2024-09-23
+
+### Corrections
+
+- Redmine 23023 : Export CSV KO
+- Redmine 21597 : Lien vers signalement avec id - erreur si position(offset) égale à 0
+
 ## [5.4.6] - 2024-09-11
 
 ### Corrections
