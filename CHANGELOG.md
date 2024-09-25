@@ -9,6 +9,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Redmine 21162 : Assignation d’un signalement à un utilisateur - envoi d’un mail de notification immédiat à la personnes assignée
 
+### Commande Django
+
+**IMPORTANT**
+
+Au passage entre la version 5 et la version 6 de GéoContrib, une commande doit être lancée :
+
+L'opération consiste à faire dans le docker "...-geocontrib" ou à la racine du projet django si pas de docker :
+
+```
+./manage.py migrate geocontrib 0050 --fake
+```
+
+Pour marquer la migration 0050 comme déjà appliquée :
+```
+./manage.py migrate 
+```
+
+Pour appliquer toutes les migrations restantes
+
 ## [6.2.2] - 2024-09-10
 
 ### Correction
