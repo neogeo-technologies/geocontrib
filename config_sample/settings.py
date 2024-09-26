@@ -24,7 +24,8 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost, 127.0.0.1, 0.0.0.0', cast=Csv())
 
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default="")
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default="", cast=Csv())
+
 USE_X_FORWARDED_HOST = config('USE_X_FORWARDED_HOST', default=False, cast=bool)
 
 # Application definition
