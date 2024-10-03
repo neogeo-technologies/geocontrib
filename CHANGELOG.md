@@ -3,6 +3,40 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.4.0] - 2024-XX-XX (non disponible)
+
+### Evolutions
+
+- Redmine 22942 : Montée de version Postgre 12 > 16
+- Redmine 18861 : Montée de version Python 3.12 + django 4.2 + lib associées
+
+### Processus de migration dans Docker pour la mise à jour de PostgreSQL
+
+(Le nom des variables est à adapter à votre envioronnement.)
+
+1. Faire un dump de la base de données pour restauration
+Afin de pouvoir restaurer les données, on a besoin d'un dump.
+Se connecter au serveur le cas échéant, identifier le conteneur de la base de données et créer un dump:
+
+    `docker exec -t dev_geocontrib-db_1 pg_dump -U geocontrib -F c -f ~/backup_geocontrib_dev_postgis11-2.5-alpine.dump geocontrib`
+
+2. Extinction conteneurs
+ Dans un premier temps il faut éteindre les conteneurs en se placant dans le dossier contenant le docker-compose concernant l'environnement a migré, dans ce cas: cd /opt/geocontrib/dev
+Puis lancer la commande éteignant tous les conteneurs: docker-compose down
+
+3. Suppression volume geocontrib_db
+On liste les volumes pour trouver le volume geocontrib_db de la dev: `docker volume ls`
+Ici il s'agit de "geocontrib_db_dev", que l'on supprime avec `docker volume rm geocontrib_db_dev`
+
+4. Re-création des conteneurs
+`docker-compose up -d`
+
+5. Restauration données
+Tout d'abord il faut copier le dump conservé sur le serveur vers le conteneur de base de données:
+`docker cp ~/backup_geocontrib_dev_postgis11-2.5-alpine.dump dev_geocontrib-db_1:/tmp/`
+
+    Ensuite on peut lancer la restauration: `docker exec -i dev_geocontrib-db_1 pg_restore -U geocontrib -d geocontrib --no-owner /tmp/backup_geocontrib_dev_postgis11-2.5-alpine.dump`
+
 ## [6.3.0] - 2024-09-20
 
 ### Evolution
