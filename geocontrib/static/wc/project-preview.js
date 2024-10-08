@@ -15,6 +15,8 @@ class ProjectPreview extends HTMLElement {
         color: '#008c86',
         font: "'Roboto Condensed', 'Lato', 'Helvetica Neue'"
       };
+      this.domain = '';
+      this.projectSlug = '';
     }
   
     // Called when the component is added to the DOM
@@ -26,24 +28,24 @@ class ProjectPreview extends HTMLElement {
         }
       });
       // Retrieve domain and project slug from attributes
-      const domain = this.getAttribute('domain');
-      const projectSlug = this.getAttribute('project-slug');
+      this.domain = this.getAttribute('domain');
+      this.projectSlug = this.getAttribute('project-slug');
       // Render the initial structure of the component
       this.render();
   
       // Handle errors if required attributes are missing
-      if (!domain) {
+      if (!this.domain) {
         this.shadowRoot.querySelector('#project-name').textContent = 'Erreur: Domaine inconnu';
         this.shadowRoot.querySelector('#project-description').textContent = 'Veuillez renseigner un domaine.';
-      } else if (!projectSlug) {
+      } else if (!this.projectSlug) {
         this.shadowRoot.querySelector('#project-name').textContent = 'Erreur: Projet inconnu';
         this.shadowRoot.querySelector('#project-description').textContent = 'Veuillez renseigner un slug projet.';
         } else {
         // Fetch project data from the API and update the component
-        fetch(`${domain}/geocontrib/api/v2/projects/${projectSlug}/`)
+        fetch(`${this.domain}/geocontrib/api/v2/projects/${this.projectSlug}/`)
           .then(response => response.json())
           .then(data => {
-            this.updateComponent(domain, data);
+            this.updateComponent(data);
           })
           .catch(error => {
             // Handle any errors that occur during the fetch request
@@ -169,7 +171,7 @@ class ProjectPreview extends HTMLElement {
           }
         </style>
 
-        <a class="project-preview" href="#">
+        <a class="project-preview" href="${this.domain}/geocontrib/projet/${this.projectSlug}">
           <div class="project-thumbnail">
             <img id="project-image" src="${base64defaultImg}" alt="">
           </div>
@@ -199,9 +201,9 @@ class ProjectPreview extends HTMLElement {
     }
   
     // Update the component with data fetched from the API
-    updateComponent(domain, data) {
+    updateComponent(data) {
       // Set project details based on the fetched data
-      this.shadowRoot.querySelector('#project-image').src = domain + data.thumbnail;
+      this.shadowRoot.querySelector('#project-image').src = this.domain + data.thumbnail;
       this.shadowRoot.querySelector('#project-name').textContent = data.title;
       this.shadowRoot.querySelector('#project-description').textContent = data.description;
       this.shadowRoot.querySelector('#project-members .number').textContent = data.nb_contributors;
