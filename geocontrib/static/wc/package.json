@@ -1,0 +1,11 @@
+{
+  "name": "@neogeo/project-preview",
+  "version": "1.0.0",
+  "main": "project-preview.js",
+  "scripts": {
+    "serve": "live-server --port=8081 --entry-file=./index-wc-demo.html"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
