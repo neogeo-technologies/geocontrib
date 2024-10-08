@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-from django.db.models import Q
 from django.http import FileResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import Http404
 from django.conf import settings
@@ -16,7 +16,6 @@ from rest_framework import generics
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import mixins
 
 from api.serializers import ProjectDetailedSerializer
 from api.serializers import ProjectAttributeSerializer
@@ -134,7 +133,10 @@ class ProjectView(viewsets.ModelViewSet):
         tags=["projects"]
     )
     def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
+        response = super().retrieve(request, *args, **kwargs)
+        # Add a CORS header to allow requesting a project from any other domain, like a web-component embed in another website
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
 
 
 class ProjectDuplicate(APIView):
