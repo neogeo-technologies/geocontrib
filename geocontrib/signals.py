@@ -4,6 +4,7 @@ import os
 from django.apps import apps
 from django.conf import settings
 from django.contrib.gis.db import models
+from django.core.management import call_command
 from django.dispatch import receiver
 from django.db import transaction
 from django.utils import timezone
@@ -93,8 +94,16 @@ def create_symetrical_relation(sender, instance, created, **kwargs):
 
 @receiver(models.signals.post_save, sender='geocontrib.FeatureType')
 @disable_for_loaddata
-def slugify_feature_type(sender, instance, created, **kwargs):
+def generate_sql_view_feature_type(sender, instance, created, **kwargs):
+    if created or instance:
+        # call command to generate sql view
+        call_command('generate_sql_view', feature_type_id=instance.id, view_name=f'auto_view_ft_{instance.id}')
 
+        
+
+@receiver(models.signals.post_save, sender='geocontrib.FeatureType')
+@disable_for_loaddata
+def slugify_feature_type(sender, instance, created, **kwargs):
     if created:
         instance.slug = slugify("{}-{}".format(instance.pk, instance.title))
         instance.save()
