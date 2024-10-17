@@ -92,10 +92,16 @@ def create_symetrical_relation(sender, instance, created, **kwargs):
 #     for instance in related:
 #         instance.delete()
 
+@receiver(models.signals.post_delete, sender='geocontrib.FeatureType')
+@disable_for_loaddata
+def delete_sql_view_feature_type(sender, instance, **kwargs):
+    # call command to generate sql view
+    call_command('generate_sql_view', is_deletion=True, feature_type_id=instance.id, view_name=f'auto_view_ft_{instance.id}')
+
 @receiver(models.signals.post_save, sender='geocontrib.FeatureType')
 @disable_for_loaddata
 def generate_sql_view_feature_type(sender, instance, created, **kwargs):
-    if created or instance:
+    if instance:
         # call command to generate sql view
         call_command('generate_sql_view', feature_type_id=instance.id, view_name=f'auto_view_ft_{instance.id}')
 
