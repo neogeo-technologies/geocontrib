@@ -13,6 +13,12 @@ L'image Docker de base possède ces variables de configuration :
 * `ALLOWED_HOSTS`, default=`"localhost, 127.0.0.1, 0.0.0.0"`, cast=`Csv()`
   Définit les hôtes autorisés à accéder à l'application.
 
+* `AUTOMATIC_VIEW_CREATION_MODE`, default=`"Type"`
+  Le mode de création des vues SQL créées automatiquement, soit 'Projet' ou 'Type'
+
+* `AUTOMATIC_VIEW_SCHEMA_NAME`, default=`"auto_view"`
+  Le nom attribué aux vues SQL créées automatiquement
+
 * `CSRF_TRUSTED_ORIGINS`, default=`""`
   Liste des domaines externes autorisés pour les requêtes sécurisées contre les attaques CSRF.  
   Chaque domaine doit inclure un schéma (ex : `https://` ou `http://`) depuis django 4. Utilisé principalement  

@@ -92,18 +92,13 @@ def create_symetrical_relation(sender, instance, created, **kwargs):
 #     for instance in related:
 #         instance.delete()
 
-# ! MOCK ! TO DELETE AFTER DEVLOPPEMENT
-AUTOMATIC_VIEW_CREATION_MODE = 'Projet'
-# AUTOMATIC_VIEW_CREATION_MODE = 'Type'
-AUTOMATIC_VIEW_SCHEMA_NAME = ''
-
 @receiver(models.signals.post_delete, sender='geocontrib.CustomField')
 @disable_for_loaddata
 def delete_custom_field_in_sql_view(sender, instance, **kwargs):
     if instance:
         call_command('generate_sql_view',
-            mode=AUTOMATIC_VIEW_CREATION_MODE,
-            view_name=AUTOMATIC_VIEW_SCHEMA_NAME,
+            mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
+            view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
             feature_type_id=instance.feature_type_id
         )
 
@@ -111,9 +106,10 @@ def delete_custom_field_in_sql_view(sender, instance, **kwargs):
 @disable_for_loaddata
 def update_sql_view(sender, instance, created, **kwargs):
     if instance:
+        breakpoint()
         call_command('generate_sql_view',
-            mode=AUTOMATIC_VIEW_CREATION_MODE,
-            view_name=AUTOMATIC_VIEW_SCHEMA_NAME,
+            mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
+            view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
             feature_type_id=instance.feature_type_id
         )
 
@@ -122,8 +118,8 @@ def update_sql_view(sender, instance, created, **kwargs):
 def delete_sql_view(sender, instance, **kwargs):
     if instance:
         call_command('generate_sql_view',
-            mode=AUTOMATIC_VIEW_CREATION_MODE,
-            view_name=AUTOMATIC_VIEW_SCHEMA_NAME,
+            mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
+            view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
             feature_type_id=instance.id,
             is_deletion=True
         
@@ -138,8 +134,8 @@ def create_or_update_sql_view(sender, instance, created, **kwargs):
         # changes could be inside customField forms, which already update the view from its own signal above
         if update_fields:
             call_command('generate_sql_view',
-                mode=AUTOMATIC_VIEW_CREATION_MODE,
-                view_name=AUTOMATIC_VIEW_SCHEMA_NAME,
+                mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
+                view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
                 feature_type_id=instance.id
             )
 
