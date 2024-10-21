@@ -191,7 +191,7 @@ class FeatureTypeAdmin(admin.ModelAdmin):
                     context=dict(
                         fds_data=fds_data,
                         cfs_data=cfs_data,
-                        feature_type_id=feature_type_id,
+                        feature_type_ids=str(feature_type_id),
                         status=status,
                         schema=getattr(settings, 'DB_SCHEMA', 'public'),  # Get database schema from settings
                         view_name=view_name,
