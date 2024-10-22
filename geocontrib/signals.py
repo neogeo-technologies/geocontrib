@@ -99,14 +99,14 @@ def delete_custom_field_in_sql_view(sender, instance, **kwargs):
         call_command('generate_sql_view',
             mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
             view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
-            feature_type_id=instance.feature_type_id
+            feature_type_id=instance.feature_type_id,
+            deleted_cf_id=instance.id
         )
 
 @receiver(models.signals.post_save, sender='geocontrib.CustomField')
 @disable_for_loaddata
 def update_sql_view(sender, instance, created, **kwargs):
     if instance:
-        breakpoint()
         call_command('generate_sql_view',
             mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
             view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
@@ -121,8 +121,8 @@ def delete_sql_view(sender, instance, **kwargs):
             mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
             view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
             feature_type_id=instance.id,
-            is_deletion=True
-        
+            project_id=instance.project.id,
+            is_ft_deletion=True
         )
 
 @receiver(models.signals.post_save, sender='geocontrib.FeatureType')
@@ -130,9 +130,9 @@ def delete_sql_view(sender, instance, **kwargs):
 def create_or_update_sql_view(sender, instance, created, **kwargs):
     if instance:
         update_fields = kwargs.get('update_fields', None)
-        # if no field updated in feature_type, no need to update the view
-        # changes could be inside customField forms, which already update the view from its own signal above
-        if update_fields:
+        # If no fields were updated in feature_type, there is no need to update the view.
+        # Changes could be in customField forms, which already trigger a view update via their own signal (handled above).
+        if created or update_fields:
             call_command('generate_sql_view',
                 mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
                 view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
