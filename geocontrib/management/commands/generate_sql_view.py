@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.db import connections
 
 from geocontrib.models import CustomField
 from geocontrib.models import FeatureType
@@ -36,7 +37,7 @@ class Command(BaseCommand):
         parser.add_argument('--project_id', type=int, required=False, help='ID of the Project for which to create the view')
         parser.add_argument('--deleted_cf_id', type=int, required=False, help='ID of the deleted custom field to remove from view')
         parser.add_argument('--is_ft_deletion', type=bool, required=False, help='Should the view be deleted')
-        parser.add_argument('--view_name', type=str, required=False, help='Name of the PostgreSQL view')
+        parser.add_argument('--schema_name', type=str, required=False, help='Name of the PostgreSQL schema')
         parser.add_argument('--mode', type=str, required=False, help='Mode of the PostgreSQL view')
 
     def handle(self, *args, **options):
@@ -44,13 +45,13 @@ class Command(BaseCommand):
         Main function that handles the generation, modification, or deletion of PostgreSQL views
         for either a single FeatureType or all FeatureTypes within a project.
         """
-        schema = getattr(settings, 'DB_SCHEMA', 'public')  # Get database schema from settings
         is_ft_deletion = options['is_ft_deletion']
         feature_type_id = options['feature_type_id']
         project_id = options['project_id']
         mode = options['mode']
         deleted_cf_id = options['deleted_cf_id']
-        view_name = options['view_name'] or 'auto'
+        schema_name = options['schema_name'] or 'Data'
+
         # Specify the feature fields to display in the view
         feature_fields_selection = ['feature_id', 'title', 'description', 'geom', 'project_id', 'feature_type_id', 'status']
         # Format each field into an object as expected by the SQL template
@@ -58,12 +59,14 @@ class Command(BaseCommand):
         # Get all existing status choices by default
         status = (stat[0] for stat in Feature.STATUS_CHOICES)
 
+        self.create_schema_if_not_exists(schema_name)
+
         if mode == 'Projet':
             project = self.get_project(project_id, feature_type_id)
-            view_name += f'_proj_{project.id}'
+            view_name = f'project_{project.id}'
             # If deleting a custom field, drop the table, then try to create again
             if deleted_cf_id is not None:
-                self.drop_existing_view(schema, view_name)
+                self.drop_existing_view(schema_name, view_name)
 
             # Get all feature type ids inside the project
             feature_type_ids = list(FeatureType.objects.filter(project=project).values_list('id', flat=True))
@@ -78,15 +81,15 @@ class Command(BaseCommand):
                 # Output error message if custom fields mismatch and abort command
                 logger.debug(e)
                 # Delete the previously existing view since the existing one cannot be updated
-                self.drop_existing_view(schema, view_name)
+                self.drop_existing_view(schema_name, view_name)
                 return  # Abort the command if custom fields are not the same
 
         else: # Default view creation for a single feature type
-            view_name += f'_ftype_{feature_type_id}'
+            view_name = f'feature_type_{feature_type_id}'
 
             if is_ft_deletion:
                 # Generate SQL to delete the view if it exists
-                self.drop_existing_view(schema, view_name)
+                self.drop_existing_view(schema_name, view_name)
                 return  # Exit the view generation command for this feature type since it was deleted
 
             # Retrieve custom fields specific to this feature type
@@ -100,7 +103,7 @@ class Command(BaseCommand):
                 cfs_data=cfs_data,
                 feature_type_ids=feature_type_ids_str if mode == 'Projet' else str(feature_type_id),
                 status=status,
-                schema=schema,
+                schema=schema_name,
                 view_name=view_name,
                 user=settings.DATABASES['default']['USER'],  # Database user from settings
             ))
@@ -110,6 +113,17 @@ class Command(BaseCommand):
         if its_alright:
             logger.info(f'Successfully created view {view_name}')
 
+    def create_schema_if_not_exists(self, schema_name):
+        """
+        Create the schema if it doesn't already exist.
+        """
+        sql = f"CREATE SCHEMA IF NOT EXISTS {schema_name};"
+        try:
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql)
+        except Exception as e:
+            logger.error(f"Error creating schema {schema_name}: {e}")
+            raise CommandError(f"Failed to create schema: {str(e)}")
 
     def get_custom_fields(self, feature_type_id, deleted_cf_id):
         customFields = CustomField.objects.filter(feature_type__pk=feature_type_id).values()
@@ -145,8 +159,8 @@ class Command(BaseCommand):
 
         return reference_fields  # Return the fields if all are identical
 
-    def drop_existing_view(self, schema, view_name):
-        sql = f"DROP VIEW IF EXISTS {schema}.{view_name}"
+    def drop_existing_view(self, schema_name, view_name):
+        sql = f"DROP VIEW IF EXISTS {schema_name}.{view_name}"
         its_alright = self.exec_sql(sql, view_name)
         if its_alright:
             logger.info(f'Successfully deleted view {view_name}')
@@ -168,7 +182,6 @@ class Command(BaseCommand):
             return Project.objects.get(id=project_id)
 
     def exec_sql(self, sql_script, view_name):
-        from django.db import connections
         try:
             with connections['default'].cursor() as cursor:
                 cursor.execute(sql_script)
