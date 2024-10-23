@@ -33,7 +33,7 @@ class Command(BaseCommand):
     help = """Permet de générer une vue SQL à la création, modification ou suppression d'un type de signalement ou de l'un de ses champs personnalisés"""
 
     def add_arguments(self, parser):
-        parser.add_argument('--feature_type_id', type=int, required=True, help='ID of the FeatureType for which to create the view')
+        parser.add_argument('--feature_type_id', type=int, required=False, help='ID of the FeatureType for which to create the view')
         parser.add_argument('--project_id', type=int, required=False, help='ID of the Project for which to create the view')
         parser.add_argument('--deleted_cf_id', type=int, required=False, help='ID of the deleted custom field to remove from view')
         parser.add_argument('--is_ft_deletion', type=bool, required=False, help='Should the view be deleted')
@@ -48,7 +48,7 @@ class Command(BaseCommand):
         is_ft_deletion = options['is_ft_deletion']
         feature_type_id = options['feature_type_id']
         project_id = options['project_id']
-        mode = options['mode']
+        mode = options['mode'] or 'Type'
         deleted_cf_id = options['deleted_cf_id']
         schema_name = options['schema_name'] or 'Data'
 
@@ -62,6 +62,11 @@ class Command(BaseCommand):
         self.create_schema_if_not_exists(schema_name)
 
         if mode == 'Projet':
+
+            # Ensure that either 'project_id' or 'feature_type_id' is provided in 'Projet' mode
+            if not project_id and not feature_type_id:
+                raise CommandError("You must provide either a 'project_id' or a 'feature_type_id' in 'Projet' mode.")
+
             project = self.get_project(project_id, feature_type_id)
             view_name = f'project_{project.id}'
             # If deleting a custom field, drop the table, then try to create again
@@ -84,7 +89,12 @@ class Command(BaseCommand):
                 self.drop_existing_view(schema_name, view_name)
                 return  # Abort the command if custom fields are not the same
 
-        else: # Default view creation for a single feature type
+        elif mode == 'Type' :
+
+            # Ensure that 'feature_type_id' is provided in 'Type' mode
+            if not feature_type_id:
+                raise CommandError("You must provide a 'feature_type_id' in 'Type' mode.")
+
             view_name = f'feature_type_{feature_type_id}'
 
             if is_ft_deletion:
