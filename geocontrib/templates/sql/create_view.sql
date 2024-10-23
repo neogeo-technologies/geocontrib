@@ -41,7 +41,7 @@ CREATE OR REPLACE VIEW {{ schema }}.{{ view_name }} AS
   FROM geocontrib_feature
   WHERE
       -- Filter records based on the feature type and status.
-      geocontrib_feature.feature_type_id = '{{ feature_type_id }}'
+      geocontrib_feature.feature_type_id IN ({{ feature_type_ids }})
       AND geocontrib_feature.status IN (
           {% for stat in status %}
               '{{ stat }}'  -- Include each status value provided in the list.

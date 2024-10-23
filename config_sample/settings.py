@@ -163,6 +163,10 @@ if cas_server_url:
     )
     CAS_APPLY_ATTRIBUTES_TO_USER = True
 
+# Configure automated view generation
+AUTOMATIC_VIEW_CREATION_MODE = config("AUTOMATIC_VIEW_CREATION_MODE", default='Type')
+AUTOMATIC_VIEW_SCHEMA_NAME = config("AUTOMATIC_VIEW_SCHEMA_NAME", default='')
+
 # Configure django admin
 LOGOUT_HIDDEN = config("LOGOUT_HIDDEN", default=False, cast=bool)
 HIDE_USER_CREATION_BUTTON = config("HIDE_USER_CREATION_BUTTON", default=False, cast=bool)
