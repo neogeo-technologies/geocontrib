@@ -32,7 +32,7 @@ CREATE OR REPLACE VIEW {{ schema }}.{{ view_name }} AS
         {% if data|lookup:'alias'|length > 0 %}
             {{ data|lookup:'alias'|slugify }}  -- Use the provided alias if available, applying slugification.
         {% else %}
-            {{ data|lookup:'name' }}  -- Use the field name as the column name if no alias is provided.
+            {{ data|lookup:'name'|underscoreify }}  -- Use the field name as the column name if no alias is provided.
         {% endif %}
         {% if not forloop.last %}
             ,  -- Add a comma separator between columns, except for the last column.
