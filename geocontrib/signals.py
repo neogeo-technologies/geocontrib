@@ -98,7 +98,7 @@ def delete_custom_field_in_sql_view(sender, instance, **kwargs):
     if instance:
         call_command('generate_sql_view',
             mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
-            view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
+            schema_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
             feature_type_id=instance.feature_type_id,
             deleted_cf_id=instance.id
         )
@@ -109,7 +109,7 @@ def update_sql_view(sender, instance, created, **kwargs):
     if instance:
         call_command('generate_sql_view',
             mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
-            view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
+            schema_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
             feature_type_id=instance.feature_type_id
         )
 
@@ -119,7 +119,7 @@ def delete_sql_view(sender, instance, **kwargs):
     if instance:
         call_command('generate_sql_view',
             mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
-            view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
+            schema_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
             feature_type_id=instance.id,
             project_id=instance.project.id,
             is_ft_deletion=True
@@ -135,7 +135,7 @@ def create_or_update_sql_view(sender, instance, created, **kwargs):
         if created or update_fields:
             call_command('generate_sql_view',
                 mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
-                view_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
+                schema_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
                 feature_type_id=instance.id
             )
 
