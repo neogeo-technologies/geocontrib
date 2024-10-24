@@ -4,6 +4,7 @@ from django.forms.fields import DateInput
 from django.conf import settings
 from urllib.parse import urljoin
 
+import re
 import logging
 
 logger = logging.getLogger(__name__)
@@ -41,3 +42,12 @@ def absurl(relative_url):
     if not isinstance(relative_url, str):
         relative_url = str(relative_url)
     return urljoin(BASE_URL, relative_url)
+
+
+@register.filter
+def underscoreify(value):
+    """
+    Convert any string by replacing dashes ('-') with underscores ('_').
+    This can be used to make any string safe for usage in various contexts like database column names, URLs, etc.
+    """
+    return re.sub(r'[-]', '_', value)
