@@ -8,7 +8,7 @@ Les utilisateurs sont classés en différents niveaux d'autorisation :
 
 | Rôle | Accès au projet | Ajouter des données | Modifier ses propres signalements | Modifier tous les signalements | Publier | Supprimer ses propres signalements | Supprimer tous les signalements | Modérer |
 |------|---------------|----------------|--------------------------|----------------------|--------|--------------------------|----------------------|--------|
-| **Utilisateur non connecté** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Utilisateur anonyme (non connecté)** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Utilisateur connecté** | ✅ (si projet public) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Contributeur** | ✅ | ✅ | ✅ (uniquement ses propres signalements) | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **Super Contributeur** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (seulement ses propres signalements) | ❌ | ❌ |
