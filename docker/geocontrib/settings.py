@@ -301,7 +301,10 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # (Permet d'appliquer strictement la durée max et le timeout d'inactivité)
 SESSION_SAVE_EVERY_REQUEST = False
 # Timeout d'inactivité : si aucune action pendant 1h, la session expire (géré par middleware)
-SESSION_IDLE_TIMEOUT =  config('SESSION_IDLE_TIMEOUT', default=3600, cast=int)
+try: # cast=int trigger an error when the value is not defined resulting in an empty string
+    SESSION_IDLE_TIMEOUT = config('SESSION_IDLE_TIMEOUT', default=3600, cast=int)
+except ValueError:
+    SESSION_IDLE_TIMEOUT = 3600
 
 # Required to avoid error in swagger
 SWAGGER_SETTINGS = {
