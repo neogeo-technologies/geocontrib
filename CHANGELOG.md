@@ -3,7 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [6.4.3] - 2024-01-27
+## [6.4.4] - 2025-02-04
+
+### Correctifs
+- Redmine 26303 : Masquer l'import pour utilisateur anonyme et connecté en projet modéré
+
+### Ajustements sur la version 6.4.3
+- Redmine 25860 : Ajout d'une durée de session limitée côté Django
+- Redmine 25836 : Publication en masse des signalements
+### Ajustements sur la version 6.4.2
+- Redmine 24200 : Déconnexion OGS <-> GC
+
+## [6.4.3] - 2025-01-27
 
 ### Correctifs
 - Redmine 25860 : Ajout d'une durée de session limitée côté Django
@@ -11,7 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Évolution
 - Redmine 25836 : Publication en masse des signalements
 
-## [6.4.2] - 2024-01-23
+## [6.4.2] - 2025-01-23
 
 ### Correctifs
 - Redmine 24200 : Déconnexion OGS <-> GC
