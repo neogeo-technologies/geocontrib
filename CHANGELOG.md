@@ -14,6 +14,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Ajustements sur la version 6.4.2
 - Redmine 24200 : Déconnexion OGS <-> GC
 
+### Environement variables
+- SESSION_MIDDLEWARE (default : '')
+-> Permet d'activer la fin de session après un délai d'inactivité en renseignant la valeur 'geocontrib.middlewares.session_timeout.SessionIdleTimeoutMiddleware'
+
+- SESSION_IDLE_TIMEOUT (default : '3600' millisecondes, soit 1h)
+-> Délai d'inactivité avant déconnexion de session
+
 ## [6.4.3] - 2025-01-27
 
 ### Correctifs
