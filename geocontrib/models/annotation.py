@@ -175,114 +175,114 @@ class Event(models.Model):
         action = "{} {}".format(evt, obj)
         return action
 
-def ping_users(self, *args, **kwargs):
-    """
-    Gère les différents cas d'envoi de notifications liés à un événement.
-    """
-    if self.object_type != 'feature':
-        return
+    def ping_users(self, *args, **kwargs):
+        """
+        Gère les différents cas d'envoi de notifications liés à un événement.
+        """
+        if self.object_type != 'feature':
+            return
 
-    Feature = apps.get_model(app_label='geocontrib', model_name='Feature')
-    feature = Feature.objects.get(feature_id=self.feature_id)
-    project = feature.project
+        Feature = apps.get_model(app_label='geocontrib', model_name='Feature')
+        feature = Feature.objects.get(feature_id=self.feature_id)
+        project = feature.project
 
-    feature_status = self.data.get('feature_status', {})
-    status_has_changed = feature_status.get('has_changed', False)
-    new_status = feature_status.get('new_status', 'draft')
+        feature_status = self.data.get('feature_status', {})
+        status_has_changed = feature_status.get('has_changed', False)
+        new_status = feature_status.get('new_status', 'draft')
 
-    # 1. Notifier les modérateurs si le signalement passe en "pending"
-    if project.moderation and status_has_changed and new_status == 'pending':
-        self._notify_moderators(feature, project)
+        # 1. Notifier les modérateurs si le signalement passe en "pending"
+        if project.moderation and status_has_changed and new_status == 'pending':
+            self._notify_moderators(feature, project)
 
-    # 2. Notifier l'auteur si le signalement est publié
-    if status_has_changed and new_status == 'published':
-        self._notify_creator(feature, project)
+        # 2. Notifier l'auteur si le signalement est publié
+        if status_has_changed and new_status == 'published':
+            self._notify_creator(feature, project)
 
-        # 3. Notifier les groupes d'utilisateurs si le signalement est publié
-        self._notify_user_groups(feature)
+            # 3. Notifier les groupes d'utilisateurs si le signalement est publié
+            self._notify_user_groups(feature)
 
-def _notify_moderators(self, feature, project):
-    """Envoie une notification aux modérateurs lorsqu'un signalement passe en 'pending'."""
-    Authorization = apps.get_model(app_label='geocontrib', model_name='Authorization')
-    UserLevelPermission = apps.get_model(app_label='geocontrib', model_name='UserLevelPermission')
+    def _notify_moderators(self, feature, project):
+        """Envoie une notification aux modérateurs lorsqu'un signalement passe en 'pending'."""
+        Authorization = apps.get_model(app_label='geocontrib', model_name='Authorization')
+        UserLevelPermission = apps.get_model(app_label='geocontrib', model_name='UserLevelPermission')
 
-    event_initiator = self.user
-    moderateur_rank = UserLevelPermission.objects.get(user_type_id=MODERATOR).rank
-    moderators_emails = Authorization.objects.filter(
-        project=project, level__rank__gte=moderateur_rank
-    ).exclude(user=event_initiator).values_list('user__email', flat=True)
+        event_initiator = self.user
+        moderateur_rank = UserLevelPermission.objects.get(user_type_id=MODERATOR).rank
+        moderators_emails = Authorization.objects.filter(
+            project=project, level__rank__gte=moderateur_rank
+        ).exclude(user=event_initiator).values_list('user__email', flat=True)
 
-    context = {
-        'feature': feature,
-        'event_initiator': event_initiator,
-        'application_name': settings.APPLICATION_NAME,
-        'application_abstract': settings.APPLICATION_ABSTRACT,
-    }
+        context = {
+            'feature': feature,
+            'event_initiator': event_initiator,
+            'application_name': settings.APPLICATION_NAME,
+            'application_abstract': settings.APPLICATION_ABSTRACT,
+        }
 
-    try:
-        notif_moderators_pending_features(emails=moderators_emails, context=context)
-    except Exception:
-        logger.exception('Event.ping_users._notify_moderators')
+        try:
+            notif_moderators_pending_features(emails=moderators_emails, context=context)
+        except Exception:
+            logger.exception('Event.ping_users._notify_moderators')
 
-def _notify_creator(self, feature, project):
-    """Notifie l'auteur du signalement si son signalement est publié."""
-    event_initiator = self.user
-    if project.moderation and event_initiator != feature.creator:
+    def _notify_creator(self, feature, project):
+        """Notifie l'auteur du signalement si son signalement est publié."""
+        event_initiator = self.user
+        if project.moderation and event_initiator != feature.creator:
+            context = {
+                'feature': feature,
+                'event': self
+            }
+            try:
+                notif_creator_published_feature(
+                    emails=[feature.creator.email], context=context
+                )
+            except Exception:
+                logger.exception('Event.ping_users._notify_creator')
+
+    def _notify_user_groups(self, feature):
+        """Notifie les membres des groupes d'utilisateurs si un signalement est publié."""
+        CustomField = apps.get_model(app_label='geocontrib', model_name='CustomField')
+        notif_custom_fields = CustomField.objects.filter(
+            feature_type=feature.feature_type, field_type='notif_group'
+        )
+
+        if not notif_custom_fields or not feature.feature_data:
+            return
+
         context = {
             'feature': feature,
             'event': self
         }
-        try:
-            notif_creator_published_feature(
-                emails=[feature.creator.email], context=context
-            )
-        except Exception:
-            logger.exception('Event.ping_users._notify_creator')
 
-def _notify_user_groups(self, feature):
-    """Notifie les membres des groupes d'utilisateurs si un signalement est publié."""
-    CustomField = apps.get_model(app_label='geocontrib', model_name='CustomField')
-    notif_custom_fields = CustomField.objects.filter(
-        feature_type=feature.feature_type, field_type='notif_group'
-    )
+        UsersGroup = apps.get_model(app_label='geocontrib', model_name='UsersGroup')
+        UserGroupMembership = apps.get_model(app_label='geocontrib', model_name='UserGroupMembership')
 
-    if not notif_custom_fields or not feature.feature_data:
-        return
+        groups = [
+            feature.feature_data[field.label]
+            for field in notif_custom_fields if field.label in feature.feature_data
+        ]
 
-    context = {
-        'feature': feature,
-        'event': self
-    }
+        global_group = UsersGroup.objects.filter(is_global=True)
+        if global_group.exists():
+            groups.append(global_group.first().codename)
 
-    UsersGroup = apps.get_model(app_label='geocontrib', model_name='UsersGroup')
-    UserGroupMembership = apps.get_model(app_label='geocontrib', model_name='UserGroupMembership')
+        for group_codename in groups:
+            try:
+                group = UsersGroup.objects.get(codename=group_codename)
+                user_emails = [
+                    membership.user.email
+                    for membership in UserGroupMembership.objects.filter(group=group)
+                    .exclude(user=self.user)
+                    .select_related('user')
+                ]
+                context['group'] = group
 
-    groups = [
-        feature.feature_data[field.label]
-        for field in notif_custom_fields if field.label in feature.feature_data
-    ]
-
-    global_group = UsersGroup.objects.filter(is_global=True)
-    if global_group.exists():
-        groups.append(global_group.first().codename)
-
-    for group_codename in groups:
-        try:
-            group = UsersGroup.objects.get(codename=group_codename)
-            user_emails = [
-                membership.user.email
-                for membership in UserGroupMembership.objects.filter(group=group)
-                .exclude(user=self.user)
-                .select_related('user')
-            ]
-            context['group'] = group
-
-            if user_emails:
-                notif_users_groups_published_feature(emails=user_emails, context=context)
-        except UsersGroup.DoesNotExist:
-            logger.exception(f'Group of users with codename {group_codename} does not exist')
-        except Exception:
-            logger.exception('Event.ping_users._notify_user_groups')
+                if user_emails:
+                    notif_users_groups_published_feature(emails=user_emails, context=context)
+            except UsersGroup.DoesNotExist:
+                logger.exception(f'Group of users with codename {group_codename} does not exist')
+            except Exception:
+                logger.exception('Event.ping_users._notify_user_groups')
 
 
 class Subscription(models.Model):
