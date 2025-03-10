@@ -216,3 +216,17 @@ def notif_project_member_assigned_feature(emails, context):
         template='geocontrib/email/notif_project_member_assigned_feature.html')
 
     email.send()
+
+
+def notif_users_groups_published_feature(emails, context):
+    feature = context['feature']
+
+    context['url_feature'] = urljoin(BASE_URL, feature.get_view_url())
+
+    subject = "[{}] Un signalement a été publié dans un groupe dont vous êtes membres".format(settings.APPLICATION_NAME)
+
+    email = EmailBaseBuilder(
+        context=context, bcc=emails, subject=subject,
+        template='geocontrib/email/notif_users_groups_published_feature.html')
+
+    email.send()

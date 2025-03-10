@@ -17,6 +17,7 @@ TYPE_CHOICES = (
     ("integer", "Nombre entier"),
     ("decimal", "Nombre décimal"),
     ("text", "Texte multiligne"),
+    ("notif_group", "Notification à un groupe"),
 )
 
 ######################
