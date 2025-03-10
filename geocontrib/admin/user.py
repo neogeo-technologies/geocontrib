@@ -8,6 +8,8 @@ from django.utils.translation import gettext_lazy as _
 
 from geocontrib.models import Authorization
 from geocontrib.models import Subscription
+from geocontrib.models import UsersGroup
+from geocontrib.models import UserGroupMembership
 
 
 logger = logging.getLogger(__name__)
@@ -42,11 +44,6 @@ class UserAdmin(DjangoUserAdmin):
         (_('Personal info'), {
             'fields': ('first_name', 'last_name',)
         }),
-        (_('Permissions'), {
-            'fields': (
-                'is_active', 'is_staff', 'is_superuser', 'is_administrator',
-                'groups', 'user_permissions'),
-        }),
         (_('Important dates'), {
             'fields': (
                 'last_login', 'date_joined'),
@@ -62,6 +59,18 @@ class UserAdmin(DjangoUserAdmin):
                 'is_active', 'is_staff', 'is_superuser'),
         }),
     )
+
+
+class UsersGroupAdmin(admin.ModelAdmin):
+    list_display = ('codename', 'display_name', 'usergroup_type', 'is_global')
+    search_fields = ('display_name',)
+
+class UserGroupMembershipAdmin(admin.ModelAdmin):
+    list_display = ('user', 'group', 'joined_at')
+    search_fields = ('user__username', 'group__display_name')
+    list_filter = ('group',)
+    ordering = ('group', 'user__username')
+    autocomplete_fields = ['user', 'group']
 
 
 class AuthorizationAdmin(admin.ModelAdmin):
@@ -82,4 +91,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(Authorization, AuthorizationAdmin)
 admin.site.register(Subscription, SubscriptionAdmin)
+admin.site.register(UsersGroup, UsersGroupAdmin)
+admin.site.register(UserGroupMembership, UserGroupMembershipAdmin)
+
 # admin.site.register(UserLevelPermission)
