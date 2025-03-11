@@ -190,12 +190,12 @@ class Event(models.Model):
         status_has_changed = feature_status.get('has_changed', False)
         new_status = feature_status.get('new_status', 'draft')
 
-        # 1. Notifier les modérateurs si le signalement passe en "pending"
         if project.moderation and status_has_changed and new_status == 'pending':
+            # 1. Notifier les modérateurs si le signalement passe en "pending"
             self._notify_moderators(feature, project)
 
-        # 2. Notifier l'auteur si le signalement est publié
         if status_has_changed and new_status == 'published':
+            # 2. Notifier l'auteur si le signalement est publié
             self._notify_creator(feature, project)
 
             # 3. Notifier les groupes d'utilisateurs si le signalement est publié
