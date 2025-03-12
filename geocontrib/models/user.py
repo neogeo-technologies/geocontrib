@@ -32,11 +32,11 @@ class UsersGroup(models.Model):
     codename = models.CharField("Nom (identifiant)", max_length=255, unique=True, validators=[validate_codename])
     display_name = models.CharField("Nom affiché", max_length=255)
     usergroup_type = models.CharField("Type de groupe utilisateurs", max_length=255)
-    is_global = models.BooleanField("Groupe 'all'", default=False, unique=True)  # Marquer le groupe d'utilisateurs 'all'
+    is_global = models.BooleanField("Groupe 'all'", default=False)  # Marquer un groupe d'utilisateurs 'all'
 
     def clean(self):
         if self.is_global and UsersGroup.objects.filter(is_global=True).exclude(pk=self.pk).exists():
-            raise ValidationError("Il ne peut y avoir qu'un seul groupe global.")
+            raise ValidationError("Il ne peut y avoir qu'un seul groupe global 'all'.")
 
     class Meta:
         verbose_name = "Groupe d'utilisateurs"

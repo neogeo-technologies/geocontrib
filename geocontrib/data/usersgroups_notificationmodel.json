@@ -1,0 +1,11 @@
+[
+  {
+    "model": "geocontrib.notificationmodel",
+    "pk": 5,
+    "fields": {
+      "template_name": "Publication dans un groupe d'utilisateurs",
+      "subject": "[{{ application_name }}] Un signalement a été publié dans un groupe dont vous êtes membres",
+      "message": "Le signalement <a href=\"{{ url_feature }}\">{{ feature.title|title }} </a> a été publié dans le projet {{ feature.project.title|title }} le {{ event.created_on }}"
+    }
+  }
+]

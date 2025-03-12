@@ -89,4 +89,5 @@ class UsersGroupsSerializer(serializers.ModelSerializer):
             'codename',
             'display_name',
             'usergroup_type',
+            'is_global'
         ]

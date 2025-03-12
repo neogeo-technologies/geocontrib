@@ -223,7 +223,31 @@ def notif_users_groups_published_feature(emails, context):
 
     context['url_feature'] = urljoin(BASE_URL, feature.get_view_url())
 
-    subject = "[{}] Un signalement a été publié dans un groupe dont vous êtes membres".format(settings.APPLICATION_NAME)
+    try:
+        # Fetch the customizable notification template from the database, which allow the administrator to edit the email body header.
+        notification_model = NotificationModel.objects.get(template_name="Publication dans un groupe d'utilisateurs")
+        # init context instance to render template & retrieve project_name from context
+        data = Context({
+            'application_name': settings.APPLICATION_NAME,
+            'url_feature': context['url_feature'],
+            'event': context['event'],
+            'project_slug': feature.project.slug,
+            'project_name': feature.project.title,
+            'feature': feature
+        })
+        # get the mail object template
+        subject_template = Template(notification_model.subject)
+        # render the mail object template
+        subject = subject_template.render(data)
+        # get the mail body header template
+        message_template = Template(notification_model.message)
+        # render the mail body header
+        message = message_template.render(data)
+        # fill context used in EmailBaseBuilder
+        context['message'] = message
+
+    except ObjectDoesNotExist:
+        subject = "[{}] Un signalement a été publié dans un groupe dont vous êtes membres".format(settings.APPLICATION_NAME)
 
     email = EmailBaseBuilder(
         context=context, bcc=emails, subject=subject,
