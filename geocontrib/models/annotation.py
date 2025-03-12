@@ -258,8 +258,8 @@ class Event(models.Model):
         UserGroupMembership = apps.get_model(app_label='geocontrib', model_name='UserGroupMembership')
 
         groups = [
-            feature.feature_data[field.label]
-            for field in notif_custom_fields if field.label in feature.feature_data
+            feature.feature_data[field.name]
+            for field in notif_custom_fields if field.name in feature.feature_data
         ]
 
         global_group = UsersGroup.objects.filter(is_global=True)
