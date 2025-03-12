@@ -49,6 +49,7 @@ from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
 from api.views.user import UserViewSet
 from api.views.user import UserLevelsPermission
+from api.views.user import GetUsersGroups
 from api.views import version
 
 from api.doc_swagger.custom_schema_generator import CustomSchemaGenerator
@@ -208,6 +209,8 @@ urlpatterns = [
         'customfields/',
         CustomFields.as_view(), name='customfields'
     ),
+    path("users-groups/",
+        GetUsersGroups.as_view(), name='get-users-groups'),
 
     # login with token
     path(

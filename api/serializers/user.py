@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from geocontrib.models import Authorization
+from geocontrib.models import UsersGroup
 from geocontrib.models import UserLevelPermission
 from geocontrib.models import GeneratedToken
 
@@ -79,3 +80,13 @@ class GeneratedTokenSerializer(serializers.ModelSerializer):
             'last_name',
             'email'
         )
+
+class UsersGroupsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UsersGroup
+        fields = [
+            'codename',
+            'display_name',
+            'usergroup_type',
+        ]
