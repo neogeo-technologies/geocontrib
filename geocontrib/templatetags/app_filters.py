@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.template.defaulttags import register
 from django.forms.fields import CheckboxInput
 from django.forms.fields import DateInput
@@ -43,6 +44,13 @@ def absurl(relative_url):
     if not isinstance(relative_url, str):
         relative_url = str(relative_url)
     return urljoin(BASE_URL, relative_url)
+
+@register.filter
+def format_attr_date(value):
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").strftime("%d/%m/%Y")
+    except (ValueError, TypeError):
+        return value  # Retourne la valeur initiale en cas d'erreur
 
 
 @register.filter

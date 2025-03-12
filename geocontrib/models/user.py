@@ -1,11 +1,13 @@
 import uuid
 from enum import Enum, unique
 import hashlib
+import re
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.gis.db import models
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from geocontrib.choices import ALL_LEVELS
@@ -21,6 +23,29 @@ class Rank(Enum):
     ADMIN = 5
 
 
+def validate_codename(value):
+    """ Valide que `name` ne contient que des lettres, chiffres et tirets bas. """
+    if not re.match(r"^[a-zA-Z0-9_-]+$", value):
+        raise ValidationError("Le nom ne peut contenir que des lettres, chiffres, tirets et underscores.")
+
+class UsersGroup(models.Model):
+    codename = models.CharField("Nom (identifiant)", max_length=255, unique=True, validators=[validate_codename])
+    display_name = models.CharField("Nom affiché", max_length=255)
+    usergroup_type = models.CharField("Type de groupe utilisateurs", max_length=255)
+    is_global = models.BooleanField("Groupe 'all'", default=False)  # Marquer un groupe d'utilisateurs 'all'
+
+    def clean(self):
+        if self.is_global and UsersGroup.objects.filter(is_global=True).exclude(pk=self.pk).exists():
+            raise ValidationError("Il ne peut y avoir qu'un seul groupe global 'all'.")
+
+    class Meta:
+        verbose_name = "Groupe d'utilisateurs"
+        verbose_name_plural = "Groupes d'utilisateurs"
+
+    def __str__(self):
+        return self.display_name
+
+
 class User(AbstractUser):
 
     is_administrator = models.BooleanField(
@@ -32,6 +57,21 @@ class User(AbstractUser):
         default=uuid.uuid4,
         editable=False
     )
+
+
+class UserGroupMembership(models.Model):
+    """ Table d'association entre `User` et `UsersGroup` """
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(UsersGroup, on_delete=models.CASCADE)
+    joined_at = models.DateTimeField("Date d'adhésion", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Membre du groupe"
+        verbose_name_plural = "Membres des groupes"
+        unique_together = ("user", "group")  # Empêche les doublons
+
+    def __str__(self):
+        return f"{self.user.username} - {self.group.display_name} ({self.group.usergroup_type})"
 
 
 class UserLevelPermission(models.Model):

@@ -258,6 +258,18 @@ def setUser(user):
     return user
 
 
+@receiver(models.signals.pre_save, sender='geocontrib.Feature')
+def store_previous_status(sender, instance, **kwargs):
+    if instance.pk:  # Seulement si ce n'est pas une création
+        try:
+            previous_instance = sender.objects.get(pk=instance.pk)
+            instance._previous_status = previous_instance.status
+        except sender.DoesNotExist:
+            instance._previous_status = None  # Si l'objet n'existait pas encore
+    else:
+        instance._previous_status = None  # Nouveau signalement, pas d'ancien statut
+
+
 @receiver(models.signals.post_save, sender='geocontrib.Feature')
 @disable_for_loaddata
 def create_event_on_feature_create_or_update(sender, instance, created, **kwargs):
@@ -266,42 +278,23 @@ def create_event_on_feature_create_or_update(sender, instance, created, **kwargs
     # Le signalement peut etre en 'pending' dés la création
     # on force le has_changed pour event.ping_users()
     Event = apps.get_model(app_label='geocontrib', model_name="Event")
-    if created:
-        Event.objects.create(
-            feature_id=instance.feature_id,
-            event_type='create',
-            object_type='feature',
-            user=instance.creator,
-            project_slug=instance.project.slug,
-            feature_type_slug=instance.feature_type.slug,
-            data={
-                'extra': instance.feature_data,
-                'feature_title': instance.title,
-                'feature_status': {
-                    'has_changed': True,
-                    'new_status': instance.status
-                }
+
+    Event.objects.create(
+        feature_id=instance.feature_id,
+        event_type='create' if created else 'update' if instance.deletion_on is None else 'delete',
+        object_type='feature',
+        user=instance.creator if created else instance.last_editor,
+        project_slug=instance.project.slug,
+        feature_type_slug=instance.feature_type.slug,
+        data={
+            'extra': instance.feature_data,
+            'feature_title': instance.title,
+            'feature_status': {
+                'has_changed': True if created else instance._previous_status != instance.status,
+                'new_status': instance.status
             }
-        )
-    elif instance:
-        last_editor = setUser(instance.last_editor)
-        Event.objects.create(
-            feature_id=instance.feature_id,
-            # If deletion_on is set, the feature has been deleted
-            event_type='update' if instance.deletion_on == None else 'delete',
-            object_type='feature',
-            user= last_editor,
-            project_slug=instance.project.slug,
-            feature_type_slug=instance.feature_type.slug,
-            data={
-                'extra': instance.feature_data,
-                'feature_title': instance.title,
-                'feature_status': {
-                    'has_changed': True,
-                    'new_status': instance.status
-                }
-            }
-        )
+        }
+    )
 
 
 @receiver(models.signals.post_save, sender='geocontrib.Comment')

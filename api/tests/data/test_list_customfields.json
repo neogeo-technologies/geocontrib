@@ -34,5 +34,9 @@
     {
         "type": "text",
         "label": "Texte multiligne"
+    },
+    {
+        "type": "notif_group",
+        "label": "Notification à un groupe"
     }
 ]

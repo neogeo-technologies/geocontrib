@@ -9,14 +9,17 @@ from rest_framework import mixins
 from rest_framework import views
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from api.serializers import UserSerializer
+from api.serializers import UsersGroupsSerializer
 from api.serializers import UserLevelsPermissionSerializer
 from api.serializers import GeneratedTokenSerializer
 from api.serializers.user import UserSerializer as DetailedUserSerializer
 from geocontrib.models import Authorization
 from geocontrib.models import Project
+from geocontrib.models import UsersGroup
 from geocontrib.models import UserLevelPermission
 from geocontrib.models import GeneratedToken
 
@@ -462,3 +465,16 @@ class UserLevelsPermission(
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+class GetUsersGroups(ListAPIView):
+    http_method_names = ['get', ]
+
+    queryset = UsersGroup.objects.all()
+    serializer_class = UsersGroupsSerializer
+
+    @swagger_auto_schema(
+        operation_summary="List all user level permissions",
+        tags=["users"]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
