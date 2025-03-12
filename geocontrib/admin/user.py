@@ -15,6 +15,11 @@ from geocontrib.models import UserGroupMembership
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
+class UserGroupMembershipInline(admin.TabularInline):  # Utilisation d'un inline
+    model = UserGroupMembership
+    extra = 0  # Nombre de lignes vides affichées pour ajouter une nouvelle association
+    autocomplete_fields = ["group"]  # Permet la sélection rapide du groupe via recherche
+
 
 class UserAdmin(DjangoUserAdmin):
     # if users added/managed externally, hide button to create user from django admin
@@ -59,6 +64,8 @@ class UserAdmin(DjangoUserAdmin):
                 'is_active', 'is_staff', 'is_superuser'),
         }),
     )
+
+    inlines = [UserGroupMembershipInline]
 
 
 class UsersGroupAdmin(admin.ModelAdmin):
