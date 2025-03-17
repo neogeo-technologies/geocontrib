@@ -28,6 +28,7 @@ from .project import ProjectDetailedSerializer
 from .project import ProjectCreationSerializer
 from .project import ProjectAuthorizationSerializer
 from .project import ProjectAttributeSerializer
+from .user import UserCreateSerializer
 from .user import UsersGroupsSerializer
 from .user import UserLevelsPermissionSerializer
 from .user import GeneratedTokenSerializer
@@ -65,6 +66,7 @@ __all__ = [
     'ProjectAttributeSerializer',
     'StackedEventSerializer',
     'UserSerializer',
+    'UserCreateSerializer',
     'UsersGroupsSerializer',
     'UserLevelsPermissionSerializer',
 ]
