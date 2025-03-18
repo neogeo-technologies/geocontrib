@@ -259,3 +259,15 @@ L'image Docker de base possède ces variables de configuration :
   
 * `URL_DOCUMENTATION_FEATURE`
   URL de la documentation de GéoContrib pour les fonctionnalités.
+  
+* `SSO_SIGNUP_URL`
+  URL pour la création de compte dans service d'authentification SSO.
+  
+* `SIGNUP_COMMENTS_FIELD_LABEL`
+  Nom du champ personnalisable pour le formulaire de création de compte dans service d'authentification SSO.
+  
+* `SIGNUP_COMMENTS_FIELD_REQUIRED`
+  Spécifie si le champ personnalisable ou commentaires pour la création de compte est requis
+  
+* `ADMIN_MAIL`
+  Adresse courriel de l'administrateur de l'instance geocontrib (utilisé pour l'ajout de groupe d'utilisateurs)
