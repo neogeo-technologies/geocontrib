@@ -9,10 +9,12 @@ from rest_framework import mixins
 from rest_framework import views
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from api.serializers import UserSerializer
+from api.serializers import UserCreateSerializer
 from api.serializers import UsersGroupsSerializer
 from api.serializers import UserLevelsPermissionSerializer
 from api.serializers import GeneratedTokenSerializer
@@ -288,7 +290,11 @@ class LoginByTokenView(views.APIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action == 'create':  # Permettre l'accès à tout le monde pour la création
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]  # Authentification requise pour les autres actions
 
     @swagger_auto_schema(
         tags=["users"],
@@ -306,10 +312,22 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         tags=["users"],
-        operation_summary="Create a new user"
+        operation_summary="Create a new user",
+        request_body=UserCreateSerializer
     )
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+        serializer = UserCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                "message": "User created successfully",
+                "user_id": user.id,
+                "username": user.username,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         tags=["users"],

@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from geocontrib.models import Authorization
 from geocontrib.models import UsersGroup
+from geocontrib.models import UserGroupMembership
 from geocontrib.models import UserLevelPermission
 from geocontrib.models import GeneratedToken
 
@@ -34,6 +35,36 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
         ]
 
+class UserCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    usersgroups = serializers.ListField(
+        child=serializers.CharField(), required=False, write_only=True
+    )
+
+
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'usersgroups']
+
+    def create(self, validated_data):
+        usersgroups_data = validated_data.pop('usersgroups', [])  # Récupère et supprime `usersgroups`
+        
+        # Création de l'utilisateur
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
+            email=validated_data.get('email', ''),
+            password=validated_data['password']
+        )
+
+        # Ajout de l'utilisateur aux groupes s'ils existent
+        for group_codename in usersgroups_data:
+            group = UsersGroup.objects.filter(codename=group_codename).first()
+            if group:
+                UserGroupMembership.objects.create(user=user, group=group)
+
+        return user
 
 class UserLevelPermissionSerializer(serializers.ModelSerializer):
     class Meta:
