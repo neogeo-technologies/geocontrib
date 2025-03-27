@@ -18,3 +18,4 @@ python-magic==0.4.27
 redis==5.0.8
 requests==2.32.3
 setuptools==73.0.1                  # Le module distutils n'est plus inclus par défaut dans Python 3.12 et fait partie de setuptools
+sentry==2.24.1
