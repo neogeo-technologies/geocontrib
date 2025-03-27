@@ -6,9 +6,15 @@ from geocontrib.views import FeatureTypeDetail
 from geocontrib.views import view404
 from geocontrib.views import protected_serve
 
+# To verify Sentry installation
+def trigger_error(request):
+    division_by_zero = 1 / 0
+
 app_name = 'geocontrib'
 
 urlpatterns = [
+        # Include Sentry URL to verify installation
+    path('sentry-debug/', trigger_error),
     # Get the media files path to register routes towards it and control if the requested files can be viewed by current user
     path('media/<path:path>', protected_serve, {'document_root': settings.MEDIA_ROOT}),
 

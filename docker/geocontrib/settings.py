@@ -12,6 +12,14 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 from decouple import config, Csv
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://9bc5c885d28f85ba1410fb1ec9b9a8a4@sentry.neogeo.fr/31",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
