@@ -58,6 +58,10 @@ from drf_yasg import openapi
 
 from rest_framework import permissions
 
+# To verify Sentry installation
+def trigger_error(request):
+    division_by_zero = 1 / 0
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Documentation REST APIs GéoContrib",
@@ -92,6 +96,8 @@ router.register(r'project-types', ProjectTypesViewDeprecated, basename='projects
 
 
 urlpatterns = [
+    # Include Sentry URL to verify installation
+    path('sentry-debug/', trigger_error),
     # Include DRF-Swagger URLs
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
