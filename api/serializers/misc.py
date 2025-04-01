@@ -355,7 +355,7 @@ class StackedEventSerializer(serializers.ModelSerializer):
         model = StackedEvent
         fields = '__all__'  # Serialize all fields from StackedEvent model
 
-    def get_events_feature_map(self, events):
+    def _get_events_feature_map(self, events):
         # Gather all unique feature IDs from the events to minimize database queries with a single query
         feature_ids = {event.feature_id for event in events if event.feature_id}
         # Retrieve all corresponding Feature objects in a single query, excluding feature with draft status, including their types
@@ -363,7 +363,7 @@ class StackedEventSerializer(serializers.ModelSerializer):
         # Map feature IDs to Feature objects
         return {feature.feature_id: feature for feature in features}
 
-    def get_grouped_events(self, events, feature_map):
+    def _get_grouped_events(self, events, feature_map):
         # Initialize a nested defaultdict
         grouped_events = defaultdict(lambda: defaultdict(list))
 
@@ -399,9 +399,9 @@ class StackedEventSerializer(serializers.ModelSerializer):
         # Retrieve all related events for the stacked event instance
         events = obj.events.all()
         # Map feature IDs to Feature objects for quick access
-        feature_map = self.get_events_feature_map(events)
+        feature_map = self._get_events_feature_map(events)
         # Grouping events by feature type and title
-        events_grouped = self.get_grouped_events(events, feature_map)
+        events_grouped = self._get_grouped_events(events, feature_map)
 
         # Serialize the grouped events for output
         grouped_data = {}
