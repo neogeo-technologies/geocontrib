@@ -58,8 +58,11 @@ class TokenAuthentication(BaseAuthentication):
 
         try:
             user = self.validate_token(raw_token)
-        except:
+        except AuthenticationFailed:
+            raise
+        except Exception:
             raise AuthenticationFailed(messages.TOKEN_INVALID)
+
         if user is None:
             return None
 

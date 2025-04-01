@@ -20,6 +20,7 @@ from geocontrib.models import Project
 
 User = get_user_model()
 
+SOURCE_SLUG = 'project.slug'
 
 class CustomFieldSerializer(serializers.ModelSerializer):
 
@@ -39,7 +40,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
 
 class FeatureTypeSerializer(serializers.ModelSerializer):
 
-    project = serializers.ReadOnlyField(source='project.slug')
+    project = serializers.ReadOnlyField(source=SOURCE_SLUG)
     customfield_set = CustomFieldSerializer(many=True)
 
     class Meta:
@@ -159,7 +160,7 @@ class FeatureTypeListSerializer(serializers.ModelSerializer):
 
 class FeatureListSerializer(serializers.ModelSerializer):
 
-    project = serializers.ReadOnlyField(source='project.slug')
+    project = serializers.ReadOnlyField(source=SOURCE_SLUG)
     feature_type = FeatureTypeSerializer(read_only=True)
     feature_data = serializers.SerializerMethodField()
     display_last_editor = serializers.SerializerMethodField()
@@ -481,7 +482,7 @@ class FeatureCSVSerializer(serializers.ModelSerializer):
 
 
 class FeatureSearchSerializer(serializers.ModelSerializer):
-    project_slug = serializers.ReadOnlyField(source='project.slug')
+    project_slug = serializers.ReadOnlyField(source=SOURCE_SLUG)
     feature_type_slug = serializers.ReadOnlyField(source='feature_type.slug')
     creator = UserSerializer()
 

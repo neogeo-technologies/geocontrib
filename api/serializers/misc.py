@@ -355,18 +355,17 @@ class StackedEventSerializer(serializers.ModelSerializer):
         model = StackedEvent
         fields = '__all__'  # Serialize all fields from StackedEvent model
 
-    def get_events(self, obj):
-        # Retrieve all related events for the stacked event instance
-        events = obj.events.all()
-        # Initialize a nested defaultdict for grouping events by feature type and title
-        events_grouped = defaultdict(lambda: defaultdict(list))
-
-        # Gather all unique feature IDs from the events to minimize database queries
+    def get_events_feature_map(self, events):
+        # Gather all unique feature IDs from the events to minimize database queries with a single query
         feature_ids = {event.feature_id for event in events if event.feature_id}
         # Retrieve all corresponding Feature objects in a single query, excluding feature with draft status, including their types
         features = Feature.objects.filter(feature_id__in=feature_ids).exclude(status='draft').select_related('feature_type')
-        # Map feature IDs to Feature objects for quick access
-        feature_map = {feature.feature_id: feature for feature in features}
+        # Map feature IDs to Feature objects
+        return {feature.feature_id: feature for feature in features}
+
+    def get_grouped_events(self, events, feature_map):
+        # Initialize a nested defaultdict
+        grouped_events = defaultdict(lambda: defaultdict(list))
 
         # Fetch FeatureTypes including the disable_notification attribute
         feature_types = FeatureType.objects.all().values('slug', 'title', 'disable_notification')
@@ -391,8 +390,18 @@ class StackedEventSerializer(serializers.ModelSerializer):
                 feature_title = feature_map[event.feature_id].title if event.feature_id in feature_map else 'Élément inconnu'
                 # Use the feature type title from the map, fallback to 'Type inconnu' if not found
                 feature_type_title = slug_to_title_and_notification.get(feature_type_slug, ('Type inconnu', False))[0]
-                # Group the event under the appropriate feature type and title
-                events_grouped[feature_type_title][feature_title].append(event)
+                # Group the event and the feature under the appropriate feature type and title
+                grouped_events[feature_type_title][feature_title].append(event)
+
+        return grouped_events
+
+    def get_events(self, obj):
+        # Retrieve all related events for the stacked event instance
+        events = obj.events.all()
+        # Map feature IDs to Feature objects for quick access
+        feature_map = self.get_events_feature_map(events)
+        # Grouping events by feature type and title
+        events_grouped = self.get_grouped_events(events, feature_map)
 
         # Serialize the grouped events for output
         grouped_data = {}
