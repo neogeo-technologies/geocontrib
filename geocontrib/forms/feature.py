@@ -91,46 +91,53 @@ class FeatureExtraForm(forms.Form):
         feature = kwargs.pop('feature', None)
         super().__init__(*args, **kwargs)
 
+        if not extra:
+            return
+
+        self._build_fields(extra)
+        self._populate_initial_values(extra, feature)
+
+    def _build_fields(self, extra):
         for custom_field in extra.order_by('position'):
-            if custom_field.field_type == 'boolean':
-                self.fields[custom_field.name] = forms.BooleanField(
-                    label=custom_field.label, initial=False, required=False,
-                )
-
-            if custom_field.field_type == 'char':
-                self.fields[custom_field.name] = forms.CharField(
-                    label=custom_field.label, max_length=256, required=False)
-
-            if custom_field.field_type == 'date':
-                self.fields[custom_field.name] = forms.DateField(
-                    label=custom_field.label, required=False,
-                )
-
-            if custom_field.field_type == 'integer':
-                self.fields[custom_field.name] = forms.IntegerField(
-                    label=custom_field.label, required=False)
-
-            if custom_field.field_type == 'decimal':
-                self.fields[custom_field.name] = forms.DecimalField(
-                    label=custom_field.label, required=False,
-                    widget=forms.TextInput(attrs={
-                        'localization': False
-                    }))
-
-            if custom_field.field_type == 'text':
-                self.fields[custom_field.name] = forms.CharField(
-                    label=custom_field.label, required=False, widget=forms.Textarea())
-
-            if custom_field.field_type == 'list' and custom_field.options:
-                self.fields[custom_field.name] = forms.ChoiceField(
-                    label=custom_field.label,
-                    choices=[(str(xx), str(xx)) for xx in custom_field.options],
-                    required=False)
-
+            self.fields[custom_field.name] = self._create_form_field(custom_field)
             self.fields[custom_field.name].widget.attrs.update({
                 'field_type': custom_field.field_type
             })
 
+    def _create_form_field(self, custom_field):
+        """Return a Django form field instance based on the field type."""
+        field_type = custom_field.field_type
+        common_kwargs = {'label': custom_field.label, 'required': False}
+
+        if field_type == 'boolean':
+            return forms.BooleanField(initial=False, **common_kwargs)
+
+        if field_type == 'char':
+            return forms.CharField(max_length=256, **common_kwargs)
+
+        if field_type == 'date':
+            return forms.DateField(**common_kwargs)
+
+        if field_type == 'integer':
+            return forms.IntegerField(**common_kwargs)
+
+        if field_type == 'decimal':
+            return forms.DecimalField(
+                widget=forms.TextInput(attrs={'localization': False}),
+                **common_kwargs
+            )
+
+        if field_type == 'text':
+            return forms.CharField(widget=forms.Textarea(), **common_kwargs)
+
+        if field_type == 'list' and custom_field.options:
+            choices = [(str(opt), str(opt)) for opt in custom_field.options]
+            return forms.ChoiceField(choices=choices, **common_kwargs)
+
+        # Default fallback (optional, or raise exception)
+        return forms.CharField(**common_kwargs)
+
+    def _populate_initial_values(self, extra, feature):
         if feature and isinstance(feature.feature_data, dict):
             for custom_field in extra:
                 self.fields[custom_field.name].initial = feature.feature_data.get(custom_field.name)
