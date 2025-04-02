@@ -3,6 +3,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.4.5] - 2025-04-02
+
+### Correctifs
+- Redmine 26721 : Impossible de se connecter par CAS IDGO - erreur 404
+- Redmine 26138 : Liste signalements filtrés - Incohérence des résultats lors de la recherche par titre des signalements
+- Redmine 26632 : Pagination liste signalements - doublon premier & dernier numéro si 5 pages
+
+
+### Évolutions
+- Redmine 26581 : Brancher GC à Sentry
+- Redmine 25582 : Mise en place d’un système de vérification lors de la création d’un compte utilisateur
+- Redmine 26377 : Ajout d'un système de notification par groupe d'utilisateurs
+
 ## [6.4.4] - 2025-02-04
 
 ### Correctifs
