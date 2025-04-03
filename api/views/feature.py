@@ -85,54 +85,64 @@ class FeatureView(
     ]
 
     def get_queryset(self):
-        """
-        Returns the queryset of features filtered by various query parameters.
-        """
+        """Returns the queryset of features filtered by various query parameters."""
         # Start with the base queryset
         queryset = super().get_queryset()
 
-        # Filter by project slug if provided
         project_slug = self.request.query_params.get('project__slug')
+        feature_type_slug = self.request.query_params.get('feature_type__slug')
+
+        queryset = self._filter_by_project_or_feature_type(queryset, project_slug, feature_type_slug)
+
+        queryset = self._filter_by_status(queryset)
+        queryset = self._filter_by_date(queryset)
+        queryset = self._filter_by_title(queryset)
+        queryset = self._filter_by_id(queryset)
+        queryset = self._apply_ordering(queryset)
+        queryset = self._apply_limit(queryset)
+
+        return queryset
+
+    def _filter_by_project_or_feature_type(self, queryset, project_slug, feature_type_slug):
+        if feature_type_slug:
+            feature_type = get_object_or_404(FeatureType, slug=feature_type_slug)
+            project = feature_type.project
+            queryset = Feature.handy.availables(self.request.user, project)
+            return queryset.filter(feature_type__slug=feature_type_slug)
+
         if project_slug:
             project = get_object_or_404(Project, slug=project_slug)
-            queryset = Feature.handy.availables(self.request.user, project)
+            return Feature.handy.availables(self.request.user, project)
 
-        # Filter by feature type slug if provided
-        feature_type_slug = self.request.query_params.get('feature_type__slug')
-        if feature_type_slug:
-            project = get_object_or_404(FeatureType, slug=feature_type_slug).project
-            queryset = Feature.handy.availables(self.request.user, project)
-            queryset = queryset.filter(feature_type__slug=feature_type_slug)
+        raise ValidationError(detail="Must provide parameter project__slug or feature_type__slug")
 
-        # Raise an error if neither project_slug nor feature_type_slug is provided
-        if not feature_type_slug and not project_slug:
-            raise ValidationError(detail="Must provide parameter project__slug or feature_type__slug")
-
-        # Filter by status if provided
+    def _filter_by_status(self, queryset):
         status_value = self.request.query_params.get('status__value')
         if status_value:
-            queryset = queryset.filter(status=status_value)
+            return queryset.filter(status=status_value)
+        return queryset
 
-        # Filter by a date range if 'from_date' is provided
+    def _filter_by_date(self, queryset):
         from_date = self.request.query_params.get('from_date')
         if from_date:
-            try:
-                parsed_date = datetime.strptime(from_date, '%Y-%m-%dT%H:%M:%S')
-            except ValueError:
-                try:
-                    parsed_date = datetime.strptime(from_date, '%Y-%m-%d')
-                except ValueError:
-                    raise ValidationError(detail=f"Invalid 'from_date' format. Use YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS")
-            queryset = queryset.filter(
-                Q(created_on__gte=parsed_date) | 
-                Q(updated_on__gte=parsed_date) | 
+            parsed_date = self._parse_date(from_date)
+            return queryset.filter(
+                Q(created_on__gte=parsed_date) |
+                Q(updated_on__gte=parsed_date) |
                 Q(deletion_on__gte=parsed_date)
             )
-        else:
-            # Exclude deleted features if no date range is provided
-            queryset = queryset.filter(deletion_on__isnull=True)
+        return queryset.filter(deletion_on__isnull=True)
 
-        # Filter by title if 'title__contains' or 'title__icontains' is provided
+    def _parse_date(self, date_str):
+        try:
+            return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            try:
+                return datetime.strptime(date_str, '%Y-%m-%d')
+            except ValueError:
+                raise ValidationError(detail="Invalid 'from_date' format. Use YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS")
+
+    def _filter_by_title(self, queryset):
         title_contains = self.request.query_params.get('title__contains')
         if title_contains:
             queryset = queryset.filter(title__contains=title_contains)
@@ -141,21 +151,27 @@ class FeatureView(
         if title_icontains:
             queryset = queryset.filter(title__icontains=title_icontains)
 
-        # Order the queryset if 'ordering' is provided
+        return queryset
+
+    def _apply_ordering(self, queryset):
         ordering = self.request.query_params.get('ordering')
         if ordering:
-            queryset = queryset.order_by(ordering)
+            return queryset.order_by(ordering)
+        return queryset
 
-        # Limit the queryset if 'limit' is provided
+    def _apply_limit(self, queryset):
         limit = self.request.query_params.get('limit')
         if limit:
-            queryset = queryset[:int(limit)]
+            try:
+                return queryset[:int(limit)]
+            except ValueError:
+                raise ValidationError(detail="Invalid 'limit' value. Must be an integer.")
+        return queryset
 
-        # Filter by ID if 'id' is provided
+    def _filter_by_id(self, queryset):
         _id = self.request.query_params.get('id')
         if _id:
-            queryset = queryset.filter(pk=_id)
-
+            return queryset.filter(pk=_id)
         return queryset
 
     @swagger_auto_schema(

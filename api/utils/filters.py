@@ -45,54 +45,67 @@ class ProjectsAttributeFilter(filters.BaseFilterBackend):
     for the attribute when the filter value is 'false', and excludes projects 
     with the attribute set to 'true' when filtering for 'false'.
     """
-    
+
     def filter_queryset(self, request, queryset, view):
-        # Retrieve the 'attributes' parameter from the query string.
-        attributes_param = request.query_params.get('attributes')
-        
-        if attributes_param:
-            try:
-                # Attempt to parse the JSON string into a Python dictionary.
-                attributes = json.loads(attributes_param)
+        attributes = self._parse_attributes(request)
+        if not attributes:
+            return queryset.distinct()
 
-                for attribute_id, value in attributes.items():
-                    # Convert the attribute value string to a boolean if it represents a boolean value.
-                    if value.lower() in ['true', 'false']:
-                        value_bool = value.lower() == 'true'
-                        
-                        if not value_bool:  # If the filter value is 'false'.
-                            # Find projects that have a 'true' association for this attribute.
-                            projects_with_attr_true = ProjectAttributeAssociation.objects.filter(
-                                attribute_id=attribute_id, value='true'
-                            ).values_list('project_id', flat=True)
-                            
-                            # Exclude those projects from the queryset, effectively including projects without an association or with a 'false' value.
-                            queryset = queryset.exclude(id__in=projects_with_attr_true)
-                        else:  # If the filter value is 'true'.
-                            # Directly filter the projects that have an association with the value 'true'.
-                            queryset = queryset.filter(
-                                projectattributeassociation__attribute_id=attribute_id, 
-                                projectattributeassociation__value='true'
-                            )
-                    else:
-                        # For non-boolean values, use OR condition for matching attribute values.
-                        # Initialize an empty Q object to start with no conditions
-                        query = Q()
-                        # Split comma-separated string into a list of values
-                        list_values = value.split(',')
-                        # Loop over each value and build OR conditions
-                        for list_value in list_values:
-                            query |= Q(projectattributeassociation__attribute_id=attribute_id,
-                                               projectattributeassociation__value__icontains=list_value)
-                        # Apply the constructed OR conditions to the queryset.
-                        queryset = queryset.filter(query).distinct()
+        for attribute_id, value in attributes.items():
+            if self._is_boolean(value):
+                queryset = self._filter_boolean_attribute(queryset, attribute_id, value)
+            else:
+                queryset = self._filter_non_boolean_attribute(queryset, attribute_id, value)
 
-            except json.JSONDecodeError:
-                # If the JSON parsing fails, ignore the filter.
-                pass
-
-        # Ensure no duplicates are included in the final queryset.
         return queryset.distinct()
+
+    def _parse_attributes(self, request):
+        """Parse the JSON 'attributes' parameter from request."""
+        attributes_param = request.query_params.get('attributes')
+        if not attributes_param:
+            return None
+        try:
+            return json.loads(attributes_param)
+        except json.JSONDecodeError:
+            return None
+
+    def _is_boolean(self, value):
+        """Check if the value is a string representing a boolean."""
+        return value.lower() in ['true', 'false']
+
+    def _filter_boolean_attribute(self, queryset, attribute_id, value):
+        """Apply filtering for boolean attribute values."""
+        is_true = value.lower() == 'true'
+        if is_true:
+            # Directly filter the projects that have an association with the value 'true'.
+            return queryset.filter(
+                projectattributeassociation__attribute_id=attribute_id,
+                projectattributeassociation__value='true'
+            )
+        else:
+            # Find projects that have a 'true' association for this attribute.
+            projects_with_attr_true = ProjectAttributeAssociation.objects.filter(
+                attribute_id=attribute_id,
+                value='true'
+            ).values_list('project_id', flat=True)
+            # Exclude those projects from the queryset, effectively including projects without an association or with a 'false' value.
+            return queryset.exclude(id__in=projects_with_attr_true)
+
+    def _filter_non_boolean_attribute(self, queryset, attribute_id, value):
+        """Apply filtering for non-boolean attribute values using OR logic."""
+        # Split comma-separated string into a list of values
+        list_values = value.split(',')
+        # Initialize an empty Q object to start with no conditions
+        query = Q()
+        # Loop over each value and build OR conditions
+        for list_value in list_values:
+            query |= Q(
+                projectattributeassociation__attribute_id=attribute_id,
+                projectattributeassociation__value__icontains=list_value
+            )
+        # Apply the constructed OR conditions to the queryset.
+        return queryset.filter(query)
+
 
 class ProjectsUserAccessLevelFilter(filters.BaseFilterBackend):
 
