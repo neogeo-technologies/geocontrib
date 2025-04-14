@@ -23,6 +23,12 @@ if cas_server:
         path('cas/logout', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
     ]
 
+# add url for sso keycloak
+if hasattr(settings, "SSO_KEYCLOAK_URL"):
+    urlpatterns += [
+        path('oidc/', include('mozilla_django_oidc.urls'))
+    ]
+
 # add prefix to URL
 urlpatterns = [path(url_prefix, include(urlpatterns))]
 

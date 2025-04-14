@@ -161,15 +161,17 @@ LOGIN_URL = config("LOGIN_URL", default='geocontrib:login')
 LOGIN_REDIRECT_URL = 'geocontrib:index'
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
 SSO_OGS_SESSION_URL = config('SSO_OGS_SESSION_URL', default='')
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
 cas_server_url = config('CAS_SERVER_URL', None)
 if cas_server_url:
     CAS_SERVER_URL = cas_server_url
-    AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.ModelBackend',
+    AUTHENTICATION_BACKENDS += [
         'django_cas_ng.backends.CASBackend',
-    )
+    ]
     CAS_APPLY_ATTRIBUTES_TO_USER = True
 
 # Configure automated view generation
@@ -183,6 +185,39 @@ HIDE_USER_CREATION_BUTTON = config("HIDE_USER_CREATION_BUTTON", default=False, c
 # Configure frontend
 LOG_URL = config("LOG_URL", default=None)
 DISABLE_LOGIN_BUTTON = config("DISABLE_LOGIN_BUTTON", default=None)
+
+# SERVER LDAP CONFIG CONNEXION
+LDAP_SERVER_URI = config('LDAP_SERVER_URI', default=None)
+if LDAP_SERVER_URI:
+    AUTHENTICATION_BACKENDS += [
+        'geocontrib.accounts.ldap_backend.LDAPBackend',
+    ]
+
+# SSO KEYCLOAK CONFIG
+SSO_KEYCLOAK_URL = config('SSO_KEYCLOAK_URL', default=None)
+
+if SSO_KEYCLOAK_URL:
+    INSTALLED_APPS += [
+        'mozilla_django_oidc',        
+    ]
+
+    AUTHENTICATION_BACKENDS += [
+        'mozilla_django_oidc.auth.OIDCAuthenticationBackend'
+    ]
+
+    OIDC_CALLBACK_CLASS = 'mozilla_django_oidc.views.OIDCAuthenticationCallbackView'
+
+    OIDC_RP_CLIENT_ID = config('SSO_KEYCLOAK_CLIENT_ID', default=None)
+    OIDC_RP_CLIENT_SECRET = config('SSO_KEYCLOAK_CLIENT_SECRET', default=None)  
+
+    OIDC_OP_DISCOVERY_ENDPOINT = config('SSO_KEYCLOAK_DISCOVERY_ENDPOINT', default=None)
+
+    OIDC_OP_AUTHORIZATION_ENDPOINT = config('SSO_KEYCLOAK_AUTHORIZATION_ENDPOINT', default=None)
+    OIDC_OP_TOKEN_ENDPOINT = config('SSO_KEYCLOAK_TOKEN_ENDPOINT', default=None)
+    OIDC_OP_USER_ENDPOINT = config('SSO_KEYCLOAK_USER_ENDPOINT', default=None)
+    OIDC_OP_JWKS_ENDPOINT = config('SSO_KEYCLOAK_JWKS_ENDPOINT', default=None)
+
+    OIDC_RP_SIGN_ALGO = 'RS256'
 
 
 # Logging properties
