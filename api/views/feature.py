@@ -86,14 +86,10 @@ class FeatureView(
 
     def get_queryset(self):
         """Returns the queryset of features filtered by various query parameters."""
-        # Start with the base queryset
-        queryset = super().get_queryset()
-
         project_slug = self.request.query_params.get('project__slug')
         feature_type_slug = self.request.query_params.get('feature_type__slug')
 
-        queryset = self._filter_by_project_or_feature_type(queryset, project_slug, feature_type_slug)
-
+        queryset = self._get_base_queryset(project_slug, feature_type_slug)
         queryset = self._filter_by_status(queryset)
         queryset = self._filter_by_date(queryset)
         queryset = self._filter_by_title(queryset)
@@ -103,12 +99,11 @@ class FeatureView(
 
         return queryset
 
-    def _filter_by_project_or_feature_type(self, queryset, project_slug, feature_type_slug):
+    def _get_base_queryset(self, project_slug, feature_type_slug):
         if feature_type_slug:
             feature_type = get_object_or_404(FeatureType, slug=feature_type_slug)
             project = feature_type.project
-            queryset = Feature.handy.availables(self.request.user, project)
-            return queryset.filter(feature_type__slug=feature_type_slug)
+            return Feature.handy.availables(self.request.user, project).filter(feature_type__slug=feature_type_slug)
 
         if project_slug:
             project = get_object_or_404(Project, slug=project_slug)
