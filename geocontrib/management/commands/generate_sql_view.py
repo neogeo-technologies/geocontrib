@@ -211,8 +211,8 @@ class Command(BaseCommand):
 
 
     def get_custom_fields(self, feature_type_id, deleted_cf_id):
-        customFields = CustomField.objects.filter(feature_type__pk=feature_type_id).values()
-        return customFields.exclude(id=deleted_cf_id)
+        custom_fields = CustomField.objects.filter(feature_type__pk=feature_type_id).values()
+        return custom_fields.exclude(id=deleted_cf_id)
     
     def validate_custom_fields(self, reference_fields, sorted_cfs, feature_type_id):
         # Compare the custom fields of the current FeatureType with the reference ones
