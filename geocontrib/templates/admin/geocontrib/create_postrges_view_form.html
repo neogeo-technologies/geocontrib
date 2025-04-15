@@ -10,16 +10,16 @@
 {% block content %}
 <form action="" method="post">{% csrf_token %}
 
-  <fieldset class="module ">
-  <h1>Création d'une vue PostrgreSQL :</h1>
-  <div class="generic__inputs">
-    {%for field in pg_form %}
-      <label for="{{ field.id_for_label }}">{{ field.label }} : </label>
-      {{ field }}
-      {{ field.errors }}
-      <br>
-    {% endfor %}
-  </div>
+  <fieldset class="module">
+    <legend style="margin: 0 0 20px;font-weight: 300;font-size: 1.25rem;">Création d'une vue PostgreSQL</legend>
+    <div class="generic__inputs">
+      {%for field in pg_form %}
+        <label for="{{ field.id_for_label }}">{{ field.label }} : </label>
+        {{ field }}
+        {{ field.errors }}
+        <br>
+      {% endfor %}
+    </div>
   </fieldset>
 
   <div class="fds">
