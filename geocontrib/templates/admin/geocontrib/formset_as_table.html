@@ -4,10 +4,11 @@
 
 
 <fieldset class="module aligned">
-  <h2>{{ formset_title }}</h2>
+  <legend class="h2">{{ formset_title }}</legend>
   {{ formset.management_form }}
   {{ formset.non_form_errors.as_ul }}
   <table>
+    <caption class="visually-hidden">{{ formset_title }}</caption>
     {% for form in formset %}
       {% if forloop.first %}
       <thead>
@@ -49,7 +50,7 @@
 
   <div class="{{ formset.prefix }}__hidden" style="display: none">
     <table>
-      {# ajout d'un header seulement pour éviter erreurs sonarqube #}
+      <caption class="visually-hidden">Table masquée - pas destinée à l'utilisateur</caption>
       <thead>
           <th scope="col" style="display: none;"></th>
           {% if formset.empty_form.hidden_fields|length > 0 %}

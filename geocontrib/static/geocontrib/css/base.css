@@ -2,3 +2,27 @@
   margin: 1rem;
   display: inline-block;
 }
+.add_button:hover {
+  cursor: pointer;
+}
+
+legend.h1 {
+  margin: 0 0 20px;
+  font-weight: 300;
+  font-size: 1.25rem;
+  color: var(--body-quiet-color);
+}
+
+legend.h2 {
+  margin:0;
+  padding:8px;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  text-align: left;
+  background: var(--primary);
+  color: var(--header-link-color);
+  width: 100%;
+  display: table;
+  float: none;
+  box-sizing: border-box
+}
