@@ -184,6 +184,13 @@ HIDE_USER_CREATION_BUTTON = config("HIDE_USER_CREATION_BUTTON", default=False, c
 LOG_URL = config("LOG_URL", default=None)
 DISABLE_LOGIN_BUTTON = config("DISABLE_LOGIN_BUTTON", default=None)
 
+# SERVER LDAP CONFIG CONNEXION
+ldap_server_uri = config('LDAP_SERVER_URI', default=None)
+if ldap_server_uri:
+    AUTHENTICATION_BACKENDS += [
+        'geocontrib.accounts.ldap_backend.LDAPBackend',
+    ]
+
 
 # Logging properties
 LOGGING = {
@@ -319,3 +326,30 @@ SWAGGER_SETTINGS = {
     'LOGIN_URL': '/geocontrib/admin/login/',
     'LOGOUT_URL': '/geocontrib/admin/logout/',
 }
+
+# SSO KEYCLOAK CONFIG
+sso_keycloak_url = config('SSO_KEYCLOAK_URL', default=None)
+
+if sso_keycloak_url:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": CELERY_BROKER_URL,
+        }
+    }
+
+    INSTALLED_APPS += [
+        'django_pyoidc',        
+    ]
+
+    DJANGO_PYOIDC = {
+        "sso_keycloak": {
+            "client_id": config('SSO_KEYCLOAK_CLIENT_ID', default=None),
+            "client_secret": config('SSO_KEYCLOAK_CLIENT_SECRET', default=None),
+            "provider_discovery_uri": config('SSO_KEYCLOAK_DISCOVERY_ENDPOINT', default=None),
+            "oidc_callback_path" : config('SSO_CALLBACK_PATH', default='/geocontrib/oidc/callback/'),
+            "scope": ['openid', 'email', 'profile'],
+            "hook_get_user": "geocontrib.accounts.pyoidc_backend:hook_get_user",
+            "oidc_cache_provider_metadata": True, 
+        }
+    }

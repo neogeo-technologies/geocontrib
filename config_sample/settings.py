@@ -187,38 +187,11 @@ LOG_URL = config("LOG_URL", default=None)
 DISABLE_LOGIN_BUTTON = config("DISABLE_LOGIN_BUTTON", default=None)
 
 # SERVER LDAP CONFIG CONNEXION
-LDAP_SERVER_URI = config('LDAP_SERVER_URI', default=None)
-if LDAP_SERVER_URI:
+ldap_server_uri = config('LDAP_SERVER_URI', default=None)
+if ldap_server_uri:
     AUTHENTICATION_BACKENDS += [
         'geocontrib.accounts.ldap_backend.LDAPBackend',
     ]
-
-# SSO KEYCLOAK CONFIG
-SSO_KEYCLOAK_URL = config('SSO_KEYCLOAK_URL', default=None)
-
-if SSO_KEYCLOAK_URL:
-    INSTALLED_APPS += [
-        'mozilla_django_oidc',        
-    ]
-
-    AUTHENTICATION_BACKENDS += [
-        'mozilla_django_oidc.auth.OIDCAuthenticationBackend'
-    ]
-
-    OIDC_CALLBACK_CLASS = 'mozilla_django_oidc.views.OIDCAuthenticationCallbackView'
-
-    OIDC_RP_CLIENT_ID = config('SSO_KEYCLOAK_CLIENT_ID', default=None)
-    OIDC_RP_CLIENT_SECRET = config('SSO_KEYCLOAK_CLIENT_SECRET', default=None)  
-
-    OIDC_OP_DISCOVERY_ENDPOINT = config('SSO_KEYCLOAK_DISCOVERY_ENDPOINT', default=None)
-
-    OIDC_OP_AUTHORIZATION_ENDPOINT = config('SSO_KEYCLOAK_AUTHORIZATION_ENDPOINT', default=None)
-    OIDC_OP_TOKEN_ENDPOINT = config('SSO_KEYCLOAK_TOKEN_ENDPOINT', default=None)
-    OIDC_OP_USER_ENDPOINT = config('SSO_KEYCLOAK_USER_ENDPOINT', default=None)
-    OIDC_OP_JWKS_ENDPOINT = config('SSO_KEYCLOAK_JWKS_ENDPOINT', default=None)
-
-    OIDC_RP_SIGN_ALGO = 'RS256'
-
 
 # Logging properties
 LOGGING = {
@@ -366,3 +339,30 @@ SWAGGER_SETTINGS = {
     'LOGIN_URL': '/geocontrib/admin/login/',
     'LOGOUT_URL': '/geocontrib/admin/logout/',
 }
+
+# SSO KEYCLOAK CONFIG
+sso_keycloak_url = config('SSO_KEYCLOAK_URL', default=None)
+
+if sso_keycloak_url:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": CELERY_BROKER_URL,
+        }
+    }
+
+    INSTALLED_APPS += [
+        'django_pyoidc',        
+    ]
+
+    DJANGO_PYOIDC = {
+        "sso_keycloak": {
+            "client_id": config('SSO_KEYCLOAK_CLIENT_ID', default=None),
+            "client_secret": config('SSO_KEYCLOAK_CLIENT_SECRET', default=None),
+            "provider_discovery_uri": config('SSO_KEYCLOAK_DISCOVERY_ENDPOINT', default=None),
+            "oidc_callback_path" : config('SSO_CALLBACK_PATH', default='/geocontrib/oidc/callback/'),
+            "scope": ['openid', 'email', 'profile'],
+            "hook_get_user": "geocontrib.accounts.pyoidc_backend:hook_get_user",
+            "oidc_cache_provider_metadata": True, 
+        }
+    }

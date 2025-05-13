@@ -25,8 +25,20 @@ if cas_server:
 
 # add url for sso keycloak
 if hasattr(settings, "SSO_KEYCLOAK_URL"):
+    from django_pyoidc.views import (
+        OIDCBackChannelLogoutView,
+        OIDCLogoutView,
+    )
+    from geocontrib.accounts.pyoidc_backend import (
+        CustomOIDCLoginView,
+        CustomOIDCCallbackView
+    )
+
     urlpatterns += [
-        path('oidc/', include('mozilla_django_oidc.urls'))
+        path('oidc/authenticate/', CustomOIDCLoginView.as_view(op_name="sso_keycloak"), name="oidc-login"),
+        path('oidc/callback/', CustomOIDCCallbackView.as_view(op_name="sso_keycloak"), name="oidc-callback"),
+        path('oidc/logout/', OIDCLogoutView.as_view(op_name="sso_keycloak"), name="oidc-logout"),
+        path('oidc/backchannel-logout/', OIDCBackChannelLogoutView.as_view(op_name="sso_keycloak"), name="oidc-backchannel-logout"),
     ]
 
 # add prefix to URL
