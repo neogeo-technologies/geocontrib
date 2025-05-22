@@ -302,7 +302,6 @@ Le code source de l'application est maintenu sur la plateforme https://git.neoge
 
 les Mainteneurs actuels :
  - Timothée POUSSARD (Neogeo)
- - Camille BLANCHON (Neogeo)
  - Matthieu ETOURNEAU (Neogeo)
  - Angela Escobar (Neogeo)
 
@@ -318,11 +317,24 @@ Afin de partager des règles communes de développement et faciliter l'intégrat
 nouveau code, veuillez lire les recommandations et bonnes pratiques recommandées pour contribuer
 au projet GeoContrib.
 
-Git
-***
+### Git
 
  - Faire une demande de contribution en envoyant un mail à metourneau@neogeo.fr
  - Un compte vous sera créé sur notre plateforme gitlab
  - Faire un fork de l'application
  - Faire des merge requests vers la branch ``develop``
  - Faire des ``git pull`` avant chaque développement et avant chaque commit
+
+### Ajout de variables d’environnement
+
+L’ajout d’une variable d’environnement dans la plateforme nécessite des modifications dans **deux dépôts distincts** :
+
+#### 1. Dépôt `geocontrib-django` – pour la génération de l’image Docker
+Il faut ajouter la variable dans les fichiers suivants :
+- [`docker/geocontrib/configure.yaml`](https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docker/geocontrib/configure.yaml)
+- [`docker/geocontrib/templates/config.json.j2`](https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docker/geocontrib/templates/config.json.j2)
+- [`docs/documentation_technique/Docker.md`](https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docs/documentation_technique/Docker.md)
+
+#### 2. Dépôt `geocontrib-docker` – pour la création du conteneur Docker
+Il faut ensuite ajouter la variable dans le fichier :
+- [`docker-compose.yml`](https://git.neogeo.fr/geocontrib/geocontrib-docker/-/blob/master/docker-compose.yml)
