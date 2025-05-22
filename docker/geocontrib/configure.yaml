@@ -98,3 +98,6 @@ variables:
   
   VUE_APP_ADMIN_MAIL:
     env_config_front: ADMIN_MAIL
+  
+  VUE_APP_ONLY_PUBLISHED_STATUS:
+    env_config_front: ONLY_PUBLISHED_STATUS
