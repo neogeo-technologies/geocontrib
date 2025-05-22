@@ -271,3 +271,6 @@ L'image Docker de base possède ces variables de configuration :
   
 * `ADMIN_MAIL`
   Adresse courriel de l'administrateur de l'instance geocontrib (utilisé pour l'ajout de groupe d'utilisateurs)
+
+* `ONLY_PUBLISHED_STATUS`
+  Limite le choix du statut d'un signalement à publier pour un usage simplifié de l'application
