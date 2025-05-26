@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.db.models import Q, When, Case, CharField, Value
 from django.apps import apps
@@ -41,9 +42,14 @@ class AvailableFeaturesManager(models.Manager):
         # 1 - si is_project_administrator on liste toutes les features
         # sauf le modérateur, qui par exemple ne doit pas voir les brouillons des autres
         if Authorization.has_permission(user, 'is_project_administrator', project) \
-                and not user_rank == moderateur_rank:
+                and user_rank != moderateur_rank:
             return queryset
-        
+
+        # 1bis - cas spécifique si la visibilité est restreinte aux auteurs eux-mêmes
+        if settings.RESTRICT_FEATURE_VISIBILITY_TO_OWNER and user.is_authenticated:
+            # il ne voit que ses propres signalements
+            return queryset.filter(creator=user)
+
         # 2 - si is_project_super_contributor:
         # Dans le cas de projets non modérés, il peut modifier le statut
         # de tous les signalements qu'il peut voir

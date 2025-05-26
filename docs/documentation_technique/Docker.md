@@ -156,6 +156,9 @@ L'image Docker de base possède ces variables de configuration :
 * `REDIS_HOST`, default=`"redis"`
   Hôte du serveur Redis utilisé pour la mise en file d'attente des tâches Celery.
 
+* `RESTRICT_FEATURE_VISIBILITY_TO_OWNER`, default=False
+  Limite la visibilité de signalement à son auteur
+
 * `SECRET_KEY`, default=`"SECRET_KEY"`
   Clé secrète utilisée par Django pour la sécurité des sessions.
 

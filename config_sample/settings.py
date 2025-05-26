@@ -332,4 +332,5 @@ SWAGGER_SETTINGS = {
     'LOGOUT_URL': '/geocontrib/admin/logout/',
 }
 
+ALLOW_LOGGED_USER_CREATE_FEATURE =  config('ALLOW_LOGGED_USER_CREATE_FEATURE', default=False, cast=bool)
 RESTRICT_FEATURE_VISIBILITY_TO_OWNER =  config('RESTRICT_FEATURE_VISIBILITY_TO_OWNER', default=False, cast=bool)
