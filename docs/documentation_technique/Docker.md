@@ -10,6 +10,9 @@ https://git.neogeo.fr/geocontrib/geocontrib-docker
 
 L'image Docker de base possède ces variables de configuration :
 
+* `ALLOW_LOGGED_USER_CREATE_FEATURE`, default=False, cast=`bool`
+  Définit les hôtes autorisés à accéder à l'application.
+
 * `ALLOWED_HOSTS`, default=`"localhost, 127.0.0.1, 0.0.0.0"`, cast=`Csv()`
   Définit les hôtes autorisés à accéder à l'application.
 
