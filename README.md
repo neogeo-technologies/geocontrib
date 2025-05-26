@@ -329,12 +329,35 @@ au projet GeoContrib.
 
 L’ajout d’une variable d’environnement dans la plateforme nécessite des modifications dans **deux dépôts distincts** :
 
-#### 1. Dépôt `geocontrib-django` – pour la génération de l’image Docker
-Il faut ajouter la variable dans les fichiers suivants :
-- [`docker/geocontrib/configure.yaml`](https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docker/geocontrib/configure.yaml)
-- [`docker/geocontrib/templates/config.json.j2`](https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docker/geocontrib/templates/config.json.j2)
+---
+
+#### 1. Dépôt `geocontrib-django`
+
+Ajoutez la variable dans les fichiers suivants :
+
+##### a. Pour l'utilisation en installation classique (variable utilisée par le backend)
+
+- [`config_sample/settings.py`](https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/config_sample/settings.py)
+
+##### b. Pour la génération de l’image Docker
+
+- [`docker/geocontrib/settings.py`](https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docker/geocontrib/settings.py)  
+  *(si la variable est utilisée par le backend)*
+
+- [`docker/geocontrib/configure.yaml`](https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docker/geocontrib/configure.yaml)  
+  *(si la variable est utilisée par le frontend)*
+
+- [`docker/geocontrib/templates/config.json.j2`](https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docker/geocontrib/templates/config.json.j2)  
+  *(si la variable est utilisée par le frontend)*
+
+##### c. Pour la documentation de l’installation avec Docker
+
 - [`docs/documentation_technique/Docker.md`](https://git.neogeo.fr/geocontrib/geocontrib-django/-/blob/develop/docs/documentation_technique/Docker.md)
 
+---
+
 #### 2. Dépôt `geocontrib-docker` – pour la création du conteneur Docker
-Il faut ensuite ajouter la variable dans le fichier :
+
+Ajoutez également la variable dans le fichier suivant :
+
 - [`docker-compose.yml`](https://git.neogeo.fr/geocontrib/geocontrib-docker/-/blob/master/docker-compose.yml)
