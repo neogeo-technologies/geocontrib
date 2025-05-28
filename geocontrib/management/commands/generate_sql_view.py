@@ -8,8 +8,10 @@ from geocontrib.models import FeatureType
 from geocontrib.models import Feature
 from geocontrib.models import Project
 
+from typing import List
 import re
 import logging
+import unicodedata
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +44,11 @@ class Command(BaseCommand):
         parser.add_argument('--is_ft_deletion', type=bool, required=False, help='Should the view be deleted')
         parser.add_argument('--schema_name', type=str, required=False, help='Name of the PostgreSQL schema')
         parser.add_argument('--mode', type=str, required=False, help='Mode of the PostgreSQL view')
+        parser.add_argument(
+            '--force_project_view_with_aliases',
+            action='store_true',
+            help="Ignore custom field mismatches and use aliases for conflicts in project-wide views."
+        )
 
     def handle(self, *args, **options):
         """
@@ -54,7 +61,14 @@ class Command(BaseCommand):
         project_id = options['project_id']
         mode = options['mode'] or 'Type'
         deleted_cf_id = options['deleted_cf_id']
+        force_aliases = options.get('force_project_view_with_aliases', False)
         schema_name = self.sanitize_schema_name(options['schema_name'] or 'data')
+        # Prevent error if not initialized
+        view_name = ''
+        cfs_data = []
+
+        if mode not in ('Projet', 'Type'):
+            raise CommandError(f"Mode inconnu: {mode}. Utilisez 'Projet' ou 'Type'.")
 
         # Specify the feature fields to display in the view
         feature_fields_selection = ['feature_id', 'title', 'description', 'geom', 'project_id', 'feature_type_id', 'status']
@@ -86,7 +100,21 @@ class Command(BaseCommand):
 
             # Retrieve custom fields specific to this project's feature types
             try:
-                cfs_data = self.get_all_custom_fields(feature_type_ids, deleted_cf_id)
+                if force_aliases:
+                    # Collect all custom fields for all feature types in the project
+                    all_custom_fields = [
+                        self.get_custom_fields(ft_id, deleted_cf_id)
+                        for ft_id in feature_type_ids
+                    ]
+
+                    # Keep the first set as canonical reference
+                    reference_fields = sorted(all_custom_fields[0], key=lambda cf: cf["name"])
+
+                    # Generate aliases and normalize
+                    cfs_data = self.generate_normalized_field_aliases(reference_fields)
+                else:
+                    cfs_data = self.get_all_custom_fields(feature_type_ids, deleted_cf_id)
+
             except CommandError as e:
                 # Output error message if custom fields mismatch and abort command
                 logger.debug(e)
@@ -109,7 +137,8 @@ class Command(BaseCommand):
                 return  # Exit the view generation command for this feature type since it was deleted
 
             # Retrieve custom fields specific to this feature type
-            cfs_data = self.get_custom_fields(feature_type_id, deleted_cf_id)
+            raw_cfs = sorted(self.get_custom_fields(feature_type_id, deleted_cf_id), key=lambda cf: cf["name"])
+            cfs_data = self.generate_normalized_field_aliases(raw_cfs)
 
         # Generate the SQL script for creating the PostgreSQL view
         sql = render_to_string(
@@ -128,6 +157,55 @@ class Command(BaseCommand):
         its_alright = self.exec_sql(sql, view_name)
         if its_alright:
             logger.info(f'Successfully created view {view_name}')
+
+    def generate_normalized_field_aliases(self, cf_list):
+        """
+        Generate normalized and safe SQL column aliases for a list of custom fields.
+
+        This function ensures each custom field name is transformed into a safe SQL-compatible
+        alias. It applies normalization (e.g., lowercase, removing accents/special characters),
+        avoids invalid identifiers (purely numeric or starting with a digit), and detects
+        duplicate normalized names to avoid collisions in SQL views.
+
+        If a collision is detected (i.e., two different fields normalize to the same name),
+        it appends a numeric suffix (e.g., `__1`) to the alias and logs a warning.
+
+        The alias will replace the original custom field name in the generated SQL view,
+        ensuring SQL syntax is valid and the view creation is resilient to naming conflicts.
+
+        Args:
+            cf_list (list): List of dictionaries representing custom fields, each containing a 'name'.
+
+        Returns:
+            list: The same list of custom fields with an added 'alias' key for SQL generation.
+        """
+        seen = {}
+        results = []
+        # Sort fields to ensure deterministic alias generation
+        for cf in sorted(cf_list, key=lambda cf: cf["name"]):
+            norm = self.normalize_column_name(cf["name"])
+
+            # Ensure alias is SQL-safe: avoid starting with a digit or being purely numeric
+            if norm.isdigit():
+                norm = f"f_{norm}"
+            elif norm and norm[0].isdigit():
+                norm = f"f_{norm}"
+
+            alias = norm
+            # Handle name collisions after normalization by appending a numeric suffix
+            if norm in seen:
+                alias = f"{norm}__{seen[norm]}"
+                seen[norm] += 1
+                logger.warning(
+                    f"⚠️ Normalized column name collision: '{norm}' used for multiple custom fields. Aliased as '{alias}'"
+                )
+            else:
+                seen[norm] = 1
+            # Save the alias to the custom field dict
+            cf["alias"] = alias
+            results.append(cf)
+
+        return results
 
     def create_schema_if_not_exists(self, schema_name, mode):
         """
@@ -175,45 +253,35 @@ class Command(BaseCommand):
         return slug.replace('-', '_')
 
     def sanitize_schema_name(self, schema_name: str) -> str:
-        """
-        Nettoie un nom de schéma pour le rendre compatible avec PostgreSQL.
-        
-        - Supprime tous les guillemets (simples et doubles).
-        - Transforme le nom en minuscules.
-        - Remplace les tirets par des underscores.
-        - Supprime tous les caractères non autorisés par PostgreSQL.
-        - Si le nom commence par un chiffre, préfixe avec un underscore.
-        - Tronque à 63 caractères (limite de PostgreSQL).
-        
-        :param schema_name: Le nom du schéma à nettoyer.
-        :return: Un nom de schéma compatible avec PostgreSQL.
-        """
         # Supprimer les guillemets simples et doubles
         sanitized = schema_name.replace("'", "").replace('"', "")
-        
         # Transformer en minuscules
         sanitized = sanitized.lower()
-        
         # Remplacer les tirets par des underscores
         sanitized = sanitized.replace("-", "_")
-        
         # Supprimer les caractères non autorisés (seuls les lettres, chiffres et underscores sont autorisés)
         sanitized = re.sub(r"[^a-z0-9_]", "", sanitized)
-        
         # Ajouter un underscore si le nom commence par un chiffre
         if sanitized and sanitized[0].isdigit():
             sanitized = f"_{sanitized}"
-        
         # Tronquer à 63 caractères (limite de PostgreSQL)
         sanitized = sanitized[:63]
         
         return sanitized
 
-
     def get_custom_fields(self, feature_type_id, deleted_cf_id):
         custom_fields = CustomField.objects.filter(feature_type__pk=feature_type_id).values()
         return custom_fields.exclude(id=deleted_cf_id)
-    
+
+    def normalize_column_name(self, name: str) -> str:
+        """
+        Normalise un nom de champ personnalisé : minuscule, sans accents, sans caractères spéciaux
+        """
+        name = name.lower()
+        name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode('ascii')
+        name = re.sub(r'\W+', '_', name)
+        return name.strip('_')
+
     def validate_custom_fields(self, reference_fields, sorted_cfs, feature_type_id):
         # Compare the custom fields of the current FeatureType with the reference ones
         if len(reference_fields) != len(sorted_cfs) or any(
@@ -227,6 +295,7 @@ class Command(BaseCommand):
             )
 
     def get_all_custom_fields(self, feature_type_ids, deleted_cf_id):
+        all_fields = []
         reference_fields = None  # Used to store the custom fields of the first FeatureType
 
         for feature_type_id in feature_type_ids:
@@ -242,7 +311,9 @@ class Command(BaseCommand):
             else:
                 self.validate_custom_fields(reference_fields, sorted_cfs, feature_type_id)
 
-        return reference_fields  # Return the fields if all are identical
+            all_fields.extend(sorted_cfs)
+
+        return self.generate_normalized_field_aliases(all_fields)  # Return the fields if all are identical and aliase similar custom field names
 
     def drop_existing_view(self, schema_name, view_name):
         sql = f"DROP VIEW IF EXISTS {schema_name}.{view_name}"
