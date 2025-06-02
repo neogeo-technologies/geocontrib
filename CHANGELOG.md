@@ -3,31 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [6.4.6] - 2025-05-28
-
-### Génération des vues SQL
-- Refonte de la commande `generate_sql_view` pour la rendre plus robuste
-- Meilleure gestion des cas limites : suppression en cascade, entités orphelines
-- Support du mode forcé multi-types avec alias (`--force_project_view_with_aliases`)
-
-### Gestion des champs personnalisés
-- Détection des conflits de noms de `CustomFields` après normalisation
-- Prise en compte des données (`feature_data`) même en l’absence de définitions associées
-
-### Maintenance & qualité
-- Couverture étendue par tests unitaires
-- Amélioration des logs et du traitement des erreurs
-
-> 🔎 Réf. internes : Redmine #23375, Redmine #27462
-
-
-## [6.4.5] - 2025-04-02
+## [6.4.5-rc4] - 2025-05-28
 
 ### Correctifs
+#### Connexions et navigation
 - Redmine 26721 : Impossible de se connecter par CAS IDGO - erreur 404
 - Redmine 26138 : Liste signalements filtrés - Incohérence des résultats lors de la recherche par titre des signalements
 - Redmine 26632 : Pagination liste signalements - doublon premier & dernier numéro si 5 pages
 
+#### Génération des vues SQL
+- Redmine 27462 (correctif de 23375) : Amélioration de la robustesse de la génération des vues SQL
+  - Détection explicite des modes invalides ou ambigus, avec retour d’erreur explicite
+  - Inclusion automatique des `feature_data` associés, même sans définition de champ
+  - Prise en compte des suppressions en cascade, entités orphelines et états inconsistants
+  - Ajout de tests unitaires couvrant les cas normaux et limites (champ orphelin, suppression de projet, collisions)
+  - Détection des conflits de noms de `CustomFields` après normalisation et génération d'alias automatique en mode `Type` ou optionnel en mode `Projet`
+  - Support du mode `--force_project_view_with_aliases` pour générer une vue projet même en cas de divergence entre types
+  - Amélioration de la journalisation (logs)
 
 ### Évolutions
 - Redmine 26581 : Brancher GC à Sentry
