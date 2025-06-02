@@ -3,6 +3,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.4.6] - 2025-05-28
+
+### Génération des vues SQL
+- Refonte de la commande `generate_sql_view` pour la rendre plus robuste
+- Meilleure gestion des cas limites : suppression en cascade, entités orphelines
+- Support du mode forcé multi-types avec alias (`--force_project_view_with_aliases`)
+
+### Gestion des champs personnalisés
+- Détection des conflits de noms de `CustomFields` après normalisation
+- Prise en compte des données (`feature_data`) même en l’absence de définitions associées
+
+### Maintenance & qualité
+- Couverture étendue par tests unitaires
+- Amélioration des logs et du traitement des erreurs
+
+> 🔎 Réf. internes : Redmine #23375, Redmine #27462
+
+
 ## [6.4.5] - 2025-04-02
 
 ### Correctifs

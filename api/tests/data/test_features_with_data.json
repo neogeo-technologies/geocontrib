@@ -1,0 +1,75 @@
+[
+    {
+      "model": "geocontrib.user",
+      "pk": 1,
+      "fields": {
+        "username": "admin",
+        "is_staff": true,
+        "is_superuser": true,
+        "is_active": true
+      }
+    },
+    {
+      "model": "geocontrib.project",
+      "pk": 1,
+      "fields": {
+        "title": "Projet Test Vue",
+        "slug": "projet-test-vue",
+        "creator": 1,
+        "access_level_pub_feature": "anonymous",
+        "access_level_arch_feature": "anonymous"
+      }
+    },
+    {
+      "model": "geocontrib.featuretype",
+      "pk": 1,
+      "fields": {
+        "title": "Signalement",
+        "slug": "signalement",
+        "geom_type": "POINT",
+        "project": 1
+      }
+    },
+    {
+      "model": "geocontrib.customfield",
+      "pk": 1,
+      "fields": {
+        "feature_type": 1,
+        "position": 1,
+        "label": "État",
+        "name": "etat",
+        "field_type": "text",
+        "is_mandatory": false
+      }
+    },
+    {
+      "model": "geocontrib.customfield",
+      "pk": 2,
+      "fields": {
+        "feature_type": 1,
+        "position": 2,
+        "label": "Priorité",
+        "name": "priorite",
+        "field_type": "text",
+        "is_mandatory": false
+      }
+    },
+    {
+      "model": "geocontrib.feature",
+      "pk": 1,
+      "fields": {
+        "feature_type": 1,
+        "project": 1,
+        "title": "Fuite d'eau",
+        "description": "Fuite dans la salle serveur",
+        "status": "draft",
+        "creator": 1,
+        "feature_data": {
+          "etat": "ouvert",
+          "priorite": "élevée"
+        },
+        "geom": "POINT(2.2945 48.8584)"
+      }
+    }
+  ]
+  
