@@ -98,3 +98,6 @@ variables:
   
   VUE_APP_ADMIN_MAIL:
     env_config_front: ADMIN_MAIL
+
+  SSO_KEYCLOAK_URL:
+    env_config_front: SSO_KEYCLOAK_URL
