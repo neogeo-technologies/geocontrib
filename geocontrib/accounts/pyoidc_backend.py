@@ -16,6 +16,8 @@ from oic.oauth2.consumer import TokenError
 from oic.utils.http_util import BadRequest
 from django_pyoidc.models import OIDCSession
 from django_pyoidc.views import OIDCCallbackView
+from geocontrib.emails import notif_user_account_created
+from geocontrib.emails import notif_admin_user_created
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +58,7 @@ def create_user(user, claims):
 
     # If != None and != ''
     if preferred_username:
-        user.last_name = preferred_username
+        user.username = preferred_username
     
     if preferred_givenname:
         user.first_name = preferred_givenname
@@ -66,6 +68,11 @@ def create_user(user, claims):
     user.save(update_fields=[
         'username', 'first_name', 'last_name',
         'email', 'is_active'])
+
+    # Envoi des notifications au nouvel utilisateur et l'administrateur
+    if user.email:
+        notif_user_account_created(user)
+    notif_admin_user_created(user)
 
     return user
 
@@ -152,11 +159,13 @@ class CustomOIDCClient(OIDCClient):
 class CustomOIDCCallbackView(OIDCCallbackView):
     def get(self, request, *args, **kwargs):
         try:
+            # Vérifie la présence de l'identifiant OIDC dans la session utilisateur
             if "oidc_sid" in request.session:
                 self.client = CustomOIDCClient( # NEOGEO EDIT : to use overwritten get_user_info method
                     self.op_name, session_id=request.session["oidc_sid"]
                 )
 
+                # Analyse la réponse d'autorisation OIDC reçue dans la requête (callback)
                 parsing_result = self.client.consumer.parse_authz(
                     query=request.GET.urlencode()
                 )
@@ -172,11 +181,13 @@ class CustomOIDCCallbackView(OIDCCallbackView):
                     logger.error("OIDC login process failure; empty OIDC response")
                     return self.login_failure(request)
 
+                # Vérifie que l'état OIDC retourné correspond à celui stocké en session (protection CSRF)
                 if aresp["state"] == request.session["oidc_sid"]:
                     state = aresp["state"]
                     session_state = aresp.get("session_state")  # type: ignore[no-untyped-call] # oic is untyped yet
 
                     # pyoidc will make the next steps in OIDC login protocol
+                    # pyoidc effectue les prochaines étapes du protocole OIDC (échange le code d'autorisation contre des tokens)
                     try:
                         tokens = self.client.consumer.complete(
                             state=state, session_state=session_state
@@ -189,6 +200,7 @@ class CustomOIDCCallbackView(OIDCCallbackView):
                         return self.login_failure(request)
 
                     # Collect data from userinfo endpoint
+                    # Récupère les informations utilisateur depuis l'endpoint userinfo
                     try:
                         userinfo = self.client.consumer.get_user_info(state=state)  # type: ignore[no-untyped-call] # oic is untyped yet
                     except Exception as e:
@@ -205,6 +217,8 @@ class CustomOIDCCallbackView(OIDCCallbackView):
 
                     # this will call token instrospection or user defined validator
                     # or return None
+                    # Effectue une introspection/validation du token d'accès (ou appel un validateur custom)
+                    # Peut retourner None si le token n'est pas valide ou si le validateur ne l'accepte pas
                     access_token_claims = self.engine.introspect_access_token(
                         access_token_jwt, self.client
                     )
@@ -223,8 +237,11 @@ class CustomOIDCCallbackView(OIDCCallbackView):
                         "id_token_claims": id_token_claims,
                     }
                     # simplify check code, if any dict is None remove the entry
+                    # Nettoie le dict des tokens: retire toutes les clés ayant pour valeur None
                     filtered_tokens = {k: v for k, v in tokens.items() if v is not None}
+
                     # Call user hook
+                    # Appelle le hook de récupération de l'utilisateur à partir des claims OIDC
                     user = self.engine.call_get_user_function(
                         tokens=filtered_tokens,
                         client=self.client,
@@ -236,14 +253,18 @@ class CustomOIDCCallbackView(OIDCCallbackView):
                         )
                         return self.login_failure(request)
                     else:
+                        # Authentifie l'utilisateur Django et crée la session
                         auth.login(request, user)
+                        # Enregistre l'association session utilisateur <-> session OIDC
                         OIDCSession.objects.create(
                             state=state,
                             sub=userinfo["sub"],
                             cache_session_key=request.session.session_key,  # type: ignore[misc] # we call auth.login right before, so session_key is set to a value
                             session_state=session_state,
                         )
+                        # Appelle le callback post-login custom si défini
                         self.call_user_login_callback_function(request, user)
+                        # Calcule l'URL finale de redirection après authentification
                         redir = self.success_url(request)
                         return redirect(redir)
                 else:

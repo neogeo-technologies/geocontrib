@@ -242,6 +242,7 @@ APPLICATION_ABSTRACT = config('APPLICATION_ABSTRACT',
                               default="Application de saisie d'informations géographiques contributive")
 LOGO_PATH = config('LOGO_PATH', default=os.path.join(MEDIA_URL, 'logo-neogeo-circle.png'))
 FAVICON_PATH = config('FAVICON_PATH', default=os.path.join(MEDIA_URL, 'logo-neogeo-circle.png'))
+PRIMARY_COLOR = config('PRIMARY_COLOR', default='#00b5ad')
 
 # Allowed formats for file attachments
 IMAGE_FORMAT = config('IMAGE_FORMAT', default='application/pdf,image/png,image/jpeg')

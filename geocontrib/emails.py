@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from django.template import Context
 from django.template import Template
 from django.utils.html import strip_tags
+
 """
 import directly from the file to avoid circular import and not from model/__init__.py
 since there are imports into a model(annotation.py) from geocontrib/emails.py
@@ -13,6 +14,7 @@ which trigger import of NotificationModel before the model is fully registrated
 fixed by removing the import from model/__init__.py
 """
 from geocontrib.models.notification import NotificationModel
+from geocontrib.models.user import User
 
 import logging
 logger = logging.getLogger(__name__)
@@ -252,5 +254,64 @@ def notif_users_groups_published_feature(emails, context):
     email = EmailBaseBuilder(
         context=context, bcc=emails, subject=subject,
         template='geocontrib/email/notif_users_groups_published_feature.html')
-
     email.send()
+
+def notif_user_account_created(user):
+    # Teste si c’est une URL absolue
+    logo_url = settings.LOGO_PATH
+    has_logo = logo_url.startswith("http://") or logo_url.startswith("https://")
+    context_dict = {
+        'application_name': settings.APPLICATION_NAME,
+        'application_url': settings.URL_PREFIX,
+        'logo_url': logo_url if has_logo else None,
+        'theme_color': settings.PRIMARY_COLOR,
+        'user': user
+    }
+    try:
+        notification_model = NotificationModel.objects.get(template_name="Création de compte utilisateur")
+        data = Context(context_dict)
+        subject = Template(notification_model.subject).render(data)
+        message = Template(notification_model.message).render(data)
+        # fill context used in EmailBaseBuilder
+        context_dict['message'] = message
+
+    except ObjectDoesNotExist:
+        subject = "[{}] Bienvenue sur la plateforme".format(settings.APPLICATION_NAME)
+
+    email = EmailBaseBuilder(
+        context=context_dict, bcc=[user.email], subject=subject,
+        template='geocontrib/email/notif_account_created_user.html'  # Template utilisateur
+    )
+    email.send()
+
+def notif_admin_user_created(user):
+    # Teste si c’est une URL absolue
+    logo_url = settings.LOGO_PATH
+    has_logo = logo_url.startswith("http://") or logo_url.startswith("https://")
+    context_dict = {
+        'application_name': settings.APPLICATION_NAME,
+        'logo_url': logo_url if has_logo else None,
+        'theme_color': settings.PRIMARY_COLOR,
+        'user': user
+    }
+    try:
+        notification_model = NotificationModel.objects.get(template_name="Notification admin création utilisateur")
+        data = Context(context_dict)
+        subject = Template(notification_model.subject).render(data)
+        message = Template(notification_model.message).render(data)
+        # fill context used in EmailBaseBuilder
+        context_dict['message'] = message
+
+    except ObjectDoesNotExist:
+        subject = "[{}] Un nouvel utilisateur a été créé".format(settings.APPLICATION_NAME)
+
+    admins = User.objects.filter(is_superuser=True)
+    for admin in admins:
+        if admin.email:
+            email = EmailBaseBuilder(
+                context=context_dict,
+                bcc=[admin.email],
+                subject=subject,
+                template='geocontrib/email/notif_account_created_admin.html'  # Template admin
+            )
+            email.send()
