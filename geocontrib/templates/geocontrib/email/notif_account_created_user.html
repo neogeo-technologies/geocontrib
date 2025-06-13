@@ -18,7 +18,7 @@
               <img src="{{ logo_url }}" alt="{{ application_name }}"
                 style="max-width: 120px; height: auto; margin-bottom: 20px;" />
               {% else %}
-              <span style="font-size: 56px; display: inline-block; margin-bottom: 12px;">🌍</span>
+              <span style="font-size: 56px; display: inline-block; margin-bottom: 12px;">👋</span>
               {% endif%}
             </td>
           </tr>
@@ -32,7 +32,7 @@
                 Nous sommes ravis de vous accueillir sur <b>{{ application_name }}</b>.<br>
                 Votre compte a bien été créé et vous pouvez désormais profiter de l'ensemble de nos services.
               </p>
-              <a href="{{ application_url|absurl }}"
+              <a href="{{ profile_url|absurl }}"
                 style="display: inline-block; background: {{ theme_color }}; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 6px; margin-top: 28px; font-weight: bold;">Accéder
                 à mon compte</a>
               {% endif%}

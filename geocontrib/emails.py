@@ -5,7 +5,9 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.template import Context
 from django.template import Template
+from django.urls import reverse
 from django.utils.html import strip_tags
+from decouple import config
 
 """
 import directly from the file to avoid circular import and not from model/__init__.py
@@ -21,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 BASE_URL = getattr(settings, 'BASE_URL', '')
-
+PRIMARY_COLOR = config('PRIMARY_COLOR', default='#00b5ad')
 
 class EmailBaseBuilder(object):
 
@@ -257,14 +259,13 @@ def notif_users_groups_published_feature(emails, context):
     email.send()
 
 def notif_user_account_created(user):
-    # Teste si c’est une URL absolue
-    logo_url = settings.LOGO_PATH
+    logo_url = settings.LOGO_PATH # Teste si c’est une URL absolue
     has_logo = logo_url.startswith("http://") or logo_url.startswith("https://")
     context_dict = {
         'application_name': settings.APPLICATION_NAME,
-        'application_url': settings.URL_PREFIX,
+        'profile_url': f"{settings.URL_PREFIX}my_account",
         'logo_url': logo_url if has_logo else None,
-        'theme_color': settings.PRIMARY_COLOR,
+        'theme_color': PRIMARY_COLOR,
         'user': user
     }
     try:
@@ -285,13 +286,13 @@ def notif_user_account_created(user):
     email.send()
 
 def notif_admin_user_created(user):
-    # Teste si c’est une URL absolue
-    logo_url = settings.LOGO_PATH
+    logo_url = settings.LOGO_PATH # Teste si c’est une URL absolue
     has_logo = logo_url.startswith("http://") or logo_url.startswith("https://")
     context_dict = {
         'application_name': settings.APPLICATION_NAME,
+        'admin_url': reverse('admin:geocontrib_user_change', args=[user.id]),
         'logo_url': logo_url if has_logo else None,
-        'theme_color': settings.PRIMARY_COLOR,
+        'theme_color': PRIMARY_COLOR,
         'user': user
     }
     try:
