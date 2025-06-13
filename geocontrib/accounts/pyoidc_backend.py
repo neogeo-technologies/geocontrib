@@ -255,6 +255,9 @@ class CustomOIDCCallbackView(OIDCCallbackView):
                     else:
                         # Authentifie l'utilisateur Django et crée la session
                         auth.login(request, user)
+
+                        if not request.session.session_key:
+                            request.session.save()
                         # Enregistre l'association session utilisateur <-> session OIDC
                         OIDCSession.objects.create(
                             state=state,
