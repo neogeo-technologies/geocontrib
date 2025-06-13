@@ -18,6 +18,9 @@ from django_pyoidc.models import OIDCSession
 from django_pyoidc.views import OIDCCallbackView
 from geocontrib.emails import notif_user_account_created
 from geocontrib.emails import notif_admin_user_created
+from decouple import config, Csv
+
+SSO_ADMIN_USERS = config('SSO_ADMIN_USERS', default="", cast=Csv())
 
 logger = logging.getLogger(__name__)
 
@@ -47,54 +50,39 @@ def hook_get_user(client, tokens):
     return user
 
 
-def create_user(user, claims):
-    user.username = claims.get('email', '')
-    user.first_name = claims.get('given_name', '')
+def apply_user_claims(user, claims):
+    """Remplit les champs de l'utilisateur Django depuis les claims OIDC."""
+    user.username = claims.get('preferred_username') or claims.get('email', '')
+    user.first_name = claims.get('preferred_givenname') or claims.get('given_name', '')
     user.last_name = claims.get('family_name', '')
-
-    # Can be 'None' if preferred_username is missing or = None
-    preferred_username = claims.get('preferred_username')
-    preferred_givenname = claims.get('preferred_givenname')
-
-    # If != None and != ''
-    if preferred_username:
-        user.username = preferred_username
-    
-    if preferred_givenname:
-        user.first_name = preferred_givenname
-
     user.email = claims.get('email', '')
-    user.is_active = True 
-    user.save(update_fields=[
-        'username', 'first_name', 'last_name',
-        'email', 'is_active'])
+    user.is_active = True
+    return user
 
-    # Envoi des notifications au nouvel utilisateur et l'administrateur
+def set_admin_flags_if_authorized(user):
+    """Attribue les droits admin si l'utilisateur est dans SSO_ADMIN_USERS."""
+    if user.username in SSO_ADMIN_USERS:
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(update_fields=['is_staff', 'is_superuser'])
+
+def create_user(user, claims):
+    user = apply_user_claims(user, claims)
+    user.save(update_fields=['username', 'first_name', 'last_name', 'email', 'is_active'])
+
+    set_admin_flags_if_authorized(user)
+
     if user.email:
         notif_user_account_created(user)
     notif_admin_user_created(user)
 
     return user
 
-
 def update_user(user, claims):
-    user.username = claims.get('email', '')
-    user.first_name = claims.get('given_name', '')
-    user.last_name = claims.get('family_name', '')
-    preferred_username = claims.get('preferred_username')
-    preferred_givenname = claims.get('preferred_givenname')
+    user = apply_user_claims(user, claims)
+    user.save(update_fields=['username', 'first_name', 'last_name', 'email', 'is_active'])
 
-    if preferred_username:
-        user.last_name = preferred_username
-    
-    if preferred_givenname:
-        user.first_name = preferred_givenname
-
-    user.email = claims.get('email', '')
-    user.is_active = True
-    user.save(update_fields=[
-        'username', 'first_name', 'last_name',
-        'email', 'is_active'])
+    set_admin_flags_if_authorized(user)
 
     return user
 

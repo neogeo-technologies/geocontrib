@@ -210,6 +210,10 @@ L'image Docker de base possède ces variables de configuration :
 
 * `SSO_CALLBACK_PATH`, default=`"/geocontrib/oidc/callback/"`
   Chemin de rappel (callback) utilisé après l’authentification réussie via Keycloak. Ce chemin doit être enregistré dans le client Keycloak comme URI de redirection autorisée.
+
+* `SSO_ADMIN_USERS`, default=`""`, cast=`Csv()`
+  Liste de usernames des utilisateurs se voyant attribuer les droits administrateur sur l'instance à la création/mise à jour d'un utilisateur depuis un service SSO (keycloak).
+  Exemple : `admin,ltorvalds`
   
 
 ## Variables utilisées pour configurer le frontend :
