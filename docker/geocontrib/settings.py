@@ -182,7 +182,6 @@ HIDE_USER_CREATION_BUTTON = config("HIDE_USER_CREATION_BUTTON", default=False, c
 
 # Configure frontend
 LOG_URL = config("LOG_URL", default=None)
-LOGOUT_URL = config("LOGOUT_URL", default=None)
 DISABLE_LOGIN_BUTTON = config("DISABLE_LOGIN_BUTTON", default=None)
 
 # SERVER LDAP CONFIG CONNEXION

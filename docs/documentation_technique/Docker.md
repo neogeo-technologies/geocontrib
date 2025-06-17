@@ -319,3 +319,6 @@ L'image Docker de base possède ces variables de configuration :
 
 * `ONLY_PUBLISHED_STATUS`
   Limite le choix du statut d'un signalement à publier pour un usage simplifié de l'application
+
+* `FEATURE_CREATION_REDIRECT_URL`
+  Spécifie l'url vers laquelle rediriger l'utilisateur après la création d'un signalement.
