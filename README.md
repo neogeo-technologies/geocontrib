@@ -102,6 +102,7 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * LOGO_PATH : chemin vers le logo affiché en page d'accueil ;
 * FAVICON_PATH : chemin vers la favicon affichée dans l'onglet du navigateur ;
 * LOGOUT_HIDDEN : -> permet de cacher le bouton de déconnexion dans le backend Django (utile dans le cadre du SSO)
+* LOGOUT_URL : url de déconnexion remplaçant l'appel au logout django (utile dans le cadre du SSO)
 * HIDE_USER_CREATION_BUTTON : désactive le bouton d'ajout d'un utilisateur (utile dans le cadre du SSO)
 * DISABLE_LOGIN_BUTTON : désactive le bouton de connexion (utile dans le cadre du SSO)
 * LOG_URL : URL de connexion externe (utile dans le cadre du SSO)

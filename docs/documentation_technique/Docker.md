@@ -248,6 +248,9 @@ L'image Docker de base possède ces variables de configuration :
 * `DISABLE_LOGIN_BUTTON`
   Cache le bouton de connexion lorsque l'authentification est gérée en dehors de l'application.
   
+* `LOGOUT_URL`
+  Spécifie une url de déconnexion remplaçant l'appel au logout django (utile dans le cadre du SSO)
+
 * `DISPLAY_FORBIDDEN_PROJECTS`
   Spécifie si tous les projets doivent être affichés dans la liste de la page principale.
   

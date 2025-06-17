@@ -101,3 +101,6 @@ variables:
 
   SSO_KEYCLOAK_URL:
     env_config_front: SSO_KEYCLOAK_URL
+
+  VUE_APP_LOGOUT_URL:
+    env_config_front: LOGOUT_URL
