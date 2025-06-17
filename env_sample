@@ -3,3 +3,17 @@ ADMIN_URL = ''
 SUPERUSERNAME = ''
 SUPERUSERPASSWORD = ''
 SUPERUSERDISPLAYNAME = ''
+
+# VARIABLE FOR SSO KEYCLOAK
+SSO_KEYCLOAK_URL='http://localhost:8080/'
+SSO_KEYCLOAK_CLIENT_ID='django-app'
+SSO_KEYCLOAK_CLIENT_SECRET='Bb1Sk2rO0d7w4Dcx7OkqHuM87ibkjWyA'
+
+SSO_KEYCLOAK_DISCOVERY_ENDPOINT='http://localhost:8080/realms/master/.well-known/openid-configuration'
+SSO_CALLBACK_PATH='/geocontrib/oidc/callback/'
+
+
+# VARIABLE FOR LDAP SERVER
+LDAP_SERVER_URI='ldap://localhost:10389'
+LDAP_BASE_DN='ou=system'
+LDAP_BIND_DN_TEMPLATE='uid={},ou=system'

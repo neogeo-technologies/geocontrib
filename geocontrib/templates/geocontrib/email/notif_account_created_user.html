@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Bienvenue sur {{ application_name }} !</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #f8f9fa;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+          style="background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-top: 30px; margin-bottom: 30px;">
+          <tr>
+            <td style="text-align:center; padding-top:32px;">
+              {% if logo_url %}
+              <img src="{{ logo_url }}" alt="{{ application_name }}"
+                style="max-width: 120px; height: auto; margin-bottom: 20px;" />
+              {% else %}
+              <span style="font-size: 56px; display: inline-block; margin-bottom: 12px;">👋</span>
+              {% endif%}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 0 40px 10px 40px; text-align: center;">
+              {% if message %}
+              {{ message }}
+              {% else %}
+              <h1 style="color: {{ theme_color }}; margin: 0 0 12px 0;">Bienvenue, {{ user.username }} !</h1>
+              <p style="font-size: 1.15em; color: #333; margin: 0;">
+                Nous sommes ravis de vous accueillir sur <b>{{ application_name }}</b>.<br>
+                Votre compte a bien été créé et vous pouvez désormais profiter de l'ensemble de nos services.
+              </p>
+              <a href="{{ profile_url|absurl }}"
+                style="display: inline-block; background: {{ theme_color }}; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 6px; margin-top: 28px; font-weight: bold;">Accéder
+                à mon compte</a>
+              {% endif%}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px 40px 0 40px;">
+              <hr style="border:0;height:1px;background:#eee;margin:0 0 22px 0">
+              <p style="font-size: 0.95em; color: #777; text-align: center; font-style: italic;">
+                Vous recevez ce message suite à la création de votre compte sur <b>{{ application_name }}</b>.<br>
+                Si vous n'êtes pas à l'origine de cette inscription, merci de nous contacter rapidement.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

@@ -161,15 +161,17 @@ LOGIN_URL = config("LOGIN_URL", default='geocontrib:login')
 LOGIN_REDIRECT_URL = 'geocontrib:index'
 LOGOUT_REDIRECT_URL = 'geocontrib:index'
 SSO_OGS_SESSION_URL = config('SSO_OGS_SESSION_URL', default='')
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # CAS https://djangocas.dev/docs/latest/configuration.html#cas-server-url-required
 cas_server_url = config('CAS_SERVER_URL', None)
 if cas_server_url:
     CAS_SERVER_URL = cas_server_url
-    AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.ModelBackend',
+    AUTHENTICATION_BACKENDS += [
         'django_cas_ng.backends.CASBackend',
-    )
+    ]
     CAS_APPLY_ATTRIBUTES_TO_USER = True
 
 # Configure automated view generation
@@ -182,8 +184,15 @@ HIDE_USER_CREATION_BUTTON = config("HIDE_USER_CREATION_BUTTON", default=False, c
 
 # Configure frontend
 LOG_URL = config("LOG_URL", default=None)
+LOGOUT_URL = config("LOGOUT_URL", default=None)
 DISABLE_LOGIN_BUTTON = config("DISABLE_LOGIN_BUTTON", default=None)
 
+# SERVER LDAP CONFIG CONNEXION
+ldap_server_uri = config('LDAP_SERVER_URI', default=None)
+if ldap_server_uri:
+    AUTHENTICATION_BACKENDS += [
+        'geocontrib.accounts.ldap_backend.LDAPBackend',
+    ]
 
 # Logging properties
 LOGGING = {
@@ -332,5 +341,34 @@ SWAGGER_SETTINGS = {
     'LOGOUT_URL': '/geocontrib/admin/logout/',
 }
 
-ALLOW_LOGGED_USER_CREATE_FEATURE =  config('ALLOW_LOGGED_USER_CREATE_FEATURE', default=False, cast=bool)
-RESTRICT_FEATURE_VISIBILITY_TO_OWNER =  config('RESTRICT_FEATURE_VISIBILITY_TO_OWNER', default=False, cast=bool)
+# SSO KEYCLOAK CONFIG
+sso_keycloak_url = config('SSO_KEYCLOAK_URL', default=None)
+
+if sso_keycloak_url:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": CELERY_BROKER_URL,
+        }
+    }
+
+    INSTALLED_APPS += [
+        'django_pyoidc',        
+    ]
+
+    DJANGO_PYOIDC = {
+        "sso_keycloak": {
+            "client_id": config('SSO_KEYCLOAK_CLIENT_ID', default=None),
+            "client_secret": config('SSO_KEYCLOAK_CLIENT_SECRET', default=None),
+            "provider_discovery_uri": config('SSO_KEYCLOAK_DISCOVERY_ENDPOINT', default=None),
+            "oidc_callback_path" : config('SSO_CALLBACK_PATH', default='/geocontrib/oidc/callback/'),
+            "scope": ['openid', 'email', 'profile'],
+            "hook_get_user": "geocontrib.accounts.pyoidc_backend:hook_get_user",
+            "oidc_cache_provider_metadata": True, 
+        }
+    }
+
+# Specific settings for contribution by logged user
+ALLOW_LOGGED_USER_CREATE_FEATURE = config('ALLOW_LOGGED_USER_CREATE_FEATURE', default=False, cast=bool)
+# Specific settings to restrict feature visibilty to owner
+RESTRICT_FEATURE_VISIBILITY_TO_OWNER = config('RESTRICT_FEATURE_VISIBILITY_TO_OWNER', default=False, cast=bool)

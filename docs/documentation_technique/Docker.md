@@ -186,6 +186,42 @@ L'image Docker de base possède ces variables de configuration :
   [Plus d'infos ici](https://redmine.neogeo.fr/issues/22571#note-11).
 
 
+* `LDAP_SERVER_URI`, default=None
+  URL du serveur LDAP (Single Sign-On), si l'application utilise l'authentification LDAP.
+  Exemple : `ldap://localhost:10389`
+
+* `LDAP_BASE_DN`, default=`"ou=system"`
+  DN de base à partir duquel les utilisateurs sont recherchés dans l’annuaire LDAP.  
+  Exemple : `ou=system` ou `ou=users,dc=example,dc=com`
+
+* `LDAP_BIND_DN_TEMPLATE`, default=`"uid={},ou=system"`
+  Modèle de DN utilisé pour se connecter avec le nom d'utilisateur saisi. `{}` sera remplacé dynamiquement.  
+  Exemple : `uid={},ou=system` devient `uid=john,ou=system`
+
+* `SSO_KEYCLOAK_URL`, default=None
+  URL de base de l’instance Keycloak utilisée pour le Single Sign-On.
+  Exemple : `http://localhost:8080`
+
+* `SSO_KEYCLOAK_DISCOVERY_ENDPOINT`, default=None
+  URL du point de découverte OIDC du Realm Keycloak. Elle permet à Django de récupérer automatiquement les métadonnées nécessaires.
+  Exemple : `http://localhost:8080/realms/master/.well-known/openid-configuration`
+
+* `SSO_KEYCLOAK_CLIENT_ID`, default=None
+  Identifiant du client enregistré dans Keycloak pour l'application Django.
+  Exemple : `django-app`
+
+* `SSO_KEYCLOAK_CLIENT_SECRET`, default=None
+  Secret partagé associé au client Keycloak. Il est généré automatiquement dans l'interface Keycloak.
+  Exemple : `Bb1Sk2rO0d7w4Dcx7OkqHuM87ibkjWyA`
+
+* `SSO_CALLBACK_PATH`, default=`"/geocontrib/oidc/callback/"`
+  Chemin de rappel (callback) utilisé après l’authentification réussie via Keycloak. Ce chemin doit être enregistré dans le client Keycloak comme URI de redirection autorisée.
+
+* `SSO_ADMIN_USERS`, default=`""`, cast=`Csv()`
+  Liste de usernames des utilisateurs se voyant attribuer les droits administrateur sur l'instance à la création/mise à jour d'un utilisateur depuis un service SSO (keycloak).
+  Exemple : `admin,ltorvalds`
+  
+
 ## Variables utilisées pour configurer le frontend :
 
 * `APPLICATION_ABSTRACT`
@@ -218,6 +254,9 @@ L'image Docker de base possède ces variables de configuration :
 * `DISABLE_LOGIN_BUTTON`
   Cache le bouton de connexion lorsque l'authentification est gérée en dehors de l'application.
   
+* `LOGOUT_URL`
+  Spécifie une url de déconnexion remplaçant l'appel au logout django (utile dans le cadre du SSO)
+
 * `DISPLAY_FORBIDDEN_PROJECTS`
   Spécifie si tous les projets doivent être affichés dans la liste de la page principale.
   
