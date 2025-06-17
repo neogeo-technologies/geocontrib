@@ -56,10 +56,13 @@ SSO_KEYCLOAK_CLIENT_ID=<client_id>
 SSO_KEYCLOAK_CLIENT_SECRET=<client_secret>
 SSO_KEYCLOAK_REALM=<realm>
 SSO_KEYCLOAK_DISCOVERY_ENDPOINT=https://<keycloak-host>/realms/<realm>/.well-known/openid-configuration
-SSO_CALLBACK_PATH=https://<keycloak-host>/geocontrib/oidc/callback/
+
+# valeur par défaut pour exemple, il n'est pas nécessaire d'ajouter cette variable si elle ne différe pas
+SSO_CALLBACK_PATH=https://<geocontrib-app>/geocontrib/oidc/callback/
+
 SSO_ADMIN_USERS=admin,ltorvalds
-LOG_URL=https://<keycloak-host>/geocontrib/oidc/authenticate/
-LOGOUT_URL=https://<keycloak-host>/geocontrib/oidc/logout/
+LOG_URL=https://<geocontrib-app>/geocontrib/oidc/authenticate/
+LOGOUT_URL=https://<geocontrib-app>/geocontrib/oidc/logout/
 ```
 
 ## Procédure de modification et de déploiement
