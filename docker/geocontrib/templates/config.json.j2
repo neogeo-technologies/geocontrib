@@ -14,6 +14,7 @@
     "VUE_APP_RELOAD_INTERVAL": 15000,
 
     "VUE_APP_LOGIN_URL": "{{ SSO_KEYCLOAK_URL | default(LOGIN_URL, true) | default('', true) }}",
+    "VUE_APP_LOGOUT_URL": "{% if SSO_KEYCLOAK_URL %}{{ SSO_KEYCLOAK_URL }}/geocontrib/oidc/logout/{% else %}{{ VUE_APP_LOGOUT_URL | default('', true) }}{% endif %}",
     "VUE_APP_DISABLE_LOGIN_BUTTON": {{ DISABLE_LOGIN_BUTTON|default('false', true) }},
 
     "VUE_APP_FONT_FAMILY": "{{ VUE_APP_FONT_FAMILY|default('', true) }}",
@@ -41,5 +42,6 @@
     "VUE_APP_SIGNUP_COMMENTS_FIELD_LABEL" : "{{ VUE_APP_SIGNUP_COMMENTS_FIELD_LABEL|default('', true) }}",
     "VUE_APP_SIGNUP_COMMENTS_FIELD_REQUIRED" : "{{ VUE_APP_SIGNUP_COMMENTS_FIELD_REQUIRED|default('', true) }}",
     "VUE_APP_ADMIN_MAIL" : "{{ VUE_APP_ADMIN_MAIL|default('', true) }}",
-    "VUE_APP_ONLY_PUBLISHED_STATUS" : "{{ VUE_APP_ONLY_PUBLISHED_STATUS|default('false', true) }}"
+    "VUE_APP_ONLY_PUBLISHED_STATUS" : "{{ VUE_APP_ONLY_PUBLISHED_STATUS|default('false', true) }}",
+    "VUE_APP_FEATURE_CREATION_REDIRECT_URL":"{{ VUE_APP_FEATURE_CREATION_REDIRECT_URL|default('', true) }}"
 }

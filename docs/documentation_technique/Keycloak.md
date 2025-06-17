@@ -57,10 +57,12 @@ SSO_KEYCLOAK_CLIENT_SECRET=<client_secret>
 SSO_KEYCLOAK_REALM=<realm>
 SSO_KEYCLOAK_DISCOVERY_ENDPOINT=https://<keycloak-host>/realms/<realm>/.well-known/openid-configuration
 
-# valeur par défaut pour exemple, il n'est pas nécessaire d'ajouter cette variable si elle ne différe pas
-SSO_CALLBACK_PATH=https://<geocontrib-app>/geocontrib/oidc/callback/
-
 SSO_ADMIN_USERS=admin,ltorvalds
+
+# Il n'est pas nécessaire d'ajouter les variables suivantes si sso_callback_path ne différent pas de la valeur par défaut.
+Pour les urls, elles sont générés automatiquent à partir de sso_keycloak_url
+SSO_CALLBACK_PATH=https://<geocontrib-app>/geocontrib/oidc/callback/
+SSO_KEYCLOAK_URL
 LOG_URL=https://<geocontrib-app>/geocontrib/oidc/authenticate/
 LOGOUT_URL=https://<geocontrib-app>/geocontrib/oidc/logout/
 ```
