@@ -13,8 +13,8 @@
     "VUE_APP_IDGO": {{ VUE_APP_IDGO|default('false', true) }},
     "VUE_APP_RELOAD_INTERVAL": 15000,
 
-    "VUE_APP_LOGIN_URL": "{{ SSO_KEYCLOAK_URL | default(LOGIN_URL, true) | default('', true) }}",
-    "VUE_APP_LOGOUT_URL": "{% if SSO_KEYCLOAK_URL %}{{ SSO_KEYCLOAK_URL }}geocontrib/oidc/logout/{% else %}{{ VUE_APP_LOGOUT_URL | default('', true) }}{% endif %}",
+    "VUE_APP_LOGIN_URL": "{{ VUE_APP_LOGIN_URL| | default('', true) }}",
+    "VUE_APP_LOGOUT_URL": "{{ VUE_APP_LOGOUT_URL | default('', true) }},
     "VUE_APP_DISABLE_LOGIN_BUTTON": {{ DISABLE_LOGIN_BUTTON|default('false', true) }},
 
     "VUE_APP_FONT_FAMILY": "{{ VUE_APP_FONT_FAMILY|default('', true) }}",
