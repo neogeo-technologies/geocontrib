@@ -104,3 +104,6 @@ variables:
 
   VUE_APP_LOGOUT_URL:
     env_config_front: LOGOUT_URL
+  
+  VUE_APP_ONLY_PUBLISHED_STATUS:
+    env_config_front: ONLY_PUBLISHED_STATUS

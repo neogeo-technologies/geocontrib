@@ -195,6 +195,10 @@ class Authorization(models.Model):
 
             user_rank = cls.get_rank(user, project)
 
+
+            if (user.is_authenticated and settings.ALLOW_LOGGED_USER_CREATE_FEATURE and user_rank == Rank.LOGGED_USER.value):
+                user_perms['can_create_feature'] = True
+
             if user_rank >= project_rank_min or project_rank_min == Rank.ANONYMOUS.value:
                 user_perms['can_view_project'] = True
                 user_perms['can_view_feature'] = True

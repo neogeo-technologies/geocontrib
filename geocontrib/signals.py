@@ -11,6 +11,8 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from geocontrib import logger
+from django.core.management.base import CommandError
+from geocontrib.models.project import Project
 
 
 def disable_for_loaddata(signal_handler):
@@ -116,15 +118,27 @@ def update_sql_view(sender, instance, created, **kwargs):
 @receiver(models.signals.post_delete, sender='geocontrib.FeatureType')
 @disable_for_loaddata
 def delete_sql_view(sender, instance, **kwargs):
-    if instance:
-        call_command('generate_sql_view',
+    if not instance:
+        return
+
+    try:
+        project_id = getattr(instance.project, 'id', None)  # peut lever RelatedObjectDoesNotExist
+    except Exception as e:
+        logger.warning(f"Project relation is broken on FeatureType {instance.id}: {e}")
+        project_id = None
+
+    try:
+        call_command(
+            'generate_sql_view',
             mode=settings.AUTOMATIC_VIEW_CREATION_MODE,
             schema_name=settings.AUTOMATIC_VIEW_SCHEMA_NAME,
             feature_type_id=instance.id,
             feature_type_slug=instance.slug,
-            project_id=instance.project.id,
+            project_id=project_id,
             is_ft_deletion=True
         )
+    except CommandError as ce:
+        logger.warning(f"Skip view generation on FT deletion ({instance.id}): {ce}")
 
 
 @receiver(models.signals.post_save, sender='geocontrib.FeatureType')

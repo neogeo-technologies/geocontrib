@@ -10,6 +10,9 @@ https://git.neogeo.fr/geocontrib/geocontrib-docker
 
 L'image Docker de base possède ces variables de configuration :
 
+* `ALLOW_LOGGED_USER_CREATE_FEATURE`, default=False, cast=`bool`
+  Définit les hôtes autorisés à accéder à l'application.
+
 * `ALLOWED_HOSTS`, default=`"localhost, 127.0.0.1, 0.0.0.0"`, cast=`Csv()`
   Définit les hôtes autorisés à accéder à l'application.
 
@@ -152,6 +155,9 @@ L'image Docker de base possède ces variables de configuration :
 
 * `REDIS_HOST`, default=`"redis"`
   Hôte du serveur Redis utilisé pour la mise en file d'attente des tâches Celery.
+
+* `RESTRICT_FEATURE_VISIBILITY_TO_OWNER`, default=False
+  Limite la visibilité de signalement à son auteur
 
 * `SECRET_KEY`, default=`"SECRET_KEY"`
   Clé secrète utilisée par Django pour la sécurité des sessions.
@@ -310,3 +316,6 @@ L'image Docker de base possède ces variables de configuration :
   
 * `ADMIN_MAIL`
   Adresse courriel de l'administrateur de l'instance geocontrib (utilisé pour l'ajout de groupe d'utilisateurs)
+
+* `ONLY_PUBLISHED_STATUS`
+  Limite le choix du statut d'un signalement à publier pour un usage simplifié de l'application

@@ -44,7 +44,7 @@ class FeatureTypeCreate(SingleObjectMixin, UserPassesTestMixin, View):
         project = self.get_object()
         return Authorization.has_permission(user, 'can_create_feature_type', project)
 
-    def get(self, request, slug):
+    def get(self, request):
         project = self.get_object()
         user = request.user
         slug = request.GET.get('create_from')
