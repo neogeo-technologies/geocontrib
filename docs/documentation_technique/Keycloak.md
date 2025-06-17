@@ -35,11 +35,18 @@ Nom du Realm Keycloak utilisé pour l’authentification (ex : master).
 URL du point de découverte OIDC du Realm Keycloak.
 Elle permet à Django de récupérer automatiquement les métadonnées nécessaires à l’authentification OIDC.
 
-* LOG\_URL
-  URL utilisée pour se connecter via SSO.
+* SSO\_CALLBACK\_PATH  
+Chemin de rappel (callback) utilisé après l’authentification réussie via Keycloak.
+-> Dans la plupart des cas la valeur par défaut suffit, par contre ce chemin doit être enregistré dans le client Keycloak comme URI de redirection autorisée.
 
-* LOGOUT\_URL
-  Spécifie une url de déconnexion remplaçant l'appel au logout django
+* SSO\_ADMIN\_USERS  
+Liste de usernames des utilisateurs se voyant attribuer les droits administrateur sur l'instance à la création/mise à jour d'un utilisateur depuis un service SSO (keycloak).
+
+* LOG\_URL  
+URL utilisée pour se connecter via SSO.
+
+* LOGOUT\_URL  
+Spécifie une url de déconnexion remplaçant l'appel au logout django
 
 
 ## Exemple de fichier `.env`
@@ -49,6 +56,8 @@ SSO_KEYCLOAK_CLIENT_ID=<client_id>
 SSO_KEYCLOAK_CLIENT_SECRET=<client_secret>
 SSO_KEYCLOAK_REALM=<realm>
 SSO_KEYCLOAK_DISCOVERY_ENDPOINT=https://<keycloak-host>/realms/<realm>/.well-known/openid-configuration
+SSO_CALLBACK_PATH=https://<keycloak-host>/geocontrib/oidc/callback/
+SSO_ADMIN_USERS=admin,ltorvalds
 LOG_URL=https://<keycloak-host>/geocontrib/oidc/authenticate/
 LOGOUT_URL=https://<keycloak-host>/geocontrib/oidc/logout/
 ```

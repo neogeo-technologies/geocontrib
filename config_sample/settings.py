@@ -367,7 +367,8 @@ if sso_keycloak_url:
             "oidc_cache_provider_metadata": True, 
         }
     }
+
 # Specific settings for contribution by logged user
-ALLOW_LOGGED_USER_CREATE_FEATURE =  config('ALLOW_LOGGED_USER_CREATE_FEATURE', default=False, cast=bool)
+ALLOW_LOGGED_USER_CREATE_FEATURE = config('ALLOW_LOGGED_USER_CREATE_FEATURE', default=False, cast=bool)
 # Specific settings to restrict feature visibilty to owner
-RESTRICT_FEATURE_VISIBILITY_TO_OWNER =  config('RESTRICT_FEATURE_VISIBILITY_TO_OWNER', default=False, cast=bool)
+RESTRICT_FEATURE_VISIBILITY_TO_OWNER = config('RESTRICT_FEATURE_VISIBILITY_TO_OWNER', default=False, cast=bool)
