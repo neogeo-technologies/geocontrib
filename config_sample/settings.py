@@ -51,7 +51,7 @@ CORE_APPS = [
 ]
 THIRD_PARTY_DJANGO_APPS = config(
     'THIRD_PARTY_DJANGO_APPS', 
-    default='rest_framework, rest_framework_gis, django_celery_beat, drf_yasg', 
+    default='rest_framework, rest_framework_gis, django_celery_beat, drf_yasg, django_pyoidc', 
     cast=Csv()
 )
 OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
@@ -267,18 +267,6 @@ DEFAULT_MAP_VIEW = {
     'zoom': 4
 }
 
-# Hauts-de-France administrative area
-# DEFAULT_MAP_VIEW = {
-#     'center': [50.00976, 2.8657699],
-#     'zoom': 7
-# }
-
-# Bourgogne Franche Comté administrative area
-# DEFAULT_MAP_VIEW = {
-#     'center': [47.5, 5.7],
-#     'zoom': 7
-# }
-
 # Project duplication settings
 PROJECT_COPY_RELATED = {
     'AUTHORIZATION': config('PROJECT_COPY_RELATED_AUTHORIZATION', default=True, cast=bool),
@@ -341,20 +329,14 @@ SWAGGER_SETTINGS = {
 }
 
 # SSO KEYCLOAK CONFIG
-sso_keycloak_url = config('SSO_KEYCLOAK_URL', default=None)
-
-if sso_keycloak_url:
+SSO_KEYCLOAK_URL = config('SSO_KEYCLOAK_URL', default=None)
+if SSO_KEYCLOAK_URL:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
             "LOCATION": CELERY_BROKER_URL,
         }
     }
-
-    INSTALLED_APPS += [
-        'django_pyoidc',        
-    ]
-
     DJANGO_PYOIDC = {
         "sso_keycloak": {
             "client_id": config('SSO_KEYCLOAK_CLIENT_ID', default=None),
