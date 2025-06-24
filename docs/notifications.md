@@ -66,3 +66,19 @@ Notre système de notifications est conçu pour informer les utilisateurs des é
 
 - **Caractéristiques Configurables** :  
   - **Activation des Notifications** : Les notifications sont activés dès lors qu'un champ personnalisé de type "Notification à un groupe" est configuré pour un type de signalement
+
+
+### 6. Notifications de création de compte utilisateur
+- **Objectif** : Informer l'utilisateur lorsque son compte a été créé dans geocontrib après une connexion par SSO.
+
+- **Fonctionnement** : L'envoi de la notification est faite au niveau de pyoidc_backend
+
+- **Déclencheur** : Se produit lorsqu'un nouvel utilisateur est ajouté suite à une connexion via keycloak.
+
+
+### 7. Notification administrateur de l'ajout d'un utilisateur
+- **Objectif** : Informer l'administrateur lorsqu'un nouvel utilisateur a été créé dans geocontrib après une connexion par SSO.
+
+- **Fonctionnement** : L'envoi de la notification est faite au niveau de pyoidc_backend
+
+- **Déclencheur** : Se produit lorsqu'un nouvel utilisateur est ajouté suite à une connexion via keycloak.

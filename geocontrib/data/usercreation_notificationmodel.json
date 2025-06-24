@@ -1,0 +1,20 @@
+[
+  {
+    "model": "geocontrib.notificationmodel",
+    "pk": 6,
+    "fields": {
+      "template_name": "Création de compte utilisateur",
+      "subject": "Bienvenue sur {{ application_name }} !",
+      "message": "<h1 style=\"color: {{ theme_color }}; margin: 0 0 12px 0;\">Bienvenue, {{ user.username }} !</h1>\n<p style=\"font-size: 1.15em; color: #333; margin: 0;\">\nNous sommes ravis de vous accueillir sur <b>{{ application_name }}</b>.<br>\nVotre compte a bien été créé et vous pouvez désormais profiter de l'ensemble de nos services.\n</p>\n<a href=\"{{ profile_url|absurl }}\"\nstyle=\"display: inline-block; background: {{ theme_color }}; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 6px; margin-top: 28px; font-weight: bold;\">Accéder\nà mon compte</a>"
+    }
+  },
+  {
+    "model": "geocontrib.notificationmodel",
+    "pk": 7,
+    "fields": {
+      "template_name": "Notification administrateur de l'ajout d'un utilisateur",
+      "subject": "[{{ application_name }}] Un nouvel utilisateur a été ajouté",
+      "message": "<h1 style=\"color: {{ theme_color }}; margin: 0 0 12px 0;\">Un nouvel utilisateur a été ajouté</h1>\n<p style=\"font-size: 1.15em; color: #333; margin: 0;\">\nNouvel utilisateur : {{ user.username }}<br>\nEmail : {{ user.email }}\n</p>"
+    }
+  }
+]
