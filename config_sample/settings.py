@@ -343,6 +343,7 @@ if SSO_KEYCLOAK_URL:
             "client_secret": config('SSO_KEYCLOAK_CLIENT_SECRET', default=None),
             "provider_discovery_uri": config('SSO_KEYCLOAK_DISCOVERY_ENDPOINT', default=None),
             "oidc_callback_path" : config('SSO_CALLBACK_PATH', default='/geocontrib/oidc/callback/'),
+            "post_logout_redirect_uri" : config('SSO_POST_LOGOUT_REDIRECT_URI', default='/geocontrib/'),
             "scope": ['openid', 'email', 'profile'],
             "hook_get_user": "geocontrib.accounts.pyoidc_backend:hook_get_user",
             "oidc_cache_provider_metadata": True, 
