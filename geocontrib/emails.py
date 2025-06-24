@@ -226,6 +226,7 @@ def notif_users_groups_published_feature(emails, context):
     feature = context['feature']
 
     context['url_feature'] = urljoin(BASE_URL, feature.get_view_url())
+    context['theme_color'] = PRIMARY_COLOR
 
     try:
         # Fetch the customizable notification template from the database, which allow the administrator to edit the email body header.
@@ -237,7 +238,8 @@ def notif_users_groups_published_feature(emails, context):
             'event': context['event'],
             'project_slug': feature.project.slug,
             'project_name': feature.project.title,
-            'feature': feature
+            'feature': feature,
+            'theme_color': PRIMARY_COLOR
         })
         # get the mail object template
         subject_template = Template(notification_model.subject)
@@ -277,7 +279,7 @@ def notif_user_account_created(user):
         context_dict['message'] = message
 
     except ObjectDoesNotExist:
-        subject = "[{}] Bienvenue sur la plateforme".format(settings.APPLICATION_NAME)
+        subject = "Bienvenue sur {} !".format(settings.APPLICATION_NAME)
 
     email = EmailBaseBuilder(
         context=context_dict, bcc=[user.email], subject=subject,
@@ -296,7 +298,7 @@ def notif_admin_user_created(user):
         'user': user
     }
     try:
-        notification_model = NotificationModel.objects.get(template_name="Notification admin création utilisateur")
+        notification_model = NotificationModel.objects.get(template_name="Notification administrateur de l'ajout d'un utilisateur")
         data = Context(context_dict)
         subject = Template(notification_model.subject).render(data)
         message = Template(notification_model.message).render(data)
@@ -304,7 +306,7 @@ def notif_admin_user_created(user):
         context_dict['message'] = message
 
     except ObjectDoesNotExist:
-        subject = "[{}] Un nouvel utilisateur a été créé".format(settings.APPLICATION_NAME)
+        subject = "[{}] Un nouvel utilisateur a été ajouté".format(settings.APPLICATION_NAME)
 
     admins = User.objects.filter(is_superuser=True)
     for admin in admins:

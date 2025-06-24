@@ -5,7 +5,7 @@
     "fields": {
       "template_name": "Publication dans un groupe d'utilisateurs",
       "subject": "[{{ application_name }}] Un signalement a été publié dans un groupe dont vous êtes membres",
-      "message": "Le signalement <a href=\"{{ url_feature }}\">{{ feature.title|title }} </a> a été publié dans le projet {{ feature.project.title|title }} le {{ event.created_on }}"
+      "message": "<h1 style=\"color: {{ theme_color }}; margin: 0 0 12px 0;\">Un nouveau signalement a été publié</h1>\n<p style=\"font-size: 1.15em; color: #333; margin: 0;\">\nLe signalement <a href=\"{{ url_feature }}\">{{ feature.title|title }} </a> a été publié dans le projet {{ feature.project.title|title }} le {{ event.created_on }}\n</p>"
     }
   }
 ]
