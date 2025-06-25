@@ -53,15 +53,18 @@ Spécifie une url de déconnexion remplaçant l'appel au logout django
 
 ## Exemple de fichier `.env`
 ```
+# Variables SSO requises pour keycloak
 SSO_KEYCLOAK_URL=https://<keycloak-host>/
 SSO_KEYCLOAK_CLIENT_ID=<client_id>
 SSO_KEYCLOAK_CLIENT_SECRET=<client_secret>
 SSO_KEYCLOAK_REALM=<realm>
 SSO_KEYCLOAK_DISCOVERY_ENDPOINT=https://<keycloak-host>/realms/<realm>/.well-known/openid-configuration
+
 # Les deux variables suivantes n'ont pas besoin d'être définies si pas de changement aux valeurs par défaut
 SSO_CALLBACK_PATH=https://<geocontrib-app>/geocontrib/oidc/callback/
 SSO_POST_LOGOUT_REDIRECT_URI=https://<geocontrib-app>/geocontrib/
 
+# Configuration du frontend geocontrib
 SSO_ADMIN_USERS=admin,ltorvalds
 LOG_URL=https://<geocontrib-app>/geocontrib/oidc/authenticate/
 LOGOUT_URL=https://<geocontrib-app>/geocontrib/oidc/logout/
@@ -88,11 +91,10 @@ Solution :
 En installation classique : Assurez-vous que la variable (comme SSO_CALLBACK_PATH) est définie et non vide dans le fichier .env. Si elle est vide, supprimez l'entrée.
 
 Avec Docker Compose personnalisé : Le fichier docker-compose.yml fourni avec l'application gère déjà ce cas. Pour une configuration personnalisée, définissez une valeur par défaut pour la variable :
-
-yaml
-Copy
+```
 environment:
-  - SSO_CALLBACK_PATH=${SSO_CALLBACK_PATH:-'/geocontrib/oidc/callback/'}
+  - SSO_CALLBACK_PATH=${SSO_CALLBACK_PATH:-/geocontrib/oidc/callback/}
+```
 Cela garantit que les URLs de redirection sont valides et fonctionnent correctement.
 
 ### Problèmes de redirection après connexion/déconnexion
@@ -105,7 +107,7 @@ Cela garantit que les URLs de redirection sont valides et fonctionnent correctem
    - Assurez-vous que les variables SSO_CALLBACK_PATH (connexion) et SSO_POST_LOGOUT_REDIRECT_URI (déconnexion) sont bien définies et non vides dans votre fichier .env.   
    Si une de ces variables est vide, supprimez l'entrée dans le fichier .env ou, pour Docker Compose personnalisé, définissez une valeur par défaut :  
    ```
-    - SSO_CALLBACK_PATH=${SSO_CALLBACK_PATH:-'/geocontrib/oidc/callback/'}
+    - SSO_CALLBACK_PATH=${SSO_CALLBACK_PATH:-/geocontrib/oidc/callback/}
    ```
 
 3. **Vérifiez la configuration du service worker (Workbox) :**
