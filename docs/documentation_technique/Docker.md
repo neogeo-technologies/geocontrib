@@ -325,3 +325,9 @@ L'image Docker de base possède ces variables de configuration :
 
 * `FEATURE_CREATION_REDIRECT_URL`
   Spécifie l'url vers laquelle rediriger l'utilisateur après la création d'un signalement.
+
+* `EXTERNAL_HOME_LINK`
+  Spécifie l'url vers laquelle rediriger l'utilisateur au clic sur le bouton d'accueil.
+
+* `HIDE_MENU_NON_ADMIN`
+  Spécifie si le menu doit être caché aux utilisateurs autres qu'administrateurs.

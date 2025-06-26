@@ -90,7 +90,7 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * LOGIN_URL https://docs.djangoproject.com/fr/3.1/ref/settings/#login-url
 
 Éditer les paramètres spécifiques à l'outil dans config/settings.py :
-* BASE_URL : URL du site, par exemple "https://geocontrib.deme.neogeo.fr" ;
+* BASE_URL : URL du site, par exemple "https://geocontrib.demo.neogeo.fr" ;
 * DEFAULT_SENDING_FREQUENCY : fréquence d'envoi des notifications par email (never/instantly/daily/weekly) ;
 * APPLICATION_NAME : nom de l'application telle qu'elle apparaît dans l'IHM ;
 * APPLICATION_ABSTRACT : description de l'application en langage naturel ;
@@ -114,6 +114,14 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * SSO_OGS_SESSION_URL = url api OGS pour vérifier l'activation de la session utilisateur (si défini active la connexion par OGS) ;
 * AUTOMATIC_VIEW_CREATION_MODE = mode de création des vues SQL créées automatiquement, soit 'Projet' soit 'Type'(valeur par défaut) ;
 * AUTOMATIC_VIEW_SCHEMA_NAME = nom du schema où sont créées automatiquement les vues SQL (par défaut 'data') ;
+* SSO_SIGNUP_URL = URL pour la création de compte dans service d'authentification SSO ;
+* SIGNUP_COMMENTS_FIELD_LABEL = Nom du champ personnalisable pour le formulaire de création de compte dans service d'authentification SSO ;
+* SIGNUP_COMMENTS_FIELD_REQUIRED = Spécifie si le champ personnalisable ou commentaires pour la création de compte est requis ;
+* ADMIN_MAIL = Adresse courriel de l'administrateur de l'instance geocontrib (utilisé pour l'ajout de groupe d'utilisateurs) ;
+* ONLY_PUBLISHED_STATUS = Limite le choix du statut d'un signalement à publier pour un usage simplifié de l'application ;
+* FEATURE_CREATION_REDIRECT_URL = Spécifie l'url vers laquelle rediriger l'utilisateur après la création d'un signalement ;
+* EXTERNAL_HOME_LINK = Spécifie l'url vers laquelle rediriger l'utilisateur au clic sur le bouton d'accueil ;
+* HIDE_MENU_NON_ADMIN = Spécifie si le menu doit être caché aux utilisateurs autres qu'administrateurs ;
 
 
 Copier le contenu du fichier config_sample/urls.py dans config/urls.py
