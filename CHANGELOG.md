@@ -3,6 +3,55 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.4.5-rc7] - 2025-06-30
+### Évolutions
+- Redmine 27831: Ajout custom redirection après création de signalement & modifications dans l'interface
+- Redmine 26839: Mise en place d'un système de multiconnexions
+- Redmine 27386: Gestion des comptes admin - connexion keycloak
+- Redmine 27383: Notification création utilisateur - connexion keycloak
+- Redmine 27381: Modification front (page de connexion) 
+- Redmine 27352: Fixer le statut du signalement en "publié"
+- Redmine 27242: Gestion du nom de groupe d'utilisateur
+- Redmine 27230: Empêcher l'utilisateur de voir un signalement qui ne lui appartient pas dans GéoContrib 
+
+### Environement variables
+* `LDAP_SERVER_URI`, default=None
+  URL du serveur LDAP (Single Sign-On), si l'application utilise l'authentification LDAP.
+  Exemple : `ldap://localhost:10389`
+* `LDAP_BASE_DN`, default=`"ou=system"`
+  DN de base à partir duquel les utilisateurs sont recherchés dans l’annuaire LDAP.  
+  Exemple : `ou=system` ou `ou=users,dc=example,dc=com`
+* `LDAP_BIND_DN_TEMPLATE`, default=`"uid={},ou=system"`
+  Modèle de DN utilisé pour se connecter avec le nom d'utilisateur saisi. `{}` sera remplacé dynamiquement.  
+  Exemple : `uid={},ou=system` devient `uid=john,ou=system`
+* `SSO_KEYCLOAK_URL`, default=None
+  URL de base de l’instance Keycloak utilisée pour le Single Sign-On.
+  Exemple : `http://localhost:8080`
+* `SSO_KEYCLOAK_DISCOVERY_ENDPOINT`, default=None
+  URL du point de découverte OIDC du Realm Keycloak. Elle permet à Django de récupérer automatiquement les métadonnées nécessaires.
+  Exemple : `http://localhost:8080/realms/master/.well-known/openid-configuration`
+* `SSO_KEYCLOAK_CLIENT_ID`, default=None
+  Identifiant du client enregistré dans Keycloak pour l'application Django.
+  Exemple : `django-app`
+* `SSO_KEYCLOAK_CLIENT_SECRET`, default=None
+  Secret partagé associé au client Keycloak. Il est généré automatiquement dans l'interface Keycloak.
+  Exemple : `Bb1Sk2rO0d7w4Dcx7OkqHuM87ibkjWyA`
+* `SSO_CALLBACK_PATH`, default=`"/geocontrib/oidc/callback/"`
+  Chemin de rappel (callback) utilisé après l’authentification réussie via Keycloak. Ce chemin doit être enregistré dans le client Keycloak comme URI de redirection autorisée.
+* `SSO_POST_LOGOUT_REDIRECT_URI`, default=`"/geocontrib/"`
+  Url de redirection après déconnexion d'un service SSO (keycloak).
+* `SSO_ADMIN_USERS`, default=`""`, cast=`Csv()`
+  Liste de usernames des utilisateurs se voyant attribuer les droits administrateur sur l'instance à la création/mise à jour d'un utilisateur depuis un service SSO (keycloak).
+  Exemple : `admin,ltorvalds`
+* `LOGOUT_URL`
+  Spécifie une url de déconnexion remplaçant l'appel au logout django (utile dans le cadre du SSO)
+* `FEATURE_CREATION_REDIRECT_URL`
+  Spécifie l'url vers laquelle rediriger l'utilisateur après la création d'un signalement.
+* `EXTERNAL_HOME_LINK`
+  Spécifie l'url vers laquelle rediriger l'utilisateur au clic sur le bouton d'accueil.
+* `HIDE_MENU_NON_ADMIN`
+  Spécifie si le menu doit être caché aux utilisateurs autres qu'administrateurs.
+
 ## [6.4.5-rc4] - 2025-05-28
 
 ### Correctifs
@@ -15,7 +64,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Redmine 27462 (correctif de 23375) : Amélioration de la robustesse de la génération des vues SQL
   - Détection explicite des modes invalides ou ambigus, avec retour d’erreur explicite
   - Inclusion automatique des `feature_data` associés, même sans définition de champ
-  - Prise en compte des suppressions en cascade, entités orphelines et états inconsistants
+- Prise en compte des suppressions en cascade, entités orphelines et états inconsistants
   - Ajout de tests unitaires couvrant les cas normaux et limites (champ orphelin, suppression de projet, collisions)
   - Détection des conflits de noms de `CustomFields` après normalisation et génération d'alias automatique en mode `Type` ou optionnel en mode `Projet`
   - Support du mode `--force_project_view_with_aliases` pour générer une vue projet même en cas de divergence entre types

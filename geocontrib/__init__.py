@@ -25,4 +25,4 @@ logger = logging.getLogger(__name__)
 
 default_app_config = 'geocontrib.apps.GeocontribConfig'
 
-__version__ = '6.4.5-rc4'
+__version__ = '6.4.5-rc7'
