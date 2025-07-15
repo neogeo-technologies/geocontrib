@@ -3,6 +3,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.4.5-rc8] - 2025-07-15
+
+### Évolution
+- Redmine 26839 : Mise en place d'un système de multiconnexions
+    - Reprise de la gestion des comptes administrateurs en utilisant les groupes Keycloak.
+    - Suppression des valeurs inutilisées à la création de l'utilisateur.
+
+### Variables d'environnement
+Suppression de `SSO_ADMIN_USERS`, remplacé par `SSO_ADMIN_USER_GROUPS`.
+
+* `SSO_ADMIN_USER_GROUPS`, default=`"geocontrib-admins"`, cast=`Csv()`
+  
+  Liste des groupes Keycloak dont les membres recevront automatiquement les droits administrateur sur Geocontrib lors de l’authentification via SSO.  
+  Exemple : `geocontrib-admins,geocontrib-superuser`
+
 ## [6.4.5-rc7] - 2025-06-30
 ### Évolutions
 - Redmine 27831: Ajout custom redirection après création de signalement & modifications dans l'interface

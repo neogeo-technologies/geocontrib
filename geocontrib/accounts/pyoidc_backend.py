@@ -20,7 +20,7 @@ from geocontrib.emails import notif_user_account_created
 from geocontrib.emails import notif_admin_user_created
 from decouple import config, Csv
 
-SSO_ADMIN_USERS = config('SSO_ADMIN_USERS', default="", cast=Csv())
+SSO_ADMIN_USER_GROUPS = config('SSO_ADMIN_USER_GROUPS', default='geocontrib-admins', cast=Csv())
 
 logger = logging.getLogger(__name__)
 
@@ -52,25 +52,37 @@ def hook_get_user(client, tokens):
 
 def apply_user_claims(user, claims):
     """Remplit les champs de l'utilisateur Django depuis les claims OIDC."""
-    user.username = claims.get('preferred_username') or claims.get('email', '')
-    user.first_name = claims.get('preferred_givenname') or claims.get('given_name', '')
+    user.first_name = claims.get('given_name', '')
     user.last_name = claims.get('family_name', '')
     user.email = claims.get('email', '')
-    user.is_active = True
+    # Utilise le username défini dans keycloak, sinon fallback sur l'email (doit être unique dans Keycloak)
+    user.username = claims.get('preferred_username') or user.email or 'anonymous'
+    # La désactivation des comptes est gérée côté Keycloak : un utilisateur désactivé ne peut pas s’authentifier.
+    user.is_active = True # Si l'utilisateur arrive jusqu'ici cela signifie qu'il est actif dans keycloak
     return user
 
-def set_admin_flags_if_authorized(user):
-    """Attribue les droits admin si l'utilisateur est dans SSO_ADMIN_USERS."""
-    if user.username in SSO_ADMIN_USERS:
+def set_admin_flags_if_authorized(user, claims):
+    """
+    Attribue les droits admin si l'utilisateur fait partie d'un groupe administrateur
+    défini dans SSO_ADMIN_USER_GROUPS.
+    """
+    # Les groupes Keycloak sont souvent préfixés ou suffixés par '/', donc on l'ignore pour la comparaison.
+    user_groups = [g.strip('/') for g in claims.get('groups', [])]
+    admin_groups = [g.strip('/') for g in SSO_ADMIN_USER_GROUPS]
+    # set1 & set2 signifie l’intersection des deux ensembles (c’est-à-dire les éléments communs aux deux).
+    if set(user_groups) & set(admin_groups):
         user.is_staff = True
         user.is_superuser = True
-        user.save(update_fields=['is_staff', 'is_superuser'])
+    else:
+        user.is_staff = False
+        user.is_superuser = False
+    user.save(update_fields=['is_staff', 'is_superuser'])
 
 def create_user(user, claims):
     user = apply_user_claims(user, claims)
     user.save(update_fields=['username', 'first_name', 'last_name', 'email', 'is_active'])
 
-    set_admin_flags_if_authorized(user)
+    set_admin_flags_if_authorized(user, claims)
 
     if user.email:
         notif_user_account_created(user)
@@ -82,7 +94,7 @@ def update_user(user, claims):
     user = apply_user_claims(user, claims)
     user.save(update_fields=['username', 'first_name', 'last_name', 'email', 'is_active'])
 
-    set_admin_flags_if_authorized(user)
+    set_admin_flags_if_authorized(user, claims)
 
     return user
 
