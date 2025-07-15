@@ -61,8 +61,53 @@ Les variables suivantes doivent être configurées dans votre `.env` (se référ
 
 ## Gestion des comptes administrateurs Django
 
-Les utilisateurs **administrateurs** dans Geocontrib sont définis via le paramètre `SSO_ADMIN_USERS`.  
-Lors de la création ou mise à jour d’un utilisateur via Keycloak, si son username correspond à l’un des utilisateurs dans `SSO_ADMIN_USERS`, il sera marqué comme administrateur dans Geocontrib.
+Les utilisateurs **administrateurs** dans Geocontrib sont gérés via leur appartenance à un **groupe Keycloak** (par défaut `/admins`).  
+L’application Geocontrib attribue automatiquement les droits d’administration à tout utilisateur membre de ce groupe dans Keycloak, lors de la connexion via SSO.
+
+### Créer et configurer le groupe d’administrateurs dans Keycloak
+
+1. Connectez-vous à l’interface d’administration Keycloak avec un compte ayant les droits nécessaires.
+2. Accédez à :  
+   **Groups** (ou “Groupes”).
+3. Cliquez sur **Create group** (ou “Créer un groupe”).
+4. Saisissez le nom du groupe souhaité (par défaut : `admins`).
+5. Cliquez sur **Save**.
+
+Le groupe apparaît alors dans la liste.  
+Vous pouvez maintenant y ajouter des membres :
+
+1. Cliquez sur le groupe (`/admins` ou le nom de votre choix).
+2. Allez dans l’onglet **Members** (ou “Membres”).
+3. Cliquez sur **Add member** (ou “Ajouter un membre”).
+4. Sélectionnez l’utilisateur à ajouter, puis validez.
+
+**Remarque :**  
+Le(s) nom(s) de groupe(s) utilisés pour l’administration sont configurables via la variable d’environnement `SSO_ADMIN_USER_GROUPS`.
+
+
+### Configurer le mappage “Group Membership” dans Keycloak
+
+Par défaut, Keycloak n’inclut pas l’information des groupes de l’utilisateur dans le jeton d’authentification (token OIDC) envoyé à Geocontrib.  
+
+Pour que Geocontrib puisse connaître les groupes Keycloak de chaque utilisateur, il est nécessaire de créer un **mapper “Group Membership”** sur le client OIDC utilisé.
+
+1. Accédez à :  
+   **Clients > [Votre client Geocontrib] > Dedicated scopes**
+2. Sélectionnez l’onglet **Mappers** (ou “Mappages”).
+3. Cliquez sur **“Create”** (ou “Ajouter un mappage”).
+4. Remplissez le formulaire comme suit :
+    - **Name** : `groups`
+    - **Mapper Type** : `Group Membership`
+    - **Token Claim Name** : `groups`
+    - **Full group path** : `true` (recommandé, retournera `/admins`)
+    - **Add to ID token** : `ON`
+    - **Add to access token** : `ON`
+    - **Add to userinfo** : `ON`
+5. Cliquez sur **Save**.
+
+> **Remarque :**  
+> Après avoir ajouté ce mapper, les utilisateurs devront se déconnecter puis se reconnecter pour obtenir un nouveau token OIDC intégrant la liste de leurs groupes.
+
 
 ## Parcours de test de connexion SSO
 

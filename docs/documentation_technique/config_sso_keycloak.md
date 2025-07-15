@@ -60,12 +60,12 @@ SSO_KEYCLOAK_CLIENT_SECRET=<client_secret>
 SSO_KEYCLOAK_REALM=<realm>
 SSO_KEYCLOAK_DISCOVERY_ENDPOINT=https://<keycloak-host>/realms/<realm>/.well-known/openid-configuration
 
-# Les deux variables suivantes n'ont pas besoin d'être définies si pas de changement aux valeurs par défaut
+# Les trois variables suivantes n'ont pas besoin d'être définies si pas de changement aux valeurs par défaut
 SSO_CALLBACK_PATH=https://<geocontrib-app>/geocontrib/oidc/callback/
 SSO_POST_LOGOUT_REDIRECT_URI=https://<geocontrib-app>/geocontrib/
+SSO_ADMIN_USER_GROUPS=geocontrib-admins
 
 # Configuration du frontend geocontrib
-SSO_ADMIN_USERS=admin,ltorvalds
 LOG_URL=https://<geocontrib-app>/geocontrib/oidc/authenticate/
 LOGOUT_URL=https://<geocontrib-app>/geocontrib/oidc/logout/
 ```

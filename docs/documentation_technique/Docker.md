@@ -220,9 +220,9 @@ L'image Docker de base possède ces variables de configuration :
 * `SSO_POST_LOGOUT_REDIRECT_URI`, default=`"/geocontrib/"`
   Url de redirection après déconnexion d'un service SSO (keycloak).
 
-* `SSO_ADMIN_USERS`, default=`""`, cast=`Csv()`
-  Liste de usernames des utilisateurs se voyant attribuer les droits administrateur sur l'instance à la création/mise à jour d'un utilisateur depuis un service SSO (keycloak).
-  Exemple : `admin,ltorvalds`
+* `SSO_ADMIN_USER_GROUPS`, default=`"geocontrib-admins"`, cast=`Csv()`
+  Liste des groupes Keycloak dont les membres recevront automatiquement les droits administrateur sur Geocontrib lors de l’authentification via SSO.
+  Exemple : `geocontrib-admins,geocontrib-superuser`
   
 
 ## Variables utilisées pour configurer le frontend :
