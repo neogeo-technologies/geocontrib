@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [6.4.5-rc8] - 2025-07-15
 
+### Correctifs
+- Redmine 28129 : Admin - sélection role admin absent
+
 ### Évolution
 - Redmine 26839 : Mise en place d'un système de multiconnexions
     - Reprise de la gestion des comptes administrateurs en utilisant les groupes Keycloak.
