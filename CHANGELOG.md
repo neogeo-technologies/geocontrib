@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.5] - 2025-09-29
+
+### Évolution
+- Redmine 27831 : Amélioration de la recherche textuelle dans les listes de valeurs pré-enregistrées
+  - Résultats plus pertinents : les correspondances commençant par le terme recherché apparaissent en premier, suivies des autres occurrences
+  - Recherche insensible aux accents et aux tirets
+  - Correction d’un bug qui limitait l’affichage à 10 résultats et masquait certaines valeurs (ex : "Rennes")
+
+### Breaking change
+- L’API `/prerecorded-list-values/<name>/` ne renvoie plus directement une liste brute, mais un objet structuré contenant les résultats et des informations de pagination (`results`, `total`, `limit`, `offset`)
+- Une migration doit être exécutée pour activer automatiquement l’extension PostgreSQL `unaccent`
+
 ## [6.4.5-rc8] - 2025-07-15
 
 ### Correctifs

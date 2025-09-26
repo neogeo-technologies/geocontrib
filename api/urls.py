@@ -21,6 +21,7 @@ from api.views.feature import FeatureView
 from api.views.feature import FeatureMVTView
 from api.views.feature import GetExternalGeojsonView
 from api.views.feature import GetIdgoCatalogView
+from api.views.feature import PreRecordedListNamesView
 from api.views.feature import PreRecordedValuesView
 from api.views.feature import ProjectFeatureBbox
 from api.views.feature import ProjectFeaturePaginated
@@ -202,7 +203,7 @@ urlpatterns = [
 
     path(
         'prerecorded-list-values/',
-        PreRecordedValuesView.as_view(), name='prerecorded-list-values'),
+        PreRecordedListNamesView.as_view(), name='prerecorded-list-names'),
     path(
         'prerecorded-list-values/<str:name>/',
         PreRecordedValuesView.as_view(), name='prerecorded-list-values'),

@@ -1419,84 +1419,71 @@ class GetExternalGeojsonView(views.APIView):
             return Response(data="Les données ne sont pas disponibles", status=404)
 
 
-class PreRecordedValuesView(APIView):
+class PreRecordedListNamesView(APIView):
     """
-    Retrieves a list of pre-recorded value names. If a name is provided, it filters the values based on the provided pattern and limit.
+    Returns the list of available pre-recorded list names.
     """
-
-    queryset = PreRecordedValues.objects.all()
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly
-    ]
-
     @swagger_auto_schema(
-        operation_summary="Retrieve pre-recorded value names or filtered values based on name, pattern, and limit",
+        operation_summary="List available pre-recorded lists",
         tags=["feature types"],
-        manual_parameters=[
-            openapi.Parameter(
-                'pattern',
-                openapi.IN_QUERY,
-                description="A pattern to filter the value names.",
-                type=openapi.TYPE_STRING,
-                required=False
-            ),
-            openapi.Parameter(
-                'limit',
-                openapi.IN_QUERY,
-                description="Limit the number of results returned.",
-                type=openapi.TYPE_INTEGER,
-                required=False
-            ),
-        ],
-        responses={
-            200: openapi.Response(
-                description="A list of pre-recorded value names.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            "name": openapi.Schema(type=openapi.TYPE_STRING, example="Catégories"),
-                        }
-                    )
-                ),
-                examples={
-                    "application/json": [
-                        {"name": "Catégories"},
-                        {"name": "Autre"}
-                    ]
-                }
-            ),
-            404: openapi.Response(
-                description="No pre-recorded values found.",
-                schema=openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    example="No pre-recorded values found."
-                )
-            )
-        }
+        responses={200: openapi.Response(
+            description="List of available lists",
+            examples={
+                "application/json": [
+                    {"name": "Catégories"},
+                    {"name": "Autre"}
+                ]
+            }
+        )}
     )
     def get(self, request, *args, **kwargs):
-        response = []
+        names = list(PreRecordedValues.objects.values("name"))
+        return JsonResponse(names, safe=False)
+
+
+class PreRecordedValuesView(APIView):
+    """
+    Returns values for a given pre-recorded list name, with pattern filtering and pagination.
+    """
+    @swagger_auto_schema(
+        operation_summary="Retrieve values of a pre-recorded list",
+        tags=["feature types"],
+        manual_parameters=[
+            openapi.Parameter("pattern", openapi.IN_QUERY, description="Search pattern", type=openapi.TYPE_STRING),
+            openapi.Parameter("limit", openapi.IN_QUERY, description="Max results", type=openapi.TYPE_INTEGER),
+            openapi.Parameter("offset", openapi.IN_QUERY, description="Pagination offset", type=openapi.TYPE_INTEGER),
+        ],
+        responses={200: openapi.Response(
+            description="Values of the requested list",
+            examples={
+                "application/json": {
+                    "results": ["Rennes", "Rennes-la-Roche", "Aix-les-Bains"],
+                    "total": 79,
+                    "limit": 50,
+                    "offset": 0
+                }
+            }
+        )}
+    )
+    def get(self, request, *args, **kwargs):
         name = kwargs.get('name')
-        pattern = self.request.query_params.get('pattern', '')
-        limit = self.request.query_params.get('limit', None)
+        pattern = request.query_params.get('pattern', '').strip()
+        try:
+            limit = min(int(request.query_params.get('limit', 50)), 100)  # garder un cap raisonnable
+        except ValueError:
+            limit = 50
+        try:
+            offset = int(request.query_params.get('offset', 0))
+        except ValueError:
+            offset = 0
 
         if name:
-            response = get_pre_recorded_values(name, pattern, limit)
+            values, total = get_pre_recorded_values(name, pattern, limit, offset, with_count=True)
+            return JsonResponse({"results": values, "total": total, "limit": limit, "offset": offset}, status=200)
         else:
-            response = list(PreRecordedValues.objects.values("name"))
-
-        # Apply pattern filtering if specified
-        if pattern:
-            response = [item for item in response if pattern.lower() in item.lower()]
-
-        # Apply limit if specified
-        if limit:
-            response = response[:int(limit)]
-
-        status = 200
-        return JsonResponse(response, safe=False, status=status)
+            # Retourne la liste des noms de listes
+            names = list(PreRecordedValues.objects.values_list("name", flat=True).order_by("name"))
+            return JsonResponse(names, safe=False, status=200)
 
 
 class CustomFields(APIView):

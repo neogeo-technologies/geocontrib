@@ -1,1 +1,15 @@
-["Lyn", "Lyon", "Lyon2", "Lyon3", "Lyon4", "Lyon5", "LyonNAIS", "Toulouse"]
+{
+  "results": [
+    "Lyn",
+    "Lyon",
+    "Lyon2",
+    "Lyon3",
+    "Lyon4",
+    "Lyon5",
+    "LyonNAIS",
+    "Toulouse"
+  ],
+  "total": 8,
+  "limit": 50,
+  "offset": 0
+}
