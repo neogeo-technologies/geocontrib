@@ -24,7 +24,7 @@ if cas_server:
     ]
 
 # add url for sso keycloak
-if hasattr(settings, "SSO_KEYCLOAK_URL"):
+if getattr(settings, "SSO_KEYCLOAK_URL", None):
     from django_pyoidc.views import (
         OIDCBackChannelLogoutView,
         OIDCLogoutView,

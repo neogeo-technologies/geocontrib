@@ -45,7 +45,7 @@ CORE_APPS = [
 ]
 THIRD_PARTY_DJANGO_APPS = config(
     'THIRD_PARTY_DJANGO_APPS', 
-    default='rest_framework, rest_framework_gis, django_celery_beat, drf_yasg, django_pyoidc',
+    default='rest_framework, rest_framework_gis, django_celery_beat, drf_yasg',
     cast=Csv()
 )
 OUR_APPS = config('OUR_APPS', default='geocontrib, api', cast=Csv())
@@ -352,6 +352,11 @@ if SSO_KEYCLOAK_URL:
             "LOCATION": CELERY_BROKER_URL,
         }
     }
+
+    INSTALLED_APPS += [
+        'django_pyoidc',        
+    ]
+
     DJANGO_PYOIDC = {
         "sso_keycloak": {
             "client_id": config('SSO_KEYCLOAK_CLIENT_ID', default=None),
