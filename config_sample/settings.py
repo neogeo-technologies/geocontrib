@@ -13,13 +13,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 from decouple import config, Csv
 import sentry_sdk
-
-sentry_sdk.init(
-    dsn="https://9bc5c885d28f85ba1410fb1ec9b9a8a4@sentry.neogeo.fr/31",
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for tracing.
-    traces_sample_rate=1.0,
-)
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -195,31 +189,54 @@ if ldap_server_uri:
 
 # Logging properties
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {pathname}, @{lineno} :\n {message} \n",
+            "style": "{",
         },
     },
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {pathname}, @{lineno} :\n {message} \n',
-            'style': '{',
+
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': config('LOG_LEVEL', default='WARN'),
-            'propagate': True,
+
+    # Root logger (catch-all)
+    # → garantit qu’aucun log n’est perdu
+    # → envoie tout vers la console (stdout) donc capté par Docker
+    "root": {
+        "handlers": ["console"],
+        "level": config("LOG_LEVEL", default="INFO"),
+    },
+
+    "loggers": {
+        # Logger Django principal
+        # propagate=False pour éviter que les logs soient envoyés
+        # à la fois à ce logger ET au root (donc doublons)
+        "django": {
+            "handlers": ["console"],
+            "level": config("LOG_LEVEL", default="INFO"),
+            "propagate": False,
         },
-        'plugin_georchestra': {
-            'handlers': ['console'],
-            'level': config('LOG_LEVEL', default='DEBUG'),
-            'propagate': True,
+
+        # Logger Celery (workers, tasks)
+        "celery": {
+            "handlers": ["console"],
+            "level": config("LOG_LEVEL", default="INFO"),
+            "propagate": False,
+        },
+
+        # Logger custom de ton app
+        "plugin_georchestra": {
+            "handlers": ["console"],
+            "level": config("LOG_LEVEL", default="INFO"),
+            "propagate": False,
         },
     },
 }
@@ -354,3 +371,21 @@ if SSO_KEYCLOAK_URL:
 ALLOW_LOGGED_USER_CREATE_FEATURE = config('ALLOW_LOGGED_USER_CREATE_FEATURE', default=False, cast=bool)
 # Specific settings to restrict feature visibilty to owner
 RESTRICT_FEATURE_VISIBILITY_TO_OWNER = config('RESTRICT_FEATURE_VISIBILITY_TO_OWNER', default=False, cast=bool)
+
+# Sentry
+SENTRY_DSN = config("SENTRY_DSN", default=None)
+SENTRY_ENABLED = config("SENTRY_ENABLED", cast=bool, default=False)
+
+if SENTRY_ENABLED and SENTRY_DSN:
+    # Intégration Sentry + Logging
+    sentry_logging = LoggingIntegration(
+        level=None,          # capture tous les logs (puis filtrage via event_level)
+        event_level="ERROR"  # n’envoie à Sentry que les logs ERROR et au-dessus
+    )
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[sentry_logging],
+        traces_sample_rate=1.0 if DEBUG else 0.1,  # 100% en dev, échantillonnage en prod
+        send_default_pii=False,  # évite d’envoyer des infos personnelles par défaut
+        max_breadcrumbs=50,      # limite l’historique de contexte
+    )

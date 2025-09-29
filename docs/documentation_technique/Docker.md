@@ -331,3 +331,11 @@ L'image Docker de base possède ces variables de configuration :
 
 * `HIDE_MENU_NON_ADMIN`
   Spécifie si le menu doit être caché aux utilisateurs autres qu'administrateurs.
+
+* `SENTRY_ENABLED`
+  Active ou désactive l’envoi des erreurs et traces vers Sentry (true / false).
+  Par défaut : désactivé si la variable n’est pas définie.
+
+* `SENTRY_DSN`
+  Chaîne de connexion DSN utilisée par Sentry pour identifier le projet et transmettre les événements.
+  Par défaut : désactivé si la variable n’est pas définie.
