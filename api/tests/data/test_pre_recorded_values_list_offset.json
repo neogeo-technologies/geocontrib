@@ -1,12 +1,10 @@
 {
   "results": [
-    "Lyn",
-    "Lyon",
     "Lyon2",
     "Lyon3",
     "Lyon4"
   ],
   "total": 8,
-  "limit": 5,
-  "offset": 0
+  "limit": 3,
+  "offset": 2
 }
