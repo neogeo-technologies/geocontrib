@@ -269,6 +269,27 @@ pytest path/to/test_file.py::nom_du_test
 ```
 <br>
 
+## Activation de Sentry
+
+L’intégration Sentry permet de suivre les erreurs et performances côté backend (Django) et frontend (Vue.js).
+
+### Variables d’environnement
+
+- `SENTRY_DSN` : DSN Sentry, activation seulement si défini  
+- `ENV_MODE` : mode d’exécution (`dev`, `recette`, `prod`), par défaut `recette`  
+
+### Backend (Django)
+
+Le backend initialise automatiquement Sentry si `SENTRY_DSN` est défini.  
+Le paramètre `ENV_MODE` ajuste le sampling des traces et du profiling :  
+- `dev` / `recette` : échantillonnage activé à **10%**  
+- `prod` : échantillonnage réduit à **0.05%** (seules quelques transactions sont remontées, mais toutes les erreurs le sont)  
+
+### Frontend (Vue.js)
+
+Le frontend récupère automatiquement la configuration Sentry via le fichier `config.json` généré par le backend lors de la construction de l’image Docker.  
+Aucune configuration manuelle supplémentaire n’est nécessaire dans le code du frontend : l’activation se fait via les mêmes variables `SENTRY_DSN` et `ENV_MODE`.
+
 ## Documentation de l'API
 
 La documentation de notre API est conçue pour fournir une référence complète et claire des différents endpoints disponibles. Elle permet aux développeurs d'explorer les fonctionnalités offertes par l'API, de tester des requêtes, et de comprendre les formats de réponse.
