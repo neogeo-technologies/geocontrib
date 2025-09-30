@@ -375,12 +375,21 @@ ALLOW_LOGGED_USER_CREATE_FEATURE = config('ALLOW_LOGGED_USER_CREATE_FEATURE', de
 # Specific settings to restrict feature visibilty to owner
 RESTRICT_FEATURE_VISIBILITY_TO_OWNER = config('RESTRICT_FEATURE_VISIBILITY_TO_OWNER', default=False, cast=bool)
 
-# Sentry
+# SENTRY
+# Variables d'environnement
 SENTRY_DSN = config("SENTRY_DSN", default=None)
-SENTRY_ENABLED = config("SENTRY_ENABLED", cast=bool, default=False)
+ENV_MODE = config("ENV_MODE", default="recette").lower()  # dev, recette, prod...
 
-if SENTRY_ENABLED and SENTRY_DSN:
-    # Intégration Sentry + Logging
+# Définition des taux de sampling par défaut
+traces_sample_rate = 0.1
+profiles_sample_rate = 0.1
+
+# En production : 5% → peu de bruit, mais assez d’échantillons
+if ENV_MODE in ("production", "prod"):
+    traces_sample_rate = 0.05
+    profiles_sample_rate = 0.05
+
+if SENTRY_DSN:  # Activation automatique si DSN présent
     sentry_logging = LoggingIntegration(
         level=None,          # capture tous les logs (puis filtrage via event_level)
         event_level="ERROR"  # n’envoie à Sentry que les logs ERROR et au-dessus
@@ -388,7 +397,9 @@ if SENTRY_ENABLED and SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[sentry_logging],
-        traces_sample_rate=1.0 if DEBUG else 0.1,  # 100% en dev, échantillonnage en prod
+        traces_sample_rate=traces_sample_rate,
+        profiles_sample_rate=profiles_sample_rate,
         send_default_pii=False,  # évite d’envoyer des infos personnelles par défaut
         max_breadcrumbs=50,      # limite l’historique de contexte
+        environment=ENV_MODE,
     )

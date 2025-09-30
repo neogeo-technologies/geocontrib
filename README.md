@@ -122,8 +122,8 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * FEATURE_CREATION_REDIRECT_URL = Spécifie l'url vers laquelle rediriger l'utilisateur après la création d'un signalement ;
 * EXTERNAL_HOME_LINK = Spécifie l'url vers laquelle rediriger l'utilisateur au clic sur le bouton d'accueil ;
 * HIDE_MENU_NON_ADMIN = Spécifie si le menu doit être caché aux utilisateurs autres qu'administrateurs ;
-* SENTRY_ENABLED = Active ou désactive l’envoi des erreurs et traces vers Sentry (true / false).
-* SENTRY_DSN = Chaîne de connexion DSN utilisée par Sentry pour identifier le projet et transmettre les événements.
+* ENV_MODE = Mode d’exécution de l’application (`dev`, `recette`, `prod`), par défaut `recette`;
+* SENTRY_DSN = DSN utilisée par Sentry pour identifier le projet et transmettre les événements, l'envoi est activé si une valeur est définie;
 
 Copier le contenu du fichier config_sample/urls.py dans config/urls.py
 
