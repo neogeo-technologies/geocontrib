@@ -116,3 +116,9 @@ variables:
 
   VUE_APP_HIDE_MENU_NON_ADMIN:
     env_config_front: HIDE_MENU_NON_ADMIN
+
+  VUE_APP_SENTRY_DSN:
+    env_config_front: SENTRY_DSN
+
+  VUE_APP_ENV_MODE:
+    env_config_front: ENV_MODE
