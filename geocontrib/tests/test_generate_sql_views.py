@@ -65,10 +65,10 @@ def test_generate_sql_view_type_mode_creates_view(caplog):
             schema_name="data"
         )
 
-    match = re.search(r"Successfully created view ([\w_]+)", caplog.text)
-    assert match, "Nom de la vue introuvable dans les logs"
-    view_name = f"data.{match.group(1)}"
-    assert get_view_exists(view_name), f"La vue {view_name} n'existe pas !"
+    cmd = generate_sql_view.Command()
+    expected_view_name = f"data.v_{cmd.safe_view_name(feature_type.slug)}__{cmd.safe_view_name(project.slug)}"
+
+    assert get_view_exists(expected_view_name), f"La vue {expected_view_name} n'existe pas !"
 
 # Cas 3 : suppression de vue quand is_ft_deletion=True
 @pytest.mark.django_db
@@ -97,8 +97,9 @@ def test_generate_sql_view_type_deletion_drops_view():
         schema_name="data"
     )
 
-    view_name = f"data.v_{feature_type.slug}__{project.slug}"
-    assert not get_view_exists(view_name), f"La vue {view_name} existe toujours !"
+    cmd = generate_sql_view.Command()
+    expected_view_name = f"data.v_{cmd.safe_view_name(feature_type.slug)}__{cmd.safe_view_name(project.slug)}"
+    assert not get_view_exists(expected_view_name), f"La vue {expected_view_name} existe toujours !"
 
 # Cas 4 : feature_type_id inexistant => CommandError explicite
 @pytest.mark.django_db
@@ -157,10 +158,9 @@ def test_generate_sql_view_project_with_multiple_feature_types_creates_view(capl
             schema_name="data"
         )
 
-    match = re.search(r"Successfully created view ([\w_]+)", caplog.text)
-    assert match
-    view_name = f"data.{match.group(1)}"
-    assert get_view_exists(view_name), f"La vue {view_name} n'existe pas !"
+    cmd = generate_sql_view.Command()
+    expected_view_name = f"data.v_{cmd.safe_view_name(project.slug)}"
+    assert get_view_exists(expected_view_name), f"La vue {expected_view_name} n'existe pas !"
 
 # Cas 7 : suppression de champ personnalisé => erreur capturée et création évitée
 @pytest.mark.django_db
@@ -194,25 +194,30 @@ def test_generate_sql_view_project_with_deleted_cf_drops_and_skips_creation(capl
 
 # Cas 8 : vérifie que les données présentes dans feature_data apparaissent dans la vue
 @pytest.mark.django_db
-def test_generate_sql_view_type_with_feature_data_fields(caplog):
+def test_generate_sql_view_type_with_feature_data_fields():
     call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
     call_command("loaddata", "api/tests/data/test_features_with_data.json", verbosity=0)
 
-    with caplog.at_level("INFO"):
-        call_command(
-            "generate_sql_view",
-            mode="Type",
-            feature_type_id=1,
-            schema_name="data"
-        )
+    # On génère la vue en mode Type pour le FeatureType 1
+    call_command(
+        "generate_sql_view",
+        mode="Type",
+        feature_type_id=1,
+        schema_name="data"
+    )
 
-    match = re.search(r"Successfully created view ([\w_]+)", caplog.text)
-    assert match
-    view_name = f"data.{match.group(1)}"
-    assert get_view_exists(view_name), f"La vue {view_name} n'existe pas !"
+    # Récupération du nom de la vue attendue via safe_view_name
+    cmd = generate_sql_view.Command()
+    feature_type = FeatureType.objects.get(pk=1)
+    project = feature_type.project
+    expected_view_name = f"data.v_{cmd.safe_view_name(feature_type.slug)}__{cmd.safe_view_name(project.slug)}"
 
+    # Vérifie que la vue existe bien
+    assert get_view_exists(expected_view_name), f"La vue {expected_view_name} n'existe pas !"
+
+    # Vérifie que les données sont présentes et correctes dans la vue
     with connection.cursor() as cursor:
-        cursor.execute(f"SELECT etat, priorite FROM {view_name} WHERE title = %s", ["Fuite d'eau"])
+        cursor.execute(f"SELECT etat, priorite FROM {expected_view_name} WHERE title = %s", ["Fuite d'eau"])
         row = cursor.fetchone()
 
     assert row is not None, "Aucune ligne retournée pour 'Fuite d'eau'"
