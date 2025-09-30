@@ -122,7 +122,8 @@ Copier le contenu du fichier config_sample/settings.py dans config/settings.py.
 * FEATURE_CREATION_REDIRECT_URL = Spécifie l'url vers laquelle rediriger l'utilisateur après la création d'un signalement ;
 * EXTERNAL_HOME_LINK = Spécifie l'url vers laquelle rediriger l'utilisateur au clic sur le bouton d'accueil ;
 * HIDE_MENU_NON_ADMIN = Spécifie si le menu doit être caché aux utilisateurs autres qu'administrateurs ;
-
+* ENV_MODE = Mode d’exécution de l’application (`dev`, `recette`, `prod`), par défaut `recette`;
+* SENTRY_DSN = DSN utilisée par Sentry pour identifier le projet et transmettre les événements, l'envoi est activé si une valeur est définie;
 
 Copier le contenu du fichier config_sample/urls.py dans config/urls.py
 
@@ -267,6 +268,27 @@ pytest path/to/test_directory_or_file.py
 pytest path/to/test_file.py::nom_du_test
 ```
 <br>
+
+## Activation de Sentry
+
+L’intégration Sentry permet de suivre les erreurs et performances côté backend (Django) et frontend (Vue.js).
+
+### Variables d’environnement
+
+- `SENTRY_DSN` : DSN Sentry, activation seulement si défini  
+- `ENV_MODE` : mode d’exécution (`dev`, `recette`, `prod`), par défaut `recette`  
+
+### Backend (Django)
+
+Le backend initialise automatiquement Sentry si `SENTRY_DSN` est défini.  
+Le paramètre `ENV_MODE` ajuste le sampling des traces et du profiling :  
+- `dev` / `recette` : échantillonnage activé à **10%**  
+- `prod` : échantillonnage réduit à **0.05%** (seules quelques transactions sont remontées, mais toutes les erreurs le sont)  
+
+### Frontend (Vue.js)
+
+Le frontend récupère automatiquement la configuration Sentry via le fichier `config.json` généré par le backend lors de la construction de l’image Docker.  
+Aucune configuration manuelle supplémentaire n’est nécessaire dans le code du frontend : l’activation se fait via les mêmes variables `SENTRY_DSN` et `ENV_MODE`.
 
 ## Documentation de l'API
 

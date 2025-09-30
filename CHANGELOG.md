@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [6.5] - 2025-09-29
 
 ### Évolution
+- Redmine 26581 : Intégration conditionnelle de Sentry et refonte du logging
+  - Nouvelles variables d'environnement : `ENV_MODE`, `SENTRY_DSN`
+  - Initialisation de Sentry uniquement si DSN défini
+  - Ajustement du logging pour éviter les doublons et limiter l’envoi à Sentry aux erreurs uniquement
+
 - Redmine 27831 : Amélioration de la recherche textuelle dans les listes de valeurs pré-enregistrées
   - Résultats plus pertinents : les correspondances commençant par le terme recherché apparaissent en premier, suivies des autres occurrences
   - Recherche insensible aux accents et aux tirets
