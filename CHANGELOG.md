@@ -3,112 +3,70 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [6.5] - 2025-09-29
+## [6.5] - 2025-09-30
 
-### Évolution
-- Redmine 26581 : Intégration conditionnelle de Sentry et refonte du logging
-  - Nouvelles variables d'environnement : `ENV_MODE`, `SENTRY_DSN`
-  - Initialisation de Sentry uniquement si DSN défini
-  - Ajustement du logging pour éviter les doublons et limiter l’envoi à Sentry aux erreurs uniquement
+### Évolutions
+- **Intégration Sentry** (Redmine 26581)  
+  Nouvelle intégration Sentry pour le suivi des erreurs et des performances :  
+  - Activation uniquement si `SENTRY_DSN` est défini  
+  - Nouvelle variable `ENV_MODE` (`dev`, `recette`, `prod`) pour ajuster le sampling  
+  - Configuration du logging adaptée pour éviter les doublons et n’envoyer que les erreurs  
 
-- Redmine 27831 : Amélioration de la recherche textuelle dans les listes de valeurs pré-enregistrées
-  - Résultats plus pertinents : les correspondances commençant par le terme recherché apparaissent en premier, suivies des autres occurrences
-  - Recherche insensible aux accents et aux tirets
-  - Correction d’un bug qui limitait l’affichage à 10 résultats et masquait certaines valeurs (ex : "Rennes")
+- **Authentification et SSO Keycloak** (Redmine 26839, 27386, 27383, 27381, 27242)  
+  - Nouveau mode de connexion via Keycloak (SSO OIDC)  
+  - Gestion des comptes administrateurs via groupes Keycloak (`SSO_ADMIN_USER_GROUPS`)  
+  - Ajout d’un système de notifications à la création d’utilisateurs via Keycloak  
+  - Prise en compte des groupes Keycloak lors de l’authentification  
 
-### Breaking change
-- L’API `/prerecorded-list-values/<name>/` ne renvoie plus directement une liste brute, mais un objet structuré contenant les résultats et des informations de pagination (`results`, `total`, `limit`, `offset`)
-- Une migration doit être exécutée pour activer automatiquement l’extension PostgreSQL `unaccent`
+- **Notifications aux groupes d’utilisateurs** (Redmine 26377)  
+  Mise en place d’un système de notifications par groupes d’utilisateurs :  
+  - Nouveau modèle `UsersGroup` et gestion des appartenances via `UserGroupMembership`  
+  - Possibilité de sélectionner un groupe notifié lors de la création d’un signalement  
+  - Nouveau modèle de mail "Notification à un groupe", configurable dans l’admin Django  
+  - Introduction d’un groupe spécial `all`, permettant à certains utilisateurs (ex. référents) de recevoir systématiquement toutes les notifications
 
-## [6.4.5-rc8] - 2025-07-15
+- **Amélioration de la recherche textuelle dans les listes de valeurs** (Redmine 27831)  
+  - Priorité aux correspondances commençant par le terme recherché  
+  - Recherche insensible aux accents et aux tirets  
+  - Correction de l'affichage limité à 10 résultats (ex. "Rennes" n'apparaissant jamais)  
+  - Réponse API désormais paginée avec métadonnées (`results`, `total`, `limit`, `offset`)  
+
+- **Permettre l'édition et suppresion de géométries multiples** (Redmine 28563)  
+  - Affichage des boutons édition et suppression sur la page liste & carte même si uniquement géométrie multiple
+  - Ajout de transition à l'apparition de bouton pour rendre le fonctionnement plus intuitif
+
+- Fixer automatiquement le statut du signalement en “publié” lors de la création (Redmine 27352)  
+- Vérification supplémentaire lors de la création d’un compte utilisateur (Redmine 25582)  
 
 ### Correctifs
-- Redmine 28129 : Admin - sélection role admin absent
+- **Génération des vues SQL** (Redmine 27462, 23375)  
+  Amélioration de la robustesse de la commande de génération des vues SQL, pour corriger des cas problématiques rencontrés en production :  
+  - Détection explicite des modes invalides/ambigus  
+  - Inclusion automatique des `feature_data` même sans champ défini  
+  - Gestion des suppressions en cascade, entités orphelines et conflits de noms de `CustomFields`  
+  - Ajout du paramètre `--force_project_view_with_aliases`  
 
-### Évolution
-- Redmine 26839 : Mise en place d'un système de multiconnexions
-    - Reprise de la gestion des comptes administrateurs en utilisant les groupes Keycloak.
-    - Suppression des valeurs inutilisées à la création de l'utilisateur.
+- Connexion CAS IDGO – erreur 404 corrigée (Redmine 26721)  
+- Liste signalements – incohérences dans la recherche par titre (Redmine 26138)  
+- Pagination – doublon du premier et dernier numéro sur 5 pages (Redmine 26632)  
+- Sécurisation : un utilisateur ne peut plus voir les signalements qui ne lui appartiennent pas (Redmine 27230)  
+
+### Breaking changes
+- L’API `/prerecorded-list-values/<name>/` ne renvoie plus une liste brute mais un objet structuré avec `results`, `total`, `limit`, `offset`  
+- Suppression de la variable d’environnement `SSO_ADMIN_USERS`, remplacée par `SSO_ADMIN_USER_GROUPS`  
+- Plusieurs migrations doivent être appliquées, notamment :  
+  - activation automatique de l’extension PostgreSQL `unaccent`  
+  - création des modèles `UsersGroup`, `UserGroupMembership` et du modèle de mail "Notification à un groupe"  
+  - ajout du modèle de template pour les notifications à la création d’utilisateur via Keycloak
 
 ### Variables d'environnement
-Suppression de `SSO_ADMIN_USERS`, remplacé par `SSO_ADMIN_USER_GROUPS`.
-
-* `SSO_ADMIN_USER_GROUPS`, default=`"geocontrib-admins"`, cast=`Csv()`
-  
-  Liste des groupes Keycloak dont les membres recevront automatiquement les droits administrateur sur Geocontrib lors de l’authentification via SSO.  
-  Exemple : `geocontrib-admins,geocontrib-superuser`
-
-## [6.4.5-rc7] - 2025-06-30
-### Évolutions
-- Redmine 27831: Ajout custom redirection après création de signalement & modifications dans l'interface
-- Redmine 26839: Mise en place d'un système de multiconnexions
-- Redmine 27386: Gestion des comptes admin - connexion keycloak
-- Redmine 27383: Notification création utilisateur - connexion keycloak
-- Redmine 27381: Modification front (page de connexion) 
-- Redmine 27352: Fixer le statut du signalement en "publié"
-- Redmine 27242: Gestion du nom de groupe d'utilisateur
-- Redmine 27230: Empêcher l'utilisateur de voir un signalement qui ne lui appartient pas dans GéoContrib 
-
-### Environement variables
-* `LDAP_SERVER_URI`, default=None
-  URL du serveur LDAP (Single Sign-On), si l'application utilise l'authentification LDAP.
-  Exemple : `ldap://localhost:10389`
-* `LDAP_BASE_DN`, default=`"ou=system"`
-  DN de base à partir duquel les utilisateurs sont recherchés dans l’annuaire LDAP.  
-  Exemple : `ou=system` ou `ou=users,dc=example,dc=com`
-* `LDAP_BIND_DN_TEMPLATE`, default=`"uid={},ou=system"`
-  Modèle de DN utilisé pour se connecter avec le nom d'utilisateur saisi. `{}` sera remplacé dynamiquement.  
-  Exemple : `uid={},ou=system` devient `uid=john,ou=system`
-* `SSO_KEYCLOAK_URL`, default=None
-  URL de base de l’instance Keycloak utilisée pour le Single Sign-On.
-  Exemple : `http://localhost:8080`
-* `SSO_KEYCLOAK_DISCOVERY_ENDPOINT`, default=None
-  URL du point de découverte OIDC du Realm Keycloak. Elle permet à Django de récupérer automatiquement les métadonnées nécessaires.
-  Exemple : `http://localhost:8080/realms/master/.well-known/openid-configuration`
-* `SSO_KEYCLOAK_CLIENT_ID`, default=None
-  Identifiant du client enregistré dans Keycloak pour l'application Django.
-  Exemple : `django-app`
-* `SSO_KEYCLOAK_CLIENT_SECRET`, default=None
-  Secret partagé associé au client Keycloak. Il est généré automatiquement dans l'interface Keycloak.
-  Exemple : `Bb1Sk2rO0d7w4Dcx7OkqHuM87ibkjWyA`
-* `SSO_CALLBACK_PATH`, default=`"/geocontrib/oidc/callback/"`
-  Chemin de rappel (callback) utilisé après l’authentification réussie via Keycloak. Ce chemin doit être enregistré dans le client Keycloak comme URI de redirection autorisée.
-* `SSO_POST_LOGOUT_REDIRECT_URI`, default=`"/geocontrib/"`
-  Url de redirection après déconnexion d'un service SSO (keycloak).
-* `SSO_ADMIN_USERS`, default=`""`, cast=`Csv()`
-  Liste de usernames des utilisateurs se voyant attribuer les droits administrateur sur l'instance à la création/mise à jour d'un utilisateur depuis un service SSO (keycloak).
-  Exemple : `admin,ltorvalds`
-* `LOGOUT_URL`
-  Spécifie une url de déconnexion remplaçant l'appel au logout django (utile dans le cadre du SSO)
-* `FEATURE_CREATION_REDIRECT_URL`
-  Spécifie l'url vers laquelle rediriger l'utilisateur après la création d'un signalement.
-* `EXTERNAL_HOME_LINK`
-  Spécifie l'url vers laquelle rediriger l'utilisateur au clic sur le bouton d'accueil.
-* `HIDE_MENU_NON_ADMIN`
-  Spécifie si le menu doit être caché aux utilisateurs autres qu'administrateurs.
-
-## [6.4.5-rc4] - 2025-05-28
-
-### Correctifs
-#### Connexions et navigation
-- Redmine 26721 : Impossible de se connecter par CAS IDGO - erreur 404
-- Redmine 26138 : Liste signalements filtrés - Incohérence des résultats lors de la recherche par titre des signalements
-- Redmine 26632 : Pagination liste signalements - doublon premier & dernier numéro si 5 pages
-
-#### Génération des vues SQL
-- Redmine 27462 (correctif de 23375) : Amélioration de la robustesse de la génération des vues SQL
-  - Détection explicite des modes invalides ou ambigus, avec retour d’erreur explicite
-  - Inclusion automatique des `feature_data` associés, même sans définition de champ
-- Prise en compte des suppressions en cascade, entités orphelines et états inconsistants
-  - Ajout de tests unitaires couvrant les cas normaux et limites (champ orphelin, suppression de projet, collisions)
-  - Détection des conflits de noms de `CustomFields` après normalisation et génération d'alias automatique en mode `Type` ou optionnel en mode `Projet`
-  - Support du mode `--force_project_view_with_aliases` pour générer une vue projet même en cas de divergence entre types
-  - Amélioration de la journalisation (logs)
-
-### Évolutions
-- Redmine 26581 : Brancher GC à Sentry
-- Redmine 25582 : Mise en place d’un système de vérification lors de la création d’un compte utilisateur
-- Redmine 26377 : Ajout d'un système de notification par groupe d'utilisateurs
+- `SENTRY_DSN` : DSN Sentry, activation seulement si défini  
+- `ENV_MODE` : mode d’exécution (`dev`, `recette`, `prod`), par défaut `recette`  
+- `SSO_ADMIN_USER_GROUPS` : groupes Keycloak recevant les droits administrateur  
+- Variables LDAP/Keycloak : `LDAP_SERVER_URI`, `LDAP_BASE_DN`, `LDAP_BIND_DN_TEMPLATE`,  
+  `SSO_KEYCLOAK_URL`, `SSO_KEYCLOAK_DISCOVERY_ENDPOINT`, `SSO_KEYCLOAK_CLIENT_ID`,  
+  `SSO_KEYCLOAK_CLIENT_SECRET`, `SSO_CALLBACK_PATH`, `SSO_POST_LOGOUT_REDIRECT_URI`, `LOGOUT_URL`  
+- Autres : `FEATURE_CREATION_REDIRECT_URL`, `EXTERNAL_HOME_LINK`, `HIDE_MENU_NON_ADMIN`
 
 ## [6.4.4] - 2025-02-04
 
