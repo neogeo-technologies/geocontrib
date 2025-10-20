@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 from decouple import config, Csv
 import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -391,6 +393,11 @@ if ENV_MODE in ("production", "prod"):
     traces_sample_rate = 0.05
     profiles_sample_rate = 0.05
 
+try:
+    from geocontrib import __version__ as GEOCONTRIB_VERSION
+except ImportError:
+    GEOCONTRIB_VERSION = "unknown"
+
 if SENTRY_DSN:  # Activation automatique si DSN présent
     sentry_logging = LoggingIntegration(
         level=None,          # capture tous les logs (puis filtrage via event_level)
@@ -398,10 +405,35 @@ if SENTRY_DSN:  # Activation automatique si DSN présent
     )
     sentry_sdk.init(
         dsn=SENTRY_DSN,
-        integrations=[sentry_logging],
+        integrations=[
+            DjangoIntegration(),   # 🔗 Capture des requêtes HTTP Django + relie front/back via les headers Sentry
+            CeleryIntegration(),   # ⚙️ Suivi des tâches asynchrones (import, export, notifications, etc.)
+            sentry_logging,        # 🧾 Capture des logs applicatifs Python
+        ],
         traces_sample_rate=traces_sample_rate,
         profiles_sample_rate=profiles_sample_rate,
         send_default_pii=False,  # évite d’envoyer des infos personnelles par défaut
         max_breadcrumbs=50,      # limite l’historique de contexte
         environment=ENV_MODE,
+        # Identification de la version du déploiement (facultatif, mais utile)
+        release=GEOCONTRIB_VERSION,
+        # Optionnel : callback pour filtrer/masquer certaines données sensibles
+        before_send=lambda event, hint: _filter_sensitive_data(event),
     )
+
+
+def _filter_sensitive_data(event):
+    """
+    Nettoie certaines données sensibles avant envoi à Sentry.
+    (Appelé automatiquement via before_send ci-dessus)
+    """
+    request = event.get("request", {})
+    if "headers" in request:
+        for k in ["Authorization", "Cookie", "X-CSRFToken", "x-csrftoken"]:
+            request["headers"].pop(k, None)
+    if "data" in request:
+        for field in ["password", "token", "csrfmiddlewaretoken", "email"]:
+            if field in request["data"]:
+                request["data"][field] = "[REDACTED]"
+    event["request"] = request
+    return event
