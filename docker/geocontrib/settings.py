@@ -382,15 +382,6 @@ RESTRICT_FEATURE_VISIBILITY_TO_OWNER = config('RESTRICT_FEATURE_VISIBILITY_TO_OW
 SENTRY_DSN = config("SENTRY_DSN", default=None)
 ENV_MODE = config("ENV_MODE", default="recette").lower()  # dev, recette, prod...
 
-# Définition des taux de sampling par défaut
-traces_sample_rate = 0.1
-profiles_sample_rate = 0.1
-
-# En production : 5% → peu de bruit, mais assez d’échantillons
-if ENV_MODE in ("production", "prod"):
-    traces_sample_rate = 0.05
-    profiles_sample_rate = 0.05
-
 try:
     from geocontrib import __version__ as GEOCONTRIB_VERSION
 except ImportError:
@@ -408,8 +399,8 @@ if SENTRY_DSN:  # Activation automatique si DSN présent
             CeleryIntegration(),   # ⚙️ Suivi des tâches asynchrones (import, export, notifications, etc.)
             sentry_logging,        # 🧾 Capture des logs applicatifs Python
         ],
-        traces_sample_rate=traces_sample_rate,
-        profiles_sample_rate=profiles_sample_rate,
+        traces_sample_rate=0,
+        profiles_sample_rate=0,
         send_default_pii=False,  # évite d’envoyer des infos personnelles par défaut
         max_breadcrumbs=50,      # limite l’historique de contexte
         environment=ENV_MODE,
@@ -418,7 +409,6 @@ if SENTRY_DSN:  # Activation automatique si DSN présent
         # Optionnel : callback pour filtrer/masquer certaines données sensibles
         before_send=lambda event, hint: _filter_sensitive_data(event),
     )
-
 
 def _filter_sensitive_data(event):
     """
