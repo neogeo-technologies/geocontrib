@@ -6,6 +6,7 @@ import collections
 from datetime import date
 
 from django.db.models import Q
+from django.db import connection
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Polygon, Polygon, MultiPoint, MultiLineString, MultiPolygon
@@ -693,34 +694,71 @@ class ProjectFeaturePositionInList(views.APIView):
     )
     def get(self, request, slug, feature_id):
         project = get_object_or_404(Project, slug=slug)
-        # Ordering :
-        ordering = self.request.query_params.get('ordering') or '-created_on'
-        # Fallback ordering by feature_id in case dates are exactly the sames https://redmine.neogeo.fr/issues/23018
-        queryset = Feature.handy.availables(request.user, project).order_by(ordering, 'feature_id')
-        # Filters :
-        feature_type_slug = self.request.query_params.get('feature_type_slug')
-        status__value = self.request.query_params.get('status')
-        title = self.request.query_params.get('title')
-        # filter out features with a deletion date, since deleted features are not anymore deleted directly from database (https://redmine.neogeo.fr/issues/16246)
-        queryset = queryset.filter(deletion_on__isnull=True)
+
+        # 🧭 Récupération du champ et du sens de tri
+        ordering = request.query_params.get('ordering') or '-created_on'
+        is_desc = ordering.startswith('-')
+        ordering_field = ordering.lstrip('-')
+        order_dir = 'DESC' if is_desc else 'ASC'
+
+        # 🧩 Vérification que le champ existe dans le modèle Feature
+        if ordering_field not in [f.name for f in Feature._meta.get_fields()]:
+            return Response(
+                {"detail": f"Invalid ordering field: '{ordering_field}'"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # ⚙️ Base queryset : filtre avec gestion des droits et exclusion des signalements supprimés
+        qs = Feature.handy.availables(request.user, project).filter(deletion_on__isnull=True)
+
+        # 🔍 Application des filtres facultatifs
+        feature_type_slug = request.query_params.get('feature_type_slug')
+        status__value = request.query_params.get('status')
+        title = request.query_params.get('title')
 
         if feature_type_slug:
-            queryset = queryset.filter(feature_type__slug__icontains=feature_type_slug)
+            qs = qs.filter(feature_type__slug__icontains=feature_type_slug)
         if status__value:
-            queryset = queryset.filter(status__icontains=status__value)
+            qs = qs.filter(status__icontains=status__value)
         if title:
-            queryset = queryset.filter(title__icontains=title)
-        # Position :
-        try:
-            instance = queryset.filter(feature_id=feature_id).first()
-            if instance:
-                position = list(queryset).index(instance)
-                return Response(data=position, status=status.HTTP_200_OK)
-            else:
-                return Response(status=status.HTTP_204_NO_CONTENT)
-        except Exception as e:
-            logger.exception("Error occurred while fetching the feature position: %s", e)
-            return Response(data={"detail": no_data_msg}, status=status.HTTP_404_NOT_FOUND)
+            qs = qs.filter(title__icontains=title)
+
+        # ⚙️ On ne garde que les champs nécessaires pour le calcul
+        qs = qs.values('feature_id', ordering_field)
+
+        base_sql, base_params = qs.query.sql_with_params()
+
+        # 🧩 Fallback ordering by feature_id in case dates are exactly the same
+        #     https://redmine.neogeo.fr/issues/23018
+        order_by_sql = f"sub.{ordering_field} {order_dir}, sub.feature_id DESC"
+
+        sql = f"""
+            WITH ranked AS (
+                SELECT sub.feature_id,
+                       ROW_NUMBER() OVER (
+                           ORDER BY {order_by_sql}
+                       ) AS position
+                FROM ({base_sql}) AS sub
+            )
+            SELECT position
+            FROM ranked
+            WHERE feature_id = %s
+            LIMIT 1;
+        """
+
+        params = list(base_params) + [str(feature_id)]
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql, params)
+            row = cursor.fetchone()
+
+        # 🧮 Correction 0-based (pour correspondre à l'offset de pagination des signalements)
+        if not row:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        position = row[0] - 1
+
+        return Response(data=position, status=status.HTTP_200_OK)
 
 class ProjectFeatureBbox(generics.GenericAPIView):
     """
