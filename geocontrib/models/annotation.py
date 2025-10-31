@@ -16,6 +16,7 @@ from geocontrib.choices import MODERATOR
 from geocontrib.emails import notif_moderators_pending_features
 from geocontrib.emails import notif_creator_published_feature
 from geocontrib.emails import notif_users_groups_published_feature
+from geocontrib.utils import get_feature_bbox
 
 
 class AnnotationAbstract(models.Model):
@@ -251,6 +252,7 @@ class Event(models.Model):
 
         context = {
             'feature': feature,
+            'feature_bbox': get_feature_bbox(feature),
             'event': self
         }
 

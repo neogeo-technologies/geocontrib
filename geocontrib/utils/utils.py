@@ -1,4 +1,6 @@
 from django.apps import apps
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.db.models import Extent
 
 def apply_permissions_to_queryset(user, queryset, project, action="edit", new_status=None):
     """
@@ -80,3 +82,20 @@ def apply_permissions_to_queryset(user, queryset, project, action="edit", new_st
 
     ## Par défaut, accès interdit
     return queryset.none()
+
+def get_feature_bbox(feature):
+    """
+    Retourne la bbox de la feature sous forme de dict {'minLon', 'minLat', 'maxLon', 'maxLat'}.
+    """
+    if feature.geom:
+        # geom_extent = (xmin, ymin, xmax, ymax)
+        geom = feature.geom
+        bbox = geom.extent  # propriété GEOSGeometry : (xmin, ymin, xmax, ymax)
+        if bbox and all(bbox):
+            return {
+                'minLon': bbox[0],
+                'minLat': bbox[1],
+                'maxLon': bbox[2],
+                'maxLat': bbox[3]
+            }
+    return None

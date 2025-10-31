@@ -239,6 +239,7 @@ def notif_users_groups_published_feature(emails, context):
             'project_slug': feature.project.slug,
             'project_name': feature.project.title,
             'feature': feature,
+            'bbox': context['feature_bbox'],
             'theme_color': PRIMARY_COLOR
         })
         # get the mail object template
