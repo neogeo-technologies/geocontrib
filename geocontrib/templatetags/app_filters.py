@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 
 import re
 import logging
+import markdown
 
 logger = logging.getLogger(__name__)
 
@@ -60,3 +61,12 @@ def safe_column_name(name):
         return mark_safe(f'"{name}"')
     # Apply underscoreify for other cases (e.g., replace invalid characters with underscores)
     return re.sub(r'\W|^(?=\d)', '_', name)
+
+@register.filter
+def markdown_to_html(value):
+    """
+    Transforme du texte Markdown en HTML.
+    """
+    if not value:
+        return ""
+    return markdown.markdown(value)

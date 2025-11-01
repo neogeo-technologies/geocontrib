@@ -3,7 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Évolutions
+- **Notification et lien d’abonnement à un nouveau projet** (Redmine 29778)
+  - Permettre aux administrateurs de projet de notifier les membres par email.
+  - Permettre aux utilisateurs de s’abonner automatiquement via un lien sécurisé reçu par mail.
+
 ## [6.5.1] - 2025-11-14
+
 ### Évolutions
 - **Ajout de la bbox dans les notifications par groupe d’utilisateurs** (Redmine 29841)
   - Nouvelle fonction utilitaire `get_feature_bbox` pour calculer la bbox d’une feature
@@ -37,7 +45,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Déplacement des appels API de `created()` vers `mounted()` pour éviter l’annulation par `beforeDestroy`
   - Gestion harmonisée des erreurs et requêtes annulées pour désactivation correcte du loader
 
-- **Restauration du créateur dans les derniers signalements** (Redmine 9432)
+- **Restauration du créateur dans les derniers signalements** (Redmine 29432)
   - Utilisation du champ `display_creator` à la place de `creator.full_name` ou `creator.username`
 
 - **Sécurisation de la vérification du créateur** (Redmine 29445)

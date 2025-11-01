@@ -1,5 +1,8 @@
 from django.apps import apps
+from django.conf import settings
 from django.contrib.gis.db.models import Extent
+from urllib.parse import urljoin
+
 
 def apply_permissions_to_queryset(user, queryset, project, action="edit", new_status=None):
     """
@@ -123,3 +126,14 @@ def get_feature_bbox(feature, buffer_m=50, to_string=False):
     if to_string:
         return f"{minx},{miny},{maxx},{maxy}"
     return bbox_dict
+
+def build_absolute_url(path: str) -> str:
+    """
+    Construit une URL complète en respectant BASE_URL et URL_PREFIX.
+    Exemple : build_absolute_url('subscribe-confirm?token=abc')
+              → http://localhost:8000/geocontrib/subscribe-confirm?token=abc
+    """
+    base = settings.BASE_URL.rstrip('/') + '/'
+    prefix = settings.URL_PREFIX.strip('/')
+    prefix = f"{prefix}/" if prefix else ""
+    return urljoin(base, prefix + path.lstrip('/'))

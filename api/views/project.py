@@ -13,6 +13,7 @@ from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework import generics
+from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -38,6 +39,9 @@ from geocontrib.models import Subscription
 from geocontrib.models import FeatureType
 from geocontrib.models import BaseMap
 from geocontrib.models import ProjectAttribute
+from geocontrib.tasks import task_notify_project_creation_with_subscription
+from geocontrib.utils import build_absolute_url
+from geocontrib.utils import validate_subscribe_token
 
 
 User = get_user_model()
@@ -420,3 +424,104 @@ class ProjectAttributeListView(generics.ListAPIView):
         Retrieve a list of project attributes, with optional filters by project ID and name.
         """
         return super().get(request, *args, **kwargs)
+
+class ProjectSubscribeByToken(APIView):
+    """
+    Subscribe a user to a project via a signed token.
+
+    Expected payload:
+        {
+            "token": "<signed_token>"
+        }
+
+    Responses:
+        200 - User successfully subscribed or already subscribed
+        400 - Invalid token or project not found or archived
+    """
+
+    http_method_names = ["post"]
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        token = request.data.get("token")
+        if token is None:  # Clé manquante ou valeur null
+            return Response(
+                {"detail": "Le token est requis."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not token:  # Chaîne vide
+            return Response(
+                {"detail": "Lien non valide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        data = validate_subscribe_token(token)
+        if not data:
+            return Response(
+                {"detail": "Lien non valide."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user = get_object_or_404(User, pk=data["u"])
+        project = get_object_or_404(Project, pk=data["p"])
+
+        # Vérifier que le projet existe
+        if not project:
+            return Response(
+                {"detail": "Le projet a été supprimé."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Vérifier que l'utilisateur est membre du projet
+        authorization = Authorization.objects.filter(
+            project=project,
+            user=user,
+            level__rank__gt=1
+        ).select_related("level").first()
+
+        if not authorization:
+            return Response(
+                {"detail": "Cet utilisateur n'est plus membre du projet."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Récupère ou crée la souscription pour le projet
+        subscription, created = Subscription.objects.get_or_create(project=project)
+        # Construit l'URL du projet
+        project_url = build_absolute_url(f"projet/{project.slug}")
+        # Vérifie si l'utilisateur est déjà abonné
+        if subscription.users.filter(pk=user.pk).exists():
+            return Response({
+                "detail": f"Vous êtes déjà abonné au projet \"{project.title}\".",
+                "project_url": project_url,
+            })
+        # Ajoute l'utilisateur à la relation ManyToMany
+        subscription.users.add(user)
+        return Response({
+            "detail": f"Vous êtes abonné au projet \"{project.title}\".",
+            "project_url": project_url,
+        })
+
+class NotifyProjectCreationView(APIView):
+    """
+    Vue pour notifier les membres d'un projet via email avec lien d'abonnement.
+
+    L'appel POST déclenche une tâche Celery qui exécute la commande
+    `notify_project_creation_with_subscription` en arrière-plan avec .delay().
+    Cela permet de ne pas bloquer la requête HTTP si le projet compte beaucoup de membres.
+    L'accès est limité aux administrateurs projets ou administrateur django
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, slug):
+        project = get_object_or_404(Project, slug=slug)
+        perms = Authorization.all_permissions(request.user, project)
+
+        # Vérifie que l’utilisateur est superadmin ou administrateur du projet
+        if not (request.user.is_superuser or (perms and perms.get('is_project_administrator'))):
+            raise exceptions.PermissionDenied("Vous n’avez pas la permission de notifier les membres de ce projet.")
+
+        # Déclenche la tâche d’envoi de notification en arrière-plan
+        task_notify_project_creation_with_subscription.delay(project.id, request.user.id)
+        # Par la nature asynchrone de la tâche, on ne dispose pas de l'état d'envoi des notifications pour la réponse
+        # Pour cela un identifiant de tache pourrait-être renvoyé au front ou stocké en base comme pour les imports
+        return Response({"status": "notification_sent"})

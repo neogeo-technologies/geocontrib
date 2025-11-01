@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{ subject }}</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #f8f9fa;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+          style="background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-top: 30px; margin-bottom: 30px;">
+          {% if message %}
+          {{ message }}
+          {% else %}
+          <!-- Header / Logo -->
+          <tr>
+            <td style="padding: 20px 40px; text-align: center;">
+              {% if logo_url %}
+              <img src="{{ logo_url }}" alt="{{ application_name }}" style="max-height: 60px; margin-bottom: 10px;">
+              {% endif %}
+              <h1 style="color: {{ theme_color }}; margin: 0 0 12px 0;">Nouveau projet créé : {{ project.title|title }}</h1>
+
+              <p style="font-size: 1em; color: #555; margin: 0 0 12px 0;">
+                {{ project.description|markdown_to_html|safe }}
+              </p>
+            </td>
+          </tr>
+          <!-- Message principal -->
+          <tr>
+            <td style="padding: 0 40px 20px 40px; text-align: center;">
+              <p style="font-size: 1.15em; color: #333; margin: 0;">
+                Le projet <b>{{ project.title|title }}</b> a été créé et vous pouvez désormais y accéder et vous y abonner.
+              </p>
+            </td>
+          </tr>
+          <!-- CTA buttons -->
+          <tr>
+            <td style="padding: 20px 40px; text-align: center;">
+              <a href="{{ project_url }}"
+                style="display: inline-block; margin: 5px; padding: 12px 24px; background: {{ theme_color }};
+                        color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                👁️ Voir le projet
+              </a>
+              <a href="{{ subscribe_url }}"
+                style="display: inline-block; margin: 5px; padding: 12px 24px; background: {{ theme_color }};
+                        color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                🔔 M’abonner
+              </a>
+            </td>
+          </tr>
+          <!-- Footer / info -->
+          <tr>
+            <td style="padding: 30px 40px 20px 40px;">
+              <hr style="border:0;height:1px;background:#eee;margin:0 0 22px 0">
+              <p style="font-size: 0.95em; color: #777; text-align: center; font-style: italic;">
+                Vous recevez ce message car vous êtes membre du projet <b>{{ project.title|title }}</b>.
+              </p>
+            </td>
+          </tr>
+        {% endif %}
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

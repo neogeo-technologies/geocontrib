@@ -39,12 +39,14 @@ from api.views.misc import EventView
 from api.views.misc import ExifGeomReaderView
 from api.views.misc import ImportTaskSearch
 from api.views.misc import ProjectComments
+from api.views.project import ProjectAttributeListView
 from api.views.project import ProjectAuthorizationView
+from api.views.project import ProjectDuplicate
 from api.views.project import ProjectSubscription
+from api.views.project import ProjectSubscribeByToken
 from api.views.project import ProjectThumbnailView
 from api.views.project import ProjectView
-from api.views.project import ProjectDuplicate
-from api.views.project import ProjectAttributeListView
+from api.views.project import NotifyProjectCreationView
 from api.views.user import TokenView, GenerateTokenView, LoginByTokenView
 from api.views.user import UserLevelProjectView
 from api.views.user import UserPermissionsView
@@ -106,10 +108,11 @@ urlpatterns = [
     # Vues générales de navigation
     path('version', version, name='version'),
     path('login/', LoginView.as_view(), name='signin-view'),
-    path('user_info/', UserInfoView.as_view(), name='user-info'),
     path('logout/', LogoutView.as_view(), name='signout-view'),
+    path('user_info/', UserInfoView.as_view(), name='user-info'),
     path('flat-pages/', FlatPagesView.as_view(), name='help'),
     # Vues de gestion et d'édition des données métiers
+    # -- Utilisateur
     path(
         'user-level-projects/',
         UserLevelProjectView.as_view(), name='user-level-project'),
@@ -118,11 +121,14 @@ urlpatterns = [
         UserPermissionsView.as_view(), name='user-permissions'),
     path(
         'project-attributes/',
-        ProjectAttributeListView.as_view(),
-        name='project-attributes-list'),
+        ProjectAttributeListView.as_view(), name='project-attributes-list'),
+    # -- Projet
     path(
         'projects/<slug:slug>/duplicate/',
         ProjectDuplicate.as_view(), name='project-duplicate'),
+    path(
+        "projects/<slug:slug>/notify-project-creation-with-subscription/",
+        NotifyProjectCreationView.as_view(), name="notify-project-creation-with-subscription"),
     path(
         'projects/<slug:slug>/thumbnail/',
         ProjectThumbnailView.as_view(), name='project-thumbnail'),
@@ -154,19 +160,12 @@ urlpatterns = [
         'projects/<slug:slug>/feature-bulk-modify/',
         ProjectFeatureBulkModify.as_view(), name='project-feature-bulk-modify'),
     path(
-        'events/',
-        EventView.as_view(), name='events-list'),
-    path(
-        'exif-geom-reader/',
-        ExifGeomReaderView.as_view(), name='exif'),
-    path(
         'features/<uuid:feature_id>/feature-links/',
         FeatureLinkView.as_view(), name='feature-link'),
+    # -- Signalement
     path(
         'features/<uuid:feature_id>/events/',
         FeatureEventView.as_view(), name='feature-events'),
-
-
     path(
         'features/<uuid:feature_id>/attachments/',
         FeatureAttachmentView.as_view(actions={'get': 'list', 'post': 'create'}),
@@ -179,7 +178,6 @@ urlpatterns = [
         'features/<uuid:feature_id>/attachments/<uuid:attachment_id>/upload-file/',
         FeatureAttachmentUploadView.as_view(),
         name='feature-attachments-upload-file'),
-
     path(
         'features/<uuid:feature_id>/comments/',
         CommentView.as_view(actions={'get': 'list', 'post': 'create'}),
@@ -190,45 +188,31 @@ urlpatterns = [
         name='comments-detail'),
     path(
         'features/<uuid:feature_id>/comments/<uuid:comment_id>/upload-file/',
-        CommentAttachmentUploadView.as_view(),
-        name='comments-upload-file'),
-
+        CommentAttachmentUploadView.as_view(), name='comments-upload-file'),
+    # -- Autres
+    path('events/', EventView.as_view(), name='events-list'),
+    path('exif-geom-reader/', ExifGeomReaderView.as_view(), name='exif'),
     path("features.mvt/", FeatureMVTView.as_view(), name="features-mvt"),
     path("external-geojson/", GetExternalGeojsonView.as_view()),
     path("idgo-catalog/", GetIdgoCatalogView.as_view()),
-
-    path(
-        'proxy/',
-        GetFeatureInfo.as_view(), name='proxy'),
-
+    path('proxy/', GetFeatureInfo.as_view(), name='proxy'),
+    path("users-groups/", GetUsersGroups.as_view(), name='get-users-groups'),
+    path('customfields/', CustomFields.as_view(), name='customfields'),
     path(
         'prerecorded-list-values/',
         PreRecordedListNamesView.as_view(), name='prerecorded-list-names'),
     path(
         'prerecorded-list-values/<str:name>/',
         PreRecordedValuesView.as_view(), name='prerecorded-list-values'),
-
+    # -- login avec token
+    path('generatetoken/', GenerateTokenView.as_view(), name='generate-token'),
+    path('login-token/', LoginByTokenView.as_view(), name='login-by-token'),
+    # -- abonnement avec token
     path(
-        'get-token/',
-        TokenView.as_view(), name='get-token'
-    ),
-    path(
-        'customfields/',
-        CustomFields.as_view(), name='customfields'
-    ),
-    path("users-groups/",
-        GetUsersGroups.as_view(), name='get-users-groups'),
-
-    # login with token
-    path(
-        'generatetoken/',
-        GenerateTokenView.as_view(), name='generate-token'
-    ),
-    path(
-        'login-token/',
-        LoginByTokenView.as_view(), name='login-by-token'
-    ),
-
+        "subscribe-by-token/",
+        ProjectSubscribeByToken.as_view(), name="project-subscribe-by-token"),
+    # Pour test unitaire
+    path('get-token/', TokenView.as_view(), name='get-token'),
     # deprecated
     path(
         'projects/<slug:slug>/feature-types/',

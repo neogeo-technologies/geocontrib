@@ -35,6 +35,9 @@ def task_notify_subscribers():
 def task_notify_subscribers_key_documents():
     call_command('notify_subscribers_key_documents')
 
+@shared_task(bind=True)
+def task_notify_project_creation_with_subscription(self, project_id, user_id):
+    call_command('notify_project_creation_with_subscription', project_id, user_id)
 
 @shared_task(soft_time_limit=2)
 def get_geocontrib_version():
