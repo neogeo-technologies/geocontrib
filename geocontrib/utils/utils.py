@@ -1,5 +1,4 @@
 from django.apps import apps
-from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.db.models import Extent
 
 def apply_permissions_to_queryset(user, queryset, project, action="edit", new_status=None):
@@ -83,36 +82,44 @@ def apply_permissions_to_queryset(user, queryset, project, action="edit", new_st
     ## Par défaut, accès interdit
     return queryset.none()
 
-def get_feature_bbox(feature, to_string=False):
+
+def get_feature_bbox(feature, buffer_m=50, to_string=False):
     """
-    Retourne la bounding box (bbox) de la feature.
+    Retourne la bbox de la feature avec un buffer précis en mètres.
+
+    Cette fonction :
+    - transforme la géométrie dans un SRID métrique (EPSG:3857) pour appliquer
+      un buffer en mètres,
+    - retransforme la géométrie en EPSG:4326 (lon/lat) pour l'utilisation côté front,
+    - retourne la bbox sous forme de dict {'minLon', 'minLat', 'maxLon', 'maxLat'}
+      ou en string si `to_string=True`.
 
     Args:
-        feature: Instance de Feature (ou tout objet possédant un attribut geom).
-        to_string (bool): Si True, retourne la bbox sous forme de chaîne "minLon,minLat,maxLon,maxLat".
-                          Sinon, retourne un dict.
+        feature: instance de Feature possédant un champ `geom`.
+        buffer_m: taille du padding en mètres autour de la géométrie.
+        to_string: si True, retourne la bbox sous forme de string "minLon,minLat,maxLon,maxLat".
 
     Returns:
-        dict | str | None: La bbox sous forme de dict ou de string, ou None si non disponible.
+        dict ou str représentant la bbox, ou None si la feature n'a pas de géométrie.
     """
     geom = getattr(feature, "geom", None)
     if not geom:
         return None
 
-    # geom.extent renvoie (xmin, ymin, xmax, ymax)
-    bbox = geom.extent
-    if not bbox or any(coord is None for coord in bbox):
-        return None
+    # transformer dans un SRID métrique pour le buffer
+    geom_3857 = geom.transform(3857, clone=True)
+    buffered = geom_3857.buffer(buffer_m)
+    # repasser en lon/lat
+    buffered = buffered.transform(4326, clone=True)
 
+    minx, miny, maxx, maxy = buffered.extent
     bbox_dict = {
-        "minLon": bbox[0],
-        "minLat": bbox[1],
-        "maxLon": bbox[2],
-        "maxLat": bbox[3],
+        "minLon": minx,
+        "minLat": miny,
+        "maxLon": maxx,
+        "maxLat": maxy
     }
 
-    return (
-        f"{bbox_dict['minLon']},{bbox_dict['minLat']},{bbox_dict['maxLon']},{bbox_dict['maxLat']}"
-        if to_string else
-        bbox_dict
-    )
+    if to_string:
+        return f"{minx},{miny},{maxx},{maxy}"
+    return bbox_dict
