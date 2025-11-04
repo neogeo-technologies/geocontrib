@@ -252,7 +252,7 @@ class Event(models.Model):
 
         context = {
             'feature': feature,
-            'feature_bbox': get_feature_bbox(feature),
+            'feature_bbox': get_feature_bbox(feature, to_string=True),
             'event': self
         }
 
