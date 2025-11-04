@@ -83,19 +83,36 @@ def apply_permissions_to_queryset(user, queryset, project, action="edit", new_st
     ## Par défaut, accès interdit
     return queryset.none()
 
-def get_feature_bbox(feature):
+def get_feature_bbox(feature, to_string=False):
     """
-    Retourne la bbox de la feature sous forme de dict {'minLon', 'minLat', 'maxLon', 'maxLat'}.
+    Retourne la bounding box (bbox) de la feature.
+
+    Args:
+        feature: Instance de Feature (ou tout objet possédant un attribut geom).
+        to_string (bool): Si True, retourne la bbox sous forme de chaîne "minLon,minLat,maxLon,maxLat".
+                          Sinon, retourne un dict.
+
+    Returns:
+        dict | str | None: La bbox sous forme de dict ou de string, ou None si non disponible.
     """
-    if feature.geom:
-        # geom_extent = (xmin, ymin, xmax, ymax)
-        geom = feature.geom
-        bbox = geom.extent  # propriété GEOSGeometry : (xmin, ymin, xmax, ymax)
-        if bbox and all(bbox):
-            return {
-                'minLon': bbox[0],
-                'minLat': bbox[1],
-                'maxLon': bbox[2],
-                'maxLat': bbox[3]
-            }
-    return None
+    geom = getattr(feature, "geom", None)
+    if not geom:
+        return None
+
+    # geom.extent renvoie (xmin, ymin, xmax, ymax)
+    bbox = geom.extent
+    if not bbox or any(coord is None for coord in bbox):
+        return None
+
+    bbox_dict = {
+        "minLon": bbox[0],
+        "minLat": bbox[1],
+        "maxLon": bbox[2],
+        "maxLat": bbox[3],
+    }
+
+    return (
+        f"{bbox_dict['minLon']},{bbox_dict['minLat']},{bbox_dict['maxLon']},{bbox_dict['maxLat']}"
+        if to_string else
+        bbox_dict
+    )
