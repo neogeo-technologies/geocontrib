@@ -3,6 +3,52 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.5.1] - 2025-11-12
+### Évolutions
+- **Ajout de la bbox dans les notifications par groupe d’utilisateurs** (Redmine 29841)
+  - Nouvelle fonction utilitaire `get_feature_bbox` pour calculer la bbox d’une feature
+  - Injection de la bbox dans le contenu des e-mails de notification pour permettre la construction de liens centrés sur la feature
+  - Formatage de la bbox sous forme de chaîne de caractères pour éviter les erreurs dans le template
+
+- **Optimisation du calcul de position des signalements** (Redmine 29016)
+  - Remplacement de la logique Python `list().index()` par une requête SQL avec `CTE` et `ROW_NUMBER()`
+  - Calcul direct en base, cohérent avec la pagination et les filtres
+  - Amélioration significative des performances sur grands jeux de données
+  - Alignement sur une indexation 0-based pour cohérence avec la pagination
+  - Compatibilité conservée avec `ordering`, `feature_type_slug`, `status`, `title`
+
+- **Configuration et anonymisation de Sentry** (Redmine 26581)
+  - Activation conditionnelle dans frontend uniquement si `SENTRY_DSN` ou `VUE_APP_SENTRY_DSN` est défini
+  - Ajout des intégrations Django, Celery, BrowserTracing et Replay
+  - Définition du release depuis la version du package pour alignement front/back
+  - Anonymisation des données sensibles (`password`, `token`, `email`, headers HTTP…)
+  - Ajustement dynamique du taux d’échantillonnage selon l’environnement (10 % dev/recette, 5 % prod)
+  - Désactivation du tracing et du profiling pour réduire la charge sur serveur
+
+- **Mise à jour d’OpenLayers vers la version 10**
+
+- **Harmoniser et simplifier l’affichage des dates** (Redmine 29989)
+  - Suppression de l'espace avant la virgule dans les derniers signalements de la page du projet
+  - Alignement de derniers signalements avec le même format de date que dans les derniers commentaires
+  - Refactorisation de la fonction de formatage `formatStringDate` pour afficher le format français et suppression de l'heure
+
+### Correctifs
+- **Loader bloqué à la navigation vers page type de signalement** (Redmine 29433)
+  - Déplacement des appels API de `created()` vers `mounted()` pour éviter l’annulation par `beforeDestroy`
+  - Gestion harmonisée des erreurs et requêtes annulées pour désactivation correcte du loader
+
+- **Restauration du créateur dans les derniers signalements** (Redmine 9432)
+  - Utilisation du champ `display_creator` à la place de `creator.full_name` ou `creator.username`
+
+- **Sécurisation de la vérification du créateur** (Redmine 29445)
+  - Vérification de nullité du champ `creator` pour éviter les `TypeError`
+  - Déplacement de la fonction `isFeatureCreator` dans `utils.js` pour réutilisation
+
+- **Correction des coordonnées de carte invalides** (Redmine 29576)
+  - Ignore le centre (0,0) pour éviter le recentrage incorrect
+  - Détection EPSG:4326 avant EPSG:3857 pour éviter les faux positifs
+  - Gestion fiabilisé de `defaultCenter`
+
 ## [6.5.0] - 2025-09-30
 
 ### Évolutions
