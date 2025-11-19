@@ -21,6 +21,7 @@ class Rank(Enum):
     SUPER_CONTRIBUTOR = 3
     MODERATOR = 4
     ADMIN = 5
+    READER = 6
 
 
 def validate_codename(value):
@@ -166,6 +167,7 @@ class Authorization(models.Model):
         3    SUPER-CONTRIBUTOR = 'super_contributor'
         4    MODERATOR = 'moderator'
         5    ADMIN = 'admin'
+        6    READER = 'reader'
         """
         user_perms = {
             'can_view_project': False,
@@ -195,6 +197,13 @@ class Authorization(models.Model):
 
             user_rank = cls.get_rank(user, project)
 
+            # Cas spécifique pour le lecteur (rank 6)
+            if user_rank == Rank.READER.value:
+                user_perms['can_view_project'] = True
+                user_perms['can_view_feature'] = True
+                user_perms['can_view_feature_type'] = True
+                user_perms['can_view_archived_feature'] = True
+                return user_perms
 
             if (user.is_authenticated and settings.ALLOW_LOGGED_USER_CREATE_FEATURE and user_rank == Rank.LOGGED_USER.value):
                 user_perms['can_create_feature'] = True

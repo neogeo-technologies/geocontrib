@@ -210,7 +210,9 @@ class Event(models.Model):
         event_initiator = self.user
         moderateur_rank = UserLevelPermission.objects.get(user_type_id=MODERATOR).rank
         moderators_emails = Authorization.objects.filter(
-            project=project, level__rank__gte=moderateur_rank
+            project=project,
+            level__rank__gte=moderateur_rank,
+            level__rank__lt=6  # Exclut le lecteur
         ).exclude(user=event_initiator).values_list('user__email', flat=True)
 
         context = {
