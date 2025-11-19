@@ -34,4 +34,10 @@
   "fields": {
     "rank": 5
   }
+}, {
+  "model": "geocontrib.userlevelpermission",
+  "pk": "reader",
+  "fields": {
+    "rank": 6
+  }
 }]
