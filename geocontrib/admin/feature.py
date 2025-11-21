@@ -454,9 +454,7 @@ class FeatureLinkAdmin(admin.ModelAdmin):
         if user.is_superuser:
             return qs
         moderation_projects_pk = Authorization.objects.filter(
-            user=user,
-            level__rank__gte=3,
-            level__rank__lt=6  # Exclut le lecteur
+            user=user, level__rank__gte=3
         ).values_list('project__pk', flat=True)
         return qs.filter(feature_to__project__in=moderation_projects_pk)
 

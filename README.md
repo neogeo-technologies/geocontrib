@@ -187,14 +187,13 @@ cp config_sample/celery.py config/celery.py
 Pour une installation en local, si on a besoin de faire des imports de signalements par exemple, il faut ouvrir un nouveau terminal, activer l'environnement virtuel et lancer la commande suvante.
 
 Lancer le worker celery:
-```shell
-celery -A config worker
-```
+
+    celery -A config worker
+
 Lancer le générateur d'évenements:
 
-```shell
-celery -A config beat
-```
+    celery -A config beat
+
 Dans `/admin/django_celery_beat/periodictask`, saisissez des tâches avec leur periodicité.
 
 ### Tâches périodiques depuis un cron

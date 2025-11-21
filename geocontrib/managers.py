@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q, When, Case, CharField, Value
 from django.apps import apps
-from geocontrib.choices import MODERATOR, SUPER_CONTRIBUTOR, READER
+from geocontrib.choices import MODERATOR, SUPER_CONTRIBUTOR
 
 
 class AvailableFeaturesManager(models.Manager):
@@ -22,7 +22,6 @@ class AvailableFeaturesManager(models.Manager):
         user_rank = Authorization.get_rank(user, project)
         project_arch_rank = project.access_level_arch_feature.rank
         project_pub_rank = project.access_level_pub_feature.rank
-        reader_rank = UserLevelPermission.objects.get(user_type_id=READER).rank
         moderateur_rank = UserLevelPermission.objects.get(user_type_id=MODERATOR).rank
         supercontributeur_rank = UserLevelPermission.objects.get(user_type_id=SUPER_CONTRIBUTOR).rank
 
@@ -75,14 +74,14 @@ class AvailableFeaturesManager(models.Manager):
                     ~Q(creator=user), status='published',
                 )
             return queryset
-        # 3 - si modérateur et utilisateur connecté ou anonyme
+        # 3 - si modérateur et utilsateur connecté ou anonyme
         else:
-            # hide draft of other user
+            # hide draft of other user user
             queryset = queryset.exclude(
                 ~Q(creator=user), status='draft',
             )
-            # hide pending of other user except for moderator
-            if project.moderation and (user_rank < moderateur_rank or user_rank == reader_rank):
+            # hide pending of other user except for moderateur
+            if project.moderation and (user_rank < moderateur_rank):
                 queryset = queryset.exclude(
                     ~Q(creator=user), 
                     status='pending',

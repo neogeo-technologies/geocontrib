@@ -176,9 +176,7 @@ class ProjectDuplicate(APIView):
             self._duplicate_project_thumbnail(instance, project_template)
             self._duplicate_project_related_sets(instance, project_template)
             self._duplicate_project_base_map(instance, project_template)
-            include_authorizations = request.query_params.get('include_authorizations', 'true').lower() != 'false'
-            if include_authorizations:
-                self._duplicate_project_authorization(instance, project_template)
+            self._duplicate_project_authorization(instance, project_template)
             serializer.save()
 
             data = serializer.data

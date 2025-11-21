@@ -26,7 +26,6 @@ TYPE_CHOICES = (
 
 ANONYMOUS = 'anonymous'
 LOGGED_USER = 'logged_user'
-READER = 'reader'
 CONTRIBUTOR = 'contributor'
 SUPER_CONTRIBUTOR = 'super_contributor'
 MODERATOR = 'moderator'
@@ -35,7 +34,6 @@ ADMIN = 'admin'
 LOWER_LEVELS = (
     (ANONYMOUS, 'Utilisateur anonyme'),
     (LOGGED_USER, 'Utilisateur connecté'),
-    (READER, 'Lecteur'),
     (CONTRIBUTOR, 'Contributeur'),
 )
 
