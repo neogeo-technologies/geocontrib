@@ -118,26 +118,55 @@ class ProjectsUserAccessLevelFilter(filters.BaseFilterBackend):
         return queryset
 
 class ProjectsUserAccessibleFilter(filters.BaseFilterBackend):
+    """
+    Filtre les projets accessible par l'utilisateur.
 
+    Ce filtre est activé uniquement lorsque le paramètre `accessible` est présent dans l'URL
+    (ex: `/api/projects/?accessible=true`). Dans ce cas, il limite les résultats aux projets :
+    - son rôle dans le projet
+    - le paramétrage de la visibilité des signalements publiés du projet
+
+    L'administrateur django (superuser) doit pouvoir visualiser tous les projets
+    """
     def filter_queryset(self, request, queryset, view):
         user_level_projects = Authorization.get_user_level_projects_ids(request.user)
-        if request.query_params.get('accessible'):
+        if request.query_params.get('accessible') and not request.user.is_superuser:
             for i, c in enumerate(queryset):
                 if (c.access_level_pub_feature.rank > user_level_projects[c.slug]):
                     queryset = queryset.exclude(slug=c.slug)
         return queryset
 
 class ProjectsUserAccountFilter(filters.BaseFilterBackend):
+    """
+    Filtre les projets dont l'utilisateur connecté est membre.
+
+    Ce filtre est activé uniquement lorsque le paramètre `myaccount` est présent dans l'URL
+    (ex: `/api/projects/?myaccount=true`). Dans ce cas, il limite les résultats aux projets :
+    - Où l'utilisateur a un rôle supérieur à **CONTRIBUTOR (rank=2)** (exclut donc le rôle **Utilisateur connecté (rank=1)**).
+    - Où l'utilisateur est le **créateur** (peu importe son rôle).
+    """
 
     def filter_queryset(self, request, queryset, view):
+        # Récupère la valeur du paramètre 'myaccount' dans l'URL (ex: ?myaccount=true)
         myaccount = request.query_params.get('myaccount', None)
         user = request.user
-        if myaccount and user and not user.is_anonymous :
-            project_authorized = Authorization.objects.filter(user=user
-            ).filter(
+
+        # Applique le filtre UNIQUEMENT si :
+        # 1. Le paramètre 'myaccount' est présent ET non vide,
+        # 2. L'utilisateur est authentifié (pas anonyme)
+        if myaccount and user and not user.is_anonymous:
+            # 1. Récupère les IDs des projets où l'utilisateur a un rôle supérieur ou égale à 2 (CONTRIBUTOR)
+            project_authorized = Authorization.objects.filter(
+                user=user,
                 level__rank__gte=2
-            ).values_list('project__pk', flat=True)
+            ).values_list('project__pk', flat=True)  # Retourne une liste d'IDs [1, 2, 3...]
+
+            # 2. Filtre le queryset pour ne garder que :
+            #    - Les projets où l'utilisateur est autorisé (liste ci-dessus),
+            #    - OU les projets dont il est le créateur (Q(pk__in=...) | Q(creator=user))
             queryset = queryset.filter(Q(pk__in=project_authorized) | Q(creator=user))
+
+        # Retourne le queryset (filtré ou non, selon les conditions)
         return queryset
 
 class ProjectsTypeFilter(filters.BaseFilterBackend):
