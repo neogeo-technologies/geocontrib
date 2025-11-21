@@ -82,6 +82,15 @@ class Project(models.Model):
     )
     attributes = models.ManyToManyField('ProjectAttribute', through='ProjectAttributeAssociation', verbose_name="Attributs")
 
+    notified_members_at = models.DateTimeField(null=True, blank=True)
+
+    notified_members_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="projects_notified"
+    )
+
     class Meta:
         verbose_name = "Projet"
         verbose_name_plural = "Projets"

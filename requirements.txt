@@ -9,8 +9,11 @@ djangorestframework-xml==2.0.0
 django-admin-list-filter-dropdown==1.0.3
 django-cas-ng==5.0.1
 django-celery-beat==2.7.0           # Garder la compatibilité avec Celery
+django-pyoidc==1.0.4
 drf-yasg==1.21.7
 ldap3==2.9.1
+Markdown==3.9
+mozilla-django-oidc==4.0.1
 Pillow==10.4.0
 psycopg2-binary==2.9.9              # Utiliser la version binaire pour éviter les problèmes sur Windows
 python-decouple==3.8
@@ -19,5 +22,3 @@ redis==5.0.8
 requests==2.32.3
 setuptools==73.0.1                  # Le module distutils n'est plus inclus par défaut dans Python 3.12 et fait partie de setuptools
 sentry-sdk>=2.0,<3.0
-mozilla-django-oidc==4.0.1
-django-pyoidc==1.0.4

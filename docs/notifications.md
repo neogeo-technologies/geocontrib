@@ -82,3 +82,12 @@ Notre système de notifications est conçu pour informer les utilisateurs des é
 - **Fonctionnement** : L'envoi de la notification est faite au niveau de pyoidc_backend
 
 - **Déclencheur** : Se produit lorsqu'un nouvel utilisateur est ajouté suite à une connexion via keycloak.
+
+
+# 8. Notifications de création de projet & abonnement 1-clic
+
+- **Objectif** : Informer automatiquement les membres d’un projet de sa création et leur permettre de s’abonner rapidement aux notifications du projet via un lien “M’abonner”.
+
+- **Fonctionnement** : L’action déclenchée par le bouton frontend poste vers l’API. La vue déclenche ensuite une tâche Celery pour envoyer les emails en arrière-plan, évitant de bloquer l’interface.
+
+- **Déclencheur** : Se produit lorsqu’un administrateur clique sur “Notifier les membres” dans la page des membres du projet. Peut-être lancé via la commande `python manage.py notify_project_creation_with_subscription`.

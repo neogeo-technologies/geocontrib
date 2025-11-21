@@ -4,12 +4,17 @@ import os
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.urls import reverse
+from django.utils.crypto import get_random_string
 from django.conf import settings
+from django.core import signing
 import pytest
 
+from geocontrib.models import Authorization
+from geocontrib.models import Subscription
 from geocontrib.models.project import Project
-from geocontrib.models.user import UserLevelPermission
 from geocontrib.models.user import User
+from geocontrib.models.user import UserLevelPermission
+from geocontrib.utils.tokens import generate_subscribe_token
 from conftest import verify_or_create_json
 
 @pytest.fixture
@@ -77,6 +82,8 @@ def test_projects_list(api_client):
             'nb_comments': 0,
             'nb_published_features_comments': 0,
             'nb_contributors': 1,
+            'notified_members_at': None,
+            'notified_members_by': None,
             'bbox': None,
             'project_attributes':[]
         }]
@@ -199,6 +206,8 @@ def test_projects_thumbnail(api_client):
         'slug': '1-projet-3',
         'title': 'Projet 3',
         'updated_on': '05/08/2021',
+        'notified_members_at': None,
+        'notified_members_by': None,
         'bbox': None,
         'project_attributes':[]
     }
@@ -483,3 +492,142 @@ def test_project_authorization(api_client):
     result = api_client.put(url, data, format='json')
     assert result.status_code == 403
     assert result.json() == {'detail': "Vous n'avez pas la permission d'effectuer cette action."}
+
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
+def test_notify_project_members_permission(api_client):
+    call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
+    anon_perm = UserLevelPermission.objects.get(pk="anonymous")
+    # Création des utilisateurs
+    admin = User.objects.create(username="ProjectAdministrator", password="password", is_active=True)
+    contributor = User.objects.create(username="Contributor", password="password", is_active=True)
+
+    # Création du projet
+    project = Project.objects.create(
+        title="notify-project-creation-with-subscription",
+        access_level_pub_feature=anon_perm,
+        access_level_arch_feature=anon_perm,
+        creator=admin
+    )
+
+    # Cas non autorisé
+    api_client.force_authenticate(user=contributor)
+    url = reverse('api:notify-project-creation-with-subscription', kwargs={'slug': project.slug})
+    response = api_client.post(url)
+    assert response.status_code == 403
+
+    # Cas autorisé
+    api_client.force_authenticate(user=admin)
+    response = api_client.post(url)
+    assert response.status_code == 200
+    assert response.json() == {"status": "notification_sent"}
+
+
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
+def test_project_subscribe_by_token(api_client):
+    call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
+    anon_perm = UserLevelPermission.objects.get(pk="anonymous")
+
+    # --- Setup : utilisateur et projet ---
+    user = User.objects.create(username="Member", password="password", is_active=True)
+    project = Project.objects.create(
+        title="Test Token Subscription",
+        access_level_pub_feature=anon_perm,
+        access_level_arch_feature=anon_perm,
+        creator=user,
+    )
+    url = reverse("api:project-subscribe-by-token")
+
+    # --- Cas 1 : Token valide, premier abonnement ---
+    payload = {"u": user.id, "p": project.id, "nonce": get_random_string(12)}
+    token = signing.dumps(payload, key=settings.SECRET_KEY)
+    response = api_client.post(url, {"token": token}, format="json")
+    assert response.status_code == 200
+    assert response.json()["detail"] == "Vous êtes abonné au projet \"Test Token Subscription\"."
+    assert Subscription.objects.filter(users=user, project=project).exists()
+
+    # --- Cas 2 : Token valide, utilisateur déjà abonné ---
+    response = api_client.post(url, {"token": token}, format="json")
+    assert response.status_code == 200
+    assert response.json()["detail"] == "Vous êtes déjà abonné au projet \"Test Token Subscription\"."
+
+    # --- Cas 3 : Token invalide (modifié) ---
+    bad_token = token[:-2] + "xx"
+    response = api_client.post(url, {"token": bad_token}, format="json")
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Lien non valide."
+
+    # --- Cas 4 : Utilisateur inexistant (token valide mais user_id invalide) ---
+    fake_user_token = signing.dumps(
+        {"u": 99999, "p": project.id, "nonce": get_random_string(12)},
+        key=settings.SECRET_KEY
+    )
+    response = api_client.post(url, {"token": fake_user_token}, format="json")
+    assert response.status_code == 404  # get_object_or_404 lève une 404
+
+    # --- Cas 5 : Projet inexistant (token valide mais project_id invalide) ---
+    fake_project_token = signing.dumps(
+        {"u": user.id, "p": 99999, "nonce": get_random_string(12)},
+        key=settings.SECRET_KEY
+    )
+    response = api_client.post(
+        reverse("api:project-subscribe-by-token"),
+        {"token": fake_project_token},
+        format="json"
+    )
+    assert response.status_code == 404  # get_object_or_404 lève une 404
+
+    # --- Cas 6a : Clé "token" manquante ---
+    response = api_client.post(url, {}, format="json")
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Le token est requis."
+
+    # --- Cas 6b : Clé "token" présente mais valeur vide ---
+    response = api_client.post(url, {"token": ""}, format="json")
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Lien non valide."
+
+
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
+def test_project_subscribe_by_token_permissions(api_client):
+    # Chargement des permissions
+    call_command("loaddata", "geocontrib/data/perm.json", verbosity=0)
+
+    perm_anonymous = UserLevelPermission.objects.get(pk="anonymous")          # rank 0
+    perm_logged = UserLevelPermission.objects.get(pk="logged_user")           # rank 1
+    perm_contributor = UserLevelPermission.objects.get(pk="contributor")      # rank 2
+
+    # --- Users ---
+    user = User.objects.create(username="Utilsateur", password="password", is_active=True)
+    admin = User.objects.create(username="admin", password="password", is_active=True)
+
+    # --- Projet ---
+    project = Project.objects.create(
+        title="Rank Test",
+        access_level_pub_feature=perm_anonymous,
+        access_level_arch_feature=perm_anonymous,
+        creator=admin,
+    )
+
+    url = reverse("api:project-subscribe-by-token")
+
+    # ---------------------------------------------------------
+    # Cas 1 : utilisateur non-membre (avec rank <= 1) → refusé
+    # ---------------------------------------------------------
+    payload_rank1 = {"u": user.id, "p": project.id, "nonce": get_random_string(12)}
+    token_rank1 = signing.dumps(payload_rank1, key=settings.SECRET_KEY)
+
+    response = api_client.post(url, {"token": token_rank1}, format="json")
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Cet utilisateur n'est plus membre du projet."
+
+    # ---------------------------------------------------------
+    # Cas 2 : membre du probjet (avec rank > 1) → OK
+    # ---------------------------------------------------------
+    Authorization.objects.filter(user=user, project=project).update(level=perm_contributor)  # rank = 2
+
+    payload_rank2 = {"u": user.id, "p": project.id, "nonce": get_random_string(12)}
+    token_rank2 = signing.dumps(payload_rank2, key=settings.SECRET_KEY)
+
+    response = api_client.post(url, {"token": token_rank2}, format="json")
+    assert response.status_code == 200
+    assert response.json()["detail"] == "Vous êtes abonné au projet \"Rank Test\"."

@@ -319,3 +319,45 @@ def notif_admin_user_created(user):
                 template='geocontrib/email/notif_account_created_admin.html'  # Template admin
             )
             email.send()
+
+def notify_project_creation_with_subscription(member, project, subscribe_url, project_url):
+    """
+    Send an email to a project member notifying the creation of a project
+    and providing a link to subscribe in 1 click.
+    
+    :param member: User instance to notify
+    :param project: Project instance
+    :param subscribe_url: URL with signed token for subscription
+    :param project_url: URL to view the project
+    """
+    logo_url = settings.LOGO_PATH  # tester si c’est une URL absolue
+    has_logo = logo_url.startswith("http://") or logo_url.startswith("https://")
+    
+    context_dict = {
+        'application_name': settings.APPLICATION_NAME,
+        'logo_url': logo_url if has_logo else None,
+        'theme_color': PRIMARY_COLOR,
+        'user': member,
+        'project': project,
+        'subscribe_url': subscribe_url,
+        'project_url': project_url
+    }
+
+    try:
+        notification_model = NotificationModel.objects.get(template_name="Nouveau projet créé - notification aux membres avec lien d'abonnement")
+        data = Context(context_dict)
+        subject = Template(notification_model.subject).render(data)
+        message = Template(notification_model.message).render(data)
+        context_dict['message'] = message
+    except ObjectDoesNotExist:
+        subject = f"[{ settings.APPLICATION_NAME }] Nouveau projet disponible : {project.title}"
+
+    context_dict['subject'] = subject
+
+    email = EmailBaseBuilder(
+        context=context_dict,
+        bcc=[member.email],
+        subject=subject,
+        template='geocontrib/email/notify_project_creation_with_subscription.html'  # template à créer
+    )
+    email.send()

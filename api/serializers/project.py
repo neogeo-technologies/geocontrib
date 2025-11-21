@@ -131,9 +131,10 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
     and its related data, such as attributes, features, comments, and contributors.
     """
 
-    # Formats 'created_on' and 'updated_on' fields to a specific date format.
+    # Formats fields to a specific date format.
     created_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
     updated_on = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
+    notified_members_at = serializers.DateTimeField(format="%d/%m/%Y", read_only=True)
 
     # SerializerMethodField is used to define fields that are computed through methods below.
     nb_features = serializers.SerializerMethodField()
@@ -143,6 +144,7 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
     nb_contributors = serializers.SerializerMethodField()
     thumbnail = serializers.SerializerMethodField()
     bbox = serializers.SerializerMethodField()
+    notified_members_by = serializers.SerializerMethodField()
 
     # Represents values of certain fields using Django's get_FOO_display method.
     access_level_pub_feature = serializers.ReadOnlyField(source='access_level_pub_feature.get_user_type_id_display')
@@ -192,6 +194,11 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
         else:
             return static('geocontrib/img/default.png')
 
+    def get_notified_members_by(self, obj):
+        if obj.notified_members_by:
+            return str(obj.notified_members_by)  # Appelle la méthode __str__ de l'utilisateur
+        return None
+
     class Meta:
         model = Project
         fields = (
@@ -217,6 +224,8 @@ class ProjectDetailedSerializer(serializers.ModelSerializer):
             'nb_contributors',
             'feature_browsing_default_filter',
             'feature_browsing_default_sort',
+            'notified_members_at',
+            'notified_members_by',
             'bbox',
             'project_attributes'
         )

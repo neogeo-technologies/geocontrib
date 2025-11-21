@@ -1,0 +1,11 @@
+[
+  {
+    "model": "geocontrib.notificationmodel",
+    "pk": 8,
+    "fields": {
+      "template_name": "Nouveau projet créé - notification aux membres avec lien d'abonnement",
+      "subject": "[{{ application_name }}] Nouveau projet disponible : {{ project.title }}",
+      "message": "<!-- Header / Logo -->\n<tr>\n  <td style=\"padding: 20px 40px; text-align: center;\">\n    {% if logo_url %}\n    <img src=\"{{ logo_url }}\" alt=\"{{ application_name }}\" style=\"max-height: 60px; margin-bottom: 10px;\">\n    {% endif %}\n    <h1 style=\"color: {{ theme_color }}; margin: 0 0 12px 0;\">Nouveau projet créé : {{ project.title|title }}</h1>\n    <p style=\"font-size: 1em; color: #555; margin: 0 0 12px 0;\">\n      {{ project.description|markdown_to_html|safe }}\n    </p>\n  </td>\n</tr>\n<!-- Message principal -->\n<tr>\n  <td style=\"padding: 0 40px 20px 40px; text-align: center;\">\n    <p style=\"font-size: 1.15em; color: #333; margin: 0;\">\n      Le projet <b>{{ project.title|title }}</b> a été créé et vous pouvez désormais y accéder et vous y abonner.\n    </p>\n  </td>\n</tr>\n<!-- CTA buttons -->\n<tr>\n  <td style=\"padding: 20px 40px; text-align: center;\">\n    <a href=\"{{ project_url }}\" style=\"display: inline-block; margin: 5px; padding: 12px 24px; background: {{ theme_color }}; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;\">👁️ Voir le projet</a>\n    <a href=\"{{ subscribe_url }}\" style=\"display: inline-block; margin: 5px; padding: 12px 24px; background: {{ theme_color }}; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;\">🔔 M’abonner</a>\n  </td>\n</tr>\n<!-- Footer / info -->\n<tr>\n  <td style=\"padding: 30px 40px 20px 40px;\">\n    <hr style=\"border:0;height:1px;background:#eee;margin:0 0 22px 0\">\n    <p style=\"font-size: 0.95em; color: #777; text-align: center; font-style: italic;\">\n      Vous recevez ce message car vous êtes membre du projet <b>{{ project.title|title }}</b>.\n    </p>\n  </td>\n</tr>"
+    }
+  }
+]
