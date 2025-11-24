@@ -463,17 +463,23 @@ class ProjectSubscribeByToken(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user = get_object_or_404(User, pk=data["u"])
-        project = get_object_or_404(Project, pk=data["p"])
+        # Vérifie si l'utilisateur existe
+        user = User.objects.filter(pk=data["u"]).first()
+        if not user:
+            return Response(
+                {"detail": "Votre compte n'existe pas ou a été supprimé."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        # Vérifier que le projet existe
+        # Vérifie si le projet existe
+        project = get_object_or_404(Project, pk=data["p"])
         if not project:
             return Response(
                 {"detail": "Le projet a été supprimé."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Vérifier que l'utilisateur est membre du projet
+        # Vérifie que l'utilisateur est membre du projet
         authorization = Authorization.objects.filter(
             project=project,
             user=user,
@@ -482,7 +488,7 @@ class ProjectSubscribeByToken(APIView):
 
         if not authorization:
             return Response(
-                {"detail": "Cet utilisateur n'est plus membre du projet."},
+                {"detail": f"{user.get_full_name() or user.username}, vous n'êtes plus membre de ce projet."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -490,16 +496,18 @@ class ProjectSubscribeByToken(APIView):
         subscription, created = Subscription.objects.get_or_create(project=project)
         # Construit l'URL du projet
         project_url = build_absolute_url(f"projet/{project.slug}")
+
         # Vérifie si l'utilisateur est déjà abonné
         if subscription.users.filter(pk=user.pk).exists():
             return Response({
-                "detail": f"Vous êtes déjà abonné au projet \"{project.title}\".",
+                "detail": f"{user.get_full_name() or user.username}, vous êtes déjà abonné·e au projet \"{project.title}\".",
                 "project_url": project_url,
             })
+
         # Ajoute l'utilisateur à la relation ManyToMany
         subscription.users.add(user)
         return Response({
-            "detail": f"Vous êtes abonné au projet \"{project.title}\".",
+            "detail": f"{user.get_full_name() or user.username}, vous êtes maintenant abonné·e au projet \"{project.title}\".",
             "project_url": project_url,
         })
 
