@@ -542,13 +542,13 @@ def test_project_subscribe_by_token(api_client):
     token = signing.dumps(payload, key=settings.SECRET_KEY)
     response = api_client.post(url, {"token": token}, format="json")
     assert response.status_code == 200
-    assert response.json()["detail"] == "Vous êtes abonné au projet \"Test Token Subscription\"."
+    assert response.json()["detail"] == "Member, vous êtes maintenant abonné·e au projet \"Test Token Subscription\"."
     assert Subscription.objects.filter(users=user, project=project).exists()
 
     # --- Cas 2 : Token valide, utilisateur déjà abonné ---
     response = api_client.post(url, {"token": token}, format="json")
     assert response.status_code == 200
-    assert response.json()["detail"] == "Vous êtes déjà abonné au projet \"Test Token Subscription\"."
+    assert response.json()["detail"] == "Member, vous êtes déjà abonné·e au projet \"Test Token Subscription\"."
 
     # --- Cas 3 : Token invalide (modifié) ---
     bad_token = token[:-2] + "xx"
@@ -562,7 +562,7 @@ def test_project_subscribe_by_token(api_client):
         key=settings.SECRET_KEY
     )
     response = api_client.post(url, {"token": fake_user_token}, format="json")
-    assert response.status_code == 404  # get_object_or_404 lève une 404
+    assert response.status_code == 400  # get_object_or_404 lève une 404
 
     # --- Cas 5 : Projet inexistant (token valide mais project_id invalide) ---
     fake_project_token = signing.dumps(
@@ -597,7 +597,7 @@ def test_project_subscribe_by_token_permissions(api_client):
     perm_contributor = UserLevelPermission.objects.get(pk="contributor")      # rank 2
 
     # --- Users ---
-    user = User.objects.create(username="Utilsateur", password="password", is_active=True)
+    user = User.objects.create(username="Utilisateur", password="password", is_active=True)
     admin = User.objects.create(username="admin", password="password", is_active=True)
 
     # --- Projet ---
@@ -618,7 +618,7 @@ def test_project_subscribe_by_token_permissions(api_client):
 
     response = api_client.post(url, {"token": token_rank1}, format="json")
     assert response.status_code == 403
-    assert response.json()["detail"] == "Cet utilisateur n'est plus membre du projet."
+    assert response.json()["detail"] == "Utilisateur, vous n'êtes plus membre de ce projet."
 
     # ---------------------------------------------------------
     # Cas 2 : membre du probjet (avec rank > 1) → OK
@@ -630,4 +630,4 @@ def test_project_subscribe_by_token_permissions(api_client):
 
     response = api_client.post(url, {"token": token_rank2}, format="json")
     assert response.status_code == 200
-    assert response.json()["detail"] == "Vous êtes abonné au projet \"Rank Test\"."
+    assert response.json()["detail"] == "Utilisateur, vous êtes maintenant abonné·e au projet \"Rank Test\"."
