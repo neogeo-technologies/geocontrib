@@ -3,124 +3,83 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [6.5.2-beta] - 2025-11-25
 
 ### Évolutions
-- **Notification et lien d’abonnement à un nouveau projet** (Redmine 29778)
-  - Permettre aux administrateurs de projet de notifier les membres par email.
-  - Permettre aux utilisateurs de s’abonner automatiquement via un lien sécurisé reçu par mail.
+- **Notifications** – Notification des membres par email par les administrateurs et abonnement automatique via un lien sécurisé  (Redmine 29778)
+- **Permissions** – Ajout du rôle "Lecteur" et choix d’héritage des membres lors de la duplication d’un projet (Redmine 29777)
+
+### Migrations  
+- Création du template de mail "Notification à un groupe" (Redmine 29778).
+- Ajout des champs `notified_members_at` et `notified_members_by` au modèle Project (Redmine 29778).
+- Mise à jour du schéma pour le rôle "Lecteur" (niveau 6) (Redmine 29777).
+
 
 ## [6.5.1] - 2025-11-14
 
 ### Évolutions
-- **Ajout de la bbox dans les notifications par groupe d’utilisateurs** (Redmine 29841)
-  - Nouvelle fonction utilitaire `get_feature_bbox` pour calculer la bbox d’une feature
-  - Injection de la bbox dans le contenu des e-mails de notification pour permettre la construction de liens centrés sur la feature
-  - Formatage de la bbox sous forme de chaîne de caractères pour éviter les erreurs dans le template
+- **Notifications** - Ajout de la bbox dans les notifications par groupe d’utilisateurs (Redmine 29841)
+- **Performance** - Optimisation du calcul de position des signalements (Redmine 29016)
+- **Surveillance** - Configuration Sentry optionnel dans frontend, intégration et anonymisation (Redmine 26581)
+- **Interface** - Harmoniser et simplifier l’affichage des dates en utilisant le format français (Redmine 29989)
 
-- **Optimisation du calcul de position des signalements** (Redmine 29016)
-  - Remplacement de la logique Python `list().index()` par une requête SQL avec `CTE` et `ROW_NUMBER()`
-  - Calcul direct en base, cohérent avec la pagination et les filtres
-  - Amélioration significative des performances sur grands jeux de données
-  - Alignement sur une indexation 0-based pour cohérence avec la pagination
-  - Compatibilité conservée avec `ordering`, `feature_type_slug`, `status`, `title`
-
-- **Configuration et anonymisation de Sentry** (Redmine 26581)
-  - Activation conditionnelle dans frontend uniquement si `SENTRY_DSN` ou `VUE_APP_SENTRY_DSN` est défini
-  - Ajout des intégrations Django, Celery, BrowserTracing et Replay
-  - Définition du release depuis la version du package pour alignement front/back
-  - Anonymisation des données sensibles (`password`, `token`, `email`, headers HTTP…)
-  - Ajustement dynamique du taux d’échantillonnage selon l’environnement (10 % dev/recette, 5 % prod)
-  - Désactivation du tracing et du profiling pour réduire la charge sur serveur
-
-- **Mise à jour d’OpenLayers vers la version 10**
-
-- **Harmoniser et simplifier l’affichage des dates** (Redmine 29989)
-  - Suppression de l'espace avant la virgule dans les derniers signalements de la page du projet
-  - Alignement de derniers signalements avec le même format de date que dans les derniers commentaires
-  - Refactorisation de la fonction de formatage `formatStringDate` pour afficher le format français et suppression de l'heure
+### Mises à jour
+- **Dépendances** - Mise à jour d’OpenLayers vers la version 10
 
 ### Correctifs
-- **Loader bloqué à la navigation vers page type de signalement** (Redmine 29433)
-  - Déplacement des appels API de `created()` vers `mounted()` pour éviter l’annulation par `beforeDestroy`
-  - Gestion harmonisée des erreurs et requêtes annulées pour désactivation correcte du loader
-
-- **Restauration du créateur dans les derniers signalements** (Redmine 29432)
-  - Utilisation du champ `display_creator` à la place de `creator.full_name` ou `creator.username`
-
-- **Sécurisation de la vérification du créateur** (Redmine 29445)
-  - Vérification de nullité du champ `creator` pour éviter les `TypeError`
-  - Déplacement de la fonction `isFeatureCreator` dans `utils.js` pour réutilisation
-
-- **Correction des coordonnées de carte invalides** (Redmine 29576)
-  - Ignore le centre (0,0) pour éviter le recentrage incorrect
-  - Détection EPSG:4326 avant EPSG:3857 pour éviter les faux positifs
-  - Gestion fiabilisé de `defaultCenter`
+- **Interface** – Correction du loader bloquant lors de la navigation vers la page "Type de signalement" (Redmine 29433)
+- **Interface** – Restauration de l’affichage du créateur dans les derniers signalements (Redmine 29432)
+- **Interface** – Correction de l’affichage du formulaire d’édition lorsque le créateur du signalement n’existe plus (Redmine 29445)
+- **Interface** - Correction des coordonnées de carte invalides (Redmine 29576)
 
 ## [6.5.0] - 2025-09-30
 
 ### Évolutions
-- **Intégration Sentry** (Redmine 26581)  
-  Nouvelle intégration Sentry pour le suivi des erreurs et des performances :  
-  - Activation uniquement si `SENTRY_DSN` est défini  
-  - Nouvelle variable `ENV_MODE` (`dev`, `recette`, `prod`) pour ajuster le sampling  
-  - Configuration du logging adaptée pour éviter les doublons et n’envoyer que les erreurs  
-
-- **Authentification et SSO Keycloak** (Redmine 26839, 27386, 27383, 27381, 27242)  
-  - Nouveau mode de connexion via Keycloak (SSO OIDC)  
-  - Gestion des comptes administrateurs via groupes Keycloak (`SSO_ADMIN_USER_GROUPS`)  
-  - Ajout d’un système de notifications à la création d’utilisateurs via Keycloak  
-  - Prise en compte des groupes Keycloak lors de l’authentification  
-
-- **Notifications aux groupes d’utilisateurs** (Redmine 26377)  
-  Mise en place d’un système de notifications par groupes d’utilisateurs :  
-  - Nouveau modèle `UsersGroup` et gestion des appartenances via `UserGroupMembership`  
-  - Possibilité de sélectionner un groupe notifié lors de la création d’un signalement  
-  - Nouveau modèle de mail "Notification à un groupe", configurable dans l’admin Django  
-  - Introduction d’un groupe spécial `all`, permettant à certains utilisateurs (ex. référents) de recevoir systématiquement toutes les notifications
-
-- **Amélioration de la recherche textuelle dans les listes de valeurs** (Redmine 27831)  
-  - Priorité aux correspondances commençant par le terme recherché  
-  - Recherche insensible aux accents et aux tirets  
-  - Correction de l'affichage limité à 10 résultats (ex. "Rennes" n'apparaissant jamais)  
-  - Réponse API désormais paginée avec métadonnées (`results`, `total`, `limit`, `offset`)  
-
-- **Permettre l'édition et suppresion de géométries multiples** (Redmine 28563)  
-  - Affichage des boutons édition et suppression sur la page liste & carte même si uniquement géométrie multiple
-  - Ajout de transition à l'apparition de bouton pour rendre le fonctionnement plus intuitif
-
-- Fixer automatiquement le statut du signalement en “publié” lors de la création (Redmine 27352)  
-- Vérification supplémentaire lors de la création d’un compte utilisateur (Redmine 25582)  
+- **Surveillance** – Activation conditionnelle de Sentry via `SENTRY_DSN` et ajustement du sampling via `ENV_MODE` (Redmine 26581)  
+- **Authentification** – Ajout du SSO OIDC via Keycloak, gestion des rôles administrateurs par groupes (`SSO_ADMIN_USER_GROUPS`), et notifications automatiques à la création de comptes (Redmine 26839, 27386, 27383, 27381, 27242)  
+- **Notifications** – Ajout de la possibilité de notifier des groupes d’utilisateurs lors de la création d’un signalement, avec un modèle d’email personnalisable depuis l’interface d’administration (Redmine 26377)  
+- **Recherche** – Amélioration de la recherche textuelle avec priorité aux correspondances exactes, insensibilité aux accents/tirets, et pagination des résultats API (`results`, `total`, `limit`, `offset`) (Redmine 27831)  
+- **Signalements** - Permettre l'édition et suppresion de géométries multiples (Redmine 28563)  
+- **Signalements** – Fixation automatique du statut "publié" lors de la création d’un signalement (Redmine 27352)  
+- **Authentification** – Ajout d’une vérification supplémentaire lors de la création d’un compte utilisateur  (Redmine 25582)  
 
 ### Correctifs
-- **Génération des vues SQL** (Redmine 27462, 23375)  
-  Amélioration de la robustesse de la commande de génération des vues SQL, pour corriger des cas problématiques rencontrés en production :  
-  - Détection explicite des modes invalides/ambigus  
-  - Inclusion automatique des `feature_data` même sans champ défini  
-  - Gestion des suppressions en cascade, entités orphelines et conflits de noms de `CustomFields`  
-  - Ajout du paramètre `--force_project_view_with_aliases`  
-
-- Connexion CAS IDGO – erreur 404 corrigée (Redmine 26721)  
-- Liste signalements – incohérences dans la recherche par titre (Redmine 26138)  
-- Pagination – doublon du premier et dernier numéro sur 5 pages (Redmine 26632)  
-- Sécurisation : un utilisateur ne peut plus voir les signalements qui ne lui appartiennent pas (Redmine 27230)  
+- **Génération des vues SQL** - Amélioration de la robustesse pour corriger des cas particuliers (Redmine 27462, 23375)  
+- **Connexion CAS IDGO** – erreur 404 corrigée (Redmine 26721)  
+- **Liste signalements** – incohérences dans la recherche par titre (Redmine 26138)  
+- **Pagination** – doublon du premier et dernier numéro sur 5 pages (Redmine 26632)  
+- **Sécurisation** : un utilisateur ne peut plus voir les signalements qui ne lui appartiennent pas (Redmine 27230)  
 
 ### Breaking changes
-- L’API `/prerecorded-list-values/<name>/` ne renvoie plus une liste brute mais un objet structuré avec `results`, `total`, `limit`, `offset`  
-- Suppression de la variable d’environnement `SSO_ADMIN_USERS`, remplacée par `SSO_ADMIN_USER_GROUPS`  
-- Plusieurs migrations doivent être appliquées, notamment :  
-  - activation automatique de l’extension PostgreSQL `unaccent`  
-  - création des modèles `UsersGroup`, `UserGroupMembership` et du modèle de mail "Notification à un groupe"  
-  - ajout du modèle de template pour les notifications à la création d’utilisateur via Keycloak
+- **API**:  `/prerecorded-list-values/<name>/` renvoie désormais un objet structuré (`results`, `total`, `limit`, `offset`) au lieu d'une liste brute.  
+- **Variables d’environnement** : Suppression de `SSO_ADMIN_USERS`, remplacée par `SSO_ADMIN_USER_GROUPS`  
+
+### Migrations
+- Activation automatique de l’extension PostgreSQL `unaccent`.  
+- Création des modèles `UsersGroup`, `UserGroupMembership` et du modèle de mail "Notification à un groupe".  
+- Ajout du template de notification pour la création d’utilisateur via Keycloak.  
 
 ### Variables d'environnement
-- `SENTRY_DSN` : DSN Sentry, activation seulement si défini  
-- `ENV_MODE` : mode d’exécution (`dev`, `recette`, `prod`), par défaut `recette`  
-- `SSO_ADMIN_USER_GROUPS` : groupes Keycloak recevant les droits administrateur  
-- Variables LDAP/Keycloak : `LDAP_SERVER_URI`, `LDAP_BASE_DN`, `LDAP_BIND_DN_TEMPLATE`,  
-  `SSO_KEYCLOAK_URL`, `SSO_KEYCLOAK_DISCOVERY_ENDPOINT`, `SSO_KEYCLOAK_CLIENT_ID`,  
-  `SSO_KEYCLOAK_CLIENT_SECRET`, `SSO_CALLBACK_PATH`, `SSO_POST_LOGOUT_REDIRECT_URI`, `LOGOUT_URL`  
-- Autres : `FEATURE_CREATION_REDIRECT_URL`, `EXTERNAL_HOME_LINK`, `HIDE_MENU_NON_ADMIN`
+- **Sentry**:  
+  - `SENTRY_DSN` : DSN Sentry (activation conditionnelle si défini).  
+  - `ENV_MODE` : mode d’exécution (`dev`, `recette`, `prod`), par défaut `recette`  
+- **Authentification** (SSO/Keycloak/LDAP) :
+  - `SSO_ADMIN_USER_GROUPS` : Groupes Keycloak recevant les droits administrateur.
+  - `SSO_KEYCLOAK_URL` : URL de l’instance Keycloak.
+  - `SSO_KEYCLOAK_DISCOVERY_ENDPOINT` : Endpoint de découverte Keycloak.
+  - `SSO_KEYCLOAK_CLIENT_ID` : Identifiant client Keycloak.
+  - `SSO_KEYCLOAK_CLIENT_SECRET` : Secret client Keycloak.
+  - `SSO_CALLBACK_PATH` : Chemin de callback pour le SSO.
+  - `SSO_POST_LOGOUT_REDIRECT_URI` : URI de redirection après déconnexion.
+  - `LOGOUT_URL` : URL de déconnexion.
+  - `LDAP_SERVER_URI` : URI du serveur LDAP.
+  - `LDAP_BASE_DN` : Base DN pour les requêtes LDAP.
+  - `LDAP_BIND_DN_TEMPLATE` : Modèle de DN pour la liaison LDAP.
+
+- **Interface** : 
+  - `FEATURE_CREATION_REDIRECT_URL` : URL de redirection après création.
+  - `EXTERNAL_HOME_LINK` : Lien personnalisé pour la page d’accueil.
+  - `HIDE_MENU_NON_ADMIN` : Masquer le menu pour les non-administrateurs.
 
 ## [6.4.4] - 2025-02-04
 
