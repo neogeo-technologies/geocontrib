@@ -3,11 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [6.5.2-beta] - 2025-11-25
+## [6.5.2] - 2025-12-15
 
 ### Évolutions
 - **Notifications** – Notification des membres par email par les administrateurs et abonnement automatique via un lien sécurisé  (Redmine 29778)
 - **Permissions** – Ajout du rôle "Lecteur" et choix d’héritage des membres lors de la duplication d’un projet (Redmine 29777)
+- **Interface** - Mise à jour du header geOrchestra (contribution externe)
 
 ### Migrations  
 - Création du template de mail "Notification à un groupe" (Redmine 29778).
